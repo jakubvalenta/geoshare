@@ -62,6 +62,7 @@ import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingOffers
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
+import page.ooooo.geoshare.lib.billing.CustomLinkFeature
 import page.ooooo.geoshare.lib.billing.FakeOneTimeOffer
 import page.ooooo.geoshare.lib.billing.FakeSubscriptionOffer
 import page.ooooo.geoshare.lib.billing.Feature
@@ -269,7 +270,7 @@ private fun BillingMainPane(
             )
         } else {
             Card(
-                Modifier.padding(top = spacing.largeAdaptive),
+                Modifier.padding(top = spacing.small),
                 shape = MaterialShapes.Sunny.toShape(),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -291,11 +292,11 @@ private fun BillingMainPane(
                         R.string.billing_intro_not_purchased
                     }
                 ),
-                Modifier.padding(top = spacing.mediumAdaptive),
+                Modifier.padding(top = spacing.smallAdaptive),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyLarge,
             )
-            MainHeadline(billingAppNameResId, Modifier.padding(top = spacing.smallAdaptive), iconEnabled = false)
+            MainHeadline(billingAppNameResId, Modifier.padding(top = spacing.tinyAdaptive), iconEnabled = false)
             CompositionLocalProvider(
                 LocalTextStyle provides MaterialTheme.typography.bodyMedium.copy(
                     lineBreak = LineBreak.Paragraph,
@@ -307,14 +308,13 @@ private fun BillingMainPane(
                         .fillMaxWidth()
                         .padding(
                             start = spacing.small,
-                            top = spacing.largeAdaptive,
+                            top = spacing.smallAdaptive,
                             end = spacing.medium,
                         ),
                     bulletSpace = spacing.tiny,
                     bulletWidth = 44.dp,
                 ) {
                     TextListItem(
-                        Modifier.padding(bottom = spacing.smallAdaptive),
                         bullet = {
                             Icon(
                                 imageVector = Icons.Default.Done,
@@ -331,7 +331,7 @@ private fun BillingMainPane(
                     }
                     billingFeatures.forEach { feature ->
                         TextListItem(
-                            Modifier.padding(bottom = spacing.smallAdaptive),
+                            Modifier.padding(vertical = spacing.tinyAdaptive),
                             bullet = {
                                 Icon(
                                     imageVector = Icons.Default.Done,
@@ -346,7 +346,7 @@ private fun BillingMainPane(
                                 style = MaterialTheme.typography.bodyLarge,
                             )
                         }
-                        TextListItem(Modifier.padding(bottom = spacing.smallAdaptive)) {
+                        TextListItem(Modifier.padding(bottom = spacing.tinyAdaptive)) {
                             Text(stringResource(feature.descriptionResId))
                         }
                         feature.itemsResIds.forEach { itemResId ->
@@ -567,7 +567,7 @@ private fun DefaultPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
@@ -587,7 +587,7 @@ private fun DarkPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
@@ -607,7 +607,7 @@ private fun TabletPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
@@ -627,7 +627,7 @@ private fun PendingPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
@@ -647,7 +647,7 @@ private fun DarkPendingPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
@@ -667,7 +667,7 @@ private fun TabletPendingPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
@@ -687,7 +687,7 @@ private fun PurchasedDonationPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
@@ -711,7 +711,7 @@ private fun DarkPurchasedDonationPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
@@ -735,7 +735,7 @@ private fun TabletPurchasedDonationPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
@@ -759,7 +759,7 @@ private fun PurchasedOneTimePreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
@@ -783,7 +783,7 @@ private fun DarkPurchasedOneTimePreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
@@ -807,7 +807,7 @@ private fun TabletPurchasedOneTimePreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
@@ -831,7 +831,7 @@ private fun PurchasedOneTimeNotRefundablePreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
@@ -855,7 +855,7 @@ private fun DarkPurchasedOneTimeNotRefundablePreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
@@ -879,7 +879,7 @@ private fun TabletPurchasedOneTimeNotRefundablePreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
@@ -903,7 +903,7 @@ private fun PurchasedSubscriptionPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
@@ -927,7 +927,7 @@ private fun DarkPurchasedSubscriptionPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
@@ -951,7 +951,7 @@ private fun TabletPurchasedSubscriptionPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
@@ -975,7 +975,7 @@ private fun PurchasedSubscriptionExpiredPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
@@ -999,7 +999,7 @@ private fun DarkPurchasedSubscriptionExpiredPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
@@ -1023,7 +1023,7 @@ private fun TabletPurchasedSubscriptionExpiredPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
@@ -1047,7 +1047,7 @@ private fun EmptyPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf()),
             billingRefundableDuration = 48.hours,
@@ -1067,7 +1067,7 @@ private fun DarkEmptyPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf()),
             billingRefundableDuration = 48.hours,
@@ -1087,7 +1087,7 @@ private fun TabletEmptyPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf()),
             billingRefundableDuration = 48.hours,
@@ -1107,7 +1107,7 @@ private fun LoadingPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Loading(),
             billingRefundableDuration = 48.hours,
@@ -1127,7 +1127,7 @@ private fun DarkLoadingPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Loading(),
             billingRefundableDuration = 48.hours,
@@ -1147,7 +1147,7 @@ private fun TabletLoadingPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Loading(),
             billingRefundableDuration = 48.hours,
@@ -1167,7 +1167,7 @@ private fun LoadingOffersPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Loading(),
             billingRefundableDuration = 48.hours,
@@ -1187,7 +1187,7 @@ private fun DarkLoadingOffersPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Loading(),
             billingRefundableDuration = 48.hours,
@@ -1207,7 +1207,7 @@ private fun TabletLoadingOffersPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingFeatures = listOf(AutomationFeature),
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
             billingOffers = BillingOffers.Loading(),
             billingRefundableDuration = 48.hours,

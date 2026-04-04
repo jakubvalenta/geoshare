@@ -3,6 +3,7 @@ package page.ooooo.geoshare.ui
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -52,9 +53,17 @@ import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.database.LinkType
 import page.ooooo.geoshare.lib.Message
+import page.ooooo.geoshare.lib.billing.AutomationFeature
+import page.ooooo.geoshare.lib.billing.BillingProduct
+import page.ooooo.geoshare.lib.billing.BillingStatus
+import page.ooooo.geoshare.lib.billing.CustomLinkFeature
+import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.point.Srs
 import page.ooooo.geoshare.ui.components.BasicListDetailScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
+import page.ooooo.geoshare.ui.components.FeatureWall
+import page.ooooo.geoshare.ui.components.FeatureBadgeSmall
+import page.ooooo.geoshare.ui.components.FeatureBadged
 import page.ooooo.geoshare.ui.components.LinkForm
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
@@ -68,15 +77,23 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @Composable
 fun LinksScreen(
     onBack: () -> Unit,
+    onNavigateToBillingScreen: () -> Unit,
+    billingViewModel: BillingViewModel = hiltViewModel(),
     viewModel: LinkViewModel = hiltViewModel(),
 ) {
     val coroutineScope = rememberCoroutineScope()
     val resources = LocalResources.current
+    val billingAppNameResId = billingViewModel.billingAppNameResId
+    val billingFeatures = billingViewModel.billingFeatures
+    val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
     val links by viewModel.all.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
 
     LinksScreen(
         destination = viewModel.destination,
+        billingAppNameResId = billingAppNameResId,
+        billingFeatures = billingFeatures,
+        billingStatus = billingStatus,
         links = links,
         message = message,
         onBack = onBack,
@@ -89,6 +106,7 @@ fun LinksScreen(
                 viewModel.navigateTo(it)
             }
         },
+        onNavigateToBillingScreen = onNavigateToBillingScreen,
         onRestoreInitialData = { viewModel.restoreInitialData(resources) },
         onSaveForm = { viewModel.saveForm(resources) },
         appEnabled = viewModel.appEnabled,
@@ -117,6 +135,9 @@ fun LinksScreen(
 @Composable
 private fun LinksScreen(
     destination: Int?,
+    billingAppNameResId: Int,
+    billingFeatures: List<Feature>,
+    billingStatus: BillingStatus,
     links: List<Link>,
     message: Message?,
     appEnabled: Boolean,
@@ -135,6 +156,7 @@ private fun LinksScreen(
     onEnable: (uid: Int) -> Unit,
     onSaveForm: () -> Unit,
     onNavigateTo: (Int?) -> Unit,
+    onNavigateToBillingScreen: () -> Unit,
     onRestoreInitialData: () -> Unit,
     onSetAppEnabled: (Boolean) -> Unit,
     onSetChipEnabled: (Boolean) -> Unit,
@@ -200,6 +222,8 @@ private fun LinksScreen(
                 // fields get briefly rendered with empty values when switching from detail to list.
                 LinksListPane(
                     destination = destination,
+                    billingFeatures = billingFeatures,
+                    billingStatus = billingStatus,
                     links = links,
                     onBack = onBack,
                     onDisable = onDisable,
@@ -216,6 +240,9 @@ private fun LinksScreen(
                         destination = destination,
                         wide = wide,
                         appEnabled = appEnabled,
+                        billingAppNameResId = billingAppNameResId,
+                        billingFeatures = billingFeatures,
+                        billingStatus = billingStatus,
                         chipEnabled = chipEnabled,
                         coordsUriTemplate = coordsUriTemplate,
                         group = group,
@@ -226,6 +253,7 @@ private fun LinksScreen(
                         type = type,
                         onBack = { onNavigateTo(null) },
                         onDelete = onDelete,
+                        onNavigateToBillingScreen = onNavigateToBillingScreen,
                         onSaveForm = onSaveForm,
                         onSetAppEnabled = onSetAppEnabled,
                         onSetChipEnabled = onSetChipEnabled,
@@ -247,6 +275,8 @@ private fun LinksScreen(
 @Composable
 private fun LinksListPane(
     destination: Int?,
+    billingFeatures: List<Feature>,
+    billingStatus: BillingStatus,
     links: List<Link>,
     onBack: () -> Unit,
     onDisable: (uid: Int) -> Unit,
@@ -273,15 +303,25 @@ private fun LinksListPane(
             )
         }
         item {
-            Button(
-                { onNavigateToContentKey(-1) },
-                Modifier.testTag("geoShareLinksListInsert"),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onSecondary,
-                ),
-            ) {
-                Text(stringResource(R.string.links_insert))
+            FeatureBadged(
+                enabled = billingStatus is BillingStatus.NotPurchased && CustomLinkFeature in billingFeatures,
+                badge = { modifier ->
+                    FeatureBadgeSmall(
+                        { onNavigateToContentKey(-1) },
+                        modifier.testTag("geoShareCustomLinkFeatureBadge"),
+                    )
+                },
+            ) { modifier ->
+                Button(
+                    { onNavigateToContentKey(-1) },
+                    modifier.testTag("geoShareLinksListInsert"),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondary,
+                    ),
+                ) {
+                    Text(stringResource(R.string.links_insert))
+                }
             }
         }
         links
@@ -358,6 +398,9 @@ private fun LinksDetailPane(
     destination: Int,
     wide: Boolean,
     appEnabled: Boolean,
+    billingAppNameResId: Int,
+    billingFeatures: List<Feature>,
+    billingStatus: BillingStatus,
     chipEnabled: Boolean,
     coordsUriTemplate: String,
     group: String,
@@ -368,6 +411,7 @@ private fun LinksDetailPane(
     type: LinkType,
     onBack: () -> Unit,
     onDelete: () -> Unit,
+    onNavigateToBillingScreen: () -> Unit,
     onSaveForm: () -> Unit,
     onSetAppEnabled: (Boolean) -> Unit,
     onSetChipEnabled: (Boolean) -> Unit,
@@ -382,54 +426,66 @@ private fun LinksDetailPane(
     val spacing = LocalSpacing.current
     val (deleteDialogOpen, setDeleteDialogOpen) = retain { mutableStateOf(false) }
 
-    ScrollablePane(
-        title = {
-            Text(
-                stringResource(if (destination == -1) R.string.links_insert else R.string.links_update),
-                Modifier.padding(horizontal = spacing.windowPadding),
-            )
-        },
-        onBack = onBack.takeUnless { wide },
-        modifier = Modifier.testTag("geoShareLinkDetailPane"),
-        actions = {
-            if (destination != -1) {
-                IconButton(
-                    onClick = { setDeleteDialogOpen(true) },
-                    modifier = Modifier.testTag("geoShareLinksDetailDelete"),
-                    colors = IconButtonDefaults.iconButtonColors(
-                        contentColor = MaterialTheme.colorScheme.error,
-                    ),
-                ) {
-                    Icon(Icons.Outlined.Delete, stringResource(R.string.links_delete))
+    Box {
+        Column {
+            ScrollablePane(
+                title = {
+                    Text(
+                        stringResource(if (destination == -1) R.string.links_insert else R.string.links_update),
+                        Modifier.padding(horizontal = spacing.windowPadding),
+                    )
+                },
+                onBack = onBack.takeUnless { wide },
+                modifier = Modifier.testTag("geoShareLinkDetailPane"),
+                actions = {
+                    if (destination != -1) {
+                        IconButton(
+                            onClick = { setDeleteDialogOpen(true) },
+                            modifier = Modifier.testTag("geoShareLinksDetailDelete"),
+                            colors = IconButtonDefaults.iconButtonColors(
+                                contentColor = MaterialTheme.colorScheme.error,
+                            ),
+                        ) {
+                            Icon(Icons.Outlined.Delete, stringResource(R.string.links_delete))
+                        }
+                    }
+                },
+                navigationImageVector = Icons.Default.Close,
+            ) {
+                item {
+                    LinkForm(
+                        appEnabled = appEnabled,
+                        chipEnabled = chipEnabled,
+                        coordsUriTemplate = coordsUriTemplate,
+                        group = group,
+                        name = name,
+                        nameUriTemplate = nameUriTemplate,
+                        sheetEnabled = sheetEnabled,
+                        srs = srs,
+                        type = type,
+                        onSaveForm = onSaveForm,
+                        onSetAppEnabled = onSetAppEnabled,
+                        onSetChipEnabled = onSetChipEnabled,
+                        onSetCoordsUriTemplate = onSetCoordsUriTemplate,
+                        onSetGroup = onSetGroup,
+                        onSetName = onSetName,
+                        onSetNameUriTemplate = onSetNameUriTemplate,
+                        onSetSheetEnabled = onSetSheetEnabled,
+                        onSetSrs = onSetSrs,
+                        onSetType = onSetType,
+                        modifier = Modifier
+                            .width(600.dp)
+                            .padding(top = spacing.smallAdaptive, bottom = spacing.tinyAdaptive),
+                        enabled = billingStatus is BillingStatus.Purchased && CustomLinkFeature in billingFeatures,
+                    )
                 }
             }
-        },
-        navigationImageVector = Icons.Default.Close,
-    ) {
-        item {
-            LinkForm(
-                appEnabled = appEnabled,
-                chipEnabled = chipEnabled,
-                coordsUriTemplate = coordsUriTemplate,
-                group = group,
-                name = name,
-                nameUriTemplate = nameUriTemplate,
-                sheetEnabled = sheetEnabled,
-                srs = srs,
-                type = type,
-                onSaveForm = onSaveForm,
-                onSetAppEnabled = onSetAppEnabled,
-                onSetChipEnabled = onSetChipEnabled,
-                onSetCoordsUriTemplate = onSetCoordsUriTemplate,
-                onSetGroup = onSetGroup,
-                onSetName = onSetName,
-                onSetNameUriTemplate = onSetNameUriTemplate,
-                onSetSheetEnabled = onSetSheetEnabled,
-                onSetSrs = onSetSrs,
-                onSetType = onSetType,
-                modifier = Modifier
-                    .width(600.dp)
-                    .padding(top = spacing.smallAdaptive, bottom = spacing.tinyAdaptive),
+        }
+        if (billingStatus is BillingStatus.NotPurchased && CustomLinkFeature in billingFeatures) {
+            FeatureWall(
+                billingAppNameResId = billingAppNameResId,
+                modifier = Modifier.testTag("geoShareCustomLinkFeatureWall"),
+                onNavigateToBillingScreen = onNavigateToBillingScreen,
             )
         }
     }
@@ -466,6 +522,13 @@ private fun DefaultPreview() {
                     links = defaultFakeLinks,
                     message = null,
                     appEnabled = false,
+                    billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Purchased(
+                        BillingProduct("test", BillingProduct.Type.DONATION),
+                        expired = false,
+                        refundable = true,
+                    ),
                     chipEnabled = false,
                     coordsUriTemplate = "",
                     group = "",
@@ -480,6 +543,7 @@ private fun DefaultPreview() {
                     onDismissMessage = {},
                     onEnable = {},
                     onNavigateTo = {},
+                    onNavigateToBillingScreen = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
                     onSetAppEnabled = {},
@@ -508,6 +572,13 @@ private fun DarkPreview() {
                     links = defaultFakeLinks,
                     message = null,
                     appEnabled = false,
+                    billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Purchased(
+                        BillingProduct("test", BillingProduct.Type.DONATION),
+                        expired = false,
+                        refundable = true,
+                    ),
                     chipEnabled = false,
                     coordsUriTemplate = "",
                     group = "",
@@ -522,6 +593,7 @@ private fun DarkPreview() {
                     onDismissMessage = {},
                     onEnable = {},
                     onNavigateTo = {},
+                    onNavigateToBillingScreen = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
                     onSetAppEnabled = {},
@@ -550,6 +622,13 @@ private fun TabletPreview() {
                     links = defaultFakeLinks,
                     message = null,
                     appEnabled = false,
+                    billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Purchased(
+                        BillingProduct("test", BillingProduct.Type.DONATION),
+                        expired = false,
+                        refundable = true,
+                    ),
                     chipEnabled = false,
                     coordsUriTemplate = "",
                     group = "",
@@ -564,6 +643,7 @@ private fun TabletPreview() {
                     onDismissMessage = {},
                     onEnable = {},
                     onNavigateTo = {},
+                    onNavigateToBillingScreen = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
                     onSetAppEnabled = {},
@@ -592,6 +672,13 @@ private fun InsertPreview() {
                     links = defaultFakeLinks,
                     message = null,
                     appEnabled = false,
+                    billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Purchased(
+                        BillingProduct("test", BillingProduct.Type.DONATION),
+                        expired = false,
+                        refundable = true,
+                    ),
                     chipEnabled = false,
                     coordsUriTemplate = "",
                     group = "",
@@ -606,6 +693,7 @@ private fun InsertPreview() {
                     onDismissMessage = {},
                     onEnable = {},
                     onNavigateTo = {},
+                    onNavigateToBillingScreen = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
                     onSetAppEnabled = {},
@@ -634,6 +722,13 @@ private fun DarkInsertPreview() {
                     links = defaultFakeLinks,
                     message = null,
                     appEnabled = false,
+                    billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Purchased(
+                        BillingProduct("test", BillingProduct.Type.DONATION),
+                        expired = false,
+                        refundable = true,
+                    ),
                     chipEnabled = false,
                     coordsUriTemplate = "",
                     group = "",
@@ -648,6 +743,7 @@ private fun DarkInsertPreview() {
                     onDismissMessage = {},
                     onEnable = {},
                     onNavigateTo = {},
+                    onNavigateToBillingScreen = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
                     onSetAppEnabled = {},
@@ -677,6 +773,13 @@ private fun TabletInsertPreview() {
                     links = defaultFakeLinks,
                     message = null,
                     appEnabled = false,
+                    billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Purchased(
+                        BillingProduct("test", BillingProduct.Type.DONATION),
+                        expired = false,
+                        refundable = true,
+                    ),
                     chipEnabled = false,
                     coordsUriTemplate = "",
                     group = "",
@@ -691,6 +794,146 @@ private fun TabletInsertPreview() {
                     onDismissMessage = {},
                     onEnable = {},
                     onNavigateTo = {},
+                    onNavigateToBillingScreen = {},
+                    onRestoreInitialData = {},
+                    onSaveForm = {},
+                    onSetAppEnabled = {},
+                    onSetChipEnabled = {},
+                    onSetCoordsUriTemplate = {},
+                    onSetGroup = {},
+                    onSetName = {},
+                    onSetNameUriTemplate = {},
+                    onSetSheetEnabled = {},
+                    onSetSrs = {},
+                    onSetType = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun InsertNotPurchasedPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                LinksScreen(
+                    destination = -1,
+                    links = defaultFakeLinks,
+                    message = null,
+                    appEnabled = false,
+                    billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.NotPurchased(pending = false),
+                    chipEnabled = false,
+                    coordsUriTemplate = "",
+                    group = "",
+                    name = "",
+                    nameUriTemplate = "",
+                    sheetEnabled = false,
+                    srs = Srs.WGS84,
+                    type = LinkType.DISPLAY,
+                    onBack = {},
+                    onDelete = {},
+                    onDisable = {},
+                    onDismissMessage = {},
+                    onEnable = {},
+                    onNavigateTo = {},
+                    onNavigateToBillingScreen = {},
+                    onRestoreInitialData = {},
+                    onSaveForm = {},
+                    onSetAppEnabled = {},
+                    onSetChipEnabled = {},
+                    onSetCoordsUriTemplate = {},
+                    onSetGroup = {},
+                    onSetName = {},
+                    onSetNameUriTemplate = {},
+                    onSetSheetEnabled = {},
+                    onSetSrs = {},
+                    onSetType = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkInsertNotPurchasedPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                LinksScreen(
+                    destination = -1,
+                    links = defaultFakeLinks,
+                    message = null,
+                    appEnabled = false,
+                    billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.NotPurchased(pending = false),
+                    chipEnabled = false,
+                    coordsUriTemplate = "",
+                    group = "",
+                    name = "",
+                    nameUriTemplate = "",
+                    sheetEnabled = false,
+                    srs = Srs.WGS84,
+                    type = LinkType.DISPLAY,
+                    onBack = {},
+                    onDelete = {},
+                    onDisable = {},
+                    onDismissMessage = {},
+                    onEnable = {},
+                    onNavigateTo = {},
+                    onNavigateToBillingScreen = {},
+                    onRestoreInitialData = {},
+                    onSaveForm = {},
+                    onSetAppEnabled = {},
+                    onSetChipEnabled = {},
+                    onSetCoordsUriTemplate = {},
+                    onSetGroup = {},
+                    onSetName = {},
+                    onSetNameUriTemplate = {},
+                    onSetSheetEnabled = {},
+                    onSetSrs = {},
+                    onSetType = {},
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+@Preview(showBackground = true, device = Devices.TABLET)
+@Composable
+private fun TabletInsertNotPurchasedPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                LinksScreen(
+                    destination = -1,
+                    links = defaultFakeLinks,
+                    message = null,
+                    appEnabled = false,
+                    billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.NotPurchased(pending = false),
+                    chipEnabled = false,
+                    coordsUriTemplate = "",
+                    group = "",
+                    name = "",
+                    nameUriTemplate = "",
+                    sheetEnabled = false,
+                    srs = Srs.WGS84,
+                    type = LinkType.DISPLAY,
+                    onBack = {},
+                    onDelete = {},
+                    onDisable = {},
+                    onDismissMessage = {},
+                    onEnable = {},
+                    onNavigateTo = {},
+                    onNavigateToBillingScreen = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
                     onSetAppEnabled = {},
@@ -721,6 +964,13 @@ private fun UpdatePreview() {
                     links = defaultFakeLinks,
                     message = null,
                     appEnabled = link.appEnabled,
+                    billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Purchased(
+                        BillingProduct("test", BillingProduct.Type.DONATION),
+                        expired = false,
+                        refundable = true,
+                    ),
                     chipEnabled = link.chipEnabled,
                     coordsUriTemplate = link.coordsUriTemplate,
                     group = link.group,
@@ -735,6 +985,7 @@ private fun UpdatePreview() {
                     onDismissMessage = {},
                     onEnable = {},
                     onNavigateTo = {},
+                    onNavigateToBillingScreen = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
                     onSetAppEnabled = {},
@@ -765,6 +1016,13 @@ private fun DarkUpdatePreview() {
                     links = defaultFakeLinks,
                     message = null,
                     appEnabled = link.appEnabled,
+                    billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Purchased(
+                        BillingProduct("test", BillingProduct.Type.DONATION),
+                        expired = false,
+                        refundable = true,
+                    ),
                     chipEnabled = link.chipEnabled,
                     coordsUriTemplate = link.coordsUriTemplate,
                     group = link.group,
@@ -779,6 +1037,7 @@ private fun DarkUpdatePreview() {
                     onDismissMessage = {},
                     onEnable = {},
                     onNavigateTo = {},
+                    onNavigateToBillingScreen = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
                     onSetAppEnabled = {},
@@ -809,6 +1068,13 @@ private fun TabletUpdatePreview() {
                     links = defaultFakeLinks,
                     message = null,
                     appEnabled = link.appEnabled,
+                    billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Purchased(
+                        BillingProduct("test", BillingProduct.Type.DONATION),
+                        expired = false,
+                        refundable = true,
+                    ),
                     chipEnabled = link.chipEnabled,
                     coordsUriTemplate = link.coordsUriTemplate,
                     group = link.group,
@@ -823,6 +1089,7 @@ private fun TabletUpdatePreview() {
                     onDismissMessage = {},
                     onEnable = {},
                     onNavigateTo = {},
+                    onNavigateToBillingScreen = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
                     onSetAppEnabled = {},

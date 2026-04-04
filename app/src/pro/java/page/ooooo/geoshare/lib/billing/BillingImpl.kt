@@ -61,7 +61,7 @@ class BillingImpl(
 
     @StringRes
     override val appNameResId = R.string.app_name_pro
-    override val features = persistentListOf(AutomationFeature)
+    override val features = persistentListOf(AutomationFeature, CustomLinkFeature)
     override val refundableDuration = 48.hours
 
     private val billingClient: BillingClient = billingClientBuilder

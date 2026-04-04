@@ -23,7 +23,7 @@ class BillingImpl(
 
     @StringRes
     override val appNameResId = R.string.app_name_pro
-    override val features = persistentListOf(AutomationFeature)
+    override val features = persistentListOf(AutomationFeature, CustomLinkFeature)
     override val products = persistentListOf(
         BillingProduct("demo_lifetime", BillingProduct.Type.ONE_TIME),
         BillingProduct("demo_monthly", BillingProduct.Type.SUBSCRIPTION),

@@ -90,6 +90,7 @@ fun LinkForm(
     onSetSrs: (Srs) -> Unit,
     onSetType: (LinkType) -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     initialExpanded: Boolean = false,
 ) {
     val context = LocalContext.current
@@ -134,6 +135,7 @@ fun LinkForm(
                 .fillMaxWidth()
                 .padding(horizontal = spacing.windowPadding)
                 .testTag("geoShareLinkFormName"),
+            enabled = enabled,
             label = {
                 Text(stringResource(R.string.links_form_name))
             },
@@ -148,6 +150,7 @@ fun LinkForm(
                 .padding(horizontal = spacing.windowPadding)
                 .padding(top = spacing.medium)
                 .testTag("geoShareLinkFormCoordsUriTemplate"),
+            enabled = enabled,
             label = {
                 Text(stringResource(R.string.links_form_uri_template_coords))
             },
@@ -206,6 +209,7 @@ fun LinkForm(
                                         )
                                     }
                                 },
+                                enabled = enabled,
                                 contentPadding = PaddingValues(start = 8.dp, end = 2.dp),
                             )
                         }
@@ -223,6 +227,7 @@ fun LinkForm(
                 value = appEnabled,
                 onCheckedChange = onSetAppEnabled,
                 label = stringResource(R.string.links_form_enabled_option_app),
+                enabled = enabled,
                 testTag = "geoShareLinkFormAppEnabled",
             ) {
                 Box(
@@ -248,6 +253,7 @@ fun LinkForm(
                 value = sheetEnabled,
                 onCheckedChange = onSetSheetEnabled,
                 label = stringResource(R.string.links_form_enabled_option_sheet),
+                enabled = enabled,
                 testTag = "geoShareLinkFormSheetEnabled",
             ) {
                 Surface(shape = BottomSheetDefaults.ExpandedShape) {
@@ -268,6 +274,7 @@ fun LinkForm(
                 value = chipEnabled,
                 onCheckedChange = onSetChipEnabled,
                 label = stringResource(R.string.links_form_enabled_option_chip),
+                enabled = enabled,
                 testTag = "geoShareLinkFormChipEnabled",
             ) {
                 Surface(
@@ -320,6 +327,7 @@ fun LinkForm(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = spacing.windowPadding),
+                    enabled = enabled,
                     label = {
                         Text(stringResource(R.string.links_form_group))
                     },
@@ -336,6 +344,7 @@ fun LinkForm(
                         .fillMaxWidth()
                         .padding(horizontal = spacing.windowPadding)
                         .padding(top = spacing.medium),
+                    enabled = enabled,
                     label = { Text(stringResource(R.string.links_form_srs)) },
                 )
                 TextField(
@@ -345,6 +354,7 @@ fun LinkForm(
                         .fillMaxWidth()
                         .padding(horizontal = spacing.windowPadding)
                         .padding(top = spacing.medium),
+                    enabled = enabled,
                     label = {
                         Text(stringResource(R.string.links_form_uri_template_name))
                     },
@@ -375,6 +385,7 @@ fun LinkForm(
                         selectedValue = type,
                         onSelect = onSetType,
                         values = listOf(LinkType.DISPLAY, LinkType.NAVIGATION, LinkType.STREET_VIEW),
+                        enabled = enabled,
                     ) { value ->
                         Surface(
                             Modifier.fillMaxWidth(),
@@ -402,7 +413,7 @@ fun LinkForm(
             Modifier
                 .padding(top = spacing.medium)
                 .testTag("geoShareLinkFormSave"),
-            enabled = isValid
+            enabled = enabled && isValid,
         ) {
             onSaveForm()
         }
@@ -414,6 +425,7 @@ private fun LinkFormEnabledCheckbox(
     value: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     label: String,
+    enabled: Boolean = true,
     testTag: String? = null,
     content: @Composable () -> Unit,
 ) {
@@ -433,6 +445,7 @@ private fun LinkFormEnabledCheckbox(
                     this.testTag = if (value) "${testTag}_checked" else "${testTag}_unchecked"
                 }
             },
+            enabled = enabled,
         )
         Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
             Text(

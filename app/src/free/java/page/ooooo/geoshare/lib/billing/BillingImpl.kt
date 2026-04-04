@@ -18,7 +18,7 @@ class BillingImpl(@Suppress("unused") context: Context) : Billing {
 
     @StringRes
     override val appNameResId = R.string.app_name
-    override val features = persistentListOf(AutomationFeature)
+    override val features = persistentListOf(AutomationFeature, CustomLinkFeature)
     override val products = persistentListOf(product)
     override val refundableDuration = Duration.ZERO
 

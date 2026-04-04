@@ -83,7 +83,6 @@ import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.lib.Message
-import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.AppDetails
@@ -97,10 +96,12 @@ import page.ooooo.geoshare.lib.android.MAPY_COM_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.ORGANIC_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
+import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingImpl
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
-import page.ooooo.geoshare.lib.billing.FeatureStatus
+import page.ooooo.geoshare.lib.billing.CustomLinkFeature
+import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.conversion.ActionFinished
 import page.ooooo.geoshare.lib.conversion.ActionWaiting
 import page.ooooo.geoshare.lib.conversion.BasicActionReady
@@ -125,6 +126,7 @@ import page.ooooo.geoshare.lib.conversion.RequestedUnshortenPermission
 import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.lib.extensions.truncateMiddle
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
+import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.network.RecoverableNetworkException
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.ActionContext
@@ -186,8 +188,8 @@ fun MainScreen(
     val currentState by conversionViewModel.currentState.collectAsStateWithLifecycle()
 
     val appDetails by conversionViewModel.appDetails.collectAsStateWithLifecycle()
-    val automationFeatureStatus by billingViewModel.automationFeatureStatus.collectAsStateWithLifecycle()
     val billingAppNameResId = billingViewModel.billingAppNameResId
+    val billingFeatures = billingViewModel.billingFeatures
     val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
     val changelogShown by inputsViewModel.changelogShown.collectAsStateWithLifecycle()
     val linkMessage by linkViewModel.message.collectAsStateWithLifecycle()
@@ -317,8 +319,8 @@ fun MainScreen(
     MainScreen(
         currentState = currentState,
         appDetails = appDetails,
-        automationFeatureStatus = automationFeatureStatus,
         billingAppNameResId = billingAppNameResId,
+        billingFeatures = billingFeatures,
         billingStatus = billingStatus,
         changelogShown = changelogShown,
         coordinateFormat = userPreferencesValues.coordinateFormat,
@@ -393,8 +395,8 @@ fun MainScreen(
 private fun MainScreen(
     currentState: State,
     appDetails: AppDetails,
-    automationFeatureStatus: FeatureStatus,
     billingAppNameResId: Int,
+    billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
     changelogShown: Boolean,
     coordinateFormat: CoordinateFormat,
@@ -532,7 +534,8 @@ private fun MainScreen(
                             CompositionLocalProvider(LocalContentColor provides contentColor) {
                                 MainSupportingPane(
                                     appDetails = appDetails,
-                                    automationFeatureStatus = automationFeatureStatus,
+                                    billingFeatures = billingFeatures,
+                                    billingStatus = billingStatus,
                                     currentState = currentState,
                                     largeLoadingIndicatorVisible = largeLoadingIndicatorVisible,
                                     outputsForApps = outputsForApps,
@@ -581,7 +584,8 @@ private fun MainScreen(
                 ) {
                     MainSupportingPane(
                         appDetails = appDetails,
-                        automationFeatureStatus = automationFeatureStatus,
+                        billingFeatures = billingFeatures,
+                        billingStatus = billingStatus,
                         currentState = currentState,
                         largeLoadingIndicatorVisible = largeLoadingIndicatorVisible,
                         outputsForApps = outputsForApps,
@@ -834,7 +838,8 @@ private fun MainBottomPane(currentState: State) {
 @Composable
 private fun MainSupportingPane(
     appDetails: AppDetails,
-    automationFeatureStatus: FeatureStatus,
+    billingFeatures: List<Feature>,
+    billingStatus: BillingStatus,
     currentState: State,
     largeLoadingIndicatorVisible: Boolean,
     outputsForApps: Map<String, List<Output>>,
@@ -858,8 +863,9 @@ private fun MainSupportingPane(
             ResultSuccessMessage(
                 currentState = currentState,
                 appDetails = appDetails,
+                billingFeatures = billingFeatures,
+                billingStatus = billingStatus,
                 modifier = modifier,
-                automationFeatureStatus = automationFeatureStatus,
                 onCancel = onCancel,
                 onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
             )
@@ -1002,8 +1008,8 @@ private fun DefaultPreview() {
         MainScreen(
             currentState = Initial(),
             appDetails = emptyMap(),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.NotPurchased(pending = false),
             changelogShown = false,
             coordinateFormat = CoordinateFormat.DEC,
@@ -1047,8 +1053,8 @@ private fun DarkPreview() {
         MainScreen(
             currentState = Initial(),
             appDetails = emptyMap(),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.NotPurchased(pending = false),
             changelogShown = false,
             coordinateFormat = CoordinateFormat.DEC,
@@ -1092,8 +1098,8 @@ private fun TabletPreview() {
         MainScreen(
             currentState = Initial(),
             appDetails = emptyMap(),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.NotPurchased(pending = false),
             changelogShown = false,
             coordinateFormat = CoordinateFormat.DEC,
@@ -1145,8 +1151,8 @@ private fun SucceededPreview() {
                 isAutomation = false,
             ),
             appDetails = emptyMap(),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 expired = false,
@@ -1215,8 +1221,8 @@ private fun DarkSucceededPreview() {
                 isAutomation = false,
             ),
             appDetails = emptyMap(),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 expired = false,
@@ -1285,8 +1291,8 @@ private fun SmallSucceededPreview() {
                 isAutomation = false,
             ),
             appDetails = emptyMap(),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 expired = false,
@@ -1355,8 +1361,8 @@ private fun TabletSucceededPreview() {
                 isAutomation = false,
             ),
             appDetails = emptyMap(),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 expired = false,
@@ -1425,8 +1431,8 @@ private fun DarkTabletSucceededPreview() {
                 isAutomation = false,
             ),
             appDetails = emptyMap(),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 expired = false,
@@ -1492,8 +1498,8 @@ private fun AutomationPreview() {
                 delay = 3.seconds,
             ),
             appDetails = emptyMap(),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 expired = false,
@@ -1559,8 +1565,8 @@ private fun DarkAutomationPreview() {
                 delay = 3.seconds,
             ),
             appDetails = emptyMap(),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 expired = false,
@@ -1626,8 +1632,8 @@ private fun TabletAutomationPreview() {
                 delay = 3.seconds,
             ),
             appDetails = emptyMap(),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 expired = false,
@@ -1693,8 +1699,8 @@ private fun WebViewPreview() {
                 webUriString = "https://www.example.com/",
             ),
             appDetails = emptyMap(),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 expired = false,
@@ -1755,8 +1761,8 @@ private fun DarkWebViewPreview() {
                 webUriString = "https://www.example.com/",
             ),
             appDetails = emptyMap(),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 expired = false,
@@ -1817,8 +1823,8 @@ private fun TabletWebViewPreview() {
                 webUriString = "https://www.example.com/",
             ),
             appDetails = emptyMap(),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 expired = false,
@@ -1869,8 +1875,8 @@ private fun ErrorPreview() {
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
             appDetails = emptyMap(),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 expired = false,
@@ -1921,8 +1927,8 @@ private fun DarkErrorPreview() {
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
             appDetails = emptyMap(),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 expired = false,
@@ -1973,8 +1979,8 @@ private fun TabletErrorPreview() {
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
             appDetails = emptyMap(),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 expired = false,
@@ -2032,8 +2038,8 @@ private fun EmptyPreview() {
                 persistentListOf(),
             ),
             appDetails = emptyMap(),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 expired = false,
@@ -2096,8 +2102,8 @@ private fun LoadingIndicatorPreview() {
                 )
             ),
             appDetails = emptyMap(),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 expired = false,
@@ -2160,8 +2166,8 @@ private fun DarkLoadingIndicatorPreview() {
                 )
             ),
             appDetails = emptyMap(),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 expired = false,
@@ -2224,8 +2230,8 @@ private fun TabletLoadingIndicatorPreview() {
                 )
             ),
             appDetails = emptyMap(),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 expired = false,
