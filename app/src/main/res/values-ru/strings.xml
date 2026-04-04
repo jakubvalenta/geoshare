@@ -58,7 +58,7 @@
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="about_title">О приложении</string>
-    <string name="conversion_failed_parse_html_error">Не удалось получить веб-страницу из картографического сервиса</string>
+    <string name="conversion_failed_parse_html_error">Не удалось получить web-страницу из картографического сервиса</string>
     <string name="conversion_failed_connection_permission_denied">Эта ссылка не поддерживается без подключения к картографическому сервису</string>
     <string name="main_input_uri_supporting_text">Например, https://maps.app.goo.gl/… или maps.apple.com/…</string>
     <string name="intro_open_by_default_app_note">Если некоторые ссылки выделены серым цветом, значит, другие приложения Google открывают их по умолчанию. Вы можете найти эти приложения и отключить открытие ссылок для них, как мы это сделали для Google Карт.</string>
@@ -145,7 +145,7 @@
         <item quantity="many">Поделимся ссылкой автоматически через %1$d сек.</item>
         <item quantity="other">Поделимся ссылкой автоматически через %1$d сек.</item>
     </plurals>
-    <string name="conversion_loading_indicator_description" tools:ignore="PluralsCandidate">Попытка %1$d из %2$d по причине: %3$s.</string>
+    <string name="conversion_loading_indicator_description" tools:ignore="PluralsCandidate">Попытка %1$d из %2$d по причине: %3$s</string>
     <string name="faq_location_permission_headline">Разрешение местоположения</string>
     <string name="faq_location_permission_text">%1$s запрашивает разрешения на доступ к местоположению, когда запускает навигацию TomTom и когда делится маршрутом GPX, т.к. в этих случаях приложению необходимо создать GPX-маршрут, начинающийся с вашей текущей позиции. Информация о позиции немедленно удаляется после создания маршрута.</string>
     <string name="user_preferences_automation_description">Выберите действия для автоматического выполнения когда ссылка на карту конвертируется в координаты.</string>
@@ -181,12 +181,12 @@
     <string name="faq_how_text_2">Однако не все URL-адреса карт содержат координаты. В таких случаях %1$s запросит у вас разрешение на подключение к картографическому сервису (Google Карты, Карты Apple и т. д.) и получение координат из:</string>
     <string name="faq_how_text_2_item_http">либо HTTP-заголовков,</string>
     <string name="faq_how_text_2_item_html">либо HTML-документа,</string>
-    <string name="faq_how_text_2_item_web">либо полной веб-страницы, включая JavaScript.</string>
+    <string name="faq_how_text_2_item_web">либо полной web-страницы, включая JavaScript.</string>
     <string name="faq_how_text_3">Если вы не разрешаете подключаться к картографическому сервису, то %1$s создаёт geo-ссылку с поисковым запросом вместо координат или прерывает выполнение, в зависимости от конкретной ссылки.</string>
     <string name="faq_how_text_4">Чтобы навсегда разрешить или запретить подключение к картографическому сервису вместо постоянного запроса (по умолчанию), перейдите в %1$s приложения.</string>
     <string name="faq_how_text_4_preferences_button">настройки</string>
     <string name="faq_privacy_headline">Вопросы конфиденциальности</string>
-    <string name="faq_privacy_text">Если возможно, %1$s преобразует ссылки на карты в автономном режиме. Если самостоятельно преобразовать ссылку на карту невозможно, приложение попросит у вас разрешение подключиться к картографическому сервису (Google Карты, Карты Apple и т.д.). Если вы разрешите подключение, картографический сервис получит ссылку на карту, сможет узнать ваш IP-адрес, а в некоторых случаях %1$s загрузит веб-страницу картографического сервиса и выполнит её JavaScript. Это произойдёт в изолированной среде, которая блокирует отслеживающие скрипты и не хранит cookie-файлы.</string>
+    <string name="faq_privacy_text">Если возможно, %1$s преобразует ссылки на карты в автономном режиме. Если самостоятельно преобразовать ссылку на карту невозможно, приложение попросит у вас разрешение подключиться к картографическому сервису (Google Карты, Карты Apple и т.д.). Если вы разрешите подключение, картографический сервис получит ссылку на карту, сможет узнать ваш IP-адрес, а в некоторых случаях %1$s загрузит web-страницу картографического сервиса и выполнит её JavaScript. Это произойдёт в изолированной среде, которая блокирует отслеживающие скрипты и не хранит cookie-файлы.</string>
     <string name="user_preferences_automation_delay_sec_title">Задержка автоматизации</string>
     <string name="user_preferences_automation_delay_sec_description">Время ожидания приложения перед выполнением автоматического действия (например, перед автоматическим открытием приложения карты).</string>
     <string name="user_preferences_number_error_range" tools:ignore="PluralsCandidate">Значение должно быть между %1$d и %2$d</string>
@@ -269,4 +269,11 @@
     <string name="user_preferences_connection_option_never">Запретить</string>
     <string name="billing_status_expired">Срок действия вашей подписки скоро истечёт</string>
     <string name="billing_status_pending">Ваш платёж ожидает подтверждения</string>
+    <string name="conversion_failed_unshorten_error_with_reason">Не удалось открыть короткую ссылку: %1$s</string>
+    <string name="conversion_failed_reason_invalid_url">неправильный URL</string>
+    <string name="conversion_failed_reason_missing_header">отсутствует HTTP-заголовок</string>
+    <string name="conversion_failed_reason_no_points">точки не найдены</string>
+    <string name="conversion_failed_reason_timeout">истекло время ожидания</string>
+    <string name="conversion_failed_parse_html_error_with_reason">Не удалось обработать web-страницу: %1$s</string>
+    <string name="network_exception_too_many_requests">слишком много запросов</string>
 </resources>
