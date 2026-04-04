@@ -98,7 +98,7 @@
     <string name="inputs_all">جميع خدمات الخرائط</string>
     <string name="inputs_recent">مُضافة حديثًا</string>
     <string name="inputs_default_handler">يُفتح افتراضيًا في %1$s</string>
-    <string name="conversion_loading_indicator_description">المحاولة %1$d من أصل %2$d بسبب %3$s.</string>
+    <string name="conversion_loading_indicator_description">المحاولة %1$d من أصل %2$d بسبب: %3$s</string>
     <string name="conversion_succeeded_save_gpx_failed">فشل حفظ GPX</string>
     <string name="main_input_uri_paste_content_description">ألصق</string>
     <string name="main_random">رابط عشوائي</string>
@@ -283,4 +283,11 @@
     </plurals>
     <string name="billing_status_expired">اشتراكك سينتهي قريبًا</string>
     <string name="billing_status_pending">دفعتك قيد الانتظار</string>
+    <string name="conversion_failed_unshorten_error_with_reason">فشل حل الرابط المختصر بسبب: %1$s</string>
+    <string name="conversion_failed_reason_invalid_url">رابط غير صالح</string>
+    <string name="conversion_failed_reason_missing_header">ترويسة HTTP مفقودة</string>
+    <string name="conversion_failed_reason_no_points">لم يُعثر على نقاط</string>
+    <string name="conversion_failed_reason_timeout">مهلة</string>
+    <string name="conversion_failed_parse_html_error_with_reason">فشل في معالجة صفحة الويب بسبب: %1$s</string>
+    <string name="network_exception_too_many_requests">طلبات كثيرة جدًا</string>
 </resources>
