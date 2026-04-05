@@ -24,8 +24,8 @@ class DemoBillingBehaviorTest : BehaviorTest {
         launchApplication()
         closeIntro()
 
-        // Shows Geo Share headline
-        onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "Geo Share" }
+        // Shows free headline
+        onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "GeoShare" }
 
         // Go to automation preferences
         goToUserPreferencesList()
@@ -65,8 +65,8 @@ class DemoBillingBehaviorTest : BehaviorTest {
         quickWaitForStableInActiveWindow()
         pressBack()
 
-        // Shows Geo Share Pro headline
-        onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "Geo Share Pro" }
+        // Shows pro headline
+        onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "GeoShare Pro" }
 
         // Does not show feature badge
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareMainBillingIcon" })
@@ -80,8 +80,8 @@ class DemoBillingBehaviorTest : BehaviorTest {
         // Go to main screen
         pressBack()
 
-        // Shows Geo Share headline
-        onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "Geo Share" }
+        // Shows free headline
+        onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "GeoShare" }
 
         // Go to automation preferences
         goToUserPreferencesList()
@@ -97,8 +97,8 @@ class DemoBillingBehaviorTest : BehaviorTest {
         launchApplication()
         closeIntro()
 
-        // Shows Geo Share headline
-        onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "Geo Share" }
+        // Shows free headline
+        onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "GeoShare" }
 
         // Go to automation preferences
         goToUserPreferencesList()
@@ -138,8 +138,8 @@ class DemoBillingBehaviorTest : BehaviorTest {
         quickWaitForStableInActiveWindow()
         pressBack()
 
-        // Shows Geo Share Pro headline
-        onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "Geo Share Pro" }
+        // Shows pro headline
+        onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "GeoShare Pro" }
 
         // Does not show feature badge
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareMainBillingIcon" })
@@ -159,8 +159,8 @@ class DemoBillingBehaviorTest : BehaviorTest {
         // Go to main screen
         pressBack()
 
-        // Shows Geo Share headline
-        onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "Geo Share" }
+        // Shows free headline
+        onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "GeoShare" }
 
         // Go to automation preferences
         goToUserPreferencesList()

@@ -1,4 +1,4 @@
-Partagez un lien de carte avec Geo Share et l'application l'ouvrira dans une autre application de cartographie installée.
+Partagez un lien de carte avec GeoShare et l'application l'ouvrira dans une autre application de cartographie installée.
 
 <b>Liens de cartes compatibles</b>
 
@@ -40,6 +40,6 @@ Si vous utilisez Google Maps pour trouver des lieux, mais que vous préférez un
 
 <b>Fonctionnement et confidentialité</b>
 
-Geo Share convertit les liens de cartes (par exemple, https://maps.app.goo.gl/...) en liens geo: compatibles avec d'autres applications de cartographie. La création d'un lien geo: nécessite des coordonnées géographiques. Geo Share les extrait de l'URL de la carte.
+GeoShare convertit les liens de cartes (par exemple, https://maps.app.goo.gl/...) en liens geo: compatibles avec d'autres applications de cartographie. La création d'un lien geo: nécessite des coordonnées géographiques. GeoShare les extrait de l'URL de la carte.
 
-Cependant, certaines URL de cartes ne contiennent pas de coordonnées. Dans ce cas, Geo Share vous <b>demandera l'autorisation de vous connecter au service de cartographie (Google Maps, Apple Maps, etc.)</b> et récupérera les coordonnées à partir des en-têtes HTTP ou du code HTML du lien. Pour plus d'informations, consultez la FAQ de l'application.
+Cependant, certaines URL de cartes ne contiennent pas de coordonnées. Dans ce cas, GeoShare vous <b>demandera l'autorisation de vous connecter au service de cartographie (Google Maps, Apple Maps, etc.)</b> et récupérera les coordonnées à partir des en-têtes HTTP ou du code HTML du lien. Pour plus d'informations, consultez la FAQ de l'application.

@@ -1,4 +1,4 @@
-Împărtășește un link de hartă prin Geo Share și aplicația îl va deschide în altă aplicație de hartă instalată.
+Împărtășește un link de hartă prin GeoShare și aplicația îl va deschide în altă aplicație de hartă instalată.
 
 <b>linkuri de hărți implementate<b>
 
@@ -32,8 +32,8 @@ Când îți place Google Maps pentru a găsi diverse locuri, dar preferi o altă
 
 <b>Cum funcționează și considerații despre confidențialitate</b>
 
-Geo Share transformă linkuri de hartă (ex. https://maps.app.goo.gl/...) în linkuri de tip geo: care pot fi deschise de către alte aplicații de hărți. Pentru a crea un link geo:, sunt necesare coordonate geografice. Geo Share extrage aceste coordonate din URL-ul de hartă inițial.
+GeoShare transformă linkuri de hartă (ex. https://maps.app.goo.gl/...) în linkuri de tip geo: care pot fi deschise de către alte aplicații de hărți. Pentru a crea un link geo:, sunt necesare coordonate geografice. GeoShare extrage aceste coordonate din URL-ul de hartă inițial.
 
-However, not all map URLs include coordinates. In such cases, Geo Share will prompt you for permission to connect to the map service (Google Maps, Apple Maps etc.) and retrieve the coordinates from either HTTP headers or the HTML document of the link. For more detailed information, check the app's FAQ screen.
+However, not all map URLs include coordinates. In such cases, GeoShare will prompt you for permission to connect to the map service (Google Maps, Apple Maps etc.) and retrieve the coordinates from either HTTP headers or the HTML document of the link. For more detailed information, check the app's FAQ screen.
 
-Totuși, nu toate URL-urile de hartă includ coordonate. În aceste cazuri, Geo Share îți va cere permisiunea pentru a se conecta la serviciul de hartă (Google Maps, Apple Maps etc.) și să primească coordonatele din headere HTTP ori din documentul HTML indicat de link. Pentru informații mai detaliate, verifică secțiunea de FAQ din aplicație.
+Totuși, nu toate URL-urile de hartă includ coordonate. În aceste cazuri, GeoShare îți va cere permisiunea pentru a se conecta la serviciul de hartă (Google Maps, Apple Maps etc.) și să primească coordonatele din headere HTTP ori din documentul HTML indicat de link. Pentru informații mai detaliate, verifică secțiunea de FAQ din aplicație.
