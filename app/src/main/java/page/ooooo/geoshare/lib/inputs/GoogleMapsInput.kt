@@ -187,11 +187,6 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
         uriQuote: UriQuote,
         log: ILog,
     ) = buildParseHtmlResult {
-        val name = pointsFromUri.lastOrNull()?.name
-        val mutablePoints = mutableListOf<GCJ02Point>()
-        var defaultPoint: GCJ02Point? = null
-
-        var genericMetaTagFound = false
         val directionsPreviewPattern = Regex("""%213d$LAT%214d$LON""")
         val pointPattern = Regex("""\[(?:null,null,|null,\[)$LAT,$LON]""")
         val defaultPointLinkPattern = Regex("""/@$LAT,$LON""")
@@ -201,6 +196,11 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
             @Suppress("SpellCheckingInspection") """<meta content="Google Maps" itemprop="name""""
         )
         val uriPattern = Regex("""data-url="([^"]+)"""")
+
+        val mutablePoints = mutableListOf<GCJ02Point>()
+        var defaultPoint: GCJ02Point? = null
+        var genericMetaTagFound = false
+        val name = pointsFromUri.lastOrNull()?.name
 
         while (true) {
             val line = channel.readLine() ?: break

@@ -91,9 +91,10 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
         uriQuote: UriQuote,
         log: ILog,
     ) = buildParseHtmlResult {
+        val pattern = Regex("""property="twitter:image" content="([^"]+)""")
+
         // Notice that unlike in other Inputs, we don't copy any point names from pointsFromUri here
 
-        val pattern = Regex("""property="twitter:image" content="([^"]+)""")
         while (true) {
             val line = channel.readLine() ?: break
             pattern.find(line)?.groupOrNull()?.let { attr ->
