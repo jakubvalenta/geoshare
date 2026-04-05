@@ -13,7 +13,7 @@
     <string name="intro_how_to_share_google_maps_content_description">Google Haritalar’ın paylaşım ekranının ekran görüntüsü</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_messaging">Mesajlaşma</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[<i>%1$s</i>'i seçin ve uygulama aynı konumu herhangi bir yüklü harita uygulamasında açmanıza izin verecek.]]></string>
+    <string name="intro_how_to_share_app_caption"><![CDATA[<i>%1$s</i>’i seçin ve uygulama aynı konumu herhangi bir yüklü harita uygulamasında açmanıza izin verecek.]]></string>
     <string name="intro_how_to_share_app_content_description">%1$s’in paylaşım ekranının ekran görüntüsü</string>
     <string name="intro_open_by_default_headline">Android’i Google Haritalar bağlantılarını alternatif haritalarda açacak şekilde yapılandırın (isteğe bağlı)</string>
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[Önce, Ayarlar ➞ Uygulamalar ➞ Haritalar ➞ <i>Varsayılan olarak aç</i> ve bu uygulamada bağlantıların açılmasını kapatın.]]></string>
@@ -150,7 +150,7 @@
     <string name="converter_waze_name">Waze</string>
     <string name="converter_yandex_maps_name">Yandex Haritalar</string>
     <string name="conversion_automation_save_gpx_succeeded">GPX otomatik olarak kaydedildi</string>
-    <string name="conversion_loading_indicator_description" tools:ignore="PluralsCandidate">Şu nedenden dolayı %2$d denemeden %1$d\'i başarısız oldu: %3$s</string>
+    <string name="conversion_loading_indicator_description" tools:ignore="PluralsCandidate">Şu nedenden dolayı %2$d denemeden %1$d’i başarısız oldu: %3$s</string>
     <string name="faq_how_headline">Nasıl çalışır</string>
     <string name="faq_how_text_2_item_http">ya HTTP başlıkları,</string>
     <string name="faq_how_text_2_item_html">ya HTML belgesi,</string>
@@ -182,19 +182,19 @@
         <item quantity="other">GPX otomatik olarak %1$ds’de kaydediliyor</item>
     </plurals>
     <string name="conversion_failed_parse_html_error">Harita servisinden web sayfası alınamadı</string>
-    <string name="inputs_settings">Android ayarlarına giderek, bağlantıların her zaman %1$s\'de açılmasını seçin</string>
+    <string name="inputs_settings">Android ayarlarına giderek, bağlantıların her zaman %1$s’de açılmasını seçin</string>
     <string name="user_preferences_coordinate_format_title">Koordinat formatı</string>
     <string name="conversion_succeeded_hide">Gizle</string>
-    <string name="intro_open_by_default_app_note_1">%1$s, %2$s ve %3$s\'u seçin. Bunlar Google Haritalar\'daki yaygın bağlantılardır. Diğer haritaları veya daha nadir bağlantıları da seçebilirsiniz, ancak bu şart değildir.</string>
+    <string name="intro_open_by_default_app_note_1">%1$s, %2$s ve %3$s’u seçin. Bunlar Google Haritalar’daki yaygın bağlantılardır. Diğer haritaları veya daha nadir bağlantıları da seçebilirsiniz, ancak bu şart değildir.</string>
     <string name="conversion_succeeded_save_gpx_succeeded">Kaydedilmiş GPX dosyası</string>
     <string name="output_gpx_point_save">GPX dosyasını tek bir noktayla kaydedin</string>
     <string name="output_gpx_points_open">GPX noktalarını aç</string>
-    <string name="output_gpx_points_open_in">GPX noktalarını %1$s\'de aç</string>
+    <string name="output_gpx_points_open_in">GPX noktalarını %1$s’de aç</string>
     <string name="output_gpx_points_share">GPX noktalarını paylaş</string>
     <string name="output_gpx_route_open">GPX rotasını aç</string>
-    <string name="output_gpx_route_open_in">GPX rotasını %1$s\'de aç</string>
+    <string name="output_gpx_route_open_in">GPX rotasını %1$s’de aç</string>
     <string name="output_gpx_route_save">GPX rotasını kaydet</string>
-    <string name="output_gpx_route_share_automation_failed">GPX\'i otomatik paylaşma başarısız oldu</string>
+    <string name="output_gpx_route_share_automation_failed">GPX’i otomatik paylaşma başarısız oldu</string>
     <string name="links_title">Web haritaları</string>
     <string name="user_preferences_section_input">Girdi</string>
     <string name="user_preferences_section_output">Çıktı</string>
@@ -202,8 +202,8 @@
     <string name="user_preferences_apps_description">Harita bağlantısını koordinatlara dönüştürdükten sonra hangi yüklü uygulamalarınızın görüntüleneceğini seçin.</string>
     <string name="faq_location_permission_text">%1$s, TomTom navigasyonunu başlatırken ve bir GPX rotası paylaşırken konum izni ister, çünkü bu durumlarda uygulamanın mevcut konumunuzdan başlayan bir GPX rotası oluşturması gerekir. Konum bilgisi, rota oluşturulduktan hemen sonra silinir.</string>
     <string name="faq_privacy_text">Mümkün olduğunda, %1$s harita bağlantılarını çevrimdışı olarak dönüştürür. Harita bağlantısı çevrimiçi dönüştürme gerektiriyorsa, uygulama harita servisine (Google Haritalar, Apple Haritalar vb.) bağlanmadan önce size soracaktır. Bağlantıya izin verirseniz, harita servisi harita bağlantısını alacak, IP adresinizi okuyabilecek ve bazı durumlarda %1$s harita servisinin canlı web sayfasını yükleyip JavaScript kodunu çalıştıracaktır. Bu, izleme komut dosyalarını engelleyen ve çerezleri saklamayan kısıtlı bir ortamda gerçekleşir.</string>
-    <string name="faq_how_text_1">%1$s, harita bağlantılarını diğer harita uygulamaları tarafından açılabilecek geo: bağlantılarına dönüştürür. Bir geo: bağlantısı oluşturmak için coğrafi koordinatlar gereklidir. %1$s bunları harita URL\'sinden çıkarır.</string>
-    <string name="faq_how_text_2">Ancak, tüm harita URL\'leri koordinat içermez. Bu gibi durumlarda, %1$s sizden harita servisine (Google Haritalar, Apple Haritalar vb.) bağlanmak ve koordinatları almak için izin isteyecektir:</string>
+    <string name="faq_how_text_1">%1$s, harita bağlantılarını diğer harita uygulamaları tarafından açılabilecek geo: bağlantılarına dönüştürür. Bir geo: bağlantısı oluşturmak için coğrafi koordinatlar gereklidir. %1$s bunları harita URL’sinden çıkarır.</string>
+    <string name="faq_how_text_2">Ancak, tüm harita URL’leri koordinat içermez. Bu gibi durumlarda, %1$s sizden harita servisine (Google Haritalar, Apple Haritalar vb.) bağlanmak ve koordinatları almak için izin isteyecektir:</string>
     <string name="faq_how_text_3">Harita servisine bağlanmaya izin vermezseniz, %1$s koordinatlar yerine bir arama terimi içeren bir geo: bağlantısı oluşturur veya çalışmayı durdurur, söz konusu bağlantıya bağlı olarak.</string>
     <string name="faq_how_text_4">Harita servisine bağlanmayı her zaman sormak (varsayılan) yerine kalıcı olarak izin vermek veya reddetmek için uygulamanın %1$s bölümüne gidin.</string>
     <string name="conversion_succeeded_apps_links_configure">Web haritalarını yapılandırın</string>
@@ -215,8 +215,8 @@
     <string name="output_open_navigation">Gezinti</string>
     <string name="output_open_street_view">Street view</string>
     <string name="output_open_link">%1$s bağlantısını aç</string>
-    <string name="conversion_permission_common_text"><![CDATA[<tt>%1$s</tt> linkikoordinat içermiyor. %2$s'in bunları alabilmek için harita hizmetine bağlanması gerekiyor.]]></string>
-    <string name="user_preferences_connection_description">Kısa bağlantıları ve URL\'de coğrafi koordinat içermeyen bağlantıları desteklemek için, %1$s harita servisine (Google Haritalar, Apple Haritalar vb.) bağlanabilir.</string>
+    <string name="conversion_permission_common_text"><![CDATA[<tt>%1$s</tt> linkikoordinat içermiyor. %2$s’in bunları alabilmek için harita hizmetine bağlanması gerekiyor.]]></string>
+    <string name="user_preferences_connection_description">Kısa bağlantıları ve URL’de coğrafi koordinat içermeyen bağlantıları desteklemek için, %1$s harita servisine (Google Haritalar, Apple Haritalar vb.) bağlanabilir.</string>
     <string name="user_preferences_connection_option_always">İzin ver</string>
     <string name="user_preferences_connection_option_never">Asla izin verme</string>
     <string name="user_preferences_coordinate_format_description">Uygulama genelinde tüm coğrafi koordinatların görüntüleneceği formatı seçin.</string>
@@ -255,7 +255,7 @@
     <string name="links_update">Web haritasını düzenle</string>
     <string name="network_exception_too_many_requests">çok fazla istek</string>
     <plurals name="user_preferences_apps_visible_count">
-        <item quantity="one">%2$d uygulamadan %1$d\'si görünür</item>
-        <item quantity="other">%2$d uygulamadan %1$d\'si görünür</item>
+        <item quantity="one">%2$d uygulamadan %1$d’si görünür</item>
+        <item quantity="other">%2$d uygulamadan %1$d’si görünür</item>
     </plurals>
 </resources>
