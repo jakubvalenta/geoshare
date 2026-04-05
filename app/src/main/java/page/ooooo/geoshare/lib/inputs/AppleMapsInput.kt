@@ -72,12 +72,13 @@ object AppleMapsInput : HtmlInput, Input.HasRandomUri {
         uriQuote: UriQuote,
         log: ILog,
     ) = buildParseHtmlResult {
-        val name = pointsFromUri.lastOrNull()?.name
-
         val latPattern = Regex("""<meta property="place:location:latitude" content="$LAT"""")
         val lonPattern = Regex("""<meta property="place:location:longitude" content="$LON"""")
+
         var lat: Double? = null
         var lon: Double? = null
+        val name = pointsFromUri.lastOrNull()?.name
+
         while (true) {
             val line = channel.readLine() ?: break
             if (lat == null) {

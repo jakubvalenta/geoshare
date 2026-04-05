@@ -22,6 +22,10 @@ class YandexMapsInputTest : BaseInputTest() {
             "yandex.com/maps?whatshere%5Bpoint%5D=144.96315783657045%2C-37.81384550131279&whatshere%5Bzoom%5D=17.852003&ll=144.96315783657042%2C-37.81384550094835&z=17.852003&si=6u8menx2bg23cfx27y7p1je8y8",
             getUri("yandex.com/maps?whatshere%5Bpoint%5D=144.96315783657045%2C-37.81384550131279&whatshere%5Bzoom%5D=17.852003&ll=144.96315783657042%2C-37.81384550094835&z=17.852003&si=6u8menx2bg23cfx27y7p1je8y8")
         )
+        assertEquals(
+            "https://yandex.ru/maps/213/moscow/geo/keramicheskiy_proyezd/8062907/",
+            getUri("https://yandex.ru/maps/213/moscow/geo/keramicheskiy_proyezd/8062907/"),
+        )
     }
 
     @Test
@@ -70,7 +74,7 @@ class YandexMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseUri_placeAndCoordinatesAndPoint() = runTest {
+    fun parseUri_poiWithCoordinatesAndPoint() = runTest {
         assertEquals(
             ParseUriResult(persistentListOf(WGS84Point(52.294001, 8.065475, z = 13.24))),
             parseUri("https://yandex.com/maps/100513/osnabruck/?ll=8.055899%2C52.280743&mode=whatshere&whatshere%5Bpoint%5D=8.065475%2C52.294001&whatshere%5Bzoom%5D=13.24&z=15"),
@@ -78,7 +82,7 @@ class YandexMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseUri_orgAndCoordinates() = runTest {
+    fun parseUri_poiWithCoordinates() = runTest {
         assertEquals(
             ParseUriResult(persistentListOf(WGS84Point(50.111192, 8.668963, z = 14.19))),
             parseUri("https://yandex.com/maps/org/94933420809/?display-text=Cafes&ll=8.668963%2C50.111192&mode=search&sctx=ZAAAAAgBEAAaKAoSCTHO34RCVCFAETJyFva0DUlAEhIJRii2gqYldj8R51JcVfZdYT8iBgABAgMEBSgKOABAZEgBYkZyZWFycj1zY2hlbWVfTG9jYWwvR2VvdXBwZXIvQWR2ZXJ0cy9SZWFycmFuZ2VCeUF1Y3Rpb24vQ2FjaGUvRW5hYmxlZD0xagJkZZ0BzczMPaABAKgBAL0ByteiIsIBkAGZj5fsswa4y%2FDcfpayrLSaAYmW5NPhAure6aC4Abn7yYWlA%2F3d2IRjiqSy14AG5PuvhaAE%2BoyK7rEC5Pu%2F75oF7L%2FyxdIDnOOpmucBt6iSh6UCyK%2FLuGyX48CmjwWFwNHQXv7d0vblBLXx6pSFA5y6x%2BXwBYy0i4Jx4oP6l8QG%2FevBrP0FnZn7uHOCpuWC9AaCAgjQmtCw0YTQtYoCNjE4NDEwNjM5MCQzNTE5MzExNDkzNyQxODQxMDYzOTQkMTg0MTA2MzkyJDIyMzA1MDc4MDc4NJICAJoCDGRlc2t0b3AtbWFwcw%3D%3D&sll=8.674635%2C50.129382&sspn=0.076143%2C0.041160&text=%D0%9A%D0%B0%D1%84%D0%B5&z=14.19"),
@@ -86,7 +90,14 @@ class YandexMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseUri_orgOnly() = runTest {
+    fun parseUri_poiWithoutCoordinates() = runTest {
+        assertEquals(
+            ParseUriResult(
+                persistentListOf(WGS84Point(name = @Suppress("SpellCheckingInspection") "keramicheskiy proyezd")),
+                htmlUriString = "https://yandex.ru/maps/213/moscow/geo/keramicheskiy_proyezd/8062907/",
+            ),
+            parseUri("https://yandex.ru/maps/213/moscow/geo/keramicheskiy_proyezd/8062907/"),
+        )
         assertEquals(
             ParseUriResult(
                 persistentListOf(),
@@ -114,13 +125,7 @@ class YandexMapsInputTest : BaseInputTest() {
     fun parseUri_trDomain() = runTest {
         assertEquals(
             ParseUriResult(
-                persistentListOf(
-                    WGS84Point(
-                        -37.81384550094835,
-                        144.96315783657042,
-                        z = 17.852003
-                    )
-                )
+                persistentListOf(WGS84Point(-37.81384550094835, 144.96315783657042, z = 17.852003))
             ),
             parseUri("https://yandex.com.tr/maps?ll=144.96315783657042%2C-37.81384550094835&z=17.852003"),
         )
@@ -129,9 +134,19 @@ class YandexMapsInputTest : BaseInputTest() {
     @Test
     fun parseHtml_containsCoordinates_returnsPoint() = runTest {
         assertEquals(
-            ParseHtmlResult(persistentListOf(WGS84Point(50.107130, 8.660903))),
-            @Suppress("SpellCheckingInspection")
-            parseHtml("""3ad6&amp;theme=light&amp;lang=en_US&amp;size=520%2C440&amp;l=map&amp;spn=0.009641%2C0.005481&amp;ll=8.660903%2C50.107130&amp;lg=0&amp;cr=0&amp;pt=8.664164%2C50.106376%2Cplacemark&amp;signature=cSM2mE5qjL5"""),
+            ParseHtmlResult(
+                persistentListOf(
+                    WGS84Point(
+                        55.882227, 37.566898,
+                        name = @Suppress("SpellCheckingInspection") "Keramichesky Drive",
+                    )
+                )
+            ),
+            parseHtml(
+                @Suppress("SpellCheckingInspection")
+                """<meta property="og:image" content="https://static-maps.yandex.ru/1.x/?api_key=xxx&amp;theme=light&amp;lang=en_US&amp;size=520%2C440&amp;l=map&amp;spn=0.012927%2C0.024085&amp;ll=37.563875%2C55.881952&amp;lg=0&amp;cr=0&amp;pt=37.566898%2C55.882227%2Cplacemark&amp;signature=xxx">
+                <h1 class="card-title-view__title" itemProp="name">Keramichesky Drive</h1>""".trimIndent()
+            ),
         )
     }
 

@@ -5,7 +5,7 @@ import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
-import org.junit.Assert
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
@@ -110,7 +110,7 @@ class LinksBehaviorTest : BehaviorTest {
         }
 
         // Does not show link
-        Assert.assertNull(onElementOrNull(BehaviorTest.Companion.ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareLinksListItem_a5092c63-cf5c-4225-9059-e888ae12e215" })
+        assertNull(onElementOrNull(BehaviorTest.ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareLinksListItem_a5092c63-cf5c-4225-9059-e888ae12e215" })
 
         // Restore initial links
         onElement { viewIdResourceName == "geoShareLinksListPane" }
