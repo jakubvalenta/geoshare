@@ -94,7 +94,7 @@
     <string name="inputs_all">Всички картографски услуги</string>
     <string name="inputs_recent">Наскоро добавени</string>
     <string name="inputs_default_handler">Отваря се по подразбиране в %1$s</string>
-    <string name="conversion_loading_indicator_description">Опит %1$d от %2$d до %3$s.</string>
+    <string name="conversion_loading_indicator_description">Опит %1$d от %2$d поради: %3$s</string>
     <string name="conversion_succeeded_save_gpx_failed">Неуспешно запазване на GPX</string>
     <string name="main_input_uri_paste_content_description">Поставяне</string>
     <string name="conversion_automation_copy_link_succeeded">Автоматично копирана връзка</string>
@@ -253,4 +253,11 @@
     <string name="user_preferences_apps_title">Приложения</string>
     <string name="user_preferences_section_input">Вход</string>
     <string name="user_preferences_section_output">Изход</string>
+    <string name="conversion_failed_unshorten_error_with_reason">Неуспешно разрешаване на кратката връзка поради: %1$s</string>
+    <string name="conversion_failed_reason_invalid_url">невалиден URL адрес</string>
+    <string name="conversion_failed_reason_missing_header">липсва HTTP заглавка</string>
+    <string name="conversion_failed_reason_no_points">не са намерени точки</string>
+    <string name="conversion_failed_reason_timeout">изтичане на времето</string>
+    <string name="conversion_failed_parse_html_error_with_reason">Неуспешна обработка на уеб страницата поради: %1$s</string>
+    <string name="network_exception_too_many_requests">твърде много заявки</string>
 </resources>
