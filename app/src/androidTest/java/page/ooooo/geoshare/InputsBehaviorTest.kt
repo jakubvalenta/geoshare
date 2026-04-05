@@ -2,7 +2,7 @@ package page.ooooo.geoshare
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.uiautomator.uiAutomator
-import org.junit.Assert
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import page.ooooo.geoshare.BehaviorTest.Companion.ELEMENT_DOES_NOT_EXIST_TIMEOUT
@@ -49,13 +49,13 @@ class InputsBehaviorTest : BehaviorTest {
         closeIntro()
 
         // Does not show main menu badge
-        Assert.assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareMainMenuBadge" })
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareMainMenuBadge" })
 
         // Go to the inputs screen
         goToInputsList()
 
         // Does not show recently added documentations
-        Assert.assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareInputsDocumentationRecent_${InputDocumentationId.MAPY_COM}" })
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareInputsDocumentationRecent_${InputDocumentationId.MAPY_COM}" })
 
         // Shows all documentations
         onElement { viewIdResourceName == "geoShareInputsDocumentationAll_${InputDocumentationId.AMAP}" }
