@@ -213,7 +213,7 @@ open class NetworkTools(
 
     companion object {
         const val DESKTOP_USER_AGENT =
-            @Suppress("SpellCheckingInspection") "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36"
+            @Suppress("SpellCheckingInspection") "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
         const val MAX_RETRIES = 9
         const val EXPONENTIAL_DELAY_BASE = 2.0
         const val EXPONENTIAL_DELAY_BASE_DELAY = 1_000L

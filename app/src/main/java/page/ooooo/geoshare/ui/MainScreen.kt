@@ -51,6 +51,7 @@ import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalClipboard
@@ -816,9 +817,16 @@ private fun MainMainPane(
 @Composable
 private fun MainBottomPane(currentState: State) {
     if (currentState is GrantedParseWebPermission) {
-        BoxWithConstraints(Modifier.fillMaxSize()) {
+        BoxWithConstraints(
+            Modifier
+                .fillMaxSize()
+                // Clip to bounds, so that the WebView inside this box never overflows the top edge of the box, which
+                // can happen due to how Modifier.requiredSize, which we use in ConversionWebView, works
+                .clipToBounds()
+        ) {
+            val density = LocalDensity.current
             val wholeSquaresCount = floor(maxWidth.value / 30)
-            val squarePx = with(LocalDensity.current) { (maxWidth / wholeSquaresCount).toPx() }
+            val squarePx = with(density) { (maxWidth / wholeSquaresCount).toPx() }
             Box(
                 Modifier
                     .fillMaxSize()
