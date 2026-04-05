@@ -8,40 +8,32 @@ data class ParseUriResult(
     val points: ImmutableList<Point> = persistentListOf(),
     val htmlUriString: String? = null,
     val webUriString: String? = null,
-) {
-    class Builder {
-        var points: ImmutableList<Point> = persistentListOf()
-        var htmlUriString: String? = null
-        var webUriString: String? = null
+)
 
-        fun build(): ParseUriResult = ParseUriResult(
-            points = points,
-            htmlUriString = htmlUriString,
-            webUriString = webUriString,
-        )
-    }
+class ParseUriResultScope {
+    var points: ImmutableList<Point> = persistentListOf()
+    var htmlUriString: String? = null
+    var webUriString: String? = null
+
+    internal fun build() = ParseUriResult(points, htmlUriString, webUriString)
 }
 
 data class ParseHtmlResult(
     val points: ImmutableList<Point> = persistentListOf(),
     val redirectUriString: String? = null,
     val webUriString: String? = null,
-) {
-    class Builder {
-        var points: ImmutableList<Point> = persistentListOf()
-        var redirectUriString: String? = null
-        var webUriString: String? = null
+)
 
-        fun build(): ParseHtmlResult = ParseHtmlResult(
-            points = points,
-            redirectUriString = redirectUriString,
-            webUriString = webUriString,
-        )
-    }
+class ParseHtmlResultScope {
+    var points: ImmutableList<Point> = persistentListOf()
+    var redirectUriString: String? = null
+    var webUriString: String? = null
+
+    internal fun build() = ParseHtmlResult(points, redirectUriString, webUriString)
 }
 
-suspend fun buildParseUriResult(block: suspend ParseUriResult.Builder.() -> Unit): ParseUriResult =
-    ParseUriResult.Builder().apply { this.block() }.build()
+suspend fun buildParseUriResult(block: suspend ParseUriResultScope.() -> Unit): ParseUriResult =
+    ParseUriResultScope().apply { this.block() }.build()
 
-suspend fun buildParseHtmlResult(block: suspend ParseHtmlResult.Builder.() -> Unit): ParseHtmlResult =
-    ParseHtmlResult.Builder().apply { this.block() }.build()
+suspend fun buildParseHtmlResult(block: suspend ParseHtmlResultScope.() -> Unit): ParseHtmlResult =
+    ParseHtmlResultScope().apply { this.block() }.build()
