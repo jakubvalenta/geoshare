@@ -8,9 +8,11 @@ import android.location.provider.ProviderProperties
 import android.os.SystemClock
 import android.view.accessibility.AccessibilityNodeInfo
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.UiAutomatorTestScope
 import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.onElement
+import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
 import io.ktor.client.HttpClient
@@ -342,7 +344,9 @@ interface BehaviorTest {
     }
 
     fun UiAutomatorTestScope.goToUserPreferencesDetail(groupId: UserPreferencesGroupId) {
-        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${groupId}" }.click()
+        onElement { viewIdResourceName == "geoShareUserPreferencesListPane" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferencesGroup_${groupId}" }
+            .click()
     }
 
     fun UiAutomatorTestScope.goToMainScreenFromUserPreferencesDetail() {

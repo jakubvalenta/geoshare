@@ -15,7 +15,9 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -52,7 +54,7 @@ fun MainMenu(
     onNavigateToUserPreferencesScreen: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
-    var menuExpanded by retain { mutableStateOf(false) }
+    var expanded by retain { mutableStateOf(false) }
 
     if (currentState is Initial && billingStatus is BillingStatus.NotPurchased) {
         FeatureBadgeSmall(
@@ -60,12 +62,10 @@ fun MainMenu(
             modifier = Modifier.testTag("geoShareMainBillingIcon"),
         )
     }
-    Box {
+    Box(Modifier.padding(end = spacing.windowPadding - spacing.builtInTopBarPaddingEnd)) {
         IconButton(
-            { menuExpanded = true },
-            Modifier
-                .padding(end = spacing.windowPadding - spacing.builtInTopBarPaddingEnd)
-                .testTag("geoShareMainMenuButton"),
+            { expanded = true },
+            Modifier.testTag("geoShareMainMenuButton"),
         ) {
             BadgedBox(
                 badge = {
@@ -81,15 +81,17 @@ fun MainMenu(
             }
         }
         DropdownMenu(
-            expanded = menuExpanded,
-            onDismissRequest = { menuExpanded = false },
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
             modifier = Modifier.semantics { testTagsAsResourceId = true },
+            shape = ShapeDefaults.Large,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
         ) {
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.user_preferences_title)) },
                 modifier = Modifier.testTag("geoShareMainMenuUserPreferences"),
                 onClick = {
-                    menuExpanded = false
+                    expanded = false
                     onNavigateToUserPreferencesScreen()
                 },
                 leadingIcon = {
@@ -99,7 +101,7 @@ fun MainMenu(
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.faq_title)) },
                 onClick = {
-                    menuExpanded = false
+                    expanded = false
                     onNavigateToFaqScreen()
                 },
                 leadingIcon = {},
@@ -107,7 +109,7 @@ fun MainMenu(
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.intro_title)) },
                 onClick = {
-                    menuExpanded = false
+                    expanded = false
                     onNavigateToIntroScreen()
                 },
                 leadingIcon = {
@@ -118,7 +120,7 @@ fun MainMenu(
                 text = { Text(stringResource(R.string.inputs_title)) },
                 modifier = Modifier.testTag("geoShareMainMenuInputs"),
                 onClick = {
-                    menuExpanded = false
+                    expanded = false
                     onNavigateToInputsScreen()
                 },
                 leadingIcon = {
@@ -141,7 +143,7 @@ fun MainMenu(
                     text = { Text(stringResource(billingAppNameResId)) },
                     modifier = Modifier.testTag("geoShareMainMenuBilling"),
                     onClick = {
-                        menuExpanded = false
+                        expanded = false
                         onNavigateToBillingScreen()
                     },
                     leadingIcon = {},
@@ -150,7 +152,7 @@ fun MainMenu(
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.about_title)) },
                 onClick = {
-                    menuExpanded = false
+                    expanded = false
                     onNavigateToAboutScreen()
                 },
                 leadingIcon = {},
