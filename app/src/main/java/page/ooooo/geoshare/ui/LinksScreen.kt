@@ -36,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -217,13 +218,14 @@ private fun LinksScreen(
         BasicListDetailScaffold(
             directive = navigator.scaffoldDirective,
             scaffoldState = navigator.scaffoldState,
-            listPane = { _, _ ->
+            listPane = { _, containerColor ->
                 // Use destination coming from view model, because if we use navigator.currentDestination?.contentKey,
                 // fields get briefly rendered with empty values when switching from detail to list.
                 LinksListPane(
                     destination = destination,
                     billingFeatures = billingFeatures,
                     billingStatus = billingStatus,
+                    containerColor = containerColor,
                     links = links,
                     onBack = onBack,
                     onDisable = onDisable,
@@ -277,6 +279,7 @@ private fun LinksListPane(
     destination: Int?,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
+    containerColor: Color,
     links: List<Link>,
     onBack: () -> Unit,
     onDisable: (uid: Int) -> Unit,
@@ -295,6 +298,7 @@ private fun LinksListPane(
         modifier = Modifier
             .padding(horizontal = spacing.windowPadding)
             .testTag("geoShareLinksListPane"),
+        containerColor = containerColor,
     ) {
         item {
             ParagraphText(
