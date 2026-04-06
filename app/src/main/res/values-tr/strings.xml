@@ -215,7 +215,7 @@
     <string name="output_open_navigation">Gezinti</string>
     <string name="output_open_street_view">Street view</string>
     <string name="output_open_link">%1$s bağlantısını aç</string>
-    <string name="conversion_permission_common_text"><![CDATA[<tt>%1$s</tt> linkikoordinat içermiyor. %2$s’in bunları alabilmek için harita hizmetine bağlanması gerekiyor.]]></string>
+    <string name="conversion_permission_common_text"><![CDATA[<tt>%1$s</tt> linki koordinat içermiyor. %2$s’in bunları alabilmek için harita hizmetine bağlanması gerekiyor.]]></string>
     <string name="user_preferences_connection_description">Kısa bağlantıları ve URL’de coğrafi koordinat içermeyen bağlantıları desteklemek için, %1$s harita servisine (Google Haritalar, Apple Haritalar vb.) bağlanabilir.</string>
     <string name="user_preferences_connection_option_always">İzin ver</string>
     <string name="user_preferences_connection_option_never">Asla izin verme</string>
