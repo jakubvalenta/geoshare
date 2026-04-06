@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="instrumentedTests.inputs" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests">
-    <module name="Geo_Share.app" />
+    <module name="GeoShare.app" />
     <option name="ANDROID_TEST_RUN_CONFIGURATION_SCHEMA_VERSION" value="1" />
     <option name="TESTING_TYPE" value="1" />
     <option name="METHOD_NAME" value="" />
