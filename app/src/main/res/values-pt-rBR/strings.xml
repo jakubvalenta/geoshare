@@ -95,7 +95,7 @@
     <string name="inputs_all">Todos os mapas</string>
     <string name="inputs_recent">Adicionados recentemente</string>
     <string name="inputs_default_handler">Abre no %1$s por padrão</string>
-    <string name="conversion_loading_indicator_description">Tentativa %1$d de %2$d devido a %3$s.</string>
+    <string name="conversion_loading_indicator_description">Tentativa %1$d de %2$d devido: %3$s</string>
     <string name="conversion_succeeded_save_gpx_failed">Falha ao salvar GPX</string>
     <string name="conversion_automation_copy_link_succeeded">Link copiado automaticamente</string>
     <string name="conversion_automation_copy_succeeded">Coordenadas copiadas automaticamente</string>
@@ -260,4 +260,11 @@
     <string name="user_preferences_apps_title">Apps</string>
     <string name="user_preferences_section_input">Entrada</string>
     <string name="user_preferences_section_output">Saída</string>
+    <string name="conversion_failed_unshorten_error_with_reason">Falha ao converter link curto devido a: %1$s</string>
+    <string name="conversion_failed_reason_invalid_url">URL inválido</string>
+    <string name="conversion_failed_reason_missing_header">cabelhaço HTTP ausente</string>
+    <string name="conversion_failed_reason_no_points">nenhum ponto encontrado</string>
+    <string name="conversion_failed_reason_timeout">tempo esgotado</string>
+    <string name="conversion_failed_parse_html_error_with_reason">Falha ao processar página da web devido a: %1$s</string>
+    <string name="network_exception_too_many_requests">solicitações demais</string>
 </resources>
