@@ -31,6 +31,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
@@ -103,11 +104,12 @@ private fun InputsScreen(
 
     NavigableBasicListDetailScaffold(
         navigator = navigator,
-        listPane = { wide, _ ->
+        listPane = { wide, containerColor ->
             InputsListPane(
                 currentDocumentationId = navigator.currentDestination?.contentKey,
                 allDocumentations = allDocumentations,
                 recentDocumentations = recentDocumentations,
+                containerColor = containerColor,
                 wide = wide,
                 onBack = {
                     coroutineScope.launch {
@@ -151,6 +153,7 @@ private fun InputsListPane(
     currentDocumentationId: InputDocumentationId?,
     allDocumentations: List<InputDocumentation>,
     recentDocumentations: List<InputDocumentation>,
+    containerColor: Color,
     wide: Boolean,
     onBack: () -> Unit,
     onNavigateToDocumentation: (id: InputDocumentationId) -> Unit,
@@ -169,6 +172,7 @@ private fun InputsListPane(
         },
         onBack = onBack,
         modifier = Modifier.padding(horizontal = spacing.windowPadding),
+        containerColor = containerColor,
     ) {
         if (!wide) {
             item {

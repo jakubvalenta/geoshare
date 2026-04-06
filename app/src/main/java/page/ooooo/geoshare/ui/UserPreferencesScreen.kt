@@ -43,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
@@ -197,13 +198,14 @@ private fun UserPreferencesScreen(
 
     NavigableBasicListDetailScaffold(
         navigator = navigator,
-        listPane = { _, _ ->
+        listPane = { _, containerColor ->
             UserPreferencesListPane(
                 currentGroupId = currentGroupId,
                 apps = apps,
                 appDetails = appDetails,
                 billingStatus = billingStatus,
                 billingFeatures = billingFeatures,
+                containerColor = containerColor,
                 links = links,
                 values = userPreferencesValues,
                 onBack = {
@@ -262,6 +264,7 @@ private fun UserPreferencesListPane(
     appDetails: AppDetails,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
+    containerColor: Color,
     links: List<Link>,
     onBack: () -> Unit,
     onNavigateToGroup: (id: UserPreferencesGroupId) -> Unit,
@@ -284,6 +287,7 @@ private fun UserPreferencesListPane(
         modifier = Modifier
             .padding(horizontal = spacing.windowPadding)
             .testTag("geoShareUserPreferencesListPane"),
+        containerColor = containerColor,
     ) {
         item {
             LabelLarge(

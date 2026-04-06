@@ -16,6 +16,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.testTag
@@ -29,6 +30,7 @@ fun ScrollablePane(
     onBack: (() -> Unit)?,
     modifier: Modifier = Modifier,
     actions: @Composable RowScope.() -> Unit = {},
+    containerColor: Color = MaterialTheme.colorScheme.surface,
     navigationImageVector: ImageVector = Icons.AutoMirrored.Default.ArrowBack,
     content: LazyListScope.() -> Unit,
 ) {
@@ -52,8 +54,8 @@ fun ScrollablePane(
             },
             actions = actions,
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-                scrolledContainerColor = MaterialTheme.colorScheme.surface,
+                containerColor = containerColor,
+                scrolledContainerColor = containerColor,
             ),
             scrollBehavior = scrollBehavior,
         )
