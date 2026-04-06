@@ -96,7 +96,7 @@
     <string name="inputs_default_handler">Öffnet standardmäßig in %1$s</string>
     <string name="main_input_uri_paste_content_description">Einfügen</string>
     <string name="conversion_succeeded_copy_coordinates">Koordinaten kopieren</string>
-    <string name="conversion_succeeded_copy_link">Link zu %1$s kopieren</string>
+    <string name="conversion_succeeded_copy_link">Link %1$s kopieren</string>
     <string name="conversion_succeeded_open_app_display">Karte in %1$s anzeigen</string>
     <string name="conversion_succeeded_open_app_navigate_to">In %1$s navigieren</string>
     <string name="conversion_succeeded_save_gpx_failed">Fehler beim Speichern der GPX-Datei</string>
@@ -194,4 +194,5 @@
     <string name="network_exception_socket_timeout">Socket-Zeitüberschreitung</string>
     <string name="network_exception_unknown">unbekannter Fehler</string>
     <string name="network_exception_unresolved_address">ungelöste Adresse</string>
+    <string name="conversion_succeeded_hide">Verbergen</string>
 </resources>
