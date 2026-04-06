@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -755,38 +757,33 @@ private fun UserPreferencesControls(
     val spacing = LocalSpacing.current
     val maxWidth = 500.dp
 
-    Box {
-        Column(Modifier.widthIn(max = maxWidth)) {
-            ScrollablePane(
-                title = {
-                    Text(
-                        stringResource(titleResId),
-                        Modifier.padding(bottom = spacing.tiny),
-                    )
-                },
-                onBack = onBack.takeUnless { wide },
-                modifier = Modifier
-                    .padding(horizontal = spacing.windowPadding)
-                    .testTag("geoShareUserPreferencesControlsPane"),
-            ) {
+    Box(Modifier.widthIn(max = maxWidth)) {
+        ScrollablePane(
+            title = {
+                Text(stringResource(titleResId))
+            },
+            onBack = onBack.takeUnless { wide },
+            modifier = Modifier
+                .padding(horizontal = spacing.windowPadding)
+                .testTag("geoShareUserPreferencesControlsPane"),
+        ) {
+            item {
                 description?.let { description ->
-                    item {
-                        ParagraphHtml(
-                            description(),
-                            Modifier
-                                .padding(bottom = spacing.mediumAdaptive)
-                                .run {
-                                    if (featureNotPurchased) {
-                                        alpha(0.7f)
-                                    } else {
-                                        this
-                                    }
-                                },
-                        )
-                    }
-                }
-                this.content()
+                    ParagraphHtml(
+                        description(),
+                        Modifier
+                            .padding(top = spacing.tiny, bottom = spacing.mediumAdaptive)
+                            .run {
+                                if (featureNotPurchased) {
+                                    alpha(0.7f)
+                                } else {
+                                    this
+                                }
+                            },
+                    )
+                } ?: Spacer(Modifier.height(spacing.tiny))
             }
+            content()
         }
         if (featureNotPurchased) {
             FeatureWall(
