@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.plugin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
+    alias(libs.plugins.aboutlibraries)
 }
 
 kotlin {
@@ -100,6 +101,7 @@ dependencies {
     implementation(composeBom)
     androidTestImplementation(composeBom)
 
+    implementation(libs.aboutlibraries.compose.m3)
     implementation(libs.accompanist.drawableplainter)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material.icons)
