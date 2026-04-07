@@ -1,4 +1,4 @@
-# ![Application icon](./docs/icon-54.png) GeoShare: Switch maps & navigations
+# ![Application icon](./docs/icon-54.png) GeoShare: Jump Between Maps
 
 An Android app to open map links in other map apps and copy coordinates.
 
