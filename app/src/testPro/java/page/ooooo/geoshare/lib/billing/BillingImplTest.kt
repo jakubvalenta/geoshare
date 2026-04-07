@@ -40,11 +40,11 @@ import kotlin.time.Duration.Companion.hours
 class BillingImplTest {
 
     private val resources: Resources = mock {
-        on { getString(R.string.app_name_pro) } doReturn "Geo Share Pro"
+        on { getString(R.string.app_name_pro) } doReturn "GeoShare Pro"
         on { getString(R.string.billing_offers_error) } doReturn "Failed to fetch offers"
         on { getString(R.string.billing_purchase_error_cancelled) } doReturn "Purchase cancelled"
         on { getString(R.string.billing_purchase_error_unknown) } doReturn "Failed to make the purchase"
-        on { getString(eq(R.string.billing_purchase_success), any()) } doReturn "Thanks for buying Geo Share Pro"
+        on { getString(eq(R.string.billing_purchase_success), any()) } doReturn "Thanks for buying GeoShare Pro"
         on { getString(R.string.billing_setup_error_unknown) } doReturn "Failed to fetch purchases"
     }
     private val context: Context = mock()
@@ -1323,7 +1323,7 @@ class BillingImplTest {
             )
             assertTrue(billingImpl.status.value is BillingStatus.Purchased)
             assertEquals(
-                Message("Thanks for buying Geo Share Pro"),
+                Message("Thanks for buying GeoShare Pro"),
                 billingImpl.message.value,
             )
         }
@@ -1410,7 +1410,7 @@ class BillingImplTest {
                 billingImpl.status.value,
             )
             assertEquals(
-                Message("Thanks for buying Geo Share Pro"),
+                Message("Thanks for buying GeoShare Pro"),
                 billingImpl.message.value,
             )
         }
@@ -1507,7 +1507,7 @@ class BillingImplTest {
                 billingImpl.status.value,
             )
             assertEquals(
-                Message("Thanks for buying Geo Share Pro"),
+                Message("Thanks for buying GeoShare Pro"),
                 billingImpl.message.value,
             )
         }

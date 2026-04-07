@@ -1,2 +1,2 @@
-- You can now translate Geo Share to your language on Hosted Weblate!
+- You can now translate GeoShare to your language on Hosted Weblate!
 - Add Brazilian Portuguese translation.

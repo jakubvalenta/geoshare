@@ -23,5 +23,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Geo Share"
+rootProject.name = "GeoShare"
 include(":app")

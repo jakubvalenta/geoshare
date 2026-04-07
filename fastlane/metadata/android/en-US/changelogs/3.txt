@@ -1,2 +1,2 @@
-You can now share not only Google Maps links but also geo: links with Geo Share.
-If you do that, Geo Share will share the geo: link back unchanged.
+You can now share not only Google Maps links but also geo: links with GeoShare.
+If you do that, GeoShare will share the geo: link back unchanged.

@@ -1,4 +1,4 @@
-Teile einen Kartenlink mit Geo Share und die App wird ihn in einer anderen installierten Karten-App öffnen.
+Teile einen Kartenlink mit GeoShare und die App wird ihn in einer anderen installierten Karten-App öffnen.
 
 <b>Unterstützte Links</b>
 
@@ -33,6 +33,6 @@ Wenn du Google Maps für die Ortssuche magst, aber eine andere App für die Navi
 
 <b>Funktionsweise und Hinweise zum Datenschutz</b>
 
-Geo Share wandelt Kartenlinks (z.B. https://maps.app.goo.gl/...) in geo:-Links um, die von anderen Karten-Apps geöffnet werden können. Um einen geo:-Link zu erstellen, sind geografische Koordinaten erforderlich. Geo Share extrahiert sie aus der Karten-URL.
+GeoShare wandelt Kartenlinks (z.B. https://maps.app.goo.gl/...) in geo:-Links um, die von anderen Karten-Apps geöffnet werden können. Um einen geo:-Link zu erstellen, sind geografische Koordinaten erforderlich. GeoShare extrahiert sie aus der Karten-URL.
 
-Allerdings enthalten nicht alle Karten-URLs Koordinaten. In solchen Fällen wird Geo Share dich um die Erlaubnis bitten, sich mit dem Kartendienst (Google Maps, Apple Maps usw.) zu verbinden und die Koordinaten entweder aus den HTTP-Headern oder dem HTML-Dokument des Links abzurufen. Mehr Infos findest du auf dem FAQ-Bildschirm der App.
+Allerdings enthalten nicht alle Karten-URLs Koordinaten. In solchen Fällen wird GeoShare dich um die Erlaubnis bitten, sich mit dem Kartendienst (Google Maps, Apple Maps usw.) zu verbinden und die Koordinaten entweder aus den HTTP-Headern oder dem HTML-Dokument des Links abzurufen. Mehr Infos findest du auf dem FAQ-Bildschirm der App.

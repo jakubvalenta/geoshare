@@ -1,8 +1,8 @@
-<b>Kiedy używać Geo Share</b>
+<b>Kiedy używać GeoShare</b>
 
-Jeśli ktoś wyśle ci link do Map Google, ale wolisz korzystać z OpenStreetMap, możesz udostępnić link za pomocą Geo Share. Aplikacja otworzy go w wybranej zainstalowanej aplikacji mapowej, takiej jak OsmAnd lub Organic Maps.
+Jeśli ktoś wyśle ci link do Map Google, ale wolisz korzystać z OpenStreetMap, możesz udostępnić link za pomocą GeoShare. Aplikacja otworzy go w wybranej zainstalowanej aplikacji mapowej, takiej jak OsmAnd lub Organic Maps.
 
-Jeśli lubisz znajdować miejsca w Mapach Google, ale wolisz inną aplikację do nawigacji, możesz udostępnić lokalizację z Map Google za pomocą Geo Share. Aplikacja otworzy ją w ulubionej aplikacji nawigacyjnej.
+Jeśli lubisz znajdować miejsca w Mapach Google, ale wolisz inną aplikację do nawigacji, możesz udostępnić lokalizację z Map Google za pomocą GeoShare. Aplikacja otworzy ją w ulubionej aplikacji nawigacyjnej.
 
 Możesz także użyć aplikacji do skopiowania linków Google Maps jako geo: link do schowka.
 

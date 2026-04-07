@@ -79,7 +79,7 @@ class AutomationBehaviorTest : BehaviorTest {
         // Google Maps opens
         onElement(20_000L) { packageName == GOOGLE_MAPS_PACKAGE_NAME }
 
-        // Go back to Geo Share
+        // Go back to app
         launchApplication()
 
         // Shows automation preferences button

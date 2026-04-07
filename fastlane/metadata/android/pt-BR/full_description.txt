@@ -1,4 +1,4 @@
-Compartilhe um link de mapa com o Geo Share e o app abrirá ele em outro app de mapa instalado.
+Compartilhe um link de mapa com o GeoShare e o app abrirá ele em outro app de mapa instalado.
 
 <b>Links de mapa suportados</b>
 
@@ -40,6 +40,6 @@ Se você gosta do Google Maps para encontrar lugares, mas prefere usar outro app
 
 <b>Como funciona e considerações de privacidade</b>
 
-O Geo Share converte links de mapa (exemplo: https://maps.app.goo.gl/...) em links geo: que podem ser abertos por outros apps de mapa. Para criar um link geo:, as coordenadas geográficas são necessárias. O Geo Share extrai elas da URL de mapa.
+O GeoShare converte links de mapa (exemplo: https://maps.app.goo.gl/...) em links geo: que podem ser abertos por outros apps de mapa. Para criar um link geo:, as coordenadas geográficas são necessárias. O GeoShare extrai elas da URL de mapa.
 
-Porém, nem todas as URLs incluem coordenadas. Nestes casos, o Geo Share <b>te pedirá permissão para conectar ao mapa (como o Google Maps, Apple Maps, etc.)</b> e obter as coordenadas ou dos cabeçalhos HTTP ou do documento HTML do link. Para informações mais detalhadas, confira a tela de perguntas frequentes no app.
+Porém, nem todas as URLs incluem coordenadas. Nestes casos, o GeoShare <b>te pedirá permissão para conectar ao mapa (como o Google Maps, Apple Maps, etc.)</b> e obter as coordenadas ou dos cabeçalhos HTTP ou do documento HTML do link. Para informações mais detalhadas, confira a tela de perguntas frequentes no app.

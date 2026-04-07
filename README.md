@@ -1,4 +1,4 @@
-# ![Application icon](./docs/icon-54.png) Geo Share
+# ![Application icon](./docs/icon-54.png) GeoShare: Jump Between Maps
 
 An Android app to open map links in other map apps and copy coordinates.
 
@@ -19,7 +19,7 @@ Droid](https://img.shields.io/endpoint?url=https://apt.izzysoft.de/fdroid/api/v1
 [![GitHub](https://img.shields.io/github/v/release/jakubvalenta/geoshare?logo=github&label=GitHub)](https://github.com/jakubvalenta/geoshare/releases/latest/download/page.ooooo.geoshare.apk)
 [![Translation status](https://hosted.weblate.org/widget/geoshare/svg-badge.svg)](https://hosted.weblate.org/engage/geoshare/)
 
-Share a map link with Geo Share and the app will open it in another installed
+Share a map link with GeoShare and the app will open it in another installed
 map app.
 
 **Supported map links**
@@ -73,10 +73,10 @@ Share a location from your map app or web browser.
 
 ![Screenshot of Google Maps’ share screen](./docs/map_app.webp)
 
-Choose _Geo Share_ and the app will let you open the same location in any
+Choose _GeoShare_ and the app will let you open the same location in any
 installed map app.
 
-![Screenshot of Geo Share’s share screen](./docs/geo_share_open.webp)
+![Screenshot of GeoShare’s share screen](./docs/geo_share_open.webp)
 
 ### Configure Android to open links to Google Maps in alternative maps (optional)
 
@@ -86,10 +86,10 @@ of links in this app.
 ![Screenshot of Google Maps’ Open by default
 settings](./docs/open_by_default_google_maps.webp)
 
-Then go to Settings > Apps > Geo Share > _Open by default_, turn on the opening
+Then go to Settings > Apps > GeoShare > _Open by default_, turn on the opening
 of links in this app, and tap _Add links_.
 
-![Screenshot of Geo Share’s Open by default
+![Screenshot of GeoShare’s Open by default
 settings](./docs/open_by_default_geo_share.webp)
 
 Select **maps.app.goog.gl**, **maps.google.com**, and **www.google.com**. These
@@ -102,11 +102,11 @@ for Google Maps.
 
 ## How it works
 
-Geo Share converts map links (e.g. https://maps.app.goo.gl/...) into geo: links
+GeoShare converts map links (e.g. https://maps.app.goo.gl/...) into geo: links
 that can be opened by other map apps. To create a geo: link, geographic
-coordinates are required. Geo Share extracts them from the map URL.
+coordinates are required. GeoShare extracts them from the map URL.
 
-However, not all map URLs include coordinates. In such cases, Geo Share will
+However, not all map URLs include coordinates. In such cases, GeoShare will
 **prompt you for permission to connect to the map service (Google Maps, Apple
 Maps etc.)** and retrieve the coordinates from:
 
@@ -116,7 +116,7 @@ Maps etc.)** and retrieve the coordinates from:
   `<meta property="place:location:latitude" content="40.78">`
 - or the whole web page with running JavaScript.
 
-If you don’t allow connecting to the map service, then Geo Share creates a geo:
+If you don’t allow connecting to the map service, then GeoShare creates a geo:
 link with a search term instead of coordinates, or it stops, depending on the
 particular link.
 
@@ -125,43 +125,43 @@ asking (the default), go to the app’s preferences.
 
 ## Privacy considerations
 
-When possible, Geo Share converts map links offline. If the map link requires
+When possible, GeoShare converts map links offline. If the map link requires
 online conversion, the app will ask you before connecting to the map service (
 Google Maps, Apple Maps, etc.). If you allow the connection, the map service
 will receive the map link, it will be able to read your IP address, and in some
-cases Geo Share will load the live web page of the map service and execute its
+cases GeoShare will load the live web page of the map service and execute its
 JavaScript. This happens in a restricted environment, which blocks tracking
 scripts and doesn’t store cookies.
 
 ## Location permission
 
-Geo Share asks for location permission when launching the TomTom navigation and
+GeoShare asks for location permission when launching the TomTom navigation and
 when sharing a GPX route, because in these cases the app needs to create a GPX
 route that starts at your current location. The location information is
 discarded immediately after the creation of the route.
 
 ## Reporting issues
 
-Geo Share supports many types of map links. If you still find a link that
+GeoShare supports many types of map links. If you still find a link that
 doesn’t work,
 please [report an issue](https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml).
 
 ## Screenshots
 
 [<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/1.png"
-alt="Screenshot of Geo Share’s main screen"
+alt="Screenshot of GeoShare’s main screen"
 width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/1.png)
 [<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/2.png"
-alt="Screenshot of Geo Share’s result screen"
+alt="Screenshot of GeoShare’s result screen"
 width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/2.png)
 [<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/3.png"
-alt="Screenshot of Geo Share’s automation configuration screen"
+alt="Screenshot of GeoShare’s automation configuration screen"
 width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/3.png)
 [<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/4.png"
-alt="Screenshot of Geo Share asking for permission to connect to Google"
+alt="Screenshot of GeoShare asking for permission to connect to Google"
 width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/4.png)
 [<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/5.png"
-alt="Screenshot of Geo Share’s intro screen"
+alt="Screenshot of GeoShare’s intro screen"
 width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/5.png)
 
 ## Installation
@@ -252,7 +252,7 @@ issue](https://github.com/jakubvalenta/geoshare/issues) or create a new one.
 
 ### Translating
 
-Geo Share is [available under
+GeoShare is [available under
 Weblate](https://hosted.weblate.org/engage/geoshare/) thanks to their libre
 tier! More instructions can be found under *Info* in it.
 
