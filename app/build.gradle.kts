@@ -96,6 +96,12 @@ android {
     }
 }
 
+aboutLibraries {
+    collect {
+        configPath = file("./config")
+    }
+}
+
 dependencies {
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)

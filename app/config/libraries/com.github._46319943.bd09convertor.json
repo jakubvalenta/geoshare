@@ -1,0 +1,14 @@
+{
+    "uniqueId": "com.github._46319943.bd09convertor",
+    "name": "BD09Convertor",
+    "description": "BD09LL BD09MC conversion tool. 针对BD09百度坐标系的墨卡托投影转换。",
+    "developers": [
+        {
+            "name": "46319943"
+        }
+    ],
+    "website": "https://github.com/46319943/BD09Convertor",
+    "licenses": [
+        "MIT"
+    ]
+}
