@@ -255,6 +255,7 @@
     <string name="inputs_recent">Recently added</string>
     <string name="inputs_settings">Go to Android settings to choose links that should always open in %1$s</string>
     <string name="inputs_title">Supported maps</string>
+    <string name="licenses">Licenses</string>
     <string name="links_delete">Delete</string>
     <string name="links_delete_text">The web map “%1$s” will be permanently deleted.</string>
     <string name="links_delete_title">Delete web map?</string>

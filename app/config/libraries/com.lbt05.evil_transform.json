@@ -1,0 +1,38 @@
+{
+    "uniqueId": "com.lbt05.evil_transform",
+    "name": "eviltransform",
+    "description": "Transport coordinate between earth(WGS-84) and mars in china(GCJ-02).",
+    "developers": [
+        {
+            "name": "Googol Lee"
+        },
+        {
+            "name": "gutenye"
+        },
+        {
+            "name": "xingxing"
+        },
+        {
+            "name": "bewantbe"
+        },
+        {
+            "name": "GhostFlying"
+        },
+        {
+            "name": "larryli"
+        },
+        {
+            "name": "gumblex"
+        },
+        {
+            "name": "lbt05"
+        },
+        {
+            "name": "chenweiyj"
+        }
+    ],
+    "website": "https://github.com/googollee/eviltransform",
+    "licenses": [
+        "BSD-2-Clause-FreeBSD"
+    ]
+}

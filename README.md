@@ -260,3 +260,6 @@ tier! More instructions can be found under *Info* in it.
 
 __Feel free to remix this project__ under the terms of the GNU General Public
 License version 3 or later. See [COPYING](./COPYING) and [NOTICE](./NOTICE).
+
+Some components of this project are derived from third-party code under other
+compatible licenses; see individual subdirectories.

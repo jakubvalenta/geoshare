@@ -28,6 +28,9 @@ data class InputsRoute(val id: InputDocumentationId? = null)
 object IntroRoute
 
 @Serializable
+object LicensesRoute
+
+@Serializable
 object LinksRoute
 
 @Serializable
@@ -62,6 +65,7 @@ fun MainNavigation(
         composable<AboutRoute> {
             AboutScreen(
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
+                onNavigateToLicensesScreen = { navController.navigate(LicensesRoute) },
                 billingViewModel = billingViewModel,
             )
         }
@@ -102,7 +106,12 @@ fun MainNavigation(
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
             )
         }
-        composable<LinksRoute> { backStackEntry ->
+        composable<LicensesRoute> {
+            LicensesScreen(
+                onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
+            )
+        }
+        composable<LinksRoute> {
             LinksScreen(
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
                 onNavigateToBillingScreen = { navController.navigate(BillingRoute) },

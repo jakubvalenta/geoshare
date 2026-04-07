@@ -1,0 +1,14 @@
+{
+    "uniqueId": "com.github.wandergis.coordtransform",
+    "name": "coordtransform",
+    "description": "提供了百度坐标（BD09）、国测局坐标（火星坐标，GCJ02）、和WGS84坐标系之间的转换",
+    "developers": [
+        {
+            "name": "记忆的残骸"
+        }
+    ],
+    "website": "https://github.com/wandergis/coordtransform",
+    "licenses": [
+        "MIT"
+    ]
+}
