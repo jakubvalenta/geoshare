@@ -29,7 +29,13 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.LineBreak
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,6 +47,7 @@ import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.ui.components.BasicSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.LargeButton
 import page.ooooo.geoshare.ui.components.ParagraphHtml
+import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.ScaffoldAction
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -48,22 +55,26 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @Composable
 fun AboutScreen(
     onBack: () -> Unit = {},
+    onNavigateToLicensesScreen: () -> Unit = {},
     billingViewModel: BillingViewModel,
 ) {
     val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
-    val donation = remember(billingStatus) {
+    val donationVisible = remember(billingStatus) {
         (billingStatus as? BillingStatus.Purchased)?.product?.type == BillingProduct.Type.DONATION
     }
 
     AboutScreen(
-        donation = donation, onBack = onBack
+        donationVisible = donationVisible,
+        onBack = onBack,
+        onNavigateToLicensesScreen = onNavigateToLicensesScreen,
     )
 }
 
 @Composable
 private fun AboutScreen(
-    donation: Boolean,
+    donationVisible: Boolean,
     onBack: () -> Unit = {},
+    onNavigateToLicensesScreen: () -> Unit = {},
 ) {
     val spacing = LocalSpacing.current
 
@@ -73,7 +84,7 @@ private fun AboutScreen(
             IconButton(onClick = onBack) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                    contentDescription = stringResource(R.string.nav_back_content_description)
+                    contentDescription = stringResource(R.string.nav_back_content_description),
                 )
             }
         },
@@ -92,15 +103,26 @@ private fun AboutScreen(
                     .padding(horizontal = spacing.windowPadding)
                     .verticalScroll(rememberScrollState()),
             ) {
-                AboutMainPane(donation = donation)
+                AboutMainPane(
+                    donationVisible = donationVisible,
+                    onNavigateToLicensesScreen = onNavigateToLicensesScreen,
+                )
             }
             if (!wide) {
-                AboutSupportingPane(donation = donation, innerPadding = innerPadding, bottomCorners = false)
+                AboutSupportingPane(
+                    donationVisible = donationVisible,
+                    innerPadding = innerPadding,
+                    bottomCorners = false,
+                )
             }
         },
         supportingPane = {
             Column(Modifier.padding(horizontal = spacing.windowPadding)) {
-                AboutSupportingPane(donation = donation, innerPadding = PaddingValues.Zero, bottomCorners = true)
+                AboutSupportingPane(
+                    donationVisible = donationVisible,
+                    innerPadding = PaddingValues.Zero,
+                    bottomCorners = true,
+                )
             }
         },
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -109,7 +131,8 @@ private fun AboutScreen(
 
 @Composable
 private fun ColumnScope.AboutMainPane(
-    donation: Boolean,
+    donationVisible: Boolean,
+    onNavigateToLicensesScreen: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
 
@@ -134,9 +157,29 @@ private fun ColumnScope.AboutMainPane(
             stringResource(R.string.about_support_email),
         )
     )
+    ParagraphText(
+        buildAnnotatedString {
+            withLink(
+                LinkAnnotation.Clickable(
+                    "licenses",
+                    styles = TextLinkStyles(
+                        SpanStyle(
+                            color = MaterialTheme.colorScheme.tertiary,
+                            textDecoration = TextDecoration.Underline
+                        )
+                    ),
+                ) {
+                    onNavigateToLicensesScreen()
+                }
+            ) {
+                append(stringResource(R.string.licenses))
+            }
+        }
+    )
 
-    if (donation) {
+    if (donationVisible) {
         ElevatedCard(
+            modifier = Modifier.padding(top = spacing.largeAdaptive),
             colors = CardDefaults.elevatedCardColors(
                 containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                 contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
@@ -155,11 +198,11 @@ private fun ColumnScope.AboutMainPane(
 
 @Composable
 private fun AboutSupportingPane(
-    donation: Boolean,
+    donationVisible: Boolean,
     innerPadding: PaddingValues,
     bottomCorners: Boolean,
 ) {
-    if (donation) {
+    if (donationVisible) {
         val uriHandler = LocalUriHandler.current
 
         ScaffoldAction(
@@ -190,7 +233,7 @@ private fun AboutSupportingPane(
 @Composable
 private fun DefaultPreview() {
     AppTheme {
-        AboutScreen(donation = false)
+        AboutScreen(donationVisible = false)
     }
 }
 
@@ -198,7 +241,7 @@ private fun DefaultPreview() {
 @Composable
 private fun DarkPreview() {
     AppTheme {
-        AboutScreen(donation = false)
+        AboutScreen(donationVisible = false)
     }
 }
 
@@ -206,7 +249,7 @@ private fun DarkPreview() {
 @Composable
 private fun TabletPreview() {
     AppTheme {
-        AboutScreen(donation = false)
+        AboutScreen(donationVisible = false)
     }
 }
 
@@ -214,7 +257,7 @@ private fun TabletPreview() {
 @Composable
 private fun DonationPreview() {
     AppTheme {
-        AboutScreen(donation = true)
+        AboutScreen(donationVisible = true)
     }
 }
 
@@ -222,7 +265,7 @@ private fun DonationPreview() {
 @Composable
 private fun DarkDonationPreview() {
     AppTheme {
-        AboutScreen(donation = true)
+        AboutScreen(donationVisible = true)
     }
 }
 
@@ -230,6 +273,6 @@ private fun DarkDonationPreview() {
 @Composable
 private fun TabletDonationPreview() {
     AppTheme {
-        AboutScreen(donation = true)
+        AboutScreen(donationVisible = true)
     }
 }
