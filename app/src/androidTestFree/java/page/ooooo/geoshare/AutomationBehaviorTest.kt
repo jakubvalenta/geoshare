@@ -21,6 +21,7 @@ import page.ooooo.geoshare.data.local.preferences.OpenRouteOnePointGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
 import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 import kotlin.time.Duration.Companion.seconds
@@ -149,7 +150,7 @@ class AutomationBehaviorTest : BehaviorTest {
         shareUri("geo:52.47254,13.4345")
 
         // Wait for the conversion to succeed
-        assertConversionSucceeded(persistentListOf(WGS84Point(52.47254, 13.4345)))
+        assertConversionSucceeded(persistentListOf(WGS84Point(52.47254, 13.4345, source = Source.URI)))
 
         // Shows automation counter
         onElement { viewIdResourceName == "geoShareResultSuccessAutomationCounter" }

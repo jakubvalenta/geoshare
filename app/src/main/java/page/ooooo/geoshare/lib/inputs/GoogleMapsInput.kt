@@ -153,7 +153,7 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
                             }
 
                     } else if (part.startsWith('@')) {
-                        // Center
+                        // Map center
                         // /@{lat},{lon},{z}z
                         Regex("""@$LAT,$LON(?:,${Z}z)?.*""").matchEntire(part)?.toLatLonZPoint(Source.MAP_CENTER)
                             ?.let { naivePoint ->

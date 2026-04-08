@@ -14,6 +14,7 @@ import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.formats.CoordsFormat
 import page.ooooo.geoshare.lib.point.GCJ02Point
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
 @RunWith(AndroidJUnit4::class)
@@ -32,7 +33,7 @@ class UserPreferencesBehaviorTest : BehaviorTest {
         onElement {
             if (viewIdResourceName == "geoShareResultSuccessLastPointCoordinates") {
                 assertEquals(
-                    CoordsFormat.formatDecCoords(GCJ02Point(52.5067296, 13.2599309)),
+                    CoordsFormat.formatDecCoords(GCJ02Point(52.5067296, 13.2599309, source = Source.MAP_CENTER)),
                     textAsString(),
                 )
                 true
@@ -51,7 +52,7 @@ class UserPreferencesBehaviorTest : BehaviorTest {
         onElement {
             if (viewIdResourceName == "geoShareResultSuccessLastPointCoordinates") {
                 assertEquals(
-                    CoordsFormat.formatDegMinSecCoords(GCJ02Point(52.5067296, 13.2599309)),
+                    CoordsFormat.formatDegMinSecCoords(GCJ02Point(52.5067296, 13.2599309, source = Source.MAP_CENTER)),
                     textAsString(),
                 )
                 true

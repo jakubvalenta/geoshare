@@ -54,7 +54,7 @@ object BaiduMapInput : ShortUriInput, WebInput {
                 }
 
             } else if (firstPart.startsWith('@')) {
-                // Center
+                // Map center
                 // https://map.baidu.com/@{centerX},{centerY},{centerZ}
                 Regex(CENTER).matchEntire(firstPart)?.toLonLatZPoint(Source.MAP_CENTER)?.let {
                     points = persistentListOf(BD09MCPoint(it))

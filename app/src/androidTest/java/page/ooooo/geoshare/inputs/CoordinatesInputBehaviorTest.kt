@@ -2,6 +2,7 @@ package page.ooooo.geoshare.inputs
 
 import androidx.test.uiautomator.uiAutomator
 import org.junit.Test
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 
 class CoordinatesInputBehaviorTest : InputBehaviorTest {
@@ -13,7 +14,7 @@ class CoordinatesInputBehaviorTest : InputBehaviorTest {
 
         // Decimal
         testTextUri(
-            WGS84Point(-68.648556, -152.775879),
+            WGS84Point(-68.648556, -152.775879, source = Source.TEXT),
             "N-68.648556,E-152.775879",
         )
     }

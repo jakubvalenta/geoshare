@@ -233,7 +233,7 @@ class BaiduMapInputTest : BaseInputTest() {
                     BD09MCPoint(
                         2631139.59, 12611885.88,
                         name = "广东省广州市越秀区大塘街道中山三路东昌大街2号",
-                        source = Source.URI
+                        source = Source.URI,
                     ),
                 )
             ),
