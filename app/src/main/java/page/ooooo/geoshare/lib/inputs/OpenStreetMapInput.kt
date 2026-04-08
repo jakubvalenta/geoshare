@@ -94,7 +94,7 @@ object OpenStreetMapInput : HtmlInput, Input.HasRandomUri {
             val line = channel.readLine() ?: break
             mutablePoints.addAll(
                 pattern.findAll(line)
-                    .mapNotNull { m -> m.toLatLonPoint(Source.HTML)?.let { WGS84Point(it) } }
+                    .mapNotNull { m -> m.toLatLonPoint(Source.API)?.let { WGS84Point(it) } }
             )
         }
 

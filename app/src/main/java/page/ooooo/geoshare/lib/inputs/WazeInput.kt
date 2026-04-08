@@ -124,7 +124,7 @@ object WazeInput : HtmlInput, Input.HasRandomUri {
 
         while (true) {
             val line = channel.readLine() ?: break
-            pattern.find(line)?.toLatLonPoint(Source.HTML)?.let {
+            pattern.find(line)?.toLatLonPoint(Source.JAVASCRIPT)?.let {
                 points = persistentListOf(WGS84Point(it).copy(name = name))
                 return@buildParseHtmlResult
             }
