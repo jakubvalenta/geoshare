@@ -50,9 +50,12 @@ class ConversionBehaviorTest : BehaviorTest {
                 // Share a Google Maps coordinates link with the app
                 shareUri("https://www.google.com/maps/@31.22850685422705,121.47552456472106,11z")
 
-                // Shows precise location in WGS 84
-                val expectedPoint =
-                    WGS84Point(31.23044166868017, 121.47099209401793, z = 11.0, source = Source.MAP_CENTER)
+                // Shows precise location
+                val expectedPoint = GCJ02Point(
+                    31.22850685422705, 121.47552456472106,
+                    z = 11.0,
+                    source = Source.MAP_CENTER,
+                )
                 assertConversionSucceeded(expectedPoint)
 
                 // Tap the Google Maps icon

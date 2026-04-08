@@ -81,7 +81,7 @@ fun ResultSuccessCoordinates(
             Modifier
                 .fillMaxWidth()
                 .padding(start = spacing.windowPadding, end = spacing.windowPadding - 10.dp)
-                .testTag("geoShareResultSuccessSource_${lastPoint.source}"),
+                .testTag("geoShareResultSuccessLastPointSource_${lastPoint.source}"),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {

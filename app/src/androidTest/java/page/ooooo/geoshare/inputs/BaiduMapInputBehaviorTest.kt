@@ -13,20 +13,24 @@ class BaiduMapInputBehaviorTest : InputBehaviorTest {
     fun baiduMap() = uiAutomator {
         // Map center
         testUri(
-            BD09MCPoint(3317203.0, 13520653.0, 13.0, source = Source.URI),
+            BD09MCPoint(3317203.0, 13520653.0, 13.0, source = Source.MAP_CENTER),
             "https://map.baidu.com/@13520653,3317203,13z",
         )
 
         // Place
         testUri(
-            BD09MCPoint(3315902.2199999997, 13502918.375, 16.0, name = "黄岩客运中心", source = Source.URI),
+            BD09MCPoint(3315902.2199999997, 13502918.375, 16.0, name = "黄岩客运中心", source = Source.MAP_CENTER),
             @Suppress("SpellCheckingInspection") "https://map.baidu.com/poi/%E9%BB%84%E5%B2%A9%E5%AE%A2%E8%BF%90%E4%B8%AD%E5%BF%83/@13502918.375,3315902.2199999997,16z?uid=fef3b5922f87e66c63180999&info_merge=1&isBizPoi=false&ugc_type=3&ugc_ver=1&device_ratio=2&compat=1&routetype=drive&en_uid=fef3b5922f87e66c63180999&pcevaname=pc4.1&querytype=detailConInfo&da_src=shareurl",
         )
 
         // Directions
         testUri(
             persistentListOf(
-                BD09MCPoint(2629182.88, 12613508.26, name = "广东省广州市越秀区白云街道烟雨路", source = Source.URI),
+                BD09MCPoint(
+                    2629182.88, 12613508.26,
+                    name = "广东省广州市越秀区白云街道烟雨路",
+                    source = Source.URI,
+                ),
                 BD09MCPoint(
                     2631131.0213408465, 12614727.164999995,
                     name = "广东省广州市越秀区梅花村街道泰兴直街35号",

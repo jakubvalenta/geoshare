@@ -35,7 +35,11 @@ import page.ooooo.geoshare.lib.network.NetworkTools.Companion.REQUEST_TIMEOUT
 import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
 import page.ooooo.geoshare.lib.formats.CoordsFormat
+import page.ooooo.geoshare.lib.geo.quickIsPointInChina
+import page.ooooo.geoshare.lib.point.BD09MCPoint
+import page.ooooo.geoshare.lib.point.GCJ02Point
 import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 import java.net.InetAddress
 import java.net.SocketException
@@ -210,35 +214,36 @@ interface BehaviorTest {
                 else -> false
             }
         }
-        val expectedName = expectedPoints.lastOrNull()?.cleanName
-        onElement {
-            if (viewIdResourceName == "geoShareResultSuccessLastPointName") {
-                if (!expectedName.isNullOrEmpty()) {
-                    assertTrue(
-                        """Expected "${textAsString()}" to contain "$expectedName"""",
-                        textAsString()?.contains(expectedName) == true,
-                    )
-                } else if (expectedPoints.size > 1) {
-                    assertTrue(
-                        """Expected "${textAsString()}" to equal "Last point" or "Dernier point""""",
-                        textAsString() in setOf("Last point", "Dernier point"),
-                    )
+        val lastPoint = expectedPoints.lastOrNull() ?: return
+        lastPoint.cleanName.let { expectedName ->
+            onElement {
+                if (viewIdResourceName == "geoShareResultSuccessLastPointName") {
+                    if (!expectedName.isNullOrEmpty()) {
+                        assertTrue(
+                            """Expected "${textAsString()}" to contain "$expectedName"""",
+                            textAsString()?.contains(expectedName) == true,
+                        )
+                    } else if (expectedPoints.size > 1) {
+                        assertTrue(
+                            """Expected "${textAsString()}" to equal "Last point" or "Dernier point""""",
+                            textAsString() in setOf("Last point", "Dernier point"),
+                        )
+                    } else {
+                        assertTrue(
+                            @Suppress("SpellCheckingInspection") """Expected "${textAsString()}" to equal "Coordinates" or "Coordonnées""""",
+                            textAsString() in setOf(
+                                "Coordinates", @Suppress("SpellCheckingInspection") "Coordonnées"
+                            ),
+                        )
+                    }
+                    true
                 } else {
-                    assertTrue(
-                        @Suppress("SpellCheckingInspection") """Expected "${textAsString()}" to equal "Coordinates" or "Coordonnées""""",
-                        textAsString() in setOf(
-                            "Coordinates", @Suppress("SpellCheckingInspection") "Coordonnées"
-                        ),
-                    )
+                    false
                 }
-                true
-            } else {
-                false
             }
         }
-        val expectedCoordinatesOptions = expectedPoints
-            .lastOrNull()
-            ?.takeIf { it.hasCoordinates() }
+        lastPoint
+            .takeIf { it.hasCoordinates() }
             ?.let { point ->
                 CoordinateFormat.entries.map { coordinateFormat ->
                     when (coordinateFormat) {
@@ -247,17 +252,33 @@ interface BehaviorTest {
                     }
                 }
             }
-        if (expectedCoordinatesOptions != null) {
-            onElement {
-                if (viewIdResourceName == "geoShareResultSuccessLastPointCoordinates") {
-                    assertTrue(
-                        """Expected "${textAsString()} to equal one of ${expectedCoordinatesOptions.joinToString()}""",
-                        textAsString() in expectedCoordinatesOptions,
-                    )
-                    true
-                } else {
-                    false
+            ?.let { expectedCoordinatesOptions ->
+                onElement {
+                    if (viewIdResourceName == "geoShareResultSuccessLastPointCoordinates") {
+                        assertTrue(
+                            """Expected "${textAsString()} to equal one of ${expectedCoordinatesOptions.joinToString()}""",
+                            textAsString() in expectedCoordinatesOptions,
+                        )
+                        true
+                    } else {
+                        false
+                    }
                 }
+            }
+        lastPoint.source.let { expectedSource ->
+            onElement { viewIdResourceName == "geoShareResultSuccessLastPointSource_${expectedSource}" }
+            if ((lastPoint is GCJ02Point || lastPoint is BD09MCPoint) &&
+                lastPoint.lat?.let { lat ->
+                    lastPoint.lon?.let { lon ->
+                        quickIsPointInChina(lon, lat)
+                    }
+                } == true
+            ) {
+                onElement { viewIdResourceName == "geoShareResultSuccessLastPointCheckSRS" }
+            } else if (expectedSource == Source.JAVASCRIPT) {
+                onElement { viewIdResourceName == "geoShareResultSuccessLastPointCheckJavaScript" }
+            } else if (expectedSource == Source.MAP_CENTER) {
+                onElement { viewIdResourceName == "geoShareResultSuccessLastPointCheckMapCenter" }
             }
         }
         if (expectedPoints.size > 1) {
