@@ -41,16 +41,20 @@ object AppleMapsInput : HtmlInput, Input.HasRandomUri {
             // Coordinates
             // https://maps.apple.com/?ll={lat},{lon}
             listOf("ll", @Suppress("SpellCheckingInspection") "daddr", "coordinate", "q")
-                .firstNotNullOfOrNull { key -> LAT_LON_PATTERN.matchEntire(queryParams[key])?.toLatLonPoint() }?.let {
-                    points = persistentListOf(it.asWGS84(Source.URI).copy(z = z, name = name))
+                .firstNotNullOfOrNull { key ->
+                    LAT_LON_PATTERN.matchEntire(queryParams[key])?.toLatLonPoint(Source.URI)
+                }?.let {
+                    points = persistentListOf(WGS84Point(it).copy(z = z, name = name))
                     return@run
                 }
 
             // Map center (including the search center 'sll')
             // https://maps.apple.com/?center={lat},{lon}
             listOf("sll", "center")
-                .firstNotNullOfOrNull { key -> LAT_LON_PATTERN.matchEntire(queryParams[key])?.toLatLonPoint() }?.let {
-                    points = persistentListOf(it.asWGS84(Source.MAP_CENTER).copy(z = z, name = name))
+                .firstNotNullOfOrNull { key ->
+                    LAT_LON_PATTERN.matchEntire(queryParams[key])?.toLatLonPoint(Source.MAP_CENTER)
+                }?.let {
+                    points = persistentListOf(WGS84Point(it).copy(z = z, name = name))
                     return@run
                 }
 

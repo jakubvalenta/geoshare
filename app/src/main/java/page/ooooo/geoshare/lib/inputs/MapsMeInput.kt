@@ -36,7 +36,11 @@ object MapsMeInput : Input {
                 ?.let { hash -> decodeGe0Hash(hash) }
                 ?.let {
                     points = persistentListOf(
-                        it.asWGS84(Source.HASH).copy(lat = it.lat?.toScale(7), lon = it.lon?.toScale(7), name = name)
+                        WGS84Point(it).copy(
+                            lat = it.lat?.toScale(7),
+                            lon = it.lon?.toScale(7),
+                            name = name
+                        )
                     )
                     return@run
                 }

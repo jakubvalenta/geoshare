@@ -56,15 +56,15 @@ object BaiduMapInput : ShortUriInput, WebInput {
             } else if (firstPart.startsWith('@')) {
                 // Center
                 // https://map.baidu.com/@{centerX},{centerY},{centerZ}
-                Regex(CENTER).matchEntire(firstPart)?.toLonLatZPoint()?.let {
-                    points = persistentListOf(it.asBD09MC(Source.MAP_CENTER))
+                Regex(CENTER).matchEntire(firstPart)?.toLonLatZPoint(Source.MAP_CENTER)?.let {
+                    points = persistentListOf(BD09MCPoint(it))
                 }
 
             } else if (firstPart == "poi") {
                 // Place
                 // https://map.baidu.com/poi/{name}/@{x},{y},{z}
-                Regex(CENTER).matchEntire(parts.getOrNull(2))?.toLonLatZPoint()?.let {
-                    points = persistentListOf(it.asBD09MC(Source.MAP_CENTER).copy(name = parts.getOrNull(1)))
+                Regex(CENTER).matchEntire(parts.getOrNull(2))?.toLonLatZPoint(Source.MAP_CENTER)?.let {
+                    points = persistentListOf(BD09MCPoint(it).copy(name = parts.getOrNull(1)))
                 }
 
             } else if (firstPart == "dir") {
@@ -72,8 +72,9 @@ object BaiduMapInput : ShortUriInput, WebInput {
                 // https://map.baidu.com/dir/...?sn={startPoint}&en={waypointPoint}$$1$$%20to:{destPoint}
                 val pattern = Regex(WAYPOINT)
                 points = listOfNotNull(
-                    pattern.find(queryParams["sn"])?.toLonLatNamePoint()?.asBD09MC(Source.URI),
-                    *pattern.findAll(queryParams["en"]).mapNotNull { it.toLonLatNamePoint()?.asBD09MC(Source.URI) }
+                    pattern.find(queryParams["sn"])?.toLonLatNamePoint(Source.URI)?.let { BD09MCPoint(it) },
+                    *pattern.findAll(queryParams["en"])
+                        .mapNotNull { m -> m.toLonLatNamePoint(Source.URI)?.let { BD09MCPoint(it) } }
                         .toList().toTypedArray(),
                 ).takeIf { it.isNotEmpty() }?.toImmutableList() ?:
                     // Directions with waypoint names only (ignore center)
@@ -87,8 +88,8 @@ object BaiduMapInput : ShortUriInput, WebInput {
             } else if (firstPart == "mobile") {
                 // Mobile place detail with coords
                 // https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid={uid}/act=read_share&vt=map&da_from=weixin&openna=1&sharegeo={lon}%2c{lat}"
-                Regex("""sharegeo=$X,$Y""").find(parts.lastOrNull())?.toLonLatPoint()?.also {
-                    points = persistentListOf(it.asBD09MC(Source.URI))
+                Regex("""sharegeo=$X,$Y""").find(parts.lastOrNull())?.toLonLatPoint(Source.URI)?.also {
+                    points = persistentListOf(BD09MCPoint(it))
                 }
                     ?: run {
                         // Mobile place detail without coords

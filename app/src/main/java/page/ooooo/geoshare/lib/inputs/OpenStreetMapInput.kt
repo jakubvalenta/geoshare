@@ -45,21 +45,21 @@ object OpenStreetMapInput : HtmlInput, Input.HasRandomUri {
             Regex("""/go/($HASH)""").matchEntire(path)?.groupOrNull()
                 ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }
                 ?.let {
-                    points = persistentListOf(it.asWGS84(Source.HASH))
+                    points = persistentListOf(WGS84Point(it))
                     return@run
                 }
 
             // Map center
             // https://www.openstreetmap.org/#map={z}/{lat}/{lon}
-            Regex("""map=$Z/$LAT/$LON.*""").matchEntire(fragment)?.toZLatLonPoint()?.let {
-                points = persistentListOf(it.asWGS84(Source.MAP_CENTER))
+            Regex("""map=$Z/$LAT/$LON.*""").matchEntire(fragment)?.toZLatLonPoint(Source.MAP_CENTER)?.let {
+                points = persistentListOf(WGS84Point(it))
                 return@run
             }
 
             // Directions
             // https://www.openstreetmap.org/directions?to={lat},{lon}
-            LAT_LON_PATTERN.matchEntire(queryParams["to"])?.toLatLonPoint()?.let {
-                points = persistentListOf(it.asWGS84(Source.URI))
+            LAT_LON_PATTERN.matchEntire(queryParams["to"])?.toLatLonPoint(Source.URI)?.let {
+                points = persistentListOf(WGS84Point(it))
                 return@run
             }
 
@@ -92,7 +92,10 @@ object OpenStreetMapInput : HtmlInput, Input.HasRandomUri {
 
         while (true) {
             val line = channel.readLine() ?: break
-            mutablePoints.addAll(pattern.findAll(line).mapNotNull { it.toLatLonPoint()?.asWGS84(Source.HTML) })
+            mutablePoints.addAll(
+                pattern.findAll(line)
+                    .mapNotNull { m -> m.toLatLonPoint(Source.HTML)?.let { WGS84Point(it) } }
+            )
         }
 
         if (name != null) {

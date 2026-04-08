@@ -36,16 +36,16 @@ object HereWeGoInput : Input, Input.HasRandomUri {
             val parts = uri.pathParts.drop(1)
             val firstPart = parts.firstOrNull() ?: return@run
             if (firstPart == "") {
-                Regex("""$LAT,$LON,$Z""").matchEntire(queryParams["map"])?.toLatLonZPoint()?.let {
-                    points = persistentListOf(it.asWGS84(Source.MAP_CENTER))
+                Regex("""$LAT,$LON,$Z""").matchEntire(queryParams["map"])?.toLatLonZPoint(Source.MAP_CENTER)?.let {
+                    points = persistentListOf(WGS84Point(it))
                 }
             } else {
                 val secondPart = parts.getOrNull(1)
                 if (secondPart != null) {
                     val z = Regex(""".*,$Z""").matchEntire(queryParams["map"])?.doubleGroupOrNull()
                     if (firstPart == "l") {
-                        LAT_LON_PATTERN.matchEntire(secondPart)?.toLatLonPoint()?.let {
-                            points = persistentListOf(it.asWGS84(Source.URI).copy(z = z))
+                        LAT_LON_PATTERN.matchEntire(secondPart)?.toLatLonPoint(Source.URI)?.let {
+                            points = persistentListOf(WGS84Point(it).copy(z = z))
                         }
                     } else if (firstPart == "p") {
                         Regex("""[a-z]-($SIMPLIFIED_BASE64)""").matchEntire(secondPart)

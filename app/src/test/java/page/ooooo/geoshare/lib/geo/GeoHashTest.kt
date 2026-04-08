@@ -3,6 +3,7 @@ package page.ooooo.geoshare.lib.geo
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.NaivePoint
+import page.ooooo.geoshare.lib.point.Source
 
 class GeoHashTest {
     @Test
@@ -39,7 +40,7 @@ class GeoHashTest {
     @Test
     fun decodeWazeGeoHash_wikipediaExample() {
         assertEquals(
-            NaivePoint(42.60498046875, -5.60302734375, 6.0),
+            NaivePoint(42.60498046875, -5.60302734375, 6.0, source = Source.HASH),
             decodeWazeGeoHash("ezs42")
         )
     }
@@ -47,21 +48,21 @@ class GeoHashTest {
     @Test
     fun decodeWazeGeoHash_examples() {
         assertEquals(
-            NaivePoint(52.77714014053345, 11.951086521148682, 16.0),
+            NaivePoint(52.77714014053345, 11.951086521148682, 16.0, source = Source.HASH),
             @Suppress("SpellCheckingInspection")
             (decodeWazeGeoHash("u32kpzy90"))
         )
         assertEquals(
-            NaivePoint(-12.58159875869751, 15.74390172958374, 16.0),
+            NaivePoint(-12.58159875869751, 15.74390172958374, 16.0, source = Source.HASH),
             decodeWazeGeoHash("kmg0qm86g")
         )
         assertEquals(
-            NaivePoint(22.65310049057007, 88.34357500076294, 16.0),
+            NaivePoint(22.65310049057007, 88.34357500076294, 16.0, source = Source.HASH),
             @Suppress("SpellCheckingInspection")
             (decodeWazeGeoHash("tunbf7cgf"))
         )
         assertEquals(
-            NaivePoint(19.40256357192993, -99.16566610336304, 16.0),
+            NaivePoint(19.40256357192993, -99.16566610336304, 16.0, source = Source.HASH),
             @Suppress("SpellCheckingInspection")
             (decodeWazeGeoHash("9g3qrkju0"))
         )
@@ -73,11 +74,11 @@ class GeoHashTest {
     @Test
     fun decodeOpenStreetMapQuadTileHash_osmExample() {
         assertEquals(
-            NaivePoint(51.510772705078125, 0.054931640625, 9.0),
+            NaivePoint(51.510772705078125, 0.054931640625, 9.0, source = Source.HASH),
             decodeOpenStreetMapQuadTileHash("0EEQjE--"),
         )
         assertEquals(
-            NaivePoint(51.510998010635376, 0.05499601364135742, 16.0),
+            NaivePoint(51.510998010635376, 0.05499601364135742, 16.0, source = Source.HASH),
             decodeOpenStreetMapQuadTileHash("0EEQjEEb"),
         )
     }
@@ -85,23 +86,23 @@ class GeoHashTest {
     @Test
     fun decodeOpenStreetMapQuadTileHash_osmZoom() {
         assertEquals(
-            NaivePoint(-16.23152732849121, -49.08348083496094, 13.0),
+            NaivePoint(-16.23152732849121, -49.08348083496094, 13.0, source = Source.HASH),
             decodeOpenStreetMapQuadTileHash("NuJWxJh"),
         )
         assertEquals(
-            NaivePoint(-16.23152732849121, -49.08348083496094, 11.0),
+            NaivePoint(-16.23152732849121, -49.08348083496094, 11.0, source = Source.HASH),
             decodeOpenStreetMapQuadTileHash("NuJWxJh-"),
         )
         assertEquals(
-            NaivePoint(-16.23152732849121, -49.08348083496094, 12.0),
+            NaivePoint(-16.23152732849121, -49.08348083496094, 12.0, source = Source.HASH),
             decodeOpenStreetMapQuadTileHash("NuJWxJh--"),
         )
         assertEquals(
-            NaivePoint(-16.23152732849121, -49.08348083496094, 13.0),
+            NaivePoint(-16.23152732849121, -49.08348083496094, 13.0, source = Source.HASH),
             decodeOpenStreetMapQuadTileHash("NuJWxJh---"),
         )
         assertEquals(
-            NaivePoint(-16.23152732849121, -49.08348083496094, 11.0),
+            NaivePoint(-16.23152732849121, -49.08348083496094, 11.0, source = Source.HASH),
             decodeOpenStreetMapQuadTileHash("NuJWxJh----"),
         )
     }
@@ -109,24 +110,24 @@ class GeoHashTest {
     @Test
     fun decodeGe0Hash_examples() {
         assertEquals(
-            NaivePoint(51.00000044424087, -108.99998679757118, 4.0),
+            NaivePoint(51.00000044424087, -108.99998679757118, 4.0, source = Source.HASH),
             decodeGe0Hash("ApYSV0YTAl"),
         )
         assertEquals(
-            NaivePoint(-18.924943217006458, 46.441640406847, 4.0),
+            NaivePoint(-18.924943217006458, 46.441640406847, 4.0, source = Source.HASH),
             decodeGe0Hash("AbCMCNp0LO"),
         )
         assertEquals(
-            NaivePoint(52.48773863770788, 13.381523340940475, 14.0),
+            NaivePoint(52.48773863770788, 13.381523340940475, 14.0, source = Source.HASH),
             decodeGe0Hash("o4MnIOApKp"),
         )
         assertEquals(
-            NaivePoint(40.712740468525084, -74.00599703192711, 9.0),
+            NaivePoint(40.712740468525084, -74.00599703192711, 9.0, source = Source.HASH),
             @Suppress("SpellCheckingInspection")
             (decodeGe0Hash("Umse5f0H8a")),
         )
         assertEquals(
-            NaivePoint(40.712740468525084, -74.00599703192711, 5.0),
+            NaivePoint(40.712740468525084, -74.00599703192711, 5.0, source = Source.HASH),
             @Suppress("SpellCheckingInspection")
             (decodeGe0Hash("Emse5f0H8a")),
         )

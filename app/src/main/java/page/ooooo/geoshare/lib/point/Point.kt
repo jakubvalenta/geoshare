@@ -96,6 +96,14 @@ data class WGS84Point(
     override val name: String? = null,
     override val source: Source,
 ) : Point {
+    constructor(naivePoint: NaivePoint) : this(
+        naivePoint.lat,
+        naivePoint.lon,
+        naivePoint.z,
+        naivePoint.name,
+        naivePoint.source,
+    )
+
     override fun toWGS84() = this
 
     /**
@@ -116,6 +124,14 @@ data class GCJ02Point(
     override val name: String? = null,
     override val source: Source,
 ) : Point {
+    constructor(naivePoint: NaivePoint) : this(
+        naivePoint.lat,
+        naivePoint.lon,
+        naivePoint.z,
+        naivePoint.name,
+        naivePoint.source,
+    )
+
     /**
      * Notice that we use a custom check whether a point is in China on top of Evil Transform's check. The reason is
      * that Evil Transform's check is only rough and considers a part of Japan as China, thus using GCJ02 for this part
@@ -145,6 +161,14 @@ data class BD09MCPoint(
     override val name: String? = null,
     override val source: Source,
 ) : Point {
+    constructor(naivePoint: NaivePoint) : this(
+        naivePoint.lat,
+        naivePoint.lon,
+        naivePoint.z,
+        naivePoint.name,
+        naivePoint.source,
+    )
+
     override fun toWGS84() = toGCJ02().toWGS84()
 
     override fun toGCJ02() = if (lat == null || lon == null) {

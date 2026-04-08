@@ -52,7 +52,7 @@ object WazeInput : HtmlInput, Input.HasRandomUri {
                 ?.let { hash -> decodeWazeGeoHash(hash) }
                 ?.let {
                     points = persistentListOf(
-                        it.asWGS84(Source.HASH).copy(lat = it.lat?.toScale(6), lon = it.lon?.toScale(6))
+                        WGS84Point(it).copy(lat = it.lat?.toScale(6), lon = it.lon?.toScale(6))
                     )
                     return@run
                 }
@@ -66,8 +66,8 @@ object WazeInput : HtmlInput, Input.HasRandomUri {
             (Regex("""ll\.$LAT,$LON""").matchEntire(queryParams["to"])
                 ?: LAT_LON_PATTERN.matchEntire(queryParams["ll"])
                 ?: LAT_LON_PATTERN.matchEntire(queryParams[@Suppress("SpellCheckingInspection") "latlng"])
-                )?.toLatLonPoint()?.let {
-                    points = persistentListOf(it.asWGS84(Source.URI).copy(z = z, name = name))
+                )?.toLatLonPoint(Source.URI)?.let {
+                    points = persistentListOf(WGS84Point(it).copy(z = z, name = name))
                     return@run
                 }
 
@@ -124,8 +124,8 @@ object WazeInput : HtmlInput, Input.HasRandomUri {
 
         while (true) {
             val line = channel.readLine() ?: break
-            pattern.find(line)?.toLatLonPoint()?.let {
-                points = persistentListOf(it.asWGS84(Source.HTML).copy(name = name))
+            pattern.find(line)?.toLatLonPoint(Source.HTML)?.let {
+                points = persistentListOf(WGS84Point(it).copy(name = name))
                 return@buildParseHtmlResult
             }
         }

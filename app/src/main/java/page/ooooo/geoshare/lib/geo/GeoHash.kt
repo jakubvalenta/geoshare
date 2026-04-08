@@ -2,6 +2,7 @@ package page.ooooo.geoshare.lib.geo
 
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.point.NaivePoint
+import page.ooooo.geoshare.lib.point.Source
 import kotlin.math.max
 import kotlin.math.pow
 
@@ -72,7 +73,7 @@ private fun decodeGeoHash(
     // base64 hashes, so we need to multiply it to make it work for base32 hashes too
     z += zoomAdjustmentConst * (digitBitCount.toDouble() / 6.0)
 
-    return NaivePoint(lat, lon, max(z, 0.0).toScale(0))
+    return NaivePoint(lat, lon, max(z, 0.0).toScale(0), source = Source.HASH)
 }
 
 @Suppress("SpellCheckingInspection")
