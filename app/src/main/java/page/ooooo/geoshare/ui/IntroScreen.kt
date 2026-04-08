@@ -41,8 +41,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.Hyphens
-import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -53,6 +51,7 @@ import page.ooooo.geoshare.data.IntroViewModel
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.ui.components.ParagraphHtml
+import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.ScreenshotMapAppOpen
 import page.ooooo.geoshare.ui.components.ScreenshotOpen
 import page.ooooo.geoshare.ui.components.ScreenshotOpenByDefault
@@ -194,23 +193,15 @@ private fun IntroScreen(
                             ) {
                                 Text(stringResource(R.string.intro_open_by_default_app_button, appName))
                             }
-                            Text(
+                            ParagraphText(
                                 styledArgsString(
                                     R.string.intro_open_by_default_app_note_1,
                                     SpanStyle(fontWeight = FontWeight.Bold),
                                     "maps.app.goog.gl", "maps.google.com", "www.google.com",
-                                ),
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    lineBreak = LineBreak.Paragraph,
-                                    hyphens = Hyphens.Auto,
-                                ),
+                                )
                             )
-                            Text(
-                                stringResource(R.string.intro_open_by_default_app_note),
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    lineBreak = LineBreak.Paragraph,
-                                    hyphens = Hyphens.Auto,
-                                ),
+                            ParagraphText(
+                                stringResource(R.string.intro_open_by_default_app_note)
                             )
                         }
                     }

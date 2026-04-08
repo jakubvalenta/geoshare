@@ -33,7 +33,6 @@ import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Devices
@@ -185,12 +184,9 @@ private fun ColumnScope.AboutMainPane(
                 contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
             ),
         ) {
-            Text(
+            ParagraphText(
                 stringResource(R.string.about_text_google_play),
                 Modifier.padding(spacing.small),
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    lineBreak = LineBreak.Paragraph,
-                ),
             )
         }
     }
