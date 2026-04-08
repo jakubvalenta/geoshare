@@ -332,7 +332,7 @@ private fun NamePreview() {
             ResultSuccessCoordinates(
                 points = persistentListOf(
                     Point.example,
-                    WGS84Point(50.123456, 11.123456, name = "My point", source = Source.JAVASCRIPT),
+                    GCJ02Point(31.22850685422705, 121.47552456472106, z = 11.0, source = Source.MAP_CENTER),
                 ),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
@@ -356,7 +356,7 @@ private fun DarkNamePreview() {
             ResultSuccessCoordinates(
                 points = persistentListOf(
                     Point.example,
-                    WGS84Point(50.123456, 11.123456, name = "My point", source = Source.JAVASCRIPT),
+                    GCJ02Point(31.22850685422705, 121.47552456472106, z = 11.0, source = Source.MAP_CENTER),
                 ),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
