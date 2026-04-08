@@ -25,8 +25,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.style.Hyphens
-import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
@@ -35,11 +33,14 @@ import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formats.CoordsFormat
+import page.ooooo.geoshare.lib.geo.quickIsPointInChina
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
 import page.ooooo.geoshare.lib.outputs.getOutputsForPointChips
 import page.ooooo.geoshare.lib.outputs.getOutputsForPointsChips
+import page.ooooo.geoshare.lib.point.BD09MCPoint
+import page.ooooo.geoshare.lib.point.GCJ02Point
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.Points
 import page.ooooo.geoshare.lib.point.Source
@@ -79,7 +80,8 @@ fun ResultSuccessCoordinates(
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(start = spacing.windowPadding, end = spacing.windowPadding - 10.dp),
+                .padding(start = spacing.windowPadding, end = spacing.windowPadding - 10.dp)
+                .testTag("geoShareResultSuccessSource_${lastPoint.source}"),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -97,17 +99,14 @@ fun ResultSuccessCoordinates(
                     )
                 }
             } else {
-                Text(
+                ParagraphText(
                     stringResource(R.string.conversion_succeeded_description_q_only),
                     Modifier
                         .weight(1f)
                         .fillMaxWidth()
                         .testTag("geoShareResultSuccessLastPointDescription"),
                     fontStyle = FontStyle.Italic,
-                    style = MaterialTheme.typography.bodySmall.copy(
-                        lineBreak = LineBreak.Paragraph,
-                        hyphens = Hyphens.Auto,
-                    ),
+                    style = MaterialTheme.typography.bodySmall,
                 )
             }
             IconButton(
@@ -119,6 +118,29 @@ fun ResultSuccessCoordinates(
                     contentDescription = stringResource(R.string.nav_menu_content_description),
                 )
             }
+        }
+        if (
+            (lastPoint is GCJ02Point || lastPoint is BD09MCPoint) &&
+            lastPoint.lat?.let { lat ->
+                lastPoint.lon?.let { lon ->
+                    quickIsPointInChina(lon, lat)
+                }
+            } == true
+        ) {
+            ResultSuccessCoordinatesCheck(
+                stringResource(R.string.conversion_succeeded_check_srs),
+                Modifier.testTag("geoShareResultSuccessLastPointCheckSRS"),
+            )
+        } else if (lastPoint.source == Source.JAVASCRIPT) {
+            ResultSuccessCoordinatesCheck(
+                stringResource(R.string.conversion_succeeded_check_unstable),
+                Modifier.testTag("geoShareResultSuccessLastPointCheckJavaScript"),
+            )
+        } else if (lastPoint.source == Source.MAP_CENTER) {
+            ResultSuccessCoordinatesCheck(
+                stringResource(R.string.conversion_succeeded_check_map_center),
+                Modifier.testTag("geoShareResultSuccessLastPointCheckMapCenter"),
+            )
         }
         if (outputsForPointChips.isNotEmpty()) {
             ScrollableChips {
@@ -196,6 +218,21 @@ fun ResultSuccessCoordinates(
             }
         }
     }
+}
+
+@Composable
+private fun ResultSuccessCoordinatesCheck(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    val spacing = LocalSpacing.current
+
+    ParagraphText(
+        text,
+        modifier.padding(horizontal = spacing.windowPadding),
+        fontStyle = FontStyle.Italic,
+        style = MaterialTheme.typography.bodySmall,
+    )
 }
 
 // Previews
@@ -286,7 +323,7 @@ private fun DarkDescriptionPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun LabelPreview() {
+private fun NamePreview() {
     AppTheme {
         Surface(
             color = MaterialTheme.colorScheme.secondaryContainer,
@@ -295,7 +332,7 @@ private fun LabelPreview() {
             ResultSuccessCoordinates(
                 points = persistentListOf(
                     Point.example,
-                    WGS84Point(50.123456, 11.123456, name = "My point", source = Source.URI),
+                    WGS84Point(50.123456, 11.123456, name = "My point", source = Source.JAVASCRIPT),
                 ),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
@@ -310,7 +347,7 @@ private fun LabelPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkLabelPreview() {
+private fun DarkNamePreview() {
     AppTheme {
         Surface(
             color = MaterialTheme.colorScheme.secondaryContainer,
@@ -319,7 +356,7 @@ private fun DarkLabelPreview() {
             ResultSuccessCoordinates(
                 points = persistentListOf(
                     Point.example,
-                    WGS84Point(50.123456, 11.123456, name = "My point", source = Source.URI),
+                    WGS84Point(50.123456, 11.123456, name = "My point", source = Source.JAVASCRIPT),
                 ),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
