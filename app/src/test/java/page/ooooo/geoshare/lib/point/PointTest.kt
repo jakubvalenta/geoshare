@@ -18,14 +18,21 @@ class PointTest {
     @Test
     fun toGCJ02_whenPointIsWGS84AndInChina_returnsGCJ02PointWithConvertedCoords() {
         assertEquals(
-            GCJ02Point(31.22281206362763, lon = 121.46840659541449, 3.14, "foo bar", source = Source.GENERATED),
+            GCJ02Point(31.22281206362763, 121.46840659541449, 3.14, "foo bar", source = Source.GENERATED),
             WGS84Point(
-                31.224731304675522,
-                lon = 121.46385323166844,
+                31.224731304675522, 121.46385323166844,
                 3.14,
                 "foo bar",
-                source = Source.GENERATED
+                source = Source.GENERATED,
             ).toGCJ02(),
+        )
+    }
+
+    @Test
+    fun toGCJ02_whenPointIsWGS84AndInChinaNearCoast_returnsGCJ02PointWithConvertedCoords() {
+        assertEquals(
+            GCJ02Point(30.60283, 122.12886, source = Source.GENERATED), // TODO This should be converted to GCJ-02
+            WGS84Point(30.60283, 122.12886, source = Source.GENERATED).toGCJ02(),
         )
     }
 

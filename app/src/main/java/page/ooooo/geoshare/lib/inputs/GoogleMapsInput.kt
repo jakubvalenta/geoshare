@@ -188,6 +188,7 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
                 htmlUriString = toString()
             }
 
+            // TODO Use GCJ-02 if inside precise Chinese boundaries, and WGS 84 otherwise
             points = mutablePoints.toImmutableList()
         }
     }
