@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 
 class OpenStreetMapInputTest : BaseInputTest() {
@@ -59,7 +60,7 @@ class OpenStreetMapInputTest : BaseInputTest() {
     @Test
     fun parseUri_coordinates() = runTest {
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(51.49, -0.13, z = 16.0))),
+            ParseUriResult(persistentListOf(WGS84Point(51.49, -0.13, z = 16.0, source = Source.MAP_CENTER))),
             parseUri("https://www.openstreetmap.org/#map=16/51.49/-0.13"),
         )
     }
@@ -67,7 +68,7 @@ class OpenStreetMapInputTest : BaseInputTest() {
     @Test
     fun parseUri_coordinatesEncoded() = runTest {
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(51.49, -0.13, z = 16.0))),
+            ParseUriResult(persistentListOf(WGS84Point(51.49, -0.13, z = 16.0, source = Source.MAP_CENTER))),
             parseUri("https://www.openstreetmap.org/#map%3D16%2F51.49%2F-0.13"),
         )
     }
@@ -75,7 +76,7 @@ class OpenStreetMapInputTest : BaseInputTest() {
     @Test
     fun parseUri_directions() = runTest {
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(51.0528, 13.7364))),
+            ParseUriResult(persistentListOf(WGS84Point(51.0528, 13.7364, source = Source.URI))),
             parseUri("https://www.openstreetmap.org/directions?to=51.0528,13.7364"),
         )
     }
@@ -108,11 +109,27 @@ class OpenStreetMapInputTest : BaseInputTest() {
     @Test
     fun parseUri_shortLink() = runTest {
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(51.510772705078125, 0.054931640625, z = 9.0))),
+            ParseUriResult(
+                persistentListOf(
+                    WGS84Point(
+                        51.510772705078125, 0.054931640625,
+                        z = 9.0,
+                        source = Source.HASH,
+                    )
+                )
+            ),
             parseUri("https://osm.org/go/0EEQjE--"),
         )
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(51.510772705078125, 0.054931640625, z = 9.0))),
+            ParseUriResult(
+                persistentListOf(
+                    WGS84Point(
+                        51.510772705078125, 0.054931640625,
+                        z = 9.0,
+                        source = Source.HASH,
+                    )
+                )
+            ),
             parseUri("https://openstreetmap.org/go/0EEQjE--"),
         )
     }
@@ -120,7 +137,15 @@ class OpenStreetMapInputTest : BaseInputTest() {
     @Test
     fun parseUri_shortLinkNegative() = runTest {
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(-16.23152732849121, -49.08348083496094, z = 11.0))),
+            ParseUriResult(
+                persistentListOf(
+                    WGS84Point(
+                        -16.23152732849121, -49.08348083496094,
+                        z = 11.0,
+                        source = Source.HASH,
+                    )
+                )
+            ),
             parseUri("https://osm.org/go/NuJWxJh-"),
         )
     }
@@ -130,7 +155,7 @@ class OpenStreetMapInputTest : BaseInputTest() {
         val json =
             """{"version":"0.6","elements":[{"type":"node","id":6284640534,"lat":45.4771659,"lon":9.2297918,"timestamp":"2024-03-07T19:04:58Z"}]}"""
         assertEquals(
-            ParseHtmlResult(persistentListOf(WGS84Point(45.4771659, 9.2297918))),
+            ParseHtmlResult(persistentListOf(WGS84Point(45.4771659, 9.2297918, source = Source.API))),
             parseHtml(json),
         )
     }
@@ -142,46 +167,46 @@ class OpenStreetMapInputTest : BaseInputTest() {
         assertEquals(
             ParseHtmlResult(
                 persistentListOf(
-                    WGS84Point(45.4776025, 9.2297852),
-                    WGS84Point(45.4773399, 9.2296095),
-                    WGS84Point(45.4770943, 9.2295887),
-                    WGS84Point(45.4770881, 9.2292100),
-                    WGS84Point(45.4772588, 9.2292121),
-                    WGS84Point(45.4776002, 9.2295189),
-                    WGS84Point(45.4776002, 9.2293737),
-                    WGS84Point(45.4773805, 9.2292100),
-                    WGS84Point(45.4774762, 9.2292100),
-                    WGS84Point(45.4774959, 9.2295256),
-                    WGS84Point(45.4774770, 9.2295534),
-                    WGS84Point(45.4776323, 9.2295472),
-                    WGS84Point(45.4773177, 9.2295833),
-                    WGS84Point(45.4776132, 9.2296902),
-                    WGS84Point(45.4773774, 9.2295549),
-                    WGS84Point(45.4774959, 9.2293841),
-                    WGS84Point(45.4776040, 9.2296902),
-                    WGS84Point(45.4773606, 9.2295265),
-                    WGS84Point(45.4772779, 9.2291696),
-                    WGS84Point(45.4774817, 9.2293589),
-                    WGS84Point(45.4773591, 9.2293890),
-                    WGS84Point(45.4773621, 9.2291674),
-                    WGS84Point(45.4773774, 9.2293573),
-                    WGS84Point(45.4775994, 9.2290779),
-                    WGS84Point(45.4776882, 9.2292067),
-                    WGS84Point(45.4775657, 9.2290790),
-                    WGS84Point(45.4776890, 9.2292514),
-                    WGS84Point(45.4772297, 9.2296848),
-                    WGS84Point(45.4773415, 9.2296804),
-                    WGS84Point(45.4772313, 9.2297776),
-                    WGS84Point(45.4775818, 9.2290785),
-                    WGS84Point(45.4776002, 9.2294250),
-                    WGS84Point(45.4773300, 9.2295985),
-                    WGS84Point(45.4773698, 9.2295407),
-                    WGS84Point(45.4774878, 9.2293679),
-                    WGS84Point(45.4772596, 9.2291990),
-                    WGS84Point(45.4773797, 9.2291925),
-                    WGS84Point(45.4776124, 9.2295200),
-                    WGS84Point(45.4776315, 9.2296597),
-                    WGS84Point(45.4774366, 9.2292100),
+                    WGS84Point(45.4776025, 9.2297852, source = Source.API),
+                    WGS84Point(45.4773399, 9.2296095, source = Source.API),
+                    WGS84Point(45.4770943, 9.2295887, source = Source.API),
+                    WGS84Point(45.4770881, 9.2292100, source = Source.API),
+                    WGS84Point(45.4772588, 9.2292121, source = Source.API),
+                    WGS84Point(45.4776002, 9.2295189, source = Source.API),
+                    WGS84Point(45.4776002, 9.2293737, source = Source.API),
+                    WGS84Point(45.4773805, 9.2292100, source = Source.API),
+                    WGS84Point(45.4774762, 9.2292100, source = Source.API),
+                    WGS84Point(45.4774959, 9.2295256, source = Source.API),
+                    WGS84Point(45.4774770, 9.2295534, source = Source.API),
+                    WGS84Point(45.4776323, 9.2295472, source = Source.API),
+                    WGS84Point(45.4773177, 9.2295833, source = Source.API),
+                    WGS84Point(45.4776132, 9.2296902, source = Source.API),
+                    WGS84Point(45.4773774, 9.2295549, source = Source.API),
+                    WGS84Point(45.4774959, 9.2293841, source = Source.API),
+                    WGS84Point(45.4776040, 9.2296902, source = Source.API),
+                    WGS84Point(45.4773606, 9.2295265, source = Source.API),
+                    WGS84Point(45.4772779, 9.2291696, source = Source.API),
+                    WGS84Point(45.4774817, 9.2293589, source = Source.API),
+                    WGS84Point(45.4773591, 9.2293890, source = Source.API),
+                    WGS84Point(45.4773621, 9.2291674, source = Source.API),
+                    WGS84Point(45.4773774, 9.2293573, source = Source.API),
+                    WGS84Point(45.4775994, 9.2290779, source = Source.API),
+                    WGS84Point(45.4776882, 9.2292067, source = Source.API),
+                    WGS84Point(45.4775657, 9.2290790, source = Source.API),
+                    WGS84Point(45.4776890, 9.2292514, source = Source.API),
+                    WGS84Point(45.4772297, 9.2296848, source = Source.API),
+                    WGS84Point(45.4773415, 9.2296804, source = Source.API),
+                    WGS84Point(45.4772313, 9.2297776, source = Source.API),
+                    WGS84Point(45.4775818, 9.2290785, source = Source.API),
+                    WGS84Point(45.4776002, 9.2294250, source = Source.API),
+                    WGS84Point(45.4773300, 9.2295985, source = Source.API),
+                    WGS84Point(45.4773698, 9.2295407, source = Source.API),
+                    WGS84Point(45.4774878, 9.2293679, source = Source.API),
+                    WGS84Point(45.4772596, 9.2291990, source = Source.API),
+                    WGS84Point(45.4773797, 9.2291925, source = Source.API),
+                    WGS84Point(45.4776124, 9.2295200, source = Source.API),
+                    WGS84Point(45.4776315, 9.2296597, source = Source.API),
+                    WGS84Point(45.4774366, 9.2292100, source = Source.API),
                 )
             ),
             parseHtml(json),
@@ -195,10 +220,10 @@ class OpenStreetMapInputTest : BaseInputTest() {
         assertEquals(
             ParseHtmlResult(
                 persistentListOf(
-                    WGS84Point(45.4770640, 9.2296749),
-                    WGS84Point(45.4771158, 9.2296737),
-                    WGS84Point(45.4771159, 9.2296361),
-                    WGS84Point(45.4772950, 9.2296354),
+                    WGS84Point(45.4770640, 9.2296749, source = Source.API),
+                    WGS84Point(45.4771158, 9.2296737, source = Source.API),
+                    WGS84Point(45.4771159, 9.2296361, source = Source.API),
+                    WGS84Point(45.4772950, 9.2296354, source = Source.API),
                 )
             ),
             parseHtml(json),

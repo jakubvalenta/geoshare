@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 
 class WazeInputTest : BaseInputTest() {
@@ -89,11 +90,11 @@ class WazeInputTest : BaseInputTest() {
     @Test
     fun parseUri_coordinates() = runTest {
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(45.6906304, -120.810983, z = 10.0))),
+            ParseUriResult(persistentListOf(WGS84Point(45.6906304, -120.810983, z = 10.0, source = Source.URI))),
             parseUri("https://waze.com/ul?ll=45.6906304,-120.810983&z=10"),
         )
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(45.69063040, -120.81098300))),
+            ParseUriResult(persistentListOf(WGS84Point(45.69063040, -120.81098300, source = Source.URI))),
             parseUri("https://ul.waze.com/ul?ll=45.69063040%2C-120.81098300&navigate=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location"),
         )
     }
@@ -101,11 +102,11 @@ class WazeInputTest : BaseInputTest() {
     @Test
     fun parseUri_directionsCoordinates() = runTest {
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(45.6906304, -120.810983))),
+            ParseUriResult(persistentListOf(WGS84Point(45.6906304, -120.810983, source = Source.URI))),
             parseUri("https://www.waze.com/live-map/directions?to=ll.45.6906304,-120.810983"),
         )
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(45.829189, 1.259372))),
+            ParseUriResult(persistentListOf(WGS84Point(45.829189, 1.259372, source = Source.URI))),
             parseUri("https://www.waze.com/live-map/directions?latlng=45.829189%2C1.259372"),
         )
     }
@@ -163,7 +164,7 @@ class WazeInputTest : BaseInputTest() {
     @Test
     fun parseUri_search() = runTest {
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(name = "66 Acacia Avenue"))),
+            ParseUriResult(persistentListOf(WGS84Point(name = "66 Acacia Avenue", source = Source.URI))),
             parseUri("https://waze.com/ul?q=66%20Acacia%20Avenue"),
         )
     }
@@ -171,15 +172,15 @@ class WazeInputTest : BaseInputTest() {
     @Test
     fun parseUri_shortLink() = runTest {
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(45.829189, 1.259372, z = 16.0))),
+            ParseUriResult(persistentListOf(WGS84Point(45.829189, 1.259372, z = 16.0, source = Source.HASH))),
             parseUri("https://waze.com/ul/hu00uswvn3"),
         )
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(45.829189, 1.259372, z = 16.0))),
+            ParseUriResult(persistentListOf(WGS84Point(45.829189, 1.259372, z = 16.0, source = Source.HASH))),
             parseUri("https://www.waze.com/ul/hu00uswvn3"),
         )
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(45.829189, 1.259372, z = 16.0))),
+            ParseUriResult(persistentListOf(WGS84Point(45.829189, 1.259372, z = 16.0, source = Source.HASH))),
             parseUri("https://www.waze.com/live-map?h=u00uswvn3"),
         )
     }
@@ -187,7 +188,7 @@ class WazeInputTest : BaseInputTest() {
     @Test
     fun parseUri_shortLinkNegative() = runTest {
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(19.402564, -99.165666, z = 16.0))),
+            ParseUriResult(persistentListOf(WGS84Point(19.402564, -99.165666, z = 16.0, source = Source.HASH))),
             parseUri("https://waze.com/ul/h9g3qrkju0"),
         )
     }
@@ -195,7 +196,7 @@ class WazeInputTest : BaseInputTest() {
     @Test
     fun parseHtml_containsLatLngJSON_returnsPoint() = runTest {
         assertEquals(
-            ParseHtmlResult(persistentListOf(WGS84Point(43.64265563, -79.387202798))),
+            ParseHtmlResult(persistentListOf(WGS84Point(43.64265563, -79.387202798, source = Source.JAVASCRIPT))),
             parseHtml(
                 """<html><script>
                 |{

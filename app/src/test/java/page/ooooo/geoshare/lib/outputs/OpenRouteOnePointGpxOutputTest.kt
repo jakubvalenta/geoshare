@@ -11,6 +11,7 @@ import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.lib.android.TEST_PACKAGE_NAME
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 import java.io.File
 import java.nio.file.attribute.PosixFilePermissions
@@ -38,7 +39,7 @@ class OpenRouteOnePointGpxOutputTest {
         val parentDir = createTempDirectory().toFile()
         val success = OpenRouteOnePointGpxOutput(TEST_PACKAGE_NAME).execute(
             location = null,
-            value = WGS84Point(1.0, 2.0, name = "My destination"),
+            value = WGS84Point(1.0, 2.0, name = "My destination", source = Source.GENERATED),
             actionContext = mockActionContext(parentDir),
         )
         assertFalse(success)
@@ -51,8 +52,8 @@ class OpenRouteOnePointGpxOutputTest {
             PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("r--------")),
         ).toFile()
         val success = OpenRouteOnePointGpxOutput(TEST_PACKAGE_NAME).execute(
-            location = WGS84Point(3.0, 4.0),
-            value = WGS84Point(1.0, 2.0, name = "My destination"),
+            location = WGS84Point(3.0, 4.0, source = Source.GPS_SENSOR),
+            value = WGS84Point(1.0, 2.0, name = "My destination", source = Source.GENERATED),
             actionContext = mockActionContext(parentDir),
         )
         assertFalse(success)
@@ -70,8 +71,8 @@ class OpenRouteOnePointGpxOutputTest {
             childDir.listFiles()?.map { it.path }?.toSet(),
         )
         val success = OpenRouteOnePointGpxOutput(TEST_PACKAGE_NAME).execute(
-            location = WGS84Point(3.0, 4.0),
-            value = WGS84Point(1.0, 2.0, name = "My destination"),
+            location = WGS84Point(3.0, 4.0, source = Source.GPS_SENSOR),
+            value = WGS84Point(1.0, 2.0, name = "My destination", source = Source.GENERATED),
             actionContext = mockActionContext(parentDir),
         )
         assertTrue(success)

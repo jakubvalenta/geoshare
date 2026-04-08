@@ -7,9 +7,10 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.formats.GoogleMapsUriFormat.formatNavigationUriString
 import page.ooooo.geoshare.lib.formats.GoogleMapsUriFormat.formatStreetViewUriString
 import page.ooooo.geoshare.lib.point.GCJ02Point
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 
-class GoogleMapsUriLinkTest {
+class GoogleMapsUriFormatTest {
     private val uriQuote: UriQuote = FakeUriQuote
 
     @Test
@@ -17,7 +18,7 @@ class GoogleMapsUriLinkTest {
         assertEquals(
             "google.navigation:q=50.123456,-11.123456",
             formatNavigationUriString(
-                WGS84Point(50.123456, -11.123456, z = 3.4),
+                WGS84Point(50.123456, -11.123456, z = 3.4, source = Source.GENERATED),
                 uriQuote,
             ),
         )
@@ -29,7 +30,7 @@ class GoogleMapsUriLinkTest {
             @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=50.123456,-11.123456",
             formatStreetViewUriString(
-                WGS84Point(50.123456, -11.123456, z = 3.4),
+                WGS84Point(50.123456, -11.123456, z = 3.4, source = Source.GENERATED),
                 uriQuote,
             ),
         )
@@ -40,7 +41,7 @@ class GoogleMapsUriLinkTest {
         assertEquals(
             "google.navigation:q=foo+bar",
             formatNavigationUriString(
-                WGS84Point(name = "foo bar", z = 3.4),
+                WGS84Point(name = "foo bar", z = 3.4, source = Source.GENERATED),
                 uriQuote,
             ),
         )
@@ -52,7 +53,7 @@ class GoogleMapsUriLinkTest {
             @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=0,0",
             formatStreetViewUriString(
-                WGS84Point(name = "foo bar", z = 3.4),
+                WGS84Point(name = "foo bar", z = 3.4, source = Source.GENERATED),
                 uriQuote,
             ),
         )
@@ -63,7 +64,7 @@ class GoogleMapsUriLinkTest {
         assertEquals(
             "google.navigation:q=50.123456,-11.123456",
             formatNavigationUriString(
-                WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4),
+                WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4, source = Source.GENERATED),
                 uriQuote,
             ),
         )
@@ -75,7 +76,7 @@ class GoogleMapsUriLinkTest {
             @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=50.123456,-11.123456",
             formatStreetViewUriString(
-                WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4),
+                WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4, source = Source.GENERATED),
                 uriQuote,
             ),
         )
@@ -86,7 +87,7 @@ class GoogleMapsUriLinkTest {
         assertEquals(
             "google.navigation:q=31.2285067,121.475524",
             formatNavigationUriString(
-                WGS84Point(31.23044166868017, 121.47099209401793),
+                WGS84Point(31.23044166868017, 121.47099209401793, source = Source.GENERATED),
                 uriQuote,
             ),
         )
@@ -98,7 +99,7 @@ class GoogleMapsUriLinkTest {
             @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=31.2285067,121.475524",
             formatStreetViewUriString(
-                WGS84Point(31.23044166868017, 121.47099209401793),
+                WGS84Point(31.23044166868017, 121.47099209401793, source = Source.GENERATED),
                 uriQuote,
             ),
         )
@@ -109,7 +110,7 @@ class GoogleMapsUriLinkTest {
         assertEquals(
             "google.navigation:q=31.2285069,121.4755246",
             formatNavigationUriString(
-                GCJ02Point(31.22850685422705, 121.47552456472106),
+                GCJ02Point(31.22850685422705, 121.47552456472106, source = Source.GENERATED),
                 uriQuote,
             ),
         )
@@ -121,7 +122,7 @@ class GoogleMapsUriLinkTest {
             @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=31.2285069,121.4755246",
             formatStreetViewUriString(
-                GCJ02Point(31.22850685422705, 121.47552456472106),
+                GCJ02Point(31.22850685422705, 121.47552456472106, source = Source.GENERATED),
                 uriQuote,
             ),
         )
@@ -132,7 +133,7 @@ class GoogleMapsUriLinkTest {
         assertEquals(
             "google.navigation:q=0,0",
             formatNavigationUriString(
-                WGS84Point(),
+                WGS84Point(source = Source.GENERATED),
                 uriQuote,
             ),
         )
@@ -144,7 +145,7 @@ class GoogleMapsUriLinkTest {
             @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=0,0",
             formatStreetViewUriString(
-                WGS84Point(),
+                WGS84Point(source = Source.GENERATED),
                 uriQuote,
             ),
         )
@@ -155,7 +156,7 @@ class GoogleMapsUriLinkTest {
         assertEquals(
             "google.navigation:q=50.123456,-11.123456",
             formatNavigationUriString(
-                WGS84Point(50.123456, -11.123456),
+                WGS84Point(50.123456, -11.123456, source = Source.GENERATED),
                 uriQuote,
             ),
         )
@@ -167,7 +168,7 @@ class GoogleMapsUriLinkTest {
             @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=50.123456,-11.123456",
             formatStreetViewUriString(
-                WGS84Point(50.123456, -11.123456),
+                WGS84Point(50.123456, -11.123456, source = Source.GENERATED),
                 uriQuote,
             ),
         )
@@ -178,7 +179,7 @@ class GoogleMapsUriLinkTest {
         assertEquals(
             "google.navigation:q=31.2285067,121.475524",
             formatNavigationUriString(
-                WGS84Point(31.23044166868017, 121.47099209401793),
+                WGS84Point(31.23044166868017, 121.47099209401793, source = Source.GENERATED),
                 uriQuote,
             ),
         )
@@ -190,7 +191,7 @@ class GoogleMapsUriLinkTest {
             @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=31.2285067,121.475524",
             formatStreetViewUriString(
-                WGS84Point(31.23044166868017, 121.47099209401793),
+                WGS84Point(31.23044166868017, 121.47099209401793, source = Source.GENERATED),
                 uriQuote,
             ),
         )
@@ -201,7 +202,7 @@ class GoogleMapsUriLinkTest {
         assertEquals(
             "google.navigation:q=31.2285069,121.4755246",
             formatNavigationUriString(
-                GCJ02Point(31.22850685422705, 121.47552456472106),
+                GCJ02Point(31.22850685422705, 121.47552456472106, source = Source.GENERATED),
                 uriQuote,
             ),
         )
@@ -213,7 +214,7 @@ class GoogleMapsUriLinkTest {
             @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=31.2285069,121.4755246",
             formatStreetViewUriString(
-                GCJ02Point(31.22850685422705, 121.47552456472106),
+                GCJ02Point(31.22850685422705, 121.47552456472106, source = Source.GENERATED),
                 uriQuote,
             ),
         )

@@ -82,7 +82,7 @@ object BaiduMapInput : ShortUriInput, WebInput {
                     parts
                         .drop(1)
                         .filterNot { it.startsWith('@') }
-                        .map { BD09MCPoint(name = it, source = Source.MAP_CENTER) }
+                        .map { BD09MCPoint(name = it, source = Source.URI) }
                         .toImmutableList()
 
             } else if (firstPart == "mobile") {
