@@ -133,7 +133,7 @@ fun ResultSuccessCoordinates(
             )
         } else if (lastPoint.source == Source.JAVASCRIPT) {
             ResultSuccessCoordinatesCheck(
-                stringResource(R.string.conversion_succeeded_check_unstable),
+                stringResource(R.string.conversion_succeeded_check_experimental),
                 Modifier.testTag("geoShareResultSuccessLastPointCheckJavaScript"),
             )
         } else if (lastPoint.source == Source.MAP_CENTER) {
