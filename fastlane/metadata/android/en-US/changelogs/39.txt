@@ -1,3 +1,5 @@
+- Added warning if resulting location might be inaccurate.
 - Added support for URLs with space characters.
 - Improved Yandex Maps POI support.
 - Improved error messages.
+- Changed app name stylization and title in app stores.
