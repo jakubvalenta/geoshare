@@ -12,6 +12,7 @@ import page.ooooo.geoshare.lib.extensions.toLatLonNamePoint
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.formats.GeoUriFormat
 import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 
 object GeoUriInput : Input, Input.HasRandomUri {
@@ -46,19 +47,19 @@ object GeoUriInput : Input, Input.HasRandomUri {
             // Pin with name
             // ?q={lat},{lon}({name})
             Regex("""$LAT,$LON(?:$NAME_REGEX)?""").matchEntire(queryParams["q"])?.toLatLonNamePoint()?.let {
-                points = persistentListOf(it.asWGS84().copy(z = z, name = it.name ?: name))
+                points = persistentListOf(it.asWGS84(Source.URI).copy(z = z, name = it.name ?: name))
                 return@run
             }
 
             // Coordinates
             // geo:{lat},{lon}
             LAT_LON_PATTERN.matchEntire(path)?.toLatLonPoint()?.let {
-                points = persistentListOf(it.asWGS84().copy(z = z, name = name))
+                points = persistentListOf(it.asWGS84(Source.URI).copy(z = z, name = name))
                 return@run
             }
 
             if (name != null) {
-                points = persistentListOf(WGS84Point(z = z, name = name))
+                points = persistentListOf(WGS84Point(z = z, name = name, source = Source.URI))
             }
         }
     }

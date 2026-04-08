@@ -10,6 +10,7 @@ import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toLatLonZPoint
 import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -36,7 +37,7 @@ object HereWeGoInput : Input, Input.HasRandomUri {
             val firstPart = parts.firstOrNull() ?: return@run
             if (firstPart == "") {
                 Regex("""$LAT,$LON,$Z""").matchEntire(queryParams["map"])?.toLatLonZPoint()?.let {
-                    points = persistentListOf(it.asWGS84())
+                    points = persistentListOf(it.asWGS84(Source.MAP_CENTER))
                 }
             } else {
                 val secondPart = parts.getOrNull(1)
@@ -44,7 +45,7 @@ object HereWeGoInput : Input, Input.HasRandomUri {
                     val z = Regex(""".*,$Z""").matchEntire(queryParams["map"])?.doubleGroupOrNull()
                     if (firstPart == "l") {
                         LAT_LON_PATTERN.matchEntire(secondPart)?.toLatLonPoint()?.let {
-                            points = persistentListOf(it.asWGS84().copy(z = z))
+                            points = persistentListOf(it.asWGS84(Source.URI).copy(z = z))
                         }
                     } else if (firstPart == "p") {
                         Regex("""[a-z]-($SIMPLIFIED_BASE64)""").matchEntire(secondPart)
@@ -57,7 +58,7 @@ object HereWeGoInput : Input, Input.HasRandomUri {
                                         Regex("""(?:lon=|"longitude":)$LON""").find(decoded)
                                             ?.doubleGroupOrNull()
                                             ?.let { lon ->
-                                                points = persistentListOf(WGS84Point(lat, lon, z))
+                                                points = persistentListOf(WGS84Point(lat, lon, z, source = Source.HASH))
                                             }
                                     }
                             }

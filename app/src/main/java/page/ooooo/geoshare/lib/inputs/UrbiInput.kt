@@ -16,6 +16,7 @@ import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
 import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Source
 
 object UrbiInput : HtmlInput, Input.HasRandomUri {
     override val uriPattern =
@@ -55,7 +56,7 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
             // Marker
             // https://maps.urbi.ae/dubai/geo/{lon}%2C{lat}?m={lon},{lat}/{z}
             Regex("""$LON,$LAT/$Z""").matchEntire(queryParams["m"])?.toLonLatZPoint()?.let {
-                points = persistentListOf(it.asWGS84())
+                points = persistentListOf(it.asWGS84(Source.URI))
                 return@run
             }
 
@@ -64,15 +65,15 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
             // Point
             // https://maps.urbi.ae/dubai/geo/{lon}%2C{lat}
             Regex(""".*/$LON,$LAT/?$""").matchEntire(path)?.toLonLatPoint()?.let {
-                points = persistentListOf(it.asWGS84().copy(z = z))
+                points = persistentListOf(it.asWGS84(Source.URI).copy(z = z))
                 return@run
             }
 
-            // API
+            // API map center
             // https://share.api.2gis.ru/getimage?...&zoom={z}&center={lon},{lat}&title={name}...
             LON_LAT_PATTERN.matchEntire(queryParams["center"])?.toLonLatPoint()?.let {
                 points = persistentListOf(
-                    it.asWGS84().copy(
+                    it.asWGS84(Source.MAP_CENTER).copy(
                         z = z,
                         name = Q_PARAM_PATTERN.matchEntire(queryParams["title"])?.groupOrNull(),
                     )

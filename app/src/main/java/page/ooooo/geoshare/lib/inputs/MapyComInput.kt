@@ -8,6 +8,7 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 
 object MapyComInput : ShortUriInput, Input.HasRandomUri {
@@ -38,7 +39,7 @@ object MapyComInput : ShortUriInput, Input.HasRandomUri {
                         m.doubleGroupOrNull(2)?.let { lon ->
                             val latSig = if (entireMatch.contains('S')) -1 else 1
                             val lonSig = if (entireMatch.contains('W')) -1 else 1
-                            points = persistentListOf(WGS84Point(latSig * lat, lonSig * lon))
+                            points = persistentListOf(WGS84Point(latSig * lat, lonSig * lon, source = Source.TEXT))
                             return@run
                         }
                     }
@@ -50,7 +51,7 @@ object MapyComInput : ShortUriInput, Input.HasRandomUri {
             LAT_PATTERN.matchEntire(queryParams["y"])?.doubleGroupOrNull()?.let { lat ->
                 LON_PATTERN.matchEntire(queryParams["x"])?.doubleGroupOrNull()?.let { lon ->
                     Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull().let { z ->
-                        points = persistentListOf(WGS84Point(lat, lon, z))
+                        points = persistentListOf(WGS84Point(lat, lon, z, source = Source.URI))
                         return@run
                     }
                 }

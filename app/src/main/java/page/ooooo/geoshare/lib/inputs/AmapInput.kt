@@ -8,6 +8,7 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonNamePoint
 import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Source
 
 object AmapInput : ShortUriInput, Input.HasRandomUri {
     override val uriPattern = Regex("""(?:https?://)?(?:surl|wb)\.amap\.com/$URI_REST""")
@@ -28,14 +29,14 @@ object AmapInput : ShortUriInput, Input.HasRandomUri {
             // Query param p
             // https://wb.amap.com/?p=<id>,<lat>,<lon>,<name>
             Regex("""\w+,$LAT,$LON,?(?:$NAME_PARAM)?.*""").matchEntire(queryParams["p"])?.toLatLonNamePoint()?.let {
-                points = persistentListOf(it.asGCJ02())
+                points = persistentListOf(it.asGCJ02(Source.URI))
                 return@run
             }
 
             // Query param q
             // https://wb.amap.com/?q=<lat>,<lon>,<name>
             Regex("""$LAT,$LON,?(?:$NAME_PARAM)?.*""").matchEntire(queryParams["q"])?.toLatLonNamePoint()?.let {
-                points = persistentListOf(it.asGCJ02())
+                points = persistentListOf(it.asGCJ02(Source.URI))
                 return@run
             }
         }

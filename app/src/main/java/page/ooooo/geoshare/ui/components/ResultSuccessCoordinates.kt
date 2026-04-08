@@ -42,6 +42,7 @@ import page.ooooo.geoshare.lib.outputs.getOutputsForPointChips
 import page.ooooo.geoshare.lib.outputs.getOutputsForPointsChips
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.Points
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -250,7 +251,7 @@ private fun DescriptionPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0)),
+                points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI)),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
                 outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
@@ -271,7 +272,7 @@ private fun DarkDescriptionPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0)),
+                points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI)),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
                 outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
@@ -294,7 +295,7 @@ private fun LabelPreview() {
             ResultSuccessCoordinates(
                 points = persistentListOf(
                     Point.example,
-                    WGS84Point(50.123456, 11.123456, name = "My point"),
+                    WGS84Point(50.123456, 11.123456, name = "My point", source = Source.URI),
                 ),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
@@ -318,7 +319,7 @@ private fun DarkLabelPreview() {
             ResultSuccessCoordinates(
                 points = persistentListOf(
                     Point.example,
-                    WGS84Point(50.123456, 11.123456, name = "My point"),
+                    WGS84Point(50.123456, 11.123456, name = "My point", source = Source.URI),
                 ),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,

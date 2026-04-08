@@ -17,6 +17,7 @@ sealed interface Point {
     val lon: Double?
     val z: Double?
     val name: String?
+    val source: Source
 
     companion object {
         val example: Point = genRandomPoint(minLat = 0.0, maxLon = -100.0)
@@ -28,13 +29,14 @@ sealed interface Point {
             maxLon: Double = 180.0,
             z: Double = 16.0,
             name: String? = null,
+            source: Source = Source.GENERATED,
         ): Point {
             val lat = Random.nextDouble(minLat, maxLat).toScale(6)
             val lon = Random.nextDouble(minLon, maxLon).toScale(6)
             return if (isPointInChina(lon, lat)) {
-                GCJ02Point(lat, lon, z, name)
+                GCJ02Point(lat, lon, z, name, source)
             } else {
-                WGS84Point(lat, lon, z, name)
+                WGS84Point(lat, lon, z, name, source)
             }
         }
     }
@@ -92,6 +94,7 @@ data class WGS84Point(
     override val lon: Double? = null,
     override val z: Double? = null,
     override val name: String? = null,
+    override val source: Source,
 ) : Point {
     override fun toWGS84() = this
 
@@ -99,9 +102,9 @@ data class WGS84Point(
      * @See GCJ02Point.toWGS84
      */
     override fun toGCJ02() = if (lat == null || lon == null || !isPointInChina(lon, lat)) {
-        GCJ02Point(lat, lon, z, name)
+        GCJ02Point(lat, lon, z, name, source)
     } else {
-        WGSPointer(lat, lon).toGCJPointer().run { GCJ02Point(latitude, longitude, z, name) }
+        WGSPointer(lat, lon).toGCJPointer().run { GCJ02Point(latitude, longitude, z, name, source) }
     }
 }
 
@@ -111,6 +114,7 @@ data class GCJ02Point(
     override val lon: Double? = null,
     override val z: Double? = null,
     override val name: String? = null,
+    override val source: Source,
 ) : Point {
     /**
      * Notice that we use a custom check whether a point is in China on top of Evil Transform's check. The reason is
@@ -125,9 +129,9 @@ data class GCJ02Point(
      * @see isPointInChina
      */
     override fun toWGS84() = if (lat == null || lon == null || !isPointInChina(lon, lat)) {
-        WGS84Point(lat, lon, z, name)
+        WGS84Point(lat, lon, z, name, source)
     } else {
-        GCJPointer(lat, lon).toExactWGSPointer().run { WGS84Point(latitude, longitude, z, name) }
+        GCJPointer(lat, lon).toExactWGSPointer().run { WGS84Point(latitude, longitude, z, name, source) }
     }
 
     override fun toGCJ02() = this
@@ -139,13 +143,14 @@ data class BD09MCPoint(
     override val lon: Double? = null,
     override val z: Double? = null,
     override val name: String? = null,
+    override val source: Source,
 ) : Point {
     override fun toWGS84() = toGCJ02().toWGS84()
 
     override fun toGCJ02() = if (lat == null || lon == null) {
-        GCJ02Point(lat, lon, z, name)
+        GCJ02Point(lat, lon, z, name, source)
     } else {
         BD09Convertor.convertMC2LL(lat, lon).let { (bd09Lat, bd09Lon) -> CoordTransform.bd09toGCJ02(bd09Lat, bd09Lon) }
-            .let { (gcj02Lat, gcj02Lon) -> GCJ02Point(gcj02Lat, gcj02Lon, z, name) }
+            .let { (gcj02Lat, gcj02Lon) -> GCJ02Point(gcj02Lat, gcj02Lon, z, name, source) }
     }
 }

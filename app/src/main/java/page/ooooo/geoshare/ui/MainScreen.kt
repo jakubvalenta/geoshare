@@ -143,6 +143,7 @@ import page.ooooo.geoshare.lib.outputs.getOutputsForPointChips
 import page.ooooo.geoshare.lib.outputs.getOutputsForPointsChips
 import page.ooooo.geoshare.lib.outputs.getOutputsForSharing
 import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 import page.ooooo.geoshare.ui.components.BasicSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
@@ -1501,7 +1502,7 @@ private fun AutomationPreview() {
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(Point.example),
-                action = OpenDisplayGeoUriOutput(GOOGLE_MAPS_PACKAGE_NAME).toAction(WGS84Point()),
+                action = OpenDisplayGeoUriOutput(GOOGLE_MAPS_PACKAGE_NAME).toAction(WGS84Point(source = Source.GENERATED)),
                 isAutomation = true,
                 delay = 3.seconds,
             ),
@@ -1568,7 +1569,7 @@ private fun DarkAutomationPreview() {
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(Point.example),
-                action = OpenDisplayGeoUriOutput(GOOGLE_MAPS_PACKAGE_NAME).toAction(WGS84Point()),
+                action = OpenDisplayGeoUriOutput(GOOGLE_MAPS_PACKAGE_NAME).toAction(WGS84Point(source = Source.GENERATED)),
                 isAutomation = true,
                 delay = 3.seconds,
             ),
@@ -1635,7 +1636,7 @@ private fun TabletAutomationPreview() {
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(Point.example),
-                action = OpenDisplayGeoUriOutput(GOOGLE_MAPS_PACKAGE_NAME).toAction(WGS84Point()),
+                action = OpenDisplayGeoUriOutput(GOOGLE_MAPS_PACKAGE_NAME).toAction(WGS84Point(source = Source.GENERATED)),
                 isAutomation = true,
                 delay = 3.seconds,
             ),

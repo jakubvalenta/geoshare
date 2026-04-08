@@ -14,6 +14,7 @@ import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 
 object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
@@ -58,7 +59,7 @@ object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
             // https://yandex.com/maps?whatshere%5Bpoint%5D={lon}%2C{lat}
             listOf(@Suppress("SpellCheckingInspection") "whatshere[point]", "ll")
                 .firstNotNullOfOrNull { key -> LON_LAT_PATTERN.matchEntire(queryParams[key])?.toLonLatPoint() }?.let {
-                    points = persistentListOf(it.asWGS84().copy(z = z))
+                    points = persistentListOf(it.asWGS84(Source.URI).copy(z = z))
                     return@buildParseUriResult
                 }
 
@@ -69,7 +70,10 @@ object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
                         // https://yandex.com/maps/.../.../geo/{name}/{id}/
                         htmlUriString = toString()
                         points = persistentListOf(
-                            WGS84Point(name = pathParts.getOrNull(i + 1)?.replace('_', ' ')),
+                            WGS84Point(
+                                name = pathParts.getOrNull(i + 1)?.replace('_', ' '),
+                                source = Source.URI,
+                            ),
                         )
                         return@buildParseUriResult
                     }
@@ -113,7 +117,7 @@ object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
         }
 
         if (lat != null || lon != null || name != null) {
-            points = persistentListOf(WGS84Point(lat, lon, name = name))
+            points = persistentListOf(WGS84Point(lat, lon, name = name, source = Source.HTML))
         }
     }
 

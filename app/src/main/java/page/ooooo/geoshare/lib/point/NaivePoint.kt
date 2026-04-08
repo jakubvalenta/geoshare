@@ -15,7 +15,7 @@ data class NaivePoint(
     val z: Double? = null,
     val name: String? = null,
 ) {
-    fun asWGS84() = WGS84Point(lat, lon, z, name)
-    fun asGCJ02() = GCJ02Point(lat, lon, z, name)
-    fun asBD09MC() = BD09MCPoint(lat, lon, z, name)
+    fun asWGS84(source: Source) = WGS84Point(lat, lon, z, name, source)
+    fun asGCJ02(source: Source) = GCJ02Point(lat, lon, z, name, source)
+    fun asBD09MC(source: Source) = BD09MCPoint(lat, lon, z, name, source)
 }

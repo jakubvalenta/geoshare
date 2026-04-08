@@ -7,6 +7,7 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.geo.decodeGe0Hash
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 
 object MapsMeInput : Input {
@@ -35,13 +36,13 @@ object MapsMeInput : Input {
                 ?.let { hash -> decodeGe0Hash(hash) }
                 ?.let {
                     points = persistentListOf(
-                        it.asWGS84().copy(lat = it.lat?.toScale(7), lon = it.lon?.toScale(7), name = name)
+                        it.asWGS84(Source.HASH).copy(lat = it.lat?.toScale(7), lon = it.lon?.toScale(7), name = name)
                     )
                     return@run
                 }
 
             if (name != null) {
-                points = persistentListOf(WGS84Point(name = name))
+                points = persistentListOf(WGS84Point(name = name, source = Source.URI))
             }
         }
     }
