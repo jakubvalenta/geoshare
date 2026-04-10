@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.outputs
 
+import android.content.Context
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -12,12 +13,20 @@ import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.lib.android.TEST_PACKAGE_NAME
+import page.ooooo.geoshare.lib.formatters.GpxFormatter
+import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.point.CoordinateConverter
 import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 import java.io.File
 import kotlin.io.path.createTempDirectory
 
 class OpenPointsGpxOutputTest {
+    private val mockContext: Context = mock {}
+    private val chinaGeometry = ChinaGeometry(mockContext)
+    private val coordinateConverter = CoordinateConverter(chinaGeometry)
+    private val gpxFormatter = GpxFormatter(coordinateConverter)
+
     private fun mockActionContext(parentDir: File): ActionContext =
         ActionContext(
             context = mock {
@@ -50,7 +59,7 @@ class OpenPointsGpxOutputTest {
             setOf(oldFile.path),
             childDir.listFiles()?.map { it.path }?.toSet(),
         )
-        val success = OpenPointsGpxOutput(TEST_PACKAGE_NAME).execute(
+        val success = OpenPointsGpxOutput(TEST_PACKAGE_NAME, gpxFormatter).execute(
             value = points,
             actionContext = mockActionContext(parentDir),
         )

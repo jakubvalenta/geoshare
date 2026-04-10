@@ -12,7 +12,7 @@ import org.junit.runner.RunWith
 import page.ooooo.geoshare.BehaviorTest.Companion.ELEMENT_DOES_NOT_EXIST_TIMEOUT
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.formats.CoordsFormat
+import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.point.GCJ02Point
 import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
@@ -33,7 +33,7 @@ class UserPreferencesBehaviorTest : BehaviorTest {
         onElement {
             if (viewIdResourceName == "geoShareResultSuccessLastPointCoordinates") {
                 assertEquals(
-                    CoordsFormat.formatDecCoords(GCJ02Point(52.5067296, 13.2599309, source = Source.MAP_CENTER)),
+                    CoordinateFormatter.formatDecCoords(GCJ02Point(52.5067296, 13.2599309, source = Source.MAP_CENTER)),
                     textAsString(),
                 )
                 true
@@ -52,7 +52,13 @@ class UserPreferencesBehaviorTest : BehaviorTest {
         onElement {
             if (viewIdResourceName == "geoShareResultSuccessLastPointCoordinates") {
                 assertEquals(
-                    CoordsFormat.formatDegMinSecCoords(GCJ02Point(52.5067296, 13.2599309, source = Source.MAP_CENTER)),
+                    CoordinateFormatter.formatDegMinSecCoords(
+                        GCJ02Point(
+                            52.5067296,
+                            13.2599309,
+                            source = Source.MAP_CENTER
+                        )
+                    ),
                     textAsString(),
                 )
                 true

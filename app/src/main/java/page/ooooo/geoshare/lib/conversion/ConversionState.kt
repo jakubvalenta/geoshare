@@ -583,7 +583,10 @@ data class ConversionSucceeded(
         }
 
         if (billingStatus is BillingStatus.Purchased && stateContext.billing.features.contains(AutomationFeature)) {
-            val output = automation.toOutput { stateContext.linkRepository.getByUUID(it) } ?: return null
+            val output = stateContext.outputRepository.getAutomationOutput(
+                automation = automation,
+                getLinkByUUID = { stateContext.linkRepository.getByUUID(it) },
+            ) ?: return null
             val action = when (output) {
                 is PointOutput -> output.toAction(lastPoint)
                 is PointsOutput -> output.toAction(points)

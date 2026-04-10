@@ -9,10 +9,11 @@ import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.geo.decodeGe0Hash
 import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object MapsMeInput : Input {
-    private const val HASH = """[A-Za-z0-9\-_]{2,}"""
-
+@Singleton
+class MapsMeInput @Inject constructor() : Input {
     override val uriPattern = Regex("""(?:(?:https?://)?(?:comaps\.at|ge0\.me|omaps\.app)|ge0:/)/$URI_REST""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.MAPS_ME,
@@ -49,5 +50,9 @@ object MapsMeInput : Input {
                 points = persistentListOf(WGS84Point(name = name, source = Source.URI))
             }
         }
+    }
+
+    private companion object {
+        private const val HASH = """[A-Za-z0-9\-_]{2,}"""
     }
 }

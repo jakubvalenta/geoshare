@@ -1,4 +1,4 @@
-package page.ooooo.geoshare.data
+package page.ooooo.geoshare.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.BuildConfig
+import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCodePreference
 import javax.inject.Inject
 
@@ -21,7 +22,7 @@ class IntroViewModel @Inject constructor(
             .map { values -> values.introShownForVersionCode != IntroShowForVersionCodePreference.default }
             .stateIn(
                 viewModelScope,
-                SharingStarted.WhileSubscribed(5000),
+                SharingStarted.Companion.WhileSubscribed(5000),
                 true,
             )
 

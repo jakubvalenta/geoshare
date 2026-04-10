@@ -34,7 +34,7 @@ import page.ooooo.geoshare.lib.network.NetworkTools.Companion.MAX_RETRIES
 import page.ooooo.geoshare.lib.network.NetworkTools.Companion.REQUEST_TIMEOUT
 import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
-import page.ooooo.geoshare.lib.formats.CoordsFormat
+import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.geo.quickIsPointInChina
 import page.ooooo.geoshare.lib.point.BD09MCPoint
 import page.ooooo.geoshare.lib.point.GCJ02Point
@@ -247,8 +247,8 @@ interface BehaviorTest {
             ?.let { point ->
                 CoordinateFormat.entries.map { coordinateFormat ->
                     when (coordinateFormat) {
-                        CoordinateFormat.DEC -> CoordsFormat.formatDecCoords(point)
-                        CoordinateFormat.DEG_MIN_SEC -> CoordsFormat.formatDegMinSecCoords(point)
+                        CoordinateFormat.DEC -> CoordinateFormatter.formatDecCoords(point)
+                        CoordinateFormat.DEG_MIN_SEC -> CoordinateFormatter.formatDegMinSecCoords(point)
                     }
                 }
             }

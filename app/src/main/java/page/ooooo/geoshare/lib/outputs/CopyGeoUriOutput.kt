@@ -5,13 +5,16 @@ import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.formats.GeoUriFormat
+import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.ui.components.ResourceIconDescriptor
+import javax.inject.Inject
 
-object CopyGeoUriOutput : CopyPointOutput {
+class CopyGeoUriOutput @Inject constructor(
+    private val geoUriFormatter: GeoUriFormatter,
+) : CopyPointOutput {
     override fun getText(value: Point, uriQuote: UriQuote) =
-        GeoUriFormat.formatGeoUriString(value, uriQuote = uriQuote)
+        geoUriFormatter.formatGeoUriString(value, uriQuote = uriQuote)
 
     @Composable
     override fun label(appDetails: AppDetails) =

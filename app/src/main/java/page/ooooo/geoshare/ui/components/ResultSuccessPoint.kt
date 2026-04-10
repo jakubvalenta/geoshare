@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -24,7 +25,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
-import page.ooooo.geoshare.lib.formats.CoordsFormat
+import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
+import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.point.CoordinateConverter
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -37,6 +40,7 @@ fun ResultSuccessPoint(
     point: Point,
     index: Int,
     coordinateFormat: CoordinateFormat,
+    coordinateFormatter: CoordinateFormatter,
     onSelect: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -58,8 +62,8 @@ fun ResultSuccessPoint(
             SelectionContainer {
                 Text(
                     when (coordinateFormat) {
-                        CoordinateFormat.DEC -> CoordsFormat.formatDecCoords(point)
-                        CoordinateFormat.DEG_MIN_SEC -> CoordsFormat.formatDegMinSecCoords(point)
+                        CoordinateFormat.DEC -> coordinateFormatter.formatDecCoords(point)
+                        CoordinateFormat.DEG_MIN_SEC -> coordinateFormatter.formatDegMinSecCoords(point)
                     },
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -81,10 +85,15 @@ fun ResultSuccessPoint(
 private fun DefaultPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
+            val chinaGeometry = ChinaGeometry(context)
+            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
             ResultSuccessPoint(
                 point = Point.example,
                 index = 2,
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
+                coordinateFormatter = coordinateFormatter,
                 onSelect = {},
             )
         }
@@ -96,10 +105,15 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
+            val chinaGeometry = ChinaGeometry(context)
+            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
             ResultSuccessPoint(
                 point = Point.example,
                 index = 2,
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
+                coordinateFormatter = coordinateFormatter,
                 onSelect = {},
             )
         }
@@ -111,11 +125,15 @@ private fun DarkPreview() {
 private fun LongNamePreview() {
     AppTheme {
         Surface {
-            @Suppress("SpellCheckingInspection")
+            val context = LocalContext.current
+            val chinaGeometry = ChinaGeometry(context)
+            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
             ResultSuccessPoint(
-                point = Point.genRandomPoint(name = "Reuterstraße 1, Berlin-Neukölln, Germany"),
+                point = Point.genRandomPoint(name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany"),
                 index = 2,
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
+                coordinateFormatter = coordinateFormatter,
                 onSelect = {},
             )
         }
@@ -127,11 +145,15 @@ private fun LongNamePreview() {
 private fun DarkLongNamePreview() {
     AppTheme {
         Surface {
-            @Suppress("SpellCheckingInspection")
+            val context = LocalContext.current
+            val chinaGeometry = ChinaGeometry(context)
+            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
             ResultSuccessPoint(
-                point = Point.genRandomPoint(name = "Reuterstraße 1, Berlin-Neukölln, Germany"),
+                point = Point.genRandomPoint(name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany"),
                 index = 2,
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
+                coordinateFormatter = coordinateFormatter,
                 onSelect = {},
             )
         }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -17,13 +18,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
+import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
+import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
+import page.ooooo.geoshare.lib.formatters.GpxFormatter
+import page.ooooo.geoshare.lib.formatters.MagicEarthUriFormatter
+import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.ChinaGeometry
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
-import page.ooooo.geoshare.lib.outputs.getOutputsForPoint
-import page.ooooo.geoshare.lib.outputs.getOutputsForPoints
+import page.ooooo.geoshare.lib.point.CoordinateConverter
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.Points
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -118,12 +126,29 @@ private fun <T> ResultSuccessSheetItemGroup(
 private fun DefaultPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
+            val chinaGeometry = ChinaGeometry(context)
+            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+            val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
+            val gpxFormatter = GpxFormatter(coordinateConverter)
+            val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
+            val uriFormatter = UriFormatter(coordinateConverter)
+            val outputRepository = OutputRepository(
+                coordinateFormatter = coordinateFormatter,
+                geoUriFormatter = geoUriFormatter,
+                googleMapsUriFormatter = googleMapsUriFormatter,
+                gpxFormatter = gpxFormatter,
+                magicEarthUriFormatter = magicEarthUriFormatter,
+                uriFormatter = uriFormatter,
+            )
             ResultSuccessSheet(
                 points = persistentListOf(Point.example, Point.genRandomPoint()),
                 selectedPointIndex = 1,
                 appDetails = emptyMap(),
-                outputsForPoint = getOutputsForPoint(defaultFakeLinks),
-                outputsForPoints = getOutputsForPoints(),
+                outputsForPoint = outputRepository.getOutputsForPoint(defaultFakeLinks),
+                outputsForPoints = outputRepository.getOutputsForPoints(),
                 onHide = {},
                 onExecute = {},
             )
@@ -140,12 +165,29 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
+            val chinaGeometry = ChinaGeometry(context)
+            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+            val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
+            val gpxFormatter = GpxFormatter(coordinateConverter)
+            val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
+            val uriFormatter = UriFormatter(coordinateConverter)
+            val outputRepository = OutputRepository(
+                coordinateFormatter = coordinateFormatter,
+                geoUriFormatter = geoUriFormatter,
+                googleMapsUriFormatter = googleMapsUriFormatter,
+                gpxFormatter = gpxFormatter,
+                magicEarthUriFormatter = magicEarthUriFormatter,
+                uriFormatter = uriFormatter,
+            )
             ResultSuccessSheet(
                 points = persistentListOf(Point.example, Point.genRandomPoint()),
                 selectedPointIndex = 1,
                 appDetails = emptyMap(),
-                outputsForPoint = getOutputsForPoint(defaultFakeLinks),
-                outputsForPoints = getOutputsForPoints(),
+                outputsForPoint = outputRepository.getOutputsForPoint(defaultFakeLinks),
+                outputsForPoints = outputRepository.getOutputsForPoints(),
                 onHide = {},
                 onExecute = {},
             )
@@ -158,12 +200,29 @@ private fun DarkPreview() {
 private fun LastPointPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
+            val chinaGeometry = ChinaGeometry(context)
+            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+            val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
+            val gpxFormatter = GpxFormatter(coordinateConverter)
+            val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
+            val uriFormatter = UriFormatter(coordinateConverter)
+            val outputRepository = OutputRepository(
+                coordinateFormatter = coordinateFormatter,
+                geoUriFormatter = geoUriFormatter,
+                googleMapsUriFormatter = googleMapsUriFormatter,
+                gpxFormatter = gpxFormatter,
+                magicEarthUriFormatter = magicEarthUriFormatter,
+                uriFormatter = uriFormatter,
+            )
             ResultSuccessSheet(
                 points = persistentListOf(Point.example),
                 selectedPointIndex = 0,
                 appDetails = emptyMap(),
-                outputsForPoint = getOutputsForPoint(defaultFakeLinks),
-                outputsForPoints = getOutputsForPoints(),
+                outputsForPoint = outputRepository.getOutputsForPoint(defaultFakeLinks),
+                outputsForPoints = outputRepository.getOutputsForPoints(),
                 onHide = {},
                 onExecute = {},
             )
@@ -180,12 +239,29 @@ private fun LastPointPreview() {
 private fun DarkLastPointPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
+            val chinaGeometry = ChinaGeometry(context)
+            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+            val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
+            val gpxFormatter = GpxFormatter(coordinateConverter)
+            val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
+            val uriFormatter = UriFormatter(coordinateConverter)
+            val outputRepository = OutputRepository(
+                coordinateFormatter = coordinateFormatter,
+                geoUriFormatter = geoUriFormatter,
+                googleMapsUriFormatter = googleMapsUriFormatter,
+                gpxFormatter = gpxFormatter,
+                magicEarthUriFormatter = magicEarthUriFormatter,
+                uriFormatter = uriFormatter,
+            )
             ResultSuccessSheet(
                 points = persistentListOf(Point.example),
                 selectedPointIndex = 0,
                 appDetails = emptyMap(),
-                outputsForPoint = getOutputsForPoint(defaultFakeLinks),
-                outputsForPoints = getOutputsForPoints(),
+                outputsForPoint = outputRepository.getOutputsForPoint(defaultFakeLinks),
+                outputsForPoints = outputRepository.getOutputsForPoints(),
                 onHide = {},
                 onExecute = {},
             )

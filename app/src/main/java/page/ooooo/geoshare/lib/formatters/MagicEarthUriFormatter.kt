@@ -1,9 +1,12 @@
-package page.ooooo.geoshare.lib.formats
+package page.ooooo.geoshare.lib.formatters
 
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.point.CoordinateConverter
 import page.ooooo.geoshare.lib.point.Point
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/, although it's outdated:
@@ -12,12 +15,15 @@ import page.ooooo.geoshare.lib.point.Point
  * - navigate_via doesn't work; it was an undocumented parameter that used to work for a while
  * - search_around seems to do the same as open_search
  */
-object MagicEarthUriFormat {
+@Singleton
+class MagicEarthUriFormatter @Inject constructor(
+    private val coordinateConverter: CoordinateConverter,
+) {
     fun formatDisplayUriString(point: Point, uriQuote: UriQuote) = Uri(
         scheme = "magicearth",
         path = "//",
         queryParams = buildMap {
-            point.toWGS84().run {
+            coordinateConverter.toWGS84(point).run {
                 latStr?.let { latStr ->
                     lonStr?.let { lonStr ->
                         set("show_on_map", "")
@@ -46,7 +52,7 @@ object MagicEarthUriFormat {
         path = "//",
         queryParams = buildMap {
             set("get_directions", "")
-            point.toWGS84().run {
+            coordinateConverter.toWGS84(point).run {
                 latStr?.let { latStr ->
                     lonStr?.let { lonStr ->
                         set("lat", latStr)

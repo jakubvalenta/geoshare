@@ -1,4 +1,4 @@
-package page.ooooo.geoshare.lib.formats
+package page.ooooo.geoshare.lib.formatters
 
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.lib.DefaultUriQuote
@@ -21,10 +21,15 @@ import page.ooooo.geoshare.lib.android.OSMAND_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.SYGIC_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.VESPUCCI_PACKAGE_NAME
+import page.ooooo.geoshare.lib.point.CoordinateConverter
 import page.ooooo.geoshare.lib.point.Point
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object GeoUriFormat {
-
+@Singleton
+class GeoUriFormatter @Inject constructor(
+    private val coordinateConverter: CoordinateConverter,
+) {
     data class Flavor(
         val srs: Srs = Srs.WGS84,
         val pin: PinFlavor,
@@ -109,11 +114,9 @@ object GeoUriFormat {
     }
 
     fun formatGeoUriString(point: Point, flavor: Flavor = Flavor.Safe, uriQuote: UriQuote = DefaultUriQuote) =
-        point.run {
-            when (flavor.srs) {
-                Flavor.Srs.GCJ02 -> toGCJ02()
-                Flavor.Srs.WGS84 -> toWGS84()
-            }
+        when (flavor.srs) {
+            Flavor.Srs.GCJ02 -> coordinateConverter.toGCJ02(point)
+            Flavor.Srs.WGS84 -> coordinateConverter.toWGS84(point) // FIXME
         }.run {
             // Use custom string builder instead of Uri.toString(), because we want to allow custom chars in query params
             buildString {

@@ -35,6 +35,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.retain.retain
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -48,12 +49,15 @@ import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeOpenStreetMapDisplayLink
 import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
+import page.ooooo.geoshare.lib.geo.ChinaGeometry
 import page.ooooo.geoshare.lib.outputs.CopyGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.OpenPointOutput
 import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.ShareDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.ShareLinkUriOutput
+import page.ooooo.geoshare.lib.point.CoordinateConverter
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -188,10 +192,14 @@ fun AppIcon(
 private fun DefaultPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
+            val chinaGeometry = ChinaGeometry(context)
+            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             AppIcon(
                 modifier = Modifier.width(85.dp),
                 label = FakeOpenStreetMapDisplayLink.group,
-                outputs = listOf(ShareDisplayGeoUriOutput, CopyGeoUriOutput),
+                outputs = listOf(ShareDisplayGeoUriOutput(geoUriFormatter), CopyGeoUriOutput(geoUriFormatter)),
             ) {
                 CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
                     IconFromDescriptor(
@@ -211,10 +219,14 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
+            val chinaGeometry = ChinaGeometry(context)
+            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             AppIcon(
                 modifier = Modifier.width(85.dp),
                 label = FakeOpenStreetMapDisplayLink.group,
-                outputs = listOf(ShareDisplayGeoUriOutput, CopyGeoUriOutput),
+                outputs = listOf(ShareDisplayGeoUriOutput(geoUriFormatter), CopyGeoUriOutput(geoUriFormatter)),
             ) {
                 CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
                     IconFromDescriptor(
@@ -234,7 +246,11 @@ private fun DarkPreview() {
 private fun ShareItemPreview() {
     AppTheme {
         Surface {
-            val output = ShareDisplayGeoUriOutput
+            val context = LocalContext.current
+            val chinaGeometry = ChinaGeometry(context)
+            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+            val output = ShareDisplayGeoUriOutput(geoUriFormatter)
             AppIcon(
                 modifier = Modifier.width(85.dp),
             ) {
@@ -259,7 +275,11 @@ private fun ShareItemPreview() {
 private fun DarkShareItemPreview() {
     AppTheme {
         Surface {
-            val output = ShareDisplayGeoUriOutput
+            val context = LocalContext.current
+            val chinaGeometry = ChinaGeometry(context)
+            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+            val output = ShareDisplayGeoUriOutput(geoUriFormatter)
             AppIcon(
                 modifier = Modifier.width(85.dp),
             ) {

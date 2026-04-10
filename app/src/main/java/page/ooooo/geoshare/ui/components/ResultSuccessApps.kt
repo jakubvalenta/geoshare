@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
@@ -46,13 +47,18 @@ import page.ooooo.geoshare.lib.android.MAPY_COM_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.ORGANIC_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
+import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
+import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
+import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
+import page.ooooo.geoshare.lib.formatters.GpxFormatter
+import page.ooooo.geoshare.lib.formatters.MagicEarthUriFormatter
+import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.ChinaGeometry
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
-import page.ooooo.geoshare.lib.outputs.getOutputsForApps
-import page.ooooo.geoshare.lib.outputs.getOutputsForLinks
-import page.ooooo.geoshare.lib.outputs.getOutputsForSharing
+import page.ooooo.geoshare.lib.point.CoordinateConverter
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.Points
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -206,6 +212,22 @@ private fun DefaultPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                val chinaGeometry = ChinaGeometry(context)
+                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+                val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
+                val gpxFormatter = GpxFormatter(coordinateConverter)
+                val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
+                val uriFormatter = UriFormatter(coordinateConverter)
+                val outputRepository = OutputRepository(
+                    coordinateFormatter = coordinateFormatter,
+                    geoUriFormatter = geoUriFormatter,
+                    googleMapsUriFormatter = googleMapsUriFormatter,
+                    gpxFormatter = gpxFormatter,
+                    magicEarthUriFormatter = magicEarthUriFormatter,
+                    uriFormatter = uriFormatter,
+                )
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessApps(
                     appDetails = mapOf(
@@ -246,7 +268,7 @@ private fun DefaultPreview() {
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
-                    outputsForApps = getOutputsForApps(
+                    outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
                             COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                             GMAPS_WV_PACKAGE_NAME to setOf(DataType.GEO_URI),
@@ -260,8 +282,8 @@ private fun DefaultPreview() {
                         ),
                         emptySet(),
                     ),
-                    outputsForLinks = getOutputsForLinks(defaultFakeLinks),
-                    outputsForSharing = getOutputsForSharing(),
+                    outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
+                    outputsForSharing = outputRepository.getOutputsForSharing(),
                     points = persistentListOf(Point.example),
                     onDisableLinkGroup = {},
                     onExecute = {},
@@ -279,6 +301,22 @@ private fun DarkPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                val chinaGeometry = ChinaGeometry(context)
+                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+                val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
+                val gpxFormatter = GpxFormatter(coordinateConverter)
+                val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
+                val uriFormatter = UriFormatter(coordinateConverter)
+                val outputRepository = OutputRepository(
+                    coordinateFormatter = coordinateFormatter,
+                    geoUriFormatter = geoUriFormatter,
+                    googleMapsUriFormatter = googleMapsUriFormatter,
+                    gpxFormatter = gpxFormatter,
+                    magicEarthUriFormatter = magicEarthUriFormatter,
+                    uriFormatter = uriFormatter,
+                )
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessApps(
                     appDetails = mapOf(
@@ -319,7 +357,7 @@ private fun DarkPreview() {
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
-                    outputsForApps = getOutputsForApps(
+                    outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
                             COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                             GMAPS_WV_PACKAGE_NAME to setOf(DataType.GEO_URI),
@@ -333,8 +371,8 @@ private fun DarkPreview() {
                         ),
                         emptySet(),
                     ),
-                    outputsForLinks = getOutputsForLinks(defaultFakeLinks),
-                    outputsForSharing = getOutputsForSharing(),
+                    outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
+                    outputsForSharing = outputRepository.getOutputsForSharing(),
                     points = persistentListOf(Point.example),
                     onDisableLinkGroup = {},
                     onExecute = {},
@@ -351,18 +389,34 @@ private fun LoadingPreview() {
     AppTheme {
         Surface {
             Column {
-                @SuppressLint("LocalContextGetResourceValueCall")
+                val context = LocalContext.current
+                val chinaGeometry = ChinaGeometry(context)
+                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+                val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
+                val gpxFormatter = GpxFormatter(coordinateConverter)
+                val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
+                val uriFormatter = UriFormatter(coordinateConverter)
+                val outputRepository = OutputRepository(
+                    coordinateFormatter = coordinateFormatter,
+                    geoUriFormatter = geoUriFormatter,
+                    googleMapsUriFormatter = googleMapsUriFormatter,
+                    gpxFormatter = gpxFormatter,
+                    magicEarthUriFormatter = magicEarthUriFormatter,
+                    uriFormatter = uriFormatter,
+                )
                 ResultSuccessApps(
                     appDetails = emptyMap(),
-                    outputsForApps = getOutputsForApps(
+                    outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
                             COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                             ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                         ),
                         emptySet(),
                     ),
-                    outputsForLinks = getOutputsForLinks(defaultFakeLinks),
-                    outputsForSharing = getOutputsForSharing(),
+                    outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
+                    outputsForSharing = outputRepository.getOutputsForSharing(),
                     points = persistentListOf(Point.example),
                     onDisableLinkGroup = {},
                     onExecute = {},
@@ -379,18 +433,34 @@ private fun DarkLoadingPreview() {
     AppTheme {
         Surface {
             Column {
-                @SuppressLint("LocalContextGetResourceValueCall")
+                val context = LocalContext.current
+                val chinaGeometry = ChinaGeometry(context)
+                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+                val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
+                val gpxFormatter = GpxFormatter(coordinateConverter)
+                val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
+                val uriFormatter = UriFormatter(coordinateConverter)
+                val outputRepository = OutputRepository(
+                    coordinateFormatter = coordinateFormatter,
+                    geoUriFormatter = geoUriFormatter,
+                    googleMapsUriFormatter = googleMapsUriFormatter,
+                    gpxFormatter = gpxFormatter,
+                    magicEarthUriFormatter = magicEarthUriFormatter,
+                    uriFormatter = uriFormatter,
+                )
                 ResultSuccessApps(
                     appDetails = emptyMap(),
-                    outputsForApps = getOutputsForApps(
+                    outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
                             COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                             ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                         ),
                         emptySet(),
                     ),
-                    outputsForLinks = getOutputsForLinks(defaultFakeLinks),
-                    outputsForSharing = getOutputsForSharing(),
+                    outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
+                    outputsForSharing = outputRepository.getOutputsForSharing(),
                     points = persistentListOf(Point.example),
                     onDisableLinkGroup = {},
                     onExecute = {},
@@ -407,11 +477,28 @@ private fun EmptyPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val chinaGeometry = ChinaGeometry(context)
+                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+                val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
+                val gpxFormatter = GpxFormatter(coordinateConverter)
+                val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
+                val uriFormatter = UriFormatter(coordinateConverter)
+                val outputRepository = OutputRepository(
+                    coordinateFormatter = coordinateFormatter,
+                    geoUriFormatter = geoUriFormatter,
+                    googleMapsUriFormatter = googleMapsUriFormatter,
+                    gpxFormatter = gpxFormatter,
+                    magicEarthUriFormatter = magicEarthUriFormatter,
+                    uriFormatter = uriFormatter,
+                )
                 ResultSuccessApps(
                     appDetails = emptyMap(),
                     outputsForApps = emptyMap(),
                     outputsForLinks = emptyMap(),
-                    outputsForSharing = getOutputsForSharing(),
+                    outputsForSharing = outputRepository.getOutputsForSharing(),
                     points = persistentListOf(Point.example),
                     onDisableLinkGroup = {},
                     onExecute = {},
@@ -428,11 +515,28 @@ private fun DarkEmptyPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val chinaGeometry = ChinaGeometry(context)
+                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+                val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
+                val gpxFormatter = GpxFormatter(coordinateConverter)
+                val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
+                val uriFormatter = UriFormatter(coordinateConverter)
+                val outputRepository = OutputRepository(
+                    coordinateFormatter = coordinateFormatter,
+                    geoUriFormatter = geoUriFormatter,
+                    googleMapsUriFormatter = googleMapsUriFormatter,
+                    gpxFormatter = gpxFormatter,
+                    magicEarthUriFormatter = magicEarthUriFormatter,
+                    uriFormatter = uriFormatter,
+                )
                 ResultSuccessApps(
                     appDetails = emptyMap(),
-                    outputsForApps = getOutputsForApps(emptyMap(), emptySet()),
+                    outputsForApps = outputRepository.getOutputsForApps(emptyMap(), emptySet()),
                     outputsForLinks = emptyMap(),
-                    outputsForSharing = getOutputsForSharing(),
+                    outputsForSharing = outputRepository.getOutputsForSharing(),
                     points = persistentListOf(Point.example),
                     onDisableLinkGroup = {},
                     onExecute = {},

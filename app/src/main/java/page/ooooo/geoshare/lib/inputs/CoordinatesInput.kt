@@ -7,31 +7,26 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toScale
-import page.ooooo.geoshare.lib.formats.CoordsFormat
+import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
+import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object CoordinatesInput : Input, Input.HasRandomUri {
-    @Suppress("SpellCheckingInspection")
-    private const val CHARS = """[\p{Zs},°'′"″NSWE]"""
-    private const val SPACE = """\p{Zs}*"""
-    private const val LAT_SIG = """(-?)"""
-    private const val LAT_DEG = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
-    private const val LAT_MIN = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
-    private const val LAT_SEC = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
-    private const val LON_SIG = """(-?)"""
-    private const val LON_DEG = """(\d{1,3}(?:\.\d{1,$MAX_PRECISION})?)"""
-    private const val LON_MIN = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
-    private const val LON_SEC = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
-
+@Singleton
+class CoordinatesInput @Inject constructor(
+    private val coordinateFormatter: CoordinateFormatter,
+    private val uriFormatter: UriFormatter,
+) : Input, Input.HasRandomUri {
     override val uriPattern = Regex("""[\d.\-\p{Zs},°'′"″NSWE]*\d[\d.\-\p{Zs},°'′"″NSWE]*""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.COORDINATES,
         nameResId = R.string.converter_coordinates_name,
         items = listOf(
             InputDocumentationItem.Text(20) {
-                stringResource(R.string.example, CoordsFormat.formatDegMinSecCoords(Point.example))
+                stringResource(R.string.example, coordinateFormatter.formatDegMinSecCoords(Point.example))
             },
         ),
     )
@@ -129,5 +124,18 @@ object CoordinatesInput : Input, Input.HasRandomUri {
     }
 
     override fun genRandomUri(point: Point) =
-        point.formatUriString("N {lat}, E {lon}")
+        uriFormatter.formatUriString(point, "N {lat}, E {lon}")
+
+    private companion object {
+        private const val CHARS = @Suppress("SpellCheckingInspection") """[\p{Zs},°'′"″NSWE]"""
+        private const val SPACE = """\p{Zs}*"""
+        private const val LAT_SIG = """(-?)"""
+        private const val LAT_DEG = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
+        private const val LAT_MIN = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
+        private const val LAT_SEC = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
+        private const val LON_SIG = """(-?)"""
+        private const val LON_DEG = """(\d{1,3}(?:\.\d{1,$MAX_PRECISION})?)"""
+        private const val LON_MIN = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
+        private const val LON_SEC = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
+    }
 }

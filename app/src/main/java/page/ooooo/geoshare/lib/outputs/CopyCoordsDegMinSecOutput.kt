@@ -5,12 +5,15 @@ import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.formats.CoordsFormat
+import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.point.Point
+import javax.inject.Inject
 
-object CopyCoordsDegMinSecOutput : CopyPointOutput {
+class CopyCoordsDegMinSecOutput @Inject constructor(
+    private val coordinateFormatter: CoordinateFormatter,
+) : CopyPointOutput {
     override fun getText(value: Point, uriQuote: UriQuote) =
-        CoordsFormat.formatDegMinSecCoords(value)
+        coordinateFormatter.formatDegMinSecCoords(value)
 
     @Composable
     override fun label(appDetails: AppDetails) =

@@ -1,13 +1,19 @@
-package page.ooooo.geoshare.lib.formats
+package page.ooooo.geoshare.lib.formatters
 
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.point.CoordinateConverter
 import page.ooooo.geoshare.lib.point.Point
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object GoogleMapsUriFormat {
+@Singleton
+class GoogleMapsUriFormatter @Inject constructor(
+    private val coordinateConverter: CoordinateConverter,
+) {
     fun formatNavigationUriString(point: Point, uriQuote: UriQuote) = Uri(
         scheme = "google.navigation",
-        path = (point.toGCJ02().run {
+        path = (coordinateConverter.toGCJ02(point).run { // FIXME
             latStr?.let { latStr ->
                 lonStr?.let { lonStr ->
                     "$latStr,$lonStr"
@@ -19,7 +25,7 @@ object GoogleMapsUriFormat {
 
     fun formatStreetViewUriString(point: Point, uriQuote: UriQuote) = Uri(
         scheme = "google.streetview",
-        path = (point.toGCJ02().run {
+        path = (coordinateConverter.toGCJ02(point).run { // FIXME
             latStr?.let { latStr ->
                 lonStr?.let { lonStr ->
                     "$latStr,$lonStr"

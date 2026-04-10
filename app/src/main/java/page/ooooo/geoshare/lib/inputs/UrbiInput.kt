@@ -15,11 +15,17 @@ import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
+import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object UrbiInput : HtmlInput, Input.HasRandomUri {
+@Singleton
+class UrbiInput @Inject constructor(
+    private val uriFormatter: UriFormatter,
+) : HtmlInput, Input.HasRandomUri {
     override val uriPattern =
         Regex("""(?:https?://)?(?:www\.)?(?:(?:go|maps)\.)?(?:2gis|urbi|urbi-[a-z]{2})(?:\.[a-z]{2,3})?\.[a-z]{2,3}/$URI_REST""")
     override val documentation = InputDocumentation(
@@ -117,5 +123,5 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
     override val loadingIndicatorTitleResId = R.string.converter_urbi_loading_indicator_title
 
     override fun genRandomUri(point: Point) =
-        point.formatUriString("https://maps.urbi.ae/dubai/geo/{lon}%2C{lat}?m={lon}%2C{lat}%2F{z}")
+        uriFormatter.formatUriString(point, "https://maps.urbi.ae/dubai/geo/{lon}%2C{lat}?m={lon}%2C{lat}%2F{z}")
 }

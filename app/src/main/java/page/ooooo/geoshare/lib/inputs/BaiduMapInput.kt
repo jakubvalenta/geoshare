@@ -16,13 +16,11 @@ import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
 import page.ooooo.geoshare.lib.point.BD09MCPoint
 import page.ooooo.geoshare.lib.point.Source
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object BaiduMapInput : ShortUriInput, WebInput {
-    private const val X = """(\d+(?:\.\d+)?)"""
-    private const val Y = """(\d+(?:\.\d+)?)"""
-    private const val CENTER = """@$X,$Y,${Z}z.*"""
-    private const val WAYPOINT = """1\$\$\$\$$X,$Y\$\$([^$]+)"""
-
+@Singleton
+class BaiduMapInput @Inject constructor() : ShortUriInput, WebInput {
     override val uriPattern = Regex("""(?:https?://)?(?:j\.)?map\.baidu\.com/$URI_REST""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.BAIDU_MAP,
@@ -125,4 +123,11 @@ object BaiduMapInput : ShortUriInput, WebInput {
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_baidu_map_loading_indicator_title
+
+    companion object {
+        private const val X = """(\d+(?:\.\d+)?)"""
+        private const val Y = """(\d+(?:\.\d+)?)"""
+        private const val CENTER = """@$X,$Y,${Z}z.*"""
+        private const val WAYPOINT = """1\$\$\$\$$X,$Y\$\$([^$]+)"""
+    }
 }

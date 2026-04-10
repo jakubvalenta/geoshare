@@ -13,12 +13,18 @@ import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
+import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
+@Singleton
+class YandexMapsInput @Inject constructor(
+    private val uriFormatter: UriFormatter,
+) : ShortUriInput, HtmlInput, Input.HasRandomUri {
     override val uriPattern = Regex("""(?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/$URI_REST""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.YANDEX_MAPS,
@@ -131,5 +137,5 @@ object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
     override val loadingIndicatorTitleResId = R.string.converter_yandex_maps_loading_indicator_title
 
     override fun genRandomUri(point: Point) =
-        point.formatUriString("https://yandex.com/maps?ll={lon}%2C{lat}&z={z}")
+        uriFormatter.formatUriString(point, "https://yandex.com/maps?ll={lon}%2C{lat}&z={z}")
 }

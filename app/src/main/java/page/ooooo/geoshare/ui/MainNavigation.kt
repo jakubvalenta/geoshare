@@ -11,8 +11,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
-import page.ooooo.geoshare.ConversionViewModel
-import page.ooooo.geoshare.data.IntroViewModel
+import page.ooooo.geoshare.ui.ConversionViewModel
+import page.ooooo.geoshare.ui.IntroViewModel
 import page.ooooo.geoshare.lib.inputs.InputDocumentationId
 
 @Serializable

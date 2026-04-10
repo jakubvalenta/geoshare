@@ -4,12 +4,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.formats.GpxFormat
+import page.ooooo.geoshare.lib.formatters.GpxFormatter
 import page.ooooo.geoshare.lib.point.Points
+import javax.inject.Inject
 
-data class OpenPointsGpxOutput(override val packageName: String) : OpenPointsOutput {
+class OpenPointsGpxOutput @Inject constructor(
+    override val packageName: String,
+    private val gpxFormatter: GpxFormatter,
+) : OpenPointsOutput {
     override fun writePoints(value: Points, writer: Appendable) {
-        GpxFormat.writeGpxPoints(value, writer)
+        gpxFormatter.writeGpxPoints(value, writer)
     }
 
     @Composable

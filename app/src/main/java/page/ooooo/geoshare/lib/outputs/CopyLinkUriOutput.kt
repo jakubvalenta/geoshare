@@ -6,11 +6,22 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.point.Point
+import javax.inject.Inject
 
-data class CopyLinkUriOutput(val link: Link) : CopyPointOutput {
+class CopyLinkUriOutput @Inject constructor(
+    val link: Link,
+    private val uriFormatter: UriFormatter,
+) : CopyPointOutput {
     override fun getText(value: Point, uriQuote: UriQuote) =
-        link.formatUriString(value, uriQuote)
+        uriFormatter.formatUriString(
+            value,
+            link.coordsUriTemplate,
+            link.nameUriTemplate,
+            link.srs,
+            uriQuote = uriQuote,
+        )
 
     override fun getIcon(appDetails: AppDetails) =
         link.icon

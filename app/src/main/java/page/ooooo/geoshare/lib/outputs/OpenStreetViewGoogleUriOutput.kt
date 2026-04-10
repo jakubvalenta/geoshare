@@ -6,17 +6,21 @@ import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.formats.GoogleMapsUriFormat
+import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.ui.components.ResourceIconDescriptor
+import javax.inject.Inject
 
 /**
  * This output creates a 'google.streetview:' URI, which some apps support to launch street view, and opens it in
  * [packageName].
  */
-data class OpenStreetViewGoogleUriOutput(override val packageName: String) : OpenPointOutput {
+class OpenStreetViewGoogleUriOutput @Inject constructor(
+    override val packageName: String,
+    private val googleMapsUriFormatter: GoogleMapsUriFormatter,
+) : OpenPointOutput {
     override fun getText(value: Point, uriQuote: UriQuote) =
-        GoogleMapsUriFormat.formatStreetViewUriString(value, uriQuote)
+        googleMapsUriFormatter.formatStreetViewUriString(value, uriQuote)
 
     @Composable
     override fun label(appDetails: AppDetails) =

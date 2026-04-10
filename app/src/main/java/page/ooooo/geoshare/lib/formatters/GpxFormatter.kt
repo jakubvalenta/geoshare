@@ -1,12 +1,17 @@
-package page.ooooo.geoshare.lib.formats
+package page.ooooo.geoshare.lib.formatters
 
 import io.ktor.util.escapeHTML
+import page.ooooo.geoshare.lib.point.CoordinateConverter
 import page.ooooo.geoshare.lib.point.Points
-import page.ooooo.geoshare.lib.point.toWGS84
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object GpxFormat {
+@Singleton
+class GpxFormatter @Inject constructor(
+    private val coordinateConverter: CoordinateConverter,
+) {
     fun writeGpxPoints(points: Points, writer: Appendable) = writeGpx(writer) {
-        points.toWGS84().filter { it.lat != null && it.lon != null }.forEach { point ->
+        coordinateConverter.toWGS84(points).filter { it.lat != null && it.lon != null }.forEach { point ->
             point.run {
                 append("<wpt lat=\"$latStr\" lon=\"$lonStr\"")
             }
@@ -22,7 +27,7 @@ object GpxFormat {
 
     fun writeGpxRoute(points: Points, writer: Appendable) = writeGpx(writer) {
         append("<rte>\n")
-        points.toWGS84().filter { it.lat != null && it.lon != null }.forEach { point ->
+        coordinateConverter.toWGS84(points).filter { it.lat != null && it.lon != null }.forEach { point ->
             point.run {
                 @Suppress("SpellCheckingInspection")
                 append("<rtept lat=\"$latStr\" lon=\"$lonStr\"")

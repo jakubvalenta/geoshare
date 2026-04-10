@@ -6,7 +6,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.point.Point
 
-object NoopOutput : PointOutput.WithoutLocation {
+class NoopOutput : PointOutput.WithoutLocation {
     override suspend fun execute(value: Point, actionContext: ActionContext) = true
 
     @Composable

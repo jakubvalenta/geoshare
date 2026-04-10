@@ -15,20 +15,43 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.inputs.Input
-import page.ooooo.geoshare.lib.inputs.allInputs
 import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.ui.InputViewModel
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun MainFormLinks(
+    modifier: Modifier = Modifier,
     onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
     onUpdateInput: (newInputUriString: String) -> Unit,
+    inputViewModel: InputViewModel = hiltViewModel(),
+) {
+    val allInputs = inputViewModel.allInputs
+
+    MainFormLinks(
+        allInputs = allInputs,
+        modifier = modifier,
+        onNavigateToInputsScreen = onNavigateToInputsScreen,
+        onNavigateToIntroScreen = onNavigateToIntroScreen,
+        onSetErrorMessageResId = onSetErrorMessageResId,
+        onUpdateInput = onUpdateInput,
+    )
+}
+
+@Composable
+private fun MainFormLinks(
+    allInputs: List<Input>,
     modifier: Modifier = Modifier,
+    onNavigateToInputsScreen: () -> Unit,
+    onNavigateToIntroScreen: () -> Unit,
+    onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
+    onUpdateInput: (newInputUriString: String) -> Unit,
 ) {
     val resources = LocalResources.current
     val spacing = LocalSpacing.current
@@ -83,6 +106,7 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             MainFormLinks(
+                allInputs = emptyList(),
                 onNavigateToInputsScreen = {},
                 onNavigateToIntroScreen = {},
                 onSetErrorMessageResId = {},
@@ -98,6 +122,7 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             MainFormLinks(
+                allInputs = emptyList(),
                 onNavigateToInputsScreen = {},
                 onNavigateToIntroScreen = {},
                 onSetErrorMessageResId = {},

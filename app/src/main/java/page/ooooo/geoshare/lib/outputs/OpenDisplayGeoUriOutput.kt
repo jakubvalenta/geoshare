@@ -5,17 +5,21 @@ import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.formats.GeoUriFormat
+import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.ui.components.DrawableIconDescriptor
 import page.ooooo.geoshare.ui.components.ResourceIconDescriptor
+import javax.inject.Inject
 
 /**
  * This output creates a geo: URI and opens it in [packageName]. So it's the most important of all outputs.
  */
-data class OpenDisplayGeoUriOutput(override val packageName: String) : OpenPointOutput {
+class OpenDisplayGeoUriOutput @Inject constructor(
+    override val packageName: String,
+    private val geoUriFormatter: GeoUriFormatter,
+) : OpenPointOutput {
     override fun getText(value: Point, uriQuote: UriQuote) =
-        GeoUriFormat.formatGeoUriString(value, packageName, uriQuote)
+        geoUriFormatter.formatGeoUriString(value, packageName, uriQuote)
 
     @Composable
     override fun label(appDetails: AppDetails) =

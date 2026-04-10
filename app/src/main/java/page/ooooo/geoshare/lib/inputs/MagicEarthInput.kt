@@ -7,14 +7,20 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
+import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/
  */
-object MagicEarthInput : Input, Input.HasRandomUri {
+@Singleton
+class MagicEarthInput @Inject constructor(
+    private val uriFormatter: UriFormatter,
+) : Input, Input.HasRandomUri {
     override val uriPattern = Regex("""(?:(?:https?://)?magicearth.com|magicearth:/)/\?$URI_REST""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.MAGIC_EARTH,
@@ -46,5 +52,8 @@ object MagicEarthInput : Input, Input.HasRandomUri {
     }
 
     override fun genRandomUri(point: Point) =
-        point.formatUriString("https://magicearth.com/?show_on_map&lat={lat}&lon={lon}&name={name}&z={z}")
+        uriFormatter.formatUriString(
+            point,
+            "https://magicearth.com/?show_on_map&lat={lat}&lon={lon}&name={name}&z={z}",
+        )
 }

@@ -45,7 +45,28 @@ import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.inputs.InputDocumentation
 import page.ooooo.geoshare.lib.inputs.InputDocumentationId
 import page.ooooo.geoshare.lib.inputs.InputDocumentationItem
-import page.ooooo.geoshare.lib.inputs.allInputs
+import page.ooooo.geoshare.data.InputRepository
+import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
+import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
+import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.inputs.AmapInput
+import page.ooooo.geoshare.lib.inputs.AppleMapsInput
+import page.ooooo.geoshare.lib.inputs.BaiduMapInput
+import page.ooooo.geoshare.lib.inputs.CoordinatesInput
+import page.ooooo.geoshare.lib.inputs.DebugInput
+import page.ooooo.geoshare.lib.inputs.GeoUriInput
+import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
+import page.ooooo.geoshare.lib.inputs.HereWeGoInput
+import page.ooooo.geoshare.lib.inputs.MagicEarthInput
+import page.ooooo.geoshare.lib.inputs.MapsMeInput
+import page.ooooo.geoshare.lib.inputs.MapyComInput
+import page.ooooo.geoshare.lib.inputs.OpenStreetMapInput
+import page.ooooo.geoshare.lib.inputs.OsmAndInput
+import page.ooooo.geoshare.lib.inputs.UrbiInput
+import page.ooooo.geoshare.lib.inputs.WazeInput
+import page.ooooo.geoshare.lib.inputs.YandexMapsInput
+import page.ooooo.geoshare.lib.point.CoordinateConverter
 import page.ooooo.geoshare.ui.components.InputsSettingsButton
 import page.ooooo.geoshare.ui.components.NavigableBasicListDetailScaffold
 import page.ooooo.geoshare.ui.components.ParagraphText
@@ -60,7 +81,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun InputsScreen(
     initialDocumentationId: InputDocumentationId?,
     onBack: () -> Unit = {},
-    viewModel: InputsViewModel = hiltViewModel(),
+    viewModel: InputViewModel = hiltViewModel(),
 ) {
     val allDocumentations by viewModel.allDocumentations.collectAsStateWithLifecycle()
     val recentDocumentations by viewModel.recentDocumentations.collectAsStateWithLifecycle()
@@ -350,10 +371,50 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val chinaGeometry = ChinaGeometry(context)
+                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+                val uriFormatter = UriFormatter(coordinateConverter)
+                val amapInput = AmapInput(uriFormatter)
+                val appleMapsInput = AppleMapsInput(uriFormatter)
+                val baiduMapInput = BaiduMapInput()
+                val coordinatesInput = CoordinatesInput(coordinateFormatter, uriFormatter)
+                val debugInput = DebugInput()
+                val geoUriInput = GeoUriInput(geoUriFormatter, uriFormatter)
+                val googleMapsInput = GoogleMapsInput(uriFormatter)
+                val hereWeGoInput = HereWeGoInput(uriFormatter)
+                val magicEarthInput = MagicEarthInput(uriFormatter)
+                val mapsMeInput = MapsMeInput()
+                val mapyComInput = MapyComInput(uriFormatter)
+                val openStreetMapInput = OpenStreetMapInput(uriFormatter)
+                val osmAndInput = OsmAndInput(uriFormatter)
+                val urbiInput = UrbiInput(uriFormatter)
+                val wazeInput = WazeInput(uriFormatter)
+                val yandexMapsInput = YandexMapsInput(uriFormatter)
+                val inputRepository = InputRepository(
+                    amapInput,
+                    appleMapsInput,
+                    baiduMapInput,
+                    coordinatesInput,
+                    debugInput,
+                    geoUriInput,
+                    googleMapsInput,
+                    hereWeGoInput,
+                    magicEarthInput,
+                    mapsMeInput,
+                    mapyComInput,
+                    openStreetMapInput,
+                    osmAndInput,
+                    urbiInput,
+                    wazeInput,
+                    yandexMapsInput,
+                )
                 InputsScreen(
                     initialDocumentationId = null,
-                    allDocumentations = allInputs.map { it.documentation },
-                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.map { it.documentation },
+                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -369,10 +430,50 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val chinaGeometry = ChinaGeometry(context)
+                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+                val uriFormatter = UriFormatter(coordinateConverter)
+                val amapInput = AmapInput(uriFormatter)
+                val appleMapsInput = AppleMapsInput(uriFormatter)
+                val baiduMapInput = BaiduMapInput()
+                val coordinatesInput = CoordinatesInput(coordinateFormatter, uriFormatter)
+                val debugInput = DebugInput()
+                val geoUriInput = GeoUriInput(geoUriFormatter, uriFormatter)
+                val googleMapsInput = GoogleMapsInput(uriFormatter)
+                val hereWeGoInput = HereWeGoInput(uriFormatter)
+                val magicEarthInput = MagicEarthInput(uriFormatter)
+                val mapsMeInput = MapsMeInput()
+                val mapyComInput = MapyComInput(uriFormatter)
+                val openStreetMapInput = OpenStreetMapInput(uriFormatter)
+                val osmAndInput = OsmAndInput(uriFormatter)
+                val urbiInput = UrbiInput(uriFormatter)
+                val wazeInput = WazeInput(uriFormatter)
+                val yandexMapsInput = YandexMapsInput(uriFormatter)
+                val inputRepository = InputRepository(
+                    amapInput,
+                    appleMapsInput,
+                    baiduMapInput,
+                    coordinatesInput,
+                    debugInput,
+                    geoUriInput,
+                    googleMapsInput,
+                    hereWeGoInput,
+                    magicEarthInput,
+                    mapsMeInput,
+                    mapyComInput,
+                    openStreetMapInput,
+                    osmAndInput,
+                    urbiInput,
+                    wazeInput,
+                    yandexMapsInput,
+                )
                 InputsScreen(
                     initialDocumentationId = null,
-                    allDocumentations = allInputs.map { it.documentation },
-                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.map { it.documentation },
+                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -388,10 +489,50 @@ private fun TabletPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val chinaGeometry = ChinaGeometry(context)
+                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+                val uriFormatter = UriFormatter(coordinateConverter)
+                val amapInput = AmapInput(uriFormatter)
+                val appleMapsInput = AppleMapsInput(uriFormatter)
+                val baiduMapInput = BaiduMapInput()
+                val coordinatesInput = CoordinatesInput(coordinateFormatter, uriFormatter)
+                val debugInput = DebugInput()
+                val geoUriInput = GeoUriInput(geoUriFormatter, uriFormatter)
+                val googleMapsInput = GoogleMapsInput(uriFormatter)
+                val hereWeGoInput = HereWeGoInput(uriFormatter)
+                val magicEarthInput = MagicEarthInput(uriFormatter)
+                val mapsMeInput = MapsMeInput()
+                val mapyComInput = MapyComInput(uriFormatter)
+                val openStreetMapInput = OpenStreetMapInput(uriFormatter)
+                val osmAndInput = OsmAndInput(uriFormatter)
+                val urbiInput = UrbiInput(uriFormatter)
+                val wazeInput = WazeInput(uriFormatter)
+                val yandexMapsInput = YandexMapsInput(uriFormatter)
+                val inputRepository = InputRepository(
+                    amapInput,
+                    appleMapsInput,
+                    baiduMapInput,
+                    coordinatesInput,
+                    debugInput,
+                    geoUriInput,
+                    googleMapsInput,
+                    hereWeGoInput,
+                    magicEarthInput,
+                    mapsMeInput,
+                    mapyComInput,
+                    openStreetMapInput,
+                    osmAndInput,
+                    urbiInput,
+                    wazeInput,
+                    yandexMapsInput,
+                )
                 InputsScreen(
                     initialDocumentationId = null,
-                    allDocumentations = allInputs.map { it.documentation },
-                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.map { it.documentation },
+                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -407,9 +548,49 @@ private fun NoRecentPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val chinaGeometry = ChinaGeometry(context)
+                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+                val uriFormatter = UriFormatter(coordinateConverter)
+                val amapInput = AmapInput(uriFormatter)
+                val appleMapsInput = AppleMapsInput(uriFormatter)
+                val baiduMapInput = BaiduMapInput()
+                val coordinatesInput = CoordinatesInput(coordinateFormatter, uriFormatter)
+                val debugInput = DebugInput()
+                val geoUriInput = GeoUriInput(geoUriFormatter, uriFormatter)
+                val googleMapsInput = GoogleMapsInput(uriFormatter)
+                val hereWeGoInput = HereWeGoInput(uriFormatter)
+                val magicEarthInput = MagicEarthInput(uriFormatter)
+                val mapsMeInput = MapsMeInput()
+                val mapyComInput = MapyComInput(uriFormatter)
+                val openStreetMapInput = OpenStreetMapInput(uriFormatter)
+                val osmAndInput = OsmAndInput(uriFormatter)
+                val urbiInput = UrbiInput(uriFormatter)
+                val wazeInput = WazeInput(uriFormatter)
+                val yandexMapsInput = YandexMapsInput(uriFormatter)
+                val inputRepository = InputRepository(
+                    amapInput,
+                    appleMapsInput,
+                    baiduMapInput,
+                    coordinatesInput,
+                    debugInput,
+                    geoUriInput,
+                    googleMapsInput,
+                    hereWeGoInput,
+                    magicEarthInput,
+                    mapsMeInput,
+                    mapyComInput,
+                    openStreetMapInput,
+                    osmAndInput,
+                    urbiInput,
+                    wazeInput,
+                    yandexMapsInput,
+                )
                 InputsScreen(
                     initialDocumentationId = null,
-                    allDocumentations = allInputs.map { it.documentation },
+                    allDocumentations = inputRepository.all.map { it.documentation },
                     recentDocumentations = emptyList(),
                     onBack = {},
                 )
@@ -424,9 +605,49 @@ private fun DarkNoRecentPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val chinaGeometry = ChinaGeometry(context)
+                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+                val uriFormatter = UriFormatter(coordinateConverter)
+                val amapInput = AmapInput(uriFormatter)
+                val appleMapsInput = AppleMapsInput(uriFormatter)
+                val baiduMapInput = BaiduMapInput()
+                val coordinatesInput = CoordinatesInput(coordinateFormatter, uriFormatter)
+                val debugInput = DebugInput()
+                val geoUriInput = GeoUriInput(geoUriFormatter, uriFormatter)
+                val googleMapsInput = GoogleMapsInput(uriFormatter)
+                val hereWeGoInput = HereWeGoInput(uriFormatter)
+                val magicEarthInput = MagicEarthInput(uriFormatter)
+                val mapsMeInput = MapsMeInput()
+                val mapyComInput = MapyComInput(uriFormatter)
+                val openStreetMapInput = OpenStreetMapInput(uriFormatter)
+                val osmAndInput = OsmAndInput(uriFormatter)
+                val urbiInput = UrbiInput(uriFormatter)
+                val wazeInput = WazeInput(uriFormatter)
+                val yandexMapsInput = YandexMapsInput(uriFormatter)
+                val inputRepository = InputRepository(
+                    amapInput,
+                    appleMapsInput,
+                    baiduMapInput,
+                    coordinatesInput,
+                    debugInput,
+                    geoUriInput,
+                    googleMapsInput,
+                    hereWeGoInput,
+                    magicEarthInput,
+                    mapsMeInput,
+                    mapyComInput,
+                    openStreetMapInput,
+                    osmAndInput,
+                    urbiInput,
+                    wazeInput,
+                    yandexMapsInput,
+                )
                 InputsScreen(
                     initialDocumentationId = null,
-                    allDocumentations = allInputs.map { it.documentation },
+                    allDocumentations = inputRepository.all.map { it.documentation },
                     recentDocumentations = emptyList(),
                     onBack = {},
                 )
@@ -441,9 +662,49 @@ private fun TabletNoRecentPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val chinaGeometry = ChinaGeometry(context)
+                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+                val uriFormatter = UriFormatter(coordinateConverter)
+                val amapInput = AmapInput(uriFormatter)
+                val appleMapsInput = AppleMapsInput(uriFormatter)
+                val baiduMapInput = BaiduMapInput()
+                val coordinatesInput = CoordinatesInput(coordinateFormatter, uriFormatter)
+                val debugInput = DebugInput()
+                val geoUriInput = GeoUriInput(geoUriFormatter, uriFormatter)
+                val googleMapsInput = GoogleMapsInput(uriFormatter)
+                val hereWeGoInput = HereWeGoInput(uriFormatter)
+                val magicEarthInput = MagicEarthInput(uriFormatter)
+                val mapsMeInput = MapsMeInput()
+                val mapyComInput = MapyComInput(uriFormatter)
+                val openStreetMapInput = OpenStreetMapInput(uriFormatter)
+                val osmAndInput = OsmAndInput(uriFormatter)
+                val urbiInput = UrbiInput(uriFormatter)
+                val wazeInput = WazeInput(uriFormatter)
+                val yandexMapsInput = YandexMapsInput(uriFormatter)
+                val inputRepository = InputRepository(
+                    amapInput,
+                    appleMapsInput,
+                    baiduMapInput,
+                    coordinatesInput,
+                    debugInput,
+                    geoUriInput,
+                    googleMapsInput,
+                    hereWeGoInput,
+                    magicEarthInput,
+                    mapsMeInput,
+                    mapyComInput,
+                    openStreetMapInput,
+                    osmAndInput,
+                    urbiInput,
+                    wazeInput,
+                    yandexMapsInput,
+                )
                 InputsScreen(
                     initialDocumentationId = null,
-                    allDocumentations = allInputs.map { it.documentation },
+                    allDocumentations = inputRepository.all.map { it.documentation },
                     recentDocumentations = emptyList(),
                     onBack = {},
                 )
@@ -458,10 +719,50 @@ private fun OpenStreetMapPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val chinaGeometry = ChinaGeometry(context)
+                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+                val uriFormatter = UriFormatter(coordinateConverter)
+                val amapInput = AmapInput(uriFormatter)
+                val appleMapsInput = AppleMapsInput(uriFormatter)
+                val baiduMapInput = BaiduMapInput()
+                val coordinatesInput = CoordinatesInput(coordinateFormatter, uriFormatter)
+                val debugInput = DebugInput()
+                val geoUriInput = GeoUriInput(geoUriFormatter, uriFormatter)
+                val googleMapsInput = GoogleMapsInput(uriFormatter)
+                val hereWeGoInput = HereWeGoInput(uriFormatter)
+                val magicEarthInput = MagicEarthInput(uriFormatter)
+                val mapsMeInput = MapsMeInput()
+                val mapyComInput = MapyComInput(uriFormatter)
+                val openStreetMapInput = OpenStreetMapInput(uriFormatter)
+                val osmAndInput = OsmAndInput(uriFormatter)
+                val urbiInput = UrbiInput(uriFormatter)
+                val wazeInput = WazeInput(uriFormatter)
+                val yandexMapsInput = YandexMapsInput(uriFormatter)
+                val inputRepository = InputRepository(
+                    amapInput,
+                    appleMapsInput,
+                    baiduMapInput,
+                    coordinatesInput,
+                    debugInput,
+                    geoUriInput,
+                    googleMapsInput,
+                    hereWeGoInput,
+                    magicEarthInput,
+                    mapsMeInput,
+                    mapyComInput,
+                    openStreetMapInput,
+                    osmAndInput,
+                    urbiInput,
+                    wazeInput,
+                    yandexMapsInput,
+                )
                 InputsScreen(
                     initialDocumentationId = InputDocumentationId.OPEN_STREET_MAP,
-                    allDocumentations = allInputs.map { it.documentation },
-                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.map { it.documentation },
+                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -477,10 +778,50 @@ private fun DarkOpenStreetMapPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val chinaGeometry = ChinaGeometry(context)
+                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+                val uriFormatter = UriFormatter(coordinateConverter)
+                val amapInput = AmapInput(uriFormatter)
+                val appleMapsInput = AppleMapsInput(uriFormatter)
+                val baiduMapInput = BaiduMapInput()
+                val coordinatesInput = CoordinatesInput(coordinateFormatter, uriFormatter)
+                val debugInput = DebugInput()
+                val geoUriInput = GeoUriInput(geoUriFormatter, uriFormatter)
+                val googleMapsInput = GoogleMapsInput(uriFormatter)
+                val hereWeGoInput = HereWeGoInput(uriFormatter)
+                val magicEarthInput = MagicEarthInput(uriFormatter)
+                val mapsMeInput = MapsMeInput()
+                val mapyComInput = MapyComInput(uriFormatter)
+                val openStreetMapInput = OpenStreetMapInput(uriFormatter)
+                val osmAndInput = OsmAndInput(uriFormatter)
+                val urbiInput = UrbiInput(uriFormatter)
+                val wazeInput = WazeInput(uriFormatter)
+                val yandexMapsInput = YandexMapsInput(uriFormatter)
+                val inputRepository = InputRepository(
+                    amapInput,
+                    appleMapsInput,
+                    baiduMapInput,
+                    coordinatesInput,
+                    debugInput,
+                    geoUriInput,
+                    googleMapsInput,
+                    hereWeGoInput,
+                    magicEarthInput,
+                    mapsMeInput,
+                    mapyComInput,
+                    openStreetMapInput,
+                    osmAndInput,
+                    urbiInput,
+                    wazeInput,
+                    yandexMapsInput,
+                )
                 InputsScreen(
                     initialDocumentationId = InputDocumentationId.OPEN_STREET_MAP,
-                    allDocumentations = allInputs.map { it.documentation },
-                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.map { it.documentation },
+                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -496,10 +837,50 @@ private fun TabletOpenStreetMapPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val chinaGeometry = ChinaGeometry(context)
+                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+                val uriFormatter = UriFormatter(coordinateConverter)
+                val amapInput = AmapInput(uriFormatter)
+                val appleMapsInput = AppleMapsInput(uriFormatter)
+                val baiduMapInput = BaiduMapInput()
+                val coordinatesInput = CoordinatesInput(coordinateFormatter, uriFormatter)
+                val debugInput = DebugInput()
+                val geoUriInput = GeoUriInput(geoUriFormatter, uriFormatter)
+                val googleMapsInput = GoogleMapsInput(uriFormatter)
+                val hereWeGoInput = HereWeGoInput(uriFormatter)
+                val magicEarthInput = MagicEarthInput(uriFormatter)
+                val mapsMeInput = MapsMeInput()
+                val mapyComInput = MapyComInput(uriFormatter)
+                val openStreetMapInput = OpenStreetMapInput(uriFormatter)
+                val osmAndInput = OsmAndInput(uriFormatter)
+                val urbiInput = UrbiInput(uriFormatter)
+                val wazeInput = WazeInput(uriFormatter)
+                val yandexMapsInput = YandexMapsInput(uriFormatter)
+                val inputRepository = InputRepository(
+                    amapInput,
+                    appleMapsInput,
+                    baiduMapInput,
+                    coordinatesInput,
+                    debugInput,
+                    geoUriInput,
+                    googleMapsInput,
+                    hereWeGoInput,
+                    magicEarthInput,
+                    mapsMeInput,
+                    mapyComInput,
+                    openStreetMapInput,
+                    osmAndInput,
+                    urbiInput,
+                    wazeInput,
+                    yandexMapsInput,
+                )
                 InputsScreen(
                     initialDocumentationId = InputDocumentationId.OPEN_STREET_MAP,
-                    allDocumentations = allInputs.map { it.documentation },
-                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.map { it.documentation },
+                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -515,10 +896,50 @@ private fun GeoUriPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val chinaGeometry = ChinaGeometry(context)
+                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+                val uriFormatter = UriFormatter(coordinateConverter)
+                val amapInput = AmapInput(uriFormatter)
+                val appleMapsInput = AppleMapsInput(uriFormatter)
+                val baiduMapInput = BaiduMapInput()
+                val coordinatesInput = CoordinatesInput(coordinateFormatter, uriFormatter)
+                val debugInput = DebugInput()
+                val geoUriInput = GeoUriInput(geoUriFormatter, uriFormatter)
+                val googleMapsInput = GoogleMapsInput(uriFormatter)
+                val hereWeGoInput = HereWeGoInput(uriFormatter)
+                val magicEarthInput = MagicEarthInput(uriFormatter)
+                val mapsMeInput = MapsMeInput()
+                val mapyComInput = MapyComInput(uriFormatter)
+                val openStreetMapInput = OpenStreetMapInput(uriFormatter)
+                val osmAndInput = OsmAndInput(uriFormatter)
+                val urbiInput = UrbiInput(uriFormatter)
+                val wazeInput = WazeInput(uriFormatter)
+                val yandexMapsInput = YandexMapsInput(uriFormatter)
+                val inputRepository = InputRepository(
+                    amapInput,
+                    appleMapsInput,
+                    baiduMapInput,
+                    coordinatesInput,
+                    debugInput,
+                    geoUriInput,
+                    googleMapsInput,
+                    hereWeGoInput,
+                    magicEarthInput,
+                    mapsMeInput,
+                    mapyComInput,
+                    openStreetMapInput,
+                    osmAndInput,
+                    urbiInput,
+                    wazeInput,
+                    yandexMapsInput,
+                )
                 InputsScreen(
                     initialDocumentationId = InputDocumentationId.GEO_URI,
-                    allDocumentations = allInputs.map { it.documentation },
-                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.map { it.documentation },
+                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -534,10 +955,50 @@ private fun DarkGeoUriPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val chinaGeometry = ChinaGeometry(context)
+                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+                val uriFormatter = UriFormatter(coordinateConverter)
+                val amapInput = AmapInput(uriFormatter)
+                val appleMapsInput = AppleMapsInput(uriFormatter)
+                val baiduMapInput = BaiduMapInput()
+                val coordinatesInput = CoordinatesInput(coordinateFormatter, uriFormatter)
+                val debugInput = DebugInput()
+                val geoUriInput = GeoUriInput(geoUriFormatter, uriFormatter)
+                val googleMapsInput = GoogleMapsInput(uriFormatter)
+                val hereWeGoInput = HereWeGoInput(uriFormatter)
+                val magicEarthInput = MagicEarthInput(uriFormatter)
+                val mapsMeInput = MapsMeInput()
+                val mapyComInput = MapyComInput(uriFormatter)
+                val openStreetMapInput = OpenStreetMapInput(uriFormatter)
+                val osmAndInput = OsmAndInput(uriFormatter)
+                val urbiInput = UrbiInput(uriFormatter)
+                val wazeInput = WazeInput(uriFormatter)
+                val yandexMapsInput = YandexMapsInput(uriFormatter)
+                val inputRepository = InputRepository(
+                    amapInput,
+                    appleMapsInput,
+                    baiduMapInput,
+                    coordinatesInput,
+                    debugInput,
+                    geoUriInput,
+                    googleMapsInput,
+                    hereWeGoInput,
+                    magicEarthInput,
+                    mapsMeInput,
+                    mapyComInput,
+                    openStreetMapInput,
+                    osmAndInput,
+                    urbiInput,
+                    wazeInput,
+                    yandexMapsInput,
+                )
                 InputsScreen(
                     initialDocumentationId = InputDocumentationId.GEO_URI,
-                    allDocumentations = allInputs.map { it.documentation },
-                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.map { it.documentation },
+                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -553,10 +1014,50 @@ private fun TabletGeoUriPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val chinaGeometry = ChinaGeometry(context)
+                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+                val uriFormatter = UriFormatter(coordinateConverter)
+                val amapInput = AmapInput(uriFormatter)
+                val appleMapsInput = AppleMapsInput(uriFormatter)
+                val baiduMapInput = BaiduMapInput()
+                val coordinatesInput = CoordinatesInput(coordinateFormatter, uriFormatter)
+                val debugInput = DebugInput()
+                val geoUriInput = GeoUriInput(geoUriFormatter, uriFormatter)
+                val googleMapsInput = GoogleMapsInput(uriFormatter)
+                val hereWeGoInput = HereWeGoInput(uriFormatter)
+                val magicEarthInput = MagicEarthInput(uriFormatter)
+                val mapsMeInput = MapsMeInput()
+                val mapyComInput = MapyComInput(uriFormatter)
+                val openStreetMapInput = OpenStreetMapInput(uriFormatter)
+                val osmAndInput = OsmAndInput(uriFormatter)
+                val urbiInput = UrbiInput(uriFormatter)
+                val wazeInput = WazeInput(uriFormatter)
+                val yandexMapsInput = YandexMapsInput(uriFormatter)
+                val inputRepository = InputRepository(
+                    amapInput,
+                    appleMapsInput,
+                    baiduMapInput,
+                    coordinatesInput,
+                    debugInput,
+                    geoUriInput,
+                    googleMapsInput,
+                    hereWeGoInput,
+                    magicEarthInput,
+                    mapsMeInput,
+                    mapyComInput,
+                    openStreetMapInput,
+                    osmAndInput,
+                    urbiInput,
+                    wazeInput,
+                    yandexMapsInput,
+                )
                 InputsScreen(
                     initialDocumentationId = InputDocumentationId.GEO_URI,
-                    allDocumentations = allInputs.map { it.documentation },
-                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.map { it.documentation },
+                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},

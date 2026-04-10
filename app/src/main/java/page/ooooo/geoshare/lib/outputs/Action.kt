@@ -109,4 +109,4 @@ sealed interface FileAction<T> : Action<T> {
     }
 }
 
-val NoopAction = BasicAction.WithPoint(WGS84Point(source = Source.GENERATED), NoopOutput)
+val NoopAction = BasicAction.WithPoint(WGS84Point(source = Source.GENERATED), NoopOutput())

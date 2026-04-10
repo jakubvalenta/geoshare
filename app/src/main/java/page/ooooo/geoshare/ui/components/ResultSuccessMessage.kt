@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.FakeLinkRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.android.AppDetail
@@ -61,10 +62,18 @@ import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.ConversionStateContext
 import page.ooooo.geoshare.lib.conversion.LocationFindingFailed
 import page.ooooo.geoshare.lib.conversion.LocationPermissionReceived
+import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
+import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
+import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
+import page.ooooo.geoshare.lib.formatters.GpxFormatter
+import page.ooooo.geoshare.lib.formatters.MagicEarthUriFormatter
+import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.ChinaGeometry
 import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.SharePointsGpxOutput
+import page.ooooo.geoshare.lib.point.CoordinateConverter
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -284,12 +293,16 @@ private fun ActionFinishedPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
+            val chinaGeometry = ChinaGeometry(context)
+            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionFinished(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME, geoUriFormatter)
+                        .toAction(Point.example),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
@@ -318,12 +331,16 @@ private fun DarkActionFinishedPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
+            val chinaGeometry = ChinaGeometry(context)
+            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionFinished(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME, geoUriFormatter)
+                        .toAction(Point.example),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
@@ -353,12 +370,16 @@ private fun ActionFinishedFeatureNotAvailablePreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                val chinaGeometry = ChinaGeometry(context)
+                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessMessage(
                     currentState = ActionFinished(
                         inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         points = persistentListOf(Point.example),
-                        action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                        action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME, geoUriFormatter)
+                            .toAction(Point.example),
                         isAutomation = true,
                     ),
                     appDetails = mapOf(
@@ -386,12 +407,16 @@ private fun DarkActionFinishedFeatureNotAvailablePreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                val chinaGeometry = ChinaGeometry(context)
+                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessMessage(
                     currentState = ActionFinished(
                         inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         points = persistentListOf(Point.example),
-                        action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                        action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME, geoUriFormatter)
+                            .toAction(Point.example),
                         isAutomation = true,
                     ),
                     appDetails = mapOf(
@@ -419,18 +444,36 @@ private fun ActionWaitingPreview() {
         Surface {
             val context = LocalContext.current
             val resources = LocalResources.current
+            val chinaGeometry = ChinaGeometry(context)
+            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+            val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
+            val gpxFormatter = GpxFormatter(coordinateConverter)
+            val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
+            val uriFormatter = UriFormatter(coordinateConverter)
+            val outputRepository = OutputRepository(
+                coordinateFormatter = coordinateFormatter,
+                geoUriFormatter = geoUriFormatter,
+                googleMapsUriFormatter = googleMapsUriFormatter,
+                gpxFormatter = gpxFormatter,
+                magicEarthUriFormatter = magicEarthUriFormatter,
+                uriFormatter = uriFormatter,
+            )
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionWaiting(
                     stateContext = ConversionStateContext(
                         linkRepository = FakeLinkRepository(),
+                        outputRepository = outputRepository,
                         resources = resources,
                         userPreferencesRepository = FakeUserPreferencesRepository(),
                         billing = BillingImpl(LocalContext.current),
                     ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME, geoUriFormatter)
+                        .toAction(Point.example),
                     isAutomation = true,
                     delay = 3.seconds,
                 ),
@@ -461,18 +504,36 @@ private fun DarkActionWaitingPreview() {
         Surface {
             val context = LocalContext.current
             val resources = LocalResources.current
+            val chinaGeometry = ChinaGeometry(context)
+            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+            val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
+            val gpxFormatter = GpxFormatter(coordinateConverter)
+            val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
+            val uriFormatter = UriFormatter(coordinateConverter)
+            val outputRepository = OutputRepository(
+                coordinateFormatter = coordinateFormatter,
+                geoUriFormatter = geoUriFormatter,
+                googleMapsUriFormatter = googleMapsUriFormatter,
+                gpxFormatter = gpxFormatter,
+                magicEarthUriFormatter = magicEarthUriFormatter,
+                uriFormatter = uriFormatter,
+            )
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionWaiting(
                     stateContext = ConversionStateContext(
                         linkRepository = FakeLinkRepository(),
+                        outputRepository = outputRepository,
                         resources = resources,
                         userPreferencesRepository = FakeUserPreferencesRepository(),
                         billing = BillingImpl(LocalContext.current),
                     ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME, geoUriFormatter)
+                        .toAction(Point.example),
                     isAutomation = true,
                     delay = 3.seconds,
                 ),
@@ -503,18 +564,36 @@ private fun LocationPermissionReceivedPreview() {
         Surface {
             val context = LocalContext.current
             val resources = LocalResources.current
+            val chinaGeometry = ChinaGeometry(context)
+            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+            val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
+            val gpxFormatter = GpxFormatter(coordinateConverter)
+            val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
+            val uriFormatter = UriFormatter(coordinateConverter)
+            val outputRepository = OutputRepository(
+                coordinateFormatter = coordinateFormatter,
+                geoUriFormatter = geoUriFormatter,
+                googleMapsUriFormatter = googleMapsUriFormatter,
+                gpxFormatter = gpxFormatter,
+                magicEarthUriFormatter = magicEarthUriFormatter,
+                uriFormatter = uriFormatter,
+            )
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = LocationPermissionReceived(
                     stateContext = ConversionStateContext(
                         linkRepository = FakeLinkRepository(),
+                        outputRepository = outputRepository,
                         resources = resources,
                         userPreferencesRepository = FakeUserPreferencesRepository(),
                         billing = BillingImpl(LocalContext.current),
                     ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME).toAction(Point.example),
+                    action = OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME, gpxFormatter)
+                        .toAction(Point.example),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
@@ -544,18 +623,36 @@ private fun DarkLocationPermissionReceivedPreview() {
         Surface {
             val context = LocalContext.current
             val resources = LocalResources.current
+            val chinaGeometry = ChinaGeometry(context)
+            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+            val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
+            val gpxFormatter = GpxFormatter(coordinateConverter)
+            val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
+            val uriFormatter = UriFormatter(coordinateConverter)
+            val outputRepository = OutputRepository(
+                coordinateFormatter = coordinateFormatter,
+                geoUriFormatter = geoUriFormatter,
+                googleMapsUriFormatter = googleMapsUriFormatter,
+                gpxFormatter = gpxFormatter,
+                magicEarthUriFormatter = magicEarthUriFormatter,
+                uriFormatter = uriFormatter,
+            )
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = LocationPermissionReceived(
                     stateContext = ConversionStateContext(
                         linkRepository = FakeLinkRepository(),
+                        outputRepository = outputRepository,
                         resources = resources,
                         userPreferencesRepository = FakeUserPreferencesRepository(),
                         billing = BillingImpl(LocalContext.current),
                     ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME).toAction(Point.example),
+                    action = OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME, gpxFormatter)
+                        .toAction(Point.example),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
@@ -584,12 +681,16 @@ private fun SucceededPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
+            val chinaGeometry = ChinaGeometry(context)
+            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME, geoUriFormatter)
+                        .toAction(Point.example),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
@@ -618,12 +719,16 @@ private fun DarSucceededPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
+            val chinaGeometry = ChinaGeometry(context)
+            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME, geoUriFormatter)
+                        .toAction(Point.example),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
@@ -652,12 +757,15 @@ private fun SucceededNoMessagePreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
+            val chinaGeometry = ChinaGeometry(context)
+            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val gpxFormatter = GpxFormatter(coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = SharePointsGpxOutput.toAction(persistentListOf(Point.example)),
+                    action = SharePointsGpxOutput(gpxFormatter).toAction(persistentListOf(Point.example)),
                     isAutomation = false,
                 ),
                 appDetails = mapOf(
@@ -686,12 +794,15 @@ private fun DarkSucceededNoMessagePreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
+            val chinaGeometry = ChinaGeometry(context)
+            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val gpxFormatter = GpxFormatter(coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = SharePointsGpxOutput.toAction(persistentListOf(Point.example)),
+                    action = SharePointsGpxOutput(gpxFormatter).toAction(persistentListOf(Point.example)),
                     isAutomation = false,
                 ),
                 appDetails = mapOf(
@@ -720,12 +831,16 @@ private fun FailedPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
+            val chinaGeometry = ChinaGeometry(context)
+            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionFailed(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME, geoUriFormatter)
+                        .toAction(Point.example),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
@@ -754,12 +869,16 @@ private fun DarkFailedPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
+            val chinaGeometry = ChinaGeometry(context)
+            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionFailed(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME, geoUriFormatter)
+                        .toAction(Point.example),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(

@@ -15,4 +15,6 @@ data class NaivePoint(
     val z: Double? = null,
     val name: String? = null,
     val source: Source,
-)
+) {
+    fun hasCoordinates(): Boolean = lat != null && lon != null
+}

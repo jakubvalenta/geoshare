@@ -45,11 +45,14 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.IntroViewModel
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
+import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.point.CoordinateConverter
 import page.ooooo.geoshare.ui.components.ParagraphHtml
 import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.ScreenshotMapAppOpen
@@ -65,6 +68,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun IntroScreen(
     onClose: () -> Unit,
     viewModel: IntroViewModel,
+    outputViewModel: OutputViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     val settingsLauncher = rememberLauncherForActivityResult(
@@ -74,6 +78,7 @@ fun IntroScreen(
     }
 
     IntroScreen(
+        coordinateFormatter = outputViewModel.coordinateFormatter,
         onClose = {
             viewModel.setShown()
             onClose()
@@ -90,6 +95,7 @@ fun IntroScreen(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 private fun IntroScreen(
+    coordinateFormatter: CoordinateFormatter,
     initialPage: Int = 0,
     onClose: () -> Unit,
     onShowOpenByDefaultSettings: () -> Unit,
@@ -153,7 +159,7 @@ private fun IntroScreen(
                         IntroFigure(
                             stringResource(R.string.intro_how_to_share_app_caption, appName),
                         ) {
-                            ScreenshotOpen()
+                            ScreenshotOpen(coordinateFormatter)
                         }
                     }
 
@@ -303,7 +309,12 @@ private fun IntroFigure(
 @Composable
 private fun PageOnePreview() {
     AppTheme {
+        val context = LocalContext.current
+        val chinaGeometry = ChinaGeometry(context)
+        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         IntroScreen(
+            coordinateFormatter = coordinateFormatter,
             onClose = {},
             onShowOpenByDefaultSettings = {},
             onShowOpenByDefaultSettingsForPackage = {},
@@ -315,7 +326,12 @@ private fun PageOnePreview() {
 @Composable
 private fun DarkPageOnePreview() {
     AppTheme {
+        val context = LocalContext.current
+        val chinaGeometry = ChinaGeometry(context)
+        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         IntroScreen(
+            coordinateFormatter = coordinateFormatter,
             onClose = {},
             onShowOpenByDefaultSettings = {},
             onShowOpenByDefaultSettingsForPackage = {},
@@ -327,7 +343,12 @@ private fun DarkPageOnePreview() {
 @Composable
 private fun SmallPageOnePreview() {
     AppTheme {
+        val context = LocalContext.current
+        val chinaGeometry = ChinaGeometry(context)
+        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         IntroScreen(
+            coordinateFormatter = coordinateFormatter,
             onClose = {},
             onShowOpenByDefaultSettings = {},
             onShowOpenByDefaultSettingsForPackage = {},
@@ -339,7 +360,12 @@ private fun SmallPageOnePreview() {
 @Composable
 private fun TabletPageOnePreview() {
     AppTheme {
+        val context = LocalContext.current
+        val chinaGeometry = ChinaGeometry(context)
+        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         IntroScreen(
+            coordinateFormatter = coordinateFormatter,
             onClose = {},
             onShowOpenByDefaultSettings = {},
             onShowOpenByDefaultSettingsForPackage = {},
@@ -351,7 +377,12 @@ private fun TabletPageOnePreview() {
 @Composable
 private fun PageTwoPreview() {
     AppTheme {
+        val context = LocalContext.current
+        val chinaGeometry = ChinaGeometry(context)
+        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         IntroScreen(
+            coordinateFormatter = coordinateFormatter,
             initialPage = 1,
             onClose = {},
             onShowOpenByDefaultSettings = {},
@@ -364,7 +395,12 @@ private fun PageTwoPreview() {
 @Composable
 private fun DarkPageTwoPreview() {
     AppTheme {
+        val context = LocalContext.current
+        val chinaGeometry = ChinaGeometry(context)
+        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         IntroScreen(
+            coordinateFormatter = coordinateFormatter,
             initialPage = 1,
             onClose = {},
             onShowOpenByDefaultSettings = {},
@@ -377,7 +413,12 @@ private fun DarkPageTwoPreview() {
 @Composable
 private fun SmallPageTwoPreview() {
     AppTheme {
+        val context = LocalContext.current
+        val chinaGeometry = ChinaGeometry(context)
+        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         IntroScreen(
+            coordinateFormatter = coordinateFormatter,
             initialPage = 1,
             onClose = {},
             onShowOpenByDefaultSettings = {},
@@ -390,7 +431,12 @@ private fun SmallPageTwoPreview() {
 @Composable
 private fun TabletPageTwoPreview() {
     AppTheme {
+        val context = LocalContext.current
+        val chinaGeometry = ChinaGeometry(context)
+        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         IntroScreen(
+            coordinateFormatter = coordinateFormatter,
             initialPage = 1,
             onClose = {},
             onShowOpenByDefaultSettings = {},

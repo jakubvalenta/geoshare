@@ -1,4 +1,4 @@
-package page.ooooo.geoshare
+package page.ooooo.geoshare.ui
 
 import android.content.Context
 import android.content.Intent
@@ -16,16 +16,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import page.ooooo.geoshare.data.AppsRepository
+import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.InputRepository
 import page.ooooo.geoshare.data.LinkRepository
+import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.billing.Billing
@@ -46,28 +42,18 @@ import page.ooooo.geoshare.lib.conversion.LocationRationaleShown
 import page.ooooo.geoshare.lib.conversion.LocationReceived
 import page.ooooo.geoshare.lib.conversion.ReceivedUriString
 import page.ooooo.geoshare.lib.conversion.State
-import page.ooooo.geoshare.lib.inputs.allInputs
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.LocationAction
-import page.ooooo.geoshare.lib.outputs.Output
-import page.ooooo.geoshare.lib.outputs.PointOutput
-import page.ooooo.geoshare.lib.outputs.PointsOutput
-import page.ooooo.geoshare.lib.outputs.getOutputsForApps
-import page.ooooo.geoshare.lib.outputs.getOutputsForLinks
-import page.ooooo.geoshare.lib.outputs.getOutputsForPoint
-import page.ooooo.geoshare.lib.outputs.getOutputsForPointChips
-import page.ooooo.geoshare.lib.outputs.getOutputsForPoints
-import page.ooooo.geoshare.lib.outputs.getOutputsForPointsChips
-import page.ooooo.geoshare.lib.outputs.getOutputsForSharing
 import page.ooooo.geoshare.lib.point.Point
 import javax.inject.Inject
 
 @OptIn(SavedStateHandleSaveableApi::class)
 @HiltViewModel
 class ConversionViewModel @Inject constructor(
-    appsRepository: AppsRepository,
     @ApplicationContext context: Context,
+    inputRepository: InputRepository,
     private val linkRepository: LinkRepository,
+    private val outputRepository: OutputRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val billing: Billing,
     savedStateHandle: SavedStateHandle,
@@ -77,8 +63,9 @@ class ConversionViewModel @Inject constructor(
     val currentState: StateFlow<State> = _currentState
 
     val stateContext = ConversionStateContext(
-        inputs = allInputs,
+        inputs = inputRepository.all,
         linkRepository = linkRepository,
+        outputRepository = outputRepository,
         resources = context.resources,
         userPreferencesRepository = userPreferencesRepository,
         billing = billing,
@@ -90,69 +77,6 @@ class ConversionViewModel @Inject constructor(
     var inputUriString by savedStateHandle.saveable("inputUriString") { mutableStateOf("") }
 
     private var transitionJob: Job? = null
-
-    val appDetails = appsRepository.appDetails
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            emptyMap(),
-        )
-    val outputsForPoint: StateFlow<List<PointOutput>> =
-        linkRepository.all.map { getOutputsForPoint(it) }
-            .stateIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(5000),
-                emptyList(),
-            )
-    val outputsForPoints: StateFlow<List<PointsOutput>> =
-        flow { emit(getOutputsForPoints()) }
-            .stateIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(5000),
-                emptyList(),
-            )
-    val outputsForPointChips: StateFlow<List<PointOutput>> =
-        linkRepository.all.map { getOutputsForPointChips(it) }
-            .stateIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(5000),
-                emptyList(),
-            )
-    val outputsForPointsChips: StateFlow<List<PointsOutput>> =
-        flow { emit(getOutputsForPointsChips()) }
-            .stateIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(5000),
-                emptyList(),
-            )
-    val outputsForApps: StateFlow<Map<String, List<Output>>> =
-        appsRepository.apps
-            .combine(
-                userPreferencesRepository.values
-                    .map { it.hiddenApps }
-                    .distinctUntilChanged()
-            ) { apps, hiddenApps ->
-                getOutputsForApps(apps, hiddenApps)
-            }
-            .stateIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(5000),
-                emptyMap(),
-            )
-    val outputsForLinks: StateFlow<Map<String?, List<Output>>> =
-        linkRepository.all.map { links -> getOutputsForLinks(links) }
-            .stateIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(5000),
-                emptyMap(),
-            )
-    val outputsForSharing: StateFlow<List<Output>> =
-        flow { emit(getOutputsForSharing()) }
-            .stateIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(5000),
-                emptyList(),
-            )
 
     // Methods
 
@@ -207,7 +131,12 @@ class ConversionViewModel @Inject constructor(
     fun startAction(action: Action<*>) {
         (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
             transition {
-                ActionReady(currentState.inputUriString, currentState.points, action, isAutomation = false)
+                ActionReady(
+                    currentState.inputUriString,
+                    currentState.points,
+                    action,
+                    isAutomation = false
+                )
             }
         }
     }
@@ -246,7 +175,10 @@ class ConversionViewModel @Inject constructor(
         (stateContext.currentState as? FileUriRequested)?.let { currentState ->
             transition {
                 ActionFinished(
-                    currentState.inputUriString, currentState.points, currentState.action, currentState.isAutomation
+                    currentState.inputUriString,
+                    currentState.points,
+                    currentState.action,
+                    currentState.isAutomation
                 )
             }
         }
@@ -271,7 +203,12 @@ class ConversionViewModel @Inject constructor(
     fun showLocationRationale(action: LocationAction<*>, isAutomation: Boolean) {
         (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
             transition {
-                LocationRationaleShown(currentState.inputUriString, currentState.points, action, isAutomation)
+                LocationRationaleShown(
+                    currentState.inputUriString,
+                    currentState.points,
+                    action,
+                    isAutomation
+                )
             }
         }
     }
@@ -318,7 +255,10 @@ class ConversionViewModel @Inject constructor(
         (stateContext.currentState as? LocationPermissionReceived)?.let { currentState ->
             transition {
                 ActionFinished(
-                    currentState.inputUriString, currentState.points, currentState.action, currentState.isAutomation
+                    currentState.inputUriString,
+                    currentState.points,
+                    currentState.action,
+                    currentState.isAutomation
                 )
             }
         }

@@ -13,16 +13,19 @@ import kotlinx.coroutines.launch
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePreference
-import page.ooooo.geoshare.lib.inputs.allInputs
+import page.ooooo.geoshare.data.InputRepository
 import javax.inject.Inject
 
 @HiltViewModel
-class InputsViewModel @Inject constructor(
+class InputViewModel @Inject constructor(
+    private val inputRepository: InputRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
 ) : ViewModel() {
 
+    val allInputs = inputRepository.all
+
     private val allDocumentationsFlow = flow {
-        emit(allInputs.map { input -> input.documentation })
+        emit(inputRepository.all.map { input -> input.documentation })
     }
 
     val allDocumentations = allDocumentationsFlow
@@ -52,7 +55,7 @@ class InputsViewModel @Inject constructor(
         )
 
     fun setChangelogShown() {
-        val newestInputAddedInVersionCode = allInputs.maxOfOrNull { input ->
+        val newestInputAddedInVersionCode = inputRepository.all.maxOfOrNull { input ->
             input.documentation.items.maxOfOrNull { it.addedInVersionCode } ?: BuildConfig.VERSION_CODE
         } ?: BuildConfig.VERSION_CODE
         viewModelScope.launch {

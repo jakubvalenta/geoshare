@@ -1,16 +1,25 @@
-package page.ooooo.geoshare.lib.formats
+package page.ooooo.geoshare.lib.formatters
 
+import android.content.Context
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.kotlin.mock
+import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.point.CoordinateConverter
 import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 
-class CoordsFormatTest {
+class CoordinateFormatterTest {
+    private val mockContext: Context = mock {}
+    private val chinaGeometry = ChinaGeometry(mockContext)
+    private val coordinateConverter = CoordinateConverter(chinaGeometry)
+    private val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+
     @Test
     fun formatDecCoords_returnsSouthWestForNegativeCoordinates() {
         assertEquals(
             "-17.2165721, -149.9470294",
-            CoordsFormat.formatDecCoords(WGS84Point(-17.2165721, -149.9470294, source = Source.GENERATED)),
+            coordinateFormatter.formatDecCoords(WGS84Point(-17.2165721, -149.9470294, source = Source.GENERATED)),
         )
     }
 
@@ -18,7 +27,7 @@ class CoordsFormatTest {
     fun formatDecCoords_returnsNorthEastForPositiveCoordinates() {
         assertEquals(
             "52.5067296, 13.2599309",
-            CoordsFormat.formatDecCoords(WGS84Point(52.5067296, 13.2599309, source = Source.GENERATED)),
+            coordinateFormatter.formatDecCoords(WGS84Point(52.5067296, 13.2599309, source = Source.GENERATED)),
         )
     }
 
@@ -26,7 +35,7 @@ class CoordsFormatTest {
     fun formatDecCoords_returnsZerosForZeroCoordinates() {
         assertEquals(
             "0, 0",
-            CoordsFormat.formatDecCoords(WGS84Point(0.0, 0.0, source = Source.GENERATED)),
+            coordinateFormatter.formatDecCoords(WGS84Point(0.0, 0.0, source = Source.GENERATED)),
         )
     }
 
@@ -34,7 +43,7 @@ class CoordsFormatTest {
     fun formatDecCoords_returnsZeroDegForZeroDegCoordinates() {
         assertEquals(
             "0.5, 0.5",
-            CoordsFormat.formatDecCoords(WGS84Point(0.5, 0.5, source = Source.GENERATED)),
+            coordinateFormatter.formatDecCoords(WGS84Point(0.5, 0.5, source = Source.GENERATED)),
         )
     }
 
@@ -42,7 +51,7 @@ class CoordsFormatTest {
     fun formatDecCoords_returnsZeroMinForZeroMinCoordinates() {
         assertEquals(
             "-10, -20",
-            CoordsFormat.formatDecCoords(WGS84Point(-10.0, -20.0, source = Source.GENERATED)),
+            coordinateFormatter.formatDecCoords(WGS84Point(-10.0, -20.0, source = Source.GENERATED)),
         )
     }
 
@@ -50,7 +59,7 @@ class CoordsFormatTest {
     fun formatDecCoords_returnsZerosSecForZeroSecCoordinates() {
         assertEquals(
             "-10.5, -20.5",
-            CoordsFormat.formatDecCoords(WGS84Point(-10.5, -20.5, source = Source.GENERATED)),
+            coordinateFormatter.formatDecCoords(WGS84Point(-10.5, -20.5, source = Source.GENERATED)),
         )
     }
 
@@ -58,7 +67,7 @@ class CoordsFormatTest {
     fun formatDegMinSecCoords_returnsSouthWestForNegativeCoordinates() {
         assertEquals(
             "17°\u00a012′\u00a059.65956″\u00a0S, 149°\u00a056′\u00a049.30584″\u00a0W",
-            CoordsFormat.formatDegMinSecCoords(WGS84Point(-17.2165721, -149.9470294, source = Source.GENERATED)),
+            coordinateFormatter.formatDegMinSecCoords(WGS84Point(-17.2165721, -149.9470294, source = Source.GENERATED)),
         )
     }
 
@@ -66,7 +75,7 @@ class CoordsFormatTest {
     fun formatDegMinSecCoords_returnsNorthEastForPositiveCoordinates() {
         assertEquals(
             "52°\u00a030′\u00a024.22656″\u00a0N, 13°\u00a015′\u00a035.75124″\u00a0E",
-            CoordsFormat.formatDegMinSecCoords(WGS84Point(52.5067296, 13.2599309, source = Source.GENERATED)),
+            coordinateFormatter.formatDegMinSecCoords(WGS84Point(52.5067296, 13.2599309, source = Source.GENERATED)),
         )
     }
 
@@ -74,7 +83,7 @@ class CoordsFormatTest {
     fun formatDegMinSecCoords_returnsZerosForZeroCoordinates() {
         assertEquals(
             "0°\u00a00′\u00a00.0″\u00a0N, 0°\u00a00′\u00a00.0″\u00a0E",
-            CoordsFormat.formatDegMinSecCoords(WGS84Point(0.0, 0.0, source = Source.GENERATED)),
+            coordinateFormatter.formatDegMinSecCoords(WGS84Point(0.0, 0.0, source = Source.GENERATED)),
         )
     }
 
@@ -82,7 +91,7 @@ class CoordsFormatTest {
     fun formatDegMinSecCoords_returnsZeroDegForZeroDegCoordinates() {
         assertEquals(
             "0°\u00a030′\u00a00.0″\u00a0N, 0°\u00a030′\u00a00.0″\u00a0E",
-            CoordsFormat.formatDegMinSecCoords(WGS84Point(0.5, 0.5, source = Source.GENERATED)),
+            coordinateFormatter.formatDegMinSecCoords(WGS84Point(0.5, 0.5, source = Source.GENERATED)),
         )
     }
 
@@ -90,7 +99,7 @@ class CoordsFormatTest {
     fun formatDegMinSecCoords_returnsZeroMinForZeroMinCoordinates() {
         assertEquals(
             "10°\u00a00′\u00a00.0″\u00a0S, 20°\u00a00′\u00a00.0″\u00a0W",
-            CoordsFormat.formatDegMinSecCoords(WGS84Point(-10.0, -20.0, source = Source.GENERATED)),
+            coordinateFormatter.formatDegMinSecCoords(WGS84Point(-10.0, -20.0, source = Source.GENERATED)),
         )
     }
 
@@ -98,7 +107,7 @@ class CoordsFormatTest {
     fun formatDegMinSecCoords_returnsZerosSecForZeroSecCoordinates() {
         assertEquals(
             "10°\u00a030′\u00a00.0″\u00a0S, 20°\u00a030′\u00a00.0″\u00a0W",
-            CoordsFormat.formatDegMinSecCoords(WGS84Point(-10.5, -20.5, source = Source.GENERATED)),
+            coordinateFormatter.formatDegMinSecCoords(WGS84Point(-10.5, -20.5, source = Source.GENERATED)),
         )
     }
 }

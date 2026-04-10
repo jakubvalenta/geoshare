@@ -5,19 +5,23 @@ import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.formats.MagicEarthUriFormat
+import page.ooooo.geoshare.lib.formatters.MagicEarthUriFormatter
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.ui.components.DrawableIconDescriptor
 import page.ooooo.geoshare.ui.components.ResourceIconDescriptor
+import javax.inject.Inject
 
 /**
  * This output creates a 'magicearth:' URI and opens it in [packageName].
  *
  * We need this output, because Magic Earth doesn't properly support geo: URIs.
  */
-data class OpenDisplayMagicEarthUriOutput(override val packageName: String) : OpenPointOutput {
+class OpenDisplayMagicEarthUriOutput @Inject constructor(
+    override val packageName: String,
+    private val magicEarthUriFormatter: MagicEarthUriFormatter,
+) : OpenPointOutput {
     override fun getText(value: Point, uriQuote: UriQuote) =
-        MagicEarthUriFormat.formatDisplayUriString(value, uriQuote)
+        magicEarthUriFormatter.formatDisplayUriString(value, uriQuote)
 
     @Composable
     override fun label(appDetails: AppDetails) =

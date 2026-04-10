@@ -10,21 +10,26 @@ import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonNamePoint
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
-import page.ooooo.geoshare.lib.formats.GeoUriFormat
+import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
+import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object GeoUriInput : Input, Input.HasRandomUri {
-    private const val NAME_REGEX = """\((.+)\)"""
-
+@Singleton
+class GeoUriInput @Inject constructor(
+    private val geoUriFormatter: GeoUriFormatter,
+    private val uriFormatter: UriFormatter,
+) : Input, Input.HasRandomUri {
     override val uriPattern = Regex("""geo:$LAT_NUM,$LON_NUM\?q=$LAT_NUM,\s*$LON_NUM|geo:$URI_REST""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.GEO_URI,
         nameResId = R.string.converter_geo_name,
         items = listOf(
             InputDocumentationItem.Text(3) {
-                stringResource(R.string.example, GeoUriFormat.formatGeoUriString(Point.example))
+                stringResource(R.string.example, geoUriFormatter.formatGeoUriString(Point.example))
             },
         ),
     )
@@ -65,5 +70,9 @@ object GeoUriInput : Input, Input.HasRandomUri {
     }
 
     override fun genRandomUri(point: Point) =
-        point.formatUriString("geo:{lat},{lon}?z={z}&q={lat},{lon}({name})")
+        uriFormatter.formatUriString(point, "geo:{lat},{lon}?z={z}&q={lat},{lon}({name})")
+
+    private companion object {
+        private const val NAME_REGEX = """\((.+)\)"""
+    }
 }
