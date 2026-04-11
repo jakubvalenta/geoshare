@@ -23,7 +23,6 @@ import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.MAGIC_EARTH_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.TEST_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
-import java.util.UUID
 
 class UserPreferencesTest {
     @Test
@@ -205,18 +204,18 @@ class UserPreferencesTest {
     @Test
     fun automationPreference_getValue_forEachOldTypeAndPackageName_returnsAutomation() =
         runTest {
-            @Suppress("SpellCheckingInspection")
+            @Suppress("DEPRECATION", "SpellCheckingInspection")
             for ((testOldAutomationType, expectedAutomation) in mapOf(
-                "COPY_APPLE_MAPS_NAVIGATE_TO_URI" to CopyLinkUriAutomation(UUID.fromString("a5092c63-cf5c-4225-9059-e888ae12e215")),
-                "COPY_APPLE_MAPS_URI" to CopyLinkUriAutomation(UUID.fromString("ce900ea1-2c5d-4641-82f3-a5429a68d603")),
+                "COPY_APPLE_MAPS_NAVIGATE_TO_URI" to CopyLinkNavigationAppleMapsUriAutomation,
+                "COPY_APPLE_MAPS_URI" to CopyLinkDisplayAppleMapsUriAutomation,
                 "COPY_COORDS_DEC" to CopyCoordsDecAutomation,
                 "COPY_COORDS_NSWE_DEC" to CopyCoordsDegMinSecAutomation,
                 "COPY_GEO_URI" to CopyGeoUriAutomation,
-                "COPY_GOOGLE_MAPS_NAVIGATE_TO_URI" to CopyLinkUriAutomation(UUID.fromString("64b0b360-24ec-4113-9056-314223c6e19a")),
-                "COPY_GOOGLE_MAPS_STREET_VIEW_URI" to CopyLinkUriAutomation(UUID.fromString("9d7cd113-ce01-4b8b-82fe-856956b8b20a")),
-                "COPY_GOOGLE_MAPS_URI" to CopyLinkUriAutomation(UUID.fromString("7bd96da4-beba-4a30-9dbd-b437a49a1dc0")),
-                "COPY_MAGIC_EARTH_NAVIGATE_TO_URI" to CopyLinkUriAutomation(UUID.fromString("ee4f961c-44b0-4cb6-baad-1ed28edb8ec7")),
-                "COPY_MAGIC_EARTH_URI" to CopyLinkUriAutomation(UUID.fromString("b109970a-aef8-4482-9879-52e128fd0e07")),
+                "COPY_GOOGLE_MAPS_NAVIGATE_TO_URI" to CopyLinkNavigationGoogleUriAutomation,
+                "COPY_GOOGLE_MAPS_STREET_VIEW_URI" to CopyLinkStreetViewGoogleUriAutomation,
+                "COPY_GOOGLE_MAPS_URI" to CopyLinkDisplayGoogleMapsUriAutomation,
+                "COPY_MAGIC_EARTH_NAVIGATE_TO_URI" to CopyLinkNavigationMagicEarthUriAutomation,
+                "COPY_MAGIC_EARTH_URI" to CopyLinkDisplayMagicEarthUriAutomation,
                 "NOOP" to NoopAutomation,
                 "OPEN_APP" to OpenDisplayGeoUriAutomation(TEST_PACKAGE_NAME),
                 "OPEN_APP_GOOGLE_MAPS_NAVIGATE_TO" to OpenNavigationGoogleUriAutomation(TEST_PACKAGE_NAME),

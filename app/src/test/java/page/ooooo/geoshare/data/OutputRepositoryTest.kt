@@ -24,8 +24,10 @@ import page.ooooo.geoshare.data.local.preferences.CopyLinkUriAutomation
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayMagicEarthUriAutomation
+import page.ooooo.geoshare.data.local.preferences.OpenNavigationGoogleUriAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenNavigationMagicEarthUriAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenRouteOnePointGpxAutomation
+import page.ooooo.geoshare.data.local.preferences.OpenStreetViewGoogleUriAutomation
 import page.ooooo.geoshare.data.local.preferences.SavePointGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.SaveRouteGpxAutomation
@@ -70,6 +72,7 @@ import page.ooooo.geoshare.lib.outputs.SharePointsGpxOutput
 import page.ooooo.geoshare.lib.outputs.ShareRouteGpxOutput
 import page.ooooo.geoshare.lib.outputs.ShareStreetViewGoogleUriOutput
 import page.ooooo.geoshare.lib.point.CoordinateConverter
+import java.util.UUID
 
 class OutputRepositoryTest {
     private val mockContext: Context = mock {}
@@ -409,6 +412,70 @@ class OutputRepositoryTest {
                         getLinkByUUID = { defaultFakeLinks.findByUUID(it) },
                     )
                 }
+            },
+        )
+    }
+
+    @Test
+    fun getAutomationOutput_convertsAllOldAutomationsToOutputs() = runTest {
+        assertEquals(
+            listOf(
+                CopyLinkUriOutput(FakeAppleMapsNavigationLink, uriFormatter),
+                CopyLinkUriOutput(FakeAppleMapsDisplayLink, uriFormatter),
+                CopyCoordsDecOutput(coordinateFormatter),
+                CopyCoordsDegMinSecOutput(coordinateFormatter),
+                CopyGeoUriOutput(geoUriFormatter),
+                CopyLinkUriOutput(FakeGoogleMapsNavigationLink, uriFormatter),
+                CopyLinkUriOutput(FakeGoogleMapsStreetViewLink, uriFormatter),
+                CopyLinkUriOutput(FakeGoogleMapsDisplayLink, uriFormatter),
+                CopyLinkUriOutput(FakeMagicEarthNavigationLink, uriFormatter),
+                CopyLinkUriOutput(FakeMagicEarthDisplayLink, uriFormatter),
+                NoopOutput(),
+                OpenDisplayGeoUriOutput(TEST_PACKAGE_NAME, geoUriFormatter),
+                OpenNavigationGoogleUriOutput(TEST_PACKAGE_NAME, googleMapsUriFormatter),
+                OpenStreetViewGoogleUriOutput(TEST_PACKAGE_NAME, googleMapsUriFormatter),
+                OpenRouteOnePointGpxOutput(TEST_PACKAGE_NAME, gpxFormatter),
+                OpenNavigationMagicEarthUriOutput(TEST_PACKAGE_NAME, magicEarthUriFormatter),
+                SavePointsGpxOutput(gpxFormatter),
+                ShareDisplayGeoUriOutput(geoUriFormatter),
+                ShareRouteGpxOutput(gpxFormatter),
+            ),
+            listOf(
+                CopyLinkUriAutomation(UUID.fromString("a5092c63-cf5c-4225-9059-e888ae12e215")),
+                CopyLinkUriAutomation(UUID.fromString("ce900ea1-2c5d-4641-82f3-a5429a68d603")),
+                CopyCoordsDecAutomation,
+                CopyCoordsDegMinSecAutomation,
+                CopyGeoUriAutomation,
+                CopyLinkUriAutomation(UUID.fromString("64b0b360-24ec-4113-9056-314223c6e19a")),
+                CopyLinkUriAutomation(UUID.fromString("9d7cd113-ce01-4b8b-82fe-856956b8b20a")),
+                CopyLinkUriAutomation(UUID.fromString("7bd96da4-beba-4a30-9dbd-b437a49a1dc0")),
+                CopyLinkUriAutomation(UUID.fromString("ee4f961c-44b0-4cb6-baad-1ed28edb8ec7")),
+                CopyLinkUriAutomation(UUID.fromString("b109970a-aef8-4482-9879-52e128fd0e07")),
+                NoopAutomation,
+                OpenDisplayGeoUriAutomation(TEST_PACKAGE_NAME),
+                OpenNavigationGoogleUriAutomation(TEST_PACKAGE_NAME),
+                OpenStreetViewGoogleUriAutomation(TEST_PACKAGE_NAME),
+                OpenRouteOnePointGpxAutomation(TEST_PACKAGE_NAME),
+                OpenNavigationMagicEarthUriAutomation(TEST_PACKAGE_NAME),
+                SavePointsGpxAutomation,
+                ShareDisplayGeoUriAutomation,
+                ShareRouteGpxAutomation,
+            ).map { automation ->
+                outputRepository.getAutomationOutput(
+                    automation = automation,
+                    getLinkByUUID = {
+                        when (it) {
+                            UUID.fromString("ce900ea1-2c5d-4641-82f3-a5429a68d603") -> FakeAppleMapsDisplayLink
+                            UUID.fromString("a5092c63-cf5c-4225-9059-e888ae12e215") -> FakeAppleMapsNavigationLink
+                            UUID.fromString("7bd96da4-beba-4a30-9dbd-b437a49a1dc0") -> FakeGoogleMapsDisplayLink
+                            UUID.fromString("64b0b360-24ec-4113-9056-314223c6e19a") -> FakeGoogleMapsNavigationLink
+                            UUID.fromString("9d7cd113-ce01-4b8b-82fe-856956b8b20a") -> FakeGoogleMapsStreetViewLink
+                            UUID.fromString("b109970a-aef8-4482-9879-52e128fd0e07") -> FakeMagicEarthDisplayLink
+                            UUID.fromString("ee4f961c-44b0-4cb6-baad-1ed28edb8ec7") -> FakeMagicEarthNavigationLink
+                            else -> null
+                        }
+                    },
+                )
             },
         )
     }
