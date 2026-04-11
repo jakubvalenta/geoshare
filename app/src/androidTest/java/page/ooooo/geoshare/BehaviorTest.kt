@@ -204,7 +204,7 @@ interface BehaviorTest {
      * phone's language and location.
      */
     fun UiAutomatorTestScope.assertConversionSucceeded(
-        expectedPoints: ImmutableList<Point>,
+        expectedPoints: Points,
         timeoutMs: Long = NETWORK_TIMEOUT,
     ) {
         onElement(timeoutMs) {

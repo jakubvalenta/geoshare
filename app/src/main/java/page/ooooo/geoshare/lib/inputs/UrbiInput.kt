@@ -3,7 +3,6 @@ package page.ooooo.geoshare.lib.inputs
 import androidx.annotation.StringRes
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readLine
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
@@ -17,6 +16,7 @@ import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Points
 import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 import javax.inject.Inject
@@ -95,7 +95,7 @@ class UrbiInput @Inject constructor(
     override suspend fun parseHtml(
         htmlUrlString: String,
         channel: ByteReadChannel,
-        pointsFromUri: ImmutableList<Point>,
+        pointsFromUri: Points,
         uriQuote: UriQuote,
         log: ILog,
     ) = buildParseHtmlResult {

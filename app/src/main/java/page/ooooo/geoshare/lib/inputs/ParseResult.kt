@@ -1,17 +1,16 @@
 package page.ooooo.geoshare.lib.inputs
 
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Points
 
 data class ParseUriResult(
-    val points: ImmutableList<Point> = persistentListOf(),
+    val points: Points = persistentListOf(),
     val htmlUriString: String? = null,
     val webUriString: String? = null,
 )
 
 class ParseUriResultScope {
-    var points: ImmutableList<Point> = persistentListOf()
+    var points: Points = persistentListOf()
     var htmlUriString: String? = null
     var webUriString: String? = null
 
@@ -19,13 +18,13 @@ class ParseUriResultScope {
 }
 
 data class ParseHtmlResult(
-    val points: ImmutableList<Point> = persistentListOf(),
+    val points: Points = persistentListOf(),
     val redirectUriString: String? = null,
     val webUriString: String? = null,
 )
 
 class ParseHtmlResultScope {
-    var points: ImmutableList<Point> = persistentListOf()
+    var points: Points = persistentListOf()
     var redirectUriString: String? = null
     var webUriString: String? = null
 

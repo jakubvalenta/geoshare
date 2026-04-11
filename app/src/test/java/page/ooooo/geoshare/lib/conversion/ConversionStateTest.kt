@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.Resources
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.jvm.javaio.toByteReadChannel
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -82,6 +81,7 @@ import page.ooooo.geoshare.lib.outputs.ShareLinkUriOutput
 import page.ooooo.geoshare.lib.outputs.SharePointsGpxOutput
 import page.ooooo.geoshare.lib.point.CoordinateConverter
 import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Points
 import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 import java.io.EOFException
@@ -1559,7 +1559,7 @@ class ConversionStateTest {
             override suspend fun parseHtml(
                 htmlUrlString: String,
                 channel: ByteReadChannel,
-                pointsFromUri: ImmutableList<Point>,
+                pointsFromUri: Points,
                 uriQuote: UriQuote,
                 log: ILog,
             ) = ParseHtmlResult()
@@ -1839,7 +1839,7 @@ class ConversionStateTest {
             override suspend fun parseHtml(
                 htmlUrlString: String,
                 channel: ByteReadChannel,
-                pointsFromUri: ImmutableList<Point>,
+                pointsFromUri: Points,
                 uriQuote: UriQuote,
                 log: ILog,
             ) = ParseHtmlResult(pointsFromHtml)
@@ -1893,7 +1893,7 @@ class ConversionStateTest {
             override suspend fun parseHtml(
                 htmlUrlString: String,
                 channel: ByteReadChannel,
-                pointsFromUri: ImmutableList<Point>,
+                pointsFromUri: Points,
                 uriQuote: UriQuote,
                 log: ILog,
             ) = ParseHtmlResult(pointsFromHtml)
@@ -1948,7 +1948,7 @@ class ConversionStateTest {
                 override suspend fun parseHtml(
                     htmlUrlString: String,
                     channel: ByteReadChannel,
-                    pointsFromUri: ImmutableList<Point>,
+                    pointsFromUri: Points,
                     uriQuote: UriQuote,
                     log: ILog,
                 ) = ParseHtmlResult(redirectUriString = redirectUriString)
@@ -2010,7 +2010,7 @@ class ConversionStateTest {
                 override suspend fun parseHtml(
                     htmlUrlString: String,
                     channel: ByteReadChannel,
-                    pointsFromUri: ImmutableList<Point>,
+                    pointsFromUri: Points,
                     uriQuote: UriQuote,
                     log: ILog,
                 ) = ParseHtmlResult(redirectUriString = redirectUriString)
@@ -2065,7 +2065,7 @@ class ConversionStateTest {
                 override suspend fun parseHtml(
                     htmlUrlString: String,
                     channel: ByteReadChannel,
-                    pointsFromUri: ImmutableList<Point>,
+                    pointsFromUri: Points,
                     uriQuote: UriQuote,
                     log: ILog,
                 ) = ParseHtmlResult(webUriString = webUriString)
@@ -2115,7 +2115,7 @@ class ConversionStateTest {
                 override suspend fun parseHtml(
                     htmlUrlString: String,
                     channel: ByteReadChannel,
-                    pointsFromUri: ImmutableList<Point>,
+                    pointsFromUri: Points,
                     uriQuote: UriQuote,
                     log: ILog,
                 ) = ParseHtmlResult(webUriString = webUriString)
@@ -2168,7 +2168,7 @@ class ConversionStateTest {
                 override suspend fun parseHtml(
                     htmlUrlString: String,
                     channel: ByteReadChannel,
-                    pointsFromUri: ImmutableList<Point>,
+                    pointsFromUri: Points,
                     uriQuote: UriQuote,
                     log: ILog,
                 ) = ParseHtmlResult(pointsFromHtml)
@@ -2223,7 +2223,7 @@ class ConversionStateTest {
                 override suspend fun parseHtml(
                     htmlUrlString: String,
                     channel: ByteReadChannel,
-                    pointsFromUri: ImmutableList<Point>,
+                    pointsFromUri: Points,
                     uriQuote: UriQuote,
                     log: ILog,
                 ) = ParseHtmlResult(pointsFromHtml)
