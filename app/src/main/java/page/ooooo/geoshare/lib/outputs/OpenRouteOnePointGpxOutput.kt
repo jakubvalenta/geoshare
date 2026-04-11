@@ -95,4 +95,13 @@ class OpenRouteOnePointGpxOutput @Inject constructor(
             appDetails[packageName]?.label ?: packageName,
             counterSec,
         )
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        other as OpenRouteOnePointGpxOutput
+        return packageName == other.packageName
+    }
+
+    override fun hashCode() = packageName.hashCode()
 }

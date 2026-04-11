@@ -335,6 +335,8 @@ class OutputRepositoryTest {
                     OpenNavigationMagicEarthUriOutput(MAGIC_EARTH_PACKAGE_NAME, magicEarthUriFormatter),
                     OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME, gpxFormatter),
                     OpenDisplayGeoUriOutput(TEST_PACKAGE_NAME, geoUriFormatter),
+                ),
+                listOf(
                     ShareLinkUriOutput(FakeAppleMapsDisplayLink, uriFormatter),
                     ShareLinkUriOutput(FakeAppleMapsNavigationLink, uriFormatter),
                     CopyLinkUriOutput(FakeAppleMapsDisplayLink, uriFormatter),

@@ -18,4 +18,12 @@ class SharePointsGpxOutput @Inject constructor(
     @Composable
     override fun label(appDetails: AppDetails) =
         stringResource(R.string.output_gpx_points_share)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is SharePointsGpxOutput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
 }

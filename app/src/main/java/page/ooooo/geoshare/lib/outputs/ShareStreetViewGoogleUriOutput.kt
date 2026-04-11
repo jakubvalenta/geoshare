@@ -26,4 +26,12 @@ class ShareStreetViewGoogleUriOutput @Inject constructor(
     @Composable
     override fun automationLabel(appDetails: AppDetails) =
         stringResource(R.string.output_open_street_view)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is ShareStreetViewGoogleUriOutput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
 }

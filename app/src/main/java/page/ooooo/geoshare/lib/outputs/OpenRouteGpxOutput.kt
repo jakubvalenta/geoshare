@@ -26,4 +26,13 @@ class OpenRouteGpxOutput @Inject constructor(
             R.string.output_gpx_route_open_in,
             appDetails[packageName]?.label ?: packageName,
         )
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        other as OpenRouteGpxOutput
+        return packageName == other.packageName
+    }
+
+    override fun hashCode() = packageName.hashCode()
 }

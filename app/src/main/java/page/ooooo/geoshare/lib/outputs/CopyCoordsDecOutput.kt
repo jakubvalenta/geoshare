@@ -26,4 +26,12 @@ class CopyCoordsDecOutput @Inject constructor(
     @Composable
     override fun automationSuccessText(appDetails: AppDetails) =
         stringResource(R.string.conversion_automation_copy_succeeded)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is CopyCoordsDecOutput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
 }

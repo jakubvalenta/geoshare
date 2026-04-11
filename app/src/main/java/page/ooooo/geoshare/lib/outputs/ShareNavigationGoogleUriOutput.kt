@@ -26,4 +26,12 @@ class ShareNavigationGoogleUriOutput @Inject constructor(
     @Composable
     override fun automationLabel(appDetails: AppDetails) =
         stringResource(R.string.output_open_navigation)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is ShareNavigationGoogleUriOutput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
 }

@@ -32,4 +32,12 @@ class ShareDisplayGeoUriOutput @Inject constructor(
     @Composable
     override fun automationLabel(appDetails: AppDetails) =
         stringResource(R.string.conversion_succeeded_share)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is ShareDisplayGeoUriOutput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
 }

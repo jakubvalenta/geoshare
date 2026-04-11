@@ -14,4 +14,12 @@ class NoopOutput : PointOutput.WithoutLocation {
         stringResource(R.string.user_preferences_automation_nothing)
 
     override fun getMenuIcon(appDetails: AppDetails) = null
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is NoopOutput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
 }

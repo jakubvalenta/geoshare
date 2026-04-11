@@ -37,4 +37,13 @@ class OpenDisplayGeoUriOutput @Inject constructor(
             R.string.conversion_succeeded_open_app_display,
             appDetails[packageName]?.label ?: packageName,
         )
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        other as OpenDisplayGeoUriOutput
+        return packageName == other.packageName
+    }
+
+    override fun hashCode() = packageName.hashCode()
 }

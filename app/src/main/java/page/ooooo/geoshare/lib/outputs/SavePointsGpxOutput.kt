@@ -35,4 +35,12 @@ class SavePointsGpxOutput @Inject constructor(
     @Composable
     override fun label(appDetails: AppDetails) =
         stringResource(R.string.conversion_succeeded_save_gpx)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is SavePointsGpxOutput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
 }

@@ -29,4 +29,12 @@ class CopyGeoUriOutput @Inject constructor(
     @Composable
     override fun automationSuccessText(appDetails: AppDetails) =
         stringResource(R.string.conversion_automation_copy_link_succeeded)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is CopyGeoUriOutput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
 }
