@@ -10,7 +10,7 @@ class TransformUtilTest {
     }
 
     @Test
-    fun outOfChina_pointIsInJapan_returnsTrue() {
+    fun outOfChina_pointIsInWesternJapan_returnsTrue() {
         assertTrue(TransformUtil.outOfChina(133.7583428, 34.5945482))
     }
 }

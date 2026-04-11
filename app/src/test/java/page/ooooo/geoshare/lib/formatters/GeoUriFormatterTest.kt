@@ -182,9 +182,9 @@ class GeoUriFormatterTest {
     }
 
     @Test
-    fun formatGeoUriString_whenLastPointIsInGCJ02AndIsInJapan_returnsUriWithCoordinatesUnchanged() {
+    fun formatGeoUriString_whenLastPointIsInGCJ02AndIsInWesternJapan_returnsUriWithCoordinatesConvertedToWGS84() {
         assertEquals(
-            "geo:34.5945482,133.7583428?q=34.5945482,133.7583428",
+            "geo:34.5953404,133.7527361?q=34.5953404,133.7527361",
             geoUriFormatter.formatGeoUriString(
                 GCJ02Point(34.5945482, 133.7583428, source = Source.GENERATED),
                 GeoUriFormatter.Flavor.Best,

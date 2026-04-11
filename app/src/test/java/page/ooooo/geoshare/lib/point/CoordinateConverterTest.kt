@@ -42,7 +42,7 @@ class CoordinateConverterTest {
     @Test
     fun toGCJ02_whenPointIsWGS84AndInChinaNearCoast_returnsGCJ02PointWithConvertedCoords() {
         assertEquals(
-            GCJ02Point(30.60283, 122.12886, source = Source.GENERATED), // TODO This should be converted to GCJ-02
+            GCJ02Point(30.600649446449268, 122.13324202346543, source = Source.GENERATED),
             coordinateConverter.toGCJ02(WGS84Point(30.60283, 122.12886, source = Source.GENERATED)),
         )
     }
