@@ -25,27 +25,6 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun MainFormLinks(
-    modifier: Modifier = Modifier,
-    onNavigateToInputsScreen: () -> Unit,
-    onNavigateToIntroScreen: () -> Unit,
-    onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
-    onUpdateInput: (newInputUriString: String) -> Unit,
-    inputViewModel: InputViewModel = hiltViewModel(),
-) {
-    val allInputs = inputViewModel.allInputs
-
-    MainFormLinks(
-        allInputs = allInputs,
-        modifier = modifier,
-        onNavigateToInputsScreen = onNavigateToInputsScreen,
-        onNavigateToIntroScreen = onNavigateToIntroScreen,
-        onSetErrorMessageResId = onSetErrorMessageResId,
-        onUpdateInput = onUpdateInput,
-    )
-}
-
-@Composable
-private fun MainFormLinks(
     allInputs: List<Input>,
     modifier: Modifier = Modifier,
     onNavigateToInputsScreen: () -> Unit,

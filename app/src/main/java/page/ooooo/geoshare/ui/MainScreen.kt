@@ -134,6 +134,7 @@ import page.ooooo.geoshare.lib.formatters.MagicEarthUriFormatter
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.ChinaGeometry
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
+import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.network.RecoverableNetworkException
 import page.ooooo.geoshare.lib.outputs.Action
@@ -324,6 +325,7 @@ fun MainScreen(
 
     MainScreen(
         currentState = currentState,
+        allInputs = inputViewModel.allInputs,
         appDetails = appDetails,
         billingAppNameResId = billingAppNameResId,
         billingFeatures = billingFeatures,
@@ -401,6 +403,7 @@ fun MainScreen(
 @Composable
 private fun MainScreen(
     currentState: State,
+    allInputs: List<Input>,
     appDetails: AppDetails,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
@@ -542,6 +545,7 @@ private fun MainScreen(
                         ) {
                             CompositionLocalProvider(LocalContentColor provides contentColor) {
                                 MainSupportingPane(
+                                    allInputs = allInputs,
                                     appDetails = appDetails,
                                     billingFeatures = billingFeatures,
                                     billingStatus = billingStatus,
@@ -592,6 +596,7 @@ private fun MainScreen(
                         .testTag("geoShareMainSupportingPane"),
                 ) {
                     MainSupportingPane(
+                        allInputs = allInputs,
                         appDetails = appDetails,
                         billingFeatures = billingFeatures,
                         billingStatus = billingStatus,
@@ -855,6 +860,7 @@ private fun MainBottomPane(currentState: State) {
 
 @Composable
 private fun MainSupportingPane(
+    allInputs: List<Input>,
     appDetails: AppDetails,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
@@ -902,6 +908,7 @@ private fun MainSupportingPane(
 
         is Initial -> {
             MainFormLinks(
+                allInputs = allInputs,
                 modifier = modifier,
                 onNavigateToInputsScreen = onNavigateToInputsScreen,
                 onNavigateToIntroScreen = onNavigateToIntroScreen,
@@ -1029,6 +1036,7 @@ private fun DefaultPreview() {
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         MainScreen(
             currentState = Initial(),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1079,6 +1087,7 @@ private fun DarkPreview() {
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         MainScreen(
             currentState = Initial(),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1129,6 +1138,7 @@ private fun TabletPreview() {
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         MainScreen(
             currentState = Initial(),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1200,6 +1210,7 @@ private fun SucceededPreview() {
                 action = NoopAction,
                 isAutomation = false,
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1288,6 +1299,7 @@ private fun DarkSucceededPreview() {
                 action = NoopAction,
                 isAutomation = false,
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1376,6 +1388,7 @@ private fun SmallSucceededPreview() {
                 action = NoopAction,
                 isAutomation = false,
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1464,6 +1477,7 @@ private fun TabletSucceededPreview() {
                 action = NoopAction,
                 isAutomation = false,
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1552,6 +1566,7 @@ private fun DarkTabletSucceededPreview() {
                 action = NoopAction,
                 isAutomation = false,
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1639,6 +1654,7 @@ private fun AutomationPreview() {
                 isAutomation = true,
                 delay = 3.seconds,
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1726,6 +1742,7 @@ private fun DarkAutomationPreview() {
                 isAutomation = true,
                 delay = 3.seconds,
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1813,6 +1830,7 @@ private fun TabletAutomationPreview() {
                 isAutomation = true,
                 delay = 3.seconds,
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1899,6 +1917,7 @@ private fun WebViewPreview() {
                 pointsFromUri = persistentListOf(),
                 webUriString = "https://www.example.com/",
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1980,6 +1999,7 @@ private fun DarkWebViewPreview() {
                 pointsFromUri = persistentListOf(),
                 webUriString = "https://www.example.com/",
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -2061,6 +2081,7 @@ private fun TabletWebViewPreview() {
                 pointsFromUri = persistentListOf(),
                 webUriString = "https://www.example.com/",
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -2118,6 +2139,7 @@ private fun ErrorPreview() {
                 message = stringResource(R.string.conversion_failed_parse_url_error),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -2175,6 +2197,7 @@ private fun DarkErrorPreview() {
                 message = stringResource(R.string.conversion_failed_parse_url_error),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -2232,6 +2255,7 @@ private fun TabletErrorPreview() {
                 message = stringResource(R.string.conversion_failed_parse_url_error),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -2310,6 +2334,7 @@ private fun EmptyPreview() {
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 persistentListOf(),
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -2393,6 +2418,7 @@ private fun LoadingIndicatorPreview() {
                     RecoverableNetworkException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -2476,6 +2502,7 @@ private fun DarkLoadingIndicatorPreview() {
                     RecoverableNetworkException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -2559,6 +2586,7 @@ private fun TabletLoadingIndicatorPreview() {
                     RecoverableNetworkException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
