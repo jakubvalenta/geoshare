@@ -138,4 +138,12 @@ class YandexMapsInput @Inject constructor(
 
     override fun genRandomUri(point: Point) =
         uriFormatter.formatUriString(point, "https://yandex.com/maps?ll={lon}%2C{lat}&z={z}")
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is YandexMapsInput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
 }

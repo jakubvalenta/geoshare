@@ -75,6 +75,14 @@ class HereWeGoInput @Inject constructor(
     override fun genRandomUri(point: Point) =
         uriFormatter.formatUriString(point, "https://wego.here.com/?map={lat}%2C{lon},{z}")
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is HereWeGoInput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
+
     private companion object {
         private const val SIMPLIFIED_BASE64 = """[A-Za-z0-9+/]+=*"""
     }

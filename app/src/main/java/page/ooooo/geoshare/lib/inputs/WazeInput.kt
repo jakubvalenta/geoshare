@@ -143,6 +143,14 @@ class WazeInput @Inject constructor(
     override fun genRandomUri(point: Point) =
         uriFormatter.formatUriString(point, "https://waze.com/ul?ll={lat}%2C{lon}&z={z}")
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is WazeInput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
+
     private companion object {
         private const val HASH = @Suppress("SpellCheckingInspection") """[0-9bcdefghjkmnpqrstuvwxyz]+"""
     }

@@ -72,6 +72,14 @@ class MapyComInput @Inject constructor(
     override fun genRandomUri(point: Point) =
         uriFormatter.formatUriString(point, "https://mapy.com/en/zakladni?x={lon}&y={lat}&z={z}")
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is MapyComInput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
+
     private companion object {
         private const val COORDS = """(\d{1,2}(?:\.\d{1,16})?)[NS], (\d{1,3}(?:\.\d{1,16})?)[WE]"""
     }

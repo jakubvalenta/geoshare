@@ -3150,7 +3150,7 @@ class ConversionStateTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val automation = SavePointsGpxAutomation
-        val action = SharePointsGpxOutput(gpxFormatter).toAction(points)
+        val action = SavePointsGpxOutput(gpxFormatter).toAction(points)
         val delay = 2.seconds
         val mockBilling: Billing = mock {
             on { status } doReturn MutableStateFlow(

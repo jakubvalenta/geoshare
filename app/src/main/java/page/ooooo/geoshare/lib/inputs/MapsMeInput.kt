@@ -52,6 +52,14 @@ class MapsMeInput @Inject constructor() : Input {
         }
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is MapsMeInput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
+
     private companion object {
         private const val HASH = """[A-Za-z0-9\-_]{2,}"""
     }

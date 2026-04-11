@@ -64,4 +64,12 @@ class OsmAndInput @Inject constructor(
 
     override fun genRandomUri(point: Point) =
         uriFormatter.formatUriString(point, "https://osmand.net/map?pin={lat}%2C{lon}")
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is OsmAndInput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
 }

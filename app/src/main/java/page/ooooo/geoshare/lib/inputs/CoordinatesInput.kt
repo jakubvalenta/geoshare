@@ -126,6 +126,14 @@ class CoordinatesInput @Inject constructor(
     override fun genRandomUri(point: Point) =
         uriFormatter.formatUriString(point, "N {lat}, E {lon}")
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is CoordinatesInput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
+
     private companion object {
         private const val CHARS = @Suppress("SpellCheckingInspection") """[\p{Zs},°'′"″NSWE]"""
         private const val SPACE = """\p{Zs}*"""

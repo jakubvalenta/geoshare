@@ -119,6 +119,14 @@ class OpenStreetMapInput @Inject constructor(
     override fun genRandomUri(point: Point) =
         uriFormatter.formatUriString(point, "https://www.openstreetmap.org/#map={z}/{lat}/{lon}")
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is OpenStreetMapInput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
+
     private companion object {
         private const val ELEMENT_PATH = """/(node|relation|way)/(\d+)(?:[/?#].*|$)"""
         private const val HASH = """[A-Za-z0-9_~]+-+"""
