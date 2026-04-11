@@ -34,7 +34,6 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 private val iconSize = 16.dp
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResultSuccessPoint(
     point: Point,

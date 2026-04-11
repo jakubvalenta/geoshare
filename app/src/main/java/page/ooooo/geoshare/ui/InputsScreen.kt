@@ -76,7 +76,6 @@ import page.ooooo.geoshare.ui.components.SegmentedListLabel
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InputsScreen(
     initialDocumentationId: InputDocumentationId?,

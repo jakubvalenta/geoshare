@@ -63,7 +63,6 @@ import page.ooooo.geoshare.ui.components.styledArgsString
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun IntroScreen(
     onClose: () -> Unit,
