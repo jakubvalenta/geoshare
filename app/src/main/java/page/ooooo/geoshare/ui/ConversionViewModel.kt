@@ -44,7 +44,7 @@ import page.ooooo.geoshare.lib.conversion.ReceivedUriString
 import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.LocationAction
-import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.geo.Point
 import javax.inject.Inject
 
 @OptIn(SavedStateHandleSaveableApi::class)

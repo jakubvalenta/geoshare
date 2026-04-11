@@ -4,9 +4,9 @@ import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.extensions.toTrimmedString
-import page.ooooo.geoshare.lib.point.CoordinateConverter
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Srs
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Srs
 import javax.inject.Inject
 import javax.inject.Singleton
 

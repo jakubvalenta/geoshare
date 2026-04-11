@@ -7,9 +7,9 @@ import org.mockito.kotlin.mock
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.ChinaGeometry
-import page.ooooo.geoshare.lib.point.CoordinateConverter
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class MagicEarthUriFormatterTest {
     private val mockContext: Context = mock {}

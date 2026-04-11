@@ -79,11 +79,11 @@ import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
 import page.ooooo.geoshare.lib.outputs.ShareLinkUriOutput
 import page.ooooo.geoshare.lib.outputs.SharePointsGpxOutput
-import page.ooooo.geoshare.lib.point.CoordinateConverter
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Points
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import java.io.EOFException
 import java.net.SocketTimeoutException
 import java.net.URL

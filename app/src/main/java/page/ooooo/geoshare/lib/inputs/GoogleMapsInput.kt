@@ -15,11 +15,11 @@ import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toLatLonZPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.formatters.UriFormatter
-import page.ooooo.geoshare.lib.point.GoogleMapsPoint
-import page.ooooo.geoshare.lib.point.NaivePoint
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Points
-import page.ooooo.geoshare.lib.point.Source
+import page.ooooo.geoshare.lib.geo.GoogleMapsPoint
+import page.ooooo.geoshare.lib.geo.NaivePoint
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.geo.Source
 import javax.inject.Inject
 import javax.inject.Singleton
 

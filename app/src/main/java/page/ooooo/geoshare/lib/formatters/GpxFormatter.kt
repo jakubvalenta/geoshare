@@ -1,8 +1,8 @@
 package page.ooooo.geoshare.lib.formatters
 
 import io.ktor.util.escapeHTML
-import page.ooooo.geoshare.lib.point.CoordinateConverter
-import page.ooooo.geoshare.lib.point.Points
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Points
 import javax.inject.Inject
 import javax.inject.Singleton
 

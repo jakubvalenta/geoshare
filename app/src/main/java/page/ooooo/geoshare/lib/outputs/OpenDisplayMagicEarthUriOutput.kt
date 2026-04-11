@@ -6,7 +6,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formatters.MagicEarthUriFormatter
-import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.ui.components.DrawableIconDescriptor
 import page.ooooo.geoshare.ui.components.ResourceIconDescriptor
 import javax.inject.Inject

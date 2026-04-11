@@ -71,6 +71,7 @@ abstract class AppDatabase : RoomDatabase() {
                     Uuid.parse("dad7a723-eeb1-4f60-af5d-7813b3cc1926").toByteArray(),
                 )
             )
+            // TODO Change Google Maps from Srs.GCJ02 to Srs.GOOGLE_MAPS
             db.execSQL(
                 "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(

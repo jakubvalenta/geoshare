@@ -10,11 +10,11 @@ import org.mockito.kotlin.mock
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.geo.ChinaGeometry
 import page.ooooo.geoshare.lib.geo.ChinaGeometryTest
-import page.ooooo.geoshare.lib.point.CoordinateConverter
-import page.ooooo.geoshare.lib.point.GCJ02Point
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.Srs
-import page.ooooo.geoshare.lib.point.WGS84Point
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.GCJ02Point
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.Srs
+import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class UriFormatterTest {
     private val mockAssetManager: AssetManager = mock {

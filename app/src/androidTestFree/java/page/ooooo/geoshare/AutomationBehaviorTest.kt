@@ -21,8 +21,8 @@ import page.ooooo.geoshare.data.local.preferences.OpenRouteOnePointGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
 import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 import kotlin.time.Duration.Companion.seconds
 

@@ -15,11 +15,9 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.inputs.Input
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.ui.InputViewModel
+import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 

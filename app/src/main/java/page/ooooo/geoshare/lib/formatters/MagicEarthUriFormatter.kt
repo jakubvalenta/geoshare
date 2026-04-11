@@ -3,8 +3,8 @@ package page.ooooo.geoshare.lib.formatters
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.point.CoordinateConverter
-import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Point
 import javax.inject.Inject
 import javax.inject.Singleton
 

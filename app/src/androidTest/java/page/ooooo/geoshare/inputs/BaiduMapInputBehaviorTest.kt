@@ -5,8 +5,8 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import page.ooooo.geoshare.BehaviorTest.Companion.NETWORK_TIMEOUT
-import page.ooooo.geoshare.lib.point.BD09MCPoint
-import page.ooooo.geoshare.lib.point.Source
+import page.ooooo.geoshare.lib.geo.BD09MCPoint
+import page.ooooo.geoshare.lib.geo.Source
 
 class BaiduMapInputBehaviorTest : InputBehaviorTest {
     @Test

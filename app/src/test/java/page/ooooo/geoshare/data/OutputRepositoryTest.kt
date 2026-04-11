@@ -71,7 +71,7 @@ import page.ooooo.geoshare.lib.outputs.ShareNavigationGoogleUriOutput
 import page.ooooo.geoshare.lib.outputs.SharePointsGpxOutput
 import page.ooooo.geoshare.lib.outputs.ShareRouteGpxOutput
 import page.ooooo.geoshare.lib.outputs.ShareStreetViewGoogleUriOutput
-import page.ooooo.geoshare.lib.point.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import java.util.UUID
 
 class OutputRepositoryTest {

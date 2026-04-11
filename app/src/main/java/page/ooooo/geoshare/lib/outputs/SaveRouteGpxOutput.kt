@@ -11,7 +11,7 @@ import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
 import page.ooooo.geoshare.lib.getTimestamp
-import page.ooooo.geoshare.lib.point.Points
+import page.ooooo.geoshare.lib.geo.Points
 import javax.inject.Inject
 
 class SaveRouteGpxOutput @Inject constructor(

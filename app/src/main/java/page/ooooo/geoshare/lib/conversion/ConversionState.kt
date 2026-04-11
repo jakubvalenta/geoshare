@@ -37,8 +37,8 @@ import page.ooooo.geoshare.lib.outputs.LocationAction
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Points
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 

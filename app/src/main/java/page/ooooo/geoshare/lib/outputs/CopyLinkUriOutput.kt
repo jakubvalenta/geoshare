@@ -7,7 +7,7 @@ import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formatters.UriFormatter
-import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.geo.Point
 import javax.inject.Inject
 
 class CopyLinkUriOutput @Inject constructor(

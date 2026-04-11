@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.extensions.firstGraphemeOrNull
-import page.ooooo.geoshare.lib.point.Srs
+import page.ooooo.geoshare.lib.geo.Srs
 import page.ooooo.geoshare.ui.components.CharacterIconDescriptor
 import page.ooooo.geoshare.ui.components.IconDescriptor
 import page.ooooo.geoshare.ui.components.ResourceIconDescriptor

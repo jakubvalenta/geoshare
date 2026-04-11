@@ -14,8 +14,8 @@ import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLonLatNamePoint
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
-import page.ooooo.geoshare.lib.point.BD09MCPoint
-import page.ooooo.geoshare.lib.point.Source
+import page.ooooo.geoshare.lib.geo.BD09MCPoint
+import page.ooooo.geoshare.lib.geo.Source
 import javax.inject.Inject
 import javax.inject.Singleton
 

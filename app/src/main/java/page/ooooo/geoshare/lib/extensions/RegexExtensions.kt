@@ -1,7 +1,7 @@
 package page.ooooo.geoshare.lib.extensions
 
-import page.ooooo.geoshare.lib.point.NaivePoint
-import page.ooooo.geoshare.lib.point.Source
+import page.ooooo.geoshare.lib.geo.NaivePoint
+import page.ooooo.geoshare.lib.geo.Source
 import kotlin.text.MatchResult
 import kotlin.text.Regex
 

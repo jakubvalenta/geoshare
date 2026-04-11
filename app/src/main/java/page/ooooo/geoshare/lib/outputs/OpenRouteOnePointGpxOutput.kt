@@ -7,7 +7,7 @@ import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
-import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.writeFile
 import page.ooooo.geoshare.ui.components.DrawableIconDescriptor
 import page.ooooo.geoshare.ui.components.IconDescriptor

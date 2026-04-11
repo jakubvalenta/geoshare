@@ -1,13 +1,11 @@
-package page.ooooo.geoshare.lib.point
+package page.ooooo.geoshare.lib.geo
 
 import androidx.compose.runtime.Immutable
 import com.lbt05.evil_transform.TransformUtil.outOfChina
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.extensions.toTrimmedString
-import page.ooooo.geoshare.lib.geo.ChinaGeometry
 import kotlin.random.Random
 
-// TODO Move package geo: CoordinateConverter, Point, Points, Source, Srs
 sealed interface Point {
     val lat: Double?
     val lon: Double?

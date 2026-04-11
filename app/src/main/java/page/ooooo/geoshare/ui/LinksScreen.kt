@@ -62,8 +62,8 @@ import page.ooooo.geoshare.lib.billing.CustomLinkFeature
 import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.ChinaGeometry
-import page.ooooo.geoshare.lib.point.CoordinateConverter
-import page.ooooo.geoshare.lib.point.Srs
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Srs
 import page.ooooo.geoshare.ui.components.BasicListDetailScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.FeatureWall

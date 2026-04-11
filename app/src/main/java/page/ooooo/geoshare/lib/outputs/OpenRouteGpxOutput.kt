@@ -5,7 +5,7 @@ import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
-import page.ooooo.geoshare.lib.point.Points
+import page.ooooo.geoshare.lib.geo.Points
 import javax.inject.Inject
 
 class OpenRouteGpxOutput @Inject constructor(

@@ -7,8 +7,8 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.geo.decodeGe0Hash
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import javax.inject.Inject
 import javax.inject.Singleton
 

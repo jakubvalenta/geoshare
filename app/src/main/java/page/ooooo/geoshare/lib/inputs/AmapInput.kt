@@ -8,9 +8,9 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonNamePoint
 import page.ooooo.geoshare.lib.formatters.UriFormatter
-import page.ooooo.geoshare.lib.point.GCJ02Point
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Source
+import page.ooooo.geoshare.lib.geo.GCJ02Point
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Source
 import javax.inject.Inject
 import javax.inject.Singleton
 

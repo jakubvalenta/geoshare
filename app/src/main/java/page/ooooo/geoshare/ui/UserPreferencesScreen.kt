@@ -96,8 +96,8 @@ import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.geo.ChinaGeometry
 import page.ooooo.geoshare.lib.outputs.Output
-import page.ooooo.geoshare.lib.point.CoordinateConverter
-import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.ui.components.FeatureWall
 import page.ooooo.geoshare.ui.components.FeatureBadgeSmall
 import page.ooooo.geoshare.ui.components.IconFromDescriptor

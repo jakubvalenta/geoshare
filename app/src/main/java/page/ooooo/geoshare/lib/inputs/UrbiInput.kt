@@ -15,10 +15,10 @@ import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
 import page.ooooo.geoshare.lib.formatters.UriFormatter
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Points
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import javax.inject.Inject
 import javax.inject.Singleton
 

@@ -62,11 +62,11 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.ChinaGeometry
 import page.ooooo.geoshare.lib.outputs.CopyLinkUriOutput
 import page.ooooo.geoshare.lib.outputs.ShareLinkUriOutput
-import page.ooooo.geoshare.lib.point.CoordinateConverter
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.Srs
-import page.ooooo.geoshare.lib.point.WGS84Point
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.Srs
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 

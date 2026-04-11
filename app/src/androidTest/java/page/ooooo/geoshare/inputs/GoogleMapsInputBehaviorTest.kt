@@ -6,8 +6,8 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assume.assumeTrue
 import org.junit.Test
 import page.ooooo.geoshare.NotEmulator
-import page.ooooo.geoshare.lib.point.GCJ02Point
-import page.ooooo.geoshare.lib.point.Source
+import page.ooooo.geoshare.lib.geo.GCJ02Point
+import page.ooooo.geoshare.lib.geo.Source
 
 class GoogleMapsInputBehaviorTest : InputBehaviorTest {
     @Test

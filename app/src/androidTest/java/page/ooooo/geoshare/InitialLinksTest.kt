@@ -16,7 +16,7 @@ import page.ooooo.geoshare.data.local.database.AppDatabase
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.database.LinkDao
 import page.ooooo.geoshare.data.local.database.LinkType
-import page.ooooo.geoshare.lib.point.Srs
+import page.ooooo.geoshare.lib.geo.Srs
 import java.io.IOException
 import java.util.UUID
 

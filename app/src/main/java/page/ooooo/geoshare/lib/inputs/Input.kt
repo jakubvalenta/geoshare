@@ -7,8 +7,8 @@ import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Points
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
 
 interface Input {
     val uriPattern: Regex

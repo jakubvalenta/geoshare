@@ -1,7 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.lib.point.Points
+import page.ooooo.geoshare.lib.geo.Points
 
 data class ParseUriResult(
     val points: Points = persistentListOf(),

@@ -1,13 +1,12 @@
-package page.ooooo.geoshare.lib.point
+package page.ooooo.geoshare.lib.geo
 
 import com.github._46319943.bd09convertor.BD09Convertor
 import com.github.wandergis.coordtransform.CoordTransform
 import com.lbt05.evil_transform.GCJPointer
-import com.lbt05.evil_transform.TransformUtil.outOfChina
+import com.lbt05.evil_transform.TransformUtil
 import com.lbt05.evil_transform.WGSPointer
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
-import page.ooooo.geoshare.lib.geo.ChinaGeometry
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -60,7 +59,15 @@ class CoordinateConverter @Inject constructor(
                 } else {
                     BD09Convertor.convertMC2LL(lat, lon)
                         .let { (bd09Lat, bd09Lon) -> CoordTransform.bd09toGCJ02(bd09Lat, bd09Lon) }
-                        .let { (gcj02Lat, gcj02Lon) -> GCJ02Point(gcj02Lat, gcj02Lon, z, name, source) }
+                        .let { (gcj02Lat, gcj02Lon) ->
+                            GCJ02Point(
+                                gcj02Lat,
+                                gcj02Lon,
+                                z,
+                                name,
+                                source
+                            )
+                        }
                 }
             }
 
@@ -77,7 +84,7 @@ class CoordinateConverter @Inject constructor(
     fun toGoogleMaps(point: Point): GoogleMapsPoint = point.run {
         when (this) {
             is GCJ02Point -> {
-                if (lat == null || lon == null || outOfChina(lat, lon)) {
+                if (lat == null || lon == null || TransformUtil.outOfChina(lat, lon)) {
                     GoogleMapsPoint(lat, lon, z, name, source)
                 } else {
                     val wgs84Pointer = GCJPointer(lat, lon).toExactWGSPointer()
@@ -85,19 +92,31 @@ class CoordinateConverter @Inject constructor(
                         GoogleMapsPoint(lat, lon, z, name, source)
                     } else {
                         // The point is outside China, so convert it to WGS 84
-                        GoogleMapsPoint(wgs84Pointer.latitude, wgs84Pointer.longitude, z, name, source)
+                        GoogleMapsPoint(
+                            wgs84Pointer.latitude,
+                            wgs84Pointer.longitude,
+                            z,
+                            name,
+                            source
+                        )
                     }
                 }
             }
 
             is WGS84Point -> {
-                if (lat == null || lon == null || outOfChina(lat, lon)) {
+                if (lat == null || lon == null || TransformUtil.outOfChina(lat, lon)) {
                     GoogleMapsPoint(lat, lon, z, name, source)
                 } else {
                     if (chinaGeometry.containsPoint(lon, lat)) {
                         // The point is inside China, so convert it to GCJ-02
                         val gcJ02Pointer = WGSPointer(lat, lon).toGCJPointer()
-                        GoogleMapsPoint(gcJ02Pointer.latitude, gcJ02Pointer.longitude, z, name, source)
+                        GoogleMapsPoint(
+                            gcJ02Pointer.latitude,
+                            gcJ02Pointer.longitude,
+                            z,
+                            name,
+                            source
+                        )
                     } else {
                         GoogleMapsPoint(lat, lon, z, name, source)
                     }
@@ -111,7 +130,7 @@ class CoordinateConverter @Inject constructor(
     }
 
     private fun toWGS84OrGCJ02Point(point: GoogleMapsPoint): Point = point.run {
-        if (lat == null || lon == null || outOfChina(lat, lon)) {
+        if (lat == null || lon == null || TransformUtil.outOfChina(lat, lon)) {
             WGS84Point(lat, lon, z, name, source)
         } else {
             // Assume the point is a GCJ-02 point and calculate whether it's inside China

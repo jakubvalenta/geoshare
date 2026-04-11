@@ -6,7 +6,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
-import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.geo.Point
 import javax.inject.Inject
 
 class CopyCoordsDecOutput @Inject constructor(

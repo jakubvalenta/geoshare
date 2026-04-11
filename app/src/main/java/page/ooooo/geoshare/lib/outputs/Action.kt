@@ -4,10 +4,10 @@ import android.content.res.Resources
 import android.net.Uri
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Points
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 
 /**
  * Action is an [output] with the [value] that's needed to execute it.

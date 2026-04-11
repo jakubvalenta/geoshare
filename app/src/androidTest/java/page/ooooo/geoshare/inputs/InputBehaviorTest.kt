@@ -5,8 +5,8 @@ import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.BehaviorTest
 import page.ooooo.geoshare.BehaviorTest.Companion.NETWORK_TIMEOUT
 import page.ooooo.geoshare.data.local.preferences.Permission
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Points
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
 interface InputBehaviorTest : BehaviorTest {
@@ -26,7 +26,11 @@ interface InputBehaviorTest : BehaviorTest {
         onElementOrNull(1_000L) { viewIdResourceName == "geoShareMainBackButton" }?.click()
     }
 
-    fun UiAutomatorTestScope.testUri(expectedPoints: Points, unsafeUriString: String, timeoutMs: Long = NETWORK_TIMEOUT) {
+    fun UiAutomatorTestScope.testUri(
+        expectedPoints: Points,
+        unsafeUriString: String,
+        timeoutMs: Long = NETWORK_TIMEOUT,
+    ) {
         // Go to main form
         goToMainForm()
 

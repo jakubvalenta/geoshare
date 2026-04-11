@@ -19,7 +19,6 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.head
 import io.ktor.http.isSuccess
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -36,10 +35,10 @@ import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.geo.quickIsPointInChina
-import page.ooooo.geoshare.lib.point.BD09MCPoint
-import page.ooooo.geoshare.lib.point.GCJ02Point
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Source
+import page.ooooo.geoshare.lib.geo.BD09MCPoint
+import page.ooooo.geoshare.lib.geo.GCJ02Point
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 import java.net.InetAddress
 import java.net.SocketException

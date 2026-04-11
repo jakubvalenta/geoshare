@@ -2,8 +2,6 @@ package page.ooooo.geoshare.lib.geo
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import page.ooooo.geoshare.lib.point.NaivePoint
-import page.ooooo.geoshare.lib.point.Source
 
 class GeoHashTest {
     @Test

@@ -52,7 +52,7 @@ import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.geo.ChinaGeometry
-import page.ooooo.geoshare.lib.point.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.ui.components.ParagraphHtml
 import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.ScreenshotMapAppOpen

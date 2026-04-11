@@ -145,10 +145,10 @@ import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
-import page.ooooo.geoshare.lib.point.CoordinateConverter
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.ui.components.BasicSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.ConversionWebView

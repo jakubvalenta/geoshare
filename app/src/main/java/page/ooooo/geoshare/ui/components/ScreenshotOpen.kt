@@ -22,8 +22,8 @@ import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.geo.ChinaGeometry
-import page.ooooo.geoshare.lib.point.CoordinateConverter
-import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable

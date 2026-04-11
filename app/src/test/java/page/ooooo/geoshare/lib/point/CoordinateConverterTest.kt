@@ -6,8 +6,13 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import page.ooooo.geoshare.lib.geo.BD09MCPoint
 import page.ooooo.geoshare.lib.geo.ChinaGeometry
 import page.ooooo.geoshare.lib.geo.ChinaGeometryTest
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.GCJ02Point
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class CoordinateConverterTest {
     private val mockAssetManager: AssetManager = mock {

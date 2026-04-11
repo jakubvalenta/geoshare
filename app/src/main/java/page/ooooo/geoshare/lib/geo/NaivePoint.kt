@@ -1,4 +1,4 @@
-package page.ooooo.geoshare.lib.point
+package page.ooooo.geoshare.lib.geo
 
 import androidx.compose.runtime.Immutable
 

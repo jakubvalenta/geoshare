@@ -3,8 +3,8 @@ package page.ooooo.geoshare.inputs
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import page.ooooo.geoshare.lib.point.GCJ02Point
-import page.ooooo.geoshare.lib.point.Source
+import page.ooooo.geoshare.lib.geo.GCJ02Point
+import page.ooooo.geoshare.lib.geo.Source
 
 class AmapInputBehaviorTest : InputBehaviorTest {
     @Test

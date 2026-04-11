@@ -21,8 +21,8 @@ import page.ooooo.geoshare.lib.android.OSMAND_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.SYGIC_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.VESPUCCI_PACKAGE_NAME
-import page.ooooo.geoshare.lib.point.CoordinateConverter
-import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Point
 import javax.inject.Inject
 import javax.inject.Singleton
 

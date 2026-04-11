@@ -15,9 +15,9 @@ import org.mockito.kotlin.mock
 import page.ooooo.geoshare.lib.android.TEST_PACKAGE_NAME
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
 import page.ooooo.geoshare.lib.geo.ChinaGeometry
-import page.ooooo.geoshare.lib.point.CoordinateConverter
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import java.io.File
 import kotlin.io.path.createTempDirectory
 

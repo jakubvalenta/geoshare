@@ -57,7 +57,7 @@ import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.ShareDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.ShareLinkUriOutput
-import page.ooooo.geoshare.lib.point.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 

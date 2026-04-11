@@ -5,8 +5,8 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
-import page.ooooo.geoshare.lib.point.BD09MCPoint
-import page.ooooo.geoshare.lib.point.Source
+import page.ooooo.geoshare.lib.geo.BD09MCPoint
+import page.ooooo.geoshare.lib.geo.Source
 
 class BaiduMapInputTest : InputTest {
     override val input = BaiduMapInput()

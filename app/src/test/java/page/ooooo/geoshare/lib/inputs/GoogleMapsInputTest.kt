@@ -10,9 +10,9 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.ChinaGeometry
-import page.ooooo.geoshare.lib.point.CoordinateConverter
-import page.ooooo.geoshare.lib.point.GoogleMapsPoint
-import page.ooooo.geoshare.lib.point.Source
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.GoogleMapsPoint
+import page.ooooo.geoshare.lib.geo.Source
 
 class GoogleMapsInputTest : InputTest {
     private val mockContext: Context = mock {}

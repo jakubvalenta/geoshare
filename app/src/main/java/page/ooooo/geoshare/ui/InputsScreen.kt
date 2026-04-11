@@ -66,7 +66,7 @@ import page.ooooo.geoshare.lib.inputs.OsmAndInput
 import page.ooooo.geoshare.lib.inputs.UrbiInput
 import page.ooooo.geoshare.lib.inputs.WazeInput
 import page.ooooo.geoshare.lib.inputs.YandexMapsInput
-import page.ooooo.geoshare.lib.point.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.ui.components.InputsSettingsButton
 import page.ooooo.geoshare.ui.components.NavigableBasicListDetailScaffold
 import page.ooooo.geoshare.ui.components.ParagraphText

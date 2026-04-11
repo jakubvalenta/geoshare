@@ -1,4 +1,4 @@
-package page.ooooo.geoshare.lib.point
+package page.ooooo.geoshare.lib.geo
 
 enum class Source {
     /**

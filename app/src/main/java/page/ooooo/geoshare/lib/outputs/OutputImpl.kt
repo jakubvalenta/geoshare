@@ -7,8 +7,8 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Points
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.writeFile
 import page.ooooo.geoshare.ui.components.DrawableIconDescriptor
 import page.ooooo.geoshare.ui.components.IconDescriptor

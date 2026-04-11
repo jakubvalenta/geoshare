@@ -13,8 +13,8 @@ import page.ooooo.geoshare.BehaviorTest.Companion.ELEMENT_DOES_NOT_EXIST_TIMEOUT
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
-import page.ooooo.geoshare.lib.point.GCJ02Point
-import page.ooooo.geoshare.lib.point.Source
+import page.ooooo.geoshare.lib.geo.GCJ02Point
+import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
 @RunWith(AndroidJUnit4::class)
