@@ -17,84 +17,62 @@ import page.ooooo.geoshare.data.di.FakeMagicEarthNavigationLink
 import page.ooooo.geoshare.data.di.FakeOpenStreetMapDisplayLink
 import page.ooooo.geoshare.data.di.FakeOpenStreetMapNavigationLink
 import page.ooooo.geoshare.data.di.defaultFakeLinks
-import page.ooooo.geoshare.data.local.database.findByUUID
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.MAGIC_EARTH_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.TEST_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
-import page.ooooo.geoshare.lib.outputs.CopyCoordsDecOutput
-import page.ooooo.geoshare.lib.outputs.CopyCoordsDegMinSecOutput
-import page.ooooo.geoshare.lib.outputs.CopyGeoUriOutput
-import page.ooooo.geoshare.lib.outputs.CopyLinkUriOutput
-import page.ooooo.geoshare.lib.outputs.NoopOutput
-import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
-import page.ooooo.geoshare.lib.outputs.OpenDisplayMagicEarthUriOutput
-import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
-import page.ooooo.geoshare.lib.outputs.OpenNavigationGoogleUriOutput
-import page.ooooo.geoshare.lib.outputs.OpenNavigationMagicEarthUriOutput
-import page.ooooo.geoshare.lib.outputs.OpenStreetViewGoogleUriOutput
-import page.ooooo.geoshare.lib.outputs.SavePointGpxOutput
-import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
-import page.ooooo.geoshare.lib.outputs.SaveRouteGpxOutput
-import page.ooooo.geoshare.lib.outputs.ShareDisplayGeoUriOutput
-import page.ooooo.geoshare.lib.outputs.ShareLinkUriOutput
-import page.ooooo.geoshare.lib.outputs.ShareNavigationGoogleUriOutput
-import page.ooooo.geoshare.lib.outputs.SharePointsGpxOutput
-import page.ooooo.geoshare.lib.outputs.ShareRouteGpxOutput
-import page.ooooo.geoshare.lib.outputs.ShareStreetViewGoogleUriOutput
 import java.util.UUID
 
 class UserPreferencesTest {
-
     @Test
-    fun getOptionGroups_returnsAllAutomationsWhichCanBeConvertedToOutputs() = runTest {
+    fun getOptionGroups_returnsAllAutomations() = runTest {
         assertEquals(
             listOf(
                 listOf(
-                    NoopOutput,
+                    NoopAutomation,
                 ),
                 listOf(
-                    CopyCoordsDecOutput,
-                    CopyCoordsDegMinSecOutput,
-                    CopyGeoUriOutput,
-                    ShareDisplayGeoUriOutput,
-                    ShareNavigationGoogleUriOutput,
-                    ShareStreetViewGoogleUriOutput,
-                    SavePointGpxOutput,
+                    CopyCoordsDecAutomation,
+                    CopyCoordsDegMinSecAutomation,
+                    CopyGeoUriAutomation,
+                    ShareDisplayGeoUriAutomation,
+                    ShareNavigationGoogleUriAutomation,
+                    ShareStreetViewGoogleUriAutomation,
+                    SavePointGpxAutomation,
                 ),
                 listOf(
-                    ShareRouteGpxOutput,
-                    SharePointsGpxOutput,
-                    SaveRouteGpxOutput,
-                    SavePointsGpxOutput,
+                    ShareRouteGpxAutomation,
+                    SharePointsGpxAutomation,
+                    SaveRouteGpxAutomation,
+                    SavePointsGpxAutomation,
                 ),
                 listOf(
-                    OpenDisplayMagicEarthUriOutput(MAGIC_EARTH_PACKAGE_NAME),
-                    OpenNavigationMagicEarthUriOutput(MAGIC_EARTH_PACKAGE_NAME),
-                    OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME),
-                    OpenDisplayGeoUriOutput(TEST_PACKAGE_NAME),
+                    OpenDisplayMagicEarthUriAutomation(MAGIC_EARTH_PACKAGE_NAME),
+                    OpenNavigationMagicEarthUriAutomation(MAGIC_EARTH_PACKAGE_NAME),
+                    OpenRouteOnePointGpxAutomation(TOMTOM_PACKAGE_NAME),
+                    OpenDisplayGeoUriAutomation(TEST_PACKAGE_NAME),
                 ),
                 listOf(
-                    ShareLinkUriOutput(FakeAppleMapsDisplayLink),
-                    ShareLinkUriOutput(FakeAppleMapsNavigationLink),
-                    CopyLinkUriOutput(FakeAppleMapsDisplayLink),
-                    CopyLinkUriOutput(FakeAppleMapsNavigationLink),
-                    ShareLinkUriOutput(FakeGoogleMapsDisplayLink),
-                    ShareLinkUriOutput(FakeGoogleMapsNavigationLink),
-                    ShareLinkUriOutput(FakeGoogleMapsStreetViewLink),
-                    CopyLinkUriOutput(FakeGoogleMapsDisplayLink),
-                    CopyLinkUriOutput(FakeGoogleMapsNavigationLink),
-                    CopyLinkUriOutput(FakeGoogleMapsStreetViewLink),
-                    ShareLinkUriOutput(FakeMagicEarthDisplayLink),
-                    ShareLinkUriOutput(FakeMagicEarthNavigationLink),
-                    CopyLinkUriOutput(FakeMagicEarthDisplayLink),
-                    CopyLinkUriOutput(FakeMagicEarthNavigationLink),
-                    ShareLinkUriOutput(FakeOpenStreetMapDisplayLink),
-                    ShareLinkUriOutput(FakeOpenStreetMapNavigationLink),
-                    CopyLinkUriOutput(FakeOpenStreetMapDisplayLink),
-                    CopyLinkUriOutput(FakeOpenStreetMapNavigationLink),
+                    ShareLinkUriAutomation(FakeAppleMapsDisplayLink.uuid),
+                    ShareLinkUriAutomation(FakeAppleMapsNavigationLink.uuid),
+                    CopyLinkUriAutomation(FakeAppleMapsDisplayLink.uuid),
+                    CopyLinkUriAutomation(FakeAppleMapsNavigationLink.uuid),
+                    ShareLinkUriAutomation(FakeGoogleMapsDisplayLink.uuid),
+                    ShareLinkUriAutomation(FakeGoogleMapsNavigationLink.uuid),
+                    ShareLinkUriAutomation(FakeGoogleMapsStreetViewLink.uuid),
+                    CopyLinkUriAutomation(FakeGoogleMapsDisplayLink.uuid),
+                    CopyLinkUriAutomation(FakeGoogleMapsNavigationLink.uuid),
+                    CopyLinkUriAutomation(FakeGoogleMapsStreetViewLink.uuid),
+                    ShareLinkUriAutomation(FakeMagicEarthDisplayLink.uuid),
+                    ShareLinkUriAutomation(FakeMagicEarthNavigationLink.uuid),
+                    CopyLinkUriAutomation(FakeMagicEarthDisplayLink.uuid),
+                    CopyLinkUriAutomation(FakeMagicEarthNavigationLink.uuid),
+                    ShareLinkUriAutomation(FakeOpenStreetMapDisplayLink.uuid),
+                    ShareLinkUriAutomation(FakeOpenStreetMapNavigationLink.uuid),
+                    CopyLinkUriAutomation(FakeOpenStreetMapDisplayLink.uuid),
+                    CopyLinkUriAutomation(FakeOpenStreetMapNavigationLink.uuid),
                 ),
             ),
             AutomationPreference
@@ -111,12 +89,7 @@ class UserPreferencesTest {
                     ),
                     hiddenApps = emptySet(),
                     links = defaultFakeLinks,
-                )
-                .map { group ->
-                    group.map { automation ->
-                        automation.toOutput { defaultFakeLinks.findByUUID(it) }
-                    }
-                },
+                ),
         )
     }
 
@@ -125,26 +98,26 @@ class UserPreferencesTest {
         assertEquals(
             listOf(
                 listOf(
-                    NoopOutput,
+                    NoopAutomation,
                 ),
                 listOf(
-                    CopyCoordsDecOutput,
-                    CopyCoordsDegMinSecOutput,
-                    CopyGeoUriOutput,
-                    ShareDisplayGeoUriOutput,
-                    ShareNavigationGoogleUriOutput,
-                    ShareStreetViewGoogleUriOutput,
-                    SavePointGpxOutput,
+                    CopyCoordsDecAutomation,
+                    CopyCoordsDegMinSecAutomation,
+                    CopyGeoUriAutomation,
+                    ShareDisplayGeoUriAutomation,
+                    ShareNavigationGoogleUriAutomation,
+                    ShareStreetViewGoogleUriAutomation,
+                    SavePointGpxAutomation,
                 ),
                 listOf(
-                    ShareRouteGpxOutput,
-                    SharePointsGpxOutput,
-                    SaveRouteGpxOutput,
-                    SavePointsGpxOutput,
+                    ShareRouteGpxAutomation,
+                    SharePointsGpxAutomation,
+                    SaveRouteGpxAutomation,
+                    SavePointsGpxAutomation,
                 ),
                 listOf(
-                    OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME),
-                    OpenDisplayGeoUriOutput(TEST_PACKAGE_NAME),
+                    OpenRouteOnePointGpxAutomation(TOMTOM_PACKAGE_NAME),
+                    OpenDisplayGeoUriAutomation(TEST_PACKAGE_NAME),
                 ),
             ),
             AutomationPreference
@@ -161,12 +134,7 @@ class UserPreferencesTest {
                     ),
                     hiddenApps = setOf(MAGIC_EARTH_PACKAGE_NAME),
                     links = emptyList(),
-                )
-                .map { group ->
-                    group.map { automation ->
-                        automation.toOutput { defaultFakeLinks.findByUUID(it) }
-                    }
-                },
+                ),
         )
     }
 
@@ -235,52 +203,39 @@ class UserPreferencesTest {
     }
 
     @Test
-    fun automationPreference_getValue_forEachOldTypeAndPackageName_returnsAutomationThatCanBeConvertedToAnOutput() =
+    fun automationPreference_getValue_forEachOldTypeAndPackageName_returnsAutomation() =
         runTest {
             @Suppress("SpellCheckingInspection")
-            for ((testOldOutputType, expectedAutomation) in mapOf(
-                "COPY_APPLE_MAPS_NAVIGATE_TO_URI" to CopyLinkUriOutput(FakeAppleMapsNavigationLink),
-                "COPY_APPLE_MAPS_URI" to CopyLinkUriOutput(FakeAppleMapsDisplayLink),
-                "COPY_COORDS_DEC" to CopyCoordsDecOutput,
-                "COPY_COORDS_NSWE_DEC" to CopyCoordsDegMinSecOutput,
-                "COPY_GEO_URI" to CopyGeoUriOutput,
-                "COPY_GOOGLE_MAPS_NAVIGATE_TO_URI" to CopyLinkUriOutput(FakeGoogleMapsNavigationLink),
-                "COPY_GOOGLE_MAPS_STREET_VIEW_URI" to CopyLinkUriOutput(FakeGoogleMapsStreetViewLink),
-                "COPY_GOOGLE_MAPS_URI" to CopyLinkUriOutput(FakeGoogleMapsDisplayLink),
-                "COPY_MAGIC_EARTH_NAVIGATE_TO_URI" to CopyLinkUriOutput(FakeMagicEarthNavigationLink),
-                "COPY_MAGIC_EARTH_URI" to CopyLinkUriOutput(FakeMagicEarthDisplayLink),
-                "NOOP" to NoopOutput,
-                "OPEN_APP" to OpenDisplayGeoUriOutput(TEST_PACKAGE_NAME),
-                "OPEN_APP_GOOGLE_MAPS_NAVIGATE_TO" to OpenNavigationGoogleUriOutput(TEST_PACKAGE_NAME),
-                "OPEN_APP_GOOGLE_MAPS_STREET_VIEW" to OpenStreetViewGoogleUriOutput(TEST_PACKAGE_NAME),
-                "OPEN_APP_GPX_ROUTE" to OpenRouteOnePointGpxOutput(TEST_PACKAGE_NAME),
-                "OPEN_APP_MAGIC_EARTH_NAVIGATE_TO" to OpenNavigationMagicEarthUriOutput(TEST_PACKAGE_NAME),
-                "SAVE_GPX" to SavePointsGpxOutput,
-                "SHARE" to ShareDisplayGeoUriOutput,
-                "SHARE_GPX_ROUTE" to ShareRouteGpxOutput,
+            for ((testOldAutomationType, expectedAutomation) in mapOf(
+                "COPY_APPLE_MAPS_NAVIGATE_TO_URI" to CopyLinkUriAutomation(UUID.fromString("a5092c63-cf5c-4225-9059-e888ae12e215")),
+                "COPY_APPLE_MAPS_URI" to CopyLinkUriAutomation(UUID.fromString("ce900ea1-2c5d-4641-82f3-a5429a68d603")),
+                "COPY_COORDS_DEC" to CopyCoordsDecAutomation,
+                "COPY_COORDS_NSWE_DEC" to CopyCoordsDegMinSecAutomation,
+                "COPY_GEO_URI" to CopyGeoUriAutomation,
+                "COPY_GOOGLE_MAPS_NAVIGATE_TO_URI" to CopyLinkUriAutomation(UUID.fromString("64b0b360-24ec-4113-9056-314223c6e19a")),
+                "COPY_GOOGLE_MAPS_STREET_VIEW_URI" to CopyLinkUriAutomation(UUID.fromString("9d7cd113-ce01-4b8b-82fe-856956b8b20a")),
+                "COPY_GOOGLE_MAPS_URI" to CopyLinkUriAutomation(UUID.fromString("7bd96da4-beba-4a30-9dbd-b437a49a1dc0")),
+                "COPY_MAGIC_EARTH_NAVIGATE_TO_URI" to CopyLinkUriAutomation(UUID.fromString("ee4f961c-44b0-4cb6-baad-1ed28edb8ec7")),
+                "COPY_MAGIC_EARTH_URI" to CopyLinkUriAutomation(UUID.fromString("b109970a-aef8-4482-9879-52e128fd0e07")),
+                "NOOP" to NoopAutomation,
+                "OPEN_APP" to OpenDisplayGeoUriAutomation(TEST_PACKAGE_NAME),
+                "OPEN_APP_GOOGLE_MAPS_NAVIGATE_TO" to OpenNavigationGoogleUriAutomation(TEST_PACKAGE_NAME),
+                "OPEN_APP_GOOGLE_MAPS_STREET_VIEW" to OpenStreetViewGoogleUriAutomation(TEST_PACKAGE_NAME),
+                "OPEN_APP_GPX_ROUTE" to OpenRouteOnePointGpxAutomation(TEST_PACKAGE_NAME),
+                "OPEN_APP_MAGIC_EARTH_NAVIGATE_TO" to OpenNavigationMagicEarthUriAutomation(TEST_PACKAGE_NAME),
+                "SAVE_GPX" to SavePointsGpxAutomation,
+                "SHARE" to ShareDisplayGeoUriAutomation,
+                "SHARE_GPX_ROUTE" to ShareRouteGpxAutomation,
             )) {
                 assertEquals(
                     expectedAutomation,
-                    AutomationPreference
-                        .getValue(
-                            preferencesOf(
-                                stringPreferencesKey("automation") to testOldOutputType,
-                                stringPreferencesKey("automation_package_name") to TEST_PACKAGE_NAME,
-                            ),
-                            log = FakeLog,
-                        )
-                        .toOutput {
-                            when (it) {
-                                UUID.fromString("ce900ea1-2c5d-4641-82f3-a5429a68d603") -> FakeAppleMapsDisplayLink
-                                UUID.fromString("a5092c63-cf5c-4225-9059-e888ae12e215") -> FakeAppleMapsNavigationLink
-                                UUID.fromString("7bd96da4-beba-4a30-9dbd-b437a49a1dc0") -> FakeGoogleMapsDisplayLink
-                                UUID.fromString("64b0b360-24ec-4113-9056-314223c6e19a") -> FakeGoogleMapsNavigationLink
-                                UUID.fromString("9d7cd113-ce01-4b8b-82fe-856956b8b20a") -> FakeGoogleMapsStreetViewLink
-                                UUID.fromString("b109970a-aef8-4482-9879-52e128fd0e07") -> FakeMagicEarthDisplayLink
-                                UUID.fromString("ee4f961c-44b0-4cb6-baad-1ed28edb8ec7") -> FakeMagicEarthNavigationLink
-                                else -> null
-                            }
-                        },
+                    AutomationPreference.getValue(
+                        preferencesOf(
+                            stringPreferencesKey("automation") to testOldAutomationType,
+                            stringPreferencesKey("automation_package_name") to TEST_PACKAGE_NAME,
+                        ),
+                        log = FakeLog,
+                    ),
                 )
             }
         }

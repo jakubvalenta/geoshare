@@ -110,7 +110,7 @@ object SaveRouteGpxAutomation : Automation
 
 @Serializable
 @SerialName("SHARE")
-object ShareDisplayUriAutomation : Automation
+object ShareDisplayGeoUriAutomation : Automation
 
 @Serializable
 @SerialName("SHARE_LINK_URI")

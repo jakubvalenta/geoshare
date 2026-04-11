@@ -27,7 +27,7 @@ import page.ooooo.geoshare.data.local.preferences.OpenStreetViewGoogleUriAutomat
 import page.ooooo.geoshare.data.local.preferences.SavePointGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.SaveRouteGpxAutomation
-import page.ooooo.geoshare.data.local.preferences.ShareDisplayUriAutomation
+import page.ooooo.geoshare.data.local.preferences.ShareDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareLinkUriAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareNavigationGoogleUriAutomation
 import page.ooooo.geoshare.data.local.preferences.SharePointsGpxAutomation
@@ -254,7 +254,7 @@ class OutputRepository @Inject constructor(
             is SaveRouteGpxAutomation ->
                 SaveRouteGpxOutput(gpxFormatter)
 
-            is ShareDisplayUriAutomation ->
+            is ShareDisplayGeoUriAutomation ->
                 ShareDisplayGeoUriOutput(geoUriFormatter)
 
             is ShareLinkUriAutomation ->

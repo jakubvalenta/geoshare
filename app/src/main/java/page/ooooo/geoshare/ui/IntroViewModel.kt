@@ -22,7 +22,7 @@ class IntroViewModel @Inject constructor(
             .map { values -> values.introShownForVersionCode != IntroShowForVersionCodePreference.default }
             .stateIn(
                 viewModelScope,
-                SharingStarted.Companion.WhileSubscribed(5000),
+                SharingStarted.WhileSubscribed(5000),
                 true,
             )
 

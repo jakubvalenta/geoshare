@@ -8,8 +8,8 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.point.BD09MCPoint
 import page.ooooo.geoshare.lib.point.Source
 
-class BaiduMapInputTest : BaseInputTest() {
-    override val input = BaiduMapInput
+class BaiduMapInputTest : InputTest {
+    override val input = BaiduMapInput()
 
     @Test
     fun uriPattern_fullUrl() {

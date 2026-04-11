@@ -8,8 +8,8 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 
-class MapsMeInputTest : BaseInputTest() {
-    override val input = MapsMeInput
+class MapsMeInputTest : InputTest {
+    override val input = MapsMeInput()
 
     @Test
     fun uriPattern_shortUrl() {

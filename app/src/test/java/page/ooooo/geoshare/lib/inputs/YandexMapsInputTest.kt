@@ -1,16 +1,25 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.Context
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.kotlin.mock
+import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.point.CoordinateConverter
 import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 
-class YandexMapsInputTest : BaseInputTest() {
-    override val input = YandexMapsInput
+class YandexMapsInputTest : InputTest {
+    private val mockContext: Context = mock {}
+    private val chinaGeometry = ChinaGeometry(mockContext)
+    private val coordinateConverter = CoordinateConverter(chinaGeometry)
+    private val uriFormatter = UriFormatter(coordinateConverter)
+    override val input = YandexMapsInput(uriFormatter)
 
     @Test
     fun uriPattern_fullUrl() {

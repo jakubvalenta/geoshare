@@ -1,7 +1,10 @@
 package page.ooooo.geoshare.data
 
-import org.junit.Assert
+import android.content.Context
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeAppleMapsDisplayLink
 import page.ooooo.geoshare.data.di.FakeAppleMapsNavigationLink
 import page.ooooo.geoshare.data.di.FakeGoogleMapsDisplayLink
@@ -13,15 +16,42 @@ import page.ooooo.geoshare.data.di.FakeOpenStreetMapDisplayLink
 import page.ooooo.geoshare.data.di.FakeOpenStreetMapNavigationLink
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.local.database.Link
+import page.ooooo.geoshare.data.local.database.findByUUID
+import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
+import page.ooooo.geoshare.data.local.preferences.CopyCoordsDegMinSecAutomation
+import page.ooooo.geoshare.data.local.preferences.CopyGeoUriAutomation
+import page.ooooo.geoshare.data.local.preferences.CopyLinkUriAutomation
+import page.ooooo.geoshare.data.local.preferences.NoopAutomation
+import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation
+import page.ooooo.geoshare.data.local.preferences.OpenDisplayMagicEarthUriAutomation
+import page.ooooo.geoshare.data.local.preferences.OpenNavigationMagicEarthUriAutomation
+import page.ooooo.geoshare.data.local.preferences.OpenRouteOnePointGpxAutomation
+import page.ooooo.geoshare.data.local.preferences.SavePointGpxAutomation
+import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
+import page.ooooo.geoshare.data.local.preferences.SaveRouteGpxAutomation
+import page.ooooo.geoshare.data.local.preferences.ShareDisplayGeoUriAutomation
+import page.ooooo.geoshare.data.local.preferences.ShareLinkUriAutomation
+import page.ooooo.geoshare.data.local.preferences.ShareNavigationGoogleUriAutomation
+import page.ooooo.geoshare.data.local.preferences.SharePointsGpxAutomation
+import page.ooooo.geoshare.data.local.preferences.ShareRouteGpxAutomation
+import page.ooooo.geoshare.data.local.preferences.ShareStreetViewGoogleUriAutomation
 import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.MAGIC_EARTH_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.TEST_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
+import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
+import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
+import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
+import page.ooooo.geoshare.lib.formatters.GpxFormatter
+import page.ooooo.geoshare.lib.formatters.MagicEarthUriFormatter
+import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.ChinaGeometry
 import page.ooooo.geoshare.lib.outputs.CopyCoordsDecOutput
 import page.ooooo.geoshare.lib.outputs.CopyCoordsDegMinSecOutput
 import page.ooooo.geoshare.lib.outputs.CopyGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.CopyLinkUriOutput
+import page.ooooo.geoshare.lib.outputs.NoopOutput
 import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.OpenDisplayMagicEarthUriOutput
 import page.ooooo.geoshare.lib.outputs.OpenNavigationGoogleUriOutput
@@ -39,25 +69,44 @@ import page.ooooo.geoshare.lib.outputs.ShareNavigationGoogleUriOutput
 import page.ooooo.geoshare.lib.outputs.SharePointsGpxOutput
 import page.ooooo.geoshare.lib.outputs.ShareRouteGpxOutput
 import page.ooooo.geoshare.lib.outputs.ShareStreetViewGoogleUriOutput
+import page.ooooo.geoshare.lib.point.CoordinateConverter
 
 class OutputRepositoryTest {
+    private val mockContext: Context = mock {}
+    private val chinaGeometry = ChinaGeometry(mockContext)
+    private val coordinateConverter = CoordinateConverter(chinaGeometry)
+    private val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+    private val geoUriFormatter = GeoUriFormatter(coordinateConverter)
+    private val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
+    private val gpxFormatter = GpxFormatter(coordinateConverter)
+    private val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
+    private val uriFormatter = UriFormatter(coordinateConverter)
+    private val outputRepository = OutputRepository(
+        coordinateFormatter = coordinateFormatter,
+        geoUriFormatter = geoUriFormatter,
+        googleMapsUriFormatter = googleMapsUriFormatter,
+        gpxFormatter = gpxFormatter,
+        magicEarthUriFormatter = magicEarthUriFormatter,
+        uriFormatter = uriFormatter,
+    )
+
     @Test
     fun getOutputsForPoint_returnsOutputsThatDoNotRequirePackageName() {
-        Assert.assertEquals(
+        assertEquals(
             listOf(
-                CopyCoordsDecOutput(coordsFormat),
-                CopyCoordsDegMinSecOutput(coordsFormat),
-                CopyGeoUriOutput(geoUriFormat),
-                CopyLinkUriOutput(FakeAppleMapsDisplayLink, uriStringFormat),
-                CopyLinkUriOutput(FakeAppleMapsNavigationLink, uriStringFormat),
-                CopyLinkUriOutput(FakeGoogleMapsDisplayLink, uriStringFormat),
-                CopyLinkUriOutput(FakeGoogleMapsNavigationLink, uriStringFormat),
-                CopyLinkUriOutput(FakeOpenStreetMapDisplayLink, uriStringFormat),
-                CopyLinkUriOutput(FakeOpenStreetMapNavigationLink, uriStringFormat),
-                ShareDisplayGeoUriOutput(geoUriFormat),
-                ShareNavigationGoogleUriOutput(googleMapsUriFormat),
-                ShareStreetViewGoogleUriOutput(googleMapsUriFormat),
-                SavePointGpxOutput(gpxFormat),
+                CopyCoordsDecOutput(coordinateFormatter),
+                CopyCoordsDegMinSecOutput(coordinateFormatter),
+                CopyGeoUriOutput(geoUriFormatter),
+                CopyLinkUriOutput(FakeAppleMapsDisplayLink, uriFormatter),
+                CopyLinkUriOutput(FakeAppleMapsNavigationLink, uriFormatter),
+                CopyLinkUriOutput(FakeGoogleMapsDisplayLink, uriFormatter),
+                CopyLinkUriOutput(FakeGoogleMapsNavigationLink, uriFormatter),
+                CopyLinkUriOutput(FakeOpenStreetMapDisplayLink, uriFormatter),
+                CopyLinkUriOutput(FakeOpenStreetMapNavigationLink, uriFormatter),
+                ShareDisplayGeoUriOutput(geoUriFormatter),
+                ShareNavigationGoogleUriOutput(googleMapsUriFormatter),
+                ShareStreetViewGoogleUriOutput(googleMapsUriFormatter),
+                SavePointGpxOutput(gpxFormatter),
             ),
             outputRepository.getOutputsForPoint(defaultFakeLinks),
         )
@@ -65,12 +114,12 @@ class OutputRepositoryTest {
 
     @Test
     fun getOutputsForPoints_returnsOutputsThatDoNotRequirePackageName() {
-        Assert.assertEquals(
+        assertEquals(
             listOf(
-                ShareRouteGpxOutput(gpxFormat),
-                SharePointsGpxOutput(gpxFormat),
-                SaveRouteGpxOutput(gpxFormat),
-                SavePointsGpxOutput(gpxFormat),
+                ShareRouteGpxOutput(gpxFormatter),
+                SharePointsGpxOutput(gpxFormatter),
+                SaveRouteGpxOutput(gpxFormatter),
+                SavePointsGpxOutput(gpxFormatter),
             ),
             outputRepository.getOutputsForPoints(),
         )
@@ -78,24 +127,24 @@ class OutputRepositoryTest {
 
     @Test
     fun getOutputsForApps_returnOutputsThatSupportPassedPackageNamesAndDataTypes() {
-        Assert.assertEquals(
+        assertEquals(
             mapOf(
                 TEST_PACKAGE_NAME to listOf(
-                    OpenDisplayGeoUriOutput(TEST_PACKAGE_NAME, geoUriFormat)
+                    OpenDisplayGeoUriOutput(TEST_PACKAGE_NAME, geoUriFormatter)
                 ),
                 GOOGLE_MAPS_PACKAGE_NAME to listOf(
-                    OpenDisplayGeoUriOutput(GOOGLE_MAPS_PACKAGE_NAME, geoUriFormat),
-                    OpenNavigationGoogleUriOutput(GOOGLE_MAPS_PACKAGE_NAME, googleMapsUriFormat),
-                    OpenStreetViewGoogleUriOutput(GOOGLE_MAPS_PACKAGE_NAME, googleMapsUriFormat),
-                    OpenRouteGpxOutput(GOOGLE_MAPS_PACKAGE_NAME, gpxFormat),
-                    OpenPointsGpxOutput(GOOGLE_MAPS_PACKAGE_NAME, gpxFormat),
+                    OpenDisplayGeoUriOutput(GOOGLE_MAPS_PACKAGE_NAME, geoUriFormatter),
+                    OpenNavigationGoogleUriOutput(GOOGLE_MAPS_PACKAGE_NAME, googleMapsUriFormatter),
+                    OpenStreetViewGoogleUriOutput(GOOGLE_MAPS_PACKAGE_NAME, googleMapsUriFormatter),
+                    OpenRouteGpxOutput(GOOGLE_MAPS_PACKAGE_NAME, gpxFormatter),
+                    OpenPointsGpxOutput(GOOGLE_MAPS_PACKAGE_NAME, gpxFormatter),
                 ),
                 MAGIC_EARTH_PACKAGE_NAME to listOf(
-                    OpenDisplayMagicEarthUriOutput(MAGIC_EARTH_PACKAGE_NAME, magicEarthUriFormat),
-                    OpenNavigationMagicEarthUriOutput(MAGIC_EARTH_PACKAGE_NAME, magicEarthUriFormat),
+                    OpenDisplayMagicEarthUriOutput(MAGIC_EARTH_PACKAGE_NAME, magicEarthUriFormatter),
+                    OpenNavigationMagicEarthUriOutput(MAGIC_EARTH_PACKAGE_NAME, magicEarthUriFormatter),
                 ),
                 TOMTOM_PACKAGE_NAME to listOf(
-                    OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME, gpxFormat),
+                    OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME, gpxFormatter),
                 ),
                 "${TEST_PACKAGE_NAME}.empty" to emptyList(),
             ),
@@ -119,13 +168,13 @@ class OutputRepositoryTest {
 
     @Test
     fun getOutputsForApps_doesNotReturnOutputsForHiddenApps() {
-        Assert.assertEquals(
+        assertEquals(
             mapOf(
                 TEST_PACKAGE_NAME to listOf(
-                    OpenDisplayGeoUriOutput(TEST_PACKAGE_NAME, geoUriFormat)
+                    OpenDisplayGeoUriOutput(TEST_PACKAGE_NAME, geoUriFormatter)
                 ),
                 TOMTOM_PACKAGE_NAME to listOf(
-                    OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME, gpxFormat),
+                    OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME, gpxFormatter),
                 ),
             ),
             outputRepository.getOutputsForApps(
@@ -145,13 +194,13 @@ class OutputRepositoryTest {
 
     @Test
     fun getOutputsForSharing_returnsOutputsThatSupportHardCodedDataTypes() {
-        Assert.assertEquals(
+        assertEquals(
             listOf(
-                ShareDisplayGeoUriOutput(geoUriFormat),
-                ShareNavigationGoogleUriOutput(googleMapsUriFormat),
-                ShareStreetViewGoogleUriOutput(googleMapsUriFormat),
-                ShareRouteGpxOutput(gpxFormat),
-                SharePointsGpxOutput(gpxFormat),
+                ShareDisplayGeoUriOutput(geoUriFormatter),
+                ShareNavigationGoogleUriOutput(googleMapsUriFormatter),
+                ShareStreetViewGoogleUriOutput(googleMapsUriFormatter),
+                ShareRouteGpxOutput(gpxFormatter),
+                SharePointsGpxOutput(gpxFormatter),
             ),
             outputRepository.getOutputsForSharing(),
         )
@@ -159,33 +208,33 @@ class OutputRepositoryTest {
 
     @Test
     fun getOutputsForLinks_returnsOutputsForAllPassedLinks() {
-        Assert.assertEquals(
+        assertEquals(
             mapOf(
                 "Google Maps" to listOf(
-                    ShareLinkUriOutput(FakeGoogleMapsDisplayLink, uriStringFormat),
-                    ShareLinkUriOutput(FakeGoogleMapsNavigationLink, uriStringFormat),
-                    ShareLinkUriOutput(FakeGoogleMapsStreetViewLink, uriStringFormat),
-                    CopyLinkUriOutput(FakeGoogleMapsDisplayLink, uriStringFormat),
-                    CopyLinkUriOutput(FakeGoogleMapsNavigationLink, uriStringFormat),
-                    CopyLinkUriOutput(FakeGoogleMapsStreetViewLink, uriStringFormat),
+                    ShareLinkUriOutput(FakeGoogleMapsDisplayLink, uriFormatter),
+                    ShareLinkUriOutput(FakeGoogleMapsNavigationLink, uriFormatter),
+                    ShareLinkUriOutput(FakeGoogleMapsStreetViewLink, uriFormatter),
+                    CopyLinkUriOutput(FakeGoogleMapsDisplayLink, uriFormatter),
+                    CopyLinkUriOutput(FakeGoogleMapsNavigationLink, uriFormatter),
+                    CopyLinkUriOutput(FakeGoogleMapsStreetViewLink, uriFormatter),
                 ),
                 "Apple Maps" to listOf(
-                    ShareLinkUriOutput(FakeAppleMapsDisplayLink, uriStringFormat),
-                    ShareLinkUriOutput(FakeAppleMapsNavigationLink, uriStringFormat),
-                    CopyLinkUriOutput(FakeAppleMapsDisplayLink, uriStringFormat),
-                    CopyLinkUriOutput(FakeAppleMapsNavigationLink, uriStringFormat),
+                    ShareLinkUriOutput(FakeAppleMapsDisplayLink, uriFormatter),
+                    ShareLinkUriOutput(FakeAppleMapsNavigationLink, uriFormatter),
+                    CopyLinkUriOutput(FakeAppleMapsDisplayLink, uriFormatter),
+                    CopyLinkUriOutput(FakeAppleMapsNavigationLink, uriFormatter),
                 ),
                 "Magic Earth" to listOf(
-                    ShareLinkUriOutput(FakeMagicEarthDisplayLink, uriStringFormat),
-                    ShareLinkUriOutput(FakeMagicEarthNavigationLink, uriStringFormat),
-                    CopyLinkUriOutput(FakeMagicEarthDisplayLink, uriStringFormat),
-                    CopyLinkUriOutput(FakeMagicEarthNavigationLink, uriStringFormat),
+                    ShareLinkUriOutput(FakeMagicEarthDisplayLink, uriFormatter),
+                    ShareLinkUriOutput(FakeMagicEarthNavigationLink, uriFormatter),
+                    CopyLinkUriOutput(FakeMagicEarthDisplayLink, uriFormatter),
+                    CopyLinkUriOutput(FakeMagicEarthNavigationLink, uriFormatter),
                 ),
                 "OpenStreetMap" to listOf(
-                    ShareLinkUriOutput(FakeOpenStreetMapDisplayLink, uriStringFormat),
-                    ShareLinkUriOutput(FakeOpenStreetMapNavigationLink, uriStringFormat),
-                    CopyLinkUriOutput(FakeOpenStreetMapDisplayLink, uriStringFormat),
-                    CopyLinkUriOutput(FakeOpenStreetMapNavigationLink, uriStringFormat),
+                    ShareLinkUriOutput(FakeOpenStreetMapDisplayLink, uriFormatter),
+                    ShareLinkUriOutput(FakeOpenStreetMapNavigationLink, uriFormatter),
+                    CopyLinkUriOutput(FakeOpenStreetMapDisplayLink, uriFormatter),
+                    CopyLinkUriOutput(FakeOpenStreetMapNavigationLink, uriFormatter),
                 ),
             ),
             outputRepository.getOutputsForLinks(defaultFakeLinks),
@@ -212,17 +261,17 @@ class OutputRepositoryTest {
             appEnabled = true,
             coordsUriTemplate = "https://www.example.com/second/{lat}/{lon}",
         )
-        Assert.assertEquals(
+        assertEquals(
             mapOf(
                 "first" to listOf(
-                    ShareLinkUriOutput(linkInFirstGroupWithoutExplicitGroup, uriStringFormat),
-                    ShareLinkUriOutput(linkInFirstGroup, uriStringFormat),
-                    CopyLinkUriOutput(linkInFirstGroupWithoutExplicitGroup, uriStringFormat),
-                    CopyLinkUriOutput(linkInFirstGroup, uriStringFormat),
+                    ShareLinkUriOutput(linkInFirstGroupWithoutExplicitGroup, uriFormatter),
+                    ShareLinkUriOutput(linkInFirstGroup, uriFormatter),
+                    CopyLinkUriOutput(linkInFirstGroupWithoutExplicitGroup, uriFormatter),
+                    CopyLinkUriOutput(linkInFirstGroup, uriFormatter),
                 ),
                 "second" to listOf(
-                    ShareLinkUriOutput(linkInSecondGroup, uriStringFormat),
-                    CopyLinkUriOutput(linkInSecondGroup, uriStringFormat),
+                    ShareLinkUriOutput(linkInSecondGroup, uriFormatter),
+                    CopyLinkUriOutput(linkInSecondGroup, uriFormatter),
                 ),
             ),
             outputRepository.getOutputsForLinks(
@@ -237,11 +286,11 @@ class OutputRepositoryTest {
 
     @Test
     fun getOutputsForPointChips_returnsHardCodedOutputs() {
-        Assert.assertEquals(
+        assertEquals(
             listOf(
-                CopyGeoUriOutput(geoUriFormat),
-                CopyLinkUriOutput(FakeGoogleMapsDisplayLink, uriStringFormat),
-                CopyLinkUriOutput(FakeOpenStreetMapDisplayLink, uriStringFormat),
+                CopyGeoUriOutput(geoUriFormatter),
+                CopyLinkUriOutput(FakeGoogleMapsDisplayLink, uriFormatter),
+                CopyLinkUriOutput(FakeOpenStreetMapDisplayLink, uriFormatter),
             ),
             outputRepository.getOutputsForPointChips(defaultFakeLinks),
         )
@@ -249,13 +298,116 @@ class OutputRepositoryTest {
 
     @Test
     fun getOutputsForPointsChips_returnsHardCodedOutputs() {
-        Assert.assertEquals(
+        assertEquals(
             listOf(
-                ShareRouteGpxOutput(gpxFormat),
-                SaveRouteGpxOutput(gpxFormat),
-                SavePointsGpxOutput(gpxFormat),
+                ShareRouteGpxOutput(gpxFormatter),
+                SaveRouteGpxOutput(gpxFormatter),
+                SavePointsGpxOutput(gpxFormatter),
             ),
             outputRepository.getOutputsForPointsChips(),
+        )
+    }
+
+    @Test
+    fun getAutomationOutput_convertsAllAutomationsToOutputs() = runTest {
+        assertEquals(
+            listOf(
+                listOf(
+                    NoopOutput(),
+                ),
+                listOf(
+                    CopyCoordsDecOutput(coordinateFormatter),
+                    CopyCoordsDegMinSecOutput(coordinateFormatter),
+                    CopyGeoUriOutput(geoUriFormatter),
+                    ShareDisplayGeoUriOutput(geoUriFormatter),
+                    ShareNavigationGoogleUriOutput(googleMapsUriFormatter),
+                    ShareStreetViewGoogleUriOutput(googleMapsUriFormatter),
+                    SavePointGpxOutput(gpxFormatter),
+                ),
+                listOf(
+                    ShareRouteGpxOutput(gpxFormatter),
+                    SharePointsGpxOutput(gpxFormatter),
+                    SaveRouteGpxOutput(gpxFormatter),
+                    SavePointsGpxOutput(gpxFormatter),
+                ),
+                listOf(
+                    OpenDisplayMagicEarthUriOutput(MAGIC_EARTH_PACKAGE_NAME, magicEarthUriFormatter),
+                    OpenNavigationMagicEarthUriOutput(MAGIC_EARTH_PACKAGE_NAME, magicEarthUriFormatter),
+                    OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME, gpxFormatter),
+                    OpenDisplayGeoUriOutput(TEST_PACKAGE_NAME, geoUriFormatter),
+                    ShareLinkUriOutput(FakeAppleMapsDisplayLink, uriFormatter),
+                    ShareLinkUriOutput(FakeAppleMapsNavigationLink, uriFormatter),
+                    CopyLinkUriOutput(FakeAppleMapsDisplayLink, uriFormatter),
+                    CopyLinkUriOutput(FakeAppleMapsNavigationLink, uriFormatter),
+                    ShareLinkUriOutput(FakeGoogleMapsDisplayLink, uriFormatter),
+                    ShareLinkUriOutput(FakeGoogleMapsNavigationLink, uriFormatter),
+                    ShareLinkUriOutput(FakeGoogleMapsStreetViewLink, uriFormatter),
+                    CopyLinkUriOutput(FakeGoogleMapsDisplayLink, uriFormatter),
+                    CopyLinkUriOutput(FakeGoogleMapsNavigationLink, uriFormatter),
+                    CopyLinkUriOutput(FakeGoogleMapsStreetViewLink, uriFormatter),
+                    ShareLinkUriOutput(FakeMagicEarthDisplayLink, uriFormatter),
+                    ShareLinkUriOutput(FakeMagicEarthNavigationLink, uriFormatter),
+                    CopyLinkUriOutput(FakeMagicEarthDisplayLink, uriFormatter),
+                    CopyLinkUriOutput(FakeMagicEarthNavigationLink, uriFormatter),
+                    ShareLinkUriOutput(FakeOpenStreetMapDisplayLink, uriFormatter),
+                    ShareLinkUriOutput(FakeOpenStreetMapNavigationLink, uriFormatter),
+                    CopyLinkUriOutput(FakeOpenStreetMapDisplayLink, uriFormatter),
+                    CopyLinkUriOutput(FakeOpenStreetMapNavigationLink, uriFormatter),
+                ),
+            ),
+            listOf(
+                listOf(
+                    NoopAutomation,
+                ),
+                listOf(
+                    CopyCoordsDecAutomation,
+                    CopyCoordsDegMinSecAutomation,
+                    CopyGeoUriAutomation,
+                    ShareDisplayGeoUriAutomation,
+                    ShareNavigationGoogleUriAutomation,
+                    ShareStreetViewGoogleUriAutomation,
+                    SavePointGpxAutomation,
+                ),
+                listOf(
+                    ShareRouteGpxAutomation,
+                    SharePointsGpxAutomation,
+                    SaveRouteGpxAutomation,
+                    SavePointsGpxAutomation,
+                ),
+                listOf(
+                    OpenDisplayMagicEarthUriAutomation(MAGIC_EARTH_PACKAGE_NAME),
+                    OpenNavigationMagicEarthUriAutomation(MAGIC_EARTH_PACKAGE_NAME),
+                    OpenRouteOnePointGpxAutomation(TOMTOM_PACKAGE_NAME),
+                    OpenDisplayGeoUriAutomation(TEST_PACKAGE_NAME),
+                ),
+                listOf(
+                    ShareLinkUriAutomation(FakeAppleMapsDisplayLink.uuid),
+                    ShareLinkUriAutomation(FakeAppleMapsNavigationLink.uuid),
+                    CopyLinkUriAutomation(FakeAppleMapsDisplayLink.uuid),
+                    CopyLinkUriAutomation(FakeAppleMapsNavigationLink.uuid),
+                    ShareLinkUriAutomation(FakeGoogleMapsDisplayLink.uuid),
+                    ShareLinkUriAutomation(FakeGoogleMapsNavigationLink.uuid),
+                    ShareLinkUriAutomation(FakeGoogleMapsStreetViewLink.uuid),
+                    CopyLinkUriAutomation(FakeGoogleMapsDisplayLink.uuid),
+                    CopyLinkUriAutomation(FakeGoogleMapsNavigationLink.uuid),
+                    CopyLinkUriAutomation(FakeGoogleMapsStreetViewLink.uuid),
+                    ShareLinkUriAutomation(FakeMagicEarthDisplayLink.uuid),
+                    ShareLinkUriAutomation(FakeMagicEarthNavigationLink.uuid),
+                    CopyLinkUriAutomation(FakeMagicEarthDisplayLink.uuid),
+                    CopyLinkUriAutomation(FakeMagicEarthNavigationLink.uuid),
+                    ShareLinkUriAutomation(FakeOpenStreetMapDisplayLink.uuid),
+                    ShareLinkUriAutomation(FakeOpenStreetMapNavigationLink.uuid),
+                    CopyLinkUriAutomation(FakeOpenStreetMapDisplayLink.uuid),
+                    CopyLinkUriAutomation(FakeOpenStreetMapNavigationLink.uuid),
+                ),
+            ).map { group ->
+                group.map { automation ->
+                    outputRepository.getAutomationOutput(
+                        automation = automation,
+                        getLinkByUUID = { defaultFakeLinks.findByUUID(it) },
+                    )
+                }
+            },
         )
     }
 }

@@ -1,16 +1,25 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.Context
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.kotlin.mock
+import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.point.CoordinateConverter
 import page.ooooo.geoshare.lib.point.GCJ02Point
 import page.ooooo.geoshare.lib.point.Source
 
-class AmapInputTest : BaseInputTest() {
-    override val input = AmapInput
+class AmapInputTest : InputTest {
+    private val mockContext: Context = mock {}
+    private val chinaGeometry = ChinaGeometry(mockContext)
+    private val coordinateConverter = CoordinateConverter(chinaGeometry)
+    private val uriFormatter = UriFormatter(coordinateConverter)
+    override val input = AmapInput(uriFormatter)
 
     @Test
     fun uriPattern_fullUrlInsideChina() {
