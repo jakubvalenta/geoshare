@@ -28,7 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.lbt05.evil_transform.TransformUtil.outOfChina
+import com.lbt05.evil_transform.TransformUtil
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
@@ -130,7 +130,7 @@ fun ResultSuccessCoordinates(
             lastPoint !is WGS84Point &&
             lastPoint.lat?.let { lat ->
                 lastPoint.lon?.let { lon ->
-                    outOfChina(lon, lat)
+                    TransformUtil.outOfChina(lon, lat)
                 }
             } == false
         ) {

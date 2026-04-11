@@ -15,6 +15,7 @@ import androidx.test.uiautomator.onElement
 import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
+import com.lbt05.evil_transform.TransformUtil
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.head
@@ -34,10 +35,12 @@ import page.ooooo.geoshare.lib.network.NetworkTools.Companion.REQUEST_TIMEOUT
 import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
-import page.ooooo.geoshare.lib.geo.quickIsPointInChina
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
+import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 import java.net.InetAddress
@@ -206,6 +209,11 @@ interface BehaviorTest {
         expectedPoints: Points,
         timeoutMs: Long = NETWORK_TIMEOUT,
     ) {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val chinaGeometry = ChinaGeometry(context)
+        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+
         onElement(timeoutMs) {
             when (viewIdResourceName) {
                 "geoShareResultSuccessLastPointName" -> true
@@ -246,8 +254,8 @@ interface BehaviorTest {
             ?.let { point ->
                 CoordinateFormat.entries.map { coordinateFormat ->
                     when (coordinateFormat) {
-                        CoordinateFormat.DEC -> CoordinateFormatter.formatDecCoords(point)
-                        CoordinateFormat.DEG_MIN_SEC -> CoordinateFormatter.formatDegMinSecCoords(point)
+                        CoordinateFormat.DEC -> coordinateFormatter.formatDecCoords(point)
+                        CoordinateFormat.DEG_MIN_SEC -> coordinateFormatter.formatDegMinSecCoords(point)
                     }
                 }
             }
@@ -269,9 +277,9 @@ interface BehaviorTest {
             if ((lastPoint is GCJ02Point || lastPoint is BD09MCPoint) &&
                 lastPoint.lat?.let { lat ->
                     lastPoint.lon?.let { lon ->
-                        quickIsPointInChina(lon, lat)
+                        TransformUtil.outOfChina(lon, lat)
                     }
-                } == true
+                } == false
             ) {
                 onElement { viewIdResourceName == "geoShareResultSuccessLastPointCheckSRS" }
             } else if (expectedSource == Source.JAVASCRIPT) {

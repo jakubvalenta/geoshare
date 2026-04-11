@@ -1,7 +1,7 @@
 package page.ooooo.geoshare.lib.geo
 
 import androidx.compose.runtime.Immutable
-import com.lbt05.evil_transform.TransformUtil.outOfChina
+import com.lbt05.evil_transform.TransformUtil
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.extensions.toTrimmedString
 import kotlin.random.Random
@@ -27,7 +27,7 @@ sealed interface Point {
         ): Point {
             val lat = Random.nextDouble(minLat, maxLat).toScale(6)
             val lon = Random.nextDouble(minLon, maxLon).toScale(6)
-            return if (outOfChina(lon, lat)) {
+            return if (TransformUtil.outOfChina(lon, lat)) {
                 WGS84Point(lat, lon, z, name, source)
             } else {
                 GCJ02Point(lat, lon, z, name, source)

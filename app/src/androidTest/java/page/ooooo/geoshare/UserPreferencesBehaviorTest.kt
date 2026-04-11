@@ -1,6 +1,7 @@
 package page.ooooo.geoshare
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
@@ -13,6 +14,8 @@ import page.ooooo.geoshare.BehaviorTest.Companion.ELEMENT_DOES_NOT_EXIST_TIMEOUT
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
+import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
@@ -22,6 +25,11 @@ class UserPreferencesBehaviorTest : BehaviorTest {
 
     @Test
     fun whenCoordinateFormatIsSet_showsCoordinatesInThatFormat() = uiAutomator {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val chinaGeometry = ChinaGeometry(context)
+        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
+
         // Launch application and close intro
         launchApplication()
         closeIntro()
@@ -33,7 +41,7 @@ class UserPreferencesBehaviorTest : BehaviorTest {
         onElement {
             if (viewIdResourceName == "geoShareResultSuccessLastPointCoordinates") {
                 assertEquals(
-                    CoordinateFormatter.formatDecCoords(GCJ02Point(52.5067296, 13.2599309, source = Source.MAP_CENTER)),
+                    coordinateFormatter.formatDecCoords(GCJ02Point(52.5067296, 13.2599309, source = Source.MAP_CENTER)),
                     textAsString(),
                 )
                 true
@@ -52,12 +60,8 @@ class UserPreferencesBehaviorTest : BehaviorTest {
         onElement {
             if (viewIdResourceName == "geoShareResultSuccessLastPointCoordinates") {
                 assertEquals(
-                    CoordinateFormatter.formatDegMinSecCoords(
-                        GCJ02Point(
-                            52.5067296,
-                            13.2599309,
-                            source = Source.MAP_CENTER
-                        )
+                    coordinateFormatter.formatDegMinSecCoords(
+                        GCJ02Point(52.5067296, 13.2599309, source = Source.MAP_CENTER)
                     ),
                     textAsString(),
                 )
