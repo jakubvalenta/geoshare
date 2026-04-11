@@ -8,13 +8,14 @@ import org.junit.Test
 import page.ooooo.geoshare.NotEmulator
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class GoogleMapsInputBehaviorTest : InputBehaviorTest {
     @Test
     fun googleMaps() = uiAutomator {
         // Coordinates in data
         testUri(
-            GCJ02Point(
+            WGS84Point(
                 52.4083009,
                 16.929066199999998,
                 name = "Poznań Old Town, 61-001 Poznań, Poland",
@@ -31,13 +32,13 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
 
         // Coordinates and query (address)
         testUri(
-            GCJ02Point(40.785091, -73.968285, z = 15.0, name = "Central Park", source = Source.MAP_CENTER),
+            WGS84Point(40.785091, -73.968285, z = 15.0, name = "Central Park", source = Source.MAP_CENTER),
             "https://www.google.com/maps/place/Central+Park/@40.785091,-73.968285,15z",
         )
 
         // Coordinates and query (business)
         testUri(
-            GCJ02Point(
+            WGS84Point(
                 50.4484901, 8.0469828,
                 name = @Suppress("SpellCheckingInspection") "Änderungsschneiderei Hadamar, Schulstraße 3, 65589 Hadamar",
                 source = Source.MAP_CENTER,
@@ -49,17 +50,17 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
         // Directions
         testUri(
             persistentListOf(
-                GCJ02Point(
+                WGS84Point(
                     52.4858222, 13.4236883,
                     name = @Suppress("SpellCheckingInspection") "Hermannstraße 1, 12049 Berlin, Germany",
                     source = Source.URI,
                 ),
-                GCJ02Point(
+                WGS84Point(
                     52.4881038, 13.4255518,
                     name = @Suppress("SpellCheckingInspection") "Weserstr. 1, 12047 Berlin, Germany",
                     source = Source.URI,
                 ),
-                GCJ02Point(
+                WGS84Point(
                     52.4807739, 13.4300356,
                     name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany",
                     z = 16.0,
@@ -72,13 +73,13 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
 
         // Map center
         testUri(
-            GCJ02Point(52.5067296, 13.2599309, z = 11.0, name = "Berlin, Germany", source = Source.MAP_CENTER),
+            WGS84Point(52.5067296, 13.2599309, z = 11.0, name = "Berlin, Germany", source = Source.MAP_CENTER),
             "https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/",
         )
 
         // API
         testUri(
-            GCJ02Point(52.5067296, 13.2599309, source = Source.MAP_CENTER),
+            WGS84Point(52.5067296, 13.2599309, source = Source.MAP_CENTER),
             "https://www.google.com/maps?center=52.5067296,13.2599309",
         )
     }
@@ -96,7 +97,7 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
 
         // Search
         testUri(
-            GCJ02Point(
+            WGS84Point(
                 51.0657922, 13.7555827,
                 name = @Suppress("SpellCheckingInspection") "Louisenstraße 60, 01099 Dresden",
                 source = Source.URI,
@@ -106,7 +107,7 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
 
         // Short URI in Japan
         testUri(
-            GCJ02Point(34.5945482, 133.7583428, z = 17.0, name = "Steak no Don", source = Source.URI),
+            WGS84Point(34.5945482, 133.7583428, z = 17.0, name = "Steak no Don", source = Source.URI),
             "https://maps.app.goo.gl/mBtbC6qXLK2baGTV9",
         )
 
@@ -118,13 +119,13 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
 
         // Place
         testUri(
-            GCJ02Point(52.5200066, 13.404954, name = "Berlin", source = Source.URI),
+            WGS84Point(52.5200066, 13.404954, name = "Berlin", source = Source.URI),
             "https://www.google.com/maps/place/Berlin,+Germany/",
         )
 
         // Directions address
         testUri(
-            GCJ02Point(43.7481, -79.6332, name = "2088 Albion Rd @43.7481,-79.6332", source = Source.HTML),
+            WGS84Point(43.7481, -79.6332, name = "2088 Albion Rd @43.7481,-79.6332", source = Source.HTML),
             @Suppress("SpellCheckingInspection") "https://maps.google.com/maps?f=d&daddr=2088%20Albion%20Rd+@43.7481,-79.6332&doflg=ptm&navigate=yes",
         )
     }
