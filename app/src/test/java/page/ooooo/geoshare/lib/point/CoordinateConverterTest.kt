@@ -110,9 +110,10 @@ class CoordinateConverterTest {
 
     @Test
     fun toGCJ02China_whenPointIsWGS84AndWithinChinaNearCoast2_returnsGCJ02PointWithConvertedCoords() {
+        // TODO Improve china boundary to fix this point
         assumeTrue("This test currently fails, because Natural Earth 10m is not precise enough", false)
         assertEquals(
-            GCJ02ChinaPoint(30.60283, 122.12886, source = Source.GENERATED),
+            GCJ02ChinaPoint(30.600649446449268, 122.13324202346543, source = Source.GENERATED),
             coordinateConverter.toGCJ02China(WGS84Point(30.60283, 122.12886, source = Source.GENERATED)),
         )
     }
@@ -197,6 +198,28 @@ class CoordinateConverterTest {
             GCJ02Point(23.146380831856163, 113.30063234845544, 3.14, "foo bar", source = Source.GENERATED),
             coordinateConverter.toGCJ02(
                 BD09MCPoint(2633524.681382545, 12613424.449999997, 3.14, "foo bar", source = Source.GENERATED)
+            ),
+        )
+    }
+
+    @Test
+    fun toWGS84_whenPointsIsGCJ02ChinaAndOutsideChinaNearCoast_returnsWGS84PointWithConvertedCoordinates() {
+        assertEquals(
+            WGS84Point(37.33557037552849, 122.47663919001769, 3.14, "foo bar", source = Source.GENERATED),
+            coordinateConverter.toWGS84(
+                GCJ02ChinaPoint(37.33644561966912, 122.48151345759582, 3.14, "foo bar", source = Source.GENERATED)
+            )
+        )
+    }
+
+    @Test
+    fun toWGS84_whenPointIsGCJ02ChinaAndWithinChinaNearCoast2_returnsWGS84PointWithConvertedCoords() {
+        // TODO Improve china boundary to fix this point
+        assumeTrue("This test currently fails, because Natural Earth 10m is not precise enough", false)
+        assertEquals(
+            WGS84Point(30.60283, 122.12886, source = Source.GENERATED),
+            coordinateConverter.toWGS84(
+                GCJ02ChinaPoint(30.600649446449268, 122.13324202346543, source = Source.GENERATED)
             ),
         )
     }

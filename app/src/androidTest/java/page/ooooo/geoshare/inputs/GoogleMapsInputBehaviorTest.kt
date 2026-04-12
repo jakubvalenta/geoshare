@@ -23,16 +23,16 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
             "https://www.google.com/maps/place/Pozna%C5%84+Old+Town,+61-001+Pozna%C5%84,+Poland/data=!4m6!3m5!1s0x47045b49399cf863:0xf61cbcaacd7d3070!7e2!8m2!3d52.4083009!4d16.929066199999998"
         )
 
-        // Coordinates in data in China
+        // Coordinates in data within China
         testUri(
             GCJ02Point(39.9168038, 116.3971621, name = "Forbidden City", source = Source.URI),
             @Suppress("SpellCheckingInspection") "https://www.google.com/maps/place/Forbidden+City/@39.9165742,116.3945834,17z/data=!4m7!3m6!1s0x35f052e94515d43d:0x674e2bd4dd3079f!8m2!3d39.9168038!4d116.3971621!15sCg5mb3JiaWRkZW4gY2l0eVoQIg5mb3JiaWRkZW4gY2l0eZIBEnRvdXJpc3RfYXR0cmFjdGlvbuABAA!16zL20vMGowYjI?entry=tts&g_ep=EgoyMDI2MDMwOS4wIPu8ASoASAFQAw%3D%3D&skid=5f340da1-a0d3-4b1c-bc05-7f90cfbd502a",
         )
 
-        // Coordinates in data outside China near coast
+        // Coordinates outside China near coast
         testUri(
-            GCJ02Point(39.9168038, 116.3971621, name = "Forbidden City", source = Source.URI),
-            @Suppress("SpellCheckingInspection") "https://www.google.com/maps/place/Forbidden+City/@39.9165742,116.3945834,17z/data=!4m7!3m6!1s0x35f052e94515d43d:0x674e2bd4dd3079f!8m2!3d39.9168038!4d116.3971621!15sCg5mb3JiaWRkZW4gY2l0eVoQIg5mb3JiaWRkZW4gY2l0eZIBEnRvdXJpc3RfYXR0cmFjdGlvbuABAA!16zL20vMGowYjI?entry=tts&g_ep=EgoyMDI2MDMwOS4wIPu8ASoASAFQAw%3D%3D&skid=5f340da1-a0d3-4b1c-bc05-7f90cfbd502a",
+            WGS84Point(37.33557037552849, 122.47663919001769, source = Source.URI),
+            "https://www.google.com/maps/?ll=37.33644561966912,122.48151345759582",
         )
 
         // Coordinates and query (address)
@@ -110,13 +110,13 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
             "https://www.google.com/maps/search/?api=1&query=Louisenstra%C3%9Fe%2060,%2001099%20Dresden",
         )
 
-        // Short URI in Japan
+        // Short URI within Japan
         testUri(
             WGS84Point(34.5945482, 133.7583428, z = 17.0, name = "Steak no Don", source = Source.URI),
             "https://maps.app.goo.gl/mBtbC6qXLK2baGTV9",
         )
 
-        // Short URI in China
+        // Short URI within China
         testUri(
             GCJ02Point(39.920439, 116.331538, source = Source.URI),
             "https://maps.app.goo.gl/FP3EV7tTUKYbmcVp7",
