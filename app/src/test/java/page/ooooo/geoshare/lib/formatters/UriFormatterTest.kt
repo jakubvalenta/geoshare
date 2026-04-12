@@ -105,7 +105,7 @@ class UriFormatterTest {
     }
 
     @Test
-    fun formatUriString_whenPointIsWGS84AndInChinaAndSrsIsGCJ02_returnsCoordsTemplateWithConvertedCoords() {
+    fun formatUriString_whenPointIsWGS84AndWithinChinaAndSrsIsGCJ02_returnsCoordsTemplateWithConvertedCoords() {
         assertEquals(
             "https://www.google.com/maps/search/?api=1&query=31.2285067%2C121.475524",
             uriFormatter.formatUriString(
@@ -119,7 +119,7 @@ class UriFormatterTest {
     }
 
     @Test
-    fun formatUriString_whenPointIsGCJ02AndInChinaAndSrsIsGCJ02_returnsCoordsTemplateWithCoordsUnchanged() {
+    fun formatUriString_whenPointIsGCJ02AndWithinChinaAndSrsIsGCJ02_returnsCoordsTemplateWithCoordsUnchanged() {
         assertEquals(
             "https://www.google.com/maps/search/?api=1&query=31.2285069%2C121.4755246",
             uriFormatter.formatUriString(

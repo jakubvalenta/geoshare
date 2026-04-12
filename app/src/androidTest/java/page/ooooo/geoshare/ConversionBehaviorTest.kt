@@ -41,7 +41,7 @@ class ConversionBehaviorTest : BehaviorTest {
     }
 
     @Test
-    fun whenLinkWithCoordinatesInChinaIsShared_showsPointAndAllowsOpeningGoogleMapsInGCJ02() =
+    fun whenLinkWithCoordinatesWithinChinaIsShared_showsPointAndAllowsOpeningGoogleMapsInGCJ02() =
         uiAutomator {
             runBlocking {
                 assumeAppInstalled(GOOGLE_MAPS_PACKAGE_NAME)

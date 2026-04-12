@@ -194,7 +194,7 @@ class GeoUriFormatterTest {
     }
 
     @Test
-    fun formatGeoUriString_whenLastPointIsInGCJ02AndIsInChina_returnsUriWithCoordinatesConvertedToWGS84() {
+    fun formatGeoUriString_whenLastPointIsInGCJ02AndIsWithinChina_returnsUriWithCoordinatesConvertedToWGS84() {
         assertEquals(
             "geo:39.9191328,116.3254076?q=39.9191328,116.3254076",
             geoUriFormatter.formatGeoUriString(

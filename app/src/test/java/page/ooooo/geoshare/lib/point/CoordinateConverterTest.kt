@@ -37,7 +37,7 @@ class CoordinateConverterTest {
     }
 
     @Test
-    fun toGCJ02_whenPointIsWGS84AndInChina_returnsGCJ02PointWithConvertedCoords() {
+    fun toGCJ02_whenPointIsWGS84AndWithinChina_returnsGCJ02PointWithConvertedCoords() {
         assertEquals(
             GCJ02Point(31.22281206362763, 121.46840659541449, 3.14, "foo bar", source = Source.GENERATED),
             coordinateConverter.toGCJ02(
@@ -47,7 +47,7 @@ class CoordinateConverterTest {
     }
 
     @Test
-    fun toGCJ02_whenPointIsWGS84AndInChinaNearCoast_returnsGCJ02PointWithConvertedCoords() {
+    fun toGCJ02_whenPointIsWGS84AndWithinChinaNearCoast_returnsGCJ02PointWithConvertedCoords() {
         assertEquals(
             GCJ02Point(37.33644561966912, 122.48151345759582, source = Source.GENERATED),
             coordinateConverter.toGCJ02(WGS84Point(37.33557, 122.47664, source = Source.GENERATED)),
@@ -55,7 +55,7 @@ class CoordinateConverterTest {
     }
 
     @Test
-    fun toGCJ02_whenPointIsWGS84AndInChinaNearCoast2_returnsGCJ02PointWithConvertedCoords() {
+    fun toGCJ02_whenPointIsWGS84AndWithinChinaNearCoast2_returnsGCJ02PointWithConvertedCoords() {
         assertEquals(
             GCJ02Point(30.600649446449268, 122.13324202346543, source = Source.GENERATED),
             coordinateConverter.toGCJ02(WGS84Point(30.60283, 122.12886, source = Source.GENERATED)),
@@ -63,7 +63,7 @@ class CoordinateConverterTest {
     }
 
     @Test
-    fun toGCJ02_whenPointIsWGS84AndNotInChina_returnsGCJ02PointWithUnchangedCoords() {
+    fun toGCJ02_whenPointIsWGS84AndOutsideChina_returnsGCJ02PointWithUnchangedCoords() {
         assertEquals(
             GCJ02Point(45.8289525077221, 1.266689300537103, 3.14, "foo bar", source = Source.GENERATED),
             coordinateConverter.toGCJ02(
@@ -73,7 +73,7 @@ class CoordinateConverterTest {
     }
 
     @Test
-    fun toGCJ02_whenPointIsWGS84AndNotInChinaNearCoast_returnsGCJ02PointWithConvertedCoords() {
+    fun toGCJ02_whenPointIsWGS84AndOutsideChinaNearCoast_returnsGCJ02PointWithConvertedCoords() {
         assertEquals(
             GCJ02Point(37.39578114164097, 122.71208265323477, 3.14, "foo bar", source = Source.GENERATED),
             coordinateConverter.toGCJ02(
@@ -91,7 +91,7 @@ class CoordinateConverterTest {
     }
 
     @Test
-    fun toGCJ02China_whenPointIsWGS84AndInChina_returnsGCJ02ChinaPointWithConvertedCoords() {
+    fun toGCJ02China_whenPointIsWGS84AndWithinChina_returnsGCJ02ChinaPointWithConvertedCoords() {
         assertEquals(
             GCJ02ChinaPoint(31.22281206362763, 121.46840659541449, 3.14, "foo bar", source = Source.GENERATED),
             coordinateConverter.toGCJ02China(
@@ -101,7 +101,7 @@ class CoordinateConverterTest {
     }
 
     @Test
-    fun toGCJ02China_whenPointIsWGS84AndInChinaNearCoast_returnsGCJ02ChinaPointWithConvertedCoords() {
+    fun toGCJ02China_whenPointIsWGS84AndWithinChinaNearCoast_returnsGCJ02ChinaPointWithConvertedCoords() {
         assertEquals(
             GCJ02ChinaPoint(37.33644561966912, 122.48151345759582, source = Source.GENERATED),
             coordinateConverter.toGCJ02China(WGS84Point(37.33557, 122.47664, source = Source.GENERATED)),
@@ -109,7 +109,7 @@ class CoordinateConverterTest {
     }
 
     @Test
-    fun toGCJ02China_whenPointIsWGS84AndInChinaNearCoast2_returnsGCJ02PointWithConvertedCoords() {
+    fun toGCJ02China_whenPointIsWGS84AndWithinChinaNearCoast2_returnsGCJ02PointWithConvertedCoords() {
         assumeTrue("This test currently fails, because Natural Earth 10m is not precise enough", false)
         assertEquals(
             GCJ02ChinaPoint(30.60283, 122.12886, source = Source.GENERATED),
@@ -118,7 +118,7 @@ class CoordinateConverterTest {
     }
 
     @Test
-    fun toGCJ02China_whenPointIsWGS84AndNotInChina_returnsGCJ02ChinaPointWithUnchangedCoords() {
+    fun toGCJ02China_whenPointIsWGS84AndOutsideChina_returnsGCJ02ChinaPointWithUnchangedCoords() {
         assertEquals(
             GCJ02ChinaPoint(45.8289525077221, 1.266689300537103, 3.14, "foo bar", source = Source.GENERATED),
             coordinateConverter.toGCJ02China(
@@ -128,7 +128,7 @@ class CoordinateConverterTest {
     }
 
     @Test
-    fun toGCJ02China_whenPointIsWGS84AndNotInChinaNearCoast_returnsGCJ02ChinaPointWithUnchangedCoords() {
+    fun toGCJ02China_whenPointIsWGS84AndOutsideChinaNearCoast_returnsGCJ02ChinaPointWithUnchangedCoords() {
         assertEquals(
             GCJ02ChinaPoint(37.394978, 122.707243, 3.14, "foo bar", source = Source.GENERATED),
             coordinateConverter.toGCJ02China(
@@ -146,7 +146,7 @@ class CoordinateConverterTest {
     }
 
     @Test
-    fun toWGS84_whenPointIsGCJ02AndInChina_returnsWGS84PointWithConvertedCoords() {
+    fun toWGS84_whenPointIsGCJ02AndWithinChina_returnsWGS84PointWithConvertedCoords() {
         assertEquals(
             WGS84Point(31.224731304675522, lon = 121.46385323166844, 3.14, "foo bar", source = Source.GENERATED),
             coordinateConverter.toWGS84(
@@ -156,7 +156,7 @@ class CoordinateConverterTest {
     }
 
     @Test
-    fun toWGS84_whenPointIsGCJ02AndNotInChina_returnsWGS84PointWithUnchangedCoords() {
+    fun toWGS84_whenPointIsGCJ02AndOutsideChina_returnsWGS84PointWithUnchangedCoords() {
         assertEquals(
             WGS84Point(45.8289525077221, 1.266689300537103, 3.14, "foo bar", source = Source.GENERATED),
             coordinateConverter.toWGS84(
@@ -174,7 +174,7 @@ class CoordinateConverterTest {
     }
 
     @Test
-    fun toGCJ02_whenPointIsBD09MCAndInChina_returnsGCJ02PointWithConvertedCoords() {
+    fun toGCJ02_whenPointIsBD09MCAndWithinChina_returnsGCJ02PointWithConvertedCoords() {
         assertEquals(
             GCJ02Point(28.696786436412197, 121.45032959369264, 3.14, "foo bar", source = Source.GENERATED),
             coordinateConverter.toGCJ02(

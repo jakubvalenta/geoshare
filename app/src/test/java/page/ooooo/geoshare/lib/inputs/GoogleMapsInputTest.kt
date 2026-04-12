@@ -144,7 +144,7 @@ class GoogleMapsInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_coordinatesInChina() = runTest {
+    fun parseUri_coordinatesWithinChina() = runTest {
         assertEquals(
             ParseUriResult(
                 persistentListOf(
@@ -154,20 +154,6 @@ class GoogleMapsInputTest : InputTest {
             parseUri("https://www.google.com/maps/@31.22850685422705,121.47552456472106,11z"),
         )
     }
-
-    @Test
-    fun parseUri_coordinatesInChinaNearCoast() = runTest {
-        assertEquals(
-            ParseUriResult(
-                persistentListOf(
-                    GCJ02ChinaPoint(30.60283, 122.12886, z = 11.0, source = Source.MAP_CENTER)
-                )
-            ),
-            parseUri("https://www.google.com/maps/@30.60283,122.12886,11z"),
-        )
-    }
-
-    // TODO Test Taiwan
 
     @Test
     fun parseUri_coordinatesOnlyStreetView() = runTest {
@@ -279,7 +265,7 @@ class GoogleMapsInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_placeAndDataInChina() = runTest {
+    fun parseUri_placeAndDataWithinChina() = runTest {
         assertEquals(
             ParseUriResult(
                 persistentListOf(

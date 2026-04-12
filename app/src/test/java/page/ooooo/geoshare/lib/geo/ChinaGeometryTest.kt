@@ -20,7 +20,7 @@ class ChinaGeometryTest {
     private val chinaGeometry = ChinaGeometry(mockContext)
 
     @Test
-    fun containsPoint_pointIsInChina_returnsTrue() {
+    fun containsPoint_pointIsWithinChina_returnsTrue() {
         assertTrue(chinaGeometry.containsPoint(116.331538, 39.920439))
     }
 

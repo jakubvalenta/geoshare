@@ -99,7 +99,7 @@ class GoogleMapsUriFormatterTest {
     }
 
     @Test
-    fun formatNavigationUriString_whenLastPointIsInChinaAndInWGS84_returnsLinkWithCoordinatesInGCJ02() {
+    fun formatNavigationUriString_whenLastPointIsWithinChinaAndInWGS84_returnsLinkWithCoordinatesInGCJ02() {
         assertEquals(
             "google.navigation:q=31.2285067,121.475524",
             googleMapsUriFormatter.formatNavigationUriString(
@@ -110,7 +110,7 @@ class GoogleMapsUriFormatterTest {
     }
 
     @Test
-    fun formatStreetViewUriString_whenLastPointIsInChinaAndInWGS84_returnsLinkWithCoordinatesInGCJ02() {
+    fun formatStreetViewUriString_whenLastPointIsWithinChinaAndInWGS84_returnsLinkWithCoordinatesInGCJ02() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=31.2285067,121.475524",
@@ -122,7 +122,7 @@ class GoogleMapsUriFormatterTest {
     }
 
     @Test
-    fun formatNavigationUriString_whenLastPointIsInChinaAndInGCJ02_returnsLinkWithCoordinatesInGCJ02() {
+    fun formatNavigationUriString_whenLastPointIsWithinChinaAndInGCJ02_returnsLinkWithCoordinatesInGCJ02() {
         assertEquals(
             "google.navigation:q=31.2285069,121.4755246",
             googleMapsUriFormatter.formatNavigationUriString(
@@ -133,7 +133,7 @@ class GoogleMapsUriFormatterTest {
     }
 
     @Test
-    fun formatStreetViewUriString_whenLastPointIsInChinaAndInGCJ02_returnsLinkWithCoordinatesInGCJ02() {
+    fun formatStreetViewUriString_whenLastPointIsWithinChinaAndInGCJ02_returnsLinkWithCoordinatesInGCJ02() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=31.2285069,121.4755246",
@@ -191,7 +191,7 @@ class GoogleMapsUriFormatterTest {
     }
 
     @Test
-    fun formatNavigationUriString_whenPointIsInChinaAndInWGS84_returnsLinkWithCoordinatesInGCJ02() {
+    fun formatNavigationUriString_whenPointIsWithinChinaAndInWGS84_returnsLinkWithCoordinatesInGCJ02() {
         assertEquals(
             "google.navigation:q=31.2285067,121.475524",
             googleMapsUriFormatter.formatNavigationUriString(
@@ -202,7 +202,7 @@ class GoogleMapsUriFormatterTest {
     }
 
     @Test
-    fun formatStreetViewUriString_whenPointIsInChinaAndInWGS84_returnsLinkWithCoordinatesInGCJ02() {
+    fun formatStreetViewUriString_whenPointIsWithinChinaAndInWGS84_returnsLinkWithCoordinatesInGCJ02() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=31.2285067,121.475524",
@@ -214,7 +214,7 @@ class GoogleMapsUriFormatterTest {
     }
 
     @Test
-    fun formatNavigationUriString_whenPointIsInChinaAndInGCJ02_returnsLinkWithCoordinatesInGCJ02() {
+    fun formatNavigationUriString_whenPointIsWithinChinaAndInGCJ02_returnsLinkWithCoordinatesInGCJ02() {
         assertEquals(
             "google.navigation:q=31.2285069,121.4755246",
             googleMapsUriFormatter.formatNavigationUriString(
@@ -225,7 +225,7 @@ class GoogleMapsUriFormatterTest {
     }
 
     @Test
-    fun formatStreetViewUriString_whenPointIsInChinaAndInGCJ02_returnsLinkWithCoordinatesInGCJ02() {
+    fun formatStreetViewUriString_whenPointIsWithinChinaAndInGCJ02_returnsLinkWithCoordinatesInGCJ02() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=31.2285069,121.4755246",

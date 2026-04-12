@@ -68,7 +68,7 @@ class AmapInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_inChina() = runTest {
+    fun parseUri_withinChina() = runTest {
         assertEquals(
             ParseUriResult(
                 persistentListOf(
@@ -84,7 +84,7 @@ class AmapInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_inChinaWithoutName() = runTest {
+    fun parseUri_withinChinaWithoutName() = runTest {
         assertEquals(
             ParseUriResult(
                 persistentListOf(GCJ02Point(31.222811749011463, 121.46840706467624, source = Source.URI))
@@ -94,7 +94,7 @@ class AmapInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_notInChina() = runTest {
+    fun parseUri_outsideChina() = runTest {
         assertEquals(
             ParseUriResult(
                 persistentListOf(
@@ -110,7 +110,7 @@ class AmapInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_notInChinaWithoutName() = runTest {
+    fun parseUri_outsideChinaWithoutName() = runTest {
         assertEquals(
             ParseUriResult(
                 persistentListOf(GCJ02Point(45.8289525077221, 1.266689300537103, source = Source.URI))
