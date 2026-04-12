@@ -83,8 +83,20 @@ data class GCJ02Point(
     )
 }
 
+/**
+ * A coordinate system used by Google Maps. It applies the same conversion as GCJ-02, but instead of applying it within
+ * the large rectangle than includes China, Taiwan, Korea, and western Japan, it applies it only within the precise land
+ * borders of mainland China. So within the Chinese sea, Taiwan, Korea and western Japan, the coordinates are WGS 84.
+ *
+ * However, there are specific locations in the Chinese sea where this logic predicts Google Maps to use WGS 84, but
+ * Google Maps seems to use GCJ-02 instead, e.g. 38.30121535762941,120.81016278215878; we use WGS 84 for these points,
+ * which results in inaccuracies.
+ *
+ * To calculate whether a point is within the land borders of mainland China, we always start with a quick check using
+ * [TransformUtil.outOfChina], and only if it fails we do an exact calculation using [ChinaGeometry].
+ */
 @Immutable
-data class BD09MCPoint(
+data class GCJ02ChinaPoint(
     override val lat: Double? = null,
     override val lon: Double? = null,
     override val z: Double? = null,
@@ -100,19 +112,8 @@ data class BD09MCPoint(
     )
 }
 
-/**
- * A coordinate system used by Google Maps, in which points that are inside the land borders of mainland China use
- * GCJ-02, and all other points (including Chinese sea and Taiwan) use WGS 84.
- *
- * However, there are points in the sea where this logic predicts Google Maps to use WGS 84, but Google Maps seems to
- * use GCJ-02 is used instead, e.g. 38.30121535762941,120.81016278215878; we use WGS 84 for these points, which results
- * in inaccuracies.
- *
- * To calculate whether a point is inside the land borders of mainland China, we always start with a quick check using
- * [outOfChina], and only if it fails we do an exact calculation using [ChinaGeometry].
- */
 @Immutable
-data class GoogleMapsPoint(
+data class BD09MCPoint(
     override val lat: Double? = null,
     override val lon: Double? = null,
     override val z: Double? = null,

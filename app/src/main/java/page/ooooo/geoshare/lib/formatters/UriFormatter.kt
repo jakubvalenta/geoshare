@@ -24,7 +24,8 @@ class UriFormatter @Inject constructor(
     ): String? = point.run {
         when (srs) {
             Srs.WGS84 -> coordinateConverter.toWGS84(point)
-            Srs.GCJ02 -> coordinateConverter.toGCJ02(point) // FIXME
+            Srs.GCJ02 -> coordinateConverter.toGCJ02(point)
+            Srs.GCJ02_CHINA -> coordinateConverter.toGCJ02China(point)
         }
             .run {
                 latStr?.let { latStr ->

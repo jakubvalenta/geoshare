@@ -23,6 +23,7 @@ import page.ooooo.geoshare.lib.android.SYGIC_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.VESPUCCI_PACKAGE_NAME
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Srs
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -35,8 +36,6 @@ class GeoUriFormatter @Inject constructor(
         val pin: PinFlavor,
         val zoom: ZoomFlavor,
     ) {
-        enum class Srs { GCJ02, WGS84 }
-
         enum class PinFlavor {
             /**
              * Pin coords are in the 'q' param with name in parentheses, e.g. 'geo:50.123,-11.123?q=50.123,-11.123(foo%20bar)'
@@ -88,10 +87,12 @@ class GeoUriFormatter @Inject constructor(
             packageName?.startsWith(COMAPS_PACKAGE_NAME_PREFIX) == true ->
             Flavor.Best
 
-        packageName == AMAP_PACKAGE_NAME ||
-            packageName == GOOGLE_MAPS_PACKAGE_NAME ||
+        packageName == AMAP_PACKAGE_NAME ->
+            Flavor.Best.copy(srs = Srs.GCJ02)
+
+        packageName == GOOGLE_MAPS_PACKAGE_NAME ||
             packageName == GMAPS_WV_PACKAGE_NAME ->
-            Flavor.Best.copy(srs = Flavor.Srs.GCJ02)
+            Flavor.Best.copy(srs = Srs.GCJ02_CHINA)
 
         packageName == BAIDU_MAP_PACKAGE_NAME ->
             // Notice that Baidu Map uses WGS 84 geo: URIs, although all its other links are in BD09MC
@@ -115,8 +116,9 @@ class GeoUriFormatter @Inject constructor(
 
     fun formatGeoUriString(point: Point, flavor: Flavor = Flavor.Safe, uriQuote: UriQuote = DefaultUriQuote) =
         when (flavor.srs) {
-            Flavor.Srs.GCJ02 -> coordinateConverter.toGCJ02(point)
-            Flavor.Srs.WGS84 -> coordinateConverter.toWGS84(point) // FIXME
+            Srs.WGS84 -> coordinateConverter.toWGS84(point)
+            Srs.GCJ02 -> coordinateConverter.toGCJ02(point)
+            Srs.GCJ02_CHINA -> coordinateConverter.toGCJ02China(point)
         }.run {
             // Use custom string builder instead of Uri.toString(), because we want to allow custom chars in query params
             buildString {
