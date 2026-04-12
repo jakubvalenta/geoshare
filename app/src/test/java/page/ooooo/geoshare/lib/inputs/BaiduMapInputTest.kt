@@ -4,6 +4,7 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assume.assumeTrue
 import org.junit.Test
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
 import page.ooooo.geoshare.lib.geo.Source
@@ -86,6 +87,39 @@ class BaiduMapInputTest : InputTest {
                 )
             ),
             parseUri(@Suppress("SpellCheckingInspection") "https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13392211,3619117,17z?querytype=share&poiShareId=p8cdf0522067cf66173901fc9e4&da_src=shareurl"),
+        )
+    }
+
+    @Test
+    fun parseUri_poiWithinTaiwan() = runTest {
+        assertEquals(
+            ParseUriResult(
+                persistentListOf(
+                    BD09MCPoint(
+                        2865337.0, 13522176.0,
+                        z = 17.0,
+                        name = "地图上的点",
+                        source = Source.MAP_CENTER,
+                    ),
+                )
+            ),
+            parseUri(@Suppress("SpellCheckingInspection") "https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13522176,2865337,17z?querytype=share&poiShareId=pb81fb1b0172f25114bd52ce2cd&da_src=shareurl"),
+        )
+    }
+
+    @Test
+    fun parseUri_poiWithinWesternJapan() = runTest {
+        assertEquals(
+            ParseUriResult(
+                persistentListOf(
+                    BD09MCPoint(
+                        4046737.5, 14571652.5,
+                        z = 19.0,
+                        source = Source.MAP_CENTER,
+                    ),
+                )
+            ),
+            parseUri("https://map.baidu.com/@14571652.5,4046737.5,19z"),
         )
     }
 
@@ -305,6 +339,27 @@ class BaiduMapInputTest : InputTest {
             ),
             parseUri(
                 "https://map.baidu.com/dir/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E6%A2%85%E8%8A%B1%E6%9D%91%E8%A1%97%E9%81%93%E6%B3%B0%E5%85%B4%E7%9B%B4%E8%A1%9735%E5%8F%B7/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E9%BB%84%E8%8A%B1%E5%B2%97%E8%A1%97%E9%81%93%E6%B0%B8%E7%A6%8F%E8%B7%AF36%E5%8F%B7DE%E5%BA%A7/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7/@12612741.165,2631232.5250000004,16z"
+            ),
+        )
+    }
+
+    @Test
+    fun parseUri_search() = runTest {
+        // TODO Add support for Baidu Map search URLs
+        assumeTrue(false)
+        assertEquals(
+            ParseUriResult(
+                persistentListOf(
+                    BD09MCPoint(
+                        4047017.0, 14571495.0,
+                        z = 16.0,
+                        name = "%E5%8C%BB%E9%99%A2",
+                        source = Source.MAP_CENTER,
+                    ),
+                )
+            ),
+            parseUri(
+                @Suppress("SpellCheckingInspection") "https://map.baidu.com/search/%E5%8C%BB%E9%99%A2/@14571400,4047000,16z?querytype=nb&ar=(14570495%2C4046017%3B14572495%2C4048017)&wd=%E5%8C%BB%E9%99%A2&c=26046&bdtp=0&nb_x=14571495&nb_y=4047017&userSign=0&b=(14566383%2C4044357%3B14576607%2C4049677)&l=16&pn=0&gr_radius=1000&r=1000&from=webmap&device_ratio=1&da_src=shareurl"
             ),
         )
     }

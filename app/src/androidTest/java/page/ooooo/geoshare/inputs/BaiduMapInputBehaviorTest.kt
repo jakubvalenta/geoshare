@@ -6,6 +6,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import page.ooooo.geoshare.BehaviorTest.Companion.NETWORK_TIMEOUT
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
+import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
 
 class BaiduMapInputBehaviorTest : InputBehaviorTest {
@@ -21,6 +22,27 @@ class BaiduMapInputBehaviorTest : InputBehaviorTest {
         testUri(
             BD09MCPoint(3315902.2199999997, 13502918.375, 16.0, name = "黄岩客运中心", source = Source.MAP_CENTER),
             @Suppress("SpellCheckingInspection") "https://map.baidu.com/poi/%E9%BB%84%E5%B2%A9%E5%AE%A2%E8%BF%90%E4%B8%AD%E5%BF%83/@13502918.375,3315902.2199999997,16z?uid=fef3b5922f87e66c63180999&info_merge=1&isBizPoi=false&ugc_type=3&ugc_ver=1&device_ratio=2&compat=1&routetype=drive&en_uid=fef3b5922f87e66c63180999&pcevaname=pc4.1&querytype=detailConInfo&da_src=shareurl",
+        )
+
+        // Point within Taiwan
+        testUri(
+            GCJ02Point(
+                25.057843815261702, 121.46399336269734,
+                z = 17.0,
+                name = "地图上的点",
+                source = Source.MAP_CENTER,
+            ),
+            @Suppress("SpellCheckingInspection") "https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13522176,2865337,17z?querytype=share&poiShareId=pb81fb1b0172f25114bd52ce2cd&da_src=shareurl",
+        )
+
+        // Point within western Japan
+        testUri(
+            GCJ02Point(
+                34.308010260830606, 130.89147646937502,
+                z = 19.0,
+                source = Source.MAP_CENTER,
+            ),
+            "https://map.baidu.com/@14571652.5,4046737.5,19z",
         )
 
         // Directions
