@@ -17,7 +17,7 @@ class ChinaGeometry @Inject constructor(
     private val geometryFactory = GeometryFactory()
 
     private val preparedGeometry: PreparedGeometry by lazy {
-        val bytes = context.assets.open("china.wkb").readBytes()
+        val bytes = context.assets.open("china_ne_10m.wkb").readBytes()
         val geometry = WKBReader(geometryFactory).read(bytes)
         PreparedGeometryFactory.prepare(geometry)
     }

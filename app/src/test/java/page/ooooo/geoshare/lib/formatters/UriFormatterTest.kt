@@ -18,9 +18,9 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class UriFormatterTest {
     private val mockAssetManager: AssetManager = mock {
-        on { open("china.wkb") } doReturn
-            (ChinaGeometryTest::class.java.getResourceAsStream("/china.wkb")
-                ?: error("china.wkb not found in test resources"))
+        on { open("china_ne_10m.wkb") } doReturn
+            (ChinaGeometryTest::class.java.getResourceAsStream("/china_ne_10m.wkb")
+                ?: error("china_ne_10m.wkb not found in test resources"))
     }
     private val mockContext: Context = mock {
         on { assets } doReturn mockAssetManager

@@ -13,7 +13,7 @@ class GoogleMapsUriFormatter @Inject constructor(
 ) {
     fun formatNavigationUriString(point: Point, uriQuote: UriQuote) = Uri(
         scheme = "google.navigation",
-        path = (coordinateConverter.toGCJ02(point).run { // FIXME
+        path = (coordinateConverter.toGCJ02(point).run { // TODO Figure out which coordinate system to use
             latStr?.let { latStr ->
                 lonStr?.let { lonStr ->
                     "$latStr,$lonStr"
@@ -25,7 +25,7 @@ class GoogleMapsUriFormatter @Inject constructor(
 
     fun formatStreetViewUriString(point: Point, uriQuote: UriQuote) = Uri(
         scheme = "google.streetview",
-        path = (coordinateConverter.toGCJ02(point).run { // FIXME
+        path = (coordinateConverter.toGCJ02(point).run { // TODO Figure out which coordinate system to use
             latStr?.let { latStr ->
                 lonStr?.let { lonStr ->
                     "$latStr,$lonStr"

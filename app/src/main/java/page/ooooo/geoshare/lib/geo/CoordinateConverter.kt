@@ -68,7 +68,6 @@ class CoordinateConverter @Inject constructor(
     /**
      * See [GCJ02ChinaPoint]
      */
-    // TODO Test
     fun toGCJ02China(point: Point): GCJ02ChinaPoint = point.run {
         when (this) {
             is WGS84Point -> {
