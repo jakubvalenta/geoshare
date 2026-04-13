@@ -87,7 +87,7 @@ class CoordinateConverterTest {
                 z = 3.14, name = "foo bar", source = Source.GENERATED,
             ),
         ),
-        // Rongcheng coast
+        // Rongcheng inland
         PointInDifferentSrs(
             wgs84 = WGS84Point(
                 37.33557, 122.47664,
@@ -106,7 +106,7 @@ class CoordinateConverterTest {
                 z = 3.14, name = "foo bar", source = Source.GENERATED,
             ),
         ),
-        // Rongcheng coast
+        // Rongcheng sea
         PointInDifferentSrs(
             wgs84 = WGS84Point(
                 37.394978, 122.707243,
@@ -127,7 +127,7 @@ class CoordinateConverterTest {
             // ),
         ),
         @Suppress("SpellCheckingInspection")
-        // Yangshan port
+        // Yangshan port island
         PointInDifferentSrs(
             wgs84 = WGS84Point(
                 30.60283, 122.12886,
@@ -148,7 +148,7 @@ class CoordinateConverterTest {
             // ),
         ),
         @Suppress("SpellCheckingInspection")
-        // Daqindao island
+        // Daqindao sea
         PointInDifferentSrs(
             wgs84 = WGS84Point(
                 38.30050979122315, 120.80518963762754,
@@ -166,6 +166,46 @@ class CoordinateConverterTest {
             // gcj02ChinaAndTaiwan = GCJ02ChinaAndTaiwanPoint(
             //     38.30121535762941, 120.81016278215878,
             //     z = 3.14, name = "foo bar", source = Source.GENERATED,
+            // ),
+        ),
+        // Taiwan
+        PointInDifferentSrs(
+            wgs84 = WGS84Point(
+                25.086597886645535, 121.50927209377286,
+                3.14, "foo bar", source = Source.GENERATED,
+            ),
+            gcj02 = GCJ02Point(
+                25.08380369719241, 121.51320397853848,
+                3.14, "foo bar", source = Source.GENERATED,
+            ),
+            gcj02China = GCJ02ChinaPoint(
+                25.086597886645535, 121.50927209377286,
+                3.14, "foo bar", source = Source.GENERATED,
+            ),
+            // TODO Add China and Taiwan boundary and test this point
+            // gcj02ChinaAndTaiwan = GCJ02ChinaAndTaiwanPoint(
+            //     25.08380369719241, 121.51320397853848,
+            //     3.14, "foo bar", source = Source.GENERATED,
+            // ),
+        ),
+        // Western Japan
+        PointInDifferentSrs(
+            wgs84 = WGS84Point(
+                34.36875865823159, 131.1821490526199,
+                3.14, "foo bar", source = Source.GENERATED,
+            ),
+            gcj02 = GCJ02Point(
+                34.36783913297475, 131.18823621449667,
+                3.14, "foo bar", source = Source.GENERATED,
+            ),
+            gcj02China = GCJ02ChinaPoint(
+                34.36875865823159, 131.1821490526199,
+                3.14, "foo bar", source = Source.GENERATED,
+            ),
+            // TODO Add China and Taiwan boundary and test this point
+            // gcj02ChinaAndTaiwan = GCJ02ChinaAndTaiwanPoint(
+            //     34.36875865823159, 131.1821490526199,
+            //     3.14, "foo bar", source = Source.GENERATED,
             // ),
         ),
         // BD09MC points
@@ -209,8 +249,6 @@ class CoordinateConverterTest {
                 3.14, "foo bar", source = Source.GENERATED,
             ),
         ),
-        // TODO Test Taiwan
-        // TODO Test western Japan
         // TODO Test bd09mc in eastern Japan
     )
 
