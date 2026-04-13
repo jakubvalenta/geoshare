@@ -290,4 +290,5 @@
     <string name="conversion_failed_reason_timeout">مهلة</string>
     <string name="conversion_failed_parse_html_error_with_reason">فشل في معالجة صفحة الويب بسبب: %1$s</string>
     <string name="network_exception_too_many_requests">طلبات كثيرة جدًا</string>
+    <string name="licenses">التراخيص</string>
 </resources>
