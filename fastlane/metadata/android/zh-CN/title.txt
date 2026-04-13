@@ -1,1 +1,1 @@
-Geo Share：地图间跳转
+GeoShare：地图间跳转
