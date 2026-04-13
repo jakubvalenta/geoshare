@@ -10,9 +10,9 @@ import org.junit.Assume.assumeTrue
 import org.junit.Test
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.lib.formatters.UriFormatter
-import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
-import page.ooooo.geoshare.lib.geo.GCJ02Point
+import page.ooooo.geoshare.lib.geo.GCJ02ChinaAndTaiwanPoint
+import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.Source
 
 class AmapInputTest : InputTest {
@@ -75,7 +75,7 @@ class AmapInputTest : InputTest {
         assertEquals(
             ParseUriResult(
                 persistentListOf(
-                    GCJ02Point(
+                    GCJ02ChinaAndTaiwanPoint(
                         31.222811749011463, 121.46840706467624,
                         name = "上海市黄浦区巨鹿路15-17号",
                         source = Source.URI,
@@ -91,7 +91,7 @@ class AmapInputTest : InputTest {
         assertEquals(
             ParseUriResult(
                 persistentListOf(
-                    GCJ02Point(
+                    GCJ02ChinaAndTaiwanPoint(
                         31.222811749011463, 121.46840706467624,
                         name = "上海市黄浦区巨鹿路15-17号",
                         source = Source.URI,
@@ -106,7 +106,7 @@ class AmapInputTest : InputTest {
     fun parseUri_withinChinaWithoutName() = runTest {
         assertEquals(
             ParseUriResult(
-                persistentListOf(GCJ02Point(31.222811749011463, 121.46840706467624, source = Source.URI))
+                persistentListOf(GCJ02ChinaAndTaiwanPoint(31.222811749011463, 121.46840706467624, source = Source.URI))
             ),
             parseUri("https://wb.amap.com/?q=31.222811749011463%2C121.46840706467624"),
         )
@@ -117,7 +117,7 @@ class AmapInputTest : InputTest {
         assertEquals(
             ParseUriResult(
                 persistentListOf(
-                    GCJ02Point(
+                    GCJ02ChinaAndTaiwanPoint(
                         45.8289525077221, 1.266689300537103,
                         name = @Suppress("SpellCheckingInspection") "利摩日主教座堂,42 Rue Prte Panet, 87000 Limoges, 法国",
                         source = Source.URI,
@@ -132,7 +132,7 @@ class AmapInputTest : InputTest {
     fun parseUri_outsideChinaWithoutName() = runTest {
         assertEquals(
             ParseUriResult(
-                persistentListOf(GCJ02Point(45.8289525077221, 1.266689300537103, source = Source.URI))
+                persistentListOf(GCJ02ChinaAndTaiwanPoint(45.8289525077221, 1.266689300537103, source = Source.URI))
             ),
             parseUri("https://wb.amap.com/?p=P0JANYX6NL%2C45.8289525077221%2C1.266689300537103"),
         )
@@ -143,7 +143,7 @@ class AmapInputTest : InputTest {
         assertEquals(
             ParseUriResult(
                 persistentListOf(
-                    GCJ02Point(
+                    GCJ02ChinaAndTaiwanPoint(
                         25.08380369719241, 121.51320397853848,
                         name = "台湾省境内",
                         source = Source.URI,
@@ -159,7 +159,7 @@ class AmapInputTest : InputTest {
         assertEquals(
             ParseUriResult(
                 persistentListOf(
-                    GCJ02Point(
+                    GCJ02ChinaAndTaiwanPoint(
                         34.36875865823159, 131.1821490526199,
                         name = "山口县长门市地图选点",
                         source = Source.URI,
