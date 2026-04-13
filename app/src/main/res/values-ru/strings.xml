@@ -276,4 +276,5 @@
     <string name="conversion_failed_reason_timeout">истекло время ожидания</string>
     <string name="conversion_failed_parse_html_error_with_reason">Не удалось обработать web-страницу: %1$s</string>
     <string name="network_exception_too_many_requests">слишком много запросов</string>
+    <string name="licenses">Лицензии</string>
 </resources>
