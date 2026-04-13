@@ -34,29 +34,32 @@ class CoordinateConverter @Inject constructor(
             is GCJ02Point -> if (lat == null || lon == null) {
                 WGS84Point(lat, lon, z, name, source)
             } else {
-                val wgs84Coords = GCJPointer(lat, lon).toExactWGSPointer()
-                WGS84Point(wgs84Coords.latitude, wgs84Coords.latitude, z, name, source)
+                GCJPointer(lat, lon).toExactWGSPointer().run {
+                    WGS84Point(latitude, latitude, z, name, source)
+                }
             }
 
             is GCJ02ChinaPoint -> if (lat == null || lon == null || TransformUtil.outOfChina(lat, lon)) {
                 WGS84Point(lat, lon, z, name, source)
             } else {
+                // If the point is within mainland China, transform its coordinates from GCJ-02 to WGS84
                 val wgs84Coords = GCJPointer(lat, lon).toExactWGSPointer()
                 if (geometries.china.containsPoint(wgs84Coords.longitude, wgs84Coords.latitude)) {
-                    WGS84Point(lat, lon, z, name, source)
-                } else {
                     WGS84Point(wgs84Coords.latitude, wgs84Coords.longitude, z, name, source)
+                } else {
+                    WGS84Point(lat, lon, z, name, source)
                 }
             }
 
             is GCJ02ChinaAndTaiwanPoint -> if (lat == null || lon == null || TransformUtil.outOfChina(lat, lon)) {
                 WGS84Point(lat, lon, z, name, source)
             } else {
+                // If the point is within mainland China or Taiwan, transform its coordinates from GCJ-02 to WGS84
                 val wgs84Coords = GCJPointer(lat, lon).toExactWGSPointer()
                 if (geometries.chinaAndTaiwan.containsPoint(wgs84Coords.longitude, wgs84Coords.latitude)) {
-                    WGS84Point(lat, lon, z, name, source)
-                } else {
                     WGS84Point(wgs84Coords.latitude, wgs84Coords.longitude, z, name, source)
+                } else {
+                    WGS84Point(lat, lon, z, name, source)
                 }
             }
 
@@ -69,18 +72,43 @@ class CoordinateConverter @Inject constructor(
 
     fun toGCJ02(point: Point): GCJ02Point = point.run {
         when (this) {
-            is WGS84Point -> if (lat == null || lon == null || TransformUtil.outOfChina(lat, lon)) {
+            is WGS84Point -> if (lat == null || lon == null) {
                 GCJ02Point(lat, lon, z, name, source)
             } else {
-                val gcj02Coords = WGSPointer(lat, lon).toGCJPointer()
-                GCJ02Point(gcj02Coords.latitude, gcj02Coords.longitude, z, name, source)
+                WGSPointer(lat, lon).toGCJPointer().run {
+                    GCJ02Point(latitude, longitude, z, name, source)
+                }
             }
 
             is GCJ02Point -> this
 
-            is GCJ02ChinaPoint -> TODO()
+            is GCJ02ChinaPoint -> if (lat == null || lon == null || TransformUtil.outOfChina(lat, lon)) {
+                GCJ02Point(lat, lon, z, name, source)
+            } else {
+                // If the point is outside mainland China, transform its coordinates from WGS 84 to GCJ-02
+                val wgs84Coords = GCJPointer(lat, lon).toExactWGSPointer()
+                if (geometries.china.containsPoint(wgs84Coords.longitude, wgs84Coords.latitude)) {
+                    GCJ02Point(lat, lon, z, name, source)
+                } else {
+                    WGSPointer(lat, lon).toGCJPointer().run {
+                        GCJ02Point(latitude, longitude, z, name, source)
+                    }
+                }
+            }
 
-            is GCJ02ChinaAndTaiwanPoint -> TODO()
+            is GCJ02ChinaAndTaiwanPoint -> if (lat == null || lon == null || TransformUtil.outOfChina(lat, lon)) {
+                GCJ02Point(lat, lon, z, name, source)
+            } else {
+                // If the point is outside mainland China or Taiwan, transform its coordinates from WGS 84 to GCJ-02
+                val wgs84Coords = GCJPointer(lat, lon).toExactWGSPointer()
+                if (geometries.chinaAndTaiwan.containsPoint(wgs84Coords.longitude, wgs84Coords.latitude)) {
+                    GCJ02Point(lat, lon, z, name, source)
+                } else {
+                    WGSPointer(lat, lon).toGCJPointer().run {
+                        GCJ02Point(latitude, longitude, z, name, source)
+                    }
+                }
+            }
 
             is BD09MCPoint -> if (lat == null || lon == null) {
                 GCJ02Point(lat, lon, z, name, source)
@@ -97,21 +125,46 @@ class CoordinateConverter @Inject constructor(
             is WGS84Point -> if (lat == null || lon == null || TransformUtil.outOfChina(lat, lon)) {
                 GCJ02ChinaPoint(lat, lon, z, name, source)
             } else {
+                // If the point is within mainland China, transform its coordinates from WGS 84 to GCJ-02
                 if (geometries.china.containsPoint(lon, lat)) {
-                    val gcj02Coords = WGSPointer(lat, lon).toGCJPointer()
-                    GCJ02ChinaPoint(gcj02Coords.latitude, gcj02Coords.longitude, z, name, source)
+                    WGSPointer(lat, lon).toGCJPointer().run {
+                        GCJ02ChinaPoint(latitude, longitude, z, name, source)
+                    }
                 } else {
                     GCJ02ChinaPoint(lat, lon, z, name, source)
                 }
             }
 
-            is GCJ02Point -> TODO()
+            is GCJ02Point -> if (lat == null || lon == null || TransformUtil.outOfChina(lat, lon)) {
+                GCJ02ChinaPoint(lat, lon, z, name, source)
+            } else {
+                // If the point is outside mainland China, transform its coordinates from GCJ-02 to WGS 84
+                val wgs84Coords = GCJPointer(lat, lon).toExactWGSPointer()
+                if (geometries.china.containsPoint(wgs84Coords.longitude, wgs84Coords.latitude)) {
+                    GCJ02ChinaPoint(lat, lon, z, name, source)
+                } else {
+                    GCJ02ChinaPoint(wgs84Coords.latitude, wgs84Coords.longitude, z, name, source)
+                }
+            }
 
             is GCJ02ChinaPoint -> this
 
-            is GCJ02ChinaAndTaiwanPoint -> TODO()
+            is GCJ02ChinaAndTaiwanPoint -> if (lat == null || lon == null || TransformUtil.outOfChina(lat, lon)) {
+                GCJ02ChinaPoint(lat, lon, z, name, source)
+            } else {
+                // If the point is within Taiwan, transform its coordinates from GCJ-02 to WGS 84
+                val wgs84Coords = GCJPointer(lat, lon).toExactWGSPointer()
+                if (
+                    !geometries.china.containsPoint(wgs84Coords.longitude, wgs84Coords.latitude) &&
+                    geometries.chinaAndTaiwan.containsPoint(wgs84Coords.longitude, wgs84Coords.latitude)
+                ) {
+                    GCJ02ChinaPoint(wgs84Coords.latitude, wgs84Coords.longitude, z, name, source)
+                } else {
+                    GCJ02ChinaPoint(lat, lon, z, name, source)
+                }
+            }
 
-            is BD09MCPoint -> TODO()
+            is BD09MCPoint -> toGCJ02China(toGCJ02(point))
         }
     }
 
@@ -120,21 +173,48 @@ class CoordinateConverter @Inject constructor(
             is WGS84Point -> if (lat == null || lon == null || TransformUtil.outOfChina(lat, lon)) {
                 GCJ02ChinaAndTaiwanPoint(lat, lon, z, name, source)
             } else {
+                // If the point is within mainland China or Taiwan, transform its coordinates from WGS 84 to GCJ-02
                 if (geometries.chinaAndTaiwan.containsPoint(lon, lat)) {
-                    val gcj02Coords = WGSPointer(lat, lon).toGCJPointer()
-                    GCJ02ChinaAndTaiwanPoint(gcj02Coords.latitude, gcj02Coords.longitude, z, name, source)
+                    WGSPointer(lat, lon).toGCJPointer().run {
+                        GCJ02ChinaAndTaiwanPoint(latitude, longitude, z, name, source)
+                    }
                 } else {
                     GCJ02ChinaAndTaiwanPoint(lat, lon, z, name, source)
                 }
             }
 
-            is GCJ02Point -> TODO()
+            is GCJ02Point -> if (lat == null || lon == null || TransformUtil.outOfChina(lat, lon)) {
+                GCJ02ChinaAndTaiwanPoint(lat, lon, z, name, source)
+            } else {
+                // If the point is outside mainland China or Taiwan, transform its coordinates from GCJ-02 to WGS 84
+                val wgs84Coords = GCJPointer(lat, lon).toExactWGSPointer()
+                if (geometries.chinaAndTaiwan.containsPoint(wgs84Coords.longitude, wgs84Coords.latitude)) {
+                    GCJ02ChinaAndTaiwanPoint(lat, lon, z, name, source)
+                } else {
+                    GCJ02ChinaAndTaiwanPoint(wgs84Coords.latitude, wgs84Coords.longitude, z, name, source)
+                }
+            }
 
-            is GCJ02ChinaPoint -> TODO()
+            is GCJ02ChinaPoint -> if (lat == null || lon == null || TransformUtil.outOfChina(lat, lon)) {
+                GCJ02ChinaAndTaiwanPoint(lat, lon, z, name, source)
+            } else {
+                // If the point is within Taiwan, transform its coordinates from WGS 84 to GCJ-02
+                val wgs84Coords = GCJPointer(lat, lon).toExactWGSPointer()
+                if (
+                    !geometries.china.containsPoint(wgs84Coords.longitude, wgs84Coords.latitude) &&
+                    geometries.chinaAndTaiwan.containsPoint(wgs84Coords.longitude, wgs84Coords.latitude)
+                ) {
+                    WGSPointer(lat, lon).toGCJPointer().run {
+                        GCJ02ChinaAndTaiwanPoint(latitude, longitude, z, name, source)
+                    }
+                } else {
+                    GCJ02ChinaAndTaiwanPoint(lat, lon, z, name, source)
+                }
+            }
 
             is GCJ02ChinaAndTaiwanPoint -> this
 
-            is BD09MCPoint -> TODO()
+            is BD09MCPoint -> toGCJ02ChinaAndTaiwan(toGCJ02(point))
         }
     }
 }
