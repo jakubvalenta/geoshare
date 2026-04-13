@@ -260,4 +260,5 @@
     <string name="conversion_failed_reason_timeout">изтичане на времето</string>
     <string name="conversion_failed_parse_html_error_with_reason">Неуспешна обработка на уеб страницата поради: %1$s</string>
     <string name="network_exception_too_many_requests">твърде много заявки</string>
+    <string name="licenses">Лицензи</string>
 </resources>
