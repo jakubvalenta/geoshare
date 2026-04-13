@@ -50,7 +50,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeOpenStreetMapDisplayLink
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
-import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.outputs.CopyGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.OpenPointOutput
 import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
@@ -193,8 +193,8 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             AppIcon(
                 modifier = Modifier.width(85.dp),
@@ -220,8 +220,8 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             AppIcon(
                 modifier = Modifier.width(85.dp),
@@ -247,8 +247,8 @@ private fun ShareItemPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             val output = ShareDisplayGeoUriOutput(geoUriFormatter)
             AppIcon(
@@ -276,8 +276,8 @@ private fun DarkShareItemPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             val output = ShareDisplayGeoUriOutput(geoUriFormatter)
             AppIcon(

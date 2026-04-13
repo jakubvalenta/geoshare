@@ -13,7 +13,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.lib.android.TEST_PACKAGE_NAME
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
-import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
@@ -23,8 +23,8 @@ import kotlin.io.path.createTempDirectory
 
 class OpenRouteOnePointGpxOutputTest {
     private val mockContext: Context = mock {}
-    private val chinaGeometry = ChinaGeometry(mockContext)
-    private val coordinateConverter = CoordinateConverter(chinaGeometry)
+    private val geometries = Geometries(mockContext)
+    private val coordinateConverter = CoordinateConverter(geometries)
     private val gpxFormatter = GpxFormatter(coordinateConverter)
 
     private fun mockActionContext(parentDir: File): ActionContext =

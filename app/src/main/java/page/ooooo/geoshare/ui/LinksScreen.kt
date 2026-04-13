@@ -61,7 +61,7 @@ import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.CustomLinkFeature
 import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.formatters.UriFormatter
-import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Srs
 import page.ooooo.geoshare.ui.components.BasicListDetailScaffold
@@ -532,8 +532,8 @@ private fun DefaultPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val uriFormatter = UriFormatter(coordinateConverter)
                 LinksScreen(
                     destination = null,
@@ -587,8 +587,8 @@ private fun DarkPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val uriFormatter = UriFormatter(coordinateConverter)
                 LinksScreen(
                     destination = null,
@@ -642,8 +642,8 @@ private fun TabletPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val uriFormatter = UriFormatter(coordinateConverter)
                 LinksScreen(
                     destination = null,
@@ -697,8 +697,8 @@ private fun InsertPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val uriFormatter = UriFormatter(coordinateConverter)
                 LinksScreen(
                     destination = -1,
@@ -752,8 +752,8 @@ private fun DarkInsertPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val uriFormatter = UriFormatter(coordinateConverter)
                 LinksScreen(
                     destination = -1,
@@ -808,8 +808,8 @@ private fun TabletInsertPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val uriFormatter = UriFormatter(coordinateConverter)
                 LinksScreen(
                     destination = -1,
@@ -863,8 +863,8 @@ private fun InsertNotPurchasedPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val uriFormatter = UriFormatter(coordinateConverter)
                 LinksScreen(
                     destination = -1,
@@ -914,8 +914,8 @@ private fun DarkInsertNotPurchasedPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val uriFormatter = UriFormatter(coordinateConverter)
                 LinksScreen(
                     destination = -1,
@@ -966,8 +966,8 @@ private fun TabletInsertNotPurchasedPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val uriFormatter = UriFormatter(coordinateConverter)
                 LinksScreen(
                     destination = -1,
@@ -1018,8 +1018,8 @@ private fun UpdatePreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val link = FakeGoogleMapsStreetViewLink
                 val uriFormatter = UriFormatter(coordinateConverter)
                 LinksScreen(
@@ -1075,8 +1075,8 @@ private fun DarkUpdatePreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val link = FakeGoogleMapsStreetViewLink
                 val uriFormatter = UriFormatter(coordinateConverter)
                 LinksScreen(
@@ -1132,8 +1132,8 @@ private fun TabletUpdatePreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val link = FakeGoogleMapsStreetViewLink
                 val uriFormatter = UriFormatter(coordinateConverter)
                 LinksScreen(

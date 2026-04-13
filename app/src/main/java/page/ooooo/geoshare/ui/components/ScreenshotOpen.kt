@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
-import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -116,8 +116,8 @@ private fun ScreenshotOpenPreview() {
     AppTheme {
         Column(Modifier.background(MaterialTheme.colorScheme.surfaceVariant)) {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val coordinateFormatter = CoordinateFormatter(coordinateConverter)
             ScreenshotOpen(coordinateFormatter)
         }
@@ -130,8 +130,8 @@ private fun DarkScreenshotOpenPreview() {
     AppTheme {
         Column(Modifier.background(MaterialTheme.colorScheme.surfaceVariant)) {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val coordinateFormatter = CoordinateFormatter(coordinateConverter)
             ScreenshotOpen(coordinateFormatter)
         }
@@ -144,8 +144,8 @@ private fun RTLScreenshotOpenPreview() {
     AppTheme {
         Column(Modifier.background(MaterialTheme.colorScheme.surfaceVariant)) {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val coordinateFormatter = CoordinateFormatter(coordinateConverter)
             ScreenshotOpen(coordinateFormatter)
         }
@@ -163,8 +163,8 @@ private fun TabletScreenshotOpenPreview() {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val coordinateFormatter = CoordinateFormatter(coordinateConverter)
             ScreenshotOpen(coordinateFormatter)
         }

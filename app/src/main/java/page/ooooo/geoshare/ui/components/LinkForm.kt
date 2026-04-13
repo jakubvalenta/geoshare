@@ -59,7 +59,7 @@ import page.ooooo.geoshare.data.local.database.LinkType
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formatters.UriFormatter
-import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.outputs.CopyLinkUriOutput
 import page.ooooo.geoshare.lib.outputs.ShareLinkUriOutput
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
@@ -479,8 +479,8 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val uriFormatter = UriFormatter(coordinateConverter)
             LinkForm(
                 appEnabled = false,
@@ -514,8 +514,8 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val uriFormatter = UriFormatter(coordinateConverter)
             LinkForm(
                 appEnabled = false,
@@ -549,8 +549,8 @@ private fun UpdatePreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val link = FakeGoogleMapsStreetViewLink
             val uriFormatter = UriFormatter(coordinateConverter)
             LinkForm(
@@ -589,8 +589,8 @@ private fun DarkUpdatePreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val link = FakeGoogleMapsStreetViewLink
             val uriFormatter = UriFormatter(coordinateConverter)
             LinkForm(
@@ -625,8 +625,8 @@ private fun UpdateExpandedPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val link = FakeGoogleMapsStreetViewLink
             val uriFormatter = UriFormatter(coordinateConverter)
             LinkForm(
@@ -666,8 +666,8 @@ private fun DarkUpdateExpandedPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val link = FakeGoogleMapsStreetViewLink
             val uriFormatter = UriFormatter(coordinateConverter)
             LinkForm(

@@ -8,8 +8,8 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.geo.ChinaGeometry
-import page.ooooo.geoshare.lib.geo.ChinaGeometryTest
+import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.GeometriesTest
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
@@ -18,14 +18,14 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 class GoogleMapsUriFormatterTest {
     private val mockAssetManager: AssetManager = mock {
         on { open("china_ne_10m.wkb") } doReturn
-            (ChinaGeometryTest::class.java.getResourceAsStream("/china_ne_10m.wkb")
+            (GeometriesTest::class.java.getResourceAsStream("/china_ne_10m.wkb")
                 ?: error("china_ne_10m.wkb not found in test resources"))
     }
     private val mockContext: Context = mock {
         on { assets } doReturn mockAssetManager
     }
-    private val chinaGeometry = ChinaGeometry(mockContext)
-    private val coordinateConverter = CoordinateConverter(chinaGeometry)
+    private val geometries = Geometries(mockContext)
+    private val coordinateConverter = CoordinateConverter(geometries)
     private val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
     private val uriQuote: UriQuote = FakeUriQuote
 

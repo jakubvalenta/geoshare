@@ -27,7 +27,7 @@ import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
 import page.ooooo.geoshare.lib.formatters.MagicEarthUriFormatter
 import page.ooooo.geoshare.lib.formatters.UriFormatter
-import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
@@ -127,8 +127,8 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val coordinateFormatter = CoordinateFormatter(coordinateConverter)
             val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
@@ -166,8 +166,8 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val coordinateFormatter = CoordinateFormatter(coordinateConverter)
             val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
@@ -201,8 +201,8 @@ private fun LastPointPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val coordinateFormatter = CoordinateFormatter(coordinateConverter)
             val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
@@ -240,8 +240,8 @@ private fun DarkLastPointPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val coordinateFormatter = CoordinateFormatter(coordinateConverter)
             val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)

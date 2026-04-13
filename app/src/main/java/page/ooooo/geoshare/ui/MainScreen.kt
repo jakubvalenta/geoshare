@@ -132,7 +132,7 @@ import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
 import page.ooooo.geoshare.lib.formatters.MagicEarthUriFormatter
 import page.ooooo.geoshare.lib.formatters.UriFormatter
-import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.network.NetworkTools
@@ -1031,8 +1031,8 @@ private fun MainSkipButton(
 private fun DefaultPreview() {
     AppTheme {
         val context = LocalContext.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         MainScreen(
             currentState = Initial(),
@@ -1082,8 +1082,8 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         val context = LocalContext.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         MainScreen(
             currentState = Initial(),
@@ -1133,8 +1133,8 @@ private fun DarkPreview() {
 private fun TabletPreview() {
     AppTheme {
         val context = LocalContext.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         MainScreen(
             currentState = Initial(),
@@ -1184,8 +1184,8 @@ private fun TabletPreview() {
 private fun SucceededPreview() {
     AppTheme {
         val context = LocalContext.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         val geoUriFormatter = GeoUriFormatter(coordinateConverter)
         val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
@@ -1273,8 +1273,8 @@ private fun SucceededPreview() {
 private fun DarkSucceededPreview() {
     AppTheme {
         val context = LocalContext.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         val geoUriFormatter = GeoUriFormatter(coordinateConverter)
         val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
@@ -1362,8 +1362,8 @@ private fun DarkSucceededPreview() {
 private fun SmallSucceededPreview() {
     AppTheme {
         val context = LocalContext.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         val geoUriFormatter = GeoUriFormatter(coordinateConverter)
         val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
@@ -1451,8 +1451,8 @@ private fun SmallSucceededPreview() {
 private fun TabletSucceededPreview() {
     AppTheme {
         val context = LocalContext.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         val geoUriFormatter = GeoUriFormatter(coordinateConverter)
         val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
@@ -1540,8 +1540,8 @@ private fun TabletSucceededPreview() {
 private fun DarkTabletSucceededPreview() {
     AppTheme {
         val context = LocalContext.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         val geoUriFormatter = GeoUriFormatter(coordinateConverter)
         val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
@@ -1622,8 +1622,8 @@ private fun AutomationPreview() {
     AppTheme {
         val context = LocalContext.current
         val resources = LocalResources.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         val geoUriFormatter = GeoUriFormatter(coordinateConverter)
         val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
@@ -1710,8 +1710,8 @@ private fun DarkAutomationPreview() {
     AppTheme {
         val context = LocalContext.current
         val resources = LocalResources.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         val geoUriFormatter = GeoUriFormatter(coordinateConverter)
         val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
@@ -1798,8 +1798,8 @@ private fun TabletAutomationPreview() {
     AppTheme {
         val context = LocalContext.current
         val resources = LocalResources.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         val geoUriFormatter = GeoUriFormatter(coordinateConverter)
         val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
@@ -1886,8 +1886,8 @@ private fun WebViewPreview() {
     AppTheme {
         val context = LocalContext.current
         val resources = LocalResources.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         val geoUriFormatter = GeoUriFormatter(coordinateConverter)
         val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
@@ -1968,8 +1968,8 @@ private fun DarkWebViewPreview() {
     AppTheme {
         val context = LocalContext.current
         val resources = LocalResources.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         val geoUriFormatter = GeoUriFormatter(coordinateConverter)
         val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
@@ -2050,8 +2050,8 @@ private fun TabletWebViewPreview() {
     AppTheme {
         val context = LocalContext.current
         val resources = LocalResources.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         val geoUriFormatter = GeoUriFormatter(coordinateConverter)
         val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
@@ -2131,8 +2131,8 @@ private fun TabletWebViewPreview() {
 private fun ErrorPreview() {
     AppTheme {
         val context = LocalContext.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         MainScreen(
             currentState = ConversionFailed(
@@ -2189,8 +2189,8 @@ private fun ErrorPreview() {
 private fun DarkErrorPreview() {
     AppTheme {
         val context = LocalContext.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         MainScreen(
             currentState = ConversionFailed(
@@ -2247,8 +2247,8 @@ private fun DarkErrorPreview() {
 private fun TabletErrorPreview() {
     AppTheme {
         val context = LocalContext.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         MainScreen(
             currentState = ConversionFailed(
@@ -2306,8 +2306,8 @@ private fun EmptyPreview() {
     AppTheme {
         val context = LocalContext.current
         val resources = LocalResources.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         val geoUriFormatter = GeoUriFormatter(coordinateConverter)
         val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
@@ -2385,8 +2385,8 @@ private fun LoadingIndicatorPreview() {
     AppTheme {
         val context = LocalContext.current
         val resources = LocalResources.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         val geoUriFormatter = GeoUriFormatter(coordinateConverter)
         val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
@@ -2469,8 +2469,8 @@ private fun DarkLoadingIndicatorPreview() {
     AppTheme {
         val context = LocalContext.current
         val resources = LocalResources.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         val geoUriFormatter = GeoUriFormatter(coordinateConverter)
         val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
@@ -2553,8 +2553,8 @@ private fun TabletLoadingIndicatorPreview() {
     AppTheme {
         val context = LocalContext.current
         val resources = LocalResources.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         val geoUriFormatter = GeoUriFormatter(coordinateConverter)
         val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)

@@ -49,6 +49,11 @@ sealed interface Point {
     fun hasName(): Boolean = !name.isNullOrEmpty()
 }
 
+/**
+ * Point that has coordinates in the international WGS 84 spatial reference system.
+ *
+ * Used by OpenStreetMap and many other services.
+ */
 @Immutable
 data class WGS84Point(
     override val lat: Double? = null,
@@ -66,6 +71,12 @@ data class WGS84Point(
     )
 }
 
+/**
+ * Point that has coordinates in the Chinese GCJ-02 spatial reference system when it's within a large rectangle that
+ * includes China, Taiwan, Korea, and western Japan. Everywhere else the coordinates are in WGS 84.
+ *
+ * Used by Evil Transform.
+ */
 @Immutable
 data class GCJ02Point(
     override val lat: Double? = null,
@@ -84,16 +95,10 @@ data class GCJ02Point(
 }
 
 /**
- * A coordinate system used by Google Maps. It applies the same conversion as GCJ-02, but instead of applying it within
- * the large rectangle than includes China, Taiwan, Korea, and western Japan, it applies it only within the precise land
- * borders of mainland China. So within the Chinese sea, Taiwan, Korea and western Japan, the coordinates are WGS 84.
+ * Point that has coordinates in the Chinese GCJ-02 spatial reference system when it's within mainland China. Everywhere
+ * else the coordinates are in WGS 84.
  *
- * However, there are specific locations in the Chinese sea where this logic predicts Google Maps to use WGS 84, but
- * Google Maps seems to use GCJ-02 instead, e.g. 38.30121535762941,120.81016278215878; we use WGS 84 for these points,
- * which results in inaccuracies.
- *
- * To calculate whether a point is within the land borders of mainland China, we always start with a quick check using
- * [TransformUtil.outOfChina], and only if it fails we do an exact calculation using [ChinaGeometry].
+ * Used by Google Maps.
  */
 @Immutable
 data class GCJ02ChinaPoint(
@@ -112,6 +117,32 @@ data class GCJ02ChinaPoint(
     )
 }
 
+/**
+ * Point that has coordinates in the Chinese GCJ-02 spatial reference system when it's within mainland China or Taiwan.
+ * Everywhere else the coordinates are in WGS 84.
+ *
+ * Used by Amap.
+ */
+@Immutable
+data class GCJ02ChinaAndTaiwanPoint(
+    override val lat: Double? = null,
+    override val lon: Double? = null,
+    override val z: Double? = null,
+    override val name: String? = null,
+    override val source: Source,
+) : Point {
+    constructor(naivePoint: NaivePoint) : this(
+        naivePoint.lat,
+        naivePoint.lon,
+        naivePoint.z,
+        naivePoint.name,
+        naivePoint.source,
+    )
+}
+
+/**
+ * Point that has coordinates in the Baidu Map spatial reference system.
+ */
 @Immutable
 data class BD09MCPoint(
     override val lat: Double? = null,

@@ -36,7 +36,7 @@ import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
-import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Point
@@ -210,8 +210,8 @@ interface BehaviorTest {
         timeoutMs: Long = NETWORK_TIMEOUT,
     ) {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
 
         onElement(timeoutMs) {

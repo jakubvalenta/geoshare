@@ -4,15 +4,15 @@ import android.content.Context
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
-import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class CoordinateFormatterTest {
     private val mockContext: Context = mock {}
-    private val chinaGeometry = ChinaGeometry(mockContext)
-    private val coordinateConverter = CoordinateConverter(chinaGeometry)
+    private val geometries = Geometries(mockContext)
+    private val coordinateConverter = CoordinateConverter(geometries)
     private val coordinateFormatter = CoordinateFormatter(coordinateConverter)
 
     @Test

@@ -59,7 +59,7 @@ import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
 import page.ooooo.geoshare.lib.formatters.MagicEarthUriFormatter
 import page.ooooo.geoshare.lib.formatters.UriFormatter
-import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.inputs.GeoUriInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.inputs.HtmlInput
@@ -167,8 +167,8 @@ class ConversionStateTest {
         on { getString(R.string.network_exception_server_response_error) } doReturn "server response error"
     }
     private val mockContext: Context = mock {}
-    private val chinaGeometry = ChinaGeometry(mockContext)
-    private val coordinateConverter = CoordinateConverter(chinaGeometry)
+    private val geometries = Geometries(mockContext)
+    private val coordinateConverter = CoordinateConverter(geometries)
     private val coordinateFormatter = CoordinateFormatter(coordinateConverter)
     private val geoUriFormatter = GeoUriFormatter(coordinateConverter)
     private val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)

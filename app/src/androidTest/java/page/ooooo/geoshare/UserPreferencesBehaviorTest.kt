@@ -14,7 +14,7 @@ import page.ooooo.geoshare.BehaviorTest.Companion.ELEMENT_DOES_NOT_EXIST_TIMEOUT
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
-import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
@@ -26,8 +26,8 @@ class UserPreferencesBehaviorTest : BehaviorTest {
     @Test
     fun whenCoordinateFormatIsSet_showsCoordinatesInThatFormat() = uiAutomator {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
 
         // Launch application and close intro

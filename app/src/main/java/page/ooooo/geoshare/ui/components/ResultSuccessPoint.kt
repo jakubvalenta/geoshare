@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
-import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -84,8 +84,8 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val coordinateFormatter = CoordinateFormatter(coordinateConverter)
             ResultSuccessPoint(
                 point = Point.example,
@@ -104,8 +104,8 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val coordinateFormatter = CoordinateFormatter(coordinateConverter)
             ResultSuccessPoint(
                 point = Point.example,
@@ -124,8 +124,8 @@ private fun LongNamePreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val coordinateFormatter = CoordinateFormatter(coordinateConverter)
             ResultSuccessPoint(
                 point = Point.genRandomPoint(name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany"),
@@ -144,8 +144,8 @@ private fun DarkLongNamePreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val coordinateFormatter = CoordinateFormatter(coordinateConverter)
             ResultSuccessPoint(
                 point = Point.genRandomPoint(name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany"),

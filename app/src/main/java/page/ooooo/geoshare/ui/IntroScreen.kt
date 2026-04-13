@@ -51,7 +51,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
-import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.ui.components.ParagraphHtml
 import page.ooooo.geoshare.ui.components.ParagraphText
@@ -309,8 +309,8 @@ private fun IntroFigure(
 private fun PageOnePreview() {
     AppTheme {
         val context = LocalContext.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         IntroScreen(
             coordinateFormatter = coordinateFormatter,
@@ -326,8 +326,8 @@ private fun PageOnePreview() {
 private fun DarkPageOnePreview() {
     AppTheme {
         val context = LocalContext.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         IntroScreen(
             coordinateFormatter = coordinateFormatter,
@@ -343,8 +343,8 @@ private fun DarkPageOnePreview() {
 private fun SmallPageOnePreview() {
     AppTheme {
         val context = LocalContext.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         IntroScreen(
             coordinateFormatter = coordinateFormatter,
@@ -360,8 +360,8 @@ private fun SmallPageOnePreview() {
 private fun TabletPageOnePreview() {
     AppTheme {
         val context = LocalContext.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         IntroScreen(
             coordinateFormatter = coordinateFormatter,
@@ -377,8 +377,8 @@ private fun TabletPageOnePreview() {
 private fun PageTwoPreview() {
     AppTheme {
         val context = LocalContext.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         IntroScreen(
             coordinateFormatter = coordinateFormatter,
@@ -395,8 +395,8 @@ private fun PageTwoPreview() {
 private fun DarkPageTwoPreview() {
     AppTheme {
         val context = LocalContext.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         IntroScreen(
             coordinateFormatter = coordinateFormatter,
@@ -413,8 +413,8 @@ private fun DarkPageTwoPreview() {
 private fun SmallPageTwoPreview() {
     AppTheme {
         val context = LocalContext.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         IntroScreen(
             coordinateFormatter = coordinateFormatter,
@@ -431,8 +431,8 @@ private fun SmallPageTwoPreview() {
 private fun TabletPageTwoPreview() {
     AppTheme {
         val context = LocalContext.current
-        val chinaGeometry = ChinaGeometry(context)
-        val coordinateConverter = CoordinateConverter(chinaGeometry)
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         IntroScreen(
             coordinateFormatter = coordinateFormatter,

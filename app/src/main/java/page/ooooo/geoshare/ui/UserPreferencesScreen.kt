@@ -94,7 +94,7 @@ import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.CustomLinkFeature
 import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
-import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
@@ -1002,8 +1002,8 @@ private fun DefaultPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 UserPreferencesScreen(
                     initialGroupId = null,
@@ -1033,8 +1033,8 @@ private fun DarkPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 UserPreferencesScreen(
                     initialGroupId = null,
@@ -1064,8 +1064,8 @@ private fun TabletPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 UserPreferencesScreen(
                     initialGroupId = null,
@@ -1095,8 +1095,8 @@ private fun ConnectionPermissionPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
@@ -1126,8 +1126,8 @@ private fun DarkConnectionPermissionPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
@@ -1157,8 +1157,8 @@ private fun TabletConnectionPermissionPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
@@ -1188,8 +1188,8 @@ private fun CoordinateFormatPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.COORDINATE_FORMAT,
@@ -1219,8 +1219,8 @@ private fun DarkCoordinateFormatPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.COORDINATE_FORMAT,
@@ -1250,8 +1250,8 @@ private fun TabletCoordinateFormatPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.COORDINATE_FORMAT,
@@ -1281,8 +1281,8 @@ private fun AutomationPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
@@ -1327,8 +1327,8 @@ private fun DarkAutomationPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
@@ -1373,8 +1373,8 @@ private fun TabletAutomationPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
@@ -1419,8 +1419,8 @@ private fun AutomationFeatureNotAvailablePreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
@@ -1461,8 +1461,8 @@ private fun DarkAutomationFeatureNotAvailablePreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
@@ -1503,8 +1503,8 @@ private fun TabletAutomationFeatureNotAvailablePreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
@@ -1545,8 +1545,8 @@ private fun AutomationDelayPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION_DELAY,
@@ -1583,8 +1583,8 @@ private fun DarkAutomationDelayPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION_DELAY,
@@ -1621,8 +1621,8 @@ private fun TableAutomationDelayPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION_DELAY,
@@ -1659,8 +1659,8 @@ private fun HiddenAppsPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
@@ -1710,8 +1710,8 @@ private fun DarkHiddenAppsPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
@@ -1761,8 +1761,8 @@ private fun TabletHiddenAppsPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
@@ -1812,8 +1812,8 @@ private fun HiddenAppsLoadingPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
@@ -1861,8 +1861,8 @@ private fun DarkHiddenAppsLoadingPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
@@ -1910,8 +1910,8 @@ private fun TabletHiddenAppsLoadingPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
@@ -1959,8 +1959,8 @@ private fun DeveloperOptionsPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.DEVELOPER_OPTIONS,
@@ -1993,8 +1993,8 @@ private fun DarkDeveloperOptionsPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.DEVELOPER_OPTIONS,
@@ -2027,8 +2027,8 @@ private fun TableDeveloperOptionsPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.DEVELOPER_OPTIONS,

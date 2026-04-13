@@ -48,7 +48,7 @@ import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
 import page.ooooo.geoshare.lib.formatters.MagicEarthUriFormatter
 import page.ooooo.geoshare.lib.formatters.UriFormatter
-import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.outputs.CopyCoordsDecOutput
 import page.ooooo.geoshare.lib.outputs.CopyCoordsDegMinSecOutput
 import page.ooooo.geoshare.lib.outputs.CopyGeoUriOutput
@@ -76,8 +76,8 @@ import java.util.UUID
 
 class OutputRepositoryTest {
     private val mockContext: Context = mock {}
-    private val chinaGeometry = ChinaGeometry(mockContext)
-    private val coordinateConverter = CoordinateConverter(chinaGeometry)
+    private val geometries = Geometries(mockContext)
+    private val coordinateConverter = CoordinateConverter(geometries)
     private val coordinateFormatter = CoordinateFormatter(coordinateConverter)
     private val geoUriFormatter = GeoUriFormatter(coordinateConverter)
     private val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)

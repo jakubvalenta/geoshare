@@ -68,7 +68,7 @@ import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
 import page.ooooo.geoshare.lib.formatters.MagicEarthUriFormatter
 import page.ooooo.geoshare.lib.formatters.UriFormatter
-import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 import page.ooooo.geoshare.lib.outputs.Output
@@ -293,8 +293,8 @@ private fun ActionFinishedPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
@@ -331,8 +331,8 @@ private fun DarkActionFinishedPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
@@ -370,8 +370,8 @@ private fun ActionFinishedFeatureNotAvailablePreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val geoUriFormatter = GeoUriFormatter(coordinateConverter)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessMessage(
@@ -407,8 +407,8 @@ private fun DarkActionFinishedFeatureNotAvailablePreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val geoUriFormatter = GeoUriFormatter(coordinateConverter)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessMessage(
@@ -444,8 +444,8 @@ private fun ActionWaitingPreview() {
         Surface {
             val context = LocalContext.current
             val resources = LocalResources.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val coordinateFormatter = CoordinateFormatter(coordinateConverter)
             val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
@@ -504,8 +504,8 @@ private fun DarkActionWaitingPreview() {
         Surface {
             val context = LocalContext.current
             val resources = LocalResources.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val coordinateFormatter = CoordinateFormatter(coordinateConverter)
             val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
@@ -564,8 +564,8 @@ private fun LocationPermissionReceivedPreview() {
         Surface {
             val context = LocalContext.current
             val resources = LocalResources.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val coordinateFormatter = CoordinateFormatter(coordinateConverter)
             val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
@@ -623,8 +623,8 @@ private fun DarkLocationPermissionReceivedPreview() {
         Surface {
             val context = LocalContext.current
             val resources = LocalResources.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val coordinateFormatter = CoordinateFormatter(coordinateConverter)
             val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
@@ -681,8 +681,8 @@ private fun SucceededPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
@@ -719,8 +719,8 @@ private fun DarSucceededPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
@@ -757,8 +757,8 @@ private fun SucceededNoMessagePreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val gpxFormatter = GpxFormatter(coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
@@ -794,8 +794,8 @@ private fun DarkSucceededNoMessagePreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val gpxFormatter = GpxFormatter(coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
@@ -831,8 +831,8 @@ private fun FailedPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
@@ -869,8 +869,8 @@ private fun DarkFailedPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val chinaGeometry = ChinaGeometry(context)
-            val coordinateConverter = CoordinateConverter(chinaGeometry)
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val geoUriFormatter = GeoUriFormatter(coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(

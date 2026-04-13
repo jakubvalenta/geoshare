@@ -49,7 +49,7 @@ import page.ooooo.geoshare.data.InputRepository
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
 import page.ooooo.geoshare.lib.formatters.UriFormatter
-import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.inputs.AmapInput
 import page.ooooo.geoshare.lib.inputs.AppleMapsInput
 import page.ooooo.geoshare.lib.inputs.BaiduMapInput
@@ -371,8 +371,8 @@ private fun DefaultPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 val geoUriFormatter = GeoUriFormatter(coordinateConverter)
                 val uriFormatter = UriFormatter(coordinateConverter)
@@ -430,8 +430,8 @@ private fun DarkPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 val geoUriFormatter = GeoUriFormatter(coordinateConverter)
                 val uriFormatter = UriFormatter(coordinateConverter)
@@ -489,8 +489,8 @@ private fun TabletPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 val geoUriFormatter = GeoUriFormatter(coordinateConverter)
                 val uriFormatter = UriFormatter(coordinateConverter)
@@ -548,8 +548,8 @@ private fun NoRecentPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 val geoUriFormatter = GeoUriFormatter(coordinateConverter)
                 val uriFormatter = UriFormatter(coordinateConverter)
@@ -605,8 +605,8 @@ private fun DarkNoRecentPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 val geoUriFormatter = GeoUriFormatter(coordinateConverter)
                 val uriFormatter = UriFormatter(coordinateConverter)
@@ -662,8 +662,8 @@ private fun TabletNoRecentPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 val geoUriFormatter = GeoUriFormatter(coordinateConverter)
                 val uriFormatter = UriFormatter(coordinateConverter)
@@ -719,8 +719,8 @@ private fun OpenStreetMapPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 val geoUriFormatter = GeoUriFormatter(coordinateConverter)
                 val uriFormatter = UriFormatter(coordinateConverter)
@@ -778,8 +778,8 @@ private fun DarkOpenStreetMapPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 val geoUriFormatter = GeoUriFormatter(coordinateConverter)
                 val uriFormatter = UriFormatter(coordinateConverter)
@@ -837,8 +837,8 @@ private fun TabletOpenStreetMapPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 val geoUriFormatter = GeoUriFormatter(coordinateConverter)
                 val uriFormatter = UriFormatter(coordinateConverter)
@@ -896,8 +896,8 @@ private fun GeoUriPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 val geoUriFormatter = GeoUriFormatter(coordinateConverter)
                 val uriFormatter = UriFormatter(coordinateConverter)
@@ -955,8 +955,8 @@ private fun DarkGeoUriPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 val geoUriFormatter = GeoUriFormatter(coordinateConverter)
                 val uriFormatter = UriFormatter(coordinateConverter)
@@ -1014,8 +1014,8 @@ private fun TabletGeoUriPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val chinaGeometry = ChinaGeometry(context)
-                val coordinateConverter = CoordinateConverter(chinaGeometry)
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val coordinateFormatter = CoordinateFormatter(coordinateConverter)
                 val geoUriFormatter = GeoUriFormatter(coordinateConverter)
                 val uriFormatter = UriFormatter(coordinateConverter)

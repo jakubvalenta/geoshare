@@ -6,15 +6,15 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.geo.ChinaGeometry
+import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class MagicEarthUriFormatterTest {
     private val mockContext: Context = mock {}
-    private val chinaGeometry = ChinaGeometry(mockContext)
-    private val coordinateConverter = CoordinateConverter(chinaGeometry)
+    private val geometries = Geometries(mockContext)
+    private val coordinateConverter = CoordinateConverter(geometries)
     private val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
     private val uriQuote: UriQuote = FakeUriQuote
 

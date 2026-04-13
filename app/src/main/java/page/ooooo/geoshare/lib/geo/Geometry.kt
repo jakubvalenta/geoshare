@@ -10,20 +10,20 @@ import org.locationtech.jts.io.WKBReader
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
-class ChinaGeometry @Inject constructor(
-    @param:ApplicationContext private val context: Context,
+class Geometry(
+    private val context: Context,
+    private val fileName: String,
 ) {
     private val geometryFactory = GeometryFactory()
 
     private val preparedGeometry: PreparedGeometry by lazy {
-        val bytes = context.assets.open("china_ne_10m.wkb").readBytes()
+        val bytes = context.assets.open(fileName).readBytes()
         val geometry = WKBReader(geometryFactory).read(bytes)
         PreparedGeometryFactory.prepare(geometry)
     }
 
     /**
-     * Returns true if the given coordinates are within the China geometry.
+     * Returns true if the given coordinates are within the geometry.
      *
      * Loads and prepares the geometry from assets on the first call.
      *
@@ -33,4 +33,12 @@ class ChinaGeometry @Inject constructor(
         val point = geometryFactory.createPoint(Coordinate(x, y))
         return preparedGeometry.contains(point)
     }
+}
+
+@Singleton
+class Geometries @Inject constructor(
+    @ApplicationContext context: Context,
+) {
+    val china = Geometry(context, "china_ne_10m.wkb")
+    val chinaAndTaiwan = Geometry(context, "china_ne_10m.wkb") // TODO Use another wkb file
 }
