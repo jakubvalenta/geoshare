@@ -3,17 +3,22 @@ package page.ooooo.geoshare.lib.point
 import android.content.Context
 import android.content.res.AssetManager
 import org.junit.Assert.assertEquals
-import org.junit.Assume.assumeTrue
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.GCJ02ChinaAndTaiwanPoint
+import page.ooooo.geoshare.lib.geo.GCJ02ChinaPoint
+import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.GeometriesTest
-import page.ooooo.geoshare.lib.geo.CoordinateConverter
-import page.ooooo.geoshare.lib.geo.GCJ02Point
+import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import kotlin.math.roundToLong
 
 class CoordinateConverterTest {
     private val mockAssetManager: AssetManager = mock {
@@ -27,157 +32,388 @@ class CoordinateConverterTest {
     private val geometries = Geometries(mockContext)
     private val coordinateConverter = CoordinateConverter(geometries)
 
-    @Test
-    fun toGCJ02_whenPointIsWGS84AndDoesNotHaveCoords_returnsGCJ02PointWithoutCoords() {
-        assertEquals(
-            GCJ02Point(z = 3.14, name = "foo bar", source = Source.GENERATED),
-            coordinateConverter.toGCJ02(WGS84Point(z = 3.14, name = "foo bar", source = Source.GENERATED)),
-        )
-    }
+    private data class PointInDifferentSrs(
+        val wgs84: WGS84Point? = null,
+        val gcj02: GCJ02Point? = null,
+        val gcj02China: GCJ02ChinaPoint? = null,
+        val gcj02ChinaAndTaiwan: GCJ02ChinaAndTaiwanPoint? = null,
+        val bd09MC: BD09MCPoint? = null,
+    )
 
-    @Test
-    fun toGCJ02_whenPointIsWGS84AndWithinChina_returnsGCJ02PointWithRecalculatedCoords() {
-        assertEquals(
-            GCJ02Point(31.22281206362763, 121.46840659541449, 3.14, "foo bar", source = Source.GENERATED),
-            coordinateConverter.toGCJ02(
-                WGS84Point(31.224731304675522, 121.46385323166844, 3.14, "foo bar", source = Source.GENERATED)
+    private val points = listOf(
+        // Empty point
+        PointInDifferentSrs(
+            wgs84 = WGS84Point(z = 3.14, name = "foo bar", source = Source.GENERATED),
+            gcj02 = GCJ02Point(z = 3.14, name = "foo bar", source = Source.GENERATED),
+            gcj02China = GCJ02ChinaPoint(z = 3.14, name = "foo bar", source = Source.GENERATED),
+            gcj02ChinaAndTaiwan = GCJ02ChinaAndTaiwanPoint(z = 3.14, name = "foo bar", source = Source.GENERATED),
+            bd09MC = BD09MCPoint(z = 3.14, name = "foo bar", source = Source.GENERATED),
+        ),
+        // Limoges
+        PointInDifferentSrs(
+            wgs84 = WGS84Point(
+                45.8289525077221, 1.266689300537103,
+                z = 3.14, name = "foo bar", source = Source.GENERATED,
             ),
-        )
-    }
-
-    @Test
-    fun toGCJ02_whenPointIsWGS84AndWithinChinaNearCoast_returnsGCJ02PointWithRecalculatedCoords() {
-        assertEquals(
-            GCJ02Point(37.33644561966912, 122.48151345759582, source = Source.GENERATED),
-            coordinateConverter.toGCJ02(WGS84Point(37.33557, 122.47664, source = Source.GENERATED)),
-        )
-    }
-
-    @Test
-    fun toGCJ02_whenPointIsWGS84AndWithinChinaNearCoast2_returnsGCJ02PointWithRecalculatedCoords() {
-        // TODO Improve china boundary to fix this point
-        assumeTrue("This test currently fails, because Natural Earth 10m is not precise enough", false)
-        assertEquals(
-            GCJ02Point(30.600649446449268, 122.13324202346543, source = Source.GENERATED),
-            coordinateConverter.toGCJ02(WGS84Point(30.60283, 122.12886, source = Source.GENERATED)),
-        )
-    }
-
-    @Test
-    fun toGCJ02_whenPointIsWGS84AndWithinFrance_returnsGCJ02PointWithUnchangedCoords() {
-        assertEquals(
-            GCJ02Point(45.8289525077221, 1.266689300537103, 3.14, "foo bar", source = Source.GENERATED),
-            coordinateConverter.toGCJ02(
-                WGS84Point(45.8289525077221, 1.266689300537103, 3.14, "foo bar", source = Source.GENERATED)
+            gcj02 = GCJ02Point(
+                45.8289525077221, 1.266689300537103,
+                z = 3.14, name = "foo bar", source = Source.GENERATED,
             ),
-        )
-    }
-
-    @Test
-    fun toGCJ02_whenPointIsWGS84AndOutsideChinaNearCoast_returnsGCJ02PointWithRecalculatedCoords() {
-        assertEquals(
-            GCJ02Point(37.39578114164097, 122.71208265323477, 3.14, "foo bar", source = Source.GENERATED),
-            coordinateConverter.toGCJ02(
-                WGS84Point(37.394978, 122.707243, 3.14, "foo bar", source = Source.GENERATED)
+            gcj02China = GCJ02ChinaPoint(
+                45.8289525077221, 1.266689300537103,
+                z = 3.14, name = "foo bar", source = Source.GENERATED,
             ),
-        )
-    }
-
-    @Test
-    fun toWGS84_whenPointIsGCJ02AndDoesNotHaveCoords_returnsWGS84PointWithoutCoords() {
-        assertEquals(
-            WGS84Point(z = 3.14, name = "foo bar", source = Source.GENERATED),
-            coordinateConverter.toWGS84(GCJ02Point(z = 3.14, name = "foo bar", source = Source.GENERATED)),
-        )
-    }
-
-    @Test
-    fun toWGS84_whenPointIsGCJ02AndWithinChina_returnsWGS84PointWithRecalculatedCoords() {
-        assertEquals(
-            WGS84Point(31.224731304675522, lon = 121.46385323166844, 3.14, "foo bar", source = Source.GENERATED),
-            coordinateConverter.toWGS84(
-                GCJ02Point(31.222811749011463, 121.46840706467624, 3.14, "foo bar", source = Source.GENERATED)
+            gcj02ChinaAndTaiwan = GCJ02ChinaAndTaiwanPoint(
+                45.8289525077221, 1.266689300537103,
+                z = 3.14, name = "foo bar", source = Source.GENERATED,
             ),
+        ),
+        // Shanghai center
+        PointInDifferentSrs(
+            wgs84 = WGS84Point(
+                31.224731304675522, 121.46385323166844,
+                z = 3.14, name = "foo bar", source = Source.GENERATED,
+            ),
+            gcj02 = GCJ02Point(
+                31.22281206362763, 121.46840659541449,
+                z = 3.14, name = "foo bar", source = Source.GENERATED,
+            ),
+            gcj02China = GCJ02ChinaPoint(
+                31.22281206362763, 121.46840659541449,
+                z = 3.14, name = "foo bar", source = Source.GENERATED,
+            ),
+            gcj02ChinaAndTaiwan = GCJ02ChinaAndTaiwanPoint(
+                31.22281206362763, 121.46840659541449,
+                z = 3.14, name = "foo bar", source = Source.GENERATED,
+            ),
+        ),
+        // Rongcheng coast
+        PointInDifferentSrs(
+            wgs84 = WGS84Point(
+                37.33557, 122.47664,
+                z = 3.14, name = "foo bar", source = Source.GENERATED,
+            ),
+            gcj02 = GCJ02Point(
+                37.33644561966912, 122.48151345759582,
+                z = 3.14, name = "foo bar", source = Source.GENERATED,
+            ),
+            gcj02China = GCJ02ChinaPoint(
+                37.33644561966912, 122.48151345759582,
+                z = 3.14, name = "foo bar", source = Source.GENERATED,
+            ),
+            gcj02ChinaAndTaiwan = GCJ02ChinaAndTaiwanPoint(
+                37.33644561966912, 122.48151345759582,
+                z = 3.14, name = "foo bar", source = Source.GENERATED,
+            ),
+        ),
+        // Rongcheng coast
+        PointInDifferentSrs(
+            wgs84 = WGS84Point(
+                37.394978, 122.707243,
+                z = 3.14, name = "foo bar", source = Source.GENERATED,
+            ),
+            gcj02 = GCJ02Point(
+                37.39578114164097, 122.71208265323477,
+                z = 3.14, name = "foo bar", source = Source.GENERATED,
+            ),
+            // TODO Improve China boundary and test this point
+            // gcj02China = GCJ02ChinaPoint(
+            //     37.39578114164097, 122.71208265323477,
+            //     z = 3.14, name = "foo bar", source = Source.GENERATED,
+            // ),
+            // gcj02ChinaAndTaiwan = GCJ02ChinaAndTaiwanPoint(
+            //     37.39578114164097, 122.71208265323477,
+            //     z = 3.14, name = "foo bar", source = Source.GENERATED,
+            // ),
+        ),
+        @Suppress("SpellCheckingInspection")
+        // Yangshan port
+        PointInDifferentSrs(
+            wgs84 = WGS84Point(
+                30.60283, 122.12886,
+                z = 3.14, name = "foo bar", source = Source.GENERATED,
+            ),
+            gcj02 = GCJ02Point(
+                30.600649446449268, 122.13324202346543,
+                z = 3.14, name = "foo bar", source = Source.GENERATED,
+            ),
+            // TODO Improve China boundary and test this point
+            // gcj02China = GCJ02ChinaPoint(
+            //     30.600649446449268, 122.13324202346543,
+            //     z = 3.14, name = "foo bar", source = Source.GENERATED,
+            // ),
+            // gcj02ChinaAndTaiwan = GCJ02ChinaAndTaiwanPoint(
+            //     30.600649446449268, 122.13324202346543,
+            //     z = 3.14, name = "foo bar", source = Source.GENERATED,
+            // ),
+        ),
+        @Suppress("SpellCheckingInspection")
+        // Daqindao island
+        PointInDifferentSrs(
+            wgs84 = WGS84Point(
+                38.30050979122315, 120.80518963762754,
+                z = 3.14, name = "foo bar", source = Source.GENERATED,
+            ),
+            gcj02 = GCJ02Point(
+                38.30121472559038, 120.81016239968592,
+                z = 3.14, name = "foo bar", source = Source.GENERATED,
+            ),
+            // TODO Improve China boundary and test this point
+            // gcj02China = GCJ02ChinaPoint(
+            //     38.30121535762941, 120.81016278215878,
+            //     z = 3.14, name = "foo bar", source = Source.GENERATED,
+            // ),
+            // gcj02ChinaAndTaiwan = GCJ02ChinaAndTaiwanPoint(
+            //     38.30121535762941, 120.81016278215878,
+            //     z = 3.14, name = "foo bar", source = Source.GENERATED,
+            // ),
+        ),
+        // BD09MC points
+        PointInDifferentSrs(
+            gcj02 = GCJ02Point(
+                28.696786436412197, 121.45032959369264,
+                3.14, "foo bar", source = Source.GENERATED,
+            ),
+            bd09MC = BD09MCPoint(
+                3317203.0, 13520653.0,
+                3.14, "foo bar", source = Source.GENERATED,
+            ),
+        ),
+        PointInDifferentSrs(
+            gcj02 = GCJ02Point(
+                28.686779688493015, 121.29095727245614,
+                3.14, "foo bar", source = Source.GENERATED,
+            ),
+            bd09MC = BD09MCPoint(
+                3315902.2199999997, 13502918.375,
+                3.14, "foo bar", source = Source.GENERATED,
+            ),
+        ),
+        PointInDifferentSrs(
+            gcj02 = GCJ02Point(
+                23.110319308993134, 113.30138024838311,
+                3.14, "foo bar", source = Source.GENERATED,
+            ),
+            bd09MC = BD09MCPoint(
+                2629182.88, 12613508.26,
+                3.14, "foo bar", source = Source.GENERATED,
+            ),
+        ),
+        PointInDifferentSrs(
+            gcj02 = GCJ02Point(
+                23.146380831856163, 113.30063234845544,
+                3.14, "foo bar", source = Source.GENERATED,
+            ),
+            bd09MC = BD09MCPoint(
+                2633524.681382545, 12613424.449999997,
+                3.14, "foo bar", source = Source.GENERATED,
+            ),
+        ),
+        // TODO Test Taiwan
+        // TODO Test western Japan
+        // TODO Test bd09mc in eastern Japan
+    )
+
+    private fun <T : Point> assertPointsEqual(expectedPoint: T, actualPoint: T) =
+        assertTrue(
+            "Expected $expectedPoint to equal $actualPoint",
+            when (expectedPoint) {
+                is BD09MCPoint ->
+                    expectedPoint.lat?.roundToLong() == actualPoint.lat?.roundToLong() &&
+                        expectedPoint.lon?.roundToLong() == actualPoint.lon?.roundToLong()
+
+                else ->
+                    expectedPoint.lat?.toScale(5) == actualPoint.lat?.toScale(5) &&
+                        expectedPoint.lon?.toScale(5) == actualPoint.lon?.toScale(5)
+            } &&
+                expectedPoint.z == actualPoint.z &&
+                expectedPoint.name == actualPoint.name &&
+                expectedPoint.source == actualPoint.source,
         )
+
+    @Test
+    fun toWGS84_fromWGS84() {
+        for (point in points) {
+            if (point.wgs84 != null) {
+                assertPointsEqual(point.wgs84, coordinateConverter.toWGS84(point.wgs84))
+            }
+        }
     }
 
     @Test
-    fun toWGS84_whenPointIsGCJ02AndWithinChinaNearCoast2_returnsWGS84PointWithRecalculatedCoords() {
-        // TODO Improve china boundary to fix this point
-        assumeTrue("This test currently fails, because Natural Earth 10m is not precise enough", false)
-        assertEquals(
-            WGS84Point(30.60283, 122.12886, source = Source.GENERATED),
-            coordinateConverter.toWGS84(
-                GCJ02Point(30.600649446449268, 122.13324202346543, source = Source.GENERATED)
-            ),
-        )
+    fun toWGS84_fromGCJ02() {
+        for (point in points) {
+            if (point.wgs84 != null && point.gcj02 != null) {
+                assertPointsEqual(point.wgs84, coordinateConverter.toWGS84(point.gcj02))
+            }
+        }
     }
 
     @Test
-    fun toWGS84_whenPointIsGCJ02AndOutsideChina_returnsWGS84PointWithUnchangedCoords() {
-        assertEquals(
-            WGS84Point(45.8289525077221, 1.266689300537103, 3.14, "foo bar", source = Source.GENERATED),
-            coordinateConverter.toWGS84(
-                GCJ02Point(45.8289525077221, 1.266689300537103, 3.14, "foo bar", source = Source.GENERATED)
-            ),
-        )
+    fun toWGS84_fromGCJ02China() {
+        for (point in points) {
+            if (point.wgs84 != null && point.gcj02China != null) {
+                assertPointsEqual(point.wgs84, coordinateConverter.toWGS84(point.gcj02China))
+            }
+        }
     }
 
     @Test
-    fun toWGS84_whenPointsIsGCJ02AndOutsideChinaNearCoast_returnsWGS84PointWithRecalculatedCoordinates() {
-        assertEquals(
-            WGS84Point(37.33557037552849, 122.47663919001769, 3.14, "foo bar", source = Source.GENERATED),
-            coordinateConverter.toWGS84(
-                GCJ02Point(37.33644561966912, 122.48151345759582, 3.14, "foo bar", source = Source.GENERATED)
-            )
-        )
+    fun toWGS84_fromGCJ02ChinaAndTaiwan() {
+        for (point in points) {
+            if (point.wgs84 != null && point.gcj02ChinaAndTaiwan != null) {
+                assertPointsEqual(point.wgs84, coordinateConverter.toWGS84(point.gcj02ChinaAndTaiwan))
+            }
+        }
     }
 
     @Test
-    fun toWGS84_whenPointsIsGCJ02AndOutsideChinaNearCoast2_returnsWGS84PointWithRecalculatedCoordinates() {
-        assertEquals(
-            WGS84Point(38.30121535762941, 120.81016278215878, 3.14, "foo bar", source = Source.GENERATED),
-            coordinateConverter.toWGS84(
-                GCJ02Point(38.30121535762941, 120.81016278215878, 3.14, "foo bar", source = Source.GENERATED)
-            )
-        )
+    fun toWGS84_fromBD09MC() {
+        for (point in points) {
+            if (point.wgs84 != null && point.bd09MC != null) {
+                assertPointsEqual(point.wgs84, coordinateConverter.toWGS84(point.bd09MC))
+            }
+        }
     }
 
     @Test
-    fun toGCJ02_whenPointIsBD09MCAndDoesNotHaveCoords_returnsGCJ02PointWithoutCoords() {
-        assertEquals(
-            GCJ02Point(z = 3.14, name = "foo bar", source = Source.GENERATED),
-            coordinateConverter.toGCJ02(BD09MCPoint(z = 3.14, name = "foo bar", source = Source.GENERATED)),
-        )
+    fun toGCJ02_fromWGS84() {
+        for (point in points) {
+            if (point.gcj02 != null && point.wgs84 != null) {
+                assertPointsEqual(point.gcj02, coordinateConverter.toGCJ02(point.wgs84))
+            }
+        }
     }
 
     @Test
-    fun toGCJ02_whenPointIsBD09MCAndWithinChina_returnsGCJ02PointWithRecalculatedCoords() {
-        assertEquals(
-            GCJ02Point(28.696786436412197, 121.45032959369264, 3.14, "foo bar", source = Source.GENERATED),
-            coordinateConverter.toGCJ02(
-                BD09MCPoint(3317203.0, 13520653.0, 3.14, "foo bar", source = Source.GENERATED)
-            ),
-        )
-        assertEquals(
-            GCJ02Point(28.686779688493015, 121.29095727245614, 3.14, "foo bar", source = Source.GENERATED),
-            coordinateConverter.toGCJ02(
-                BD09MCPoint(3315902.2199999997, 13502918.375, 3.14, "foo bar", source = Source.GENERATED)
-            ),
-        )
-        assertEquals(
-            GCJ02Point(23.110319308993134, 113.30138024838311, 3.14, "foo bar", source = Source.GENERATED),
-            coordinateConverter.toGCJ02(
-                BD09MCPoint(2629182.88, 12613508.26, 3.14, "foo bar", source = Source.GENERATED)
-            ),
-        )
-        assertEquals(
-            GCJ02Point(23.146380831856163, 113.30063234845544, 3.14, "foo bar", source = Source.GENERATED),
-            coordinateConverter.toGCJ02(
-                BD09MCPoint(2633524.681382545, 12613424.449999997, 3.14, "foo bar", source = Source.GENERATED)
-            ),
-        )
+    fun toGCJ02_fromGCJ02() {
+        for (point in points) {
+            if (point.gcj02 != null) {
+                assertPointsEqual(point.gcj02, coordinateConverter.toGCJ02(point.gcj02))
+            }
+        }
     }
 
-    // TODO Test bd09mc in Eastern Japan
+    @Test
+    fun toGCJ02_fromGCJ02China() {
+        for (point in points) {
+            if (point.gcj02 != null && point.gcj02China != null) {
+                assertPointsEqual(point.gcj02, coordinateConverter.toGCJ02(point.gcj02China))
+            }
+        }
+    }
+
+    @Test
+    fun toGCJ02_fromGCJ02ChinaAndTaiwan() {
+        for (point in points) {
+            if (point.gcj02 != null && point.gcj02ChinaAndTaiwan != null) {
+                assertEquals(point.gcj02, coordinateConverter.toGCJ02(point.gcj02ChinaAndTaiwan))
+            }
+        }
+    }
+
+    @Test
+    fun toGCJ02_fromBD09MC() {
+        for (point in points) {
+            if (point.gcj02 != null && point.bd09MC != null) {
+                assertPointsEqual(point.gcj02, coordinateConverter.toGCJ02(point.bd09MC))
+            }
+        }
+    }
+
+    @Test
+    fun toGCJ02China_fromWGS84() {
+        for (point in points) {
+            if (point.gcj02China != null && point.wgs84 != null) {
+                assertPointsEqual(point.gcj02China, coordinateConverter.toGCJ02China(point.wgs84))
+            }
+        }
+    }
+
+    @Test
+    fun toGCJ02China_fromGCJ02() {
+        for (point in points) {
+            if (point.gcj02China != null && point.gcj02 != null) {
+                assertPointsEqual(point.gcj02China, coordinateConverter.toGCJ02China(point.gcj02))
+            }
+        }
+    }
+
+    @Test
+    fun toGCJ02China_fromGCJ02China() {
+        for (point in points) {
+            if (point.gcj02China != null) {
+                assertPointsEqual(point.gcj02China, coordinateConverter.toGCJ02China(point.gcj02China))
+            }
+        }
+    }
+
+    @Test
+    fun toGCJ02China_fromGCJ02ChinaAndTaiwan() {
+        for (point in points) {
+            if (point.gcj02China != null && point.gcj02ChinaAndTaiwan != null) {
+                assertPointsEqual(point.gcj02China, coordinateConverter.toGCJ02China(point.gcj02ChinaAndTaiwan))
+            }
+        }
+    }
+
+    @Test
+    fun toGCJ02China_fromBD09MC() {
+        for (point in points) {
+            if (point.gcj02China != null && point.bd09MC != null) {
+                assertPointsEqual(point.gcj02China, coordinateConverter.toGCJ02China(point.bd09MC))
+            }
+        }
+    }
+
+    @Test
+    fun toGCJ02ChinaAndTaiwan_fromWGS84() {
+        for (point in points) {
+            if (point.gcj02ChinaAndTaiwan != null && point.wgs84 != null) {
+                assertPointsEqual(point.gcj02ChinaAndTaiwan, coordinateConverter.toGCJ02ChinaAndTaiwan(point.wgs84))
+            }
+        }
+    }
+
+    @Test
+    fun toGCJ02ChinaAndTaiwan_fromGCJ02() {
+        for (point in points) {
+            if (point.gcj02ChinaAndTaiwan != null && point.gcj02 != null) {
+                assertPointsEqual(point.gcj02ChinaAndTaiwan, coordinateConverter.toGCJ02ChinaAndTaiwan(point.gcj02))
+            }
+        }
+    }
+
+    @Test
+    fun toGCJ02ChinaAndTaiwan_fromGCJ02China() {
+        for (point in points) {
+            if (point.gcj02ChinaAndTaiwan != null && point.gcj02China != null) {
+                assertPointsEqual(
+                    point.gcj02ChinaAndTaiwan,
+                    coordinateConverter.toGCJ02ChinaAndTaiwan(point.gcj02China)
+                )
+            }
+        }
+    }
+
+    @Test
+    fun toGCJ02ChinaAndTaiwan_fromGCJ02ChinaAndTaiwan() {
+        for (point in points) {
+            if (point.gcj02ChinaAndTaiwan != null) {
+                assertPointsEqual(
+                    point.gcj02ChinaAndTaiwan,
+                    coordinateConverter.toGCJ02ChinaAndTaiwan(point.gcj02ChinaAndTaiwan)
+                )
+            }
+        }
+    }
+
+    @Test
+    fun toGCJ02ChinaAndTaiwan_fromBD09MC() {
+        for (point in points) {
+            if (point.gcj02ChinaAndTaiwan != null && point.bd09MC != null) {
+                assertPointsEqual(point.gcj02ChinaAndTaiwan, coordinateConverter.toGCJ02ChinaAndTaiwan(point.bd09MC))
+            }
+        }
+    }
 }

@@ -35,7 +35,7 @@ class CoordinateConverter @Inject constructor(
                 WGS84Point(lat, lon, z, name, source)
             } else {
                 GCJPointer(lat, lon).toExactWGSPointer().run {
-                    WGS84Point(latitude, latitude, z, name, source)
+                    WGS84Point(latitude, longitude, z, name, source)
                 }
             }
 
