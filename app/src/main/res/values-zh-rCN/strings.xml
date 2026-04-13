@@ -255,4 +255,5 @@
     <string name="conversion_failed_reason_timeout">超时</string>
     <string name="conversion_failed_parse_html_error_with_reason">无法处理网页，原因：%1$s</string>
     <string name="network_exception_too_many_requests">请求过多</string>
+    <string name="licenses">许可</string>
 </resources>
