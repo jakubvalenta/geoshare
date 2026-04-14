@@ -88,7 +88,7 @@ class GeoUriFormatter @Inject constructor(
             Flavor.Best
 
         packageName == AMAP_PACKAGE_NAME ->
-            Flavor.Best.copy(srs = Srs.GCJ02)
+            Flavor.Best.copy(srs = Srs.GCJ02_MAINLAND_CHINA_AND_TAIWAN)
 
         packageName == GOOGLE_MAPS_PACKAGE_NAME ||
             packageName == GMAPS_WV_PACKAGE_NAME ->
@@ -115,12 +115,7 @@ class GeoUriFormatter @Inject constructor(
     }
 
     fun formatGeoUriString(point: Point, flavor: Flavor = Flavor.Safe, uriQuote: UriQuote = DefaultUriQuote) =
-        when (flavor.srs) {
-            Srs.WGS84 -> coordinateConverter.toWGS84(point)
-            Srs.GCJ02 -> coordinateConverter.toGCJ02(point)
-            Srs.GCJ02_MAINLAND_CHINA -> coordinateConverter.toGCJ02MainlandChina(point)
-            Srs.GCJ02_MAINLAND_CHINA_AND_TAIWAN -> coordinateConverter.toGCJ02MainlandChinaAndTaiwan(point)
-        }.run {
+        coordinateConverter.toSrs(point, flavor.srs).run {
             // Use custom string builder instead of Uri.toString(), because we want to allow custom chars in query params
             buildString {
                 append("geo:")

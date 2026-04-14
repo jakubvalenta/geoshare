@@ -10,7 +10,7 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 class AmapInputBehaviorTest : InputBehaviorTest {
     @Test
     fun amap() = uiAutomator {
-        // Coordinates within mainlan China
+        // Coordinates within mainland China
         testUri(
             GCJ02Point(
                 31.222811749011463, 121.46840706467624,

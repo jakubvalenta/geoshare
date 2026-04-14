@@ -14,7 +14,7 @@ class ShareNavigationGoogleUriOutput @Inject constructor(
     private val googleMapsUriFormatter: GoogleMapsUriFormatter,
 ) : SharePointOutput {
     override fun getText(value: Point, uriQuote: UriQuote) =
-        googleMapsUriFormatter.formatNavigationUriString(value, uriQuote)
+        googleMapsUriFormatter.formatNavigationUriString(value, uriQuote = uriQuote)
 
     @Composable
     override fun label(appDetails: AppDetails) =

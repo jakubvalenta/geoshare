@@ -21,29 +21,22 @@ class UriFormatter @Inject constructor(
         srs: Srs = Srs.WGS84,
         defaultZ: Double = 16.0,
         uriQuote: UriQuote = DefaultUriQuote,
-    ): String? = point.run {
-        when (srs) {
-            Srs.WGS84 -> coordinateConverter.toWGS84(point)
-            Srs.GCJ02 -> coordinateConverter.toGCJ02(point)
-            Srs.GCJ02_MAINLAND_CHINA -> coordinateConverter.toGCJ02MainlandChina(point)
-            Srs.GCJ02_MAINLAND_CHINA_AND_TAIWAN -> coordinateConverter.toGCJ02MainlandChinaAndTaiwan(point)
-        }
-            .run {
-                latStr?.let { latStr ->
-                    lonStr?.let { lonStr ->
-                        val zOrDefaultStr = (z ?: defaultZ).toScale(7).toTrimmedString()
-                        coordsUriTemplate
-                            .replace("{lat}", uriQuote.encode(latStr))
-                            .replace("{lon}", uriQuote.encode(lonStr))
-                            .replace("{z}", uriQuote.encode(zOrDefaultStr))
-                            .replace("{name}", uriQuote.encode(cleanName.orEmpty()))
-                            .takeIf { it.isNotEmpty() }
-                    }
-                } ?: cleanName?.let { cleanName ->
-                    nameUriTemplate
-                        .replace("{q}", uriQuote.encode(cleanName))
+    ): String? =
+        coordinateConverter.toSrs(point, srs).run {
+            latStr?.let { latStr ->
+                lonStr?.let { lonStr ->
+                    val zOrDefaultStr = (z ?: defaultZ).toScale(7).toTrimmedString()
+                    coordsUriTemplate
+                        .replace("{lat}", uriQuote.encode(latStr))
+                        .replace("{lon}", uriQuote.encode(lonStr))
+                        .replace("{z}", uriQuote.encode(zOrDefaultStr))
+                        .replace("{name}", uriQuote.encode(cleanName.orEmpty()))
                         .takeIf { it.isNotEmpty() }
                 }
+            } ?: cleanName?.let { cleanName ->
+                nameUriTemplate
+                    .replace("{q}", uriQuote.encode(cleanName))
+                    .takeIf { it.isNotEmpty() }
             }
-    }
+        }
 }

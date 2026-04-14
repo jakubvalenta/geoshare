@@ -14,7 +14,7 @@ class ShareStreetViewGoogleUriOutput @Inject constructor(
     private val googleMapsUriFormatter: GoogleMapsUriFormatter,
 ) : SharePointOutput {
     override fun getText(value: Point, uriQuote: UriQuote) =
-        googleMapsUriFormatter.formatStreetViewUriString(value, uriQuote)
+        googleMapsUriFormatter.formatStreetViewUriString(value, uriQuote = uriQuote)
 
     @Composable
     override fun label(appDetails: AppDetails) =

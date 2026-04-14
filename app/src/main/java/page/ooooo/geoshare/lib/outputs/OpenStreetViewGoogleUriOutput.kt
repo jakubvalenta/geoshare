@@ -20,7 +20,7 @@ class OpenStreetViewGoogleUriOutput @Inject constructor(
     private val googleMapsUriFormatter: GoogleMapsUriFormatter,
 ) : OpenPointOutput {
     override fun getText(value: Point, uriQuote: UriQuote) =
-        googleMapsUriFormatter.formatStreetViewUriString(value, uriQuote)
+        googleMapsUriFormatter.formatStreetViewUriString(value, packageName, uriQuote = uriQuote)
 
     @Composable
     override fun label(appDetails: AppDetails) =

@@ -236,4 +236,12 @@ class CoordinateConverter @Inject constructor(
             is BD09MCPoint -> toGCJ02MainlandChinaAndTaiwan(toGCJ02(point))
         }
     }
+
+    fun toSrs(point: Point, srs: Srs): Point =
+        when (srs) {
+            Srs.WGS84 -> toWGS84(point)
+            Srs.GCJ02 -> toGCJ02(point)
+            Srs.GCJ02_MAINLAND_CHINA -> toGCJ02MainlandChinaAndTaiwan(point)
+            Srs.GCJ02_MAINLAND_CHINA_AND_TAIWAN -> toGCJ02MainlandChinaAndTaiwan(point)
+        }
 }
