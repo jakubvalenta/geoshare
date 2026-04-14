@@ -302,6 +302,9 @@
         <item quantity="one">%1$d second</item>
         <item quantity="other">%1$d seconds</item>
     </plurals>
+    <string name="srs_description" translatable="false">%1$s (%1$s)</string>
+    <string name="srs_description_mainland_china">mainland China</string>
+    <string name="srs_description_mainland_china_and_taiwan">mainland China and Taiwan</string>
     <string name="srs_gcj02" translatable="false">GCJ-02</string>
     <string name="srs_wgs84" translatable="false">WGS 84</string>
     <string name="text_list_bullet" translatable="false">•</string>

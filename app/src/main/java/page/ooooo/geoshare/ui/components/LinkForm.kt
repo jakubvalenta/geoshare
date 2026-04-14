@@ -348,10 +348,25 @@ fun LinkForm(
                 )
                 DropdownField(
                     value = srs,
-                    options = mapOf(
-                        Srs.WGS84 to stringResource(R.string.srs_wgs84),
-                        Srs.GCJ02 to stringResource(R.string.srs_gcj02),
-                    ),
+                    options = Srs.entries.associateWith { srs ->
+                        when (srs) {
+                            Srs.WGS84 -> stringResource(R.string.srs_wgs84)
+
+                            Srs.GCJ02 -> stringResource(R.string.srs_gcj02)
+
+                            Srs.GCJ02_MAINLAND_CHINA -> stringResource(
+                                R.string.srs_description,
+                                stringResource(R.string.srs_gcj02),
+                                stringResource(R.string.srs_description_mainland_china),
+                            )
+
+                            Srs.GCJ02_MAINLAND_CHINA_AND_TAIWAN -> stringResource(
+                                R.string.srs_description,
+                                stringResource(R.string.srs_gcj02),
+                                stringResource(R.string.srs_description_mainland_china_and_taiwan),
+                            )
+                        }
+                    },
                     onValueChange = onSetSrs,
                     modifier = Modifier
                         .fillMaxWidth()
