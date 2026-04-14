@@ -74,7 +74,7 @@ class BaiduMapInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_point() = runTest {
+    fun parseUri_coordinates() = runTest {
         assertEquals(
             ParseUriResult(
                 persistentListOf(
@@ -91,62 +91,7 @@ class BaiduMapInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_poiWithinTaiwan() = runTest {
-        assertEquals(
-            ParseUriResult(
-                persistentListOf(
-                    BD09MCPoint(
-                        2865337.0, 13522176.0,
-                        z = 17.0,
-                        name = "地图上的点",
-                        source = Source.MAP_CENTER,
-                    ),
-                )
-            ),
-            parseUri(@Suppress("SpellCheckingInspection") "https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13522176,2865337,17z?querytype=share&poiShareId=pb81fb1b0172f25114bd52ce2cd&da_src=shareurl"),
-        )
-    }
-
-    @Test
-    fun parseUri_poiWithinWesternJapan() = runTest {
-        assertEquals(
-            ParseUriResult(
-                persistentListOf(
-                    BD09MCPoint(
-                        4046737.5, 14571652.5,
-                        z = 19.0,
-                        source = Source.MAP_CENTER,
-                    ),
-                )
-            ),
-            parseUri("https://map.baidu.com/@14571652.5,4046737.5,19z"),
-        )
-    }
-
-    @Test
-    fun parseUri_sharedPoint() = runTest {
-        assertEquals(
-            ParseUriResult(
-                persistentListOf(),
-                webUriString = "https://map.baidu.com/?poiShareId=p8cdf0522067cf66173901fc9e4",
-            ),
-            parseUri("https://map.baidu.com/?poiShareId=p8cdf0522067cf66173901fc9e4"),
-        )
-    }
-
-    @Test
-    fun parseUri_sharedPointDetail() = runTest {
-        assertEquals(
-            ParseUriResult(
-                persistentListOf(),
-                webUriString = "https://map.baidu.com/?newmap=1&s=inf%26uid%3D2c2bd9487c142391100daa62&sharecallbackflag=poiDetailPage",
-            ),
-            parseUri("https://map.baidu.com/?newmap=1&s=inf%26uid%3D2c2bd9487c142391100daa62&sharecallbackflag=poiDetailPage"),
-        )
-    }
-
-    @Test
-    fun parseUri_place() = runTest {
+    fun parseUri_poi() = runTest {
         assertEquals(
             ParseUriResult(
                 persistentListOf(
@@ -163,7 +108,29 @@ class BaiduMapInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_sharedPlace_returnsSupportsWebParsing() = runTest {
+    fun parseUri_sharedCoordinates() = runTest {
+        assertEquals(
+            ParseUriResult(
+                persistentListOf(),
+                webUriString = "https://map.baidu.com/?poiShareId=p8cdf0522067cf66173901fc9e4",
+            ),
+            parseUri("https://map.baidu.com/?poiShareId=p8cdf0522067cf66173901fc9e4"),
+        )
+    }
+
+    @Test
+    fun parseUri_sharedPOIParamS_returnsSupportsWebParsing() = runTest {
+        assertEquals(
+            ParseUriResult(
+                persistentListOf(),
+                webUriString = "https://map.baidu.com/?newmap=1&s=inf%26uid%3D2c2bd9487c142391100daa62&sharecallbackflag=poiDetailPage",
+            ),
+            parseUri("https://map.baidu.com/?newmap=1&s=inf%26uid%3D2c2bd9487c142391100daa62&sharecallbackflag=poiDetailPage"),
+        )
+    }
+
+    @Test
+    fun parseUri_sharedPOIParamUid_returnsSupportsWebParsing() = runTest {
         assertEquals(
             ParseUriResult(
                 persistentListOf(),

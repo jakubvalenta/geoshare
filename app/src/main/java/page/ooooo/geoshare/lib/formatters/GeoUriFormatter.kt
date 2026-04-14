@@ -88,7 +88,7 @@ class GeoUriFormatter @Inject constructor(
             Flavor.Best
 
         packageName == AMAP_PACKAGE_NAME ->
-            Flavor.Best.copy(srs = Srs.GCJ02_MAINLAND_CHINA_AND_TAIWAN)
+            Flavor.Best.copy(srs = Srs.GCJ02_GREATER_CHINA_AND_TAIWAN)
 
         packageName == GOOGLE_MAPS_PACKAGE_NAME ||
             packageName == GMAPS_WV_PACKAGE_NAME ->

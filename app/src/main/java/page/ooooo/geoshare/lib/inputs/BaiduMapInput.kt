@@ -45,9 +45,10 @@ class BaiduMapInput @Inject constructor() : ShortUriInput, WebInput {
                     !queryParams["poiShareUid"].isNullOrEmpty() ||
                     queryParams["s"]?.contains("uid=") == true
                 ) {
-                    // Shared point or shared place
+                    // Shared coordinates or shared POI
                     // https://map.baidu.com/?poiShareId={id}
                     // https://map.baidu.com/?shareurl=1&poiShareUid={uid}
+                    // https://map.baidu.com/?newmap=1&s=inf%26uid%3D{uid}
                     webUriString = toString()
                 }
 
@@ -59,7 +60,7 @@ class BaiduMapInput @Inject constructor() : ShortUriInput, WebInput {
                 }
 
             } else if (firstPart == "poi") {
-                // Place
+                // POI
                 // https://map.baidu.com/poi/{name}/@{x},{y},{z}
                 Regex(CENTER).matchEntire(parts.getOrNull(2))?.toLonLatZPoint(Source.MAP_CENTER)?.let {
                     points = persistentListOf(BD09MCPoint(it).copy(name = parts.getOrNull(1)))

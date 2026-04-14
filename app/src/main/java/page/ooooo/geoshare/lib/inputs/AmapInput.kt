@@ -8,7 +8,7 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonNamePoint
 import page.ooooo.geoshare.lib.formatters.UriFormatter
-import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaAndTaiwanPoint
+import page.ooooo.geoshare.lib.geo.GCJ02GreaterChinaAndTaiwanPoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import javax.inject.Inject
@@ -37,7 +37,7 @@ class AmapInput @Inject constructor(
             // https://wb.amap.com/?p=<id>,<lat>,<lon>,<name>
             Regex("""\w+,$LAT,$LON,?(?:$NAME_PARAM)?.*""").matchEntire(queryParams["p"])?.toLatLonNamePoint(Source.URI)
                 ?.let {
-                    points = persistentListOf(GCJ02MainlandChinaAndTaiwanPoint(it))
+                    points = persistentListOf(GCJ02GreaterChinaAndTaiwanPoint(it))
                     return@run
                 }
 
@@ -45,7 +45,7 @@ class AmapInput @Inject constructor(
             // https://wb.amap.com/?q=<lat>,<lon>,<name>
             Regex("""$LAT,$LON,?(?:$NAME_PARAM)?.*""").matchEntire(queryParams["q"])?.toLatLonNamePoint(Source.URI)
                 ?.let {
-                    points = persistentListOf(GCJ02MainlandChinaAndTaiwanPoint(it))
+                    points = persistentListOf(GCJ02GreaterChinaAndTaiwanPoint(it))
                     return@run
                 }
         }

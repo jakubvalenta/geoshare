@@ -11,7 +11,7 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
-import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaAndTaiwanPoint
+import page.ooooo.geoshare.lib.geo.GCJ02GreaterChinaAndTaiwanPoint
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.Source
 
@@ -75,7 +75,7 @@ class AmapInputTest : InputTest {
         assertEquals(
             ParseUriResult(
                 persistentListOf(
-                    GCJ02MainlandChinaAndTaiwanPoint(
+                    GCJ02GreaterChinaAndTaiwanPoint(
                         31.222811749011463, 121.46840706467624,
                         name = "上海市黄浦区巨鹿路15-17号",
                         source = Source.URI,
@@ -87,11 +87,11 @@ class AmapInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_withinMainlandChina() = runTest {
+    fun parseUri_qParamWithName() = runTest {
         assertEquals(
             ParseUriResult(
                 persistentListOf(
-                    GCJ02MainlandChinaAndTaiwanPoint(
+                    GCJ02GreaterChinaAndTaiwanPoint(
                         31.222811749011463, 121.46840706467624,
                         name = "上海市黄浦区巨鹿路15-17号",
                         source = Source.URI,
@@ -103,11 +103,11 @@ class AmapInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_withinMainlandChinaWithoutName() = runTest {
+    fun parseUri_qParamWithoutName() = runTest {
         assertEquals(
             ParseUriResult(
                 persistentListOf(
-                    GCJ02MainlandChinaAndTaiwanPoint(
+                    GCJ02GreaterChinaAndTaiwanPoint(
                         31.222811749011463,
                         121.46840706467624,
                         source = Source.URI
@@ -119,11 +119,27 @@ class AmapInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_outsideMainlandChina() = runTest {
+    fun parseUri_qParamWithOtherParams() = runTest {
         assertEquals(
             ParseUriResult(
                 persistentListOf(
-                    GCJ02MainlandChinaAndTaiwanPoint(
+                    GCJ02GreaterChinaAndTaiwanPoint(
+                        34.36875865823159, 131.1821490526199,
+                        name = "山口县长门市地图选点",
+                        source = Source.URI,
+                    ),
+                )
+            ),
+            parseUri("https://wb.amap.com/?commonBizInfo=%7B%22share_from%22%3A%22com.autonavi.map.search.fragment.SearchCQDetailPage%22%2C%22share_from_type%22%3A%22Native%22%2C%22share_type%22%3A%22url%22%2C%22share_lastClickSpm%22%3A%22amap.27854080.tipBar_RenderPOITipBar.shareBtn%22%2C%22share_bid%22%3A%22tb71dkhi4aoadgfj55md1rmengsknme8f235b8f%22%2C%22share_bizParams%22%3A%22%257B%2522poiid%2522%253A%2522%2522%252C%2522trigger%2522%253A%2522click%2522%252C%2522is_rank%2522%253A0%257D%22%7D&q=34.36875865823159%2C131.1821490526199%2C%E5%B1%B1%E5%8F%A3%E5%8E%BF%E9%95%BF%E9%97%A8%E5%B8%82%E5%9C%B0%E5%9B%BE%E9%80%89%E7%82%B9&src=app_C3090&userRelationToken=e5b28b1e36b011f19f8300163e3c2dbc0"),
+        )
+    }
+
+    @Test
+    fun parseUri_pParamWithName() = runTest {
+        assertEquals(
+            ParseUriResult(
+                persistentListOf(
+                    GCJ02GreaterChinaAndTaiwanPoint(
                         45.8289525077221, 1.266689300537103,
                         name = @Suppress("SpellCheckingInspection") "利摩日主教座堂,42 Rue Prte Panet, 87000 Limoges, 法国",
                         source = Source.URI,
@@ -135,11 +151,11 @@ class AmapInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_outsideMainlandChinaWithoutName() = runTest {
+    fun parseUri_pParamWithoutName() = runTest {
         assertEquals(
             ParseUriResult(
                 persistentListOf(
-                    GCJ02MainlandChinaAndTaiwanPoint(
+                    GCJ02GreaterChinaAndTaiwanPoint(
                         45.8289525077221,
                         1.266689300537103,
                         source = Source.URI
@@ -147,38 +163,6 @@ class AmapInputTest : InputTest {
                 )
             ),
             parseUri("https://wb.amap.com/?p=P0JANYX6NL%2C45.8289525077221%2C1.266689300537103"),
-        )
-    }
-
-    @Test
-    fun parseUri_withinTaiwan() = runTest {
-        assertEquals(
-            ParseUriResult(
-                persistentListOf(
-                    GCJ02MainlandChinaAndTaiwanPoint(
-                        25.08380369719241, 121.51320397853848,
-                        name = "台湾省境内",
-                        source = Source.URI,
-                    ),
-                )
-            ),
-            parseUri("https://wb.amap.com/?q=25.08380369719241%2C121.51320397853848%2C%E5%8F%B0%E6%B9%BE%E7%9C%81%E5%A2%83%E5%86%85"),
-        )
-    }
-
-    @Test
-    fun parseUri_withinWesternJapan() = runTest {
-        assertEquals(
-            ParseUriResult(
-                persistentListOf(
-                    GCJ02MainlandChinaAndTaiwanPoint(
-                        34.36875865823159, 131.1821490526199,
-                        name = "山口县长门市地图选点",
-                        source = Source.URI,
-                    ),
-                )
-            ),
-            parseUri("https://wb.amap.com/?commonBizInfo=%7B%22share_from%22%3A%22com.autonavi.map.search.fragment.SearchCQDetailPage%22%2C%22share_from_type%22%3A%22Native%22%2C%22share_type%22%3A%22url%22%2C%22share_lastClickSpm%22%3A%22amap.27854080.tipBar_RenderPOITipBar.shareBtn%22%2C%22share_bid%22%3A%22tb71dkhi4aoadgfj55md1rmengsknme8f235b8f%22%2C%22share_bizParams%22%3A%22%257B%2522poiid%2522%253A%2522%2522%252C%2522trigger%2522%253A%2522click%2522%252C%2522is_rank%2522%253A0%257D%22%7D&q=34.36875865823159%2C131.1821490526199%2C%E5%B1%B1%E5%8F%A3%E5%8E%BF%E9%95%BF%E9%97%A8%E5%B8%82%E5%9C%B0%E5%9B%BE%E9%80%89%E7%82%B9&src=app_C3090&userRelationToken=e5b28b1e36b011f19f8300163e3c2dbc0"),
         )
     }
 

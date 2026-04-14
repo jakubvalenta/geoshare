@@ -25,15 +25,33 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
 
         // Coordinates in data within mainland China
         testUri(
-            GCJ02Point(39.9168038, 116.3971621, name = "Forbidden City", source = Source.URI),
+            GCJ02Point(39.9168038, 116.3971621, z = 17.0, name = "Forbidden City", source = Source.URI),
             @Suppress("SpellCheckingInspection") "https://www.google.com/maps/place/Forbidden+City/@39.9165742,116.3945834,17z/data=!4m7!3m6!1s0x35f052e94515d43d:0x674e2bd4dd3079f!8m2!3d39.9168038!4d116.3971621!15sCg5mb3JiaWRkZW4gY2l0eVoQIg5mb3JiaWRkZW4gY2l0eZIBEnRvdXJpc3RfYXR0cmFjdGlvbuABAA!16zL20vMGowYjI?entry=tts&g_ep=EgoyMDI2MDMwOS4wIPu8ASoASAFQAw%3D%3D&skid=5f340da1-a0d3-4b1c-bc05-7f90cfbd502a",
         )
 
         @Suppress("SpellCheckingInspection")
         // Coordinates within mainland China on the Yangshan port island
         testUri(
-            WGS84Point(30.602829622230516, 122.12885969924668, source = Source.URI),
+            GCJ02Point(30.600649446449268, 122.13324202346543, source = Source.URI),
             "https://www.google.com/maps/?ll=30.600649446449268,122.13324202346543",
+        )
+
+        // Coordinates within Hong Kong
+        testUri(
+            WGS84Point(22.301015146333217, 114.17126075831801, source = Source.URI),
+            "https://www.google.com/maps/?ll=22.301015146333217,114.17126075831801",
+        )
+
+        // Coordinates within Taiwan
+        testUri(
+            WGS84Point(24.146155957428395, 120.43731802970248, source = Source.URI),
+            "https://www.google.com/maps/?ll=24.146155957428395,120.43731802970248",
+        )
+
+        // Coordinates within western Japan
+        testUri(
+            WGS84Point(33.2868514264416, 129.46775525445975, source = Source.URI),
+            "https://www.google.com/maps/?ll=33.2868514264416,129.46775525445975",
         )
 
         // Coordinates and query (address)

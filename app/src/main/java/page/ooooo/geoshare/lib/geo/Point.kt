@@ -73,7 +73,7 @@ data class WGS84Point(
 
 /**
  * Point that has coordinates in the GCJ-02 spatial reference system when it's within a large rectangle that includes
- * mainland China, Taiwan, Korea, and western Japan. Everywhere else the coordinates are in WGS 84.
+ * mainland China, Hong Kong, Macao, Taiwan, Korea, and western Japan. Everywhere else the coordinates are in WGS 84.
  *
  * Used by Evil Transform.
  */
@@ -95,8 +95,8 @@ data class GCJ02Point(
 }
 
 /**
- * Point that has coordinates in the GCJ-02 spatial reference system when it's within mainland China. Everywhere else
- * the coordinates are in WGS 84.
+ * Point that has coordinates in the GCJ-02 spatial reference system when it's within mainland China only. Within Hong
+ * Kong, Macao, Taiwan, and everywhere else the coordinates are in WGS 84.
  *
  * Used by Google Maps.
  */
@@ -118,13 +118,13 @@ data class GCJ02MainlandChinaPoint(
 }
 
 /**
- * Point that has coordinates in the GCJ-02 spatial reference system when it's within mainland China or Taiwan.
- * Everywhere else the coordinates are in WGS 84.
+ * Point that has coordinates in the GCJ-02 spatial reference system when it's within mainland China, Hong Kong, Macao,
+ * or Taiwan. Everywhere else the coordinates are in WGS 84.
  *
  * Used by Amap.
  */
 @Immutable
-data class GCJ02MainlandChinaAndTaiwanPoint(
+data class GCJ02GreaterChinaAndTaiwanPoint(
     override val lat: Double? = null,
     override val lon: Double? = null,
     override val z: Double? = null,

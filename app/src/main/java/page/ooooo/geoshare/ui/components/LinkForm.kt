@@ -360,10 +360,10 @@ fun LinkForm(
                                 stringResource(R.string.srs_description_mainland_china),
                             )
 
-                            Srs.GCJ02_MAINLAND_CHINA_AND_TAIWAN -> stringResource(
+                            Srs.GCJ02_GREATER_CHINA_AND_TAIWAN -> stringResource(
                                 R.string.srs_description,
                                 stringResource(R.string.srs_gcj02),
-                                stringResource(R.string.srs_description_mainland_china_and_taiwan),
+                                stringResource(R.string.srs_description_greater_china_and_taiwan),
                             )
                         }
                     },

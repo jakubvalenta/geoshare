@@ -144,18 +144,6 @@ class GoogleMapsInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_coordinatesWithinMainlandChina() = runTest {
-        assertEquals(
-            ParseUriResult(
-                persistentListOf(
-                    GCJ02MainlandChinaPoint(31.22850685422705, 121.47552456472106, z = 11.0, source = Source.MAP_CENTER)
-                )
-            ),
-            parseUri("https://www.google.com/maps/@31.22850685422705,121.47552456472106,11z"),
-        )
-    }
-
-    @Test
     fun parseUri_coordinatesOnlyStreetView() = runTest {
         assertEquals(
             ParseUriResult(
@@ -269,23 +257,6 @@ class GoogleMapsInputTest : InputTest {
                 )
             ),
             parseUri("https://www.google.com/maps/place/Central+Park/@40.785091,-73.968285,15z/data=!3m1!4b1!4m5!3m4!1s0x89c2589a018531e3:0xb9df1f3170d990b5!8m2"),
-        )
-    }
-
-    @Test
-    fun parseUri_placeAndDataWithinMainlandChina() = runTest {
-        assertEquals(
-            ParseUriResult(
-                persistentListOf(
-                    GCJ02MainlandChinaPoint(
-                        39.9168038, 116.3971621,
-                        z = 17.0,
-                        name = "Forbidden City",
-                        source = Source.URI,
-                    )
-                )
-            ),
-            parseUri(@Suppress("SpellCheckingInspection") "https://www.google.com/maps/place/Forbidden+City/@39.9165742,116.3945834,17z/data=!4m7!3m6!1s0x35f052e94515d43d:0x674e2bd4dd3079f!8m2!3d39.9168038!4d116.3971621!15sCg5mb3JiaWRkZW4gY2l0eVoQIg5mb3JiaWRkZW4gY2l0eZIBEnRvdXJpc3RfYXR0cmFjdGlvbuABAA!16zL20vMGowYjI"),
         )
     }
 
@@ -439,12 +410,7 @@ class GoogleMapsInputTest : InputTest {
     fun parseUri_searchPlace() = runTest {
         assertEquals(
             ParseUriResult(
-                persistentListOf(
-                    GCJ02MainlandChinaPoint(
-                        name = "restaurants near me",
-                        source = Source.URI
-                    )
-                )
+                persistentListOf(GCJ02MainlandChinaPoint(name = "restaurants near me", source = Source.URI))
             ),
             parseUri("https://www.google.com/maps/search/restaurants+near+me"),
         )

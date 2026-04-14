@@ -52,7 +52,7 @@ class GoogleMapsUriFormatter @Inject constructor(
     // TODO Merge with [GeoUriFormatter.getFlavor] if all apps use the same SRS for geo, google.navigation, and google.streetview links
     private fun getSrs(packageName: String?): Srs =
         when (packageName) {
-            AMAP_PACKAGE_NAME -> Srs.GCJ02_MAINLAND_CHINA_AND_TAIWAN
+            AMAP_PACKAGE_NAME -> Srs.GCJ02_GREATER_CHINA_AND_TAIWAN
             GOOGLE_MAPS_PACKAGE_NAME, GMAPS_WV_PACKAGE_NAME -> Srs.GCJ02_MAINLAND_CHINA
             else -> Srs.WGS84
         }
