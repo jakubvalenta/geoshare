@@ -141,7 +141,7 @@ class CoordinateConverterTest {
         // Yangshan port island
         PointInDifferentSrs(
             wgs84 = WGS84Point(
-                30.60283, 122.12886,
+                30.602829622230516, 122.12885969924668,
                 z = 3.14, name = "foo bar", source = Source.GENERATED,
             ),
             gcj02 = GCJ02Point(
