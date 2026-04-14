@@ -5,7 +5,7 @@ import org.junit.Test
 
 class TransformUtilTest {
     @Test
-    fun outOfChina_pointIsWithinChina_returnsTrue() {
+    fun outOfChina_pointIsWithinMainlandChina_returnsTrue() {
         assertTrue(TransformUtil.outOfChina(116.331538, 39.920439))
     }
 

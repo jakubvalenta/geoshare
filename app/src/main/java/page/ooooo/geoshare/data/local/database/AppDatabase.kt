@@ -76,7 +76,7 @@ abstract class AppDatabase : RoomDatabase() {
                 arrayOf<Any>(
                     "Google Maps",
                     "Google Maps",
-                    "GCJ02_CHINA",
+                    "GCJ02_MAINLAND_CHINA",
                     "DISPLAY",
                     1,
                     1,
@@ -92,7 +92,7 @@ abstract class AppDatabase : RoomDatabase() {
                 arrayOf<Any>(
                     "Google Maps",
                     "Google Maps navigation",
-                    "GCJ02_CHINA",
+                    "GCJ02_MAINLAND_CHINA",
                     "NAVIGATION",
                     1,
                     0,
@@ -108,7 +108,7 @@ abstract class AppDatabase : RoomDatabase() {
                 arrayOf<Any>(
                     "Google Maps",
                     "Google Street View",
-                    "GCJ02_CHINA",
+                    "GCJ02_MAINLAND_CHINA",
                     "STREET_VIEW",
                     1,
                     0,
@@ -425,21 +425,21 @@ abstract class AppDatabase : RoomDatabase() {
                 db.execSQL(
                     "UPDATE Link SET `srs` = ? WHERE uuid = ?",
                     arrayOf<Any>(
-                        "GCJ02_CHINA",
+                        "GCJ02_MAINLAND_CHINA",
                         Uuid.parse("7bd96da4-beba-4a30-9dbd-b437a49a1dc0").toByteArray(),
                     )
                 )
                 db.execSQL(
                     "UPDATE Link SET `srs` = ? WHERE uuid = ?",
                     arrayOf<Any>(
-                        "GCJ02_CHINA",
+                        "GCJ02_MAINLAND_CHINA",
                         Uuid.parse("64b0b360-24ec-4113-9056-314223c6e19a").toByteArray(),
                     )
                 )
                 db.execSQL(
                     "UPDATE Link SET `srs` = ? WHERE uuid = ?",
                     arrayOf<Any>(
-                        "GCJ02_CHINA",
+                        "GCJ02_MAINLAND_CHINA",
                         Uuid.parse("9d7cd113-ce01-4b8b-82fe-856956b8b20a").toByteArray(),
                     )
                 )

@@ -25,8 +25,8 @@ class UriFormatter @Inject constructor(
         when (srs) {
             Srs.WGS84 -> coordinateConverter.toWGS84(point)
             Srs.GCJ02 -> coordinateConverter.toGCJ02(point)
-            Srs.GCJ02_CHINA -> coordinateConverter.toGCJ02China(point)
-            Srs.GCJ02_CHINA_AND_TAIWAN -> coordinateConverter.toGCJ02ChinaAndTaiwan(point)
+            Srs.GCJ02_MAINLAND_CHINA -> coordinateConverter.toGCJ02MainlandChina(point)
+            Srs.GCJ02_MAINLAND_CHINA_AND_TAIWAN -> coordinateConverter.toGCJ02MainlandChinaAndTaiwan(point)
         }
             .run {
                 latStr?.let { latStr ->

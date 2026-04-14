@@ -18,9 +18,12 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class UriFormatterTest {
     private val mockAssetManager: AssetManager = mock {
-        on { open("china_ne_10m.wkb") } doReturn
-            (GeometriesTest::class.java.getResourceAsStream("/china_ne_10m.wkb")
-                ?: error("china_ne_10m.wkb not found in test resources"))
+        on { open("mainland_china.wkb") } doReturn
+            (GeometriesTest::class.java.getResourceAsStream("/mainland_china.wkb")
+                ?: error("mainland_china.wkb not found in test resources"))
+        on { open("taiwan.wkb") } doReturn
+            (GeometriesTest::class.java.getResourceAsStream("/taiwan.wkb")
+                ?: error("taiwan.wkb not found in test resources"))
     }
     private val mockContext: Context = mock {
         on { assets } doReturn mockAssetManager
@@ -105,7 +108,7 @@ class UriFormatterTest {
     }
 
     @Test
-    fun formatUriString_whenPointIsWGS84AndWithinChinaAndSrsIsGCJ02_returnsCoordsTemplateWithConvertedCoords() {
+    fun formatUriString_whenPointIsWGS84AndWithinMainlandChinaAndSrsIsGCJ02_returnsCoordsTemplateWithConvertedCoords() {
         assertEquals(
             "https://www.google.com/maps/search/?api=1&query=31.2285067%2C121.475524",
             uriFormatter.formatUriString(
@@ -119,7 +122,7 @@ class UriFormatterTest {
     }
 
     @Test
-    fun formatUriString_whenPointIsGCJ02AndWithinChinaAndSrsIsGCJ02_returnsCoordsTemplateWithCoordsUnchanged() {
+    fun formatUriString_whenPointIsGCJ02AndWithinMainlandChinaAndSrsIsGCJ02_returnsCoordsTemplateWithCoordsUnchanged() {
         assertEquals(
             "https://www.google.com/maps/search/?api=1&query=31.2285069%2C121.4755246",
             uriFormatter.formatUriString(

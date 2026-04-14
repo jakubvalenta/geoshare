@@ -17,9 +17,12 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class GoogleMapsUriFormatterTest {
     private val mockAssetManager: AssetManager = mock {
-        on { open("china_ne_10m.wkb") } doReturn
-            (GeometriesTest::class.java.getResourceAsStream("/china_ne_10m.wkb")
-                ?: error("china_ne_10m.wkb not found in test resources"))
+        on { open("mainland_china.wkb") } doReturn
+            (GeometriesTest::class.java.getResourceAsStream("/mainland_china.wkb")
+                ?: error("mainland_china.wkb not found in test resources"))
+        on { open("taiwan.wkb") } doReturn
+            (GeometriesTest::class.java.getResourceAsStream("/taiwan.wkb")
+                ?: error("taiwan.wkb not found in test resources"))
     }
     private val mockContext: Context = mock {
         on { assets } doReturn mockAssetManager
@@ -99,7 +102,7 @@ class GoogleMapsUriFormatterTest {
     }
 
     @Test
-    fun formatNavigationUriString_whenLastPointIsWithinChinaAndInWGS84_returnsLinkWithCoordinatesInGCJ02() {
+    fun formatNavigationUriString_whenLastPointIsWithinMainlandChinaAndInWGS84_returnsLinkWithCoordinatesInGCJ02() {
         assertEquals(
             "google.navigation:q=31.2285067,121.475524",
             googleMapsUriFormatter.formatNavigationUriString(
@@ -110,7 +113,7 @@ class GoogleMapsUriFormatterTest {
     }
 
     @Test
-    fun formatStreetViewUriString_whenLastPointIsWithinChinaAndInWGS84_returnsLinkWithCoordinatesInGCJ02() {
+    fun formatStreetViewUriString_whenLastPointIsWithinMainlandChinaAndInWGS84_returnsLinkWithCoordinatesInGCJ02() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=31.2285067,121.475524",
@@ -122,7 +125,7 @@ class GoogleMapsUriFormatterTest {
     }
 
     @Test
-    fun formatNavigationUriString_whenLastPointIsWithinChinaAndInGCJ02_returnsLinkWithCoordinatesInGCJ02() {
+    fun formatNavigationUriString_whenLastPointIsWithinMainlandChinaAndInGCJ02_returnsLinkWithCoordinatesInGCJ02() {
         assertEquals(
             "google.navigation:q=31.2285069,121.4755246",
             googleMapsUriFormatter.formatNavigationUriString(
@@ -133,7 +136,7 @@ class GoogleMapsUriFormatterTest {
     }
 
     @Test
-    fun formatStreetViewUriString_whenLastPointIsWithinChinaAndInGCJ02_returnsLinkWithCoordinatesInGCJ02() {
+    fun formatStreetViewUriString_whenLastPointIsWithinMainlandChinaAndInGCJ02_returnsLinkWithCoordinatesInGCJ02() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=31.2285069,121.4755246",
@@ -191,7 +194,7 @@ class GoogleMapsUriFormatterTest {
     }
 
     @Test
-    fun formatNavigationUriString_whenPointIsWithinChinaAndInWGS84_returnsLinkWithCoordinatesInGCJ02() {
+    fun formatNavigationUriString_whenPointIsWithinMainlandChinaAndInWGS84_returnsLinkWithCoordinatesInGCJ02() {
         assertEquals(
             "google.navigation:q=31.2285067,121.475524",
             googleMapsUriFormatter.formatNavigationUriString(
@@ -202,7 +205,7 @@ class GoogleMapsUriFormatterTest {
     }
 
     @Test
-    fun formatStreetViewUriString_whenPointIsWithinChinaAndInWGS84_returnsLinkWithCoordinatesInGCJ02() {
+    fun formatStreetViewUriString_whenPointIsWithinMainlandChinaAndInWGS84_returnsLinkWithCoordinatesInGCJ02() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=31.2285067,121.475524",
@@ -214,7 +217,7 @@ class GoogleMapsUriFormatterTest {
     }
 
     @Test
-    fun formatNavigationUriString_whenPointIsWithinChinaAndInGCJ02_returnsLinkWithCoordinatesInGCJ02() {
+    fun formatNavigationUriString_whenPointIsWithinMainlandChinaAndInGCJ02_returnsLinkWithCoordinatesInGCJ02() {
         assertEquals(
             "google.navigation:q=31.2285069,121.4755246",
             googleMapsUriFormatter.formatNavigationUriString(
@@ -225,7 +228,7 @@ class GoogleMapsUriFormatterTest {
     }
 
     @Test
-    fun formatStreetViewUriString_whenPointIsWithinChinaAndInGCJ02_returnsLinkWithCoordinatesInGCJ02() {
+    fun formatStreetViewUriString_whenPointIsWithinMainlandChinaAndInGCJ02_returnsLinkWithCoordinatesInGCJ02() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=31.2285069,121.4755246",

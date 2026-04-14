@@ -39,6 +39,6 @@ class Geometry(
 class Geometries @Inject constructor(
     @ApplicationContext context: Context,
 ) {
-    val china = Geometry(context, "china_ne_10m.wkb")
-    val chinaAndTaiwan = Geometry(context, "china_ne_10m.wkb") // TODO Use another wkb file
+    val mainlandChina = Geometry(context, "mainland_china.wkb")
+    val taiwan = Geometry(context, "taiwan.wkb")
 }

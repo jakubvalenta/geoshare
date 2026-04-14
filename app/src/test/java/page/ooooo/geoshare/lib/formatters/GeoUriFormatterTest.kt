@@ -37,9 +37,12 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class GeoUriFormatterTest {
     private val mockAssetManager: AssetManager = mock {
-        on { open("china_ne_10m.wkb") } doReturn
-            (GeometriesTest::class.java.getResourceAsStream("/china_ne_10m.wkb")
-                ?: error("china_ne_10m.wkb not found in test resources"))
+        on { open("mainland_china.wkb") } doReturn
+            (GeometriesTest::class.java.getResourceAsStream("/mainland_china.wkb")
+                ?: error("mainland_china.wkb not found in test resources"))
+        on { open("taiwan.wkb") } doReturn
+            (GeometriesTest::class.java.getResourceAsStream("/taiwan.wkb")
+                ?: error("taiwan.wkb not found in test resources"))
     }
     private val mockContext: Context = mock {
         on { assets } doReturn mockAssetManager
@@ -194,7 +197,7 @@ class GeoUriFormatterTest {
     }
 
     @Test
-    fun formatGeoUriString_whenLastPointIsInGCJ02AndIsWithinChina_returnsUriWithCoordinatesConvertedToWGS84() {
+    fun formatGeoUriString_whenLastPointIsInGCJ02AndIsWithinMainlandChina_returnsUriWithCoordinatesConvertedToWGS84() {
         assertEquals(
             "geo:39.9191328,116.3254076?q=39.9191328,116.3254076",
             geoUriFormatter.formatGeoUriString(

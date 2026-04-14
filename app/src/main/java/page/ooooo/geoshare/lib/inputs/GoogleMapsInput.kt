@@ -15,7 +15,7 @@ import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toLatLonZPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.formatters.UriFormatter
-import page.ooooo.geoshare.lib.geo.GCJ02ChinaPoint
+import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
@@ -192,7 +192,7 @@ class GoogleMapsInput @Inject constructor(
             }
         }
 
-        points = mutableNaivePoints.map { GCJ02ChinaPoint(it) }.toImmutableList()
+        points = mutableNaivePoints.map { GCJ02MainlandChinaPoint(it) }.toImmutableList()
     }
 
     override suspend fun parseHtml(
@@ -276,7 +276,7 @@ class GoogleMapsInput @Inject constructor(
             }
         }
 
-        points = mutableNaivePoints.map { GCJ02ChinaPoint(it) }.toImmutableList()
+        points = mutableNaivePoints.map { GCJ02MainlandChinaPoint(it) }.toImmutableList()
     }
 
     override fun shouldInterceptRequest(requestUrlString: String) =

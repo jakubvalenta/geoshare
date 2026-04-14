@@ -92,7 +92,7 @@ class GeoUriFormatter @Inject constructor(
 
         packageName == GOOGLE_MAPS_PACKAGE_NAME ||
             packageName == GMAPS_WV_PACKAGE_NAME ->
-            Flavor.Best.copy(srs = Srs.GCJ02_CHINA)
+            Flavor.Best.copy(srs = Srs.GCJ02_MAINLAND_CHINA)
 
         packageName == BAIDU_MAP_PACKAGE_NAME ->
             // Notice that Baidu Map uses WGS 84 geo: URIs, although all its other links are in BD09MC
@@ -118,8 +118,8 @@ class GeoUriFormatter @Inject constructor(
         when (flavor.srs) {
             Srs.WGS84 -> coordinateConverter.toWGS84(point)
             Srs.GCJ02 -> coordinateConverter.toGCJ02(point)
-            Srs.GCJ02_CHINA -> coordinateConverter.toGCJ02China(point)
-            Srs.GCJ02_CHINA_AND_TAIWAN -> coordinateConverter.toGCJ02ChinaAndTaiwan(point)
+            Srs.GCJ02_MAINLAND_CHINA -> coordinateConverter.toGCJ02MainlandChina(point)
+            Srs.GCJ02_MAINLAND_CHINA_AND_TAIWAN -> coordinateConverter.toGCJ02MainlandChinaAndTaiwan(point)
         }.run {
             // Use custom string builder instead of Uri.toString(), because we want to allow custom chars in query params
             buildString {
