@@ -256,7 +256,8 @@ class CoordinateConverterTest {
                 3.14, "foo bar", source = Source.GENERATED,
             ),
         ),
-        // TODO Test bd09mc in eastern Japan
+        // TODO Test BD09MC in eastern Japan
+        // TODO Test Hong Kong
     )
 
     private fun <T : Point> assertPointsEqual(expectedPoint: T, actualPoint: T) =
