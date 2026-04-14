@@ -29,11 +29,11 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
             @Suppress("SpellCheckingInspection") "https://www.google.com/maps/place/Forbidden+City/@39.9165742,116.3945834,17z/data=!4m7!3m6!1s0x35f052e94515d43d:0x674e2bd4dd3079f!8m2!3d39.9168038!4d116.3971621!15sCg5mb3JiaWRkZW4gY2l0eVoQIg5mb3JiaWRkZW4gY2l0eZIBEnRvdXJpc3RfYXR0cmFjdGlvbuABAA!16zL20vMGowYjI?entry=tts&g_ep=EgoyMDI2MDMwOS4wIPu8ASoASAFQAw%3D%3D&skid=5f340da1-a0d3-4b1c-bc05-7f90cfbd502a",
         )
 
-        // Coordinates outside mainland China near coast
-        // FIXME
+        @Suppress("SpellCheckingInspection")
+        // Coordinates within mainland China on the Yangshan port island
         testUri(
-            WGS84Point(37.33557037552849, 122.47663919001769, source = Source.URI),
-            "https://www.google.com/maps/?ll=37.33644561966912,122.48151345759582",
+            WGS84Point(30.602829622230516, 122.12885969924668, source = Source.URI),
+            "https://www.google.com/maps/?ll=30.600649446449268,122.13324202346543",
         )
 
         // Coordinates and query (address)
@@ -111,7 +111,7 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
             "https://www.google.com/maps/search/?api=1&query=Louisenstra%C3%9Fe%2060,%2001099%20Dresden",
         )
 
-        // Short URI within Japan
+        // Short URI within western Japan
         testUri(
             WGS84Point(34.5945482, 133.7583428, z = 17.0, name = "Steak no Don", source = Source.URI),
             "https://maps.app.goo.gl/mBtbC6qXLK2baGTV9",
