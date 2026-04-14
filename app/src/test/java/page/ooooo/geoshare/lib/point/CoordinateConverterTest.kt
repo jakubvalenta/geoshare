@@ -1,43 +1,20 @@
 package page.ooooo.geoshare.lib.point
 
-import android.content.Context
-import android.content.res.AssetManager
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
+import page.ooooo.geoshare.lib.geo.BaseGeometriesTest
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.GCJ02GreaterChinaAndTaiwanPoint
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.GCJ02Point
-import page.ooooo.geoshare.lib.geo.Geometries
-import page.ooooo.geoshare.lib.geo.GeometriesTest
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import kotlin.math.roundToLong
 
-class CoordinateConverterTest {
-    private val mockAssetManager: AssetManager = mock {
-        on { open("greater_china.wkb") } doReturn
-            (GeometriesTest::class.java.getResourceAsStream("/greater_china.wkb")
-                ?: error("greater_china.wkb not found in test resources"))
-        on { open("hong_kong.wkb") } doReturn
-            (GeometriesTest::class.java.getResourceAsStream("/hong_kong.wkb")
-                ?: error("hong_kong.wkb not found in test resources"))
-        on { open("macao.wkb") } doReturn
-            (GeometriesTest::class.java.getResourceAsStream("/macao.wkb")
-                ?: error("macao.wkb not found in test resources"))
-        on { open("taiwan.wkb") } doReturn
-            (GeometriesTest::class.java.getResourceAsStream("/taiwan.wkb")
-                ?: error("taiwan.wkb not found in test resources"))
-    }
-    private val mockContext: Context = mock {
-        on { assets } doReturn mockAssetManager
-    }
-    private val geometries = Geometries(mockContext)
+class CoordinateConverterTest : BaseGeometriesTest() {
     private val coordinateConverter = CoordinateConverter(geometries)
 
     private data class PointInDifferentSrs(

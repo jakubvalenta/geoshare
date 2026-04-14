@@ -1,11 +1,7 @@
 package page.ooooo.geoshare.lib.formatters
 
-import android.content.Context
-import android.content.res.AssetManager
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AMAP_PACKAGE_NAME
@@ -28,29 +24,13 @@ import page.ooooo.geoshare.lib.android.SYGIC_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.TEST_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.VESPUCCI_PACKAGE_NAME
-import page.ooooo.geoshare.lib.geo.Geometries
-import page.ooooo.geoshare.lib.geo.GeometriesTest
+import page.ooooo.geoshare.lib.geo.BaseGeometriesTest
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-class GeoUriFormatterTest {
-    private val mockAssetManager: AssetManager = mock {
-        on { open("greater_china.wkb") } doReturn
-            (GeometriesTest::class.java.getResourceAsStream("/greater_china.wkb")
-                ?: error("greater_china.wkb not found in test resources"))
-        on { open("macao.wkb") } doReturn
-            (GeometriesTest::class.java.getResourceAsStream("/macao.wkb")
-                ?: error("macao.wkb not found in test resources"))
-        on { open("taiwan.wkb") } doReturn
-            (GeometriesTest::class.java.getResourceAsStream("/taiwan.wkb")
-                ?: error("taiwan.wkb not found in test resources"))
-    }
-    private val mockContext: Context = mock {
-        on { assets } doReturn mockAssetManager
-    }
-    private val geometries = Geometries(mockContext)
+class GeoUriFormatterTest : BaseGeometriesTest() {
     private val coordinateConverter = CoordinateConverter(geometries)
     private val geoUriFormatter = GeoUriFormatter(coordinateConverter)
     private val uriQuote: UriQuote = FakeUriQuote
