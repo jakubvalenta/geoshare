@@ -13,6 +13,7 @@ import page.ooooo.geoshare.lib.geo.GeometriesTest
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.Srs
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class GoogleMapsUriFormatterTest {
@@ -38,7 +39,7 @@ class GoogleMapsUriFormatterTest {
             "google.navigation:q=50.123456,-11.123456",
             googleMapsUriFormatter.formatNavigationUriString(
                 WGS84Point(50.123456, -11.123456, z = 3.4, source = Source.GENERATED),
-                uriQuote,
+                uriQuote = uriQuote,
             ),
         )
     }
@@ -50,7 +51,7 @@ class GoogleMapsUriFormatterTest {
             "google.streetview:cbll=50.123456,-11.123456",
             googleMapsUriFormatter.formatStreetViewUriString(
                 WGS84Point(50.123456, -11.123456, z = 3.4, source = Source.GENERATED),
-                uriQuote,
+                uriQuote = uriQuote,
             ),
         )
     }
@@ -61,7 +62,7 @@ class GoogleMapsUriFormatterTest {
             "google.navigation:q=foo+bar",
             googleMapsUriFormatter.formatNavigationUriString(
                 WGS84Point(name = "foo bar", z = 3.4, source = Source.GENERATED),
-                uriQuote,
+                uriQuote = uriQuote,
             ),
         )
     }
@@ -73,7 +74,7 @@ class GoogleMapsUriFormatterTest {
             "google.streetview:cbll=0,0",
             googleMapsUriFormatter.formatStreetViewUriString(
                 WGS84Point(name = "foo bar", z = 3.4, source = Source.GENERATED),
-                uriQuote,
+                uriQuote = uriQuote,
             ),
         )
     }
@@ -84,7 +85,7 @@ class GoogleMapsUriFormatterTest {
             "google.navigation:q=50.123456,-11.123456",
             googleMapsUriFormatter.formatNavigationUriString(
                 WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4, source = Source.GENERATED),
-                uriQuote,
+                uriQuote = uriQuote,
             ),
         )
     }
@@ -96,7 +97,7 @@ class GoogleMapsUriFormatterTest {
             "google.streetview:cbll=50.123456,-11.123456",
             googleMapsUriFormatter.formatStreetViewUriString(
                 WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4, source = Source.GENERATED),
-                uriQuote,
+                uriQuote = uriQuote,
             ),
         )
     }
@@ -107,7 +108,8 @@ class GoogleMapsUriFormatterTest {
             "google.navigation:q=31.2285067,121.475524",
             googleMapsUriFormatter.formatNavigationUriString(
                 WGS84Point(31.23044166868017, 121.47099209401793, source = Source.GENERATED),
-                uriQuote,
+                srs = Srs.GCJ02_MAINLAND_CHINA,
+                uriQuote = uriQuote,
             ),
         )
     }
@@ -119,7 +121,8 @@ class GoogleMapsUriFormatterTest {
             "google.streetview:cbll=31.2285067,121.475524",
             googleMapsUriFormatter.formatStreetViewUriString(
                 WGS84Point(31.23044166868017, 121.47099209401793, source = Source.GENERATED),
-                uriQuote,
+                srs = Srs.GCJ02_MAINLAND_CHINA,
+                uriQuote = uriQuote,
             ),
         )
     }
@@ -130,7 +133,8 @@ class GoogleMapsUriFormatterTest {
             "google.navigation:q=31.2285069,121.4755246",
             googleMapsUriFormatter.formatNavigationUriString(
                 GCJ02Point(31.22850685422705, 121.47552456472106, source = Source.GENERATED),
-                uriQuote,
+                srs = Srs.GCJ02_MAINLAND_CHINA,
+                uriQuote = uriQuote,
             ),
         )
     }
@@ -142,7 +146,8 @@ class GoogleMapsUriFormatterTest {
             "google.streetview:cbll=31.2285069,121.4755246",
             googleMapsUriFormatter.formatStreetViewUriString(
                 GCJ02Point(31.22850685422705, 121.47552456472106, source = Source.GENERATED),
-                uriQuote,
+                srs = Srs.GCJ02_MAINLAND_CHINA,
+                uriQuote = uriQuote,
             ),
         )
     }
@@ -153,7 +158,7 @@ class GoogleMapsUriFormatterTest {
             "google.navigation:q=0,0",
             googleMapsUriFormatter.formatNavigationUriString(
                 WGS84Point(source = Source.GENERATED),
-                uriQuote,
+                uriQuote = uriQuote,
             ),
         )
     }
@@ -165,7 +170,7 @@ class GoogleMapsUriFormatterTest {
             "google.streetview:cbll=0,0",
             googleMapsUriFormatter.formatStreetViewUriString(
                 WGS84Point(source = Source.GENERATED),
-                uriQuote,
+                uriQuote = uriQuote,
             ),
         )
     }
@@ -176,7 +181,7 @@ class GoogleMapsUriFormatterTest {
             "google.navigation:q=50.123456,-11.123456",
             googleMapsUriFormatter.formatNavigationUriString(
                 WGS84Point(50.123456, -11.123456, source = Source.GENERATED),
-                uriQuote,
+                uriQuote = uriQuote,
             ),
         )
     }
@@ -188,7 +193,7 @@ class GoogleMapsUriFormatterTest {
             "google.streetview:cbll=50.123456,-11.123456",
             googleMapsUriFormatter.formatStreetViewUriString(
                 WGS84Point(50.123456, -11.123456, source = Source.GENERATED),
-                uriQuote,
+                uriQuote = uriQuote,
             ),
         )
     }
@@ -199,7 +204,8 @@ class GoogleMapsUriFormatterTest {
             "google.navigation:q=31.2285067,121.475524",
             googleMapsUriFormatter.formatNavigationUriString(
                 WGS84Point(31.23044166868017, 121.47099209401793, source = Source.GENERATED),
-                uriQuote,
+                srs = Srs.GCJ02_MAINLAND_CHINA,
+                uriQuote = uriQuote,
             ),
         )
     }
@@ -211,7 +217,8 @@ class GoogleMapsUriFormatterTest {
             "google.streetview:cbll=31.2285067,121.475524",
             googleMapsUriFormatter.formatStreetViewUriString(
                 WGS84Point(31.23044166868017, 121.47099209401793, source = Source.GENERATED),
-                uriQuote,
+                srs = Srs.GCJ02_MAINLAND_CHINA,
+                uriQuote = uriQuote,
             ),
         )
     }
@@ -222,7 +229,8 @@ class GoogleMapsUriFormatterTest {
             "google.navigation:q=31.2285069,121.4755246",
             googleMapsUriFormatter.formatNavigationUriString(
                 GCJ02Point(31.22850685422705, 121.47552456472106, source = Source.GENERATED),
-                uriQuote,
+                srs = Srs.GCJ02_MAINLAND_CHINA,
+                uriQuote = uriQuote,
             ),
         )
     }
@@ -234,7 +242,8 @@ class GoogleMapsUriFormatterTest {
             "google.streetview:cbll=31.2285069,121.4755246",
             googleMapsUriFormatter.formatStreetViewUriString(
                 GCJ02Point(31.22850685422705, 121.47552456472106, source = Source.GENERATED),
-                uriQuote,
+                srs = Srs.GCJ02_MAINLAND_CHINA,
+                uriQuote = uriQuote,
             ),
         )
     }
