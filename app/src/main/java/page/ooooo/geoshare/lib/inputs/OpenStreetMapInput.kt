@@ -16,6 +16,7 @@ import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toZLatLonPoint
 import page.ooooo.geoshare.lib.geo.decodeOpenStreetMapQuadTileHash
 import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 
 object OpenStreetMapInput : HtmlInput, Input.HasRandomUri {
@@ -44,21 +45,21 @@ object OpenStreetMapInput : HtmlInput, Input.HasRandomUri {
             Regex("""/go/($HASH)""").matchEntire(path)?.groupOrNull()
                 ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }
                 ?.let {
-                    points = persistentListOf(it.asWGS84())
+                    points = persistentListOf(WGS84Point(it))
                     return@run
                 }
 
-            // Coordinates
+            // Map center
             // https://www.openstreetmap.org/#map={z}/{lat}/{lon}
-            Regex("""map=$Z/$LAT/$LON.*""").matchEntire(fragment)?.toZLatLonPoint()?.let {
-                points = persistentListOf(it.asWGS84())
+            Regex("""map=$Z/$LAT/$LON.*""").matchEntire(fragment)?.toZLatLonPoint(Source.MAP_CENTER)?.let {
+                points = persistentListOf(WGS84Point(it))
                 return@run
             }
 
             // Directions
             // https://www.openstreetmap.org/directions?to={lat},{lon}
-            LAT_LON_PATTERN.matchEntire(queryParams["to"])?.toLatLonPoint()?.let {
-                points = persistentListOf(it.asWGS84())
+            LAT_LON_PATTERN.matchEntire(queryParams["to"])?.toLatLonPoint(Source.URI)?.let {
+                points = persistentListOf(WGS84Point(it))
                 return@run
             }
 
@@ -91,7 +92,10 @@ object OpenStreetMapInput : HtmlInput, Input.HasRandomUri {
 
         while (true) {
             val line = channel.readLine() ?: break
-            mutablePoints.addAll(pattern.findAll(line).mapNotNull { it.toLatLonPoint()?.asWGS84() })
+            mutablePoints.addAll(
+                pattern.findAll(line)
+                    .mapNotNull { m -> m.toLatLonPoint(Source.API)?.let { WGS84Point(it) } }
+            )
         }
 
         if (name != null) {

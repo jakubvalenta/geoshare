@@ -16,6 +16,8 @@ import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
 import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Source
+import page.ooooo.geoshare.lib.point.WGS84Point
 
 object UrbiInput : HtmlInput, Input.HasRandomUri {
     override val uriPattern =
@@ -54,8 +56,8 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
         uri.run {
             // Marker
             // https://maps.urbi.ae/dubai/geo/{lon}%2C{lat}?m={lon},{lat}/{z}
-            Regex("""$LON,$LAT/$Z""").matchEntire(queryParams["m"])?.toLonLatZPoint()?.let {
-                points = persistentListOf(it.asWGS84())
+            Regex("""$LON,$LAT/$Z""").matchEntire(queryParams["m"])?.toLonLatZPoint(Source.URI)?.let {
+                points = persistentListOf(WGS84Point(it))
                 return@run
             }
 
@@ -63,16 +65,16 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
 
             // Point
             // https://maps.urbi.ae/dubai/geo/{lon}%2C{lat}
-            Regex(""".*/$LON,$LAT/?$""").matchEntire(path)?.toLonLatPoint()?.let {
-                points = persistentListOf(it.asWGS84().copy(z = z))
+            Regex(""".*/$LON,$LAT/?$""").matchEntire(path)?.toLonLatPoint(Source.URI)?.let {
+                points = persistentListOf(WGS84Point(it).copy(z = z))
                 return@run
             }
 
-            // API
+            // API map center
             // https://share.api.2gis.ru/getimage?...&zoom={z}&center={lon},{lat}&title={name}...
-            LON_LAT_PATTERN.matchEntire(queryParams["center"])?.toLonLatPoint()?.let {
+            LON_LAT_PATTERN.matchEntire(queryParams["center"])?.toLonLatPoint(Source.MAP_CENTER)?.let {
                 points = persistentListOf(
-                    it.asWGS84().copy(
+                    WGS84Point(it).copy(
                         z = z,
                         name = Q_PARAM_PATTERN.matchEntire(queryParams["title"])?.groupOrNull(),
                     )

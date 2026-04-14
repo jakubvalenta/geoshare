@@ -62,6 +62,7 @@ import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.outputs.CopyLinkUriOutput
 import page.ooooo.geoshare.lib.outputs.ShareLinkUriOutput
 import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.Srs
 import page.ooooo.geoshare.lib.point.WGS84Point
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -179,8 +180,16 @@ fun LinkForm(
             isError = coordsUriTemplate.isEmpty(),
         )
         listOf(
-            WGS84Point(-3.075833, 37.353333) to stringResource(R.string.links_form_test_world),
-            WGS84Point(39.915833, 116.390833) to stringResource(R.string.links_form_test_china),
+            WGS84Point(
+                -3.075833,
+                37.353333,
+                source = Source.GENERATED,
+            ) to stringResource(R.string.links_form_test_world),
+            WGS84Point(
+                39.915833,
+                116.390833,
+                source = Source.GENERATED,
+            ) to stringResource(R.string.links_form_test_china),
         ).let { testPointsWithName ->
             Column(verticalArrangement = Arrangement.spacedBy(spacing.small)) {
                 ScrollableChips(PaddingValues(horizontal = LocalSpacing.current.windowPadding)) {

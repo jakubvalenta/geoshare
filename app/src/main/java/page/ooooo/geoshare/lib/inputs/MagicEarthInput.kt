@@ -8,6 +8,7 @@ import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 
 /**
@@ -33,13 +34,13 @@ object MagicEarthInput : Input, Input.HasRandomUri {
 
             LAT_PATTERN.matchEntire(queryParams["lat"])?.doubleGroupOrNull()?.let { lat ->
                 LON_PATTERN.matchEntire(queryParams["lon"])?.doubleGroupOrNull()?.let { lon ->
-                    points = persistentListOf(WGS84Point(lat, lon, z, name))
+                    points = persistentListOf(WGS84Point(lat, lon, z, name, Source.URI))
                     return@run
                 }
             }
 
             if (name != null) {
-                points = persistentListOf(WGS84Point(z = z, name = name))
+                points = persistentListOf(WGS84Point(z = z, name = name, source = Source.URI))
             }
         }
     }

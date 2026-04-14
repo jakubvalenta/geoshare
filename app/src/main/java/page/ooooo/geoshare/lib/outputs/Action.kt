@@ -6,6 +6,7 @@ import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.Points
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 
 /**
@@ -108,4 +109,4 @@ sealed interface FileAction<T> : Action<T> {
     }
 }
 
-val NoopAction = BasicAction.WithPoint(WGS84Point(), NoopOutput)
+val NoopAction = BasicAction.WithPoint(WGS84Point(source = Source.GENERATED), NoopOutput)

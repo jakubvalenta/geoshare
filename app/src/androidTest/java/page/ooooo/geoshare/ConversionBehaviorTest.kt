@@ -16,6 +16,7 @@ import org.junit.runner.RunWith
 import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
 import page.ooooo.geoshare.lib.point.GCJ02Point
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 import kotlin.time.Duration.Companion.seconds
 
@@ -30,7 +31,7 @@ class ConversionBehaviorTest : BehaviorTest {
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
         // Shows precise location
-        assertConversionSucceeded(GCJ02Point(52.5067296, 13.2599309, z = 11.0))
+        assertConversionSucceeded(GCJ02Point(52.5067296, 13.2599309, z = 11.0, source = Source.MAP_CENTER))
 
         // Tap the Google Maps icon
         onElement { viewIdResourceName == "geoShareApp_${GOOGLE_MAPS_PACKAGE_NAME}" }.click()
@@ -49,8 +50,12 @@ class ConversionBehaviorTest : BehaviorTest {
                 // Share a Google Maps coordinates link with the app
                 shareUri("https://www.google.com/maps/@31.22850685422705,121.47552456472106,11z")
 
-                // Shows precise location in WGS 84
-                val expectedPoint = WGS84Point(31.23044166868017, 121.47099209401793, z = 11.0)
+                // Shows precise location
+                val expectedPoint = GCJ02Point(
+                    31.22850685422705, 121.47552456472106,
+                    z = 11.0,
+                    source = Source.MAP_CENTER,
+                )
                 assertConversionSucceeded(expectedPoint)
 
                 // Tap the Google Maps icon
@@ -80,6 +85,7 @@ class ConversionBehaviorTest : BehaviorTest {
                     GCJ02Point(
                         52.4842015, 13.4167277,
                         name = @Suppress("SpellCheckingInspection") "Columbiadamm 160, 12049 Berlin",
+                        source = Source.URI,
                     )
                 )
 
@@ -112,6 +118,7 @@ class ConversionBehaviorTest : BehaviorTest {
                     GCJ02Point(
                         52.4842015, 13.4167277,
                         name = @Suppress("SpellCheckingInspection") "Columbiadamm 160, 12049 Berlin",
+                        source = Source.URI,
                     )
                 )
 
@@ -124,6 +131,7 @@ class ConversionBehaviorTest : BehaviorTest {
                     GCJ02Point(
                         44.4490541, 26.0888398,
                         name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București",
+                        source = Source.URI,
                     )
                 )
             }
@@ -220,7 +228,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 }
 
                 // Shows precise location
-                assertConversionSucceeded(WGS84Point(52.4697882, 13.4257989))
+                assertConversionSucceeded(WGS84Point(52.4697882, 13.4257989, source = Source.HTML))
 
                 // Share another Apple Maps place link with the app
                 shareUri("https://maps.apple.com/place?place-id=I849C144AAC7A794F&_provider=9902")
@@ -247,14 +255,14 @@ class ConversionBehaviorTest : BehaviorTest {
                 }
 
                 // Shows precise location
-                assertConversionSucceeded(WGS84Point(52.4778665, 13.426398))
+                assertConversionSucceeded(WGS84Point(52.4778665, 13.426398, source = Source.HTML))
 
                 // Share another Apple Maps place link with the app
                 shareUri("https://maps.apple.com/place?place-id=I6E0F00362159B5EC&_provider=9902")
                 quickWaitForStableInActiveWindow()
 
                 // Shows precise location again
-                assertConversionSucceeded(WGS84Point(52.4820815, 13.4338421))
+                assertConversionSucceeded(WGS84Point(52.4820815, 13.4338421, source = Source.HTML))
             }
         }
 
@@ -334,6 +342,7 @@ class ConversionBehaviorTest : BehaviorTest {
                     GCJ02Point(
                         52.4848232, 13.4240791,
                         name = @Suppress("SpellCheckingInspection") "Hermannstraße 10, 12049 Berlin",
+                        source = Source.URI,
                     )
                 )
 
@@ -366,6 +375,7 @@ class ConversionBehaviorTest : BehaviorTest {
                     GCJ02Point(
                         52.4834254, 13.4245399,
                         name = @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin",
+                        source = Source.URI,
                     ),
                 )
 
@@ -378,6 +388,7 @@ class ConversionBehaviorTest : BehaviorTest {
                     GCJ02Point(
                         52.4832988, 13.4245179,
                         name = @Suppress("SpellCheckingInspection") "Hermannstraße 21, 12049 Berlin",
+                        source = Source.URI,
                     )
                 )
             }
@@ -399,7 +410,10 @@ class ConversionBehaviorTest : BehaviorTest {
 
                 // Shows location search
                 assertConversionSucceeded(
-                    GCJ02Point(name = @Suppress("SpellCheckingInspection") "Hermannstr. 30, Berlin")
+                    GCJ02Point(
+                        name = @Suppress("SpellCheckingInspection") "Hermannstr. 30, Berlin",
+                        source = Source.URI,
+                    )
                 )
 
                 // Share another Google Maps place link with the app
@@ -427,7 +441,10 @@ class ConversionBehaviorTest : BehaviorTest {
 
                 // Shows location search
                 assertConversionSucceeded(
-                    GCJ02Point(name = @Suppress("SpellCheckingInspection") "Hermannstr. 40, Berlin")
+                    GCJ02Point(
+                        name = @Suppress("SpellCheckingInspection") "Hermannstr. 40, Berlin",
+                        source = Source.URI,
+                    )
                 )
 
                 // Share another Google Maps place link with the app
@@ -436,7 +453,10 @@ class ConversionBehaviorTest : BehaviorTest {
 
                 // Shows location search
                 assertConversionSucceeded(
-                    GCJ02Point(name = @Suppress("SpellCheckingInspection") "Hermannstr. 41, Berlin")
+                    GCJ02Point(
+                        name = @Suppress("SpellCheckingInspection") "Hermannstr. 41, Berlin",
+                        source = Source.URI,
+                    )
                 )
             }
         }
@@ -460,6 +480,7 @@ class ConversionBehaviorTest : BehaviorTest {
                     GCJ02Point(
                         51.1982447, 6.4389493,
                         name = @Suppress("SpellCheckingInspection") "Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
+                        source = Source.URI,
                     )
                 )
             }
@@ -532,7 +553,15 @@ class ConversionBehaviorTest : BehaviorTest {
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
         // Wait for the conversion to succeed
-        assertConversionSucceeded(persistentListOf(WGS84Point(52.5067296, 13.2599309, 11.0)))
+        assertConversionSucceeded(
+            persistentListOf(
+                WGS84Point(
+                    52.5067296, 13.2599309,
+                    11.0,
+                    source = Source.MAP_CENTER,
+                )
+            )
+        )
 
         // Open copy menu
         onElement { viewIdResourceName == "geoShareResultSuccessLastPointMenu" }.click()

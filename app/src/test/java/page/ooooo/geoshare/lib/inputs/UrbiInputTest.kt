@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 
 class UrbiInputTest : BaseInputTest() {
@@ -124,7 +125,7 @@ class UrbiInputTest : BaseInputTest() {
     @Test
     fun parseUri_point() = runTest {
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(25.284889, 55.172173))),
+            ParseUriResult(persistentListOf(WGS84Point(25.284889, 55.172173, source = Source.URI))),
             parseUri("https://maps.urbi.ae/dubai/geo/55.172173%2C25.284889"),
         )
     }
@@ -132,7 +133,7 @@ class UrbiInputTest : BaseInputTest() {
     @Test
     fun parseUri_pointWithMarker() = runTest {
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(25.25915, 55.225263, z = 12.77))),
+            ParseUriResult(persistentListOf(WGS84Point(25.25915, 55.225263, z = 12.77, source = Source.URI))),
             parseUri("https://maps.urbi.ae/dubai/geo/55.171971%2C25.289452?m=55.225263%2C25.25915%2F12.77"),
         )
     }
@@ -162,7 +163,7 @@ class UrbiInputTest : BaseInputTest() {
     @Test
     fun parseUri_firmWithCoordinates() = runTest {
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(25.19925, 55.332211))),
+            ParseUriResult(persistentListOf(WGS84Point(25.19925, 55.332211, source = Source.URI))),
             parseUri("https://maps.urbi.ae/dubai/firm/70000001043503020/55.332211%2C25.19925"),
         )
     }
@@ -170,7 +171,7 @@ class UrbiInputTest : BaseInputTest() {
     @Test
     fun parseUri_firmWithMarker() = runTest {
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(25.196707, 55.320748, z = 14.82))),
+            ParseUriResult(persistentListOf(WGS84Point(25.196707, 55.320748, z = 14.82, source = Source.URI))),
             parseUri("https://maps.urbi.ae/dubai/firm/70000001043503020/55.332211%2C25.19925?m=55.320748%2C25.196707%2F14.82"),
         )
     }
@@ -202,6 +203,7 @@ class UrbiInputTest : BaseInputTest() {
                         41.285765, 69.234083,
                         z = 17.0,
                         name = "Music Store, магазин музыкальных инструментов",
+                        source = Source.MAP_CENTER,
                     ),
                 )
             ),
@@ -212,7 +214,7 @@ class UrbiInputTest : BaseInputTest() {
     @Test
     fun parseUri_apiWithoutTitle() = runTest {
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(41.285765, 69.234083, z = 17.0))),
+            ParseUriResult(persistentListOf(WGS84Point(41.285765, 69.234083, z = 17.0, source = Source.MAP_CENTER))),
             parseUri("https://share.api.2gis.ru/getimage?city=tashkent&zoom=17&center=69.234083%2C41.285765"),
         )
     }
@@ -226,6 +228,7 @@ class UrbiInputTest : BaseInputTest() {
                         41.285765, 69.234083,
                         z = 17.0,
                         name = "Music Store, магазин музыкальных инструментов",
+                        source = Source.MAP_CENTER,
                     ),
                 )
             ),

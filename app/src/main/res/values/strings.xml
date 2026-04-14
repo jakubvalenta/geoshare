@@ -32,6 +32,9 @@
     <string name="billing_subscription_monthly" translatable="false">Monthly subscription</string>
     <string name="billing_terms_of_service" translatable="false">Terms of service</string>
     <string name="billing_support_email" translatable="false">Support email</string>
+    <string name="conversion_succeeded_check_experimental">Location might be inaccurate due to an experimental extraction method.</string>
+    <string name="conversion_succeeded_check_map_center">Location might be a map center, not a pin.</string>
+    <string name="conversion_succeeded_check_srs">Location might be inaccurate due to coordinate system conversion.</string>
     <string name="conversion_succeeded_copy_coordinates">Copy coordinates</string>
     <string name="conversion_succeeded_copy_link">Copy %1$s link</string>
     <string name="conversion_succeeded_description_q_only">The original link doesn’t contain coordinates, only a place name. When you open this location in another app, it might find a different place than the original link.</string>

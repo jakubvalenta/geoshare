@@ -26,16 +26,17 @@ import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.VESPUCCI_PACKAGE_NAME
 import page.ooooo.geoshare.lib.formats.GeoUriFormat.formatGeoUriString
 import page.ooooo.geoshare.lib.point.GCJ02Point
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 
-class GeoUriLinkTest {
+class GeoUriFormatTest {
     private val uriQuote: UriQuote = FakeUriQuote
 
     @Test
     fun formatGeoUriString_whenLastPointDoesNotHaveCoordinates_returnsUriWithZeroCoordinates() {
         assertEquals(
             "geo:0,0",
-            formatGeoUriString(WGS84Point(), GeoUriFormat.Flavor.Best, uriQuote),
+            formatGeoUriString(WGS84Point(source = Source.GENERATED), GeoUriFormat.Flavor.Best, uriQuote),
         )
     }
 
@@ -43,7 +44,11 @@ class GeoUriLinkTest {
     fun formatGeoUriString_whenLastPointHasName_returnsUriWithZeroCoordinatesAndQParam() {
         assertEquals(
             "geo:0,0?q=foo%20bar",
-            formatGeoUriString(WGS84Point(name = "foo bar"), GeoUriFormat.Flavor.Best, uriQuote),
+            formatGeoUriString(
+                WGS84Point(name = "foo bar", source = Source.GENERATED),
+                GeoUriFormat.Flavor.Best,
+                uriQuote
+            ),
         )
     }
 
@@ -52,7 +57,7 @@ class GeoUriLinkTest {
         assertEquals(
             "geo:50.123456,-11.123456?q=50.123456,-11.123456",
             formatGeoUriString(
-                WGS84Point(50.123456, -11.123456),
+                WGS84Point(50.123456, -11.123456, source = Source.GENERATED),
                 GeoUriFormat.Flavor.Best,
                 uriQuote,
             ),
@@ -64,7 +69,7 @@ class GeoUriLinkTest {
         assertEquals(
             "geo:50.123456,-11.123456?z=3.4&q=50.123456,-11.123456",
             formatGeoUriString(
-                WGS84Point(50.123456, -11.123456, z = 3.4),
+                WGS84Point(50.123456, -11.123456, z = 3.4, source = Source.GENERATED),
                 GeoUriFormat.Flavor.Best,
                 uriQuote,
             ),
@@ -76,7 +81,7 @@ class GeoUriLinkTest {
         assertEquals(
             "geo:50.123456,-11.123456?q=50.123456,-11.123456(foo%20bar)",
             formatGeoUriString(
-                WGS84Point(50.123456, -11.123456, name = "foo bar"),
+                WGS84Point(50.123456, -11.123456, name = "foo bar", source = Source.GENERATED),
                 GeoUriFormat.Flavor.Best,
                 uriQuote,
             ),
@@ -88,7 +93,7 @@ class GeoUriLinkTest {
         assertEquals(
             "geo:50.123456,-11.123456?z=3.4&q=50.123456,-11.123456(foo%20bar)",
             formatGeoUriString(
-                WGS84Point(50.123456, -11.123456, z = 3.4, name = "foo bar"),
+                WGS84Point(50.123456, -11.123456, z = 3.4, name = "foo bar", source = Source.GENERATED),
                 GeoUriFormat.Flavor.Best,
                 uriQuote,
             ),
@@ -100,7 +105,7 @@ class GeoUriLinkTest {
         assertEquals(
             "geo:50.123456,-11.123456?q=50.123456,-11.123456",
             formatGeoUriString(
-                WGS84Point(50.123456, -11.123456, name = "foo bar"),
+                WGS84Point(50.123456, -11.123456, name = "foo bar", source = Source.GENERATED),
                 GeoUriFormat.Flavor(
                     pin = GeoUriFormat.Flavor.PinFlavor.COORDS_ONLY_IN_Q,
                     zoom = GeoUriFormat.Flavor.ZoomFlavor.ANY,
@@ -115,7 +120,7 @@ class GeoUriLinkTest {
         assertEquals(
             "geo:50.123456,-11.123456",
             formatGeoUriString(
-                WGS84Point(50.123456, -11.123456, name = "foo bar"),
+                WGS84Point(50.123456, -11.123456, name = "foo bar", source = Source.GENERATED),
                 GeoUriFormat.Flavor(
                     pin = GeoUriFormat.Flavor.PinFlavor.NOT_AVAILABLE,
                     zoom = GeoUriFormat.Flavor.ZoomFlavor.ANY,
@@ -130,7 +135,7 @@ class GeoUriLinkTest {
         assertEquals(
             "geo:50.123456,-11.123456?q=50.123456,-11.123456(foo%20bar)",
             formatGeoUriString(
-                WGS84Point(50.123456, -11.123456, z = 12.0, name = "foo bar"),
+                WGS84Point(50.123456, -11.123456, z = 12.0, name = "foo bar", source = Source.GENERATED),
                 GeoUriFormat.Flavor(
                     pin = GeoUriFormat.Flavor.PinFlavor.COORDS_AND_NAME_IN_Q,
                     zoom = GeoUriFormat.Flavor.ZoomFlavor.ALONE_ONLY,
@@ -145,7 +150,7 @@ class GeoUriLinkTest {
         assertEquals(
             "geo:50.123456,-11.123456?q=50.123456,-11.123456",
             formatGeoUriString(
-                WGS84Point(50.123456, -11.123456, z = 3.4),
+                WGS84Point(50.123456, -11.123456, z = 3.4, source = Source.GENERATED),
                 GeoUriFormat.Flavor(
                     pin = GeoUriFormat.Flavor.PinFlavor.COORDS_AND_NAME_IN_Q,
                     zoom = GeoUriFormat.Flavor.ZoomFlavor.NOT_AVAILABLE,
@@ -160,7 +165,7 @@ class GeoUriLinkTest {
         assertEquals(
             "geo:34.5945482,133.7583428?q=34.5945482,133.7583428",
             formatGeoUriString(
-                GCJ02Point(34.5945482, 133.7583428),
+                GCJ02Point(34.5945482, 133.7583428, source = Source.GENERATED),
                 GeoUriFormat.Flavor.Best,
                 uriQuote,
             )
@@ -172,7 +177,7 @@ class GeoUriLinkTest {
         assertEquals(
             "geo:39.9191328,116.3254076?q=39.9191328,116.3254076",
             formatGeoUriString(
-                GCJ02Point(39.920439, 116.331538),
+                GCJ02Point(39.920439, 116.331538, source = Source.GENERATED),
                 GeoUriFormat.Flavor.Best,
                 uriQuote,
             )
@@ -195,7 +200,7 @@ class GeoUriLinkTest {
                 AMAP_PACKAGE_NAME, // GCJ-02
             ).map { packageName ->
                 formatGeoUriString(
-                    WGS84Point(31.23044166868017, 121.47099209401793),
+                    WGS84Point(31.23044166868017, 121.47099209401793, source = Source.GENERATED),
                     packageName,
                     uriQuote,
                 )
@@ -205,7 +210,8 @@ class GeoUriLinkTest {
 
     @Test
     fun formatGeoUriString_choosesCorrectFlavorBasedOnPackageName() {
-        val point = WGS84Point(31.23044166868017, 121.47099209401793, z = 3.4, name = "foo bar")
+        val point =
+            WGS84Point(31.23044166868017, 121.47099209401793, z = 3.4, name = "foo bar", source = Source.GENERATED)
         val expectedUriStrings = mapOf(
             AMAP_PACKAGE_NAME to "geo:31.2285067,121.475524?z=3.4&q=31.2285067,121.475524(foo%20bar)",
             BAIDU_MAP_PACKAGE_NAME to "geo:31.2304417,121.4709921?z=3.4",

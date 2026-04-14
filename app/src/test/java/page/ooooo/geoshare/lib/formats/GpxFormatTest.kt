@@ -5,6 +5,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import page.ooooo.geoshare.lib.formats.GpxFormat.writeGpxPoints
 import page.ooooo.geoshare.lib.formats.GpxFormat.writeGpxRoute
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 
 class GpxFormatTest {
@@ -23,9 +24,9 @@ class GpxFormatTest {
             StringBuilder().apply {
                 writeGpxPoints(
                     persistentListOf(
-                        WGS84Point(50.123456, -11.123456),
-                        WGS84Point(), // Empty point
-                        WGS84Point(52.5067296, 13.2599309),
+                        WGS84Point(50.123456, -11.123456, source = Source.GENERATED),
+                        WGS84Point(source = Source.GENERATED), // Empty point
+                        WGS84Point(52.5067296, 13.2599309, source = Source.GENERATED),
                     ),
                     this,
                 )
@@ -48,7 +49,7 @@ class GpxFormatTest {
             StringBuilder().apply {
                 writeGpxPoints(
                     persistentListOf(
-                        WGS84Point(50.123456, -11.123456, name = "<script>alert()</script>"),
+                        WGS84Point(50.123456, -11.123456, name = "<script>alert()</script>", source = Source.GENERATED),
                     ),
                     this,
                 )
@@ -91,10 +92,10 @@ class GpxFormatTest {
             StringBuilder().apply {
                 writeGpxRoute(
                     persistentListOf(
-                        WGS84Point(50.123456, -11.123456),
-                        WGS84Point(), // Empty point
-                        WGS84Point(52.5067296, 13.2599309),
-                        WGS84Point(53.0, 14.0),
+                        WGS84Point(50.123456, -11.123456, source = Source.GENERATED),
+                        WGS84Point(source = Source.GENERATED), // Empty point
+                        WGS84Point(52.5067296, 13.2599309, source = Source.GENERATED),
+                        WGS84Point(53.0, 14.0, source = Source.GENERATED),
                     ),
                     this,
                 )
@@ -119,7 +120,7 @@ class GpxFormatTest {
             StringBuilder().apply {
                 writeGpxRoute(
                     persistentListOf(
-                        WGS84Point(50.123456, -11.123456, name = "<script>alert()</script>"),
+                        WGS84Point(50.123456, -11.123456, name = "<script>alert()</script>", source = Source.GENERATED),
                     ),
                     this,
                 )

@@ -7,6 +7,7 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.GCJ02Point
+import page.ooooo.geoshare.lib.point.Source
 
 class AmapInputTest : BaseInputTest() {
     override val input = AmapInput
@@ -65,6 +66,7 @@ class AmapInputTest : BaseInputTest() {
                     GCJ02Point(
                         31.222811749011463, 121.46840706467624,
                         name = "上海市黄浦区巨鹿路15-17号",
+                        source = Source.URI,
                     ),
                 )
             ),
@@ -76,7 +78,7 @@ class AmapInputTest : BaseInputTest() {
     fun parseUri_inChinaWithoutName() = runTest {
         assertEquals(
             ParseUriResult(
-                persistentListOf(GCJ02Point(31.222811749011463, 121.46840706467624))
+                persistentListOf(GCJ02Point(31.222811749011463, 121.46840706467624, source = Source.URI))
             ),
             parseUri("https://wb.amap.com/?q=31.222811749011463%2C121.46840706467624"),
         )
@@ -90,6 +92,7 @@ class AmapInputTest : BaseInputTest() {
                     GCJ02Point(
                         45.8289525077221, 1.266689300537103,
                         name = @Suppress("SpellCheckingInspection") "利摩日主教座堂,42 Rue Prte Panet, 87000 Limoges, 法国",
+                        source = Source.URI,
                     ),
                 )
             ),
@@ -101,7 +104,7 @@ class AmapInputTest : BaseInputTest() {
     fun parseUri_notInChinaWithoutName() = runTest {
         assertEquals(
             ParseUriResult(
-                persistentListOf(GCJ02Point(45.8289525077221, 1.266689300537103))
+                persistentListOf(GCJ02Point(45.8289525077221, 1.266689300537103, source = Source.URI))
             ),
             parseUri("https://wb.amap.com/?p=P0JANYX6NL%2C45.8289525077221%2C1.266689300537103"),
         )

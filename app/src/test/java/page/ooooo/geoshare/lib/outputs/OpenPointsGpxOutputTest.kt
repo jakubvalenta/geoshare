@@ -12,6 +12,7 @@ import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.lib.android.TEST_PACKAGE_NAME
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 import java.io.File
 import kotlin.io.path.createTempDirectory
@@ -36,9 +37,9 @@ class OpenPointsGpxOutputTest {
     @Test
     fun execute_pointsHasThreePoints_writesGpxPoints() = runTest {
         val points = persistentListOf(
-            WGS84Point(3.0, 4.0),
-            WGS84Point(5.0, 6.0, name = "My waypoint"),
-            WGS84Point(1.0, 2.0, name = "My destination"),
+            WGS84Point(3.0, 4.0, source = Source.GENERATED),
+            WGS84Point(5.0, 6.0, name = "My waypoint", source = Source.GENERATED),
+            WGS84Point(1.0, 2.0, name = "My destination", source = Source.GENERATED),
         )
         val parentDir = createTempDirectory().toFile()
         val childDir = File(parentDir, "points")

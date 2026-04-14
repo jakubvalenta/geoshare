@@ -13,7 +13,9 @@ import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
+import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 
 object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
@@ -57,8 +59,10 @@ object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
             // https://yandex.com/maps?ll={lon},{lat}
             // https://yandex.com/maps?whatshere%5Bpoint%5D={lon}%2C{lat}
             listOf(@Suppress("SpellCheckingInspection") "whatshere[point]", "ll")
-                .firstNotNullOfOrNull { key -> LON_LAT_PATTERN.matchEntire(queryParams[key])?.toLonLatPoint() }?.let {
-                    points = persistentListOf(it.asWGS84().copy(z = z))
+                .firstNotNullOfOrNull { key ->
+                    LON_LAT_PATTERN.matchEntire(queryParams[key])?.toLonLatPoint(Source.URI)
+                }?.let {
+                    points = persistentListOf(WGS84Point(it).copy(z = z))
                     return@buildParseUriResult
                 }
 
@@ -69,7 +73,10 @@ object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
                         // https://yandex.com/maps/.../.../geo/{name}/{id}/
                         htmlUriString = toString()
                         points = persistentListOf(
-                            WGS84Point(name = pathParts.getOrNull(i + 1)?.replace('_', ' ')),
+                            WGS84Point(
+                                name = pathParts.getOrNull(i + 1)?.replace('_', ' '),
+                                source = Source.URI,
+                            ),
                         )
                         return@buildParseUriResult
                     }
@@ -95,15 +102,13 @@ object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
         val pointPattern = Regex("""pt=$LON%2C$LAT""")
         val namePattern = Regex("""itemProp="name"[^>]*>([^<]+)""")
 
-        var lat: Double? = null
-        var lon: Double? = null
+        var naivePoint: NaivePoint? = null
         var name = pointsFromUri.lastOrNull()?.name
 
         while (true) {
             val line = channel.readLine() ?: break
-            pointPattern.find(line)?.toLonLatPoint()?.let { naivePoint ->
-                lat = naivePoint.lat
-                lon = naivePoint.lon
+            pointPattern.find(line)?.toLonLatPoint(Source.HTML)?.let {
+                naivePoint = it
                 continue
             }
             namePattern.find(line)?.groupOrNull()?.let {
@@ -112,8 +117,10 @@ object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
             }
         }
 
-        if (lat != null || lon != null || name != null) {
-            points = persistentListOf(WGS84Point(lat, lon, name = name))
+        naivePoint?.also {
+            points = persistentListOf(WGS84Point(it).copy(name = name))
+        } ?: name?.also {
+            points = persistentListOf(WGS84Point(name = name, source = Source.HTML))
         }
     }
 

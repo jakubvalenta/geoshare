@@ -17,6 +17,7 @@ import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.geo.decodeWazeGeoHash
 import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 
 /**
@@ -50,7 +51,9 @@ object WazeInput : HtmlInput, Input.HasRandomUri {
                 )?.groupOrNull()
                 ?.let { hash -> decodeWazeGeoHash(hash) }
                 ?.let {
-                    points = persistentListOf(it.asWGS84().copy(lat = it.lat?.toScale(6), lon = it.lon?.toScale(6)))
+                    points = persistentListOf(
+                        WGS84Point(it).copy(lat = it.lat?.toScale(6), lon = it.lon?.toScale(6))
+                    )
                     return@run
                 }
 
@@ -63,15 +66,15 @@ object WazeInput : HtmlInput, Input.HasRandomUri {
             (Regex("""ll\.$LAT,$LON""").matchEntire(queryParams["to"])
                 ?: LAT_LON_PATTERN.matchEntire(queryParams["ll"])
                 ?: LAT_LON_PATTERN.matchEntire(queryParams[@Suppress("SpellCheckingInspection") "latlng"])
-                )?.toLatLonPoint()?.let {
-                    points = persistentListOf(it.asWGS84().copy(z = z, name = name))
+                )?.toLatLonPoint(Source.URI)?.let {
+                    points = persistentListOf(WGS84Point(it).copy(z = z, name = name))
                     return@run
                 }
 
             // Search
             // https://waze.com/ul?q={name}
             if (name != null) {
-                points = persistentListOf(WGS84Point(z = z, name = name))
+                points = persistentListOf(WGS84Point(z = z, name = name, source = Source.URI))
             }
 
             // Place
@@ -121,8 +124,8 @@ object WazeInput : HtmlInput, Input.HasRandomUri {
 
         while (true) {
             val line = channel.readLine() ?: break
-            pattern.find(line)?.toLatLonPoint()?.let {
-                points = persistentListOf(it.asWGS84().copy(name = name))
+            pattern.find(line)?.toLatLonPoint(Source.JAVASCRIPT)?.let {
+                points = persistentListOf(WGS84Point(it).copy(name = name))
                 return@buildParseHtmlResult
             }
         }

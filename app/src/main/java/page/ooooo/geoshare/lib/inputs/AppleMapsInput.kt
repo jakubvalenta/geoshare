@@ -14,6 +14,7 @@ import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 
 object AppleMapsInput : HtmlInput, Input.HasRandomUri {
@@ -39,10 +40,21 @@ object AppleMapsInput : HtmlInput, Input.HasRandomUri {
 
             // Coordinates
             // https://maps.apple.com/?ll={lat},{lon}
-            // Notice that we consider the search center 'sll' to be a normal point
-            listOf("ll", @Suppress("SpellCheckingInspection") "daddr", "coordinate", "q", "sll", "center")
-                .firstNotNullOfOrNull { key -> LAT_LON_PATTERN.matchEntire(queryParams[key])?.toLatLonPoint() }?.let {
-                    points = persistentListOf(it.asWGS84().copy(z = z, name = name))
+            listOf("ll", @Suppress("SpellCheckingInspection") "daddr", "coordinate", "q")
+                .firstNotNullOfOrNull { key ->
+                    LAT_LON_PATTERN.matchEntire(queryParams[key])?.toLatLonPoint(Source.URI)
+                }?.let {
+                    points = persistentListOf(WGS84Point(it).copy(z = z, name = name))
+                    return@run
+                }
+
+            // Map center (including the search center 'sll')
+            // https://maps.apple.com/?center={lat},{lon}
+            listOf("sll", "center")
+                .firstNotNullOfOrNull { key ->
+                    LAT_LON_PATTERN.matchEntire(queryParams[key])?.toLatLonPoint(Source.MAP_CENTER)
+                }?.let {
+                    points = persistentListOf(WGS84Point(it).copy(z = z, name = name))
                     return@run
                 }
 
@@ -60,7 +72,7 @@ object AppleMapsInput : HtmlInput, Input.HasRandomUri {
             }
 
             if (name != null) {
-                points = persistentListOf(WGS84Point(z = z, name = name))
+                points = persistentListOf(WGS84Point(z = z, name = name, source = Source.URI))
             }
         }
     }
@@ -88,7 +100,7 @@ object AppleMapsInput : HtmlInput, Input.HasRandomUri {
                 lonPattern.find(line)?.doubleGroupOrNull()?.let { lon = it }
             }
             if (lat != null && lon != null) {
-                points = persistentListOf(WGS84Point(lat, lon, name = name))
+                points = persistentListOf(WGS84Point(lat, lon, name = name, source = Source.HTML))
                 return@buildParseHtmlResult
             }
         }

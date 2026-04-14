@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.extensions
 
 import page.ooooo.geoshare.lib.point.NaivePoint
+import page.ooooo.geoshare.lib.point.Source
 import kotlin.text.MatchResult
 import kotlin.text.Regex
 
@@ -14,51 +15,51 @@ fun MatchResult.groupOrNull(index: Int = 1): String? = this.groupValues[index].t
 
 fun MatchResult.doubleGroupOrNull(index: Int = 1): Double? = this.groupValues[index].toDoubleOrNull()
 
-fun MatchResult.toLatLonPoint(): NaivePoint? =
+fun MatchResult.toLatLonPoint(source: Source): NaivePoint? =
     this.doubleGroupOrNull(1)?.let { lat ->
         this.doubleGroupOrNull(2)?.let { lon ->
-            NaivePoint(lat, lon)
+            NaivePoint(lat, lon, source = source)
         }
     }
 
-fun MatchResult.toLatLonZPoint(): NaivePoint? =
+fun MatchResult.toLatLonZPoint(source: Source): NaivePoint? =
     this.doubleGroupOrNull(1)?.let { lat ->
         this.doubleGroupOrNull(2)?.let { lon ->
-            NaivePoint(lat, lon, z = this.doubleGroupOrNull(3))
+            NaivePoint(lat, lon, z = this.doubleGroupOrNull(3), source = source)
         }
     }
 
-fun MatchResult.toLatLonNamePoint(): NaivePoint? =
+fun MatchResult.toLatLonNamePoint(source: Source): NaivePoint? =
     this.doubleGroupOrNull(1)?.let { lat ->
         this.doubleGroupOrNull(2)?.let { lon ->
-            NaivePoint(lat, lon, name = this.groupOrNull(3))
+            NaivePoint(lat, lon, name = this.groupOrNull(3), source = source)
         }
     }
 
-fun MatchResult.toZLatLonPoint(): NaivePoint? =
+fun MatchResult.toZLatLonPoint(source: Source): NaivePoint? =
     this.doubleGroupOrNull(2)?.let { lat ->
         this.doubleGroupOrNull(3)?.let { lon ->
-            NaivePoint(lat, lon, z = this.doubleGroupOrNull(1))
+            NaivePoint(lat, lon, z = this.doubleGroupOrNull(1), source = source)
         }
     }
 
-fun MatchResult.toLonLatPoint(): NaivePoint? =
+fun MatchResult.toLonLatPoint(source: Source): NaivePoint? =
     this.doubleGroupOrNull(1)?.let { lon ->
         this.doubleGroupOrNull(2)?.let { lat ->
-            NaivePoint(lat, lon)
+            NaivePoint(lat, lon, source = source)
         }
     }
 
-fun MatchResult.toLonLatZPoint(): NaivePoint? =
+fun MatchResult.toLonLatZPoint(source: Source): NaivePoint? =
     this.doubleGroupOrNull(1)?.let { lon ->
         this.doubleGroupOrNull(2)?.let { lat ->
-            NaivePoint(lat, lon, this.doubleGroupOrNull(3))
+            NaivePoint(lat, lon, this.doubleGroupOrNull(3), source = source)
         }
     }
 
-fun MatchResult.toLonLatNamePoint(): NaivePoint? =
+fun MatchResult.toLonLatNamePoint(source: Source): NaivePoint? =
     this.doubleGroupOrNull(1)?.let { lon ->
         this.doubleGroupOrNull(2)?.let { lat ->
-            NaivePoint(lat, lon, name = this.groupOrNull(3))
+            NaivePoint(lat, lon, name = this.groupOrNull(3), source = source)
         }
     }

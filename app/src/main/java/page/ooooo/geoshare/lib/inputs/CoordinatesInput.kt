@@ -9,6 +9,7 @@ import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.formats.CoordsFormat
 import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.lib.point.WGS84Point
 
 object CoordinatesInput : Input, Input.HasRandomUri {
@@ -52,6 +53,7 @@ object CoordinatesInput : Input, Input.HasRandomUri {
                             m.groupOrNull(3),
                             m.groupOrNull(4),
                         ),
+                        source = Source.TEXT,
                     )
                 )
                 return@run
@@ -78,6 +80,7 @@ object CoordinatesInput : Input, Input.HasRandomUri {
                             m.groupOrNull(7),
                             m.groupOrNull(8),
                         ),
+                        source = Source.TEXT,
                     )
                 )
                 return@run
@@ -102,6 +105,7 @@ object CoordinatesInput : Input, Input.HasRandomUri {
                             m.groupOrNull(5),
                             m.groupOrNull(6),
                         ),
+                        source = Source.TEXT,
                     )
                 )
                 return@run

@@ -10,6 +10,8 @@ import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toZLatLonPoint
 import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Source
+import page.ooooo.geoshare.lib.point.WGS84Point
 
 object OsmAndInput : Input, Input.HasRandomUri {
     override val uriPattern = Regex("""(?:https?://)?(?:www\.)?osmand\.net/$URI_REST""")
@@ -27,10 +29,12 @@ object OsmAndInput : Input, Input.HasRandomUri {
 
             // Directions
             // https://osmand.net/map?start={lat},{lon}&finish={lat},{lon}
-            LAT_LON_PATTERN.matchEntire(queryParams["finish"])?.toLatLonPoint().let { finish ->
-                LAT_LON_PATTERN.matchEntire(queryParams["start"])?.toLatLonPoint().let { start ->
+            LAT_LON_PATTERN.matchEntire(queryParams["finish"])?.toLatLonPoint(Source.URI).let { finish ->
+                LAT_LON_PATTERN.matchEntire(queryParams["start"])?.toLatLonPoint(Source.URI).let { start ->
                     if (finish != null || start != null) {
-                        points = listOfNotNull(start, finish).map { it.asWGS84().copy(z = z) }.toImmutableList()
+                        points = listOfNotNull(start, finish)
+                            .map { WGS84Point(it).copy(z = z) }
+                            .toImmutableList()
                         return@run
                     }
                 }
@@ -38,15 +42,15 @@ object OsmAndInput : Input, Input.HasRandomUri {
 
             // Pin
             // https://osmand.net/map?pin={lat},{lon}
-            LAT_LON_PATTERN.matchEntire(queryParams["pin"])?.toLatLonPoint()?.let {
-                points = persistentListOf(it.asWGS84().copy(z = z))
+            LAT_LON_PATTERN.matchEntire(queryParams["pin"])?.toLatLonPoint(Source.URI)?.let {
+                points = persistentListOf(WGS84Point(it).copy(z = z))
                 return@run
             }
 
-            // View
+            // Map center
             // https://osmand.net/map#{z}/{lat}/{lon}
-            Regex("""$Z/$LAT/$LON.*""").matchEntire(fragment)?.toZLatLonPoint()?.let {
-                points = persistentListOf(it.asWGS84().copy(z = z))
+            Regex("""$Z/$LAT/$LON.*""").matchEntire(fragment)?.toZLatLonPoint(Source.MAP_CENTER)?.let {
+                points = persistentListOf(WGS84Point(it).copy(z = z))
                 return@run
             }
         }
