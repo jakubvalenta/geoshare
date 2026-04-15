@@ -277,4 +277,7 @@
     <string name="conversion_failed_parse_html_error_with_reason">Не удалось обработать web-страницу: %1$s</string>
     <string name="network_exception_too_many_requests">слишком много запросов</string>
     <string name="licenses">Лицензии</string>
+    <string name="conversion_succeeded_check_experimental">Местоположение может быть неточным из-за экспериментального метода извлечения.</string>
+    <string name="conversion_succeeded_check_map_center">Местоположение может быть центром карты, а не маркером.</string>
+    <string name="conversion_succeeded_check_srs">Местоположение может быть неточным из-за преобразования системы координат.</string>
 </resources>
