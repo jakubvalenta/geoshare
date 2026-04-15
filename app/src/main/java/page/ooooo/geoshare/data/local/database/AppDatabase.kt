@@ -423,24 +423,27 @@ abstract class AppDatabase : RoomDatabase() {
         val MIGRATION_2_3 = object : Migration(2, 3) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
-                    "UPDATE Link SET `srs` = ? WHERE uuid = ?",
+                    "UPDATE Link SET srs = ? WHERE uuid = ? AND srs = ?",
                     arrayOf<Any>(
                         "GCJ02_MAINLAND_CHINA",
                         Uuid.parse("7bd96da4-beba-4a30-9dbd-b437a49a1dc0").toByteArray(),
+                        "GCJ02",
                     )
                 )
                 db.execSQL(
-                    "UPDATE Link SET `srs` = ? WHERE uuid = ?",
+                    "UPDATE Link SET srs = ? WHERE uuid = ? AND srs = ?",
                     arrayOf<Any>(
                         "GCJ02_MAINLAND_CHINA",
                         Uuid.parse("64b0b360-24ec-4113-9056-314223c6e19a").toByteArray(),
+                        "GCJ02",
                     )
                 )
                 db.execSQL(
-                    "UPDATE Link SET `srs` = ? WHERE uuid = ?",
+                    "UPDATE Link SET srs = ? WHERE uuid = ? AND srs = ?",
                     arrayOf<Any>(
                         "GCJ02_MAINLAND_CHINA",
                         Uuid.parse("9d7cd113-ce01-4b8b-82fe-856956b8b20a").toByteArray(),
+                        "GCJ02",
                     )
                 )
             }
