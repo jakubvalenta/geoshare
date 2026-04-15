@@ -256,4 +256,7 @@
     <string name="conversion_failed_parse_html_error_with_reason">无法处理网页，原因：%1$s</string>
     <string name="network_exception_too_many_requests">请求过多</string>
     <string name="licenses">许可</string>
+    <string name="conversion_succeeded_check_experimental">由于采用了实验性的提取方法，位置可能不准确。</string>
+    <string name="conversion_succeeded_check_map_center">位置可能是地图中心点，而非精准标记点。</string>
+    <string name="conversion_succeeded_check_srs">由于坐标系转换，位置可能不准确。</string>
 </resources>
