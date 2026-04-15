@@ -1,6 +1,6 @@
 - Added warning if resulting location might be inaccurate.
 - Added support for URLs with space characters.
-- Fixed location accuracy in the wider region of China.
+- Improved Google Maps and Amap accuracy in the greater China region.
 - Improved Yandex Maps POI support.
 - Improved error messages.
 - Changed app name stylization and title in app stores.
