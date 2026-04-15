@@ -13,13 +13,8 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class OsmAndInput @Inject constructor(
-    private val uriFormatter: UriFormatter,
-) : Input, Input.HasRandomUri {
+object OsmAndInput : Input, Input.HasRandomUri {
     override val uriPattern = Regex("""(?:https?://)?(?:www\.)?osmand\.net/$URI_REST""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.OSM_AND,
@@ -63,7 +58,7 @@ class OsmAndInput @Inject constructor(
     }
 
     override fun genRandomUri(point: Point) =
-        uriFormatter.formatUriString(point, "https://osmand.net/map?pin={lat}%2C{lon}")
+        UriFormatter.formatUriString(point, "https://osmand.net/map?pin={lat}%2C{lon}")
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

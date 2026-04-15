@@ -11,13 +11,8 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.GCJ02GreaterChinaAndTaiwanPoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class AmapInput @Inject constructor(
-    private val uriFormatter: UriFormatter,
-) : ShortUriInput, Input.HasRandomUri {
+object AmapInput : ShortUriInput, Input.HasRandomUri {
     override val uriPattern = Regex("""(?:https?://)?(?:surl|wb)\.amap\.com/$URI_REST""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.AMAP,
@@ -58,7 +53,7 @@ class AmapInput @Inject constructor(
     override val loadingIndicatorTitleResId = R.string.converter_amap_loading_indicator_title
 
     override fun genRandomUri(point: Point) =
-        uriFormatter.formatUriString(point, "https://wb.amap.com/?q={lat}%2C{lon}")
+        UriFormatter.formatUriString(point, "https://wb.amap.com/?q={lat}%2C{lon}")
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

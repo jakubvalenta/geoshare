@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.lib.outputs
 
-import android.content.Context
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -13,19 +12,16 @@ import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.lib.android.PackageNames
-import page.ooooo.geoshare.lib.formatters.GpxFormatter
-import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.GeoTest
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import java.io.File
 import kotlin.io.path.createTempDirectory
 
-class OpenPointsGpxOutputTest {
-    private val mockContext: Context = mock {}
-    private val geometries = Geometries(mockContext)
+class OpenPointsGpxOutputTest : GeoTest {
+    private val geometries = mockGeometries()
     private val coordinateConverter = CoordinateConverter(geometries)
-    private val gpxFormatter = GpxFormatter(coordinateConverter)
 
     private fun mockActionContext(parentDir: File): ActionContext =
         ActionContext(
@@ -59,7 +55,7 @@ class OpenPointsGpxOutputTest {
             setOf(oldFile.path),
             childDir.listFiles()?.map { it.path }?.toSet(),
         )
-        val success = OpenPointsGpxOutput(PackageNames.TEST, gpxFormatter).execute(
+        val success = OpenPointsGpxOutput(PackageNames.TEST, coordinateConverter).execute(
             value = points,
             actionContext = mockActionContext(parentDir),
         )

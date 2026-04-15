@@ -4,156 +4,100 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.geo.BaseGeometriesTest
-import page.ooooo.geoshare.lib.geo.CoordinateConverter
-import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.geo.Srs
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-class GoogleMapsUriFormatterTest : BaseGeometriesTest() {
-    private val coordinateConverter = CoordinateConverter(geometries)
-    private val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
+class GoogleMapsUriFormatterTest {
     private val uriQuote: UriQuote = FakeUriQuote
 
     @Test
-    fun formatNavigationUriString_whenLastPointHasCoordinatesAndZoom_returnsLinkWithCoordinatesAsQueryAndZoom() {
+    fun formatNavigationUriString_whenPointHasCoordinatesAndZoom_returnsLinkWithCoordinatesAsQueryAndZoom() {
         assertEquals(
             "google.navigation:q=50.123456,-11.123456",
-            googleMapsUriFormatter.formatNavigationUriString(
+            GoogleMapsUriFormatter.formatNavigationUriString(
                 WGS84Point(50.123456, -11.123456, z = 3.4, source = Source.GENERATED),
-                uriQuote = uriQuote,
+                uriQuote,
             ),
         )
     }
 
     @Test
-    fun formatStreetViewUriString_whenLastPointHasCoordinatesAndZoom_returnsLinkWithCoordinatesAsQueryAndZoom() {
+    fun formatStreetViewUriString_whenPointHasCoordinatesAndZoom_returnsLinkWithCoordinatesAsQueryAndZoom() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=50.123456,-11.123456",
-            googleMapsUriFormatter.formatStreetViewUriString(
+            GoogleMapsUriFormatter.formatStreetViewUriString(
                 WGS84Point(50.123456, -11.123456, z = 3.4, source = Source.GENERATED),
-                uriQuote = uriQuote,
+                uriQuote,
             ),
         )
     }
 
     @Test
-    fun formatNavigationUriString_whenLastPointHasQueryAndZoom_returnsLinkWithQueryAndZoom() {
+    fun formatNavigationUriString_whenPointHasQueryAndZoom_returnsLinkWithQueryAndZoom() {
         assertEquals(
             "google.navigation:q=foo+bar",
-            googleMapsUriFormatter.formatNavigationUriString(
+            GoogleMapsUriFormatter.formatNavigationUriString(
                 WGS84Point(name = "foo bar", z = 3.4, source = Source.GENERATED),
-                uriQuote = uriQuote,
+                uriQuote,
             ),
         )
     }
 
     @Test
-    fun formatStreetViewUriString_whenLastPointHasQueryAndZoom_returnsZeroCoordinates() {
+    fun formatStreetViewUriString_whenPointHasQueryAndZoom_returnsZeroCoordinates() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=0,0",
-            googleMapsUriFormatter.formatStreetViewUriString(
+            GoogleMapsUriFormatter.formatStreetViewUriString(
                 WGS84Point(name = "foo bar", z = 3.4, source = Source.GENERATED),
-                uriQuote = uriQuote,
+                uriQuote,
             ),
         )
     }
 
     @Test
-    fun formatNavigationUriString_whenLastPointHasCoordinatesAndQueryAndZoom_returnsLinkWithCoordinatesAndZoom() {
+    fun formatNavigationUriString_whenPointHasCoordinatesAndQueryAndZoom_returnsLinkWithCoordinatesAndZoom() {
         assertEquals(
             "google.navigation:q=50.123456,-11.123456",
-            googleMapsUriFormatter.formatNavigationUriString(
+            GoogleMapsUriFormatter.formatNavigationUriString(
                 WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4, source = Source.GENERATED),
-                uriQuote = uriQuote,
+                uriQuote,
             ),
         )
     }
 
     @Test
-    fun formatStreetViewUriString_whenLastPointHasCoordinatesAndQueryAndZoom_returnsLinkWithCoordinatesAndZoom() {
+    fun formatStreetViewUriString_whenPointHasCoordinatesAndQueryAndZoom_returnsLinkWithCoordinatesAndZoom() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=50.123456,-11.123456",
-            googleMapsUriFormatter.formatStreetViewUriString(
+            GoogleMapsUriFormatter.formatStreetViewUriString(
                 WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4, source = Source.GENERATED),
-                uriQuote = uriQuote,
+                uriQuote,
             ),
         )
     }
 
     @Test
-    fun formatNavigationUriString_whenLastPointIsWithinMainlandChinaAndInWGS84_returnsLinkWithCoordinatesInGCJ02() {
-        assertEquals(
-            "google.navigation:q=31.2285067,121.475524",
-            googleMapsUriFormatter.formatNavigationUriString(
-                WGS84Point(31.23044166868017, 121.47099209401793, source = Source.GENERATED),
-                srs = Srs.GCJ02_MAINLAND_CHINA,
-                uriQuote = uriQuote,
-            ),
-        )
-    }
-
-    @Test
-    fun formatStreetViewUriString_whenLastPointIsWithinMainlandChinaAndInWGS84_returnsLinkWithCoordinatesInGCJ02() {
-        assertEquals(
-            @Suppress("SpellCheckingInspection")
-            "google.streetview:cbll=31.2285067,121.475524",
-            googleMapsUriFormatter.formatStreetViewUriString(
-                WGS84Point(31.23044166868017, 121.47099209401793, source = Source.GENERATED),
-                srs = Srs.GCJ02_MAINLAND_CHINA,
-                uriQuote = uriQuote,
-            ),
-        )
-    }
-
-    @Test
-    fun formatNavigationUriString_whenLastPointIsWithinMainlandChinaAndInGCJ02_returnsLinkWithCoordinatesInGCJ02() {
-        assertEquals(
-            "google.navigation:q=31.2285069,121.4755246",
-            googleMapsUriFormatter.formatNavigationUriString(
-                GCJ02Point(31.22850685422705, 121.47552456472106, source = Source.GENERATED),
-                srs = Srs.GCJ02_MAINLAND_CHINA,
-                uriQuote = uriQuote,
-            ),
-        )
-    }
-
-    @Test
-    fun formatStreetViewUriString_whenLastPointIsWithinMainlandChinaAndInGCJ02_returnsLinkWithCoordinatesInGCJ02() {
-        assertEquals(
-            @Suppress("SpellCheckingInspection")
-            "google.streetview:cbll=31.2285069,121.4755246",
-            googleMapsUriFormatter.formatStreetViewUriString(
-                GCJ02Point(31.22850685422705, 121.47552456472106, source = Source.GENERATED),
-                srs = Srs.GCJ02_MAINLAND_CHINA,
-                uriQuote = uriQuote,
-            ),
-        )
-    }
-
-    @Test
-    fun formatNavigationUriString_whenLastPointHasNeitherPointNorQuery_returnsZeroCoordinates() {
+    fun formatNavigationUriString_whenPointHasNeitherPointNorQuery_returnsZeroCoordinates() {
         assertEquals(
             "google.navigation:q=0,0",
-            googleMapsUriFormatter.formatNavigationUriString(
+            GoogleMapsUriFormatter.formatNavigationUriString(
                 WGS84Point(source = Source.GENERATED),
-                uriQuote = uriQuote,
+                uriQuote,
             ),
         )
     }
 
     @Test
-    fun formatStreetViewUriString_whenLastPointHasNeitherPointNorQuery_returnsZeroCoordinates() {
+    fun formatStreetViewUriString_whenPointHasNeitherPointNorQuery_returnsZeroCoordinates() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=0,0",
-            googleMapsUriFormatter.formatStreetViewUriString(
+            GoogleMapsUriFormatter.formatStreetViewUriString(
                 WGS84Point(source = Source.GENERATED),
-                uriQuote = uriQuote,
+                uriQuote,
             ),
         )
     }
@@ -162,9 +106,9 @@ class GoogleMapsUriFormatterTest : BaseGeometriesTest() {
     fun formatNavigationUriString_whenPointHasCoordinates_returnsLinkWithCoordinatesAsQuery() {
         assertEquals(
             "google.navigation:q=50.123456,-11.123456",
-            googleMapsUriFormatter.formatNavigationUriString(
+            GoogleMapsUriFormatter.formatNavigationUriString(
                 WGS84Point(50.123456, -11.123456, source = Source.GENERATED),
-                uriQuote = uriQuote,
+                uriQuote,
             ),
         )
     }
@@ -174,59 +118,9 @@ class GoogleMapsUriFormatterTest : BaseGeometriesTest() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=50.123456,-11.123456",
-            googleMapsUriFormatter.formatStreetViewUriString(
+            GoogleMapsUriFormatter.formatStreetViewUriString(
                 WGS84Point(50.123456, -11.123456, source = Source.GENERATED),
-                uriQuote = uriQuote,
-            ),
-        )
-    }
-
-    @Test
-    fun formatNavigationUriString_whenPointIsWithinMainlandChinaAndInWGS84_returnsLinkWithCoordinatesInGCJ02() {
-        assertEquals(
-            "google.navigation:q=31.2285067,121.475524",
-            googleMapsUriFormatter.formatNavigationUriString(
-                WGS84Point(31.23044166868017, 121.47099209401793, source = Source.GENERATED),
-                srs = Srs.GCJ02_MAINLAND_CHINA,
-                uriQuote = uriQuote,
-            ),
-        )
-    }
-
-    @Test
-    fun formatStreetViewUriString_whenPointIsWithinMainlandChinaAndInWGS84_returnsLinkWithCoordinatesInGCJ02() {
-        assertEquals(
-            @Suppress("SpellCheckingInspection")
-            "google.streetview:cbll=31.2285067,121.475524",
-            googleMapsUriFormatter.formatStreetViewUriString(
-                WGS84Point(31.23044166868017, 121.47099209401793, source = Source.GENERATED),
-                srs = Srs.GCJ02_MAINLAND_CHINA,
-                uriQuote = uriQuote,
-            ),
-        )
-    }
-
-    @Test
-    fun formatNavigationUriString_whenPointIsWithinMainlandChinaAndInGCJ02_returnsLinkWithCoordinatesInGCJ02() {
-        assertEquals(
-            "google.navigation:q=31.2285069,121.4755246",
-            googleMapsUriFormatter.formatNavigationUriString(
-                GCJ02Point(31.22850685422705, 121.47552456472106, source = Source.GENERATED),
-                srs = Srs.GCJ02_MAINLAND_CHINA,
-                uriQuote = uriQuote,
-            ),
-        )
-    }
-
-    @Test
-    fun formatStreetViewUriString_whenPointIsWithinMainlandChinaAndInGCJ02_returnsLinkWithCoordinatesInGCJ02() {
-        assertEquals(
-            @Suppress("SpellCheckingInspection")
-            "google.streetview:cbll=31.2285069,121.4755246",
-            googleMapsUriFormatter.formatStreetViewUriString(
-                GCJ02Point(31.22850685422705, 121.47552456472106, source = Source.GENERATED),
-                srs = Srs.GCJ02_MAINLAND_CHINA,
-                uriQuote = uriQuote,
+                uriQuote,
             ),
         )
     }

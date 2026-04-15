@@ -5,7 +5,9 @@ import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.ui.components.DrawableIconDescriptor
 import page.ooooo.geoshare.ui.components.ResourceIconDescriptor
@@ -16,10 +18,14 @@ import javax.inject.Inject
  */
 class OpenDisplayGeoUriOutput @Inject constructor(
     override val packageName: String,
-    private val geoUriFormatter: GeoUriFormatter,
+    private val coordinateConverter: CoordinateConverter,
 ) : OpenPointOutput {
     override fun getText(value: Point, uriQuote: UriQuote) =
-        geoUriFormatter.formatGeoUriString(value, packageName, uriQuote)
+        GeoUriFormatter.formatGeoUriString(
+            coordinateConverter.toSrs(value, PackageNames.getSrs(packageName)),
+            PackageNames.getGeoUriFlavor(packageName),
+            uriQuote,
+        )
 
     @Composable
     override fun label(appDetails: AppDetails) =

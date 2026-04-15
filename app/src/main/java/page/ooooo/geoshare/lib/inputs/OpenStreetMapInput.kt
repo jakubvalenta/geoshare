@@ -14,18 +14,16 @@ import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toZLatLonPoint
 import page.ooooo.geoshare.lib.formatters.UriFormatter
-import page.ooooo.geoshare.lib.geo.decodeOpenStreetMapQuadTileHash
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import javax.inject.Inject
-import javax.inject.Singleton
+import page.ooooo.geoshare.lib.geo.decodeOpenStreetMapQuadTileHash
 
-@Singleton
-class OpenStreetMapInput @Inject constructor(
-    private val uriFormatter: UriFormatter,
-) : HtmlInput, Input.HasRandomUri {
+object OpenStreetMapInput : HtmlInput, Input.HasRandomUri {
+    private const val ELEMENT_PATH = """/(node|relation|way)/(\d+)(?:[/?#].*|$)"""
+    private const val HASH = """[A-Za-z0-9_~]+-+"""
+
     override val uriPattern = Regex("""(?:https?://)?(?:www\.)?(?:openstreetmap|osm)\.org/$URI_REST""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.OPEN_STREET_MAP,
@@ -117,7 +115,7 @@ class OpenStreetMapInput @Inject constructor(
     override val loadingIndicatorTitleResId = R.string.converter_open_street_map_loading_indicator_title
 
     override fun genRandomUri(point: Point) =
-        uriFormatter.formatUriString(point, "https://www.openstreetmap.org/#map={z}/{lat}/{lon}")
+        UriFormatter.formatUriString(point, "https://www.openstreetmap.org/#map={z}/{lat}/{lon}")
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -126,9 +124,4 @@ class OpenStreetMapInput @Inject constructor(
     }
 
     override fun hashCode() = javaClass.hashCode()
-
-    private companion object {
-        private const val ELEMENT_PATH = """/(node|relation|way)/(\d+)(?:[/?#].*|$)"""
-        private const val HASH = """[A-Za-z0-9_~]+-+"""
-    }
 }

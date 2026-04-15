@@ -60,15 +60,14 @@ import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.CustomLinkFeature
 import page.ooooo.geoshare.lib.billing.Feature
-import page.ooooo.geoshare.lib.formatters.UriFormatter
-import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.Srs
 import page.ooooo.geoshare.ui.components.BasicListDetailScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
-import page.ooooo.geoshare.ui.components.FeatureWall
 import page.ooooo.geoshare.ui.components.FeatureBadgeSmall
 import page.ooooo.geoshare.ui.components.FeatureBadged
+import page.ooooo.geoshare.ui.components.FeatureWall
 import page.ooooo.geoshare.ui.components.LinkForm
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
@@ -100,6 +99,7 @@ fun LinksScreen(
         billingAppNameResId = billingAppNameResId,
         billingFeatures = billingFeatures,
         billingStatus = billingStatus,
+        coordinateConverter = outputViewModel.coordinateConverter,
         links = links,
         message = message,
         onBack = onBack,
@@ -124,7 +124,6 @@ fun LinksScreen(
         sheetEnabled = viewModel.sheetEnabled,
         srs = viewModel.srs,
         type = viewModel.type,
-        uriFormatter = outputViewModel.uriFormatter,
         onSetAppEnabled = { viewModel.appEnabled = it },
         onSetChipEnabled = { viewModel.chipEnabled = it },
         onSetCoordsUriTemplate = { viewModel.coordsUriTemplate = it },
@@ -145,6 +144,7 @@ private fun LinksScreen(
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
+    coordinateConverter: CoordinateConverter,
     links: List<Link>,
     message: Message?,
     appEnabled: Boolean,
@@ -156,7 +156,6 @@ private fun LinksScreen(
     sheetEnabled: Boolean,
     srs: Srs,
     type: LinkType,
-    uriFormatter: UriFormatter,
     onBack: () -> Unit,
     onDelete: () -> Unit,
     onDisable: (uid: Int) -> Unit,
@@ -253,6 +252,7 @@ private fun LinksScreen(
                         billingFeatures = billingFeatures,
                         billingStatus = billingStatus,
                         chipEnabled = chipEnabled,
+                        coordinateConverter = coordinateConverter,
                         coordsUriTemplate = coordsUriTemplate,
                         group = group,
                         name = name,
@@ -260,7 +260,6 @@ private fun LinksScreen(
                         sheetEnabled = sheetEnabled,
                         srs = srs,
                         type = type,
-                        uriFormatter = uriFormatter,
                         onBack = { onNavigateTo(null) },
                         onDelete = onDelete,
                         onNavigateToBillingScreen = onNavigateToBillingScreen,
@@ -414,6 +413,7 @@ private fun LinksDetailPane(
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
     chipEnabled: Boolean,
+    coordinateConverter: CoordinateConverter,
     coordsUriTemplate: String,
     group: String,
     name: String,
@@ -421,7 +421,6 @@ private fun LinksDetailPane(
     sheetEnabled: Boolean,
     srs: Srs,
     type: LinkType,
-    uriFormatter: UriFormatter,
     onBack: () -> Unit,
     onDelete: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
@@ -469,6 +468,7 @@ private fun LinksDetailPane(
                     LinkForm(
                         appEnabled = appEnabled,
                         chipEnabled = chipEnabled,
+                        coordinateConverter = coordinateConverter,
                         coordsUriTemplate = coordsUriTemplate,
                         group = group,
                         name = name,
@@ -476,7 +476,6 @@ private fun LinksDetailPane(
                         sheetEnabled = sheetEnabled,
                         srs = srs,
                         type = type,
-                        uriFormatter = uriFormatter,
                         onSaveForm = onSaveForm,
                         onSetAppEnabled = onSetAppEnabled,
                         onSetChipEnabled = onSetChipEnabled,
@@ -534,7 +533,6 @@ private fun DefaultPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val uriFormatter = UriFormatter(coordinateConverter)
                 LinksScreen(
                     destination = null,
                     links = defaultFakeLinks,
@@ -548,6 +546,7 @@ private fun DefaultPreview() {
                         refundable = true,
                     ),
                     chipEnabled = false,
+                    coordinateConverter = coordinateConverter,
                     coordsUriTemplate = "",
                     group = "",
                     name = "",
@@ -555,7 +554,6 @@ private fun DefaultPreview() {
                     sheetEnabled = false,
                     srs = Srs.WGS84,
                     type = LinkType.DISPLAY,
-                    uriFormatter = uriFormatter,
                     onBack = {},
                     onDelete = {},
                     onDisable = {},
@@ -589,7 +587,6 @@ private fun DarkPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val uriFormatter = UriFormatter(coordinateConverter)
                 LinksScreen(
                     destination = null,
                     links = defaultFakeLinks,
@@ -603,6 +600,7 @@ private fun DarkPreview() {
                         refundable = true,
                     ),
                     chipEnabled = false,
+                    coordinateConverter = coordinateConverter,
                     coordsUriTemplate = "",
                     group = "",
                     name = "",
@@ -610,7 +608,6 @@ private fun DarkPreview() {
                     sheetEnabled = false,
                     srs = Srs.WGS84,
                     type = LinkType.DISPLAY,
-                    uriFormatter = uriFormatter,
                     onBack = {},
                     onDelete = {},
                     onDisable = {},
@@ -644,7 +641,6 @@ private fun TabletPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val uriFormatter = UriFormatter(coordinateConverter)
                 LinksScreen(
                     destination = null,
                     links = defaultFakeLinks,
@@ -658,6 +654,7 @@ private fun TabletPreview() {
                         refundable = true,
                     ),
                     chipEnabled = false,
+                    coordinateConverter = coordinateConverter,
                     coordsUriTemplate = "",
                     group = "",
                     name = "",
@@ -665,7 +662,6 @@ private fun TabletPreview() {
                     sheetEnabled = false,
                     srs = Srs.WGS84,
                     type = LinkType.DISPLAY,
-                    uriFormatter = uriFormatter,
                     onBack = {},
                     onDelete = {},
                     onDisable = {},
@@ -699,7 +695,6 @@ private fun InsertPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val uriFormatter = UriFormatter(coordinateConverter)
                 LinksScreen(
                     destination = -1,
                     links = defaultFakeLinks,
@@ -713,6 +708,7 @@ private fun InsertPreview() {
                         refundable = true,
                     ),
                     chipEnabled = false,
+                    coordinateConverter = coordinateConverter,
                     coordsUriTemplate = "",
                     group = "",
                     name = "",
@@ -720,7 +716,6 @@ private fun InsertPreview() {
                     sheetEnabled = false,
                     srs = Srs.WGS84,
                     type = LinkType.DISPLAY,
-                    uriFormatter = uriFormatter,
                     onBack = {},
                     onDelete = {},
                     onDisable = {},
@@ -754,7 +749,6 @@ private fun DarkInsertPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val uriFormatter = UriFormatter(coordinateConverter)
                 LinksScreen(
                     destination = -1,
                     links = defaultFakeLinks,
@@ -768,6 +762,7 @@ private fun DarkInsertPreview() {
                         refundable = true,
                     ),
                     chipEnabled = false,
+                    coordinateConverter = coordinateConverter,
                     coordsUriTemplate = "",
                     group = "",
                     name = "",
@@ -775,7 +770,6 @@ private fun DarkInsertPreview() {
                     sheetEnabled = false,
                     srs = Srs.WGS84,
                     type = LinkType.DISPLAY,
-                    uriFormatter = uriFormatter,
                     onBack = {},
                     onDelete = {},
                     onDisable = {},
@@ -810,7 +804,6 @@ private fun TabletInsertPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val uriFormatter = UriFormatter(coordinateConverter)
                 LinksScreen(
                     destination = -1,
                     links = defaultFakeLinks,
@@ -824,6 +817,7 @@ private fun TabletInsertPreview() {
                         refundable = true,
                     ),
                     chipEnabled = false,
+                    coordinateConverter = coordinateConverter,
                     coordsUriTemplate = "",
                     group = "",
                     name = "",
@@ -831,7 +825,6 @@ private fun TabletInsertPreview() {
                     sheetEnabled = false,
                     srs = Srs.WGS84,
                     type = LinkType.DISPLAY,
-                    uriFormatter = uriFormatter,
                     onBack = {},
                     onDelete = {},
                     onDisable = {},
@@ -865,7 +858,6 @@ private fun InsertNotPurchasedPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val uriFormatter = UriFormatter(coordinateConverter)
                 LinksScreen(
                     destination = -1,
                     links = defaultFakeLinks,
@@ -878,11 +870,11 @@ private fun InsertNotPurchasedPreview() {
                     coordsUriTemplate = "",
                     group = "",
                     name = "",
+                    coordinateConverter = coordinateConverter,
                     nameUriTemplate = "",
                     sheetEnabled = false,
                     srs = Srs.WGS84,
                     type = LinkType.DISPLAY,
-                    uriFormatter = uriFormatter,
                     onBack = {},
                     onDelete = {},
                     onDisable = {},
@@ -916,7 +908,6 @@ private fun DarkInsertNotPurchasedPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val uriFormatter = UriFormatter(coordinateConverter)
                 LinksScreen(
                     destination = -1,
                     links = defaultFakeLinks,
@@ -926,6 +917,7 @@ private fun DarkInsertNotPurchasedPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.NotPurchased(pending = false),
                     chipEnabled = false,
+                    coordinateConverter = coordinateConverter,
                     coordsUriTemplate = "",
                     group = "",
                     name = "",
@@ -933,7 +925,6 @@ private fun DarkInsertNotPurchasedPreview() {
                     sheetEnabled = false,
                     srs = Srs.WGS84,
                     type = LinkType.DISPLAY,
-                    uriFormatter = uriFormatter,
                     onBack = {},
                     onDelete = {},
                     onDisable = {},
@@ -968,7 +959,6 @@ private fun TabletInsertNotPurchasedPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val uriFormatter = UriFormatter(coordinateConverter)
                 LinksScreen(
                     destination = -1,
                     links = defaultFakeLinks,
@@ -978,6 +968,7 @@ private fun TabletInsertNotPurchasedPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.NotPurchased(pending = false),
                     chipEnabled = false,
+                    coordinateConverter = coordinateConverter,
                     coordsUriTemplate = "",
                     group = "",
                     name = "",
@@ -985,7 +976,6 @@ private fun TabletInsertNotPurchasedPreview() {
                     sheetEnabled = false,
                     srs = Srs.WGS84,
                     type = LinkType.DISPLAY,
-                    uriFormatter = uriFormatter,
                     onBack = {},
                     onDelete = {},
                     onDisable = {},
@@ -1021,7 +1011,6 @@ private fun UpdatePreview() {
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
                 val link = FakeGoogleMapsStreetViewLink
-                val uriFormatter = UriFormatter(coordinateConverter)
                 LinksScreen(
                     destination = link.uid,
                     links = defaultFakeLinks,
@@ -1035,6 +1024,7 @@ private fun UpdatePreview() {
                         refundable = true,
                     ),
                     chipEnabled = link.chipEnabled,
+                    coordinateConverter = coordinateConverter,
                     coordsUriTemplate = link.coordsUriTemplate,
                     group = link.group,
                     name = link.name,
@@ -1042,7 +1032,6 @@ private fun UpdatePreview() {
                     sheetEnabled = link.sheetEnabled,
                     srs = link.srs,
                     type = link.type,
-                    uriFormatter = uriFormatter,
                     onBack = {},
                     onDelete = {},
                     onDisable = {},
@@ -1078,7 +1067,6 @@ private fun DarkUpdatePreview() {
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
                 val link = FakeGoogleMapsStreetViewLink
-                val uriFormatter = UriFormatter(coordinateConverter)
                 LinksScreen(
                     destination = link.uid,
                     links = defaultFakeLinks,
@@ -1092,6 +1080,7 @@ private fun DarkUpdatePreview() {
                         refundable = true,
                     ),
                     chipEnabled = link.chipEnabled,
+                    coordinateConverter = coordinateConverter,
                     coordsUriTemplate = link.coordsUriTemplate,
                     group = link.group,
                     name = link.name,
@@ -1099,7 +1088,6 @@ private fun DarkUpdatePreview() {
                     sheetEnabled = link.sheetEnabled,
                     srs = link.srs,
                     type = link.type,
-                    uriFormatter = uriFormatter,
                     onBack = {},
                     onDelete = {},
                     onDisable = {},
@@ -1135,7 +1123,6 @@ private fun TabletUpdatePreview() {
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
                 val link = FakeGoogleMapsStreetViewLink
-                val uriFormatter = UriFormatter(coordinateConverter)
                 LinksScreen(
                     destination = link.uid,
                     links = defaultFakeLinks,
@@ -1149,6 +1136,7 @@ private fun TabletUpdatePreview() {
                         refundable = true,
                     ),
                     chipEnabled = link.chipEnabled,
+                    coordinateConverter = coordinateConverter,
                     coordsUriTemplate = link.coordsUriTemplate,
                     group = link.group,
                     name = link.name,
@@ -1156,7 +1144,6 @@ private fun TabletUpdatePreview() {
                     sheetEnabled = link.sheetEnabled,
                     srs = link.srs,
                     type = link.type,
-                    uriFormatter = uriFormatter,
                     onBack = {},
                     onDelete = {},
                     onDisable = {},

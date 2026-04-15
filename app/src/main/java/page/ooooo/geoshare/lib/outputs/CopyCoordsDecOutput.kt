@@ -6,21 +6,23 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import javax.inject.Inject
 
 class CopyCoordsDecOutput @Inject constructor(
-    private val coordinateFormatter: CoordinateFormatter,
+    private val coordinateConverter: CoordinateConverter,
 ) : CopyPointOutput {
     override fun getText(value: Point, uriQuote: UriQuote) =
-        coordinateFormatter.formatDecCoords(value)
+        CoordinateFormatter.formatDecCoords(coordinateConverter.toWGS84(value))
 
     @Composable
     override fun label(appDetails: AppDetails) =
         stringResource(R.string.conversion_succeeded_copy_coordinates)
 
     override fun getAutomationDescription() = @Composable {
-        getText(Point.example)
+        getText(WGS84Point.example)
     }
 
     @Composable

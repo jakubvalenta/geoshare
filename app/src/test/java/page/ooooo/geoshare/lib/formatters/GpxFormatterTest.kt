@@ -1,21 +1,12 @@
 package page.ooooo.geoshare.lib.formatters
 
-import android.content.Context
 import kotlinx.collections.immutable.persistentListOf
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.mockito.kotlin.mock
-import page.ooooo.geoshare.lib.geo.Geometries
-import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class GpxFormatterTest {
-    private val mockContext: Context = mock {}
-    private val geometries = Geometries(mockContext)
-    private val coordinateConverter = CoordinateConverter(geometries)
-    private val gpxFormatter = GpxFormatter(coordinateConverter)
-
     @Test
     fun writeGpxPoints_basic() {
         assertEquals(
@@ -28,7 +19,7 @@ class GpxFormatterTest {
 </gpx>
 """,
             StringBuilder().apply {
-                gpxFormatter.writeGpxPoints(
+                GpxFormatter.writeGpxPoints(
                     persistentListOf(
                         WGS84Point(50.123456, -11.123456, source = Source.GENERATED),
                         WGS84Point(source = Source.GENERATED), // Empty point
@@ -53,7 +44,7 @@ class GpxFormatterTest {
 </gpx>
 """,
             StringBuilder().apply {
-                gpxFormatter.writeGpxPoints(
+                GpxFormatter.writeGpxPoints(
                     persistentListOf(
                         WGS84Point(50.123456, -11.123456, name = "<script>alert()</script>", source = Source.GENERATED),
                     ),
@@ -73,8 +64,8 @@ class GpxFormatterTest {
 </gpx>
 """,
             StringBuilder().apply {
-                gpxFormatter.writeGpxPoints(
-                    persistentListOf<WGS84Point>(),
+                GpxFormatter.writeGpxPoints(
+                    persistentListOf(),
                     this,
                 )
             }.toString(),
@@ -96,7 +87,7 @@ class GpxFormatterTest {
 </gpx>
 """,
             StringBuilder().apply {
-                gpxFormatter.writeGpxRoute(
+                GpxFormatter.writeGpxRoute(
                     persistentListOf(
                         WGS84Point(50.123456, -11.123456, source = Source.GENERATED),
                         WGS84Point(source = Source.GENERATED), // Empty point
@@ -124,7 +115,7 @@ class GpxFormatterTest {
 </gpx>
 """,
             StringBuilder().apply {
-                gpxFormatter.writeGpxRoute(
+                GpxFormatter.writeGpxRoute(
                     persistentListOf(
                         WGS84Point(50.123456, -11.123456, name = "<script>alert()</script>", source = Source.GENERATED),
                     ),
@@ -146,8 +137,8 @@ class GpxFormatterTest {
 </gpx>
 """,
             StringBuilder().apply {
-                gpxFormatter.writeGpxRoute(
-                    persistentListOf<WGS84Point>(),
+                GpxFormatter.writeGpxRoute(
+                    persistentListOf(),
                     this,
                 )
             }.toString(),

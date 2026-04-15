@@ -4,39 +4,30 @@ import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.extensions.toTrimmedString
-import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
-import page.ooooo.geoshare.lib.geo.Srs
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class UriFormatter @Inject constructor(
-    private val coordinateConverter: CoordinateConverter,
-) {
+object UriFormatter {
     fun formatUriString(
         point: Point,
         coordsUriTemplate: String,
         nameUriTemplate: String = "",
-        srs: Srs = Srs.WGS84,
         defaultZ: Double = 16.0,
         uriQuote: UriQuote = DefaultUriQuote,
-    ): String? =
-        coordinateConverter.toSrs(point, srs).run {
-            latStr?.let { latStr ->
-                lonStr?.let { lonStr ->
-                    val zOrDefaultStr = (z ?: defaultZ).toScale(7).toTrimmedString()
-                    coordsUriTemplate
-                        .replace("{lat}", uriQuote.encode(latStr))
-                        .replace("{lon}", uriQuote.encode(lonStr))
-                        .replace("{z}", uriQuote.encode(zOrDefaultStr))
-                        .replace("{name}", uriQuote.encode(cleanName.orEmpty()))
-                        .takeIf { it.isNotEmpty() }
-                }
-            } ?: cleanName?.let { cleanName ->
-                nameUriTemplate
-                    .replace("{q}", uriQuote.encode(cleanName))
+    ): String? = point.run {
+        latStr?.let { latStr ->
+            lonStr?.let { lonStr ->
+                val zOrDefaultStr = (z ?: defaultZ).toScale(7).toTrimmedString()
+                coordsUriTemplate
+                    .replace("{lat}", uriQuote.encode(latStr))
+                    .replace("{lon}", uriQuote.encode(lonStr))
+                    .replace("{z}", uriQuote.encode(zOrDefaultStr))
+                    .replace("{name}", uriQuote.encode(cleanName.orEmpty()))
                     .takeIf { it.isNotEmpty() }
             }
+        } ?: cleanName?.let { cleanName ->
+            nameUriTemplate
+                .replace("{q}", uriQuote.encode(cleanName))
+                .takeIf { it.isNotEmpty() }
         }
+    }
 }

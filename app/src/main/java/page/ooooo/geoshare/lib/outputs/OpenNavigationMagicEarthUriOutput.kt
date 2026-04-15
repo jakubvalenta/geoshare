@@ -6,6 +6,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formatters.MagicEarthUriFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.ui.components.ResourceIconDescriptor
 import javax.inject.Inject
@@ -17,10 +18,10 @@ import javax.inject.Inject
  */
 class OpenNavigationMagicEarthUriOutput @Inject constructor(
     override val packageName: String,
-    private val magicEarthUriFormatter: MagicEarthUriFormatter,
+    private val coordinateConverter: CoordinateConverter,
 ) : OpenPointOutput {
     override fun getText(value: Point, uriQuote: UriQuote) =
-        magicEarthUriFormatter.formatNavigationUriString(value, uriQuote)
+        MagicEarthUriFormatter.formatNavigationUriString(coordinateConverter.toWGS84(value), uriQuote)
 
     @Composable
     override fun label(appDetails: AppDetails) =

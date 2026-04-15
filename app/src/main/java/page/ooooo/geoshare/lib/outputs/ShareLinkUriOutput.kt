@@ -8,19 +8,19 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
 import javax.inject.Inject
 
 class ShareLinkUriOutput @Inject constructor(
     val link: Link,
-    private val uriFormatter: UriFormatter,
+    private val coordinateConverter: CoordinateConverter,
 ) : SharePointOutput {
     override fun getText(value: Point, uriQuote: UriQuote) =
-        uriFormatter.formatUriString(
-            value,
+        UriFormatter.formatUriString(
+            coordinateConverter.toSrs(value, link.srs),
             link.coordsUriTemplate,
             link.nameUriTemplate,
-            link.srs,
             uriQuote = uriQuote,
         )
 

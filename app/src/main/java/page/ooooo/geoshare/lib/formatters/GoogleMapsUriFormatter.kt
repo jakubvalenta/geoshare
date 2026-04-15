@@ -2,55 +2,30 @@ package page.ooooo.geoshare.lib.formatters
 
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.android.PackageNames
-import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
-import page.ooooo.geoshare.lib.geo.Srs
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class GoogleMapsUriFormatter @Inject constructor(
-    private val coordinateConverter: CoordinateConverter,
-) {
-    fun formatNavigationUriString(point: Point, srs: Srs = Srs.WGS84, uriQuote: UriQuote) =
-        coordinateConverter.toSrs(point, srs).run {
-            Uri(
-                scheme = "google.navigation",
-                path = (latStr?.let { latStr ->
-                    lonStr?.let { lonStr ->
-                        "$latStr,$lonStr"
-                    }
-                } ?: name ?: "0,0").let { "q=$it" },
-                uriQuote = uriQuote,
-            ).toString()
-        }
+object GoogleMapsUriFormatter {
+    fun formatNavigationUriString(point: Point, uriQuote: UriQuote) = point.run {
+        Uri(
+            scheme = "google.navigation",
+            path = (latStr?.let { latStr ->
+                lonStr?.let { lonStr ->
+                    "$latStr,$lonStr"
+                }
+            } ?: name ?: "0,0").let { "q=$it" },
+            uriQuote = uriQuote,
+        ).toString()
+    }
 
-    fun formatNavigationUriString(point: Point, packageName: String?, uriQuote: UriQuote) =
-        formatNavigationUriString(point, getSrs(packageName), uriQuote)
-
-    // TODO Check Google Maps and Amap Street View
-    fun formatStreetViewUriString(point: Point, srs: Srs = Srs.WGS84, uriQuote: UriQuote) =
-        coordinateConverter.toSrs(point, srs).run {
-            Uri(
-                scheme = "google.streetview",
-                path = (latStr?.let { latStr ->
-                    lonStr?.let { lonStr ->
-                        "$latStr,$lonStr"
-                    }
-                } ?: "0,0").let { @Suppress("SpellCheckingInspection") "cbll=$it" },
-                uriQuote = uriQuote,
-            ).toString()
-        }
-
-    fun formatStreetViewUriString(point: Point, packageName: String?, uriQuote: UriQuote) =
-        formatStreetViewUriString(point, getSrs(packageName), uriQuote)
-
-    // TODO Merge with [GeoUriFormatter.getFlavor] if all apps use the same SRS for geo, google.navigation, and google.streetview links
-    private fun getSrs(packageName: String?): Srs =
-        when (packageName) {
-            PackageNames.AMAP -> Srs.GCJ02_GREATER_CHINA_AND_TAIWAN
-            PackageNames.GOOGLE_MAPS, PackageNames.GMAPS_WV -> Srs.GCJ02_MAINLAND_CHINA
-            else -> Srs.WGS84
-        }
+    fun formatStreetViewUriString(point: Point, uriQuote: UriQuote) = point.run {
+        Uri(
+            scheme = "google.streetview",
+            path = (latStr?.let { latStr ->
+                lonStr?.let { lonStr ->
+                    "$latStr,$lonStr"
+                }
+            } ?: "0,0").let { @Suppress("SpellCheckingInspection") "cbll=$it" },
+            uriQuote = uriQuote,
+        ).toString()
+    }
 }

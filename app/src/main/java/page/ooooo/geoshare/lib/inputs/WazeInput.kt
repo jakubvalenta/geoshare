@@ -15,21 +15,18 @@ import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.formatters.UriFormatter
-import page.ooooo.geoshare.lib.geo.decodeWazeGeoHash
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import javax.inject.Inject
-import javax.inject.Singleton
+import page.ooooo.geoshare.lib.geo.decodeWazeGeoHash
 
 /**
  * See https://developers.google.com/waze/deeplinks/
  */
-@Singleton
-class WazeInput @Inject constructor(
-    private val uriFormatter: UriFormatter,
-) : HtmlInput, Input.HasRandomUri {
+object WazeInput : HtmlInput, Input.HasRandomUri {
+    private const val HASH = @Suppress("SpellCheckingInspection") """[0-9bcdefghjkmnpqrstuvwxyz]+"""
+
     override val uriPattern = Regex("""(?:https?://)?(?:(?:www|ul)\.)?waze\.com/$URI_REST""")
 
     override val documentation = InputDocumentation(
@@ -141,7 +138,7 @@ class WazeInput @Inject constructor(
     override val loadingIndicatorTitleResId = R.string.converter_waze_loading_indicator_title
 
     override fun genRandomUri(point: Point) =
-        uriFormatter.formatUriString(point, "https://waze.com/ul?ll={lat}%2C{lon}&z={z}")
+        UriFormatter.formatUriString(point, "https://waze.com/ul?ll={lat}%2C{lon}&z={z}")
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -150,8 +147,4 @@ class WazeInput @Inject constructor(
     }
 
     override fun hashCode() = javaClass.hashCode()
-
-    private companion object {
-        private const val HASH = @Suppress("SpellCheckingInspection") """[0-9bcdefghjkmnpqrstuvwxyz]+"""
-    }
 }

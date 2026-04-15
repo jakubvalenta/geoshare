@@ -118,15 +118,8 @@ import page.ooooo.geoshare.lib.conversion.RequestedParseWebPermission
 import page.ooooo.geoshare.lib.conversion.RequestedUnshortenPermission
 import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.lib.extensions.truncateMiddle
-import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
-import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
-import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
-import page.ooooo.geoshare.lib.formatters.GpxFormatter
-import page.ooooo.geoshare.lib.formatters.MagicEarthUriFormatter
-import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
-import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
@@ -323,8 +316,8 @@ fun MainScreen(
         billingFeatures = billingFeatures,
         billingStatus = billingStatus,
         changelogShown = changelogShown,
+        coordinateConverter = outputViewModel.coordinateConverter,
         coordinateFormat = userPreferencesValues.coordinateFormat,
-        coordinateFormatter = outputViewModel.coordinateFormatter,
         inputUriString = conversionViewModel.inputUriString,
         largeLoadingIndicatorVisible = largeLoadingIndicatorVisible,
         linkMessage = linkMessage,
@@ -401,8 +394,8 @@ private fun MainScreen(
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
     changelogShown: Boolean,
+    coordinateConverter: CoordinateConverter,
     coordinateFormat: CoordinateFormat,
-    coordinateFormatter: CoordinateFormatter,
     inputUriString: String,
     largeLoadingIndicatorVisible: Boolean,
     linkMessage: Message?,
@@ -512,8 +505,8 @@ private fun MainScreen(
                         outputsForPointsChips = outputsForPointsChips,
                         billingAppNameResId = billingAppNameResId,
                         billingStatus = billingStatus,
+                        coordinateConverter = coordinateConverter,
                         coordinateFormat = coordinateFormat,
-                        coordinateFormatter = coordinateFormatter,
                         errorMessageResId = errorMessageResId,
                         inputUriString = inputUriString,
                         largeLoadingIndicatorVisible = largeLoadingIndicatorVisible,
@@ -761,8 +754,8 @@ private fun MainMainPane(
     outputsForPointsChips: List<PointsOutput>,
     billingAppNameResId: Int,
     billingStatus: BillingStatus,
+    coordinateConverter: CoordinateConverter,
     coordinateFormat: CoordinateFormat,
-    coordinateFormatter: CoordinateFormatter,
     errorMessageResId: Int?,
     inputUriString: String,
     largeLoadingIndicatorVisible: Boolean,
@@ -798,8 +791,8 @@ private fun MainMainPane(
             ResultSuccessCoordinates(
                 points = currentState.points,
                 appDetails = appDetails,
+                coordinateConverter = coordinateConverter,
                 coordinateFormat = coordinateFormat,
-                coordinateFormatter = coordinateFormatter,
                 outputsForPointChips = outputsForPointChips,
                 outputsForPointsChips = outputsForPointsChips,
                 onExecute = onExecute,
@@ -1025,7 +1018,6 @@ private fun DefaultPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         MainScreen(
             currentState = Initial(),
             allInputs = emptyList(),
@@ -1034,8 +1026,8 @@ private fun DefaultPreview() {
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.NotPurchased(pending = false),
             changelogShown = false,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            coordinateFormatter = coordinateFormatter,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             linkMessage = null,
@@ -1076,7 +1068,6 @@ private fun DarkPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         MainScreen(
             currentState = Initial(),
             allInputs = emptyList(),
@@ -1085,8 +1076,8 @@ private fun DarkPreview() {
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.NotPurchased(pending = false),
             changelogShown = false,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            coordinateFormatter = coordinateFormatter,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             linkMessage = null,
@@ -1127,7 +1118,6 @@ private fun TabletPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         MainScreen(
             currentState = Initial(),
             allInputs = emptyList(),
@@ -1136,8 +1126,8 @@ private fun TabletPreview() {
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.NotPurchased(pending = false),
             changelogShown = false,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            coordinateFormatter = coordinateFormatter,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             linkMessage = null,
@@ -1178,26 +1168,15 @@ private fun SucceededPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-        val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-        val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-        val gpxFormatter = GpxFormatter(coordinateConverter)
-        val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-        val uriFormatter = UriFormatter(coordinateConverter)
         val outputRepository = OutputRepository(
-            coordinateFormatter = coordinateFormatter,
-            geoUriFormatter = geoUriFormatter,
-            googleMapsUriFormatter = googleMapsUriFormatter,
-            gpxFormatter = gpxFormatter,
-            magicEarthUriFormatter = magicEarthUriFormatter,
-            uriFormatter = uriFormatter,
+            coordinateConverter = coordinateConverter,
         )
         MainScreen(
             currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
-                    Point.genRandomPoint(),
-                    Point.example,
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.example,
                 ),
                 action = NoopAction,
                 isAutomation = false,
@@ -1212,8 +1191,8 @@ private fun SucceededPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            coordinateFormatter = coordinateFormatter,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             linkMessage = null,
@@ -1267,26 +1246,15 @@ private fun DarkSucceededPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-        val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-        val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-        val gpxFormatter = GpxFormatter(coordinateConverter)
-        val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-        val uriFormatter = UriFormatter(coordinateConverter)
         val outputRepository = OutputRepository(
-            coordinateFormatter = coordinateFormatter,
-            geoUriFormatter = geoUriFormatter,
-            googleMapsUriFormatter = googleMapsUriFormatter,
-            gpxFormatter = gpxFormatter,
-            magicEarthUriFormatter = magicEarthUriFormatter,
-            uriFormatter = uriFormatter,
+            coordinateConverter = coordinateConverter,
         )
         MainScreen(
             currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
-                    Point.genRandomPoint(),
-                    Point.example,
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.example,
                 ),
                 action = NoopAction,
                 isAutomation = false,
@@ -1301,8 +1269,8 @@ private fun DarkSucceededPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            coordinateFormatter = coordinateFormatter,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             linkMessage = null,
@@ -1356,26 +1324,15 @@ private fun SmallSucceededPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-        val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-        val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-        val gpxFormatter = GpxFormatter(coordinateConverter)
-        val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-        val uriFormatter = UriFormatter(coordinateConverter)
         val outputRepository = OutputRepository(
-            coordinateFormatter = coordinateFormatter,
-            geoUriFormatter = geoUriFormatter,
-            googleMapsUriFormatter = googleMapsUriFormatter,
-            gpxFormatter = gpxFormatter,
-            magicEarthUriFormatter = magicEarthUriFormatter,
-            uriFormatter = uriFormatter,
+            coordinateConverter = coordinateConverter,
         )
         MainScreen(
             currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
-                    Point.genRandomPoint(),
-                    Point.example,
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.example,
                 ),
                 action = NoopAction,
                 isAutomation = false,
@@ -1390,8 +1347,8 @@ private fun SmallSucceededPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            coordinateFormatter = coordinateFormatter,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             linkMessage = null,
@@ -1445,26 +1402,15 @@ private fun TabletSucceededPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-        val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-        val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-        val gpxFormatter = GpxFormatter(coordinateConverter)
-        val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-        val uriFormatter = UriFormatter(coordinateConverter)
         val outputRepository = OutputRepository(
-            coordinateFormatter = coordinateFormatter,
-            geoUriFormatter = geoUriFormatter,
-            googleMapsUriFormatter = googleMapsUriFormatter,
-            gpxFormatter = gpxFormatter,
-            magicEarthUriFormatter = magicEarthUriFormatter,
-            uriFormatter = uriFormatter,
+            coordinateConverter = coordinateConverter,
         )
         MainScreen(
             currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
-                    Point.genRandomPoint(),
-                    Point.example,
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.example,
                 ),
                 action = NoopAction,
                 isAutomation = false,
@@ -1479,8 +1425,8 @@ private fun TabletSucceededPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            coordinateFormatter = coordinateFormatter,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             linkMessage = null,
@@ -1534,26 +1480,15 @@ private fun DarkTabletSucceededPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-        val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-        val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-        val gpxFormatter = GpxFormatter(coordinateConverter)
-        val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-        val uriFormatter = UriFormatter(coordinateConverter)
         val outputRepository = OutputRepository(
-            coordinateFormatter = coordinateFormatter,
-            geoUriFormatter = geoUriFormatter,
-            googleMapsUriFormatter = googleMapsUriFormatter,
-            gpxFormatter = gpxFormatter,
-            magicEarthUriFormatter = magicEarthUriFormatter,
-            uriFormatter = uriFormatter,
+            coordinateConverter = coordinateConverter,
         )
         MainScreen(
             currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
-                    Point.genRandomPoint(),
-                    Point.example,
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.example,
                 ),
                 action = NoopAction,
                 isAutomation = false,
@@ -1568,8 +1503,8 @@ private fun DarkTabletSucceededPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            coordinateFormatter = coordinateFormatter,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             linkMessage = null,
@@ -1616,19 +1551,8 @@ private fun AutomationPreview() {
         val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-        val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-        val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-        val gpxFormatter = GpxFormatter(coordinateConverter)
-        val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-        val uriFormatter = UriFormatter(coordinateConverter)
         val outputRepository = OutputRepository(
-            coordinateFormatter = coordinateFormatter,
-            geoUriFormatter = geoUriFormatter,
-            googleMapsUriFormatter = googleMapsUriFormatter,
-            gpxFormatter = gpxFormatter,
-            magicEarthUriFormatter = magicEarthUriFormatter,
-            uriFormatter = uriFormatter,
+            coordinateConverter = coordinateConverter,
         )
         MainScreen(
             currentState = ActionWaiting(
@@ -1640,8 +1564,8 @@ private fun AutomationPreview() {
                     billing = BillingImpl(LocalContext.current),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                points = persistentListOf(Point.example),
-                action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, geoUriFormatter)
+                points = persistentListOf(WGS84Point.example),
+                action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
                     .toAction(WGS84Point(source = Source.GENERATED)),
                 isAutomation = true,
                 delay = 3.seconds,
@@ -1656,8 +1580,8 @@ private fun AutomationPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            coordinateFormatter = coordinateFormatter,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             linkMessage = null,
@@ -1704,19 +1628,8 @@ private fun DarkAutomationPreview() {
         val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-        val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-        val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-        val gpxFormatter = GpxFormatter(coordinateConverter)
-        val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-        val uriFormatter = UriFormatter(coordinateConverter)
         val outputRepository = OutputRepository(
-            coordinateFormatter = coordinateFormatter,
-            geoUriFormatter = geoUriFormatter,
-            googleMapsUriFormatter = googleMapsUriFormatter,
-            gpxFormatter = gpxFormatter,
-            magicEarthUriFormatter = magicEarthUriFormatter,
-            uriFormatter = uriFormatter,
+            coordinateConverter = coordinateConverter,
         )
         MainScreen(
             currentState = ActionWaiting(
@@ -1728,8 +1641,8 @@ private fun DarkAutomationPreview() {
                     billing = BillingImpl(LocalContext.current),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                points = persistentListOf(Point.example),
-                action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, geoUriFormatter)
+                points = persistentListOf(WGS84Point.example),
+                action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
                     .toAction(WGS84Point(source = Source.GENERATED)),
                 isAutomation = true,
                 delay = 3.seconds,
@@ -1744,8 +1657,8 @@ private fun DarkAutomationPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            coordinateFormatter = coordinateFormatter,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             linkMessage = null,
@@ -1792,19 +1705,8 @@ private fun TabletAutomationPreview() {
         val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-        val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-        val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-        val gpxFormatter = GpxFormatter(coordinateConverter)
-        val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-        val uriFormatter = UriFormatter(coordinateConverter)
         val outputRepository = OutputRepository(
-            coordinateFormatter = coordinateFormatter,
-            geoUriFormatter = geoUriFormatter,
-            googleMapsUriFormatter = googleMapsUriFormatter,
-            gpxFormatter = gpxFormatter,
-            magicEarthUriFormatter = magicEarthUriFormatter,
-            uriFormatter = uriFormatter,
+            coordinateConverter = coordinateConverter,
         )
         MainScreen(
             currentState = ActionWaiting(
@@ -1816,8 +1718,8 @@ private fun TabletAutomationPreview() {
                     billing = BillingImpl(LocalContext.current),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                points = persistentListOf(Point.example),
-                action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, geoUriFormatter)
+                points = persistentListOf(WGS84Point.example),
+                action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
                     .toAction(WGS84Point(source = Source.GENERATED)),
                 isAutomation = true,
                 delay = 3.seconds,
@@ -1832,8 +1734,8 @@ private fun TabletAutomationPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            coordinateFormatter = coordinateFormatter,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             linkMessage = null,
@@ -1880,19 +1782,8 @@ private fun WebViewPreview() {
         val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-        val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-        val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-        val gpxFormatter = GpxFormatter(coordinateConverter)
-        val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-        val uriFormatter = UriFormatter(coordinateConverter)
         val outputRepository = OutputRepository(
-            coordinateFormatter = coordinateFormatter,
-            geoUriFormatter = geoUriFormatter,
-            googleMapsUriFormatter = googleMapsUriFormatter,
-            gpxFormatter = gpxFormatter,
-            magicEarthUriFormatter = magicEarthUriFormatter,
-            uriFormatter = uriFormatter,
+            coordinateConverter = coordinateConverter,
         )
         MainScreen(
             currentState = GrantedParseWebPermission(
@@ -1904,7 +1795,7 @@ private fun WebViewPreview() {
                     billing = BillingImpl(LocalContext.current),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                input = GoogleMapsInput(uriFormatter),
+                input = GoogleMapsInput,
                 uri = Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 pointsFromUri = persistentListOf(),
                 webUriString = "https://www.example.com/",
@@ -1919,8 +1810,8 @@ private fun WebViewPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            coordinateFormatter = coordinateFormatter,
             inputUriString = "",
             largeLoadingIndicatorVisible = true,
             linkMessage = null,
@@ -1962,19 +1853,8 @@ private fun DarkWebViewPreview() {
         val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-        val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-        val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-        val gpxFormatter = GpxFormatter(coordinateConverter)
-        val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-        val uriFormatter = UriFormatter(coordinateConverter)
         val outputRepository = OutputRepository(
-            coordinateFormatter = coordinateFormatter,
-            geoUriFormatter = geoUriFormatter,
-            googleMapsUriFormatter = googleMapsUriFormatter,
-            gpxFormatter = gpxFormatter,
-            magicEarthUriFormatter = magicEarthUriFormatter,
-            uriFormatter = uriFormatter,
+            coordinateConverter = coordinateConverter,
         )
         MainScreen(
             currentState = GrantedParseWebPermission(
@@ -1986,7 +1866,7 @@ private fun DarkWebViewPreview() {
                     billing = BillingImpl(LocalContext.current),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                input = GoogleMapsInput(uriFormatter),
+                input = GoogleMapsInput,
                 uri = Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 pointsFromUri = persistentListOf(),
                 webUriString = "https://www.example.com/",
@@ -2001,8 +1881,8 @@ private fun DarkWebViewPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            coordinateFormatter = coordinateFormatter,
             inputUriString = "",
             largeLoadingIndicatorVisible = true,
             linkMessage = null,
@@ -2044,19 +1924,8 @@ private fun TabletWebViewPreview() {
         val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-        val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-        val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-        val gpxFormatter = GpxFormatter(coordinateConverter)
-        val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-        val uriFormatter = UriFormatter(coordinateConverter)
         val outputRepository = OutputRepository(
-            coordinateFormatter = coordinateFormatter,
-            geoUriFormatter = geoUriFormatter,
-            googleMapsUriFormatter = googleMapsUriFormatter,
-            gpxFormatter = gpxFormatter,
-            magicEarthUriFormatter = magicEarthUriFormatter,
-            uriFormatter = uriFormatter,
+            coordinateConverter = coordinateConverter,
         )
         MainScreen(
             currentState = GrantedParseWebPermission(
@@ -2068,7 +1937,7 @@ private fun TabletWebViewPreview() {
                     billing = BillingImpl(LocalContext.current),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                input = GoogleMapsInput(uriFormatter),
+                input = GoogleMapsInput,
                 uri = Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 pointsFromUri = persistentListOf(),
                 webUriString = "https://www.example.com/",
@@ -2083,8 +1952,8 @@ private fun TabletWebViewPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            coordinateFormatter = coordinateFormatter,
             inputUriString = "",
             largeLoadingIndicatorVisible = true,
             linkMessage = null,
@@ -2125,7 +1994,6 @@ private fun ErrorPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         MainScreen(
             currentState = ConversionFailed(
                 message = stringResource(R.string.conversion_failed_parse_url_error),
@@ -2141,8 +2009,8 @@ private fun ErrorPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            coordinateFormatter = coordinateFormatter,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             linkMessage = null,
@@ -2183,7 +2051,6 @@ private fun DarkErrorPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         MainScreen(
             currentState = ConversionFailed(
                 message = stringResource(R.string.conversion_failed_parse_url_error),
@@ -2199,8 +2066,8 @@ private fun DarkErrorPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            coordinateFormatter = coordinateFormatter,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             linkMessage = null,
@@ -2241,7 +2108,6 @@ private fun TabletErrorPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
         MainScreen(
             currentState = ConversionFailed(
                 message = stringResource(R.string.conversion_failed_parse_url_error),
@@ -2257,8 +2123,8 @@ private fun TabletErrorPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            coordinateFormatter = coordinateFormatter,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             linkMessage = null,
@@ -2300,19 +2166,8 @@ private fun EmptyPreview() {
         val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-        val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-        val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-        val gpxFormatter = GpxFormatter(coordinateConverter)
-        val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-        val uriFormatter = UriFormatter(coordinateConverter)
         val outputRepository = OutputRepository(
-            coordinateFormatter = coordinateFormatter,
-            geoUriFormatter = geoUriFormatter,
-            googleMapsUriFormatter = googleMapsUriFormatter,
-            gpxFormatter = gpxFormatter,
-            magicEarthUriFormatter = magicEarthUriFormatter,
-            uriFormatter = uriFormatter,
+            coordinateConverter = coordinateConverter,
         )
         MainScreen(
             currentState = ConversionSucceeded(
@@ -2336,8 +2191,8 @@ private fun EmptyPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            coordinateFormatter = coordinateFormatter,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             linkMessage = null,
@@ -2379,19 +2234,8 @@ private fun LoadingIndicatorPreview() {
         val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-        val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-        val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-        val gpxFormatter = GpxFormatter(coordinateConverter)
-        val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-        val uriFormatter = UriFormatter(coordinateConverter)
         val outputRepository = OutputRepository(
-            coordinateFormatter = coordinateFormatter,
-            geoUriFormatter = geoUriFormatter,
-            googleMapsUriFormatter = googleMapsUriFormatter,
-            gpxFormatter = gpxFormatter,
-            magicEarthUriFormatter = magicEarthUriFormatter,
-            uriFormatter = uriFormatter,
+            coordinateConverter = coordinateConverter,
         )
         MainScreen(
             currentState = GrantedUnshortenPermission(
@@ -2403,7 +2247,7 @@ private fun LoadingIndicatorPreview() {
                     billing = BillingImpl(LocalContext.current),
                 ),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                GoogleMapsInput(uriFormatter),
+                GoogleMapsInput,
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 retry = NetworkTools.Retry(
                     2,
@@ -2420,8 +2264,8 @@ private fun LoadingIndicatorPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            coordinateFormatter = coordinateFormatter,
             inputUriString = "",
             largeLoadingIndicatorVisible = true,
             linkMessage = null,
@@ -2463,19 +2307,8 @@ private fun DarkLoadingIndicatorPreview() {
         val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-        val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-        val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-        val gpxFormatter = GpxFormatter(coordinateConverter)
-        val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-        val uriFormatter = UriFormatter(coordinateConverter)
         val outputRepository = OutputRepository(
-            coordinateFormatter = coordinateFormatter,
-            geoUriFormatter = geoUriFormatter,
-            googleMapsUriFormatter = googleMapsUriFormatter,
-            gpxFormatter = gpxFormatter,
-            magicEarthUriFormatter = magicEarthUriFormatter,
-            uriFormatter = uriFormatter,
+            coordinateConverter = coordinateConverter,
         )
         MainScreen(
             currentState = GrantedUnshortenPermission(
@@ -2487,7 +2320,7 @@ private fun DarkLoadingIndicatorPreview() {
                     billing = BillingImpl(LocalContext.current),
                 ),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                GoogleMapsInput(uriFormatter),
+                GoogleMapsInput,
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 retry = NetworkTools.Retry(
                     2,
@@ -2504,8 +2337,8 @@ private fun DarkLoadingIndicatorPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            coordinateFormatter = coordinateFormatter,
             inputUriString = "",
             largeLoadingIndicatorVisible = true,
             linkMessage = null,
@@ -2547,19 +2380,8 @@ private fun TabletLoadingIndicatorPreview() {
         val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-        val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-        val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-        val gpxFormatter = GpxFormatter(coordinateConverter)
-        val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-        val uriFormatter = UriFormatter(coordinateConverter)
         val outputRepository = OutputRepository(
-            coordinateFormatter = coordinateFormatter,
-            geoUriFormatter = geoUriFormatter,
-            googleMapsUriFormatter = googleMapsUriFormatter,
-            gpxFormatter = gpxFormatter,
-            magicEarthUriFormatter = magicEarthUriFormatter,
-            uriFormatter = uriFormatter,
+            coordinateConverter = coordinateConverter,
         )
         MainScreen(
             currentState = GrantedUnshortenPermission(
@@ -2571,7 +2393,7 @@ private fun TabletLoadingIndicatorPreview() {
                     billing = BillingImpl(LocalContext.current),
                 ),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                GoogleMapsInput(uriFormatter),
+                GoogleMapsInput,
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 retry = NetworkTools.Retry(
                     2,
@@ -2588,8 +2410,8 @@ private fun TabletLoadingIndicatorPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            coordinateFormatter = coordinateFormatter,
             inputUriString = "",
             largeLoadingIndicatorVisible = true,
             linkMessage = null,

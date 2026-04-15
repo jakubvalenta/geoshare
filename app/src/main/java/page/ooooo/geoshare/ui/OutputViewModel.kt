@@ -18,6 +18,7 @@ import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
@@ -30,8 +31,7 @@ class OutputViewModel @Inject constructor(
     linkRepository: LinkRepository,
     private val outputRepository: OutputRepository,
     userPreferencesRepository: UserPreferencesRepository,
-    val coordinateFormatter: CoordinateFormatter,
-    val uriFormatter: UriFormatter,
+    val coordinateConverter: CoordinateConverter,
 ) : ViewModel() {
 
     val appDetails = appsRepository.appDetails

@@ -4,15 +4,12 @@ import androidx.annotation.StringRes
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Debug input is useful for WebView testing, because it has web parsing enabled but doesn't make a request to
  * a commercial website.
  */
-@Singleton
-class DebugInput @Inject constructor() : WebInput {
+object DebugInput : WebInput {
     override val uriPattern = Regex("""(?:https?://)?(?:www\.)?example\.com(?:/\S+|$)""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.DEBUG,

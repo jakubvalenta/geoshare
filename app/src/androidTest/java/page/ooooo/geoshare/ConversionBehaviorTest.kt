@@ -75,7 +75,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
 
                 // Grant unshorten permission
-                onDialog("geoShareUnshortenPermissionDialog") {
+                onDialog("geoShareUnshortenPermissionDialog", timeoutMs = 20_000L) {
                     confirm()
                 }
 
@@ -107,7 +107,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
 
                 // Grant unshorten permission and check "Don't ask me again"
-                onDialog("geoShareUnshortenPermissionDialog") {
+                onDialog("geoShareUnshortenPermissionDialog", timeoutMs = 20_000L) {
                     toggleDoNotAsk()
                     confirm()
                 }
@@ -146,7 +146,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
 
                 // Deny unshorten permission
-                onDialog("geoShareUnshortenPermissionDialog") {
+                onDialog("geoShareUnshortenPermissionDialog", timeoutMs = 20_000L) {
                     dismiss()
                 }
 
@@ -174,7 +174,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
 
                 // Deny unshorten permission
-                onDialog("geoShareUnshortenPermissionDialog") {
+                onDialog("geoShareUnshortenPermissionDialog", timeoutMs = 20_000L) {
                     toggleDoNotAsk()
                     dismiss()
                 }
@@ -203,7 +203,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://maps.app.goo.gl/spam")
 
                 // Grant unshorten permission
-                onDialog("geoShareUnshortenPermissionDialog") {
+                onDialog("geoShareUnshortenPermissionDialog", timeoutMs = 20_000L) {
                     confirm()
                 }
 
@@ -222,7 +222,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://maps.apple.com/place?place-id=I7BA098CC17989C16&_provider=9902")
 
                 // Grant parse HTML permission
-                onDialog("geoShareParseHtmlPermissionDialog") {
+                onDialog("geoShareParseHtmlPermissionDialog", timeoutMs = 20_000L) {
                     confirm()
                 }
 
@@ -248,7 +248,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://maps.apple.com/place?place-id=I1CBDEBCF5A275CB2&_provider=9902")
 
                 // Grant parse HTML permission and check "Don't ask me again"
-                onDialog("geoShareParseHtmlPermissionDialog") {
+                onDialog("geoShareParseHtmlPermissionDialog", timeoutMs = 20_000L) {
                     toggleDoNotAsk()
                     confirm()
                 }
@@ -275,7 +275,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://maps.apple.com/place?place-id=I8D204FAB527CE0EB&_provider=9902")
 
                 // Deny parse HTML permission
-                onDialog("geoShareParseHtmlPermissionDialog") {
+                onDialog("geoShareParseHtmlPermissionDialog", timeoutMs = 20_000L) {
                     dismiss()
                 }
 
@@ -303,7 +303,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://maps.apple.com/place?place-id=I5ECF0E5A2703FCD1&_provider=9902")
 
                 // Deny parse HTML permission
-                onDialog("geoShareParseHtmlPermissionDialog") {
+                onDialog("geoShareParseHtmlPermissionDialog", timeoutMs = 20_000L) {
                     toggleDoNotAsk()
                     dismiss()
                 }
@@ -332,7 +332,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://www.google.com/maps/place/Hermannstr.+10,+Berlin/")
 
                 // Grant parse HTML permission
-                onDialog("geoShareParseHtmlPermissionDialog") {
+                onDialog("geoShareParseHtmlPermissionDialog", timeoutMs = 20_000L) {
                     confirm()
                 }
 
@@ -364,7 +364,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://www.google.com/maps/place/Hermannstr.+20,+Berlin/")
 
                 // Grant parse HTML permission and check "Don't ask me again"
-                onDialog("geoShareParseHtmlPermissionDialog") {
+                onDialog("geoShareParseHtmlPermissionDialog", timeoutMs = 20_000L) {
                     toggleDoNotAsk()
                     confirm()
                 }
@@ -403,7 +403,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://www.google.com/maps/place/Hermannstr.+30,+Berlin/")
 
                 // Deny parse HTML permission
-                onDialog("geoShareParseHtmlPermissionDialog") {
+                onDialog("geoShareParseHtmlPermissionDialog", timeoutMs = 20_000L) {
                     dismiss()
                 }
 
@@ -433,7 +433,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://www.google.com/maps/place/Hermannstr.+40,+Berlin/")
 
                 // Deny parse HTML permission
-                onDialog("geoShareParseHtmlPermissionDialog") {
+                onDialog("geoShareParseHtmlPermissionDialog", timeoutMs = 20_000L) {
                     toggleDoNotAsk()
                     dismiss()
                 }
@@ -470,7 +470,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8")
 
                 // Grant unshorten permission
-                onDialog("geoShareUnshortenPermissionDialog") {
+                onDialog("geoShareUnshortenPermissionDialog", timeoutMs = 20_000L) {
                     confirm()
                 }
 

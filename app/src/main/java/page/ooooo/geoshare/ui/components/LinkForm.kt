@@ -75,6 +75,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun LinkForm(
     appEnabled: Boolean,
     chipEnabled: Boolean,
+    coordinateConverter: CoordinateConverter,
     coordsUriTemplate: String,
     group: String,
     name: String,
@@ -82,7 +83,6 @@ fun LinkForm(
     sheetEnabled: Boolean,
     srs: Srs,
     type: LinkType,
-    uriFormatter: UriFormatter,
     onSaveForm: () -> Unit,
     onSetAppEnabled: (Boolean) -> Unit,
     onSetChipEnabled: (Boolean) -> Unit,
@@ -128,8 +128,8 @@ fun LinkForm(
             nameUriTemplate = nameUriTemplate,
         )
     }
-    val copyOutput = remember(link) { CopyLinkUriOutput(link, uriFormatter) }
-    val shareOutput = remember(link) { ShareLinkUriOutput(link, uriFormatter) }
+    val copyOutput = remember(link) { CopyLinkUriOutput(link, coordinateConverter) }
+    val shareOutput = remember(link) { ShareLinkUriOutput(link, coordinateConverter) }
 
     Column(modifier) {
         TextField(
@@ -200,11 +200,10 @@ fun LinkForm(
                         item {
                             SuggestionChip(
                                 onClick = {
-                                    uriFormatter.formatUriString(
-                                        point.copy(name = name),
+                                    UriFormatter.formatUriString(
+                                        coordinateConverter.toSrs(point.copy(name = name), srs),
                                         coordsUriTemplate,
                                         nameUriTemplate,
-                                        srs,
                                     )?.let {
                                         AndroidTools.openWebUri(context, it)
                                     }
@@ -276,7 +275,7 @@ fun LinkForm(
                         }
                         ResultSuccessSheetItem(
                             headlineText = copyOutput.label(appDetails),
-                            supportingText = copyOutput.getDescription(Point.example),
+                            supportingText = copyOutput.getDescription(WGS84Point.example),
                             icon = copyOutput.getIcon(appDetails),
                         )
                     }
@@ -425,7 +424,7 @@ fun LinkForm(
                                 onClick = { onSetType(value) },
                                 leadingIcon = {
                                     IconFromDescriptor(
-                                        ShareLinkUriOutput(link = link.copy(type = value), uriFormatter)
+                                        ShareLinkUriOutput(link.copy(type = value), coordinateConverter)
                                             .getMenuIcon(appDetails),
                                         contentDescription = null,
                                     )
@@ -496,10 +495,10 @@ private fun DefaultPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val uriFormatter = UriFormatter(coordinateConverter)
             LinkForm(
                 appEnabled = false,
                 chipEnabled = false,
+                coordinateConverter = coordinateConverter,
                 coordsUriTemplate = "",
                 group = "",
                 name = "",
@@ -507,7 +506,6 @@ private fun DefaultPreview() {
                 sheetEnabled = false,
                 srs = Srs.WGS84,
                 type = LinkType.DISPLAY,
-                uriFormatter = uriFormatter,
                 onSaveForm = {},
                 onSetAppEnabled = {},
                 onSetChipEnabled = {},
@@ -531,10 +529,10 @@ private fun DarkPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val uriFormatter = UriFormatter(coordinateConverter)
             LinkForm(
                 appEnabled = false,
                 chipEnabled = false,
+                coordinateConverter = coordinateConverter,
                 coordsUriTemplate = "",
                 group = "",
                 name = "",
@@ -542,7 +540,6 @@ private fun DarkPreview() {
                 sheetEnabled = false,
                 srs = Srs.WGS84,
                 type = LinkType.DISPLAY,
-                uriFormatter = uriFormatter,
                 onSaveForm = {},
                 onSetAppEnabled = {},
                 onSetChipEnabled = {},
@@ -567,10 +564,10 @@ private fun UpdatePreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val link = FakeGoogleMapsStreetViewLink
-            val uriFormatter = UriFormatter(coordinateConverter)
             LinkForm(
                 appEnabled = link.appEnabled,
                 chipEnabled = link.chipEnabled,
+                coordinateConverter = coordinateConverter,
                 coordsUriTemplate = link.coordsUriTemplate,
                 group = link.group,
                 name = link.name,
@@ -578,7 +575,6 @@ private fun UpdatePreview() {
                 sheetEnabled = link.sheetEnabled,
                 srs = link.srs,
                 type = link.type,
-                uriFormatter = uriFormatter,
                 onSaveForm = {},
                 onSetAppEnabled = {},
                 onSetChipEnabled = {},
@@ -607,10 +603,10 @@ private fun DarkUpdatePreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val link = FakeGoogleMapsStreetViewLink
-            val uriFormatter = UriFormatter(coordinateConverter)
             LinkForm(
                 appEnabled = link.appEnabled,
                 chipEnabled = link.chipEnabled,
+                coordinateConverter = coordinateConverter,
                 coordsUriTemplate = link.coordsUriTemplate,
                 group = link.group,
                 name = link.name,
@@ -618,7 +614,6 @@ private fun DarkUpdatePreview() {
                 sheetEnabled = link.sheetEnabled,
                 srs = link.srs,
                 type = link.type,
-                uriFormatter = uriFormatter,
                 onSaveForm = {},
                 onSetAppEnabled = {},
                 onSetChipEnabled = {},
@@ -643,10 +638,10 @@ private fun UpdateExpandedPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val link = FakeGoogleMapsStreetViewLink
-            val uriFormatter = UriFormatter(coordinateConverter)
             LinkForm(
                 appEnabled = link.appEnabled,
                 chipEnabled = link.chipEnabled,
+                coordinateConverter = coordinateConverter,
                 coordsUriTemplate = link.coordsUriTemplate,
                 group = link.group,
                 name = link.name,
@@ -654,7 +649,6 @@ private fun UpdateExpandedPreview() {
                 sheetEnabled = link.sheetEnabled,
                 srs = link.srs,
                 type = link.type,
-                uriFormatter = uriFormatter,
                 onSaveForm = {},
                 onSetAppEnabled = {},
                 onSetChipEnabled = {},
@@ -684,10 +678,10 @@ private fun DarkUpdateExpandedPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val link = FakeGoogleMapsStreetViewLink
-            val uriFormatter = UriFormatter(coordinateConverter)
             LinkForm(
                 appEnabled = link.appEnabled,
                 chipEnabled = link.chipEnabled,
+                coordinateConverter = coordinateConverter,
                 coordsUriTemplate = link.coordsUriTemplate,
                 group = link.group,
                 name = link.name,
@@ -695,7 +689,6 @@ private fun DarkUpdateExpandedPreview() {
                 sheetEnabled = link.sheetEnabled,
                 srs = link.srs,
                 type = link.type,
-                uriFormatter = uriFormatter,
                 onSaveForm = {},
                 onSetAppEnabled = {},
                 onSetChipEnabled = {},

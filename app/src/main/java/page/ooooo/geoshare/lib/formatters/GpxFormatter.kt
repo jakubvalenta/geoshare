@@ -1,17 +1,12 @@
 package page.ooooo.geoshare.lib.formatters
 
 import io.ktor.util.escapeHTML
-import page.ooooo.geoshare.lib.geo.CoordinateConverter
-import page.ooooo.geoshare.lib.geo.Points
-import javax.inject.Inject
-import javax.inject.Singleton
+import kotlinx.collections.immutable.ImmutableList
+import page.ooooo.geoshare.lib.geo.WGS84Point
 
-@Singleton
-class GpxFormatter @Inject constructor(
-    private val coordinateConverter: CoordinateConverter,
-) {
-    fun writeGpxPoints(points: Points, writer: Appendable) = writeGpx(writer) {
-        coordinateConverter.toWGS84(points).filter { it.lat != null && it.lon != null }.forEach { point ->
+object GpxFormatter {
+    fun writeGpxPoints(points: ImmutableList<WGS84Point>, writer: Appendable) = writeGpx(writer) {
+        points.filter { it.lat != null && it.lon != null }.forEach { point ->
             point.run {
                 append("<wpt lat=\"$latStr\" lon=\"$lonStr\"")
             }
@@ -25,9 +20,9 @@ class GpxFormatter @Inject constructor(
         }
     }
 
-    fun writeGpxRoute(points: Points, writer: Appendable) = writeGpx(writer) {
+    fun writeGpxRoute(points: ImmutableList<WGS84Point>, writer: Appendable) = writeGpx(writer) {
         append("<rte>\n")
-        coordinateConverter.toWGS84(points).filter { it.lat != null && it.lon != null }.forEach { point ->
+        points.filter { it.lat != null && it.lon != null }.forEach { point ->
             point.run {
                 @Suppress("SpellCheckingInspection")
                 append("<rtept lat=\"$latStr\" lon=\"$lonStr\"")

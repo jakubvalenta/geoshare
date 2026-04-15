@@ -18,10 +18,9 @@ import javax.inject.Singleton
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-@Singleton
-class HereWeGoInput @Inject constructor(
-    private val uriFormatter: UriFormatter,
-) : Input, Input.HasRandomUri {
+object HereWeGoInput : Input, Input.HasRandomUri {
+    private const val SIMPLIFIED_BASE64 = """[A-Za-z0-9+/]+=*"""
+
     override val uriPattern = Regex("""(?:https?://)?(?:share|wego)\.here\.com/$URI_REST""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.HERE_WEGO,
@@ -73,7 +72,7 @@ class HereWeGoInput @Inject constructor(
     }
 
     override fun genRandomUri(point: Point) =
-        uriFormatter.formatUriString(point, "https://wego.here.com/?map={lat}%2C{lon},{z}")
+        UriFormatter.formatUriString(point, "https://wego.here.com/?map={lat}%2C{lon},{z}")
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -82,8 +81,4 @@ class HereWeGoInput @Inject constructor(
     }
 
     override fun hashCode() = javaClass.hashCode()
-
-    private companion object {
-        private const val SIMPLIFIED_BASE64 = """[A-Za-z0-9+/]+=*"""
-    }
 }

@@ -11,7 +11,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -21,15 +20,11 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
-import page.ooooo.geoshare.lib.geo.Geometries
-import page.ooooo.geoshare.lib.geo.CoordinateConverter
-import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable
-fun ScreenshotOpen(
-    coordinateFormatter: CoordinateFormatter,
-) {
+fun ScreenshotOpen() {
     val appName = stringResource(R.string.app_name)
     val density = LocalDensity.current
     Screenshot(
@@ -44,7 +39,7 @@ fun ScreenshotOpen(
             y = 100,
         ) {
             ScreenshotText(
-                coordinateFormatter.formatDecCoords(Point.example),
+                CoordinateFormatter.formatDecCoords(WGS84Point.example),
                 scale,
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                 style = MaterialTheme.typography.bodyLarge,
@@ -115,11 +110,7 @@ fun ScreenshotOpen(
 private fun ScreenshotOpenPreview() {
     AppTheme {
         Column(Modifier.background(MaterialTheme.colorScheme.surfaceVariant)) {
-            val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
-            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-            ScreenshotOpen(coordinateFormatter)
+            ScreenshotOpen()
         }
     }
 }
@@ -129,11 +120,7 @@ private fun ScreenshotOpenPreview() {
 private fun DarkScreenshotOpenPreview() {
     AppTheme {
         Column(Modifier.background(MaterialTheme.colorScheme.surfaceVariant)) {
-            val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
-            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-            ScreenshotOpen(coordinateFormatter)
+            ScreenshotOpen()
         }
     }
 }
@@ -143,11 +130,7 @@ private fun DarkScreenshotOpenPreview() {
 private fun RTLScreenshotOpenPreview() {
     AppTheme {
         Column(Modifier.background(MaterialTheme.colorScheme.surfaceVariant)) {
-            val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
-            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-            ScreenshotOpen(coordinateFormatter)
+            ScreenshotOpen()
         }
     }
 }
@@ -162,11 +145,7 @@ private fun TabletScreenshotOpenPreview() {
                 .background(MaterialTheme.colorScheme.surfaceVariant),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
-            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-            ScreenshotOpen(coordinateFormatter)
+            ScreenshotOpen()
         }
     }
 }

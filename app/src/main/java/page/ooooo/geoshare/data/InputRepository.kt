@@ -22,24 +22,7 @@ import javax.inject.Singleton
 import kotlin.collections.plus
 
 @Singleton
-class InputRepository @Inject constructor(
-    amapInput: AmapInput,
-    appleMapsInput: AppleMapsInput,
-    baiduMapInput: BaiduMapInput,
-    coordinatesInput: CoordinatesInput,
-    debugInput: DebugInput,
-    geoUriInput: GeoUriInput,
-    googleMapsInput: GoogleMapsInput,
-    hereWeGoInput: HereWeGoInput,
-    magicEarthInput: MagicEarthInput,
-    mapsMeInput: MapsMeInput,
-    mapyComInput: MapyComInput,
-    openStreetMapInput: OpenStreetMapInput,
-    osmAndInput: OsmAndInput,
-    urbiInput: UrbiInput,
-    wazeInput: WazeInput,
-    yandexMapsInput: YandexMapsInput,
-) {
+class InputRepository @Inject constructor() {
     /**
      * All [page.ooooo.geoshare.lib.inputs.Input] objects.
      *
@@ -47,24 +30,24 @@ class InputRepository @Inject constructor(
      * parsing a URI.
      */
     val all = listOf(
-        geoUriInput,
-        googleMapsInput,
-        appleMapsInput,
-        amapInput,
-        baiduMapInput,
-        hereWeGoInput,
-        magicEarthInput,
-        mapyComInput,
-        openStreetMapInput,
-        mapsMeInput,
-        osmAndInput,
-        urbiInput,
-        wazeInput,
-        yandexMapsInput,
-        coordinatesInput,
+        GeoUriInput,
+        GoogleMapsInput,
+        AppleMapsInput,
+        AmapInput,
+        BaiduMapInput,
+        HereWeGoInput,
+        MagicEarthInput,
+        MapyComInput,
+        OpenStreetMapInput,
+        MapsMeInput,
+        OsmAndInput,
+        UrbiInput,
+        WazeInput,
+        YandexMapsInput,
+        CoordinatesInput,
     ).run {
         if (BuildConfig.DEBUG) {
-            this + debugInput
+            this + DebugInput
         } else {
             this
         }

@@ -2,17 +2,11 @@ package page.ooooo.geoshare.lib.formatters
 
 import page.ooooo.geoshare.lib.extensions.toDegMinSec
 import page.ooooo.geoshare.lib.extensions.toScale
-import page.ooooo.geoshare.lib.geo.CoordinateConverter
-import page.ooooo.geoshare.lib.geo.Point
-import javax.inject.Inject
-import javax.inject.Singleton
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import kotlin.math.abs
 
-@Singleton
-class CoordinateFormatter @Inject constructor(
-    private val coordinateConverter: CoordinateConverter,
-) {
-    fun formatDecCoords(point: Point) = coordinateConverter.toWGS84(point).run {
+object CoordinateFormatter {
+    fun formatDecCoords(point: WGS84Point) = point.run {
         latStr?.let { latStr ->
             lonStr?.let { lonStr ->
                 "$latStr, $lonStr"
@@ -20,7 +14,7 @@ class CoordinateFormatter @Inject constructor(
         } ?: "0, 0"
     }
 
-    fun formatDegMinSecCoords(point: Point): String = coordinateConverter.toWGS84(point).run {
+    fun formatDegMinSecCoords(point: WGS84Point): String = point.run {
         lat?.let { lat ->
             lon?.let { lon ->
                 lat.toDegMinSec().let { (deg, min, sec) ->

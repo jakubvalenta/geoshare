@@ -14,10 +14,9 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
-class MapyComInput @Inject constructor(
-    private val uriFormatter: UriFormatter,
-) : ShortUriInput, Input.HasRandomUri {
+object MapyComInput : ShortUriInput, Input.HasRandomUri {
+    private const val COORDS = """(\d{1,2}(?:\.\d{1,16})?)[NS], (\d{1,3}(?:\.\d{1,16})?)[WE]"""
+
     override val uriPattern =
         Regex("""$COORDS|(?:https?://)?(?:(?:hapticke|www)\.)?mapy\.[a-z]{2,3}[/?]$URI_REST""")
     override val documentation = InputDocumentation(
@@ -70,7 +69,7 @@ class MapyComInput @Inject constructor(
     override val loadingIndicatorTitleResId = R.string.converter_mapy_com_loading_indicator_title
 
     override fun genRandomUri(point: Point) =
-        uriFormatter.formatUriString(point, "https://mapy.com/en/zakladni?x={lon}&y={lat}&z={z}")
+        UriFormatter.formatUriString(point, "https://mapy.com/en/zakladni?x={lon}&y={lat}&z={z}")
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -79,8 +78,4 @@ class MapyComInput @Inject constructor(
     }
 
     override fun hashCode() = javaClass.hashCode()
-
-    private companion object {
-        private const val COORDS = """(\d{1,2}(?:\.\d{1,16})?)[NS], (\d{1,3}(?:\.\d{1,16})?)[WE]"""
-    }
 }

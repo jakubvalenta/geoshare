@@ -25,9 +25,10 @@ import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
-import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -38,7 +39,7 @@ fun ResultSuccessPoint(
     point: Point,
     index: Int,
     coordinateFormat: CoordinateFormat,
-    coordinateFormatter: CoordinateFormatter,
+    coordinateConverter: CoordinateConverter,
     onSelect: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -60,8 +61,13 @@ fun ResultSuccessPoint(
             SelectionContainer {
                 Text(
                     when (coordinateFormat) {
-                        CoordinateFormat.DEC -> coordinateFormatter.formatDecCoords(point)
-                        CoordinateFormat.DEG_MIN_SEC -> coordinateFormatter.formatDegMinSecCoords(point)
+                        CoordinateFormat.DEC -> CoordinateFormatter.formatDecCoords(
+                            coordinateConverter.toWGS84(point)
+                        )
+
+                        CoordinateFormat.DEG_MIN_SEC -> CoordinateFormatter.formatDegMinSecCoords(
+                            coordinateConverter.toWGS84(point)
+                        )
                     },
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -86,12 +92,11 @@ private fun DefaultPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
             ResultSuccessPoint(
-                point = Point.example,
+                point = WGS84Point.example,
                 index = 2,
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
-                coordinateFormatter = coordinateFormatter,
+                coordinateConverter = coordinateConverter,
                 onSelect = {},
             )
         }
@@ -106,12 +111,11 @@ private fun DarkPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
             ResultSuccessPoint(
-                point = Point.example,
+                point = WGS84Point.example,
                 index = 2,
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
-                coordinateFormatter = coordinateFormatter,
+                coordinateConverter = coordinateConverter,
                 onSelect = {},
             )
         }
@@ -126,12 +130,11 @@ private fun LongNamePreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
             ResultSuccessPoint(
-                point = Point.genRandomPoint(name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany"),
+                point = WGS84Point.genRandomPoint(name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany"),
                 index = 2,
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
-                coordinateFormatter = coordinateFormatter,
+                coordinateConverter = coordinateConverter,
                 onSelect = {},
             )
         }
@@ -146,12 +149,11 @@ private fun DarkLongNamePreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
             ResultSuccessPoint(
-                point = Point.genRandomPoint(name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany"),
+                point = WGS84Point.genRandomPoint(name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany"),
                 index = 2,
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
-                coordinateFormatter = coordinateFormatter,
+                coordinateConverter = coordinateConverter,
                 onSelect = {},
             )
         }

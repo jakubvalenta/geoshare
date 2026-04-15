@@ -39,16 +39,11 @@ import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.PackageNames
-import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
-import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
-import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
-import page.ooooo.geoshare.lib.formatters.GpxFormatter
-import page.ooooo.geoshare.lib.formatters.MagicEarthUriFormatter
-import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
@@ -206,19 +201,8 @@ private fun DefaultPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-                val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-                val gpxFormatter = GpxFormatter(coordinateConverter)
-                val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-                val uriFormatter = UriFormatter(coordinateConverter)
                 val outputRepository = OutputRepository(
-                    coordinateFormatter = coordinateFormatter,
-                    geoUriFormatter = geoUriFormatter,
-                    googleMapsUriFormatter = googleMapsUriFormatter,
-                    gpxFormatter = gpxFormatter,
-                    magicEarthUriFormatter = magicEarthUriFormatter,
-                    uriFormatter = uriFormatter,
+                    coordinateConverter = coordinateConverter,
                 )
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessApps(
@@ -276,7 +260,7 @@ private fun DefaultPreview() {
                     ),
                     outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
                     outputsForSharing = outputRepository.getOutputsForSharing(),
-                    points = persistentListOf(Point.example),
+                    points = persistentListOf(WGS84Point.example),
                     onDisableLinkGroup = {},
                     onExecute = {},
                     onHideApp = {},
@@ -295,19 +279,8 @@ private fun DarkPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-                val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-                val gpxFormatter = GpxFormatter(coordinateConverter)
-                val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-                val uriFormatter = UriFormatter(coordinateConverter)
                 val outputRepository = OutputRepository(
-                    coordinateFormatter = coordinateFormatter,
-                    geoUriFormatter = geoUriFormatter,
-                    googleMapsUriFormatter = googleMapsUriFormatter,
-                    gpxFormatter = gpxFormatter,
-                    magicEarthUriFormatter = magicEarthUriFormatter,
-                    uriFormatter = uriFormatter,
+                    coordinateConverter = coordinateConverter,
                 )
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessApps(
@@ -365,7 +338,7 @@ private fun DarkPreview() {
                     ),
                     outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
                     outputsForSharing = outputRepository.getOutputsForSharing(),
-                    points = persistentListOf(Point.example),
+                    points = persistentListOf(WGS84Point.example),
                     onDisableLinkGroup = {},
                     onExecute = {},
                     onHideApp = {},
@@ -384,19 +357,8 @@ private fun LoadingPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-                val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-                val gpxFormatter = GpxFormatter(coordinateConverter)
-                val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-                val uriFormatter = UriFormatter(coordinateConverter)
                 val outputRepository = OutputRepository(
-                    coordinateFormatter = coordinateFormatter,
-                    geoUriFormatter = geoUriFormatter,
-                    googleMapsUriFormatter = googleMapsUriFormatter,
-                    gpxFormatter = gpxFormatter,
-                    magicEarthUriFormatter = magicEarthUriFormatter,
-                    uriFormatter = uriFormatter,
+                    coordinateConverter = coordinateConverter,
                 )
                 ResultSuccessApps(
                     appDetails = emptyMap(),
@@ -409,7 +371,7 @@ private fun LoadingPreview() {
                     ),
                     outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
                     outputsForSharing = outputRepository.getOutputsForSharing(),
-                    points = persistentListOf(Point.example),
+                    points = persistentListOf(WGS84Point.example),
                     onDisableLinkGroup = {},
                     onExecute = {},
                     onHideApp = {},
@@ -428,19 +390,8 @@ private fun DarkLoadingPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-                val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-                val gpxFormatter = GpxFormatter(coordinateConverter)
-                val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-                val uriFormatter = UriFormatter(coordinateConverter)
                 val outputRepository = OutputRepository(
-                    coordinateFormatter = coordinateFormatter,
-                    geoUriFormatter = geoUriFormatter,
-                    googleMapsUriFormatter = googleMapsUriFormatter,
-                    gpxFormatter = gpxFormatter,
-                    magicEarthUriFormatter = magicEarthUriFormatter,
-                    uriFormatter = uriFormatter,
+                    coordinateConverter = coordinateConverter,
                 )
                 ResultSuccessApps(
                     appDetails = emptyMap(),
@@ -453,7 +404,7 @@ private fun DarkLoadingPreview() {
                     ),
                     outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
                     outputsForSharing = outputRepository.getOutputsForSharing(),
-                    points = persistentListOf(Point.example),
+                    points = persistentListOf(WGS84Point.example),
                     onDisableLinkGroup = {},
                     onExecute = {},
                     onHideApp = {},
@@ -472,26 +423,15 @@ private fun EmptyPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-                val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-                val gpxFormatter = GpxFormatter(coordinateConverter)
-                val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-                val uriFormatter = UriFormatter(coordinateConverter)
                 val outputRepository = OutputRepository(
-                    coordinateFormatter = coordinateFormatter,
-                    geoUriFormatter = geoUriFormatter,
-                    googleMapsUriFormatter = googleMapsUriFormatter,
-                    gpxFormatter = gpxFormatter,
-                    magicEarthUriFormatter = magicEarthUriFormatter,
-                    uriFormatter = uriFormatter,
+                    coordinateConverter = coordinateConverter,
                 )
                 ResultSuccessApps(
                     appDetails = emptyMap(),
                     outputsForApps = emptyMap(),
                     outputsForLinks = emptyMap(),
                     outputsForSharing = outputRepository.getOutputsForSharing(),
-                    points = persistentListOf(Point.example),
+                    points = persistentListOf(WGS84Point.example),
                     onDisableLinkGroup = {},
                     onExecute = {},
                     onHideApp = {},
@@ -510,26 +450,15 @@ private fun DarkEmptyPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-                val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-                val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-                val gpxFormatter = GpxFormatter(coordinateConverter)
-                val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-                val uriFormatter = UriFormatter(coordinateConverter)
                 val outputRepository = OutputRepository(
-                    coordinateFormatter = coordinateFormatter,
-                    geoUriFormatter = geoUriFormatter,
-                    googleMapsUriFormatter = googleMapsUriFormatter,
-                    gpxFormatter = gpxFormatter,
-                    magicEarthUriFormatter = magicEarthUriFormatter,
-                    uriFormatter = uriFormatter,
+                    coordinateConverter = coordinateConverter,
                 )
                 ResultSuccessApps(
                     appDetails = emptyMap(),
                     outputsForApps = outputRepository.getOutputsForApps(emptyMap(), emptySet()),
                     outputsForLinks = emptyMap(),
                     outputsForSharing = outputRepository.getOutputsForSharing(),
-                    points = persistentListOf(Point.example),
+                    points = persistentListOf(WGS84Point.example),
                     onDisableLinkGroup = {},
                     onExecute = {},
                     onHideApp = {},

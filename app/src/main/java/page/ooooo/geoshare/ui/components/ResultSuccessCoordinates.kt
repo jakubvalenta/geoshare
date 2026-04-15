@@ -35,15 +35,9 @@ import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
-import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
-import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
-import page.ooooo.geoshare.lib.formatters.GpxFormatter
-import page.ooooo.geoshare.lib.formatters.MagicEarthUriFormatter
-import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Geometries
-import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
@@ -59,7 +53,7 @@ fun ResultSuccessCoordinates(
     points: Points,
     appDetails: AppDetails,
     coordinateFormat: CoordinateFormat,
-    coordinateFormatter: CoordinateFormatter,
+    coordinateConverter: CoordinateConverter,
     outputsForPointChips: List<PointOutput>,
     outputsForPointsChips: List<PointsOutput>,
     onExecute: (action: Action<*>) -> Unit,
@@ -95,8 +89,13 @@ fun ResultSuccessCoordinates(
                 SelectionContainer {
                     Text(
                         when (coordinateFormat) {
-                            CoordinateFormat.DEC -> coordinateFormatter.formatDecCoords(lastPoint)
-                            CoordinateFormat.DEG_MIN_SEC -> coordinateFormatter.formatDegMinSecCoords(lastPoint)
+                            CoordinateFormat.DEC -> CoordinateFormatter.formatDecCoords(
+                                coordinateConverter.toWGS84(lastPoint)
+                            )
+
+                            CoordinateFormat.DEG_MIN_SEC -> CoordinateFormatter.formatDegMinSecCoords(
+                                coordinateConverter.toWGS84(lastPoint)
+                            )
                         },
                         Modifier
                             .weight(1f)
@@ -125,7 +124,7 @@ fun ResultSuccessCoordinates(
                 )
             }
         }
-        if (!lastPoint.isAccurate()) {
+        if (!lastPoint.accurate) {
             ResultSuccessCoordinatesCheck(
                 stringResource(R.string.conversion_succeeded_check_srs),
                 Modifier.testTag("geoShareResultSuccessLastPointCheckSRS"),
@@ -192,7 +191,7 @@ fun ResultSuccessCoordinates(
                                     point = point,
                                     index = index,
                                     coordinateFormat = coordinateFormat,
-                                    coordinateFormatter = coordinateFormatter,
+                                    coordinateConverter = coordinateConverter,
                                     onSelect = { onSelect(index) },
                                 )
                             }
@@ -248,25 +247,14 @@ private fun DefaultPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-            val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-            val gpxFormatter = GpxFormatter(coordinateConverter)
-            val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-            val uriFormatter = UriFormatter(coordinateConverter)
             val outputRepository = OutputRepository(
-                coordinateFormatter = coordinateFormatter,
-                geoUriFormatter = geoUriFormatter,
-                googleMapsUriFormatter = googleMapsUriFormatter,
-                gpxFormatter = gpxFormatter,
-                magicEarthUriFormatter = magicEarthUriFormatter,
-                uriFormatter = uriFormatter,
+                coordinateConverter = coordinateConverter,
             )
             ResultSuccessCoordinates(
-                points = persistentListOf(Point.example),
+                points = persistentListOf(WGS84Point.example),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
-                coordinateFormatter = coordinateFormatter,
+                coordinateConverter = coordinateConverter,
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 onExecute = {},
@@ -287,25 +275,14 @@ private fun DarkPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-            val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-            val gpxFormatter = GpxFormatter(coordinateConverter)
-            val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-            val uriFormatter = UriFormatter(coordinateConverter)
             val outputRepository = OutputRepository(
-                coordinateFormatter = coordinateFormatter,
-                geoUriFormatter = geoUriFormatter,
-                googleMapsUriFormatter = googleMapsUriFormatter,
-                gpxFormatter = gpxFormatter,
-                magicEarthUriFormatter = magicEarthUriFormatter,
-                uriFormatter = uriFormatter,
+                coordinateConverter = coordinateConverter,
             )
             ResultSuccessCoordinates(
-                points = persistentListOf(Point.example),
+                points = persistentListOf(WGS84Point.example),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
-                coordinateFormatter = coordinateFormatter,
+                coordinateConverter = coordinateConverter,
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 onExecute = {},
@@ -326,25 +303,14 @@ private fun DescriptionPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-            val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-            val gpxFormatter = GpxFormatter(coordinateConverter)
-            val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-            val uriFormatter = UriFormatter(coordinateConverter)
             val outputRepository = OutputRepository(
-                coordinateFormatter = coordinateFormatter,
-                geoUriFormatter = geoUriFormatter,
-                googleMapsUriFormatter = googleMapsUriFormatter,
-                gpxFormatter = gpxFormatter,
-                magicEarthUriFormatter = magicEarthUriFormatter,
-                uriFormatter = uriFormatter,
+                coordinateConverter = coordinateConverter,
             )
             ResultSuccessCoordinates(
                 points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI)),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
-                coordinateFormatter = coordinateFormatter,
+                coordinateConverter = coordinateConverter,
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 onExecute = {},
@@ -365,25 +331,14 @@ private fun DarkDescriptionPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-            val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-            val gpxFormatter = GpxFormatter(coordinateConverter)
-            val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-            val uriFormatter = UriFormatter(coordinateConverter)
             val outputRepository = OutputRepository(
-                coordinateFormatter = coordinateFormatter,
-                geoUriFormatter = geoUriFormatter,
-                googleMapsUriFormatter = googleMapsUriFormatter,
-                gpxFormatter = gpxFormatter,
-                magicEarthUriFormatter = magicEarthUriFormatter,
-                uriFormatter = uriFormatter,
+                coordinateConverter = coordinateConverter,
             )
             ResultSuccessCoordinates(
                 points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI)),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
-                coordinateFormatter = coordinateFormatter,
+                coordinateConverter = coordinateConverter,
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 onExecute = {},
@@ -404,28 +359,17 @@ private fun NamePreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-            val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-            val gpxFormatter = GpxFormatter(coordinateConverter)
-            val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-            val uriFormatter = UriFormatter(coordinateConverter)
             val outputRepository = OutputRepository(
-                coordinateFormatter = coordinateFormatter,
-                geoUriFormatter = geoUriFormatter,
-                googleMapsUriFormatter = googleMapsUriFormatter,
-                gpxFormatter = gpxFormatter,
-                magicEarthUriFormatter = magicEarthUriFormatter,
-                uriFormatter = uriFormatter,
+                coordinateConverter = coordinateConverter,
             )
             ResultSuccessCoordinates(
                 points = persistentListOf(
-                    Point.example,
+                    WGS84Point.example,
                     GCJ02Point(31.22850685422705, 121.47552456472106, z = 11.0, source = Source.MAP_CENTER),
                 ),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
-                coordinateFormatter = coordinateFormatter,
+                coordinateConverter = coordinateConverter,
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 onExecute = {},
@@ -446,28 +390,17 @@ private fun DarkNamePreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-            val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-            val gpxFormatter = GpxFormatter(coordinateConverter)
-            val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-            val uriFormatter = UriFormatter(coordinateConverter)
             val outputRepository = OutputRepository(
-                coordinateFormatter = coordinateFormatter,
-                geoUriFormatter = geoUriFormatter,
-                googleMapsUriFormatter = googleMapsUriFormatter,
-                gpxFormatter = gpxFormatter,
-                magicEarthUriFormatter = magicEarthUriFormatter,
-                uriFormatter = uriFormatter,
+                coordinateConverter = coordinateConverter,
             )
             ResultSuccessCoordinates(
                 points = persistentListOf(
-                    Point.example,
+                    WGS84Point.example,
                     GCJ02Point(31.22850685422705, 121.47552456472106, z = 11.0, source = Source.MAP_CENTER),
                 ),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
-                coordinateFormatter = coordinateFormatter,
+                coordinateConverter = coordinateConverter,
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 onExecute = {},
@@ -488,33 +421,22 @@ private fun PointsPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-            val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-            val gpxFormatter = GpxFormatter(coordinateConverter)
-            val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-            val uriFormatter = UriFormatter(coordinateConverter)
             val outputRepository = OutputRepository(
-                coordinateFormatter = coordinateFormatter,
-                geoUriFormatter = geoUriFormatter,
-                googleMapsUriFormatter = googleMapsUriFormatter,
-                gpxFormatter = gpxFormatter,
-                magicEarthUriFormatter = magicEarthUriFormatter,
-                uriFormatter = uriFormatter,
+                coordinateConverter = coordinateConverter,
             )
             ResultSuccessCoordinates(
                 points = persistentListOf(
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
                 ),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
-                coordinateFormatter = coordinateFormatter,
+                coordinateConverter = coordinateConverter,
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 initialExpanded = true,
@@ -536,33 +458,22 @@ private fun DarkPointsPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-            val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-            val gpxFormatter = GpxFormatter(coordinateConverter)
-            val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-            val uriFormatter = UriFormatter(coordinateConverter)
             val outputRepository = OutputRepository(
-                coordinateFormatter = coordinateFormatter,
-                geoUriFormatter = geoUriFormatter,
-                googleMapsUriFormatter = googleMapsUriFormatter,
-                gpxFormatter = gpxFormatter,
-                magicEarthUriFormatter = magicEarthUriFormatter,
-                uriFormatter = uriFormatter,
+                coordinateConverter = coordinateConverter,
             )
             ResultSuccessCoordinates(
                 points = persistentListOf(
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
                 ),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
-                coordinateFormatter = coordinateFormatter,
+                coordinateConverter = coordinateConverter,
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 initialExpanded = true,
@@ -584,29 +495,18 @@ private fun PointsWithNamePreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-            val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-            val gpxFormatter = GpxFormatter(coordinateConverter)
-            val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-            val uriFormatter = UriFormatter(coordinateConverter)
             val outputRepository = OutputRepository(
-                coordinateFormatter = coordinateFormatter,
-                geoUriFormatter = geoUriFormatter,
-                googleMapsUriFormatter = googleMapsUriFormatter,
-                gpxFormatter = gpxFormatter,
-                magicEarthUriFormatter = magicEarthUriFormatter,
-                uriFormatter = uriFormatter,
+                coordinateConverter = coordinateConverter,
             )
             ResultSuccessCoordinates(
                 points = persistentListOf(
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(name = "Berlin, Germany", z = 13.0),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(name = "Berlin, Germany", z = 13.0),
                 ),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
-                coordinateFormatter = coordinateFormatter,
+                coordinateConverter = coordinateConverter,
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 initialExpanded = true,
@@ -628,29 +528,18 @@ private fun DarkPointsWithNamePreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-            val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-            val gpxFormatter = GpxFormatter(coordinateConverter)
-            val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-            val uriFormatter = UriFormatter(coordinateConverter)
             val outputRepository = OutputRepository(
-                coordinateFormatter = coordinateFormatter,
-                geoUriFormatter = geoUriFormatter,
-                googleMapsUriFormatter = googleMapsUriFormatter,
-                gpxFormatter = gpxFormatter,
-                magicEarthUriFormatter = magicEarthUriFormatter,
-                uriFormatter = uriFormatter,
+                coordinateConverter = coordinateConverter,
             )
             ResultSuccessCoordinates(
                 points = persistentListOf(
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(name = "Berlin, Germany", z = 13.0),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(name = "Berlin, Germany", z = 13.0),
                 ),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
-                coordinateFormatter = coordinateFormatter,
+                coordinateConverter = coordinateConverter,
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 initialExpanded = true,

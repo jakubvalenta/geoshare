@@ -1,26 +1,15 @@
 package page.ooooo.geoshare.lib.inputs
 
-import android.content.Context
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
-import org.mockito.kotlin.mock
-import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
-import page.ooooo.geoshare.lib.formatters.UriFormatter
-import page.ooooo.geoshare.lib.geo.Geometries
-import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class GeoUriInputTest : InputTest {
-    private val mockContext: Context = mock {}
-    private val geometries = Geometries(mockContext)
-    private val coordinateConverter = CoordinateConverter(geometries)
-    private val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-    private val uriFormatter = UriFormatter(coordinateConverter)
-    override val input: Input = GeoUriInput(geoUriFormatter, uriFormatter)
+    override val input: Input = GeoUriInput
 
     @Test
     fun uriPattern_geoUri() {

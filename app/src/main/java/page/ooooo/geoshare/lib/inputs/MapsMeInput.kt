@@ -12,8 +12,9 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
-class MapsMeInput @Inject constructor() : Input {
+object MapsMeInput : Input {
+    private const val HASH = """[A-Za-z0-9\-_]{2,}"""
+
     override val uriPattern = Regex("""(?:(?:https?://)?(?:comaps\.at|ge0\.me|omaps\.app)|ge0:/)/$URI_REST""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.MAPS_ME,
@@ -59,8 +60,4 @@ class MapsMeInput @Inject constructor() : Input {
     }
 
     override fun hashCode() = javaClass.hashCode()
-
-    private companion object {
-        private const val HASH = """[A-Za-z0-9\-_]{2,}"""
-    }
 }

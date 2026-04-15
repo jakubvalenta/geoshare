@@ -17,13 +17,8 @@ import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class AppleMapsInput @Inject constructor(
-    private val uriFormatter: UriFormatter,
-) : HtmlInput, Input.HasRandomUri {
+object AppleMapsInput : HtmlInput, Input.HasRandomUri {
     override val uriPattern = Regex("""(?:https?://)?maps\.apple(\.com)?[/?#]$URI_REST""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.APPLE_MAPS,
@@ -119,7 +114,7 @@ class AppleMapsInput @Inject constructor(
     override val loadingIndicatorTitleResId = R.string.converter_apple_maps_loading_indicator_title
 
     override fun genRandomUri(point: Point) =
-        uriFormatter.formatUriString(
+        UriFormatter.formatUriString(
             point,
             listOf(
                 "https://maps.apple.com/?ll={lat}%2C{lon}&z={z}&q={name}",

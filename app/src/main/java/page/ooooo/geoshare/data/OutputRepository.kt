@@ -35,12 +35,7 @@ import page.ooooo.geoshare.data.local.preferences.ShareRouteGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareStreetViewGoogleUriAutomation
 import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.DataTypes
-import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
-import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
-import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
-import page.ooooo.geoshare.lib.formatters.GpxFormatter
-import page.ooooo.geoshare.lib.formatters.MagicEarthUriFormatter
-import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.outputs.CopyCoordsDecOutput
 import page.ooooo.geoshare.lib.outputs.CopyCoordsDegMinSecOutput
 import page.ooooo.geoshare.lib.outputs.CopyGeoUriOutput
@@ -72,62 +67,57 @@ import javax.inject.Singleton
 
 @Singleton
 class OutputRepository @Inject constructor(
-    private val coordinateFormatter: CoordinateFormatter,
-    private val geoUriFormatter: GeoUriFormatter,
-    private val googleMapsUriFormatter: GoogleMapsUriFormatter,
-    private val gpxFormatter: GpxFormatter,
-    private val magicEarthUriFormatter: MagicEarthUriFormatter,
-    private val uriFormatter: UriFormatter,
+    private val coordinateConverter: CoordinateConverter,
 ) {
     fun getOutputsForPoint(links: List<Link>): List<PointOutput> =
         listOf(
-            CopyCoordsDecOutput(coordinateFormatter),
-            CopyCoordsDegMinSecOutput(coordinateFormatter),
-            CopyGeoUriOutput(geoUriFormatter),
+            CopyCoordsDecOutput(coordinateConverter),
+            CopyCoordsDegMinSecOutput(coordinateConverter),
+            CopyGeoUriOutput(coordinateConverter),
             *links
                 .filter { it.sheetEnabled }
                 .groupBy { it.groupOrName }
                 .toSortedMap()
                 .values
                 .flatten()
-                .map { CopyLinkUriOutput(it, uriFormatter) }
+                .map { CopyLinkUriOutput(it, coordinateConverter) }
                 .toTypedArray(),
-            ShareDisplayGeoUriOutput(geoUriFormatter),
-            ShareNavigationGoogleUriOutput(googleMapsUriFormatter),
-            ShareStreetViewGoogleUriOutput(googleMapsUriFormatter),
-            SavePointGpxOutput(gpxFormatter),
+            ShareDisplayGeoUriOutput(coordinateConverter),
+            ShareNavigationGoogleUriOutput(coordinateConverter),
+            ShareStreetViewGoogleUriOutput(coordinateConverter),
+            SavePointGpxOutput(coordinateConverter),
         )
 
     fun getOutputsForPoints(): List<PointsOutput> =
         listOf(
-            ShareRouteGpxOutput(gpxFormatter),
-            SharePointsGpxOutput(gpxFormatter),
-            SaveRouteGpxOutput(gpxFormatter),
-            SavePointsGpxOutput(gpxFormatter),
+            ShareRouteGpxOutput(coordinateConverter),
+            SharePointsGpxOutput(coordinateConverter),
+            SaveRouteGpxOutput(coordinateConverter),
+            SavePointsGpxOutput(coordinateConverter),
         )
 
     fun getOutputsForApps(apps: DataTypes, hiddenApps: Set<String>?): Map<String, List<Output>> =
         apps.filterKeys { hiddenApps?.contains(it) != true }.mapValues { (packageName, dataTypes) ->
             buildList {
                 if (DataType.GEO_URI in dataTypes) {
-                    add(OpenDisplayGeoUriOutput(packageName, geoUriFormatter))
+                    add(OpenDisplayGeoUriOutput(packageName, coordinateConverter))
                 }
                 if (DataType.MAGIC_EARTH_URI in dataTypes) {
-                    add(OpenDisplayMagicEarthUriOutput(packageName, magicEarthUriFormatter))
-                    add(OpenNavigationMagicEarthUriOutput(packageName, magicEarthUriFormatter))
+                    add(OpenDisplayMagicEarthUriOutput(packageName, coordinateConverter))
+                    add(OpenNavigationMagicEarthUriOutput(packageName, coordinateConverter))
                 }
                 if (DataType.GOOGLE_NAVIGATION_URI in dataTypes) {
-                    add(OpenNavigationGoogleUriOutput(packageName, googleMapsUriFormatter))
+                    add(OpenNavigationGoogleUriOutput(packageName, coordinateConverter))
                 }
                 if (DataType.GOOGLE_STREET_VIEW_URI in dataTypes) {
-                    add(OpenStreetViewGoogleUriOutput(packageName, googleMapsUriFormatter))
+                    add(OpenStreetViewGoogleUriOutput(packageName, coordinateConverter))
                 }
                 if (DataType.GPX_DATA in dataTypes) {
-                    add(OpenRouteGpxOutput(packageName, gpxFormatter))
-                    add(OpenPointsGpxOutput(packageName, gpxFormatter))
+                    add(OpenRouteGpxOutput(packageName, coordinateConverter))
+                    add(OpenPointsGpxOutput(packageName, coordinateConverter))
                 }
                 if (DataType.GPX_ONE_POINT_DATA in dataTypes) {
-                    add(OpenRouteOnePointGpxOutput(packageName, gpxFormatter))
+                    add(OpenRouteOnePointGpxOutput(packageName, coordinateConverter))
                 }
             }
         }
@@ -139,138 +129,156 @@ class OutputRepository @Inject constructor(
             .toSortedMap()
             .mapValues { (_, links) ->
                 listOf(
-                    *links.map { ShareLinkUriOutput(it, uriFormatter) }.toTypedArray(),
-                    *links.map { CopyLinkUriOutput(it, uriFormatter) }.toTypedArray(),
+                    *links.map { ShareLinkUriOutput(it, coordinateConverter) }.toTypedArray(),
+                    *links.map { CopyLinkUriOutput(it, coordinateConverter) }.toTypedArray(),
                 )
             }
 
     fun getOutputsForSharing(): List<Output> =
         listOf(
-            ShareDisplayGeoUriOutput(geoUriFormatter),
-            ShareNavigationGoogleUriOutput(googleMapsUriFormatter),
-            ShareStreetViewGoogleUriOutput(googleMapsUriFormatter),
-            ShareRouteGpxOutput(gpxFormatter),
-            SharePointsGpxOutput(gpxFormatter),
+            ShareDisplayGeoUriOutput(coordinateConverter),
+            ShareNavigationGoogleUriOutput(coordinateConverter),
+            ShareStreetViewGoogleUriOutput(coordinateConverter),
+            ShareRouteGpxOutput(coordinateConverter),
+            SharePointsGpxOutput(coordinateConverter),
         )
 
     fun getOutputsForPointChips(links: List<Link>): List<PointOutput> =
         listOf(
-            CopyGeoUriOutput(geoUriFormatter),
-            *links.filter { it.chipEnabled }.sortedBy { it.name }.map { CopyLinkUriOutput(it, uriFormatter) }
+            CopyGeoUriOutput(coordinateConverter),
+            *links.filter { it.chipEnabled }.sortedBy { it.name }
+                .map { CopyLinkUriOutput(it, coordinateConverter) }
                 .toTypedArray(),
         )
 
     fun getOutputsForPointsChips(): List<PointsOutput> =
         listOf(
-            ShareRouteGpxOutput(gpxFormatter),
-            SaveRouteGpxOutput(gpxFormatter),
-            SavePointsGpxOutput(gpxFormatter),
+            ShareRouteGpxOutput(coordinateConverter),
+            SaveRouteGpxOutput(coordinateConverter),
+            SavePointsGpxOutput(coordinateConverter),
         )
 
     suspend fun getAutomationOutput(automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?): Output? =
         when (automation) {
             is CopyCoordsDecAutomation ->
-                CopyCoordsDecOutput(coordinateFormatter)
+                CopyCoordsDecOutput(coordinateConverter)
 
             is CopyCoordsDegMinSecAutomation ->
-                CopyCoordsDegMinSecOutput(coordinateFormatter)
+                CopyCoordsDegMinSecOutput(coordinateConverter)
 
             is CopyGeoUriAutomation ->
-                CopyGeoUriOutput(geoUriFormatter)
+                CopyGeoUriOutput(coordinateConverter)
 
             is CopyLinkUriAutomation ->
-                getLinkByUUID(automation.linkUUID)
-                    ?.let { link -> CopyLinkUriOutput(link, uriFormatter) }
+                getLinkByUUID(automation.linkUUID)?.let { link ->
+                    CopyLinkUriOutput(link, coordinateConverter)
+                }
 
             is CopyLinkDisplayAppleMapsUriAutomation ->
-                getLinkByUUID(UUID.fromString("ce900ea1-2c5d-4641-82f3-a5429a68d603"))
-                    ?.let { link -> CopyLinkUriOutput(link, uriFormatter) }
+                getLinkByUUID(UUID.fromString("ce900ea1-2c5d-4641-82f3-a5429a68d603"))?.let { link ->
+                    CopyLinkUriOutput(link, coordinateConverter)
+                }
 
             is CopyLinkDisplayGoogleMapsUriAutomation ->
-                getLinkByUUID(UUID.fromString("7bd96da4-beba-4a30-9dbd-b437a49a1dc0"))
-                    ?.let { link -> CopyLinkUriOutput(link, uriFormatter) }
+                getLinkByUUID(UUID.fromString("7bd96da4-beba-4a30-9dbd-b437a49a1dc0"))?.let { link ->
+                    CopyLinkUriOutput(link, coordinateConverter)
+                }
 
             is CopyLinkDisplayMagicEarthUriAutomation ->
-                getLinkByUUID(UUID.fromString("b109970a-aef8-4482-9879-52e128fd0e07"))
-                    ?.let { link -> CopyLinkUriOutput(link, uriFormatter) }
+                getLinkByUUID(UUID.fromString("b109970a-aef8-4482-9879-52e128fd0e07"))?.let { link ->
+                    CopyLinkUriOutput(link, coordinateConverter)
+                }
 
             is CopyLinkNavigationAppleMapsUriAutomation ->
-                getLinkByUUID(UUID.fromString("a5092c63-cf5c-4225-9059-e888ae12e215"))
-                    ?.let { link -> CopyLinkUriOutput(link, uriFormatter) }
+                getLinkByUUID(UUID.fromString("a5092c63-cf5c-4225-9059-e888ae12e215"))?.let { link ->
+                    CopyLinkUriOutput(link, coordinateConverter)
+                }
 
             is CopyLinkNavigationGoogleUriAutomation ->
-                getLinkByUUID(UUID.fromString("64b0b360-24ec-4113-9056-314223c6e19a"))
-                    ?.let { link -> CopyLinkUriOutput(link, uriFormatter) }
+                getLinkByUUID(UUID.fromString("64b0b360-24ec-4113-9056-314223c6e19a"))?.let { link ->
+                    CopyLinkUriOutput(link, coordinateConverter)
+                }
 
             is CopyLinkNavigationMagicEarthUriAutomation ->
-                getLinkByUUID(UUID.fromString("ee4f961c-44b0-4cb6-baad-1ed28edb8ec7"))
-                    ?.let { link -> CopyLinkUriOutput(link, uriFormatter) }
+                getLinkByUUID(UUID.fromString("ee4f961c-44b0-4cb6-baad-1ed28edb8ec7"))?.let { link ->
+                    CopyLinkUriOutput(link, coordinateConverter)
+                }
 
             is CopyLinkStreetViewGoogleUriAutomation ->
-                getLinkByUUID(UUID.fromString("9d7cd113-ce01-4b8b-82fe-856956b8b20a"))
-                    ?.let { link -> CopyLinkUriOutput(link, uriFormatter) }
+                getLinkByUUID(UUID.fromString("9d7cd113-ce01-4b8b-82fe-856956b8b20a"))?.let { link ->
+                    CopyLinkUriOutput(link, coordinateConverter)
+                }
 
             is NoopAutomation ->
                 NoopOutput()
 
             is OpenDisplayGeoUriAutomation ->
-                automation.packageName
-                    ?.let { packageName -> OpenDisplayGeoUriOutput(packageName, geoUriFormatter) }
+                automation.packageName?.let { packageName ->
+                    OpenDisplayGeoUriOutput(packageName, coordinateConverter)
+                }
 
             is OpenDisplayMagicEarthUriAutomation ->
-                automation.packageName
-                    ?.let { packageName -> OpenDisplayMagicEarthUriOutput(packageName, magicEarthUriFormatter) }
+                automation.packageName?.let { packageName ->
+                    OpenDisplayMagicEarthUriOutput(packageName, coordinateConverter)
+                }
 
             is OpenNavigationGoogleUriAutomation ->
-                automation.packageName
-                    ?.let { packageName -> OpenNavigationGoogleUriOutput(packageName, googleMapsUriFormatter) }
+                automation.packageName?.let { packageName ->
+                    OpenNavigationGoogleUriOutput(packageName, coordinateConverter)
+                }
 
             is OpenNavigationMagicEarthUriAutomation ->
-                automation.packageName
-                    ?.let { packageName -> OpenNavigationMagicEarthUriOutput(packageName, magicEarthUriFormatter) }
+                automation.packageName?.let { packageName ->
+                    OpenNavigationMagicEarthUriOutput(packageName, coordinateConverter)
+                }
 
             is OpenStreetViewGoogleUriAutomation ->
-                automation.packageName
-                    ?.let { packageName -> OpenStreetViewGoogleUriOutput(packageName, googleMapsUriFormatter) }
+                automation.packageName?.let { packageName ->
+                    OpenStreetViewGoogleUriOutput(packageName, coordinateConverter)
+                }
 
             is OpenPointsGpxAutomation ->
-                automation.packageName
-                    ?.let { packageName -> OpenPointsGpxOutput(packageName, gpxFormatter) }
+                automation.packageName?.let { packageName ->
+                    OpenPointsGpxOutput(packageName, coordinateConverter)
+                }
 
             is OpenRouteGpxAutomation ->
-                automation.packageName
-                    ?.let { packageName -> OpenRouteGpxOutput(packageName, gpxFormatter) }
+                automation.packageName?.let { packageName ->
+                    OpenRouteGpxOutput(packageName, coordinateConverter)
+                }
 
             is OpenRouteOnePointGpxAutomation ->
-                automation.packageName
-                    ?.let { packageName -> OpenRouteOnePointGpxOutput(packageName, gpxFormatter) }
+                automation.packageName?.let { packageName ->
+                    OpenRouteOnePointGpxOutput(packageName, coordinateConverter)
+                }
 
             is SavePointGpxAutomation ->
-                SavePointGpxOutput(gpxFormatter)
+                SavePointGpxOutput(coordinateConverter)
 
             is SavePointsGpxAutomation ->
-                SavePointsGpxOutput(gpxFormatter)
+                SavePointsGpxOutput(coordinateConverter)
 
             is SaveRouteGpxAutomation ->
-                SaveRouteGpxOutput(gpxFormatter)
+                SaveRouteGpxOutput(coordinateConverter)
 
             is ShareDisplayGeoUriAutomation ->
-                ShareDisplayGeoUriOutput(geoUriFormatter)
+                ShareDisplayGeoUriOutput(coordinateConverter)
 
             is ShareLinkUriAutomation ->
-                getLinkByUUID(automation.linkUUID)
-                    ?.let { link -> ShareLinkUriOutput(link, uriFormatter) }
+                getLinkByUUID(automation.linkUUID)?.let { link ->
+                    ShareLinkUriOutput(link, coordinateConverter)
+                }
 
             is ShareRouteGpxAutomation ->
-                ShareRouteGpxOutput(gpxFormatter)
+                ShareRouteGpxOutput(coordinateConverter)
 
             is SharePointsGpxAutomation ->
-                SharePointsGpxOutput(gpxFormatter)
+                SharePointsGpxOutput(coordinateConverter)
 
             is ShareNavigationGoogleUriAutomation ->
-                ShareNavigationGoogleUriOutput(googleMapsUriFormatter)
+                ShareNavigationGoogleUriOutput(coordinateConverter)
 
             is ShareStreetViewGoogleUriAutomation ->
-                ShareStreetViewGoogleUriOutput(googleMapsUriFormatter)
+                ShareStreetViewGoogleUriOutput(coordinateConverter)
         }
 }

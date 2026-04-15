@@ -15,7 +15,6 @@ import androidx.test.uiautomator.onElement
 import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
-import com.lbt05.evil_transform.TransformUtil
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.head
@@ -29,9 +28,7 @@ import org.junit.Before
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
-import page.ooooo.geoshare.lib.geo.BD09MCPoint
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
-import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
@@ -119,7 +116,7 @@ interface BehaviorTest {
 
     fun onDialog(
         resourceName: String,
-        timeoutMs: Long = 20_000L,
+        timeoutMs: Long = 10_000L,
         block: DialogScope.() -> Unit,
     ) = uiAutomator {
         val dialog = onElement(timeoutMs) { viewIdResourceName == resourceName }
@@ -211,7 +208,6 @@ interface BehaviorTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
 
         onElement(timeoutMs) {
             when (viewIdResourceName) {
@@ -253,8 +249,13 @@ interface BehaviorTest {
             ?.let { point ->
                 CoordinateFormat.entries.map { coordinateFormat ->
                     when (coordinateFormat) {
-                        CoordinateFormat.DEC -> coordinateFormatter.formatDecCoords(point)
-                        CoordinateFormat.DEG_MIN_SEC -> coordinateFormatter.formatDegMinSecCoords(point)
+                        CoordinateFormat.DEC -> CoordinateFormatter.formatDecCoords(
+                            coordinateConverter.toWGS84(point)
+                        )
+
+                        CoordinateFormat.DEG_MIN_SEC -> CoordinateFormatter.formatDegMinSecCoords(
+                            coordinateConverter.toWGS84(point)
+                        )
                     }
                 }
             }
@@ -273,13 +274,7 @@ interface BehaviorTest {
             }
         lastPoint.source.let { expectedSource ->
             onElement { viewIdResourceName == "geoShareResultSuccessLastPointSource_${expectedSource}" }
-            if ((lastPoint is GCJ02Point || lastPoint is BD09MCPoint) &&
-                lastPoint.lat?.let { lat ->
-                    lastPoint.lon?.let { lon ->
-                        TransformUtil.outOfChina(lon, lat)
-                    }
-                } == false
-            ) {
+            if (!lastPoint.accurate) {
                 onElement { viewIdResourceName == "geoShareResultSuccessLastPointCheckSRS" }
             } else if (expectedSource == Source.JAVASCRIPT) {
                 onElement { viewIdResourceName == "geoShareResultSuccessLastPointCheckJavaScript" }

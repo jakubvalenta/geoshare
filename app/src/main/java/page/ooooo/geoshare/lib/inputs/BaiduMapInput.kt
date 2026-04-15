@@ -5,7 +5,6 @@ import androidx.annotation.StringRes
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.find
@@ -16,11 +15,14 @@ import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
 import page.ooooo.geoshare.lib.geo.Source
-import javax.inject.Inject
-import javax.inject.Singleton
+import page.ooooo.geoshare.lib.network.NetworkTools
 
-@Singleton
-class BaiduMapInput @Inject constructor() : ShortUriInput, WebInput {
+object BaiduMapInput : ShortUriInput, WebInput {
+    private const val X = """(\d+(?:\.\d+)?)"""
+    private const val Y = """(\d+(?:\.\d+)?)"""
+    private const val CENTER = """@$X,$Y,${Z}z.*"""
+    private const val WAYPOINT = """1\$\$\$\$$X,$Y\$\$([^$]+)"""
+
     override val uriPattern = Regex("""(?:https?://)?(?:j\.)?map\.baidu\.com/$URI_REST""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.BAIDU_MAP,
@@ -132,11 +134,4 @@ class BaiduMapInput @Inject constructor() : ShortUriInput, WebInput {
     }
 
     override fun hashCode() = javaClass.hashCode()
-
-    companion object {
-        private const val X = """(\d+(?:\.\d+)?)"""
-        private const val Y = """(\d+(?:\.\d+)?)"""
-        private const val CENTER = """@$X,$Y,${Z}z.*"""
-        private const val WAYPOINT = """1\$\$\$\$$X,$Y\$\$([^$]+)"""
-    }
 }

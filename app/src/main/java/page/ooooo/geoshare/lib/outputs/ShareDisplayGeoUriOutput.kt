@@ -8,16 +8,17 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.ui.components.ImageVectorIconDescriptor
 import page.ooooo.geoshare.ui.components.ResourceIconDescriptor
 import javax.inject.Inject
 
 class ShareDisplayGeoUriOutput @Inject constructor(
-    private val geoUriFormatter: GeoUriFormatter,
+    private val coordinateConverter: CoordinateConverter,
 ) : SharePointOutput {
     override fun getText(value: Point, uriQuote: UriQuote) =
-        geoUriFormatter.formatGeoUriString(value, uriQuote = uriQuote)
+        GeoUriFormatter.formatGeoUriString(coordinateConverter.toWGS84(value), uriQuote = uriQuote)
 
     @Composable
     override fun label(appDetails: AppDetails) =

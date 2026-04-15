@@ -21,19 +21,13 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
-import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
-import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
-import page.ooooo.geoshare.lib.formatters.GpxFormatter
-import page.ooooo.geoshare.lib.formatters.MagicEarthUriFormatter
-import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
-import page.ooooo.geoshare.lib.geo.CoordinateConverter
-import page.ooooo.geoshare.lib.geo.Point
-import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -129,22 +123,11 @@ private fun DefaultPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-            val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-            val gpxFormatter = GpxFormatter(coordinateConverter)
-            val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-            val uriFormatter = UriFormatter(coordinateConverter)
             val outputRepository = OutputRepository(
-                coordinateFormatter = coordinateFormatter,
-                geoUriFormatter = geoUriFormatter,
-                googleMapsUriFormatter = googleMapsUriFormatter,
-                gpxFormatter = gpxFormatter,
-                magicEarthUriFormatter = magicEarthUriFormatter,
-                uriFormatter = uriFormatter,
+                coordinateConverter = coordinateConverter,
             )
             ResultSuccessSheet(
-                points = persistentListOf(Point.example, Point.genRandomPoint()),
+                points = persistentListOf(WGS84Point.example, WGS84Point.genRandomPoint()),
                 selectedPointIndex = 1,
                 appDetails = emptyMap(),
                 outputsForPoint = outputRepository.getOutputsForPoint(defaultFakeLinks),
@@ -168,22 +151,11 @@ private fun DarkPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-            val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-            val gpxFormatter = GpxFormatter(coordinateConverter)
-            val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-            val uriFormatter = UriFormatter(coordinateConverter)
             val outputRepository = OutputRepository(
-                coordinateFormatter = coordinateFormatter,
-                geoUriFormatter = geoUriFormatter,
-                googleMapsUriFormatter = googleMapsUriFormatter,
-                gpxFormatter = gpxFormatter,
-                magicEarthUriFormatter = magicEarthUriFormatter,
-                uriFormatter = uriFormatter,
+                coordinateConverter = coordinateConverter,
             )
             ResultSuccessSheet(
-                points = persistentListOf(Point.example, Point.genRandomPoint()),
+                points = persistentListOf(WGS84Point.example, WGS84Point.genRandomPoint()),
                 selectedPointIndex = 1,
                 appDetails = emptyMap(),
                 outputsForPoint = outputRepository.getOutputsForPoint(defaultFakeLinks),
@@ -203,22 +175,11 @@ private fun LastPointPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-            val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-            val gpxFormatter = GpxFormatter(coordinateConverter)
-            val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-            val uriFormatter = UriFormatter(coordinateConverter)
             val outputRepository = OutputRepository(
-                coordinateFormatter = coordinateFormatter,
-                geoUriFormatter = geoUriFormatter,
-                googleMapsUriFormatter = googleMapsUriFormatter,
-                gpxFormatter = gpxFormatter,
-                magicEarthUriFormatter = magicEarthUriFormatter,
-                uriFormatter = uriFormatter,
+                coordinateConverter = coordinateConverter,
             )
             ResultSuccessSheet(
-                points = persistentListOf(Point.example),
+                points = persistentListOf(WGS84Point.example),
                 selectedPointIndex = 0,
                 appDetails = emptyMap(),
                 outputsForPoint = outputRepository.getOutputsForPoint(defaultFakeLinks),
@@ -242,22 +203,11 @@ private fun DarkLastPointPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val coordinateFormatter = CoordinateFormatter(coordinateConverter)
-            val geoUriFormatter = GeoUriFormatter(coordinateConverter)
-            val googleMapsUriFormatter = GoogleMapsUriFormatter(coordinateConverter)
-            val gpxFormatter = GpxFormatter(coordinateConverter)
-            val magicEarthUriFormatter = MagicEarthUriFormatter(coordinateConverter)
-            val uriFormatter = UriFormatter(coordinateConverter)
             val outputRepository = OutputRepository(
-                coordinateFormatter = coordinateFormatter,
-                geoUriFormatter = geoUriFormatter,
-                googleMapsUriFormatter = googleMapsUriFormatter,
-                gpxFormatter = gpxFormatter,
-                magicEarthUriFormatter = magicEarthUriFormatter,
-                uriFormatter = uriFormatter,
+                coordinateConverter = coordinateConverter,
             )
             ResultSuccessSheet(
-                points = persistentListOf(Point.example),
+                points = persistentListOf(WGS84Point.example),
                 selectedPointIndex = 0,
                 appDetails = emptyMap(),
                 outputsForPoint = outputRepository.getOutputsForPoint(defaultFakeLinks),

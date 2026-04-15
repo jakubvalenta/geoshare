@@ -6,15 +6,16 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.ui.components.ResourceIconDescriptor
 import javax.inject.Inject
 
 class ShareNavigationGoogleUriOutput @Inject constructor(
-    private val googleMapsUriFormatter: GoogleMapsUriFormatter,
+    private val coordinateConverter: CoordinateConverter,
 ) : SharePointOutput {
     override fun getText(value: Point, uriQuote: UriQuote) =
-        googleMapsUriFormatter.formatNavigationUriString(value, uriQuote = uriQuote)
+        GoogleMapsUriFormatter.formatNavigationUriString(coordinateConverter.toWGS84(value), uriQuote)
 
     @Composable
     override fun label(appDetails: AppDetails) =

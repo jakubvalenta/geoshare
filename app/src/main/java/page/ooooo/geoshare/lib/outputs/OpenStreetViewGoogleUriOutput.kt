@@ -6,7 +6,9 @@ import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.ui.components.ResourceIconDescriptor
 import javax.inject.Inject
@@ -17,10 +19,13 @@ import javax.inject.Inject
  */
 class OpenStreetViewGoogleUriOutput @Inject constructor(
     override val packageName: String,
-    private val googleMapsUriFormatter: GoogleMapsUriFormatter,
+    private val coordinateConverter: CoordinateConverter,
 ) : OpenPointOutput {
     override fun getText(value: Point, uriQuote: UriQuote) =
-        googleMapsUriFormatter.formatStreetViewUriString(value, packageName, uriQuote = uriQuote)
+        GoogleMapsUriFormatter.formatStreetViewUriString(
+            coordinateConverter.toSrs(value, PackageNames.getSrs(packageName)),
+            uriQuote,
+        )
 
     @Composable
     override fun label(appDetails: AppDetails) =

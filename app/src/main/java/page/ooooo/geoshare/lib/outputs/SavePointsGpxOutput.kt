@@ -10,12 +10,13 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.getTimestamp
 import page.ooooo.geoshare.lib.geo.Points
 import javax.inject.Inject
 
 class SavePointsGpxOutput @Inject constructor(
-    private val gpxFormatter: GpxFormatter,
+    private val coordinateConverter: CoordinateConverter,
 ) : PointsOutput.WithFile, SaveFileOutput {
     override fun getFilename(resources: Resources) =
         resources.getString(
@@ -28,7 +29,7 @@ class SavePointsGpxOutput @Inject constructor(
 
     override suspend fun execute(uri: Uri, value: Points, actionContext: ActionContext) = withContext(Dispatchers.IO) {
         AndroidTools.openFileUri(actionContext.context, uri) {
-            gpxFormatter.writeGpxPoints(value, this)
+            GpxFormatter.writeGpxPoints(coordinateConverter.toWGS84(value), this)
         }
     }
 

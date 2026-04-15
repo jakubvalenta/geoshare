@@ -4,7 +4,9 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class GeometriesTest : BaseGeometriesTest() {
+class GeometriesTest : GeoTest {
+    private val geometries = mockGeometries()
+
     @Test
     fun china_containsPoint_pointIsWithinMainlandChina_returnsTrue() {
         assertTrue(geometries.greaterChina.containsPoint(116.331538, 39.920439))

@@ -28,7 +28,6 @@ class UserPreferencesBehaviorTest : BehaviorTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val coordinateFormatter = CoordinateFormatter(coordinateConverter)
 
         // Launch application and close intro
         launchApplication()
@@ -41,7 +40,11 @@ class UserPreferencesBehaviorTest : BehaviorTest {
         onElement {
             if (viewIdResourceName == "geoShareResultSuccessLastPointCoordinates") {
                 assertEquals(
-                    coordinateFormatter.formatDecCoords(GCJ02Point(52.5067296, 13.2599309, source = Source.MAP_CENTER)),
+                    CoordinateFormatter.formatDecCoords(
+                        coordinateConverter.toWGS84(
+                            GCJ02Point(52.5067296, 13.2599309, source = Source.MAP_CENTER)
+                        )
+                    ),
                     textAsString(),
                 )
                 true
@@ -60,8 +63,10 @@ class UserPreferencesBehaviorTest : BehaviorTest {
         onElement {
             if (viewIdResourceName == "geoShareResultSuccessLastPointCoordinates") {
                 assertEquals(
-                    coordinateFormatter.formatDegMinSecCoords(
-                        GCJ02Point(52.5067296, 13.2599309, source = Source.MAP_CENTER)
+                    CoordinateFormatter.formatDegMinSecCoords(
+                        coordinateConverter.toWGS84(
+                            GCJ02Point(52.5067296, 13.2599309, source = Source.MAP_CENTER)
+                        )
                     ),
                     textAsString(),
                 )

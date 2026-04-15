@@ -1,21 +1,12 @@
-package page.ooooo.geoshare.lib.point
+package page.ooooo.geoshare.lib.geo
 
-import org.junit.Assert.assertTrue
+import org.junit.Assert
 import org.junit.Test
 import page.ooooo.geoshare.lib.extensions.toScale
-import page.ooooo.geoshare.lib.geo.BD09MCPoint
-import page.ooooo.geoshare.lib.geo.BaseGeometriesTest
-import page.ooooo.geoshare.lib.geo.CoordinateConverter
-import page.ooooo.geoshare.lib.geo.GCJ02GreaterChinaAndTaiwanPoint
-import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
-import page.ooooo.geoshare.lib.geo.GCJ02Point
-import page.ooooo.geoshare.lib.geo.Point
-import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.geo.WGS84Point
 import kotlin.math.roundToLong
 
-class CoordinateConverterTest : BaseGeometriesTest() {
-    private val coordinateConverter = CoordinateConverter(geometries)
+class CoordinateConverterTest : GeoTest {
+    private val coordinateConverter = CoordinateConverter(mockGeometries())
 
     private data class PointInDifferentSrs(
         val name: String,
@@ -293,7 +284,7 @@ class CoordinateConverterTest : BaseGeometriesTest() {
     )
 
     private fun <T : Point> assertPointsEqual(expectedPoint: T, actualPoint: T, name: String) =
-        assertTrue(
+        Assert.assertTrue(
             "Expected $name $expectedPoint to equal $actualPoint",
             when (expectedPoint) {
                 is BD09MCPoint ->

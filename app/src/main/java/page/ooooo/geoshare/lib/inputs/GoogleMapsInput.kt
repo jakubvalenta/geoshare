@@ -23,10 +23,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
-class GoogleMapsInput @Inject constructor(
-    private val uriFormatter: UriFormatter,
-) : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri {
+object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri {
     override val uriPattern =
         Regex("""(?:https?://)?(?:(?:(?:www|maps)\.)?google(?:\.[a-z]{2,3})?\.[a-z]{2,3}|(?:maps\.)?(?:app\.)?goo\.gl|g\.co)[/?#]$URI_REST""")
     override val documentation = InputDocumentation(
@@ -310,7 +307,7 @@ class GoogleMapsInput @Inject constructor(
     override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
     override fun genRandomUri(point: Point) =
-        uriFormatter.formatUriString(
+        UriFormatter.formatUriString(
             point,
             listOf(
                 "https://www.google.com/maps/search/?api=1&query={lat}%2C{lon}",

@@ -15,21 +15,17 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class GeoUriInput @Inject constructor(
-    private val geoUriFormatter: GeoUriFormatter,
-    private val uriFormatter: UriFormatter,
-) : Input, Input.HasRandomUri {
+object GeoUriInput : Input, Input.HasRandomUri {
+    private const val NAME_REGEX = """\((.+)\)"""
+
     override val uriPattern = Regex("""geo:$LAT_NUM,$LON_NUM\?q=$LAT_NUM,\s*$LON_NUM|geo:$URI_REST""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.GEO_URI,
         nameResId = R.string.converter_geo_name,
         items = listOf(
             InputDocumentationItem.Text(3) {
-                stringResource(R.string.example, geoUriFormatter.formatGeoUriString(Point.example))
+                stringResource(R.string.example, GeoUriFormatter.formatGeoUriString(WGS84Point.example))
             },
         ),
     )
@@ -70,7 +66,7 @@ class GeoUriInput @Inject constructor(
     }
 
     override fun genRandomUri(point: Point) =
-        uriFormatter.formatUriString(point, "geo:{lat},{lon}?z={z}&q={lat},{lon}({name})")
+        UriFormatter.formatUriString(point, "geo:{lat},{lon}?z={z}&q={lat},{lon}({name})")
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -79,8 +75,4 @@ class GeoUriInput @Inject constructor(
     }
 
     override fun hashCode() = javaClass.hashCode()
-
-    private companion object {
-        private const val NAME_REGEX = """\((.+)\)"""
-    }
 }

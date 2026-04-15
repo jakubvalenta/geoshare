@@ -5,15 +5,16 @@ import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Points
 import javax.inject.Inject
 
 class OpenRouteGpxOutput @Inject constructor(
     override val packageName: String,
-    private val gpxFormatter: GpxFormatter,
+    private val coordinateConverter: CoordinateConverter,
 ) : OpenPointsOutput {
     override fun writePoints(value: Points, writer: Appendable) {
-        gpxFormatter.writeGpxRoute(value, writer)
+        GpxFormatter.writeGpxRoute(coordinateConverter.toWGS84(value), writer)
     }
 
     @Composable

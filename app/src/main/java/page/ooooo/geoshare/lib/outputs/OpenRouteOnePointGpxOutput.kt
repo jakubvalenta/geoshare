@@ -7,6 +7,7 @@ import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.writeFile
 import page.ooooo.geoshare.ui.components.DrawableIconDescriptor
@@ -21,7 +22,7 @@ import javax.inject.Inject
  */
 class OpenRouteOnePointGpxOutput @Inject constructor(
     val packageName: String,
-    private val gpxFormatter: GpxFormatter,
+    private val coordinateConverter: CoordinateConverter,
 ) :
     PointOutput.WithLocation,
     Output.HasErrorText,
@@ -37,7 +38,7 @@ class OpenRouteOnePointGpxOutput @Inject constructor(
         location?.let { location ->
             // Notice that we use the .xml extension, because that's what TomTom requires.
             writeFile(actionContext.context.filesDir, "routes", "${System.currentTimeMillis()}.xml") {
-                gpxFormatter.writeGpxRoute(persistentListOf(location, value), this)
+                GpxFormatter.writeGpxRoute(coordinateConverter.toWGS84(persistentListOf(location, value)), this)
             }?.let { file ->
                 actionContext.androidTools.openAppFile(actionContext.context, packageName, file)
             }

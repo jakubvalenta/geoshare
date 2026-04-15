@@ -18,13 +18,8 @@ import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class YandexMapsInput @Inject constructor(
-    private val uriFormatter: UriFormatter,
-) : ShortUriInput, HtmlInput, Input.HasRandomUri {
+object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
     override val uriPattern = Regex("""(?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/$URI_REST""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.YANDEX_MAPS,
@@ -137,7 +132,7 @@ class YandexMapsInput @Inject constructor(
     override val loadingIndicatorTitleResId = R.string.converter_yandex_maps_loading_indicator_title
 
     override fun genRandomUri(point: Point) =
-        uriFormatter.formatUriString(point, "https://yandex.com/maps?ll={lon}%2C{lat}&z={z}")
+        UriFormatter.formatUriString(point, "https://yandex.com/maps?ll={lon}%2C{lat}&z={z}")
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

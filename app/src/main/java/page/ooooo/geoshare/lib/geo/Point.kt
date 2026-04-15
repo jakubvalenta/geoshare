@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.geo
 
 import androidx.compose.runtime.Immutable
-import com.lbt05.evil_transform.TransformUtil
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.extensions.toTrimmedString
 import kotlin.random.Random
@@ -12,28 +11,7 @@ sealed interface Point {
     val z: Double?
     val name: String?
     val source: Source
-
-    companion object {
-        val example: Point = genRandomPoint(minLat = 0.0, maxLon = -100.0)
-
-        fun genRandomPoint(
-            minLat: Double = -50.0,
-            maxLat: Double = 80.0,
-            minLon: Double = -180.0,
-            maxLon: Double = 180.0,
-            z: Double = 16.0,
-            name: String? = null,
-            source: Source = Source.GENERATED,
-        ): Point {
-            val lat = Random.nextDouble(minLat, maxLat).toScale(6)
-            val lon = Random.nextDouble(minLon, maxLon).toScale(6)
-            return if (TransformUtil.outOfChina(lon, lat)) {
-                WGS84Point(lat, lon, z, name, source)
-            } else {
-                GCJ02Point(lat, lon, z, name, source)
-            }
-        }
-    }
+    val accurate: Boolean
 
     val latStr: String?
         get() = lat?.toScale(7)?.toTrimmedString()
@@ -47,8 +25,6 @@ sealed interface Point {
     fun hasCoordinates(): Boolean = lat != null && lon != null
 
     fun hasName(): Boolean = !name.isNullOrEmpty()
-
-    fun isAccurate(): Boolean
 }
 
 /**
@@ -72,7 +48,25 @@ data class WGS84Point(
         naivePoint.source,
     )
 
-    override fun isAccurate() = true
+    companion object {
+        val example = genRandomPoint(minLat = 0.0, maxLon = -100.0)
+
+        fun genRandomPoint(
+            minLat: Double = -50.0,
+            maxLat: Double = 80.0,
+            minLon: Double = -180.0,
+            maxLon: Double = 180.0,
+            z: Double = 16.0,
+            name: String? = null,
+            source: Source = Source.GENERATED,
+        ): WGS84Point = WGS84Point(
+            Random.nextDouble(minLat, maxLat).toScale(6),
+            Random.nextDouble(minLon, maxLon).toScale(6),
+            z, name, source,
+        )
+    }
+
+    override val accurate = true
 }
 
 /**
@@ -97,7 +91,7 @@ data class GCJ02Point(
         naivePoint.source,
     )
 
-    override fun isAccurate() = lat == null || lon == null || TransformUtil.outOfChina(lon, lat)
+    override val accurate = false
 }
 
 /**
@@ -122,7 +116,7 @@ data class GCJ02MainlandChinaPoint(
         naivePoint.source,
     )
 
-    override fun isAccurate() = lat == null || lon == null || TransformUtil.outOfChina(lon, lat)
+    override val accurate = false
 }
 
 /**
@@ -147,7 +141,7 @@ data class GCJ02GreaterChinaAndTaiwanPoint(
         naivePoint.source,
     )
 
-    override fun isAccurate() = lat == null || lon == null || TransformUtil.outOfChina(lon, lat)
+    override val accurate = false
 }
 
 /**
@@ -169,5 +163,5 @@ data class BD09MCPoint(
         naivePoint.source,
     )
 
-    override fun isAccurate() = lat == null || lon == null
+    override val accurate = false
 }
