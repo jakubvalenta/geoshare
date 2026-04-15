@@ -47,6 +47,8 @@ sealed interface Point {
     fun hasCoordinates(): Boolean = lat != null && lon != null
 
     fun hasName(): Boolean = !name.isNullOrEmpty()
+
+    fun isAccurate(): Boolean
 }
 
 /**
@@ -69,6 +71,8 @@ data class WGS84Point(
         naivePoint.name,
         naivePoint.source,
     )
+
+    override fun isAccurate() = true
 }
 
 /**
@@ -92,6 +96,8 @@ data class GCJ02Point(
         naivePoint.name,
         naivePoint.source,
     )
+
+    override fun isAccurate() = lat == null || lon == null || TransformUtil.outOfChina(lon, lat)
 }
 
 /**
@@ -115,6 +121,8 @@ data class GCJ02MainlandChinaPoint(
         naivePoint.name,
         naivePoint.source,
     )
+
+    override fun isAccurate() = lat == null || lon == null || TransformUtil.outOfChina(lon, lat)
 }
 
 /**
@@ -138,6 +146,8 @@ data class GCJ02GreaterChinaAndTaiwanPoint(
         naivePoint.name,
         naivePoint.source,
     )
+
+    override fun isAccurate() = lat == null || lon == null || TransformUtil.outOfChina(lon, lat)
 }
 
 /**
@@ -158,4 +168,6 @@ data class BD09MCPoint(
         naivePoint.name,
         naivePoint.source,
     )
+
+    override fun isAccurate() = lat == null || lon == null
 }

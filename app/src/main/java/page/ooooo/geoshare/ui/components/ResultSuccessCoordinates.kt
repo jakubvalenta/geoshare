@@ -28,7 +28,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.lbt05.evil_transform.TransformUtil
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
@@ -41,16 +40,16 @@ import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
 import page.ooooo.geoshare.lib.formatters.MagicEarthUriFormatter
 import page.ooooo.geoshare.lib.formatters.UriFormatter
-import page.ooooo.geoshare.lib.geo.Geometries
-import page.ooooo.geoshare.lib.outputs.Action
-import page.ooooo.geoshare.lib.outputs.PointOutput
-import page.ooooo.geoshare.lib.outputs.PointsOutput
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.GCJ02Point
+import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.outputs.Action
+import page.ooooo.geoshare.lib.outputs.PointOutput
+import page.ooooo.geoshare.lib.outputs.PointsOutput
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -126,14 +125,7 @@ fun ResultSuccessCoordinates(
                 )
             }
         }
-        if (
-            lastPoint !is WGS84Point &&
-            lastPoint.lat?.let { lat ->
-                lastPoint.lon?.let { lon ->
-                    TransformUtil.outOfChina(lon, lat)
-                }
-            } == false
-        ) {
+        if (!lastPoint.isAccurate()) {
             ResultSuccessCoordinatesCheck(
                 stringResource(R.string.conversion_succeeded_check_srs),
                 Modifier.testTag("geoShareResultSuccessLastPointCheckSRS"),
