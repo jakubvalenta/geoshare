@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.geo
 
 import androidx.compose.runtime.Immutable
+import com.lbt05.evil_transform.TransformUtil
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.extensions.toTrimmedString
 import kotlin.random.Random
@@ -11,7 +12,6 @@ sealed interface Point {
     val z: Double?
     val name: String?
     val source: Source
-    val accurate: Boolean
 
     val latStr: String?
         get() = lat?.toScale(7)?.toTrimmedString()
@@ -25,6 +25,8 @@ sealed interface Point {
     fun hasCoordinates(): Boolean = lat != null && lon != null
 
     fun hasName(): Boolean = !name.isNullOrEmpty()
+
+    fun isAccurate(): Boolean
 }
 
 /**
@@ -48,6 +50,8 @@ data class WGS84Point(
         naivePoint.source,
     )
 
+    override fun isAccurate() = true
+
     companion object {
         val example = genRandomPoint(minLat = 0.0, maxLon = -100.0)
 
@@ -65,8 +69,6 @@ data class WGS84Point(
             z, name, source,
         )
     }
-
-    override val accurate = true
 }
 
 /**
@@ -91,7 +93,7 @@ data class GCJ02Point(
         naivePoint.source,
     )
 
-    override val accurate = false
+    override fun isAccurate() = lat == null || lon == null || TransformUtil.outOfChina(lat, lon)
 }
 
 /**
@@ -116,7 +118,7 @@ data class GCJ02MainlandChinaPoint(
         naivePoint.source,
     )
 
-    override val accurate = false
+    override fun isAccurate() = lat == null || lon == null || TransformUtil.outOfChina(lat, lon)
 }
 
 /**
@@ -141,7 +143,7 @@ data class GCJ02GreaterChinaAndTaiwanPoint(
         naivePoint.source,
     )
 
-    override val accurate = false
+    override fun isAccurate() = lat == null || lon == null || TransformUtil.outOfChina(lat, lon)
 }
 
 /**
@@ -163,5 +165,5 @@ data class BD09MCPoint(
         naivePoint.source,
     )
 
-    override val accurate = false
+    override fun isAccurate() = lat == null || lon == null
 }

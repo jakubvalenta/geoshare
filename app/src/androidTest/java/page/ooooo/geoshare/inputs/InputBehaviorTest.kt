@@ -29,6 +29,7 @@ interface InputBehaviorTest : BehaviorTest {
     fun UiAutomatorTestScope.testUri(
         expectedPoints: Points,
         unsafeUriString: String,
+        accurate: Boolean? = null,
         timeoutMs: Long = NETWORK_TIMEOUT,
     ) {
         // Go to main form
@@ -38,11 +39,16 @@ interface InputBehaviorTest : BehaviorTest {
         shareUri(unsafeUriString)
         confirmDialogIfVisible()
 
-        assertConversionSucceeded(expectedPoints, timeoutMs)
+        assertConversionSucceeded(expectedPoints, accurate, timeoutMs)
     }
 
-    fun UiAutomatorTestScope.testUri(expectedPoint: Point, unsafeUriString: String, timeoutMs: Long = NETWORK_TIMEOUT) =
-        testUri(persistentListOf(expectedPoint), unsafeUriString, timeoutMs)
+    fun UiAutomatorTestScope.testUri(
+        expectedPoint: Point,
+        unsafeUriString: String,
+        accurate: Boolean? = null,
+        timeoutMs: Long = NETWORK_TIMEOUT,
+    ) =
+        testUri(persistentListOf(expectedPoint), unsafeUriString, accurate, timeoutMs)
 
     fun UiAutomatorTestScope.testTextUri(expectedPoints: Points, unsafeText: String) {
         // It would be preferable to test sharing of the text with the app, but this shell command doesn't work when

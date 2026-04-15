@@ -203,6 +203,7 @@ interface BehaviorTest {
      */
     fun UiAutomatorTestScope.assertConversionSucceeded(
         expectedPoints: Points,
+        accurate: Boolean? = null,
         timeoutMs: Long = NETWORK_TIMEOUT,
     ) {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -274,7 +275,7 @@ interface BehaviorTest {
             }
         lastPoint.source.let { expectedSource ->
             onElement { viewIdResourceName == "geoShareResultSuccessLastPointSource_${expectedSource}" }
-            if (!lastPoint.accurate) {
+            if (!(accurate ?: lastPoint.isAccurate())) {
                 onElement { viewIdResourceName == "geoShareResultSuccessLastPointCheckSRS" }
             } else if (expectedSource == Source.JAVASCRIPT) {
                 onElement { viewIdResourceName == "geoShareResultSuccessLastPointCheckJavaScript" }
@@ -299,9 +300,10 @@ interface BehaviorTest {
 
     fun UiAutomatorTestScope.assertConversionSucceeded(
         expectedPoint: Point,
+        accurate: Boolean? = null,
         timeoutMs: Long = NETWORK_TIMEOUT,
     ) =
-        assertConversionSucceeded(persistentListOf(expectedPoint), timeoutMs)
+        assertConversionSucceeded(persistentListOf(expectedPoint), accurate, timeoutMs)
 
     fun UiAutomatorTestScope.waitAndAssertGoogleMapsContainsElement(block: AccessibilityNodeInfo.() -> Boolean) {
         // Wait for Google Maps

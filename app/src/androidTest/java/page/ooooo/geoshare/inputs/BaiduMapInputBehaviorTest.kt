@@ -63,6 +63,7 @@ class BaiduMapInputBehaviorTest : InputBehaviorTest {
                 source = Source.MAP_CENTER,
             ),
             "https://map.baidu.com/@16206826.38,5332511.04,19z",
+            accurate = false,
         )
 
         // Directions

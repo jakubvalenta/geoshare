@@ -124,7 +124,7 @@ fun ResultSuccessCoordinates(
                 )
             }
         }
-        if (!lastPoint.accurate) {
+        if (!lastPoint.isAccurate()) {
             ResultSuccessCoordinatesCheck(
                 stringResource(R.string.conversion_succeeded_check_srs),
                 Modifier.testTag("geoShareResultSuccessLastPointCheckSRS"),
