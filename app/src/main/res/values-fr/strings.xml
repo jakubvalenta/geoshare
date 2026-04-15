@@ -268,4 +268,7 @@
     <string name="conversion_failed_parse_html_error_with_reason">Échec du traitement de la page Web pour la raison suivante : %1$s</string>
     <string name="network_exception_too_many_requests">Trop de demandes</string>
     <string name="licenses">Licences</string>
+    <string name="conversion_succeeded_check_experimental">La localisation peut être inexacte en raison d\'une méthode d\'extraction expérimentale.</string>
+    <string name="conversion_succeeded_check_map_center">L\'emplacement peut correspondre au centre de la carte, et non à un repère.</string>
+    <string name="conversion_succeeded_check_srs">La localisation peut être imprécise en raison de la conversion du système de coordonnées.</string>
 </resources>
