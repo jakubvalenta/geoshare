@@ -5,6 +5,8 @@ import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -111,6 +113,11 @@ class LinksBehaviorTest : BehaviorTest {
 
         // Does not show link
         assertNull(onElementOrNull(BehaviorTest.ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareLinksListItem_a5092c63-cf5c-4225-9059-e888ae12e215" })
+
+        // Wait for the delete toast to disappear, because it covers the restore button
+        runBlocking {
+            delay(3_000L)
+        }
 
         // Restore initial links
         onElement { viewIdResourceName == "geoShareLinksListPane" }
