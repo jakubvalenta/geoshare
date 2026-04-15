@@ -46,8 +46,7 @@ import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.billing.BillingProduct
@@ -59,7 +58,12 @@ import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
 import page.ooooo.geoshare.lib.formatters.MagicEarthUriFormatter
 import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.GeoUriInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.inputs.HtmlInput
@@ -79,11 +83,6 @@ import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
 import page.ooooo.geoshare.lib.outputs.ShareLinkUriOutput
 import page.ooooo.geoshare.lib.outputs.SharePointsGpxOutput
-import page.ooooo.geoshare.lib.geo.CoordinateConverter
-import page.ooooo.geoshare.lib.geo.Point
-import page.ooooo.geoshare.lib.geo.Points
-import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.geo.WGS84Point
 import java.io.EOFException
 import java.net.SocketTimeoutException
 import java.net.URL
@@ -3054,8 +3053,8 @@ class ConversionStateTest {
     fun conversionSucceeded_userPreferenceAutomationIsOpenApp_returnsActionWaiting() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val automation = OpenDisplayGeoUriAutomation(GOOGLE_MAPS_PACKAGE_NAME)
-        val action = OpenDisplayGeoUriOutput(GOOGLE_MAPS_PACKAGE_NAME, geoUriFormatter).toAction(points.last())
+        val automation = OpenDisplayGeoUriAutomation(PackageNames.GOOGLE_MAPS)
+        val action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, geoUriFormatter).toAction(points.last())
         val delay = 2.seconds
         val mockBilling: Billing = mock {
             on { status } doReturn MutableStateFlow(
@@ -3182,8 +3181,8 @@ class ConversionStateTest {
     fun conversionSucceeded_userPreferenceAutomationIsShare_returnsActionWaiting() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val automation = OpenDisplayGeoUriAutomation(GOOGLE_MAPS_PACKAGE_NAME)
-        val action = OpenDisplayGeoUriOutput(GOOGLE_MAPS_PACKAGE_NAME, geoUriFormatter).toAction(points.last())
+        val automation = OpenDisplayGeoUriAutomation(PackageNames.GOOGLE_MAPS)
+        val action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, geoUriFormatter).toAction(points.last())
         val delay = 2.seconds
         val mockBilling: Billing = mock {
             on { status } doReturn MutableStateFlow(
@@ -3314,7 +3313,7 @@ class ConversionStateTest {
     fun actionReady_actionIsShareGpxRouteAutomation_returnsLocationRationaleRequested() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = OpenRouteOnePointGpxOutput(GOOGLE_MAPS_PACKAGE_NAME, gpxFormatter).toAction(points.last())
+        val action = OpenRouteOnePointGpxOutput(PackageNames.GOOGLE_MAPS, gpxFormatter).toAction(points.last())
         val state = ActionReady(inputUriString, points, action, isAutomation = true)
         assertEquals(
             LocationRationaleRequested(inputUriString, points, action, isAutomation = true),
@@ -3326,7 +3325,7 @@ class ConversionStateTest {
     fun actionReady_actionIsShareGpxRouteAction_returnsLocationRationaleRequested() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = OpenRouteOnePointGpxOutput(GOOGLE_MAPS_PACKAGE_NAME, gpxFormatter).toAction(points.last())
+        val action = OpenRouteOnePointGpxOutput(PackageNames.GOOGLE_MAPS, gpxFormatter).toAction(points.last())
         val state = ActionReady(inputUriString, points, action, isAutomation = false)
         assertEquals(
             LocationRationaleRequested(inputUriString, points, action, isAutomation = false),
@@ -3356,7 +3355,7 @@ class ConversionStateTest {
     fun locationActionReady_returnsNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = OpenRouteOnePointGpxOutput(GOOGLE_MAPS_PACKAGE_NAME, gpxFormatter).toAction(points.last())
+        val action = OpenRouteOnePointGpxOutput(PackageNames.GOOGLE_MAPS, gpxFormatter).toAction(points.last())
         val state = LocationActionReady(
             inputUriString,
             points,
@@ -3407,7 +3406,7 @@ class ConversionStateTest {
     fun actionSucceeded_executionIsNotCancelled_waitsAndReturnsActionFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = OpenDisplayGeoUriOutput(GOOGLE_MAPS_PACKAGE_NAME, geoUriFormatter).toAction(points.last())
+        val action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, geoUriFormatter).toAction(points.last())
         val state = ActionSucceeded(inputUriString, points, action, isAutomation = true)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
@@ -3422,7 +3421,7 @@ class ConversionStateTest {
     fun actionSucceeded_executionIsCancelled_returnsActionFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = OpenDisplayGeoUriOutput(GOOGLE_MAPS_PACKAGE_NAME, geoUriFormatter).toAction(points.last())
+        val action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, geoUriFormatter).toAction(points.last())
         val state = ActionSucceeded(inputUriString, points, action, isAutomation = true)
         var res: State? = null
         val job = launch {
@@ -3445,7 +3444,7 @@ class ConversionStateTest {
     fun actionFailed_executionIsNotCancelled_waitsAndReturnsActionFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = OpenDisplayGeoUriOutput(GOOGLE_MAPS_PACKAGE_NAME, geoUriFormatter).toAction(points.last())
+        val action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, geoUriFormatter).toAction(points.last())
         val state = ActionFailed(inputUriString, points, action, isAutomation = true)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
@@ -3460,7 +3459,7 @@ class ConversionStateTest {
     fun actionFailed_executionIsCancelled_returnsActionFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = OpenDisplayGeoUriOutput(GOOGLE_MAPS_PACKAGE_NAME, geoUriFormatter).toAction(points.last())
+        val action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, geoUriFormatter).toAction(points.last())
         val state = ActionFailed(inputUriString, points, action, isAutomation = true)
         var res: State? = null
         val job = launch {
@@ -3483,7 +3482,7 @@ class ConversionStateTest {
     fun actionFinished_returnsNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = OpenDisplayGeoUriOutput(GOOGLE_MAPS_PACKAGE_NAME, geoUriFormatter).toAction(points.last())
+        val action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, geoUriFormatter).toAction(points.last())
         val state = ActionFinished(inputUriString, points, action, isAutomation = true)
         assertNull(state.transition())
     }
@@ -3501,7 +3500,7 @@ class ConversionStateTest {
     fun locationRationaleRequested_returnsNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME, gpxFormatter).toAction(points.last())
+        val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, gpxFormatter).toAction(points.last())
         val state = LocationRationaleRequested(inputUriString, points, action, isAutomation = false)
         assertNull(state.transition())
     }
@@ -3510,7 +3509,7 @@ class ConversionStateTest {
     fun locationRationaleShown_grant_returnsLocationRationaleConfirmed() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME, gpxFormatter).toAction(points.last())
+        val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, gpxFormatter).toAction(points.last())
         val state = LocationRationaleShown(inputUriString, points, action, isAutomation = false)
         assertEquals(
             LocationRationaleConfirmed(inputUriString, points, action, isAutomation = false),
@@ -3522,7 +3521,7 @@ class ConversionStateTest {
     fun locationRationaleShown_deny_returnsActionFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME, gpxFormatter).toAction(points.last())
+        val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, gpxFormatter).toAction(points.last())
         val state = LocationRationaleShown(inputUriString, points, action, isAutomation = false)
         assertEquals(
             ActionFinished(inputUriString, points, action, isAutomation = false),
@@ -3534,7 +3533,7 @@ class ConversionStateTest {
     fun locationRationaleConfirmed_returnsNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME, gpxFormatter).toAction(points.last())
+        val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, gpxFormatter).toAction(points.last())
         val state = LocationRationaleConfirmed(inputUriString, points, action, isAutomation = false)
         assertNull(state.transition())
     }
@@ -3543,7 +3542,7 @@ class ConversionStateTest {
     fun locationPermissionReceived_returnsNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME, gpxFormatter).toAction(points.last())
+        val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, gpxFormatter).toAction(points.last())
         val stateContext = mockStateContext()
         val state = LocationPermissionReceived(stateContext, inputUriString, points, action, isAutomation = false)
         assertNull(state.transition())
@@ -3553,7 +3552,7 @@ class ConversionStateTest {
     fun locationPermissionReceived_getSmallLoadingIndicator_returnsLoadingIndicator() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME, gpxFormatter).toAction(points.last())
+        val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, gpxFormatter).toAction(points.last())
         val stateContext = mockStateContext()
         val state = LocationPermissionReceived(stateContext, inputUriString, points, action, isAutomation = false)
         assertEquals(
@@ -3566,7 +3565,7 @@ class ConversionStateTest {
     fun locationReceived_locationIsNull_returnsLocationFindingFailed() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME, gpxFormatter).toAction(points.last())
+        val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, gpxFormatter).toAction(points.last())
         val state = LocationReceived(inputUriString, points, action, isAutomation = false, location = null)
         assertEquals(
             LocationFindingFailed(inputUriString, points, action, isAutomation = false),
@@ -3578,7 +3577,7 @@ class ConversionStateTest {
     fun locationReceived_locationIsNotNull_returnsLocationActionReady() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME, gpxFormatter).toAction(points.last())
+        val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, gpxFormatter).toAction(points.last())
         val location = WGS84Point(3.0, 4.0, source = Source.GENERATED)
         val state = LocationReceived(inputUriString, points, action, isAutomation = false, location)
         assertEquals(
@@ -3591,7 +3590,7 @@ class ConversionStateTest {
     fun locationFindingFailed_executionIsNotCancelled_waitsAndReturnsActionFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME, gpxFormatter).toAction(points.last())
+        val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, gpxFormatter).toAction(points.last())
         val state = LocationFindingFailed(inputUriString, points, action, isAutomation = false)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
@@ -3606,7 +3605,7 @@ class ConversionStateTest {
     fun locationFindingFailed_executionIsCancelled_returnsActionFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME, gpxFormatter).toAction(points.last())
+        val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, gpxFormatter).toAction(points.last())
         val state = LocationFindingFailed(inputUriString, points, action, isAutomation = false)
         var res: State? = null
         val job = launch {

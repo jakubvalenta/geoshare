@@ -12,7 +12,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
-import page.ooooo.geoshare.lib.android.TEST_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
@@ -37,7 +37,7 @@ class OpenPointsGpxOutputTest {
             androidTools = mock {
                 on { openApp(any(), any(), any()) } doThrow NotImplementedError()
                 on { openAppFile(any(), any(), any()) } doThrow NotImplementedError()
-                on { openAppFile(any(), eq(TEST_PACKAGE_NAME), any()) } doReturn true
+                on { openAppFile(any(), eq(PackageNames.TEST), any()) } doReturn true
                 on { openChooser(any(), any()) } doThrow NotImplementedError()
                 on { openChooserFile(any(), any()) } doThrow NotImplementedError()
             },
@@ -59,7 +59,7 @@ class OpenPointsGpxOutputTest {
             setOf(oldFile.path),
             childDir.listFiles()?.map { it.path }?.toSet(),
         )
-        val success = OpenPointsGpxOutput(TEST_PACKAGE_NAME, gpxFormatter).execute(
+        val success = OpenPointsGpxOutput(PackageNames.TEST, gpxFormatter).execute(
             value = points,
             actionContext = mockActionContext(parentDir),
         )

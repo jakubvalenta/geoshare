@@ -271,7 +271,7 @@ class CoordinateConverter @Inject constructor(
         when (srs) {
             Srs.WGS84 -> toWGS84(point)
             Srs.GCJ02 -> toGCJ02(point)
-            Srs.GCJ02_MAINLAND_CHINA -> toGCJ02GreaterChinaAndTaiwan(point)
+            Srs.GCJ02_MAINLAND_CHINA -> toGCJ02MainlandChina(point)
             Srs.GCJ02_GREATER_CHINA_AND_TAIWAN -> toGCJ02GreaterChinaAndTaiwan(point)
         }
 }

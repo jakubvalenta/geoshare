@@ -4,23 +4,7 @@ import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.android.AMAP_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.BAIDU_MAP_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.COMAPS_PACKAGE_NAME_PREFIX
-import page.ooooo.geoshare.lib.android.GARMIN_PACKAGE_NAME_PREFIX
-import page.ooooo.geoshare.lib.android.GMAPS_WV_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.HERE_WEGO_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.KOMOOT_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.LOCUS_MAP_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.MAPS_ME_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.MAPY_COM_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.OEFFI_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.ORGANIC_MAPS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.OSMAND_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.SYGIC_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.VESPUCCI_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Srs
@@ -76,38 +60,38 @@ class GeoUriFormatter @Inject constructor(
     }
 
     private fun getFlavor(packageName: String?): Flavor = when {
-        packageName == HERE_WEGO_PACKAGE_NAME ||
-            packageName == MAPS_ME_PACKAGE_NAME ||
-            packageName == MAPY_COM_PACKAGE_NAME ||
-            packageName == ORGANIC_MAPS_PACKAGE_NAME ||
-            packageName == OSMAND_PACKAGE_NAME ||
-            packageName == OSMAND_PLUS_PACKAGE_NAME ||
-            packageName == SYGIC_PACKAGE_NAME ||
-            packageName == VESPUCCI_PACKAGE_NAME ||
-            packageName?.startsWith(COMAPS_PACKAGE_NAME_PREFIX) == true ->
+        packageName == PackageNames.HERE_WEGO ||
+            packageName == PackageNames.MAPS_ME ||
+            packageName == PackageNames.MAPY_COM ||
+            packageName == PackageNames.ORGANIC_MAPS ||
+            packageName == PackageNames.OSMAND ||
+            packageName == PackageNames.OSMAND_PLUS ||
+            packageName == PackageNames.SYGIC ||
+            packageName == PackageNames.VESPUCCI ||
+            packageName?.startsWith(PackageNames.COMAPS_PREFIX) == true ->
             Flavor.Best
 
-        packageName == AMAP_PACKAGE_NAME ->
+        packageName == PackageNames.AMAP ->
             Flavor.Best.copy(srs = Srs.GCJ02_GREATER_CHINA_AND_TAIWAN)
 
-        packageName == GOOGLE_MAPS_PACKAGE_NAME ||
-            packageName == GMAPS_WV_PACKAGE_NAME ->
+        packageName == PackageNames.GOOGLE_MAPS ||
+            packageName == PackageNames.GMAPS_WV ->
             Flavor.Best.copy(srs = Srs.GCJ02_MAINLAND_CHINA)
 
-        packageName == BAIDU_MAP_PACKAGE_NAME ->
+        packageName == PackageNames.BAIDU_MAP ->
             // Notice that Baidu Map uses WGS 84 geo: URIs, although all its other links are in BD09MC
             Flavor(pin = Flavor.PinFlavor.NOT_AVAILABLE, zoom = Flavor.ZoomFlavor.ALONE_ONLY)
 
-        packageName?.startsWith(GARMIN_PACKAGE_NAME_PREFIX) == true ->
+        packageName?.startsWith(PackageNames.GARMIN_PREFIX) == true ->
             Flavor(pin = Flavor.PinFlavor.COORDS_AND_NAME_IN_Q, zoom = Flavor.ZoomFlavor.NOT_AVAILABLE)
 
-        packageName == KOMOOT_PACKAGE_NAME ->
+        packageName == PackageNames.KOMOOT ->
             Flavor(pin = Flavor.PinFlavor.COORDS_ONLY_IN_Q, zoom = Flavor.ZoomFlavor.ANY)
 
-        packageName == LOCUS_MAP_PACKAGE_NAME ->
+        packageName == PackageNames.LOCUS_MAP ->
             Flavor(pin = Flavor.PinFlavor.NAME_ONLY_IN_Q, zoom = Flavor.ZoomFlavor.ANY)
 
-        packageName == OEFFI_PACKAGE_NAME ->
+        packageName == PackageNames.OEFFI ->
             Flavor(pin = Flavor.PinFlavor.COORDS_ONLY_IN_Q, zoom = Flavor.ZoomFlavor.ANY)
 
         else ->

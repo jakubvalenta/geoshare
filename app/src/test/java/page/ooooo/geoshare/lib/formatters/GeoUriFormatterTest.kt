@@ -4,26 +4,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.android.AMAP_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.BAIDU_MAP_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.COMAPS_FDROID_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.GARMIN_EXPLORE_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.GMAPS_WV_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.HERE_WEGO_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.KOMOOT_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.LOCUS_MAP_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.MAGIC_EARTH_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.MAPS_ME_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.MAPY_COM_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.OEFFI_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.ORGANIC_MAPS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.OSMAND_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.SYGIC_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.TEST_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.VESPUCCI_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.BaseGeometriesTest
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.GCJ02Point
@@ -201,10 +182,10 @@ class GeoUriFormatterTest : BaseGeometriesTest() {
                 "geo:31.2285067,121.475524?q=31.2285067,121.475524", // GCJ-02
             ),
             listOf(
-                TEST_PACKAGE_NAME, // WGS 84
-                GOOGLE_MAPS_PACKAGE_NAME, // GCJ-02
-                GMAPS_WV_PACKAGE_NAME, // GCJ-02
-                AMAP_PACKAGE_NAME, // GCJ-02
+                PackageNames.TEST, // WGS 84
+                PackageNames.GOOGLE_MAPS, // GCJ-02
+                PackageNames.GMAPS_WV, // GCJ-02
+                PackageNames.AMAP, // GCJ-02
             ).map { packageName ->
                 geoUriFormatter.formatGeoUriString(
                     WGS84Point(31.23044166868017, 121.47099209401793, source = Source.GENERATED),
@@ -220,26 +201,26 @@ class GeoUriFormatterTest : BaseGeometriesTest() {
         val point =
             WGS84Point(31.23044166868017, 121.47099209401793, z = 3.4, name = "foo bar", source = Source.GENERATED)
         val expectedUriStrings = mapOf(
-            AMAP_PACKAGE_NAME to "geo:31.2285067,121.475524?z=3.4&q=31.2285067,121.475524(foo%20bar)",
-            BAIDU_MAP_PACKAGE_NAME to "geo:31.2304417,121.4709921?z=3.4",
-            COMAPS_FDROID_PACKAGE_NAME to "geo:31.2304417,121.4709921?z=3.4&q=31.2304417,121.4709921(foo%20bar)",
-            GARMIN_EXPLORE_PACKAGE_NAME to "geo:31.2304417,121.4709921?q=31.2304417,121.4709921(foo%20bar)",
-            GMAPS_WV_PACKAGE_NAME to "geo:31.2285067,121.475524?z=3.4&q=31.2285067,121.475524(foo%20bar)",
-            GOOGLE_MAPS_PACKAGE_NAME to "geo:31.2285067,121.475524?z=3.4&q=31.2285067,121.475524(foo%20bar)",
-            HERE_WEGO_PACKAGE_NAME to "geo:31.2304417,121.4709921?z=3.4&q=31.2304417,121.4709921(foo%20bar)",
-            KOMOOT_PACKAGE_NAME to "geo:31.2304417,121.4709921?z=3.4&q=31.2304417,121.4709921",
-            LOCUS_MAP_PACKAGE_NAME to "geo:31.2304417,121.4709921?z=3.4&q=foo%20bar",
-            MAGIC_EARTH_PACKAGE_NAME to "geo:31.2304417,121.4709921",
-            MAPS_ME_PACKAGE_NAME to "geo:31.2304417,121.4709921?z=3.4&q=31.2304417,121.4709921(foo%20bar)",
-            MAPY_COM_PACKAGE_NAME to "geo:31.2304417,121.4709921?z=3.4&q=31.2304417,121.4709921(foo%20bar)",
-            OEFFI_PACKAGE_NAME to "geo:31.2304417,121.4709921?z=3.4&q=31.2304417,121.4709921",
-            ORGANIC_MAPS_PACKAGE_NAME to "geo:31.2304417,121.4709921?z=3.4&q=31.2304417,121.4709921(foo%20bar)",
-            OSMAND_PACKAGE_NAME to "geo:31.2304417,121.4709921?z=3.4&q=31.2304417,121.4709921(foo%20bar)",
-            OSMAND_PLUS_PACKAGE_NAME to "geo:31.2304417,121.4709921?z=3.4&q=31.2304417,121.4709921(foo%20bar)",
-            SYGIC_PACKAGE_NAME to "geo:31.2304417,121.4709921?z=3.4&q=31.2304417,121.4709921(foo%20bar)",
-            TEST_PACKAGE_NAME to "geo:31.2304417,121.4709921",
-            TOMTOM_PACKAGE_NAME to "geo:31.2304417,121.4709921",
-            VESPUCCI_PACKAGE_NAME to "geo:31.2304417,121.4709921?z=3.4&q=31.2304417,121.4709921(foo%20bar)",
+            PackageNames.AMAP to "geo:31.2285067,121.475524?z=3.4&q=31.2285067,121.475524(foo%20bar)",
+            PackageNames.BAIDU_MAP to "geo:31.2304417,121.4709921?z=3.4",
+            PackageNames.COMAPS_FDROID to "geo:31.2304417,121.4709921?z=3.4&q=31.2304417,121.4709921(foo%20bar)",
+            PackageNames.GARMIN_EXPLORE to "geo:31.2304417,121.4709921?q=31.2304417,121.4709921(foo%20bar)",
+            PackageNames.GMAPS_WV to "geo:31.2285067,121.475524?z=3.4&q=31.2285067,121.475524(foo%20bar)",
+            PackageNames.GOOGLE_MAPS to "geo:31.2285067,121.475524?z=3.4&q=31.2285067,121.475524(foo%20bar)",
+            PackageNames.HERE_WEGO to "geo:31.2304417,121.4709921?z=3.4&q=31.2304417,121.4709921(foo%20bar)",
+            PackageNames.KOMOOT to "geo:31.2304417,121.4709921?z=3.4&q=31.2304417,121.4709921",
+            PackageNames.LOCUS_MAP to "geo:31.2304417,121.4709921?z=3.4&q=foo%20bar",
+            PackageNames.MAGIC_EARTH to "geo:31.2304417,121.4709921",
+            PackageNames.MAPS_ME to "geo:31.2304417,121.4709921?z=3.4&q=31.2304417,121.4709921(foo%20bar)",
+            PackageNames.MAPY_COM to "geo:31.2304417,121.4709921?z=3.4&q=31.2304417,121.4709921(foo%20bar)",
+            PackageNames.OEFFI to "geo:31.2304417,121.4709921?z=3.4&q=31.2304417,121.4709921",
+            PackageNames.ORGANIC_MAPS to "geo:31.2304417,121.4709921?z=3.4&q=31.2304417,121.4709921(foo%20bar)",
+            PackageNames.OSMAND to "geo:31.2304417,121.4709921?z=3.4&q=31.2304417,121.4709921(foo%20bar)",
+            PackageNames.OSMAND_PLUS to "geo:31.2304417,121.4709921?z=3.4&q=31.2304417,121.4709921(foo%20bar)",
+            PackageNames.SYGIC to "geo:31.2304417,121.4709921?z=3.4&q=31.2304417,121.4709921(foo%20bar)",
+            PackageNames.TEST to "geo:31.2304417,121.4709921",
+            PackageNames.TOMTOM to "geo:31.2304417,121.4709921",
+            PackageNames.VESPUCCI to "geo:31.2304417,121.4709921?z=3.4&q=31.2304417,121.4709921(foo%20bar)",
         )
         assertEquals(
             expectedUriStrings,

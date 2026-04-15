@@ -83,23 +83,21 @@ import page.ooooo.geoshare.data.local.preferences.TextPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.android.COMAPS_FDROID_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.DataTypes
-import page.ooooo.geoshare.lib.android.ORGANIC_MAPS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.CustomLinkFeature
 import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
-import page.ooooo.geoshare.lib.geo.Geometries
-import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.Point
-import page.ooooo.geoshare.ui.components.FeatureWall
+import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.ui.components.FeatureBadgeSmall
+import page.ooooo.geoshare.ui.components.FeatureWall
 import page.ooooo.geoshare.ui.components.IconFromDescriptor
 import page.ooooo.geoshare.ui.components.LabelLarge
 import page.ooooo.geoshare.ui.components.NavigableBasicListDetailScaffold
@@ -1288,10 +1286,10 @@ private fun AutomationPreview() {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION,
                     apps = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                        PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                     ),
                     appDetails = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -1334,10 +1332,10 @@ private fun DarkAutomationPreview() {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION,
                     apps = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                        PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                     ),
                     appDetails = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -1380,10 +1378,10 @@ private fun TabletAutomationPreview() {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION,
                     apps = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                        PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                     ),
                     appDetails = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -1426,10 +1424,10 @@ private fun AutomationFeatureNotAvailablePreview() {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION,
                     apps = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                        PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                     ),
                     appDetails = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -1468,10 +1466,10 @@ private fun DarkAutomationFeatureNotAvailablePreview() {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION,
                     apps = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                        PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                     ),
                     appDetails = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -1510,10 +1508,10 @@ private fun TabletAutomationFeatureNotAvailablePreview() {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION,
                     apps = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                        PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                     ),
                     appDetails = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -1666,20 +1664,20 @@ private fun HiddenAppsPreview() {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
                     apps = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to emptySet(),
-                        ORGANIC_MAPS_PACKAGE_NAME to emptySet(),
-                        OSMAND_PLUS_PACKAGE_NAME to emptySet(),
+                        PackageNames.COMAPS_FDROID to emptySet(),
+                        PackageNames.ORGANIC_MAPS to emptySet(),
+                        PackageNames.OSMAND_PLUS to emptySet(),
                     ),
                     appDetails = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to AppDetail(
+                        PackageNames.COMAPS_FDROID to AppDetail(
                             "CoMaps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        ORGANIC_MAPS_PACKAGE_NAME to AppDetail(
+                        PackageNames.ORGANIC_MAPS to AppDetail(
                             "Organic Maps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -1690,7 +1688,7 @@ private fun HiddenAppsPreview() {
                     coordinateFormatter = coordinateFormatter,
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
-                        hiddenApps = setOf(ORGANIC_MAPS_PACKAGE_NAME),
+                        hiddenApps = setOf(PackageNames.ORGANIC_MAPS),
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
@@ -1717,20 +1715,20 @@ private fun DarkHiddenAppsPreview() {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
                     apps = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to emptySet(),
-                        ORGANIC_MAPS_PACKAGE_NAME to emptySet(),
-                        OSMAND_PLUS_PACKAGE_NAME to emptySet(),
+                        PackageNames.COMAPS_FDROID to emptySet(),
+                        PackageNames.ORGANIC_MAPS to emptySet(),
+                        PackageNames.OSMAND_PLUS to emptySet(),
                     ),
                     appDetails = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to AppDetail(
+                        PackageNames.COMAPS_FDROID to AppDetail(
                             "CoMaps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        ORGANIC_MAPS_PACKAGE_NAME to AppDetail(
+                        PackageNames.ORGANIC_MAPS to AppDetail(
                             "Organic Maps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -1741,7 +1739,7 @@ private fun DarkHiddenAppsPreview() {
                     coordinateFormatter = coordinateFormatter,
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
-                        hiddenApps = setOf(ORGANIC_MAPS_PACKAGE_NAME),
+                        hiddenApps = setOf(PackageNames.ORGANIC_MAPS),
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
@@ -1768,20 +1766,20 @@ private fun TabletHiddenAppsPreview() {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
                     apps = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to emptySet(),
-                        ORGANIC_MAPS_PACKAGE_NAME to emptySet(),
-                        OSMAND_PLUS_PACKAGE_NAME to emptySet(),
+                        PackageNames.COMAPS_FDROID to emptySet(),
+                        PackageNames.ORGANIC_MAPS to emptySet(),
+                        PackageNames.OSMAND_PLUS to emptySet(),
                     ),
                     appDetails = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to AppDetail(
+                        PackageNames.COMAPS_FDROID to AppDetail(
                             "CoMaps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        ORGANIC_MAPS_PACKAGE_NAME to AppDetail(
+                        PackageNames.ORGANIC_MAPS to AppDetail(
                             "Organic Maps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -1792,7 +1790,7 @@ private fun TabletHiddenAppsPreview() {
                     coordinateFormatter = coordinateFormatter,
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
-                        hiddenApps = setOf(ORGANIC_MAPS_PACKAGE_NAME),
+                        hiddenApps = setOf(PackageNames.ORGANIC_MAPS),
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
@@ -1819,20 +1817,20 @@ private fun HiddenAppsLoadingPreview() {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
                     apps = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to emptySet(),
-                        ORGANIC_MAPS_PACKAGE_NAME to emptySet(),
-                        OSMAND_PLUS_PACKAGE_NAME to emptySet(),
+                        PackageNames.COMAPS_FDROID to emptySet(),
+                        PackageNames.ORGANIC_MAPS to emptySet(),
+                        PackageNames.OSMAND_PLUS to emptySet(),
                     ),
                     appDetails = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to AppDetail(
+                        PackageNames.COMAPS_FDROID to AppDetail(
                             "CoMaps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        ORGANIC_MAPS_PACKAGE_NAME to AppDetail(
+                        PackageNames.ORGANIC_MAPS to AppDetail(
                             "Organic Maps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -1868,20 +1866,20 @@ private fun DarkHiddenAppsLoadingPreview() {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
                     apps = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to emptySet(),
-                        ORGANIC_MAPS_PACKAGE_NAME to emptySet(),
-                        OSMAND_PLUS_PACKAGE_NAME to emptySet(),
+                        PackageNames.COMAPS_FDROID to emptySet(),
+                        PackageNames.ORGANIC_MAPS to emptySet(),
+                        PackageNames.OSMAND_PLUS to emptySet(),
                     ),
                     appDetails = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to AppDetail(
+                        PackageNames.COMAPS_FDROID to AppDetail(
                             "CoMaps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        ORGANIC_MAPS_PACKAGE_NAME to AppDetail(
+                        PackageNames.ORGANIC_MAPS to AppDetail(
                             "Organic Maps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -1917,20 +1915,20 @@ private fun TabletHiddenAppsLoadingPreview() {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
                     apps = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to emptySet(),
-                        ORGANIC_MAPS_PACKAGE_NAME to emptySet(),
-                        OSMAND_PLUS_PACKAGE_NAME to emptySet(),
+                        PackageNames.COMAPS_FDROID to emptySet(),
+                        PackageNames.ORGANIC_MAPS to emptySet(),
+                        PackageNames.OSMAND_PLUS to emptySet(),
                     ),
                     appDetails = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to AppDetail(
+                        PackageNames.COMAPS_FDROID to AppDetail(
                             "CoMaps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        ORGANIC_MAPS_PACKAGE_NAME to AppDetail(
+                        PackageNames.ORGANIC_MAPS to AppDetail(
                             "Organic Maps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),

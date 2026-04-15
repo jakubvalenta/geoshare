@@ -38,16 +38,14 @@ import page.ooooo.geoshare.data.local.preferences.SharePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareRouteGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareStreetViewGoogleUriAutomation
 import page.ooooo.geoshare.lib.android.DataType
-import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.MAGIC_EARTH_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.TEST_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
 import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
 import page.ooooo.geoshare.lib.formatters.MagicEarthUriFormatter
 import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.outputs.CopyCoordsDecOutput
 import page.ooooo.geoshare.lib.outputs.CopyCoordsDegMinSecOutput
@@ -71,7 +69,6 @@ import page.ooooo.geoshare.lib.outputs.ShareNavigationGoogleUriOutput
 import page.ooooo.geoshare.lib.outputs.SharePointsGpxOutput
 import page.ooooo.geoshare.lib.outputs.ShareRouteGpxOutput
 import page.ooooo.geoshare.lib.outputs.ShareStreetViewGoogleUriOutput
-import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import java.util.UUID
 
 class OutputRepositoryTest {
@@ -132,37 +129,37 @@ class OutputRepositoryTest {
     fun getOutputsForApps_returnOutputsThatSupportPassedPackageNamesAndDataTypes() {
         assertEquals(
             mapOf(
-                TEST_PACKAGE_NAME to listOf(
-                    OpenDisplayGeoUriOutput(TEST_PACKAGE_NAME, geoUriFormatter)
+                PackageNames.TEST to listOf(
+                    OpenDisplayGeoUriOutput(PackageNames.TEST, geoUriFormatter)
                 ),
-                GOOGLE_MAPS_PACKAGE_NAME to listOf(
-                    OpenDisplayGeoUriOutput(GOOGLE_MAPS_PACKAGE_NAME, geoUriFormatter),
-                    OpenNavigationGoogleUriOutput(GOOGLE_MAPS_PACKAGE_NAME, googleMapsUriFormatter),
-                    OpenStreetViewGoogleUriOutput(GOOGLE_MAPS_PACKAGE_NAME, googleMapsUriFormatter),
-                    OpenRouteGpxOutput(GOOGLE_MAPS_PACKAGE_NAME, gpxFormatter),
-                    OpenPointsGpxOutput(GOOGLE_MAPS_PACKAGE_NAME, gpxFormatter),
+                PackageNames.GOOGLE_MAPS to listOf(
+                    OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, geoUriFormatter),
+                    OpenNavigationGoogleUriOutput(PackageNames.GOOGLE_MAPS, googleMapsUriFormatter),
+                    OpenStreetViewGoogleUriOutput(PackageNames.GOOGLE_MAPS, googleMapsUriFormatter),
+                    OpenRouteGpxOutput(PackageNames.GOOGLE_MAPS, gpxFormatter),
+                    OpenPointsGpxOutput(PackageNames.GOOGLE_MAPS, gpxFormatter),
                 ),
-                MAGIC_EARTH_PACKAGE_NAME to listOf(
-                    OpenDisplayMagicEarthUriOutput(MAGIC_EARTH_PACKAGE_NAME, magicEarthUriFormatter),
-                    OpenNavigationMagicEarthUriOutput(MAGIC_EARTH_PACKAGE_NAME, magicEarthUriFormatter),
+                PackageNames.MAGIC_EARTH to listOf(
+                    OpenDisplayMagicEarthUriOutput(PackageNames.MAGIC_EARTH, magicEarthUriFormatter),
+                    OpenNavigationMagicEarthUriOutput(PackageNames.MAGIC_EARTH, magicEarthUriFormatter),
                 ),
-                TOMTOM_PACKAGE_NAME to listOf(
-                    OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME, gpxFormatter),
+                PackageNames.TOMTOM to listOf(
+                    OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, gpxFormatter),
                 ),
-                "${TEST_PACKAGE_NAME}.empty" to emptyList(),
+                "${PackageNames.TEST}.empty" to emptyList(),
             ),
             outputRepository.getOutputsForApps(
                 mapOf(
-                    TEST_PACKAGE_NAME to setOf(DataType.GEO_URI),
-                    GOOGLE_MAPS_PACKAGE_NAME to setOf(
+                    PackageNames.TEST to setOf(DataType.GEO_URI),
+                    PackageNames.GOOGLE_MAPS to setOf(
                         DataType.GEO_URI,
                         DataType.GOOGLE_NAVIGATION_URI,
                         DataType.GOOGLE_STREET_VIEW_URI,
                         DataType.GPX_DATA,
                     ),
-                    MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
-                    TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
-                    "${TEST_PACKAGE_NAME}.empty" to emptySet(),
+                    PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
+                    PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
+                    "${PackageNames.TEST}.empty" to emptySet(),
                 ),
                 emptySet(),
             ),
@@ -173,23 +170,23 @@ class OutputRepositoryTest {
     fun getOutputsForApps_doesNotReturnOutputsForHiddenApps() {
         assertEquals(
             mapOf(
-                TEST_PACKAGE_NAME to listOf(
-                    OpenDisplayGeoUriOutput(TEST_PACKAGE_NAME, geoUriFormatter)
+                PackageNames.TEST to listOf(
+                    OpenDisplayGeoUriOutput(PackageNames.TEST, geoUriFormatter)
                 ),
-                TOMTOM_PACKAGE_NAME to listOf(
-                    OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME, gpxFormatter),
+                PackageNames.TOMTOM to listOf(
+                    OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, gpxFormatter),
                 ),
             ),
             outputRepository.getOutputsForApps(
                 mapOf(
-                    TEST_PACKAGE_NAME to setOf(DataType.GEO_URI),
-                    GOOGLE_MAPS_PACKAGE_NAME to setOf(DataType.GOOGLE_NAVIGATION_URI),
-                    MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
-                    TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
+                    PackageNames.TEST to setOf(DataType.GEO_URI),
+                    PackageNames.GOOGLE_MAPS to setOf(DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
+                    PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
                 ),
                 setOf(
-                    GOOGLE_MAPS_PACKAGE_NAME,
-                    MAGIC_EARTH_PACKAGE_NAME,
+                    PackageNames.GOOGLE_MAPS,
+                    PackageNames.MAGIC_EARTH,
                 ),
             ),
         )
@@ -334,10 +331,10 @@ class OutputRepositoryTest {
                     SavePointsGpxOutput(gpxFormatter),
                 ),
                 listOf(
-                    OpenDisplayMagicEarthUriOutput(MAGIC_EARTH_PACKAGE_NAME, magicEarthUriFormatter),
-                    OpenNavigationMagicEarthUriOutput(MAGIC_EARTH_PACKAGE_NAME, magicEarthUriFormatter),
-                    OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME, gpxFormatter),
-                    OpenDisplayGeoUriOutput(TEST_PACKAGE_NAME, geoUriFormatter),
+                    OpenDisplayMagicEarthUriOutput(PackageNames.MAGIC_EARTH, magicEarthUriFormatter),
+                    OpenNavigationMagicEarthUriOutput(PackageNames.MAGIC_EARTH, magicEarthUriFormatter),
+                    OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, gpxFormatter),
+                    OpenDisplayGeoUriOutput(PackageNames.TEST, geoUriFormatter),
                 ),
                 listOf(
                     ShareLinkUriOutput(FakeAppleMapsDisplayLink, uriFormatter),
@@ -380,10 +377,10 @@ class OutputRepositoryTest {
                     SavePointsGpxAutomation,
                 ),
                 listOf(
-                    OpenDisplayMagicEarthUriAutomation(MAGIC_EARTH_PACKAGE_NAME),
-                    OpenNavigationMagicEarthUriAutomation(MAGIC_EARTH_PACKAGE_NAME),
-                    OpenRouteOnePointGpxAutomation(TOMTOM_PACKAGE_NAME),
-                    OpenDisplayGeoUriAutomation(TEST_PACKAGE_NAME),
+                    OpenDisplayMagicEarthUriAutomation(PackageNames.MAGIC_EARTH),
+                    OpenNavigationMagicEarthUriAutomation(PackageNames.MAGIC_EARTH),
+                    OpenRouteOnePointGpxAutomation(PackageNames.TOMTOM),
+                    OpenDisplayGeoUriAutomation(PackageNames.TEST),
                 ),
                 listOf(
                     ShareLinkUriAutomation(FakeAppleMapsDisplayLink.uuid),
@@ -431,11 +428,11 @@ class OutputRepositoryTest {
                 CopyLinkUriOutput(FakeMagicEarthNavigationLink, uriFormatter),
                 CopyLinkUriOutput(FakeMagicEarthDisplayLink, uriFormatter),
                 NoopOutput(),
-                OpenDisplayGeoUriOutput(TEST_PACKAGE_NAME, geoUriFormatter),
-                OpenNavigationGoogleUriOutput(TEST_PACKAGE_NAME, googleMapsUriFormatter),
-                OpenStreetViewGoogleUriOutput(TEST_PACKAGE_NAME, googleMapsUriFormatter),
-                OpenRouteOnePointGpxOutput(TEST_PACKAGE_NAME, gpxFormatter),
-                OpenNavigationMagicEarthUriOutput(TEST_PACKAGE_NAME, magicEarthUriFormatter),
+                OpenDisplayGeoUriOutput(PackageNames.TEST, geoUriFormatter),
+                OpenNavigationGoogleUriOutput(PackageNames.TEST, googleMapsUriFormatter),
+                OpenStreetViewGoogleUriOutput(PackageNames.TEST, googleMapsUriFormatter),
+                OpenRouteOnePointGpxOutput(PackageNames.TEST, gpxFormatter),
+                OpenNavigationMagicEarthUriOutput(PackageNames.TEST, magicEarthUriFormatter),
                 SavePointsGpxOutput(gpxFormatter),
                 ShareDisplayGeoUriOutput(geoUriFormatter),
                 ShareRouteGpxOutput(gpxFormatter),
@@ -452,11 +449,11 @@ class OutputRepositoryTest {
                 CopyLinkUriAutomation(UUID.fromString("ee4f961c-44b0-4cb6-baad-1ed28edb8ec7")),
                 CopyLinkUriAutomation(UUID.fromString("b109970a-aef8-4482-9879-52e128fd0e07")),
                 NoopAutomation,
-                OpenDisplayGeoUriAutomation(TEST_PACKAGE_NAME),
-                OpenNavigationGoogleUriAutomation(TEST_PACKAGE_NAME),
-                OpenStreetViewGoogleUriAutomation(TEST_PACKAGE_NAME),
-                OpenRouteOnePointGpxAutomation(TEST_PACKAGE_NAME),
-                OpenNavigationMagicEarthUriAutomation(TEST_PACKAGE_NAME),
+                OpenDisplayGeoUriAutomation(PackageNames.TEST),
+                OpenNavigationGoogleUriAutomation(PackageNames.TEST),
+                OpenStreetViewGoogleUriAutomation(PackageNames.TEST),
+                OpenRouteOnePointGpxAutomation(PackageNames.TEST),
+                OpenNavigationMagicEarthUriAutomation(PackageNames.TEST),
                 SavePointsGpxAutomation,
                 ShareDisplayGeoUriAutomation,
                 ShareRouteGpxAutomation,

@@ -167,7 +167,7 @@ object AndroidTools {
                 },
             )) {
                 getOrPut(packageName) { mutableSetOf() }.add(
-                    if (packageName.startsWith(TOMTOM_PACKAGE_NAME_PREFIX)) {
+                    if (packageName.startsWith(PackageNames.TOMTOM_PREFIX)) {
                         DataType.GPX_ONE_POINT_DATA
                     } else {
                         DataType.GPX_DATA

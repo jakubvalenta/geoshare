@@ -87,16 +87,8 @@ import page.ooooo.geoshare.lib.Message
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.android.COMAPS_FDROID_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.DataType
-import page.ooooo.geoshare.lib.android.GMAPS_WV_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.HERE_WEGO_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.MAGIC_EARTH_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.MAPY_COM_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.ORGANIC_MAPS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingImpl
 import page.ooooo.geoshare.lib.billing.BillingProduct
@@ -132,7 +124,11 @@ import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
 import page.ooooo.geoshare.lib.formatters.MagicEarthUriFormatter
 import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.network.NetworkTools
@@ -145,10 +141,6 @@ import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
-import page.ooooo.geoshare.lib.geo.CoordinateConverter
-import page.ooooo.geoshare.lib.geo.Point
-import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.ui.components.BasicSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.ConversionWebView
@@ -1227,15 +1219,15 @@ private fun SucceededPreview() {
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
                 mapOf(
-                    COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    GMAPS_WV_PACKAGE_NAME to setOf(DataType.GEO_URI),
-                    GOOGLE_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    HERE_WEGO_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
-                    MAPY_COM_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GPX_DATA),
-                    TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
+                    PackageNames.COMAPS_FDROID to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.GMAPS_WV to setOf(DataType.GEO_URI),
+                    PackageNames.GOOGLE_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.HERE_WEGO to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
+                    PackageNames.MAPY_COM to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.ORGANIC_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.OSMAND_PLUS to setOf(DataType.GPX_DATA),
+                    PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
                 ),
                 emptySet(),
             ),
@@ -1316,15 +1308,15 @@ private fun DarkSucceededPreview() {
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
                 mapOf(
-                    COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    GMAPS_WV_PACKAGE_NAME to setOf(DataType.GEO_URI),
-                    GOOGLE_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    HERE_WEGO_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
-                    MAPY_COM_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GPX_DATA),
-                    TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
+                    PackageNames.COMAPS_FDROID to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.GMAPS_WV to setOf(DataType.GEO_URI),
+                    PackageNames.GOOGLE_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.HERE_WEGO to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
+                    PackageNames.MAPY_COM to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.ORGANIC_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.OSMAND_PLUS to setOf(DataType.GPX_DATA),
+                    PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
                 ),
                 emptySet(),
             ),
@@ -1405,15 +1397,15 @@ private fun SmallSucceededPreview() {
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
                 mapOf(
-                    COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    GMAPS_WV_PACKAGE_NAME to setOf(DataType.GEO_URI),
-                    GOOGLE_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    HERE_WEGO_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
-                    MAPY_COM_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GPX_DATA),
-                    TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
+                    PackageNames.COMAPS_FDROID to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.GMAPS_WV to setOf(DataType.GEO_URI),
+                    PackageNames.GOOGLE_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.HERE_WEGO to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
+                    PackageNames.MAPY_COM to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.ORGANIC_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.OSMAND_PLUS to setOf(DataType.GPX_DATA),
+                    PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
                 ),
                 emptySet(),
             ),
@@ -1494,15 +1486,15 @@ private fun TabletSucceededPreview() {
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
                 mapOf(
-                    COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    GMAPS_WV_PACKAGE_NAME to setOf(DataType.GEO_URI),
-                    GOOGLE_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    HERE_WEGO_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
-                    MAPY_COM_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GPX_DATA),
-                    TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
+                    PackageNames.COMAPS_FDROID to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.GMAPS_WV to setOf(DataType.GEO_URI),
+                    PackageNames.GOOGLE_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.HERE_WEGO to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
+                    PackageNames.MAPY_COM to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.ORGANIC_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.OSMAND_PLUS to setOf(DataType.GPX_DATA),
+                    PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
                 ),
                 emptySet(),
             ),
@@ -1583,7 +1575,7 @@ private fun DarkTabletSucceededPreview() {
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
                 mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                 ),
                 emptySet(),
             ),
@@ -1649,7 +1641,7 @@ private fun AutomationPreview() {
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(Point.example),
-                action = OpenDisplayGeoUriOutput(GOOGLE_MAPS_PACKAGE_NAME, geoUriFormatter)
+                action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, geoUriFormatter)
                     .toAction(WGS84Point(source = Source.GENERATED)),
                 isAutomation = true,
                 delay = 3.seconds,
@@ -1671,7 +1663,7 @@ private fun AutomationPreview() {
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
                 mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                 ),
                 emptySet(),
             ),
@@ -1737,7 +1729,7 @@ private fun DarkAutomationPreview() {
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(Point.example),
-                action = OpenDisplayGeoUriOutput(GOOGLE_MAPS_PACKAGE_NAME, geoUriFormatter)
+                action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, geoUriFormatter)
                     .toAction(WGS84Point(source = Source.GENERATED)),
                 isAutomation = true,
                 delay = 3.seconds,
@@ -1759,7 +1751,7 @@ private fun DarkAutomationPreview() {
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
                 mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                 ),
                 emptySet(),
             ),
@@ -1825,7 +1817,7 @@ private fun TabletAutomationPreview() {
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(Point.example),
-                action = OpenDisplayGeoUriOutput(GOOGLE_MAPS_PACKAGE_NAME, geoUriFormatter)
+                action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, geoUriFormatter)
                     .toAction(WGS84Point(source = Source.GENERATED)),
                 isAutomation = true,
                 delay = 3.seconds,
@@ -1847,7 +1839,7 @@ private fun TabletAutomationPreview() {
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
                 mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                 ),
                 emptySet(),
             ),

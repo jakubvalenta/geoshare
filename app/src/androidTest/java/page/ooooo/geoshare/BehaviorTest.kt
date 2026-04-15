@@ -27,21 +27,20 @@ import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Before
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
+import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
+import page.ooooo.geoshare.lib.geo.BD09MCPoint
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.GCJ02Point
+import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.network.NetworkTools.Companion.CONNECT_TIMEOUT
 import page.ooooo.geoshare.lib.network.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE
 import page.ooooo.geoshare.lib.network.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE_DELAY
 import page.ooooo.geoshare.lib.network.NetworkTools.Companion.MAX_RETRIES
 import page.ooooo.geoshare.lib.network.NetworkTools.Companion.REQUEST_TIMEOUT
-import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
-import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
-import page.ooooo.geoshare.lib.geo.BD09MCPoint
-import page.ooooo.geoshare.lib.geo.Geometries
-import page.ooooo.geoshare.lib.geo.CoordinateConverter
-import page.ooooo.geoshare.lib.geo.GCJ02Point
-import page.ooooo.geoshare.lib.geo.Point
-import page.ooooo.geoshare.lib.geo.Points
-import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 import java.net.InetAddress
 import java.net.SocketException
@@ -311,17 +310,17 @@ interface BehaviorTest {
 
     fun UiAutomatorTestScope.waitAndAssertGoogleMapsContainsElement(block: AccessibilityNodeInfo.() -> Boolean) {
         // Wait for Google Maps
-        onElement(20_000L) { packageName == GOOGLE_MAPS_PACKAGE_NAME }
+        onElement(20_000L) { packageName == PackageNames.GOOGLE_MAPS }
 
         // If there is a Google Maps sign in screen, skip it
         onElementOrNull(3_000L) {
-            packageName == GOOGLE_MAPS_PACKAGE_NAME && @Suppress("SpellCheckingInspection") when (textAsString()) {
+            packageName == PackageNames.GOOGLE_MAPS && @Suppress("SpellCheckingInspection") when (textAsString()) {
                 "Make it your map", "Profitez d'une carte personnalisée" -> true
                 else -> false
             }
         }?.let {
             onElement {
-                packageName == GOOGLE_MAPS_PACKAGE_NAME && when (textAsString()?.lowercase()) {
+                packageName == PackageNames.GOOGLE_MAPS && when (textAsString()?.lowercase()) {
                     "skip", "ignorer" -> true
                     else -> false
                 }
@@ -329,12 +328,12 @@ interface BehaviorTest {
         }
 
         // Verify Google Maps content
-        onElement(20_000L) { packageName == GOOGLE_MAPS_PACKAGE_NAME && this.block() }
+        onElement(20_000L) { packageName == PackageNames.GOOGLE_MAPS && this.block() }
     }
 
     fun UiAutomatorTestScope.waitAndAssertTomTomContainsElement(block: AccessibilityNodeInfo.() -> Boolean) {
         // Wait for TomTom
-        onElement(30_000L) { packageName == TOMTOM_PACKAGE_NAME }
+        onElement(30_000L) { packageName == PackageNames.TOMTOM }
 
         // If there is location permission, grant it
         grantLocationPermissionIfNecessary()
@@ -348,7 +347,7 @@ interface BehaviorTest {
         }?.click()
 
         // Verify TomTom content
-        onElement { packageName == TOMTOM_PACKAGE_NAME && this.block() }
+        onElement { packageName == PackageNames.TOMTOM && this.block() }
     }
 
     fun UiAutomatorTestScope.shareUri(unsafeUriString: String) {

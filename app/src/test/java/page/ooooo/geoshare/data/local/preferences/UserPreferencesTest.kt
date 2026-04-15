@@ -20,9 +20,7 @@ import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.DataType
-import page.ooooo.geoshare.lib.android.MAGIC_EARTH_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.TEST_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.PackageNames
 
 class UserPreferencesTest {
     @Test
@@ -48,10 +46,10 @@ class UserPreferencesTest {
                     SavePointsGpxAutomation,
                 ),
                 listOf(
-                    OpenDisplayMagicEarthUriAutomation(MAGIC_EARTH_PACKAGE_NAME),
-                    OpenNavigationMagicEarthUriAutomation(MAGIC_EARTH_PACKAGE_NAME),
-                    OpenRouteOnePointGpxAutomation(TOMTOM_PACKAGE_NAME),
-                    OpenDisplayGeoUriAutomation(TEST_PACKAGE_NAME),
+                    OpenDisplayMagicEarthUriAutomation(PackageNames.MAGIC_EARTH),
+                    OpenNavigationMagicEarthUriAutomation(PackageNames.MAGIC_EARTH),
+                    OpenRouteOnePointGpxAutomation(PackageNames.TOMTOM),
+                    OpenDisplayGeoUriAutomation(PackageNames.TEST),
                 ),
                 listOf(
                     ShareLinkUriAutomation(FakeAppleMapsDisplayLink.uuid),
@@ -77,14 +75,14 @@ class UserPreferencesTest {
             AutomationPreference
                 .getOptionGroups(
                     apps = mapOf(
-                        MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
-                        TEST_PACKAGE_NAME to setOf(DataType.GEO_URI),
-                        TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
+                        PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
+                        PackageNames.TEST to setOf(DataType.GEO_URI),
+                        PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
                     ),
                     appDetails = mapOf(
-                        MAGIC_EARTH_PACKAGE_NAME to AppDetail("Magic Earth", mock()),
-                        TEST_PACKAGE_NAME to AppDetail("ZZZ sort last", mock()),
-                        TOMTOM_PACKAGE_NAME to AppDetail("TomTom", mock()),
+                        PackageNames.MAGIC_EARTH to AppDetail("Magic Earth", mock()),
+                        PackageNames.TEST to AppDetail("ZZZ sort last", mock()),
+                        PackageNames.TOMTOM to AppDetail("TomTom", mock()),
                     ),
                     hiddenApps = emptySet(),
                     links = defaultFakeLinks,
@@ -115,23 +113,23 @@ class UserPreferencesTest {
                     SavePointsGpxAutomation,
                 ),
                 listOf(
-                    OpenRouteOnePointGpxAutomation(TOMTOM_PACKAGE_NAME),
-                    OpenDisplayGeoUriAutomation(TEST_PACKAGE_NAME),
+                    OpenRouteOnePointGpxAutomation(PackageNames.TOMTOM),
+                    OpenDisplayGeoUriAutomation(PackageNames.TEST),
                 ),
             ),
             AutomationPreference
                 .getOptionGroups(
                     apps = mapOf(
-                        MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
-                        TEST_PACKAGE_NAME to setOf(DataType.GEO_URI),
-                        TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
+                        PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
+                        PackageNames.TEST to setOf(DataType.GEO_URI),
+                        PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
                     ),
                     appDetails = mapOf(
-                        MAGIC_EARTH_PACKAGE_NAME to AppDetail("Magic Earth", mock()),
-                        TEST_PACKAGE_NAME to AppDetail("ZZZ sort last", mock()),
-                        TOMTOM_PACKAGE_NAME to AppDetail("TomTom", mock()),
+                        PackageNames.MAGIC_EARTH to AppDetail("Magic Earth", mock()),
+                        PackageNames.TEST to AppDetail("ZZZ sort last", mock()),
+                        PackageNames.TOMTOM to AppDetail("TomTom", mock()),
                     ),
-                    hiddenApps = setOf(MAGIC_EARTH_PACKAGE_NAME),
+                    hiddenApps = setOf(PackageNames.MAGIC_EARTH),
                     links = emptyList(),
                 ),
         )
@@ -144,7 +142,7 @@ class UserPreferencesTest {
             AutomationPreference.getValue(
                 preferencesOf(
                     stringPreferencesKey("automation") to "spam",
-                    stringPreferencesKey("automation_package_name") to TEST_PACKAGE_NAME,
+                    stringPreferencesKey("automation_package_name") to PackageNames.TEST,
                 ),
                 log = FakeLog,
             )
@@ -155,14 +153,14 @@ class UserPreferencesTest {
     fun automationPreference_getValue_forEachSerializedString_returnsAutomation() {
         AutomationPreference.getOptionGroups(
             apps = mapOf(
-                TEST_PACKAGE_NAME to setOf(DataType.GEO_URI),
-                MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
-                TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
+                PackageNames.TEST to setOf(DataType.GEO_URI),
+                PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
+                PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
             ),
             appDetails = mapOf(
-                MAGIC_EARTH_PACKAGE_NAME to AppDetail("Magic Earth", mock()),
-                TEST_PACKAGE_NAME to AppDetail("ZZZ sort last", mock()),
-                TOMTOM_PACKAGE_NAME to AppDetail("TomTom", mock()),
+                PackageNames.MAGIC_EARTH to AppDetail("Magic Earth", mock()),
+                PackageNames.TEST to AppDetail("ZZZ sort last", mock()),
+                PackageNames.TOMTOM to AppDetail("TomTom", mock()),
             ),
             hiddenApps = emptySet(),
             links = defaultFakeLinks,
@@ -179,10 +177,10 @@ class UserPreferencesTest {
     @Test
     fun automationPreference_getValue_serializedStringContainsUnknownProperties_returnsAutomation() {
         val preferences = mutablePreferencesOf(
-            stringPreferencesKey("automation") to """{"type":"OPEN_APP","packageName":"$TEST_PACKAGE_NAME","spam":"spam"}""",
+            stringPreferencesKey("automation") to """{"type":"OPEN_APP","packageName":"${PackageNames.TEST}","spam":"spam"}""",
         )
         assertEquals(
-            OpenDisplayGeoUriAutomation(TEST_PACKAGE_NAME),
+            OpenDisplayGeoUriAutomation(PackageNames.TEST),
             AutomationPreference.getValue(preferences, log = FakeLog),
         )
     }
@@ -194,7 +192,7 @@ class UserPreferencesTest {
             AutomationPreference.getValue(
                 preferencesOf(
                     stringPreferencesKey("automation") to "spam",
-                    stringPreferencesKey("automation_package_name") to TEST_PACKAGE_NAME,
+                    stringPreferencesKey("automation_package_name") to PackageNames.TEST,
                 ),
                 log = FakeLog,
             )
@@ -217,11 +215,11 @@ class UserPreferencesTest {
                 "COPY_MAGIC_EARTH_NAVIGATE_TO_URI" to CopyLinkNavigationMagicEarthUriAutomation,
                 "COPY_MAGIC_EARTH_URI" to CopyLinkDisplayMagicEarthUriAutomation,
                 "NOOP" to NoopAutomation,
-                "OPEN_APP" to OpenDisplayGeoUriAutomation(TEST_PACKAGE_NAME),
-                "OPEN_APP_GOOGLE_MAPS_NAVIGATE_TO" to OpenNavigationGoogleUriAutomation(TEST_PACKAGE_NAME),
-                "OPEN_APP_GOOGLE_MAPS_STREET_VIEW" to OpenStreetViewGoogleUriAutomation(TEST_PACKAGE_NAME),
-                "OPEN_APP_GPX_ROUTE" to OpenRouteOnePointGpxAutomation(TEST_PACKAGE_NAME),
-                "OPEN_APP_MAGIC_EARTH_NAVIGATE_TO" to OpenNavigationMagicEarthUriAutomation(TEST_PACKAGE_NAME),
+                "OPEN_APP" to OpenDisplayGeoUriAutomation(PackageNames.TEST),
+                "OPEN_APP_GOOGLE_MAPS_NAVIGATE_TO" to OpenNavigationGoogleUriAutomation(PackageNames.TEST),
+                "OPEN_APP_GOOGLE_MAPS_STREET_VIEW" to OpenStreetViewGoogleUriAutomation(PackageNames.TEST),
+                "OPEN_APP_GPX_ROUTE" to OpenRouteOnePointGpxAutomation(PackageNames.TEST),
+                "OPEN_APP_MAGIC_EARTH_NAVIGATE_TO" to OpenNavigationMagicEarthUriAutomation(PackageNames.TEST),
                 "SAVE_GPX" to SavePointsGpxAutomation,
                 "SHARE" to ShareDisplayGeoUriAutomation,
                 "SHARE_GPX_ROUTE" to ShareRouteGpxAutomation,
@@ -231,7 +229,7 @@ class UserPreferencesTest {
                     AutomationPreference.getValue(
                         preferencesOf(
                             stringPreferencesKey("automation") to testOldAutomationType,
-                            stringPreferencesKey("automation_package_name") to TEST_PACKAGE_NAME,
+                            stringPreferencesKey("automation_package_name") to PackageNames.TEST,
                         ),
                         log = FakeLog,
                     ),

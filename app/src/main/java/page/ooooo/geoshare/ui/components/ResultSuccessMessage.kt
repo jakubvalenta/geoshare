@@ -46,8 +46,7 @@ import page.ooooo.geoshare.data.di.FakeLinkRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingImpl
 import page.ooooo.geoshare.lib.billing.BillingProduct
@@ -68,13 +67,13 @@ import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
 import page.ooooo.geoshare.lib.formatters.MagicEarthUriFormatter
 import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.SharePointsGpxOutput
-import page.ooooo.geoshare.lib.geo.CoordinateConverter
-import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
@@ -301,12 +300,12 @@ private fun ActionFinishedPreview() {
                 currentState = ActionFinished(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME, geoUriFormatter)
+                    action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, geoUriFormatter)
                         .toAction(Point.example),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                    PackageNames.OSMAND_PLUS to AppDetail(
                         "OsmAnd",
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
@@ -339,12 +338,12 @@ private fun DarkActionFinishedPreview() {
                 currentState = ActionFinished(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME, geoUriFormatter)
+                    action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, geoUriFormatter)
                         .toAction(Point.example),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                    PackageNames.OSMAND_PLUS to AppDetail(
                         "OsmAnd",
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
@@ -378,12 +377,12 @@ private fun ActionFinishedFeatureNotAvailablePreview() {
                     currentState = ActionFinished(
                         inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         points = persistentListOf(Point.example),
-                        action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME, geoUriFormatter)
+                        action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, geoUriFormatter)
                             .toAction(Point.example),
                         isAutomation = true,
                     ),
                     appDetails = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -415,12 +414,12 @@ private fun DarkActionFinishedFeatureNotAvailablePreview() {
                     currentState = ActionFinished(
                         inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         points = persistentListOf(Point.example),
-                        action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME, geoUriFormatter)
+                        action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, geoUriFormatter)
                             .toAction(Point.example),
                         isAutomation = true,
                     ),
                     appDetails = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -472,13 +471,13 @@ private fun ActionWaitingPreview() {
                     ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME, geoUriFormatter)
+                    action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, geoUriFormatter)
                         .toAction(Point.example),
                     isAutomation = true,
                     delay = 3.seconds,
                 ),
                 appDetails = mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                    PackageNames.OSMAND_PLUS to AppDetail(
                         "OsmAnd",
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
@@ -532,13 +531,13 @@ private fun DarkActionWaitingPreview() {
                     ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME, geoUriFormatter)
+                    action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, geoUriFormatter)
                         .toAction(Point.example),
                     isAutomation = true,
                     delay = 3.seconds,
                 ),
                 appDetails = mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                    PackageNames.OSMAND_PLUS to AppDetail(
                         "OsmAnd",
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
@@ -592,12 +591,12 @@ private fun LocationPermissionReceivedPreview() {
                     ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME, gpxFormatter)
+                    action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, gpxFormatter)
                         .toAction(Point.example),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                    PackageNames.OSMAND_PLUS to AppDetail(
                         "OsmAnd",
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
@@ -651,12 +650,12 @@ private fun DarkLocationPermissionReceivedPreview() {
                     ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME, gpxFormatter)
+                    action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, gpxFormatter)
                         .toAction(Point.example),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                    PackageNames.OSMAND_PLUS to AppDetail(
                         "OsmAnd",
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
@@ -689,12 +688,12 @@ private fun SucceededPreview() {
                 currentState = ActionSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME, geoUriFormatter)
+                    action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, geoUriFormatter)
                         .toAction(Point.example),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                    PackageNames.OSMAND_PLUS to AppDetail(
                         "OsmAnd",
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
@@ -727,12 +726,12 @@ private fun DarSucceededPreview() {
                 currentState = ActionSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME, geoUriFormatter)
+                    action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, geoUriFormatter)
                         .toAction(Point.example),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                    PackageNames.OSMAND_PLUS to AppDetail(
                         "OsmAnd",
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
@@ -769,7 +768,7 @@ private fun SucceededNoMessagePreview() {
                     isAutomation = false,
                 ),
                 appDetails = mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                    PackageNames.OSMAND_PLUS to AppDetail(
                         "OsmAnd",
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
@@ -806,7 +805,7 @@ private fun DarkSucceededNoMessagePreview() {
                     isAutomation = false,
                 ),
                 appDetails = mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                    PackageNames.OSMAND_PLUS to AppDetail(
                         "OsmAnd",
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
@@ -839,12 +838,12 @@ private fun FailedPreview() {
                 currentState = ActionFailed(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME, geoUriFormatter)
+                    action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, geoUriFormatter)
                         .toAction(Point.example),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                    PackageNames.OSMAND_PLUS to AppDetail(
                         "OsmAnd",
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
@@ -877,12 +876,12 @@ private fun DarkFailedPreview() {
                 currentState = ActionFailed(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME, geoUriFormatter)
+                    action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, geoUriFormatter)
                         .toAction(Point.example),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                    PackageNames.OSMAND_PLUS to AppDetail(
                         "OsmAnd",
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),

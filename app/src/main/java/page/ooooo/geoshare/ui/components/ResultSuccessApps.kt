@@ -37,30 +37,22 @@ import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.android.COMAPS_FDROID_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.DataType
-import page.ooooo.geoshare.lib.android.GMAPS_WV_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.HERE_WEGO_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.MAGIC_EARTH_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.MAPY_COM_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.ORGANIC_MAPS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
 import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
 import page.ooooo.geoshare.lib.formatters.MagicEarthUriFormatter
 import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
-import page.ooooo.geoshare.lib.geo.CoordinateConverter
-import page.ooooo.geoshare.lib.geo.Point
-import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -231,54 +223,54 @@ private fun DefaultPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessApps(
                     appDetails = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to AppDetail(
+                        PackageNames.COMAPS_FDROID to AppDetail(
                             "CoMaps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        ORGANIC_MAPS_PACKAGE_NAME to AppDetail(
+                        PackageNames.ORGANIC_MAPS to AppDetail(
                             "Organic Maps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        HERE_WEGO_PACKAGE_NAME to AppDetail(
+                        PackageNames.HERE_WEGO to AppDetail(
                             "HERE WeGo",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        MAPY_COM_PACKAGE_NAME to AppDetail(
+                        PackageNames.MAPY_COM to AppDetail(
                             "Mapy.com",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        MAGIC_EARTH_PACKAGE_NAME to AppDetail(
+                        PackageNames.MAGIC_EARTH to AppDetail(
                             "Magic Earth",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        GOOGLE_MAPS_PACKAGE_NAME to AppDetail(
+                        PackageNames.GOOGLE_MAPS to AppDetail(
                             "Google Maps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        GMAPS_WV_PACKAGE_NAME to AppDetail(
+                        PackageNames.GMAPS_WV to AppDetail(
                             "GMaps WV",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        TOMTOM_PACKAGE_NAME to AppDetail(
+                        PackageNames.TOMTOM to AppDetail(
                             "TomTom",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
                     outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
-                            COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                            GMAPS_WV_PACKAGE_NAME to setOf(DataType.GEO_URI),
-                            GOOGLE_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                            HERE_WEGO_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                            MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
-                            MAPY_COM_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                            ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                            OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GPX_DATA),
-                            TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
+                            PackageNames.COMAPS_FDROID to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            PackageNames.GMAPS_WV to setOf(DataType.GEO_URI),
+                            PackageNames.GOOGLE_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            PackageNames.HERE_WEGO to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
+                            PackageNames.MAPY_COM to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            PackageNames.ORGANIC_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            PackageNames.OSMAND_PLUS to setOf(DataType.GPX_DATA),
+                            PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
                         ),
                         emptySet(),
                     ),
@@ -320,54 +312,54 @@ private fun DarkPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessApps(
                     appDetails = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to AppDetail(
+                        PackageNames.COMAPS_FDROID to AppDetail(
                             "CoMaps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        ORGANIC_MAPS_PACKAGE_NAME to AppDetail(
+                        PackageNames.ORGANIC_MAPS to AppDetail(
                             "Organic Maps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        HERE_WEGO_PACKAGE_NAME to AppDetail(
+                        PackageNames.HERE_WEGO to AppDetail(
                             "HERE WeGo",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        MAPY_COM_PACKAGE_NAME to AppDetail(
+                        PackageNames.MAPY_COM to AppDetail(
                             "Mapy.com",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        MAGIC_EARTH_PACKAGE_NAME to AppDetail(
+                        PackageNames.MAGIC_EARTH to AppDetail(
                             "Magic Earth",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        GOOGLE_MAPS_PACKAGE_NAME to AppDetail(
+                        PackageNames.GOOGLE_MAPS to AppDetail(
                             "Google Maps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        GMAPS_WV_PACKAGE_NAME to AppDetail(
+                        PackageNames.GMAPS_WV to AppDetail(
                             "GMaps WV",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        TOMTOM_PACKAGE_NAME to AppDetail(
+                        PackageNames.TOMTOM to AppDetail(
                             "TomTom",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
                     outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
-                            COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                            GMAPS_WV_PACKAGE_NAME to setOf(DataType.GEO_URI),
-                            GOOGLE_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                            HERE_WEGO_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                            MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
-                            MAPY_COM_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                            ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                            OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GPX_DATA),
-                            TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
+                            PackageNames.COMAPS_FDROID to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            PackageNames.GMAPS_WV to setOf(DataType.GEO_URI),
+                            PackageNames.GOOGLE_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            PackageNames.HERE_WEGO to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
+                            PackageNames.MAPY_COM to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            PackageNames.ORGANIC_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            PackageNames.OSMAND_PLUS to setOf(DataType.GPX_DATA),
+                            PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
                         ),
                         emptySet(),
                     ),
@@ -410,8 +402,8 @@ private fun LoadingPreview() {
                     appDetails = emptyMap(),
                     outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
-                            COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                            ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            PackageNames.COMAPS_FDROID to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            PackageNames.ORGANIC_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                         ),
                         emptySet(),
                     ),
@@ -454,8 +446,8 @@ private fun DarkLoadingPreview() {
                     appDetails = emptyMap(),
                     outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
-                            COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                            ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            PackageNames.COMAPS_FDROID to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            PackageNames.ORGANIC_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                         ),
                         emptySet(),
                     ),

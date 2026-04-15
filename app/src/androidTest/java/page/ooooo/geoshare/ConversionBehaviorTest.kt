@@ -13,8 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
-import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
@@ -25,7 +24,7 @@ class ConversionBehaviorTest : BehaviorTest {
 
     @Test
     fun whenFullUriIsShared_showsPointAndAllowsOpeningGoogleMaps() = uiAutomator {
-        assumeAppInstalled(GOOGLE_MAPS_PACKAGE_NAME)
+        assumeAppInstalled(PackageNames.GOOGLE_MAPS)
 
         // Share a Google Maps coordinates link with the app
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
@@ -34,7 +33,7 @@ class ConversionBehaviorTest : BehaviorTest {
         assertConversionSucceeded(GCJ02Point(52.5067296, 13.2599309, z = 11.0, source = Source.MAP_CENTER))
 
         // Tap the Google Maps icon
-        onElement { viewIdResourceName == "geoShareApp_${GOOGLE_MAPS_PACKAGE_NAME}" }.click()
+        onElement { viewIdResourceName == "geoShareApp_${PackageNames.GOOGLE_MAPS}" }.click()
 
         // Google Maps shows precise location
         waitAndAssertGoogleMapsContainsElement { textAsString() in setOf("Westend", "Berlin-Westend") }
@@ -44,7 +43,7 @@ class ConversionBehaviorTest : BehaviorTest {
     fun whenLinkWithCoordinatesWithinMainlandChinaIsShared_showsPointAndAllowsOpeningGoogleMapsInGCJ02() =
         uiAutomator {
             runBlocking {
-                assumeAppInstalled(GOOGLE_MAPS_PACKAGE_NAME)
+                assumeAppInstalled(PackageNames.GOOGLE_MAPS)
                 assumeDomainResolvable("maps.google.com")
 
                 // Share a Google Maps coordinates link with the app
@@ -59,7 +58,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 assertConversionSucceeded(expectedPoint)
 
                 // Tap the Google Maps icon
-                onElement { viewIdResourceName == "geoShareApp_${GOOGLE_MAPS_PACKAGE_NAME}" }.click()
+                onElement { viewIdResourceName == "geoShareApp_${PackageNames.GOOGLE_MAPS}" }.click()
 
                 // Google Maps shows precise location
                 waitAndAssertGoogleMapsContainsElement { textAsString() == "Ming&Qing Dynasties Furniture Hall" }
@@ -490,7 +489,7 @@ class ConversionBehaviorTest : BehaviorTest {
     @Test
     fun allowsOpeningTomTom() = uiAutomator {
         runBlocking {
-            assumeAppInstalled(TOMTOM_PACKAGE_NAME)
+            assumeAppInstalled(PackageNames.TOMTOM)
             assumeDomainResolvable("tomtom.com")
 
             // Share a geo: URI with the app
@@ -500,7 +499,7 @@ class ConversionBehaviorTest : BehaviorTest {
             onMainScrollablePane()
                 // Scroll by percents, because it's more reliable than scrolling to the app icon
                 .scroll(Direction.DOWN, 2f)
-            onElement { viewIdResourceName == "geoShareApp_${TOMTOM_PACKAGE_NAME}" }.click()
+            onElement { viewIdResourceName == "geoShareApp_${PackageNames.TOMTOM}" }.click()
 
             // Dismiss the location rationale dialog
             onDialog("geoShareLocationRationaleDialog", timeoutMs = 20_000L) {
@@ -508,7 +507,7 @@ class ConversionBehaviorTest : BehaviorTest {
             }
 
             // Tap the TomTom icon again
-            onElement { viewIdResourceName == "geoShareApp_${TOMTOM_PACKAGE_NAME}" }.click()
+            onElement { viewIdResourceName == "geoShareApp_${PackageNames.TOMTOM}" }.click()
 
             // Confirm location rationale
             onDialog("geoShareLocationRationaleDialog", timeoutMs = 20_000L) {
@@ -519,7 +518,7 @@ class ConversionBehaviorTest : BehaviorTest {
             denyLocationPermission()
 
             // Tap the TomTom icon again
-            onElement { viewIdResourceName == "geoShareApp_${TOMTOM_PACKAGE_NAME}" }.click()
+            onElement { viewIdResourceName == "geoShareApp_${PackageNames.TOMTOM}" }.click()
 
             // Confirm location rationale
             onDialog("geoShareLocationRationaleDialog", timeoutMs = 20_000L) {
