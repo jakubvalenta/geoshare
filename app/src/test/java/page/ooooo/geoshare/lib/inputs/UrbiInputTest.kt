@@ -118,7 +118,7 @@ class UrbiInputTest : InputTest {
     fun uriPattern_unknownScheme() {
         assertEquals(
             "2gis.uz/tashkent/firm/70000001060803297",
-            input.uriPattern.find("ftp://2gis.uz/tashkent/firm/70000001060803297")?.value,
+            getUri("ftp://2gis.uz/tashkent/firm/70000001060803297"),
         )
     }
 

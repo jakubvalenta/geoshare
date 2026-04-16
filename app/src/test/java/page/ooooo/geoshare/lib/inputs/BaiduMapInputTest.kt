@@ -50,7 +50,7 @@ class BaiduMapInputTest : InputTest {
     fun uriPattern_unknownScheme() {
         assertEquals(
             "map.baidu.com/@13520653,3317203,13z",
-            input.uriPattern.find("ftp://map.baidu.com/@13520653,3317203,13z")?.value,
+            getUri("ftp://map.baidu.com/@13520653,3317203,13z"),
         )
     }
 

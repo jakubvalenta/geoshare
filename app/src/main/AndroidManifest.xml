@@ -353,6 +353,18 @@
                     android:host="map.baidu.com"
                     android:scheme="https" />
             </intent-filter>
+            <!-- Cartes IGN -->
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="cartes-ign.ign.fr"
+                    android:path="/"
+                    android:scheme="https" />
+            </intent-filter>
             <!-- Geo URI -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

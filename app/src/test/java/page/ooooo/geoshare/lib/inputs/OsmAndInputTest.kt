@@ -29,7 +29,7 @@ class OsmAndInputTest : InputTest {
     fun uriPattern_unknownScheme() {
         assertEquals(
             "osmand.net/map?pin=52.51628,13.37771",
-            input.uriPattern.find("ftp://osmand.net/map?pin=52.51628,13.37771")?.value,
+            getUri("ftp://osmand.net/map?pin=52.51628,13.37771"),
         )
     }
 
