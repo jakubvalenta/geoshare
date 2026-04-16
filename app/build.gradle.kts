@@ -129,6 +129,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.ktor.client.cio)
     implementation(libs.ktor.client.mock)
+    implementation(libs.openlocationcode)
     ksp(libs.androidx.room.compiler)
     ksp(libs.hilt.compiler)
 
