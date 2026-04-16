@@ -1,12 +1,13 @@
 package page.ooooo.geoshare.lib.inputs
 
-import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toScale
+import page.ooooo.geoshare.lib.formatters.OpenLocationCodeFormatter
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.decodeOpenLocationCode
 
@@ -17,15 +18,19 @@ import page.ooooo.geoshare.lib.geo.decodeOpenLocationCode
  */
 object OpenLocationCodeInput : Input {
     private const val CHAR = @Suppress("SpellCheckingInspection") """[2-9CFGHJMPQRVWXcfghjmpqrvwx]"""
-    private const val CODE = """$CHAR{2,8}\+$CHAR{2,7}"""
+    private const val HASH = """$CHAR{2,8}\+$CHAR{2,7}"""
 
-    override val uriPattern = Regex("""($CODE)(?: $URI_REST)?""")
+    override val uriPattern = Regex("""($HASH)(?: $URI_REST)?""")
 
     override val documentation = InputDocumentation(
         id = InputDocumentationId.OPEN_LOCATION_CODE,
         nameResId = R.string.converter_open_location_code_name,
         items = listOf(
-            InputDocumentationItem.Text(39, @Composable { "" }), // TODO Example
+            InputDocumentationItem.Text(39) {
+                stringResource(
+                    R.string.example, OpenLocationCodeFormatter.formatOpenLocationCode(WGS84Point.example)
+                )
+            },
         ),
     )
 
@@ -34,9 +39,9 @@ object OpenLocationCodeInput : Input {
             // Plus Code (full or short, with or without locality)
             // e.g. `28WR+CW Comstock Park, Michigan`
             uriPattern.matchEntire(path)?.let { m ->
-                m.groupOrNull(1)?.let { code ->
+                m.groupOrNull(1)?.let { hash ->
                     val locality = m.groupOrNull(2)
-                    decodeOpenLocationCode(code, locality).let {
+                    decodeOpenLocationCode(hash, locality)?.let {
                         points = persistentListOf(
                             WGS84Point(it).copy(lat = it.lat?.toScale(6), lon = it.lon?.toScale(6))
                         )
