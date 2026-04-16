@@ -67,12 +67,4 @@ object GeoUriInput : Input, Input.HasRandomUri {
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "geo:{lat},{lon}?z={z}&q={lat},{lon}({name})")
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        return other is GeoUriInput
-    }
-
-    override fun hashCode() = javaClass.hashCode()
 }

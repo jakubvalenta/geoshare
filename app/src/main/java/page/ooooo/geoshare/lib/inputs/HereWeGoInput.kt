@@ -71,12 +71,4 @@ object HereWeGoInput : Input, Input.HasRandomUri {
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "https://wego.here.com/?map={lat}%2C{lon},{z}")
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        return other is HereWeGoInput
-    }
-
-    override fun hashCode() = javaClass.hashCode()
 }

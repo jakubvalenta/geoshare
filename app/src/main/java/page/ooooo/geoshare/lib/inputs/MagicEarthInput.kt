@@ -51,12 +51,4 @@ object MagicEarthInput : Input, Input.HasRandomUri {
             point,
             "https://magicearth.com/?show_on_map&lat={lat}&lon={lon}&name={name}&z={z}",
         )
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        return other is MagicEarthInput
-    }
-
-    override fun hashCode() = javaClass.hashCode()
 }

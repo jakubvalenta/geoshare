@@ -313,12 +313,4 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint={lat}%2C{lon}",
             ).random(),
         )
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        return other is GoogleMapsInput
-    }
-
-    override fun hashCode() = javaClass.hashCode()
 }

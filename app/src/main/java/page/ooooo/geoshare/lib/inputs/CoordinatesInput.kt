@@ -132,12 +132,4 @@ object CoordinatesInput : Input, Input.HasRandomUri {
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "N {lat}, E {lon}")
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        return other is CoordinatesInput
-    }
-
-    override fun hashCode() = javaClass.hashCode()
 }

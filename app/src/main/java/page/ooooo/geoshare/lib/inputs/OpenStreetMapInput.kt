@@ -128,12 +128,4 @@ object OpenStreetMapInput : HtmlInput, Input.HasRandomUri {
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "https://www.openstreetmap.org/#map={z}/{lat}/{lon}")
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        return other is OpenStreetMapInput
-    }
-
-    override fun hashCode() = javaClass.hashCode()
 }

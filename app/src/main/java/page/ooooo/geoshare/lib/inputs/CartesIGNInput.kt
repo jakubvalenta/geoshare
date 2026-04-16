@@ -37,13 +37,5 @@ object CartesIGNInput : Input, Input.HasRandomUri {
     }
 
     override fun genRandomUri(point: Point) =
-        UriFormatter.formatUriString(point, "https://cartes-ign.ign.fr?lng={lon}&lat={lat}")
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        return other is CartesIGNInput
-    }
-
-    override fun hashCode() = javaClass.hashCode()
+        UriFormatter.formatUriString(point, "https://cartes-ign.ign.fr?lng={lon}&lat={lat}&z={z}")
 }
