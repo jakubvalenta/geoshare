@@ -1,0 +1,109 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 4,
+    "identityHash": "a0b437bd69eb7d16c0e1496bbfdafba5",
+    "entities": [
+      {
+        "tableName": "Link",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`group` TEXT NOT NULL, `name` TEXT NOT NULL, `srs` TEXT NOT NULL, `type` TEXT NOT NULL, `appEnabled` INTEGER NOT NULL, `chipEnabled` INTEGER NOT NULL, `sheetEnabled` INTEGER NOT NULL, `coordsUriTemplate` TEXT NOT NULL, `nameUriTemplate` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `uid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `uuid` BLOB NOT NULL DEFAULT (RANDOMBLOB(16)))",
+        "fields": [
+          {
+            "fieldPath": "group",
+            "columnName": "group",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "srs",
+            "columnName": "srs",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "appEnabled",
+            "columnName": "appEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chipEnabled",
+            "columnName": "chipEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sheetEnabled",
+            "columnName": "sheetEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "coordsUriTemplate",
+            "columnName": "coordsUriTemplate",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nameUriTemplate",
+            "columnName": "nameUriTemplate",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uid",
+            "columnName": "uid",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uuid",
+            "columnName": "uuid",
+            "affinity": "BLOB",
+            "notNull": true,
+            "defaultValue": "(RANDOMBLOB(16))"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "uid"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_Link_uuid",
+            "unique": false,
+            "columnNames": [
+              "uuid"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Link_uuid` ON `${TABLE_NAME}` (`uuid`)"
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a0b437bd69eb7d16c0e1496bbfdafba5')"
+    ]
+  }
+}

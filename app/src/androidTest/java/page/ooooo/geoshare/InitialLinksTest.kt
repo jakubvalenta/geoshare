@@ -54,7 +54,7 @@ class InitialLinksTest {
                 name = "OpenStreetMap",
                 chipEnabled = true,
                 sheetEnabled = true,
-                coordsUriTemplate = "https://www.openstreetmap.org/#map={z}/{lat}/{lon}",
+                coordsUriTemplate = @Suppress("SpellCheckingInspection") "https://www.openstreetmap.org/?mlat={lat}&mlon={lon}#map={z}/{lat}/{lon}",
                 nameUriTemplate = "https://www.openstreetmap.org/search?query={q}",
                 uuid = UUID.fromString("a771fd79-291e-4e55-9952-601f87b05bfe"),
             ),
@@ -139,25 +139,22 @@ class InitialLinksTest {
                 coordsUriTemplate = "https://www.gasbuddy.com/gaspricemap?lat={lat}&lng={lon}&z={z}",
                 uuid = UUID.fromString("fd89f6f0-694e-4d96-b604-ed15e2530a2d"),
             ),
-            @Suppress("SpellCheckingInspection")
             Link(
-                name = "KartaView",
+                name = @Suppress("SpellCheckingInspection") "KartaView",
                 type = LinkType.STREET_VIEW,
                 appEnabled = false,
-                coordsUriTemplate = "https://kartaview.org/map/@{lat}%2C{lon},{z}z",
+                coordsUriTemplate = @Suppress("SpellCheckingInspection") "https://kartaview.org/map/@{lat}%2C{lon},{z}z",
                 uuid = UUID.fromString("7e09855d-d29b-4c18-944f-7fa440db3528"),
             ),
-            @Suppress("SpellCheckingInspection")
             Link(
-                name = "Mapilio",
+                name = @Suppress("SpellCheckingInspection") "Mapilio",
                 type = LinkType.STREET_VIEW,
                 appEnabled = false,
                 coordsUriTemplate = "https://mapilio.com/app?lat={lat}&lng={lon}&zoom={z}",
                 uuid = UUID.fromString("c206d165-b2db-4030-a415-203e92cacb66"),
             ),
-            @Suppress("SpellCheckingInspection")
             Link(
-                name = "Panoramax",
+                name = @Suppress("SpellCheckingInspection") "Panoramax",
                 type = LinkType.STREET_VIEW,
                 appEnabled = false,
                 coordsUriTemplate = "https://panoramax.openstreetmap.fr/#background=streets&focus=map&map={z}/{lat}/{lon}&speed=250",
@@ -180,6 +177,12 @@ class InitialLinksTest {
                 appEnabled = false,
                 coordsUriTemplate = "https://umap.openstreetmap.fr/en/map/test-mapy_626288#{z}/{lat}/{lon}",
                 uuid = UUID.fromString("94e1350a-3599-43b3-858b-59750a6f8680"),
+            ),
+            Link(
+                name = "Zoom Earth",
+                appEnabled = false,
+                coordsUriTemplate = "https://zoom.earth/maps/satellite/#view={lat},{lon},{z}",
+                uuid = UUID.fromString("a0b5b493-31a7-410d-9fe2-285974738ff1"),
             ),
         ).sortedBy { it.name }
         val actualLinks = linkDao.getAll()
