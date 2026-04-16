@@ -26,6 +26,14 @@ class UriFormatterTest {
                 uriQuote = FakeUriQuote,
             ),
         )
+        assertEquals(
+            "https://www.openstreetmap.org/?mlat=50.123456&mlon=-11.123456#map=3.4/50.123456/-11.123456",
+            UriFormatter.formatUriString(
+                WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4, source = Source.GENERATED),
+                coordsUriTemplate = @Suppress("SpellCheckingInspection") "https://www.openstreetmap.org/?mlat={lat}&mlon={lon}#map={z}/{lat}/{lon}",
+                uriQuote = FakeUriQuote,
+            ),
+        )
     }
 
     @Test
