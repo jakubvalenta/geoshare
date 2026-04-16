@@ -137,3 +137,14 @@ fun decodeWazeGeoHash(hash: String) = decodeGeoHash(
     digitBitCount = 5,
     roundingMode = GeoHashRoundingMode.MIDDLE,
 )
+
+// TODO Doc string
+fun decodeOpenLocationCode(code: String, locality: String? = null): NaivePoint =
+    OpenLocationCode(code).decode().let { area ->
+        NaivePoint(
+            lat = area.getCenterLatitude(),
+            lon = area.getCenterLongitude(),
+            name = locality,
+            source = Source.HASH,
+        )
+    }

@@ -15,6 +15,7 @@ const val Z = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
  *
  * "https://maps.google.com/maps?daddr=2088 Albion Rd"
  */
+// TODO Check URIs that end with a single space
 const val URI_REST = """.+?(?= {2}|\n|$)"""
 
 /**

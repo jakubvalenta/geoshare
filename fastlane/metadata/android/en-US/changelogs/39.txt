@@ -1,5 +1,6 @@
 - Added warning if resulting location might be inaccurate.
 - Added Cartes IGN input support.
+- Added Plus Codes support.
 - Added web map Zoom Earth and fixed OSM pin.
 - Added support for URLs with space characters.
 - Added support for OSM links with query params.

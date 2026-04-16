@@ -17,6 +17,7 @@ enum class InputDocumentationId {
     MAGIC_EARTH,
     MAPS_ME,
     MAPY_COM,
+    OPEN_LOCATION_CODE,
     OPEN_STREET_MAP,
     OSM_AND,
     URBI,

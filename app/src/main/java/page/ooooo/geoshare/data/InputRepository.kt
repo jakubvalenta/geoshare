@@ -13,6 +13,7 @@ import page.ooooo.geoshare.lib.inputs.HereWeGoInput
 import page.ooooo.geoshare.lib.inputs.MagicEarthInput
 import page.ooooo.geoshare.lib.inputs.MapsMeInput
 import page.ooooo.geoshare.lib.inputs.MapyComInput
+import page.ooooo.geoshare.lib.inputs.OpenLocationCodeInput
 import page.ooooo.geoshare.lib.inputs.OpenStreetMapInput
 import page.ooooo.geoshare.lib.inputs.OsmAndInput
 import page.ooooo.geoshare.lib.inputs.UrbiInput
@@ -46,6 +47,7 @@ class InputRepository @Inject constructor() {
         UrbiInput,
         WazeInput,
         YandexMapsInput,
+        OpenLocationCodeInput,
         CoordinatesInput,
     ).run {
         if (BuildConfig.DEBUG) {
