@@ -10,10 +10,11 @@ import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonNamePoint
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
-import page.ooooo.geoshare.lib.formats.GeoUriFormat
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
+import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
+import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 
 object GeoUriInput : Input, Input.HasRandomUri {
     private const val NAME_REGEX = """\((.+)\)"""
@@ -24,7 +25,7 @@ object GeoUriInput : Input, Input.HasRandomUri {
         nameResId = R.string.converter_geo_name,
         items = listOf(
             InputDocumentationItem.Text(3) {
-                stringResource(R.string.example, GeoUriFormat.formatGeoUriString(Point.example))
+                stringResource(R.string.example, GeoUriFormatter.formatGeoUriString(WGS84Point.example))
             },
         ),
     )
@@ -65,5 +66,13 @@ object GeoUriInput : Input, Input.HasRandomUri {
     }
 
     override fun genRandomUri(point: Point) =
-        point.formatUriString("geo:{lat},{lon}?z={z}&q={lat},{lon}({name})")
+        UriFormatter.formatUriString(point, "geo:{lat},{lon}?z={z}&q={lat},{lon}({name})")
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is GeoUriInput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
 }

@@ -7,11 +7,22 @@ import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Point
+import javax.inject.Inject
 
-data class ShareLinkUriOutput(val link: Link) : SharePointOutput {
+class ShareLinkUriOutput @Inject constructor(
+    val link: Link,
+    private val coordinateConverter: CoordinateConverter,
+) : SharePointOutput {
     override fun getText(value: Point, uriQuote: UriQuote) =
-        link.formatUriString(value, uriQuote)
+        UriFormatter.formatUriString(
+            coordinateConverter.toSrs(value, link.srs),
+            link.coordsUriTemplate,
+            link.nameUriTemplate,
+            uriQuote = uriQuote,
+        )
 
     override suspend fun execute(value: Point, actionContext: ActionContext) =
         getText(value, actionContext.uriQuote)?.let { uriString ->
@@ -27,4 +38,13 @@ data class ShareLinkUriOutput(val link: Link) : SharePointOutput {
 
     override fun getIcon(appDetails: AppDetails) =
         link.icon
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        other as ShareLinkUriOutput
+        return link == other.link
+    }
+
+    override fun hashCode() = link.hashCode()
 }

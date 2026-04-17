@@ -1,8 +1,6 @@
 package page.ooooo.geoshare.lib.geo
 
 import page.ooooo.geoshare.lib.extensions.toScale
-import page.ooooo.geoshare.lib.point.NaivePoint
-import page.ooooo.geoshare.lib.point.Source
 import kotlin.math.max
 import kotlin.math.pow
 

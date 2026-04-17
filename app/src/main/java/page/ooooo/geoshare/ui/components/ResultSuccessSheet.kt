@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -17,15 +18,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
-import page.ooooo.geoshare.lib.outputs.getOutputsForPoint
-import page.ooooo.geoshare.lib.outputs.getOutputsForPoints
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Points
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -118,12 +120,18 @@ private fun <T> ResultSuccessSheetItemGroup(
 private fun DefaultPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+            )
             ResultSuccessSheet(
-                points = persistentListOf(Point.example, Point.genRandomPoint()),
+                points = persistentListOf(WGS84Point.example, WGS84Point.genRandomPoint()),
                 selectedPointIndex = 1,
                 appDetails = emptyMap(),
-                outputsForPoint = getOutputsForPoint(defaultFakeLinks),
-                outputsForPoints = getOutputsForPoints(),
+                outputsForPoint = outputRepository.getOutputsForPoint(defaultFakeLinks),
+                outputsForPoints = outputRepository.getOutputsForPoints(),
                 onHide = {},
                 onExecute = {},
             )
@@ -140,12 +148,18 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+            )
             ResultSuccessSheet(
-                points = persistentListOf(Point.example, Point.genRandomPoint()),
+                points = persistentListOf(WGS84Point.example, WGS84Point.genRandomPoint()),
                 selectedPointIndex = 1,
                 appDetails = emptyMap(),
-                outputsForPoint = getOutputsForPoint(defaultFakeLinks),
-                outputsForPoints = getOutputsForPoints(),
+                outputsForPoint = outputRepository.getOutputsForPoint(defaultFakeLinks),
+                outputsForPoints = outputRepository.getOutputsForPoints(),
                 onHide = {},
                 onExecute = {},
             )
@@ -158,12 +172,18 @@ private fun DarkPreview() {
 private fun LastPointPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+            )
             ResultSuccessSheet(
-                points = persistentListOf(Point.example),
+                points = persistentListOf(WGS84Point.example),
                 selectedPointIndex = 0,
                 appDetails = emptyMap(),
-                outputsForPoint = getOutputsForPoint(defaultFakeLinks),
-                outputsForPoints = getOutputsForPoints(),
+                outputsForPoint = outputRepository.getOutputsForPoint(defaultFakeLinks),
+                outputsForPoints = outputRepository.getOutputsForPoints(),
                 onHide = {},
                 onExecute = {},
             )
@@ -180,12 +200,18 @@ private fun LastPointPreview() {
 private fun DarkLastPointPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+            )
             ResultSuccessSheet(
-                points = persistentListOf(Point.example),
+                points = persistentListOf(WGS84Point.example),
                 selectedPointIndex = 0,
                 appDetails = emptyMap(),
-                outputsForPoint = getOutputsForPoint(defaultFakeLinks),
-                outputsForPoints = getOutputsForPoints(),
+                outputsForPoint = outputRepository.getOutputsForPoint(defaultFakeLinks),
+                outputsForPoints = outputRepository.getOutputsForPoints(),
                 onHide = {},
                 onExecute = {},
             )

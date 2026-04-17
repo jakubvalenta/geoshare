@@ -7,9 +7,10 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonNamePoint
-import page.ooooo.geoshare.lib.point.GCJ02Point
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Source
+import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.GCJ02GreaterChinaAndTaiwanPoint
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Source
 
 object AmapInput : ShortUriInput, Input.HasRandomUri {
     override val uriPattern = Regex("""(?:https?://)?(?:surl|wb)\.amap\.com/$URI_REST""")
@@ -31,7 +32,7 @@ object AmapInput : ShortUriInput, Input.HasRandomUri {
             // https://wb.amap.com/?p=<id>,<lat>,<lon>,<name>
             Regex("""\w+,$LAT,$LON,?(?:$NAME_PARAM)?.*""").matchEntire(queryParams["p"])?.toLatLonNamePoint(Source.URI)
                 ?.let {
-                    points = persistentListOf(GCJ02Point(it))
+                    points = persistentListOf(GCJ02GreaterChinaAndTaiwanPoint(it))
                     return@run
                 }
 
@@ -39,7 +40,7 @@ object AmapInput : ShortUriInput, Input.HasRandomUri {
             // https://wb.amap.com/?q=<lat>,<lon>,<name>
             Regex("""$LAT,$LON,?(?:$NAME_PARAM)?.*""").matchEntire(queryParams["q"])?.toLatLonNamePoint(Source.URI)
                 ?.let {
-                    points = persistentListOf(GCJ02Point(it))
+                    points = persistentListOf(GCJ02GreaterChinaAndTaiwanPoint(it))
                     return@run
                 }
         }
@@ -52,5 +53,13 @@ object AmapInput : ShortUriInput, Input.HasRandomUri {
     override val loadingIndicatorTitleResId = R.string.converter_amap_loading_indicator_title
 
     override fun genRandomUri(point: Point) =
-        point.formatUriString("https://wb.amap.com/?q={lat}%2C{lon}")
+        UriFormatter.formatUriString(point, "https://wb.amap.com/?q={lat}%2C{lon}")
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is AmapInput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
 }

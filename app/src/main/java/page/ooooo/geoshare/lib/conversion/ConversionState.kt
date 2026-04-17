@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.conversion
 
 import androidx.annotation.StringRes
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +20,6 @@ import page.ooooo.geoshare.data.local.preferences.BillingCachedProductIdPreferen
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.Permission
-import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingStatus
@@ -29,6 +27,7 @@ import page.ooooo.geoshare.lib.inputs.HtmlInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.ShortUriInput
 import page.ooooo.geoshare.lib.inputs.WebInput
+import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.network.RecoverableNetworkException
 import page.ooooo.geoshare.lib.network.UnrecoverableNetworkException
 import page.ooooo.geoshare.lib.outputs.Action
@@ -38,7 +37,8 @@ import page.ooooo.geoshare.lib.outputs.LocationAction
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
-import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -67,7 +67,7 @@ interface ConversionState : State {
 
     interface HasResult {
         val inputUriString: String
-        val points: ImmutableList<Point>
+        val points: Points
     }
 
     companion object {
@@ -301,7 +301,7 @@ data class RequestedParseHtmlPermission(
     val inputUriString: String,
     val input: HtmlInput,
     val uri: Uri,
-    val pointsFromUri: ImmutableList<Point>,
+    val pointsFromUri: Points,
     val htmlUriString: String,
 ) : ConversionState, ConversionState.HasPermission {
     override val permissionTitleResId: Int = input.permissionTitleResId
@@ -326,7 +326,7 @@ data class GrantedParseHtmlPermission(
     val inputUriString: String,
     val input: HtmlInput,
     val uri: Uri,
-    val pointsFromUri: ImmutableList<Point>,
+    val pointsFromUri: Points,
     val htmlUriString: String,
     val retry: NetworkTools.Retry? = null,
     val dispatcher: CoroutineDispatcher = Dispatchers.Default,
@@ -426,7 +426,7 @@ data class GrantedParseHtmlPermission(
 data class DeniedParseHtmlPermission(
     val stateContext: ConversionStateContext,
     val inputUriString: String,
-    val points: ImmutableList<Point>,
+    val points: Points,
 ) : ConversionState {
     override suspend fun transition() = if (points.lastOrNull()?.let { it.hasCoordinates() || it.hasName() } == true) {
         ConversionSucceeded(stateContext, inputUriString, points)
@@ -443,7 +443,7 @@ data class RequestedParseWebPermission(
     val inputUriString: String,
     val input: WebInput,
     val uri: Uri,
-    val pointsFromUri: ImmutableList<Point>,
+    val pointsFromUri: Points,
     val webUriString: String,
 ) : ConversionState, ConversionState.HasPermission {
     override val permissionTitleResId: Int = input.permissionTitleResId
@@ -478,7 +478,7 @@ data class GrantedParseWebPermission(
     val inputUriString: String,
     val input: WebInput,
     val uri: Uri,
-    val pointsFromUri: ImmutableList<Point>,
+    val pointsFromUri: Points,
     val webUriString: String,
     val timeout: Duration = 60.seconds,
 ) : ConversionState, ConversionState.HasLargeLoadingIndicator {
@@ -534,7 +534,7 @@ data class GrantedParseWebPermission(
 data class ConversionSucceeded(
     val stateContext: ConversionStateContext,
     override val inputUriString: String,
-    override val points: ImmutableList<Point>,
+    override val points: Points,
     val billingStatusTimeout: Duration = 3.seconds,
 ) : ConversionState, ConversionState.HasResult {
     @OptIn(FlowPreview::class)
@@ -583,7 +583,10 @@ data class ConversionSucceeded(
         }
 
         if (billingStatus is BillingStatus.Purchased && stateContext.billing.features.contains(AutomationFeature)) {
-            val output = automation.toOutput { stateContext.linkRepository.getByUUID(it) } ?: return null
+            val output = stateContext.outputRepository.getAutomationOutput(
+                automation = automation,
+                getLinkByUUID = { stateContext.linkRepository.getByUUID(it) },
+            ) ?: return null
             val action = when (output) {
                 is PointOutput -> output.toAction(lastPoint)
                 is PointsOutput -> output.toAction(points)
@@ -606,7 +609,7 @@ data class ConversionFailed(
 data class ActionWaiting(
     val stateContext: ConversionStateContext,
     override val inputUriString: String,
-    override val points: ImmutableList<Point>,
+    override val points: Points,
     val action: Action<*>,
     @Suppress("SameParameterValue") val isAutomation: Boolean,
     val delay: Duration,
@@ -623,7 +626,7 @@ data class ActionWaiting(
 
 data class ActionReady(
     override val inputUriString: String,
-    override val points: ImmutableList<Point>,
+    override val points: Points,
     val action: Action<*>,
     val isAutomation: Boolean,
 ) : ConversionState, ConversionState.HasResult {
@@ -636,14 +639,14 @@ data class ActionReady(
 
 data class BasicActionReady(
     override val inputUriString: String,
-    override val points: ImmutableList<Point>,
+    override val points: Points,
     val action: BasicAction<*>,
     val isAutomation: Boolean,
 ) : ConversionState, ConversionState.HasResult
 
 data class FileActionReady(
     override val inputUriString: String,
-    override val points: ImmutableList<Point>,
+    override val points: Points,
     val action: FileAction<*>,
     val isAutomation: Boolean,
     val uri: android.net.Uri,
@@ -651,7 +654,7 @@ data class FileActionReady(
 
 data class LocationActionReady(
     override val inputUriString: String,
-    override val points: ImmutableList<Point>,
+    override val points: Points,
     val action: LocationAction<*>,
     val isAutomation: Boolean,
     val location: Point,
@@ -659,7 +662,7 @@ data class LocationActionReady(
 
 data class ActionRan(
     override val inputUriString: String,
-    override val points: ImmutableList<Point>,
+    override val points: Points,
     val action: Action<*>,
     val isAutomation: Boolean,
     val success: Boolean?,
@@ -673,7 +676,7 @@ data class ActionRan(
 
 data class ActionSucceeded(
     override val inputUriString: String,
-    override val points: ImmutableList<Point>,
+    override val points: Points,
     val action: Action<*>,
     val isAutomation: Boolean,
 ) : ConversionState, ConversionState.HasResult {
@@ -689,7 +692,7 @@ data class ActionSucceeded(
 
 data class ActionFailed(
     override val inputUriString: String,
-    override val points: ImmutableList<Point>,
+    override val points: Points,
     val action: Action<*>,
     val isAutomation: Boolean,
 ) : ConversionState, ConversionState.HasResult {
@@ -705,28 +708,28 @@ data class ActionFailed(
 
 data class ActionFinished(
     override val inputUriString: String,
-    override val points: ImmutableList<Point>,
+    override val points: Points,
     val action: Action<*>,
     val isAutomation: Boolean,
 ) : ConversionState, ConversionState.HasResult
 
 data class FileUriRequested(
     override val inputUriString: String,
-    override val points: ImmutableList<Point>,
+    override val points: Points,
     val action: FileAction<*>,
     val isAutomation: Boolean,
 ) : ConversionState, ConversionState.HasResult
 
 data class LocationRationaleRequested(
     override val inputUriString: String,
-    override val points: ImmutableList<Point>,
+    override val points: Points,
     val action: LocationAction<*>,
     val isAutomation: Boolean,
 ) : ConversionState, ConversionState.HasResult
 
 data class LocationRationaleShown(
     override val inputUriString: String,
-    override val points: ImmutableList<Point>,
+    override val points: Points,
     val action: LocationAction<*>,
     val isAutomation: Boolean,
 ) : ConversionState, ConversionState.HasPermission, ConversionState.HasResult {
@@ -742,7 +745,7 @@ data class LocationRationaleShown(
 
 data class LocationRationaleConfirmed(
     override val inputUriString: String,
-    override val points: ImmutableList<Point>,
+    override val points: Points,
     val action: LocationAction<*>,
     val isAutomation: Boolean,
 ) : ConversionState, ConversionState.HasResult
@@ -750,7 +753,7 @@ data class LocationRationaleConfirmed(
 data class LocationPermissionReceived(
     val stateContext: ConversionStateContext,
     override val inputUriString: String,
-    override val points: ImmutableList<Point>,
+    override val points: Points,
     val action: LocationAction<*>,
     val isAutomation: Boolean,
 ) : ConversionState, ConversionState.HasSmallLoadingIndicator, ConversionState.HasResult {
@@ -761,7 +764,7 @@ data class LocationPermissionReceived(
 
 data class LocationReceived(
     override val inputUriString: String,
-    override val points: ImmutableList<Point>,
+    override val points: Points,
     val action: LocationAction<*>,
     val isAutomation: Boolean,
     val location: Point?,
@@ -775,7 +778,7 @@ data class LocationReceived(
 
 data class LocationFindingFailed(
     override val inputUriString: String,
-    override val points: ImmutableList<Point>,
+    override val points: Points,
     val action: LocationAction<*>,
     val isAutomation: Boolean,
 ) : ConversionState, ConversionState.HasResult {

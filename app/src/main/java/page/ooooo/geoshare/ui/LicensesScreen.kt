@@ -45,7 +45,6 @@ fun LicensesScreen(
             )
         },
     ) { innerPadding ->
-
         LibrariesContainer(
             libraries,
             Modifier

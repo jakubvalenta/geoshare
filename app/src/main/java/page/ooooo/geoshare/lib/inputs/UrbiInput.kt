@@ -3,7 +3,6 @@ package page.ooooo.geoshare.lib.inputs
 import androidx.annotation.StringRes
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readLine
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
@@ -15,9 +14,11 @@ import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
+import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 
 object UrbiInput : HtmlInput, Input.HasRandomUri {
     override val uriPattern =
@@ -89,7 +90,7 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
     override suspend fun parseHtml(
         htmlUrlString: String,
         channel: ByteReadChannel,
-        pointsFromUri: ImmutableList<Point>,
+        pointsFromUri: Points,
         uriQuote: UriQuote,
         log: ILog,
     ) = buildParseHtmlResult {
@@ -117,5 +118,13 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
     override val loadingIndicatorTitleResId = R.string.converter_urbi_loading_indicator_title
 
     override fun genRandomUri(point: Point) =
-        point.formatUriString("https://maps.urbi.ae/dubai/geo/{lon}%2C{lat}?m={lon}%2C{lat}%2F{z}")
+        UriFormatter.formatUriString(point, "https://maps.urbi.ae/dubai/geo/{lon}%2C{lat}?m={lon}%2C{lat}%2F{z}")
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is UrbiInput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
 }

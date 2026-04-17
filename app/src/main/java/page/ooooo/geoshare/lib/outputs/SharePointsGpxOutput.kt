@@ -4,15 +4,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.formats.GpxFormat
-import page.ooooo.geoshare.lib.point.Points
+import page.ooooo.geoshare.lib.formatters.GpxFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Points
+import javax.inject.Inject
 
-object SharePointsGpxOutput : SharePointsOutput {
+class SharePointsGpxOutput @Inject constructor(
+    private val coordinateConverter: CoordinateConverter,
+) : SharePointsOutput {
     override fun writePoints(value: Points, writer: Appendable) {
-        GpxFormat.writeGpxPoints(value, writer)
+        GpxFormatter.writeGpxPoints(coordinateConverter.toWGS84(value), writer)
     }
 
     @Composable
     override fun label(appDetails: AppDetails) =
         stringResource(R.string.output_gpx_points_share)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is SharePointsGpxOutput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
 }

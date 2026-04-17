@@ -19,10 +19,9 @@ import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenRouteOnePointGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
-import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
+import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 import kotlin.time.Duration.Companion.seconds
 
@@ -53,7 +52,7 @@ class AutomationBehaviorTest : BehaviorTest {
 
     @Test
     fun automationOpensApp() = uiAutomator {
-        assumeAppInstalled(GOOGLE_MAPS_PACKAGE_NAME)
+        assumeAppInstalled(PackageNames.GOOGLE_MAPS)
 
         // Launch application and close intro
         launchApplication()
@@ -62,7 +61,7 @@ class AutomationBehaviorTest : BehaviorTest {
         // Configure automation
         goToUserPreferencesList()
         goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
-        val automation = OpenDisplayGeoUriAutomation(GOOGLE_MAPS_PACKAGE_NAME)
+        val automation = OpenDisplayGeoUriAutomation(PackageNames.GOOGLE_MAPS)
         val serializedString = Json.encodeToString<Automation>(automation)
         onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
             .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceAutomation_${serializedString}" }
@@ -75,10 +74,10 @@ class AutomationBehaviorTest : BehaviorTest {
         onElement { viewIdResourceName == "geoShareResultSuccessAutomationCounter" }
 
         // Google Maps doesn't open while the counter is running
-        assertNull(onElementOrNull(3_000L) { packageName == GOOGLE_MAPS_PACKAGE_NAME })
+        assertNull(onElementOrNull(3_000L) { packageName == PackageNames.GOOGLE_MAPS })
 
         // Google Maps opens
-        onElement(20_000L) { packageName == GOOGLE_MAPS_PACKAGE_NAME }
+        onElement(20_000L) { packageName == PackageNames.GOOGLE_MAPS }
 
         // Go back to app
         launchApplication()
@@ -90,7 +89,7 @@ class AutomationBehaviorTest : BehaviorTest {
     @Test
     fun automationOpensTomTom() = uiAutomator {
         runBlocking {
-            assumeAppInstalled(TOMTOM_PACKAGE_NAME)
+            assumeAppInstalled(PackageNames.TOMTOM)
             assumeDomainResolvable("tomtom.com")
 
             // Launch application and close intro
@@ -100,7 +99,7 @@ class AutomationBehaviorTest : BehaviorTest {
             // Configure automation
             goToUserPreferencesList()
             goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
-            val automation = OpenRouteOnePointGpxAutomation(TOMTOM_PACKAGE_NAME)
+            val automation = OpenRouteOnePointGpxAutomation(PackageNames.TOMTOM)
             val serializedString = Json.encodeToString<Automation>(automation)
             onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
                 .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceAutomation_${serializedString}" }

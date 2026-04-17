@@ -13,11 +13,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
-import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
-import page.ooooo.geoshare.lib.point.GCJ02Point
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
+import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.geo.GCJ02Point
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import kotlin.time.Duration.Companion.seconds
 
 @RunWith(AndroidJUnit4::class)
@@ -25,7 +24,7 @@ class ConversionBehaviorTest : BehaviorTest {
 
     @Test
     fun whenFullUriIsShared_showsPointAndAllowsOpeningGoogleMaps() = uiAutomator {
-        assumeAppInstalled(GOOGLE_MAPS_PACKAGE_NAME)
+        assumeAppInstalled(PackageNames.GOOGLE_MAPS)
 
         // Share a Google Maps coordinates link with the app
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
@@ -34,17 +33,17 @@ class ConversionBehaviorTest : BehaviorTest {
         assertConversionSucceeded(GCJ02Point(52.5067296, 13.2599309, z = 11.0, source = Source.MAP_CENTER))
 
         // Tap the Google Maps icon
-        onElement { viewIdResourceName == "geoShareApp_${GOOGLE_MAPS_PACKAGE_NAME}" }.click()
+        onElement { viewIdResourceName == "geoShareApp_${PackageNames.GOOGLE_MAPS}" }.click()
 
         // Google Maps shows precise location
         waitAndAssertGoogleMapsContainsElement { textAsString() in setOf("Westend", "Berlin-Westend") }
     }
 
     @Test
-    fun whenLinkWithCoordinatesInChinaIsShared_showsPointAndAllowsOpeningGoogleMapsInGCJ02() =
+    fun whenLinkWithCoordinatesWithinMainlandChinaIsShared_showsPointAndAllowsOpeningGoogleMapsInGCJ02() =
         uiAutomator {
             runBlocking {
-                assumeAppInstalled(GOOGLE_MAPS_PACKAGE_NAME)
+                assumeAppInstalled(PackageNames.GOOGLE_MAPS)
                 assumeDomainResolvable("maps.google.com")
 
                 // Share a Google Maps coordinates link with the app
@@ -59,7 +58,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 assertConversionSucceeded(expectedPoint)
 
                 // Tap the Google Maps icon
-                onElement { viewIdResourceName == "geoShareApp_${GOOGLE_MAPS_PACKAGE_NAME}" }.click()
+                onElement { viewIdResourceName == "geoShareApp_${PackageNames.GOOGLE_MAPS}" }.click()
 
                 // Google Maps shows precise location
                 waitAndAssertGoogleMapsContainsElement { textAsString() == "Ming&Qing Dynasties Furniture Hall" }
@@ -76,7 +75,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
 
                 // Grant unshorten permission
-                onDialog("geoShareUnshortenPermissionDialog") {
+                onDialog("geoShareUnshortenPermissionDialog", timeoutMs = 20_000L) {
                     confirm()
                 }
 
@@ -108,7 +107,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
 
                 // Grant unshorten permission and check "Don't ask me again"
-                onDialog("geoShareUnshortenPermissionDialog") {
+                onDialog("geoShareUnshortenPermissionDialog", timeoutMs = 20_000L) {
                     toggleDoNotAsk()
                     confirm()
                 }
@@ -147,7 +146,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
 
                 // Deny unshorten permission
-                onDialog("geoShareUnshortenPermissionDialog") {
+                onDialog("geoShareUnshortenPermissionDialog", timeoutMs = 20_000L) {
                     dismiss()
                 }
 
@@ -175,7 +174,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
 
                 // Deny unshorten permission
-                onDialog("geoShareUnshortenPermissionDialog") {
+                onDialog("geoShareUnshortenPermissionDialog", timeoutMs = 20_000L) {
                     toggleDoNotAsk()
                     dismiss()
                 }
@@ -204,7 +203,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://maps.app.goo.gl/spam")
 
                 // Grant unshorten permission
-                onDialog("geoShareUnshortenPermissionDialog") {
+                onDialog("geoShareUnshortenPermissionDialog", timeoutMs = 20_000L) {
                     confirm()
                 }
 
@@ -223,7 +222,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://maps.apple.com/place?place-id=I7BA098CC17989C16&_provider=9902")
 
                 // Grant parse HTML permission
-                onDialog("geoShareParseHtmlPermissionDialog") {
+                onDialog("geoShareParseHtmlPermissionDialog", timeoutMs = 20_000L) {
                     confirm()
                 }
 
@@ -249,7 +248,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://maps.apple.com/place?place-id=I1CBDEBCF5A275CB2&_provider=9902")
 
                 // Grant parse HTML permission and check "Don't ask me again"
-                onDialog("geoShareParseHtmlPermissionDialog") {
+                onDialog("geoShareParseHtmlPermissionDialog", timeoutMs = 20_000L) {
                     toggleDoNotAsk()
                     confirm()
                 }
@@ -276,7 +275,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://maps.apple.com/place?place-id=I8D204FAB527CE0EB&_provider=9902")
 
                 // Deny parse HTML permission
-                onDialog("geoShareParseHtmlPermissionDialog") {
+                onDialog("geoShareParseHtmlPermissionDialog", timeoutMs = 20_000L) {
                     dismiss()
                 }
 
@@ -304,7 +303,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://maps.apple.com/place?place-id=I5ECF0E5A2703FCD1&_provider=9902")
 
                 // Deny parse HTML permission
-                onDialog("geoShareParseHtmlPermissionDialog") {
+                onDialog("geoShareParseHtmlPermissionDialog", timeoutMs = 20_000L) {
                     toggleDoNotAsk()
                     dismiss()
                 }
@@ -333,7 +332,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://www.google.com/maps/place/Hermannstr.+10,+Berlin/")
 
                 // Grant parse HTML permission
-                onDialog("geoShareParseHtmlPermissionDialog") {
+                onDialog("geoShareParseHtmlPermissionDialog", timeoutMs = 20_000L) {
                     confirm()
                 }
 
@@ -365,7 +364,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://www.google.com/maps/place/Hermannstr.+20,+Berlin/")
 
                 // Grant parse HTML permission and check "Don't ask me again"
-                onDialog("geoShareParseHtmlPermissionDialog") {
+                onDialog("geoShareParseHtmlPermissionDialog", timeoutMs = 20_000L) {
                     toggleDoNotAsk()
                     confirm()
                 }
@@ -404,7 +403,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://www.google.com/maps/place/Hermannstr.+30,+Berlin/")
 
                 // Deny parse HTML permission
-                onDialog("geoShareParseHtmlPermissionDialog") {
+                onDialog("geoShareParseHtmlPermissionDialog", timeoutMs = 20_000L) {
                     dismiss()
                 }
 
@@ -434,7 +433,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://www.google.com/maps/place/Hermannstr.+40,+Berlin/")
 
                 // Deny parse HTML permission
-                onDialog("geoShareParseHtmlPermissionDialog") {
+                onDialog("geoShareParseHtmlPermissionDialog", timeoutMs = 20_000L) {
                     toggleDoNotAsk()
                     dismiss()
                 }
@@ -471,7 +470,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 shareUri("https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8")
 
                 // Grant unshorten permission
-                onDialog("geoShareUnshortenPermissionDialog") {
+                onDialog("geoShareUnshortenPermissionDialog", timeoutMs = 20_000L) {
                     confirm()
                 }
 
@@ -490,7 +489,7 @@ class ConversionBehaviorTest : BehaviorTest {
     @Test
     fun allowsOpeningTomTom() = uiAutomator {
         runBlocking {
-            assumeAppInstalled(TOMTOM_PACKAGE_NAME)
+            assumeAppInstalled(PackageNames.TOMTOM)
             assumeDomainResolvable("tomtom.com")
 
             // Share a geo: URI with the app
@@ -500,7 +499,7 @@ class ConversionBehaviorTest : BehaviorTest {
             onMainScrollablePane()
                 // Scroll by percents, because it's more reliable than scrolling to the app icon
                 .scroll(Direction.DOWN, 2f)
-            onElement { viewIdResourceName == "geoShareApp_${TOMTOM_PACKAGE_NAME}" }.click()
+            onElement { viewIdResourceName == "geoShareApp_${PackageNames.TOMTOM}" }.click()
 
             // Dismiss the location rationale dialog
             onDialog("geoShareLocationRationaleDialog", timeoutMs = 20_000L) {
@@ -508,7 +507,7 @@ class ConversionBehaviorTest : BehaviorTest {
             }
 
             // Tap the TomTom icon again
-            onElement { viewIdResourceName == "geoShareApp_${TOMTOM_PACKAGE_NAME}" }.click()
+            onElement { viewIdResourceName == "geoShareApp_${PackageNames.TOMTOM}" }.click()
 
             // Confirm location rationale
             onDialog("geoShareLocationRationaleDialog", timeoutMs = 20_000L) {
@@ -519,7 +518,7 @@ class ConversionBehaviorTest : BehaviorTest {
             denyLocationPermission()
 
             // Tap the TomTom icon again
-            onElement { viewIdResourceName == "geoShareApp_${TOMTOM_PACKAGE_NAME}" }.click()
+            onElement { viewIdResourceName == "geoShareApp_${PackageNames.TOMTOM}" }.click()
 
             // Confirm location rationale
             onDialog("geoShareLocationRationaleDialog", timeoutMs = 20_000L) {

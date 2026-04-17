@@ -11,13 +11,18 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
-import page.ooooo.geoshare.lib.android.TEST_PACKAGE_NAME
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
+import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.GeoTest
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import java.io.File
 import kotlin.io.path.createTempDirectory
 
-class OpenPointsGpxOutputTest {
+class OpenPointsGpxOutputTest : GeoTest {
+    private val geometries = mockGeometries()
+    private val coordinateConverter = CoordinateConverter(geometries)
+
     private fun mockActionContext(parentDir: File): ActionContext =
         ActionContext(
             context = mock {
@@ -28,7 +33,7 @@ class OpenPointsGpxOutputTest {
             androidTools = mock {
                 on { openApp(any(), any(), any()) } doThrow NotImplementedError()
                 on { openAppFile(any(), any(), any()) } doThrow NotImplementedError()
-                on { openAppFile(any(), eq(TEST_PACKAGE_NAME), any()) } doReturn true
+                on { openAppFile(any(), eq(PackageNames.TEST), any()) } doReturn true
                 on { openChooser(any(), any()) } doThrow NotImplementedError()
                 on { openChooserFile(any(), any()) } doThrow NotImplementedError()
             },
@@ -50,7 +55,7 @@ class OpenPointsGpxOutputTest {
             setOf(oldFile.path),
             childDir.listFiles()?.map { it.path }?.toSet(),
         )
-        val success = OpenPointsGpxOutput(TEST_PACKAGE_NAME).execute(
+        val success = OpenPointsGpxOutput(PackageNames.TEST, coordinateConverter).execute(
             value = points,
             actionContext = mockActionContext(parentDir),
         )

@@ -3,7 +3,6 @@ package page.ooooo.geoshare.lib.inputs
 import androidx.annotation.StringRes
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readLine
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
 import page.ooooo.geoshare.R
@@ -15,17 +14,18 @@ import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toScale
+import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.decodeWazeGeoHash
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
 
 /**
  * See https://developers.google.com/waze/deeplinks/
  */
 object WazeInput : HtmlInput, Input.HasRandomUri {
-    @Suppress("SpellCheckingInspection")
-    private const val HASH = """[0-9bcdefghjkmnpqrstuvwxyz]+"""
+    private const val HASH = @Suppress("SpellCheckingInspection") """[0-9bcdefghjkmnpqrstuvwxyz]+"""
 
     override val uriPattern = Regex("""(?:https?://)?(?:(?:www|ul)\.)?waze\.com/$URI_REST""")
 
@@ -114,7 +114,7 @@ object WazeInput : HtmlInput, Input.HasRandomUri {
     override suspend fun parseHtml(
         htmlUrlString: String,
         channel: ByteReadChannel,
-        pointsFromUri: ImmutableList<Point>,
+        pointsFromUri: Points,
         uriQuote: UriQuote,
         log: ILog,
     ) = buildParseHtmlResult {
@@ -138,5 +138,13 @@ object WazeInput : HtmlInput, Input.HasRandomUri {
     override val loadingIndicatorTitleResId = R.string.converter_waze_loading_indicator_title
 
     override fun genRandomUri(point: Point) =
-        point.formatUriString("https://waze.com/ul?ll={lat}%2C{lon}&z={z}")
+        UriFormatter.formatUriString(point, "https://waze.com/ul?ll={lat}%2C{lon}&z={z}")
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is WazeInput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
 }

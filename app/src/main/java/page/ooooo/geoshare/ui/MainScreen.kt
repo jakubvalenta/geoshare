@@ -77,8 +77,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.FakeLinkRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
@@ -87,16 +87,8 @@ import page.ooooo.geoshare.lib.Message
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.android.COMAPS_FDROID_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.DataType
-import page.ooooo.geoshare.lib.android.GMAPS_WV_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.HERE_WEGO_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.MAGIC_EARTH_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.MAPY_COM_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.ORGANIC_MAPS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingImpl
 import page.ooooo.geoshare.lib.billing.BillingProduct
@@ -126,7 +118,12 @@ import page.ooooo.geoshare.lib.conversion.RequestedParseWebPermission
 import page.ooooo.geoshare.lib.conversion.RequestedUnshortenPermission
 import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.lib.extensions.truncateMiddle
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
+import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.network.RecoverableNetworkException
 import page.ooooo.geoshare.lib.outputs.Action
@@ -137,14 +134,6 @@ import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
-import page.ooooo.geoshare.lib.outputs.getOutputsForApps
-import page.ooooo.geoshare.lib.outputs.getOutputsForLinks
-import page.ooooo.geoshare.lib.outputs.getOutputsForPointChips
-import page.ooooo.geoshare.lib.outputs.getOutputsForPointsChips
-import page.ooooo.geoshare.lib.outputs.getOutputsForSharing
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
 import page.ooooo.geoshare.ui.components.BasicSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.ConversionWebView
@@ -178,7 +167,8 @@ fun MainScreen(
     onNavigateToUserPreferencesScreen: () -> Unit,
     billingViewModel: BillingViewModel,
     conversionViewModel: ConversionViewModel,
-    inputsViewModel: InputsViewModel = hiltViewModel(),
+    inputViewModel: InputViewModel = hiltViewModel(),
+    outputViewModel: OutputViewModel = hiltViewModel(),
     linkViewModel: LinkViewModel = hiltViewModel(),
     userPreferencesViewModel: UserPreferencesViewModel = hiltViewModel(),
 ) {
@@ -189,19 +179,19 @@ fun MainScreen(
 
     val currentState by conversionViewModel.currentState.collectAsStateWithLifecycle()
 
-    val appDetails by conversionViewModel.appDetails.collectAsStateWithLifecycle()
+    val appDetails by outputViewModel.appDetails.collectAsStateWithLifecycle()
     val billingAppNameResId = billingViewModel.billingAppNameResId
     val billingFeatures = billingViewModel.billingFeatures
     val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
-    val changelogShown by inputsViewModel.changelogShown.collectAsStateWithLifecycle()
+    val changelogShown by inputViewModel.changelogShown.collectAsStateWithLifecycle()
     val linkMessage by linkViewModel.message.collectAsStateWithLifecycle()
-    val outputsForApps by conversionViewModel.outputsForApps.collectAsStateWithLifecycle()
-    val outputsForLinks by conversionViewModel.outputsForLinks.collectAsStateWithLifecycle()
-    val outputsForPoint by conversionViewModel.outputsForPoint.collectAsStateWithLifecycle()
-    val outputsForPointChips by conversionViewModel.outputsForPointChips.collectAsStateWithLifecycle()
-    val outputsForPoints by conversionViewModel.outputsForPoints.collectAsStateWithLifecycle()
-    val outputsForPointsChips by conversionViewModel.outputsForPointsChips.collectAsStateWithLifecycle()
-    val outputsForSharing by conversionViewModel.outputsForSharing.collectAsStateWithLifecycle()
+    val outputsForApps by outputViewModel.outputsForApps.collectAsStateWithLifecycle()
+    val outputsForLinks by outputViewModel.outputsForLinks.collectAsStateWithLifecycle()
+    val outputsForPoint by outputViewModel.outputsForPoint.collectAsStateWithLifecycle()
+    val outputsForPointChips by outputViewModel.outputsForPointChips.collectAsStateWithLifecycle()
+    val outputsForPoints by outputViewModel.outputsForPoints.collectAsStateWithLifecycle()
+    val outputsForPointsChips by outputViewModel.outputsForPointsChips.collectAsStateWithLifecycle()
+    val outputsForSharing by outputViewModel.outputsForSharing.collectAsStateWithLifecycle()
     val userPreferencesMessage by userPreferencesViewModel.message.collectAsStateWithLifecycle()
     val userPreferencesValues by userPreferencesViewModel.values.collectAsStateWithLifecycle()
 
@@ -320,11 +310,13 @@ fun MainScreen(
 
     MainScreen(
         currentState = currentState,
+        allInputs = inputViewModel.allInputs,
         appDetails = appDetails,
         billingAppNameResId = billingAppNameResId,
         billingFeatures = billingFeatures,
         billingStatus = billingStatus,
         changelogShown = changelogShown,
+        coordinateConverter = outputViewModel.coordinateConverter,
         coordinateFormat = userPreferencesValues.coordinateFormat,
         inputUriString = conversionViewModel.inputUriString,
         largeLoadingIndicatorVisible = largeLoadingIndicatorVisible,
@@ -396,11 +388,13 @@ fun MainScreen(
 @Composable
 private fun MainScreen(
     currentState: State,
+    allInputs: List<Input>,
     appDetails: AppDetails,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
     changelogShown: Boolean,
+    coordinateConverter: CoordinateConverter,
     coordinateFormat: CoordinateFormat,
     inputUriString: String,
     largeLoadingIndicatorVisible: Boolean,
@@ -511,6 +505,7 @@ private fun MainScreen(
                         outputsForPointsChips = outputsForPointsChips,
                         billingAppNameResId = billingAppNameResId,
                         billingStatus = billingStatus,
+                        coordinateConverter = coordinateConverter,
                         coordinateFormat = coordinateFormat,
                         errorMessageResId = errorMessageResId,
                         inputUriString = inputUriString,
@@ -535,6 +530,7 @@ private fun MainScreen(
                         ) {
                             CompositionLocalProvider(LocalContentColor provides contentColor) {
                                 MainSupportingPane(
+                                    allInputs = allInputs,
                                     appDetails = appDetails,
                                     billingFeatures = billingFeatures,
                                     billingStatus = billingStatus,
@@ -585,6 +581,7 @@ private fun MainScreen(
                         .testTag("geoShareMainSupportingPane"),
                 ) {
                     MainSupportingPane(
+                        allInputs = allInputs,
                         appDetails = appDetails,
                         billingFeatures = billingFeatures,
                         billingStatus = billingStatus,
@@ -757,6 +754,7 @@ private fun MainMainPane(
     outputsForPointsChips: List<PointsOutput>,
     billingAppNameResId: Int,
     billingStatus: BillingStatus,
+    coordinateConverter: CoordinateConverter,
     coordinateFormat: CoordinateFormat,
     errorMessageResId: Int?,
     inputUriString: String,
@@ -793,6 +791,7 @@ private fun MainMainPane(
             ResultSuccessCoordinates(
                 points = currentState.points,
                 appDetails = appDetails,
+                coordinateConverter = coordinateConverter,
                 coordinateFormat = coordinateFormat,
                 outputsForPointChips = outputsForPointChips,
                 outputsForPointsChips = outputsForPointsChips,
@@ -846,6 +845,7 @@ private fun MainBottomPane(currentState: State) {
 
 @Composable
 private fun MainSupportingPane(
+    allInputs: List<Input>,
     appDetails: AppDetails,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
@@ -893,6 +893,7 @@ private fun MainSupportingPane(
 
         is Initial -> {
             MainFormLinks(
+                allInputs = allInputs,
                 modifier = modifier,
                 onNavigateToInputsScreen = onNavigateToInputsScreen,
                 onNavigateToIntroScreen = onNavigateToIntroScreen,
@@ -1014,13 +1015,18 @@ private fun MainSkipButton(
 @Composable
 private fun DefaultPreview() {
     AppTheme {
+        val context = LocalContext.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         MainScreen(
             currentState = Initial(),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.NotPurchased(pending = false),
             changelogShown = false,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
@@ -1059,13 +1065,18 @@ private fun DefaultPreview() {
 @Composable
 private fun DarkPreview() {
     AppTheme {
+        val context = LocalContext.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         MainScreen(
             currentState = Initial(),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.NotPurchased(pending = false),
             changelogShown = false,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
@@ -1104,13 +1115,18 @@ private fun DarkPreview() {
 @Composable
 private fun TabletPreview() {
     AppTheme {
+        val context = LocalContext.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         MainScreen(
             currentState = Initial(),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = BillingStatus.NotPurchased(pending = false),
             changelogShown = false,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
@@ -1149,16 +1165,23 @@ private fun TabletPreview() {
 @Composable
 private fun SucceededPreview() {
     AppTheme {
+        val context = LocalContext.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+        )
         MainScreen(
             currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
-                    Point.genRandomPoint(),
-                    Point.example,
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.example,
                 ),
                 action = NoopAction,
                 isAutomation = false,
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1168,30 +1191,31 @@ private fun SucceededPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             linkMessage = null,
-            outputsForApps = getOutputsForApps(
+            outputsForApps = outputRepository.getOutputsForApps(
                 mapOf(
-                    COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    GMAPS_WV_PACKAGE_NAME to setOf(DataType.GEO_URI),
-                    GOOGLE_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    HERE_WEGO_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
-                    MAPY_COM_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GPX_DATA),
-                    TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
+                    PackageNames.COMAPS_FDROID to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.GMAPS_WV to setOf(DataType.GEO_URI),
+                    PackageNames.GOOGLE_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.HERE_WEGO to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
+                    PackageNames.MAPY_COM to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.ORGANIC_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.OSMAND_PLUS to setOf(DataType.GPX_DATA),
+                    PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
                 ),
                 emptySet(),
             ),
-            outputsForLinks = getOutputsForLinks(defaultFakeLinks),
+            outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
             outputsForPoint = emptyList(),
-            outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+            outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
             outputsForPoints = emptyList(),
-            outputsForPointsChips = getOutputsForPointsChips(),
-            outputsForSharing = getOutputsForSharing(),
+            outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
+            outputsForSharing = outputRepository.getOutputsForSharing(),
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -1219,16 +1243,23 @@ private fun SucceededPreview() {
 @Composable
 private fun DarkSucceededPreview() {
     AppTheme {
+        val context = LocalContext.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+        )
         MainScreen(
             currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
-                    Point.genRandomPoint(),
-                    Point.example,
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.example,
                 ),
                 action = NoopAction,
                 isAutomation = false,
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1238,30 +1269,31 @@ private fun DarkSucceededPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             linkMessage = null,
-            outputsForApps = getOutputsForApps(
+            outputsForApps = outputRepository.getOutputsForApps(
                 mapOf(
-                    COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    GMAPS_WV_PACKAGE_NAME to setOf(DataType.GEO_URI),
-                    GOOGLE_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    HERE_WEGO_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
-                    MAPY_COM_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GPX_DATA),
-                    TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
+                    PackageNames.COMAPS_FDROID to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.GMAPS_WV to setOf(DataType.GEO_URI),
+                    PackageNames.GOOGLE_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.HERE_WEGO to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
+                    PackageNames.MAPY_COM to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.ORGANIC_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.OSMAND_PLUS to setOf(DataType.GPX_DATA),
+                    PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
                 ),
                 emptySet(),
             ),
-            outputsForLinks = getOutputsForLinks(defaultFakeLinks),
+            outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
             outputsForPoint = emptyList(),
-            outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+            outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
             outputsForPoints = emptyList(),
-            outputsForPointsChips = getOutputsForPointsChips(),
-            outputsForSharing = getOutputsForSharing(),
+            outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
+            outputsForSharing = outputRepository.getOutputsForSharing(),
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -1289,16 +1321,23 @@ private fun DarkSucceededPreview() {
 @Composable
 private fun SmallSucceededPreview() {
     AppTheme {
+        val context = LocalContext.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+        )
         MainScreen(
             currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
-                    Point.genRandomPoint(),
-                    Point.example,
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.example,
                 ),
                 action = NoopAction,
                 isAutomation = false,
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1308,30 +1347,31 @@ private fun SmallSucceededPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             linkMessage = null,
-            outputsForApps = getOutputsForApps(
+            outputsForApps = outputRepository.getOutputsForApps(
                 mapOf(
-                    COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    GMAPS_WV_PACKAGE_NAME to setOf(DataType.GEO_URI),
-                    GOOGLE_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    HERE_WEGO_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
-                    MAPY_COM_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GPX_DATA),
-                    TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
+                    PackageNames.COMAPS_FDROID to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.GMAPS_WV to setOf(DataType.GEO_URI),
+                    PackageNames.GOOGLE_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.HERE_WEGO to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
+                    PackageNames.MAPY_COM to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.ORGANIC_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.OSMAND_PLUS to setOf(DataType.GPX_DATA),
+                    PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
                 ),
                 emptySet(),
             ),
-            outputsForLinks = getOutputsForLinks(defaultFakeLinks),
+            outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
             outputsForPoint = emptyList(),
-            outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+            outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
             outputsForPoints = emptyList(),
-            outputsForPointsChips = getOutputsForPointsChips(),
-            outputsForSharing = getOutputsForSharing(),
+            outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
+            outputsForSharing = outputRepository.getOutputsForSharing(),
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -1359,16 +1399,23 @@ private fun SmallSucceededPreview() {
 @Composable
 private fun TabletSucceededPreview() {
     AppTheme {
+        val context = LocalContext.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+        )
         MainScreen(
             currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
-                    Point.genRandomPoint(),
-                    Point.example,
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.example,
                 ),
                 action = NoopAction,
                 isAutomation = false,
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1378,30 +1425,31 @@ private fun TabletSucceededPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             linkMessage = null,
-            outputsForApps = getOutputsForApps(
+            outputsForApps = outputRepository.getOutputsForApps(
                 mapOf(
-                    COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    GMAPS_WV_PACKAGE_NAME to setOf(DataType.GEO_URI),
-                    GOOGLE_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    HERE_WEGO_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
-                    MAPY_COM_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GPX_DATA),
-                    TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
+                    PackageNames.COMAPS_FDROID to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.GMAPS_WV to setOf(DataType.GEO_URI),
+                    PackageNames.GOOGLE_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.HERE_WEGO to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
+                    PackageNames.MAPY_COM to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.ORGANIC_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.OSMAND_PLUS to setOf(DataType.GPX_DATA),
+                    PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
                 ),
                 emptySet(),
             ),
-            outputsForLinks = getOutputsForLinks(defaultFakeLinks),
+            outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
             outputsForPoint = emptyList(),
-            outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+            outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
             outputsForPoints = emptyList(),
-            outputsForPointsChips = getOutputsForPointsChips(),
-            outputsForSharing = getOutputsForSharing(),
+            outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
+            outputsForSharing = outputRepository.getOutputsForSharing(),
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -1429,16 +1477,23 @@ private fun TabletSucceededPreview() {
 @Composable
 private fun DarkTabletSucceededPreview() {
     AppTheme {
+        val context = LocalContext.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+        )
         MainScreen(
             currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
-                    Point.genRandomPoint(),
-                    Point.example,
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.example,
                 ),
                 action = NoopAction,
                 isAutomation = false,
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1448,22 +1503,23 @@ private fun DarkTabletSucceededPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             linkMessage = null,
-            outputsForApps = getOutputsForApps(
+            outputsForApps = outputRepository.getOutputsForApps(
                 mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                 ),
                 emptySet(),
             ),
-            outputsForLinks = getOutputsForLinks(defaultFakeLinks),
+            outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
             outputsForPoint = emptyList(),
-            outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+            outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
             outputsForPoints = emptyList(),
-            outputsForPointsChips = getOutputsForPointsChips(),
-            outputsForSharing = getOutputsForSharing(),
+            outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
+            outputsForSharing = outputRepository.getOutputsForSharing(),
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -1491,21 +1547,30 @@ private fun DarkTabletSucceededPreview() {
 @Composable
 private fun AutomationPreview() {
     AppTheme {
+        val context = LocalContext.current
         val resources = LocalResources.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+        )
         MainScreen(
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(
                     linkRepository = FakeLinkRepository(),
+                    outputRepository = outputRepository,
                     resources = resources,
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                points = persistentListOf(Point.example),
-                action = OpenDisplayGeoUriOutput(GOOGLE_MAPS_PACKAGE_NAME).toAction(WGS84Point(source = Source.GENERATED)),
+                points = persistentListOf(WGS84Point.example),
+                action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
+                    .toAction(WGS84Point(source = Source.GENERATED)),
                 isAutomation = true,
                 delay = 3.seconds,
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1515,22 +1580,23 @@ private fun AutomationPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             linkMessage = null,
-            outputsForApps = getOutputsForApps(
+            outputsForApps = outputRepository.getOutputsForApps(
                 mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                 ),
                 emptySet(),
             ),
-            outputsForLinks = getOutputsForLinks(defaultFakeLinks),
+            outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
             outputsForPoint = emptyList(),
-            outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+            outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
             outputsForPoints = emptyList(),
-            outputsForPointsChips = getOutputsForPointsChips(),
-            outputsForSharing = getOutputsForSharing(),
+            outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
+            outputsForSharing = outputRepository.getOutputsForSharing(),
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -1558,21 +1624,30 @@ private fun AutomationPreview() {
 @Composable
 private fun DarkAutomationPreview() {
     AppTheme {
+        val context = LocalContext.current
         val resources = LocalResources.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+        )
         MainScreen(
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(
                     linkRepository = FakeLinkRepository(),
+                    outputRepository = outputRepository,
                     resources = resources,
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                points = persistentListOf(Point.example),
-                action = OpenDisplayGeoUriOutput(GOOGLE_MAPS_PACKAGE_NAME).toAction(WGS84Point(source = Source.GENERATED)),
+                points = persistentListOf(WGS84Point.example),
+                action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
+                    .toAction(WGS84Point(source = Source.GENERATED)),
                 isAutomation = true,
                 delay = 3.seconds,
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1582,22 +1657,23 @@ private fun DarkAutomationPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             linkMessage = null,
-            outputsForApps = getOutputsForApps(
+            outputsForApps = outputRepository.getOutputsForApps(
                 mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                 ),
                 emptySet(),
             ),
-            outputsForLinks = getOutputsForLinks(defaultFakeLinks),
+            outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
             outputsForPoint = emptyList(),
-            outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+            outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
             outputsForPoints = emptyList(),
-            outputsForPointsChips = getOutputsForPointsChips(),
-            outputsForSharing = getOutputsForSharing(),
+            outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
+            outputsForSharing = outputRepository.getOutputsForSharing(),
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -1625,21 +1701,30 @@ private fun DarkAutomationPreview() {
 @Composable
 private fun TabletAutomationPreview() {
     AppTheme {
+        val context = LocalContext.current
         val resources = LocalResources.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+        )
         MainScreen(
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(
                     linkRepository = FakeLinkRepository(),
+                    outputRepository = outputRepository,
                     resources = resources,
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                points = persistentListOf(Point.example),
-                action = OpenDisplayGeoUriOutput(GOOGLE_MAPS_PACKAGE_NAME).toAction(WGS84Point(source = Source.GENERATED)),
+                points = persistentListOf(WGS84Point.example),
+                action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
+                    .toAction(WGS84Point(source = Source.GENERATED)),
                 isAutomation = true,
                 delay = 3.seconds,
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1649,22 +1734,23 @@ private fun TabletAutomationPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             linkMessage = null,
-            outputsForApps = getOutputsForApps(
+            outputsForApps = outputRepository.getOutputsForApps(
                 mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                 ),
                 emptySet(),
             ),
-            outputsForLinks = getOutputsForLinks(defaultFakeLinks),
+            outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
             outputsForPoint = emptyList(),
-            outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+            outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
             outputsForPoints = emptyList(),
-            outputsForPointsChips = getOutputsForPointsChips(),
-            outputsForSharing = getOutputsForSharing(),
+            outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
+            outputsForSharing = outputRepository.getOutputsForSharing(),
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -1692,11 +1778,18 @@ private fun TabletAutomationPreview() {
 @Composable
 private fun WebViewPreview() {
     AppTheme {
+        val context = LocalContext.current
         val resources = LocalResources.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+        )
         MainScreen(
             currentState = GrantedParseWebPermission(
                 stateContext = ConversionStateContext(
                     linkRepository = FakeLinkRepository(),
+                    outputRepository = outputRepository,
                     resources = resources,
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
@@ -1707,6 +1800,7 @@ private fun WebViewPreview() {
                 pointsFromUri = persistentListOf(),
                 webUriString = "https://www.example.com/",
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1716,6 +1810,7 @@ private fun WebViewPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = true,
@@ -1754,11 +1849,18 @@ private fun WebViewPreview() {
 @Composable
 private fun DarkWebViewPreview() {
     AppTheme {
+        val context = LocalContext.current
         val resources = LocalResources.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+        )
         MainScreen(
             currentState = GrantedParseWebPermission(
                 stateContext = ConversionStateContext(
                     linkRepository = FakeLinkRepository(),
+                    outputRepository = outputRepository,
                     resources = resources,
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
@@ -1769,6 +1871,7 @@ private fun DarkWebViewPreview() {
                 pointsFromUri = persistentListOf(),
                 webUriString = "https://www.example.com/",
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1778,6 +1881,7 @@ private fun DarkWebViewPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = true,
@@ -1816,11 +1920,18 @@ private fun DarkWebViewPreview() {
 @Composable
 private fun TabletWebViewPreview() {
     AppTheme {
+        val context = LocalContext.current
         val resources = LocalResources.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+        )
         MainScreen(
             currentState = GrantedParseWebPermission(
                 stateContext = ConversionStateContext(
                     linkRepository = FakeLinkRepository(),
+                    outputRepository = outputRepository,
                     resources = resources,
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
@@ -1831,6 +1942,7 @@ private fun TabletWebViewPreview() {
                 pointsFromUri = persistentListOf(),
                 webUriString = "https://www.example.com/",
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1840,6 +1952,7 @@ private fun TabletWebViewPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = true,
@@ -1878,11 +1991,15 @@ private fun TabletWebViewPreview() {
 @Composable
 private fun ErrorPreview() {
     AppTheme {
+        val context = LocalContext.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         MainScreen(
             currentState = ConversionFailed(
                 message = stringResource(R.string.conversion_failed_parse_url_error),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1892,6 +2009,7 @@ private fun ErrorPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
@@ -1930,11 +2048,15 @@ private fun ErrorPreview() {
 @Composable
 private fun DarkErrorPreview() {
     AppTheme {
+        val context = LocalContext.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         MainScreen(
             currentState = ConversionFailed(
                 message = stringResource(R.string.conversion_failed_parse_url_error),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1944,6 +2066,7 @@ private fun DarkErrorPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
@@ -1982,11 +2105,15 @@ private fun DarkErrorPreview() {
 @Composable
 private fun TabletErrorPreview() {
     AppTheme {
+        val context = LocalContext.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
         MainScreen(
             currentState = ConversionFailed(
                 message = stringResource(R.string.conversion_failed_parse_url_error),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1996,6 +2123,7 @@ private fun TabletErrorPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
@@ -2034,11 +2162,18 @@ private fun TabletErrorPreview() {
 @Composable
 private fun EmptyPreview() {
     AppTheme {
+        val context = LocalContext.current
         val resources = LocalResources.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+        )
         MainScreen(
             currentState = ConversionSucceeded(
                 stateContext = ConversionStateContext(
                     linkRepository = FakeLinkRepository(),
+                    outputRepository = outputRepository,
                     resources = resources,
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
@@ -2046,6 +2181,7 @@ private fun EmptyPreview() {
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 persistentListOf(),
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -2055,6 +2191,7 @@ private fun EmptyPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
@@ -2093,11 +2230,18 @@ private fun EmptyPreview() {
 @Composable
 private fun LoadingIndicatorPreview() {
     AppTheme {
+        val context = LocalContext.current
         val resources = LocalResources.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+        )
         MainScreen(
             currentState = GrantedUnshortenPermission(
                 stateContext = ConversionStateContext(
                     linkRepository = FakeLinkRepository(),
+                    outputRepository = outputRepository,
                     resources = resources,
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
@@ -2110,6 +2254,7 @@ private fun LoadingIndicatorPreview() {
                     RecoverableNetworkException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -2119,6 +2264,7 @@ private fun LoadingIndicatorPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = true,
@@ -2157,11 +2303,18 @@ private fun LoadingIndicatorPreview() {
 @Composable
 private fun DarkLoadingIndicatorPreview() {
     AppTheme {
+        val context = LocalContext.current
         val resources = LocalResources.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+        )
         MainScreen(
             currentState = GrantedUnshortenPermission(
                 stateContext = ConversionStateContext(
                     linkRepository = FakeLinkRepository(),
+                    outputRepository = outputRepository,
                     resources = resources,
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
@@ -2174,6 +2327,7 @@ private fun DarkLoadingIndicatorPreview() {
                     RecoverableNetworkException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -2183,6 +2337,7 @@ private fun DarkLoadingIndicatorPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = true,
@@ -2221,11 +2376,18 @@ private fun DarkLoadingIndicatorPreview() {
 @Composable
 private fun TabletLoadingIndicatorPreview() {
     AppTheme {
+        val context = LocalContext.current
         val resources = LocalResources.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+        )
         MainScreen(
             currentState = GrantedUnshortenPermission(
                 stateContext = ConversionStateContext(
                     linkRepository = FakeLinkRepository(),
+                    outputRepository = outputRepository,
                     resources = resources,
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
@@ -2238,6 +2400,7 @@ private fun TabletLoadingIndicatorPreview() {
                     RecoverableNetworkException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
+            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -2247,6 +2410,7 @@ private fun TabletLoadingIndicatorPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = true,

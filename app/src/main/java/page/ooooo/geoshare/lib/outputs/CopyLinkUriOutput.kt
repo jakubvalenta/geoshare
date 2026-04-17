@@ -6,11 +6,22 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Point
+import javax.inject.Inject
 
-data class CopyLinkUriOutput(val link: Link) : CopyPointOutput {
+class CopyLinkUriOutput @Inject constructor(
+    val link: Link,
+    private val coordinateConverter: CoordinateConverter,
+) : CopyPointOutput {
     override fun getText(value: Point, uriQuote: UriQuote) =
-        link.formatUriString(value, uriQuote)
+        UriFormatter.formatUriString(
+            coordinateConverter.toSrs(value, link.srs),
+            link.coordsUriTemplate,
+            link.nameUriTemplate,
+            uriQuote = uriQuote,
+        )
 
     override fun getIcon(appDetails: AppDetails) =
         link.icon
@@ -22,4 +33,13 @@ data class CopyLinkUriOutput(val link: Link) : CopyPointOutput {
     @Composable
     override fun automationSuccessText(appDetails: AppDetails) =
         stringResource(R.string.conversion_automation_copy_link_succeeded)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        other as CopyLinkUriOutput
+        return link == other.link
+    }
+
+    override fun hashCode() = link.hashCode()
 }

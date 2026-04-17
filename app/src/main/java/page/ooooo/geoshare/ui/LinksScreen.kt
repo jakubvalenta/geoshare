@@ -37,6 +37,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -59,12 +60,14 @@ import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.CustomLinkFeature
 import page.ooooo.geoshare.lib.billing.Feature
-import page.ooooo.geoshare.lib.point.Srs
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.Srs
 import page.ooooo.geoshare.ui.components.BasicListDetailScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
-import page.ooooo.geoshare.ui.components.FeatureWall
 import page.ooooo.geoshare.ui.components.FeatureBadgeSmall
 import page.ooooo.geoshare.ui.components.FeatureBadged
+import page.ooooo.geoshare.ui.components.FeatureWall
 import page.ooooo.geoshare.ui.components.LinkForm
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
@@ -80,6 +83,7 @@ fun LinksScreen(
     onBack: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     billingViewModel: BillingViewModel = hiltViewModel(),
+    outputViewModel: OutputViewModel = hiltViewModel(),
     viewModel: LinkViewModel = hiltViewModel(),
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -95,6 +99,7 @@ fun LinksScreen(
         billingAppNameResId = billingAppNameResId,
         billingFeatures = billingFeatures,
         billingStatus = billingStatus,
+        coordinateConverter = outputViewModel.coordinateConverter,
         links = links,
         message = message,
         onBack = onBack,
@@ -139,6 +144,7 @@ private fun LinksScreen(
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
+    coordinateConverter: CoordinateConverter,
     links: List<Link>,
     message: Message?,
     appEnabled: Boolean,
@@ -246,6 +252,7 @@ private fun LinksScreen(
                         billingFeatures = billingFeatures,
                         billingStatus = billingStatus,
                         chipEnabled = chipEnabled,
+                        coordinateConverter = coordinateConverter,
                         coordsUriTemplate = coordsUriTemplate,
                         group = group,
                         name = name,
@@ -406,6 +413,7 @@ private fun LinksDetailPane(
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
     chipEnabled: Boolean,
+    coordinateConverter: CoordinateConverter,
     coordsUriTemplate: String,
     group: String,
     name: String,
@@ -460,6 +468,7 @@ private fun LinksDetailPane(
                     LinkForm(
                         appEnabled = appEnabled,
                         chipEnabled = chipEnabled,
+                        coordinateConverter = coordinateConverter,
                         coordsUriTemplate = coordsUriTemplate,
                         group = group,
                         name = name,
@@ -521,6 +530,9 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 LinksScreen(
                     destination = null,
                     links = defaultFakeLinks,
@@ -534,6 +546,7 @@ private fun DefaultPreview() {
                         refundable = true,
                     ),
                     chipEnabled = false,
+                    coordinateConverter = coordinateConverter,
                     coordsUriTemplate = "",
                     group = "",
                     name = "",
@@ -571,6 +584,9 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 LinksScreen(
                     destination = null,
                     links = defaultFakeLinks,
@@ -584,6 +600,7 @@ private fun DarkPreview() {
                         refundable = true,
                     ),
                     chipEnabled = false,
+                    coordinateConverter = coordinateConverter,
                     coordsUriTemplate = "",
                     group = "",
                     name = "",
@@ -621,6 +638,9 @@ private fun TabletPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 LinksScreen(
                     destination = null,
                     links = defaultFakeLinks,
@@ -634,6 +654,7 @@ private fun TabletPreview() {
                         refundable = true,
                     ),
                     chipEnabled = false,
+                    coordinateConverter = coordinateConverter,
                     coordsUriTemplate = "",
                     group = "",
                     name = "",
@@ -671,6 +692,9 @@ private fun InsertPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 LinksScreen(
                     destination = -1,
                     links = defaultFakeLinks,
@@ -684,6 +708,7 @@ private fun InsertPreview() {
                         refundable = true,
                     ),
                     chipEnabled = false,
+                    coordinateConverter = coordinateConverter,
                     coordsUriTemplate = "",
                     group = "",
                     name = "",
@@ -721,6 +746,9 @@ private fun DarkInsertPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 LinksScreen(
                     destination = -1,
                     links = defaultFakeLinks,
@@ -734,6 +762,7 @@ private fun DarkInsertPreview() {
                         refundable = true,
                     ),
                     chipEnabled = false,
+                    coordinateConverter = coordinateConverter,
                     coordsUriTemplate = "",
                     group = "",
                     name = "",
@@ -772,6 +801,9 @@ private fun TabletInsertPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 LinksScreen(
                     destination = -1,
                     links = defaultFakeLinks,
@@ -785,6 +817,7 @@ private fun TabletInsertPreview() {
                         refundable = true,
                     ),
                     chipEnabled = false,
+                    coordinateConverter = coordinateConverter,
                     coordsUriTemplate = "",
                     group = "",
                     name = "",
@@ -822,6 +855,9 @@ private fun InsertNotPurchasedPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 LinksScreen(
                     destination = -1,
                     links = defaultFakeLinks,
@@ -834,6 +870,7 @@ private fun InsertNotPurchasedPreview() {
                     coordsUriTemplate = "",
                     group = "",
                     name = "",
+                    coordinateConverter = coordinateConverter,
                     nameUriTemplate = "",
                     sheetEnabled = false,
                     srs = Srs.WGS84,
@@ -868,6 +905,9 @@ private fun DarkInsertNotPurchasedPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 LinksScreen(
                     destination = -1,
                     links = defaultFakeLinks,
@@ -877,6 +917,7 @@ private fun DarkInsertNotPurchasedPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.NotPurchased(pending = false),
                     chipEnabled = false,
+                    coordinateConverter = coordinateConverter,
                     coordsUriTemplate = "",
                     group = "",
                     name = "",
@@ -915,6 +956,9 @@ private fun TabletInsertNotPurchasedPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 LinksScreen(
                     destination = -1,
                     links = defaultFakeLinks,
@@ -924,6 +968,7 @@ private fun TabletInsertNotPurchasedPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.NotPurchased(pending = false),
                     chipEnabled = false,
+                    coordinateConverter = coordinateConverter,
                     coordsUriTemplate = "",
                     group = "",
                     name = "",
@@ -962,6 +1007,9 @@ private fun UpdatePreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val link = FakeGoogleMapsStreetViewLink
                 LinksScreen(
                     destination = link.uid,
@@ -976,6 +1024,7 @@ private fun UpdatePreview() {
                         refundable = true,
                     ),
                     chipEnabled = link.chipEnabled,
+                    coordinateConverter = coordinateConverter,
                     coordsUriTemplate = link.coordsUriTemplate,
                     group = link.group,
                     name = link.name,
@@ -1014,6 +1063,9 @@ private fun DarkUpdatePreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val link = FakeGoogleMapsStreetViewLink
                 LinksScreen(
                     destination = link.uid,
@@ -1028,6 +1080,7 @@ private fun DarkUpdatePreview() {
                         refundable = true,
                     ),
                     chipEnabled = link.chipEnabled,
+                    coordinateConverter = coordinateConverter,
                     coordsUriTemplate = link.coordsUriTemplate,
                     group = link.group,
                     name = link.name,
@@ -1066,6 +1119,9 @@ private fun TabletUpdatePreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 val link = FakeGoogleMapsStreetViewLink
                 LinksScreen(
                     destination = link.uid,
@@ -1080,6 +1136,7 @@ private fun TabletUpdatePreview() {
                         refundable = true,
                     ),
                     chipEnabled = link.chipEnabled,
+                    coordinateConverter = coordinateConverter,
                     coordsUriTemplate = link.coordsUriTemplate,
                     group = link.group,
                     name = link.name,

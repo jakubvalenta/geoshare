@@ -246,20 +246,31 @@ adb -s emulator-5554 shell am start -W -a android.intent.action.SEND -t text/pla
 
 ## Contributing
 
-Your contributions are welcome! To show that you’d like to work on a bug, or
-feature request, please comment on the relevant [GitHub
-issue](https://github.com/jakubvalenta/geoshare/issues) or create a new one.
+Contributions are welcome. To claim a bug or feature request, comment on the
+relevant [GitHub issue](https://github.com/jakubvalenta/geoshare/issues) or
+open a new one.
 
 ### Translating
 
-GeoShare is [available under
+GeoShare is [available on
 Weblate](https://hosted.weblate.org/engage/geoshare/) thanks to their libre
-tier! More instructions can be found under *Info* in it.
+tier. Further instructions are in the _Overview_ tab there.
 
 [![Translation status](https://hosted.weblate.org/widget/geoshare/multi-auto.svg)](https://hosted.weblate.org/engage/geoshare/)
 
-__Feel free to remix this project__ under the terms of the GNU General Public
+## License
+
+Feel free to remix this project under the terms of the GNU General Public
 License version 3 or later. See [COPYING](./COPYING) and [NOTICE](./NOTICE).
 
-Some components of this project are derived from third-party code under other
-compatible licenses; see individual subdirectories.
+Some components are derived from third-party code under other compatible
+licenses; see individual subdirectories.
+
+Map data is derived from [Natural Earth](https://www.naturalearthdata.com/)
+and [Marine Regions](https://www.marineregions.org/).
+
+## References
+
+Flanders Marine Institute (2023). Maritime Boundaries Geodatabase: Maritime
+Boundaries and Exclusive Economic Zones (200NM), version 12. Available online
+at https://www.marineregions.org/. https://doi.org/10.14284/632

@@ -47,9 +47,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.IntroViewModel
 import page.ooooo.geoshare.lib.android.AndroidTools
-import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.ui.components.ParagraphHtml
 import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.ScreenshotMapAppOpen
@@ -60,7 +59,6 @@ import page.ooooo.geoshare.ui.components.styledArgsString
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun IntroScreen(
     onClose: () -> Unit,
@@ -168,7 +166,7 @@ private fun IntroScreen(
                             ScreenshotOpenByDefaultMapApp()
                             Button(
                                 {
-                                    onShowOpenByDefaultSettingsForPackage(GOOGLE_MAPS_PACKAGE_NAME)
+                                    onShowOpenByDefaultSettingsForPackage(PackageNames.GOOGLE_MAPS)
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = MaterialTheme.colorScheme.tertiaryContainer,

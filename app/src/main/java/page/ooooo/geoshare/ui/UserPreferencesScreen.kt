@@ -83,21 +83,21 @@ import page.ooooo.geoshare.data.local.preferences.TextPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.android.COMAPS_FDROID_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.DataTypes
-import page.ooooo.geoshare.lib.android.ORGANIC_MAPS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.CustomLinkFeature
 import page.ooooo.geoshare.lib.billing.Feature
-import page.ooooo.geoshare.lib.formats.CoordsFormat
+import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.Output
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.ui.components.FeatureWall
 import page.ooooo.geoshare.ui.components.FeatureBadgeSmall
+import page.ooooo.geoshare.ui.components.FeatureWall
 import page.ooooo.geoshare.ui.components.IconFromDescriptor
 import page.ooooo.geoshare.ui.components.LabelLarge
 import page.ooooo.geoshare.ui.components.NavigableBasicListDetailScaffold
@@ -108,6 +108,7 @@ import page.ooooo.geoshare.ui.components.SegmentedList
 import page.ooooo.geoshare.ui.components.SegmentedListLabel
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
+import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
@@ -139,6 +140,7 @@ fun UserPreferencesScreen(
     onNavigateToLinksScreen: () -> Unit,
     billingViewModel: BillingViewModel,
     viewModel: UserPreferencesViewModel = hiltViewModel(),
+    outputViewModel: OutputViewModel = hiltViewModel(),
 ) {
     val apps by viewModel.apps.collectAsStateWithLifecycle()
     val appDetails by viewModel.appDetails.collectAsStateWithLifecycle()
@@ -155,9 +157,13 @@ fun UserPreferencesScreen(
         billingAppNameResId = billingAppNameResId,
         billingFeatures = billingFeatures,
         billingStatus = billingStatus,
+        coordinateConverter = outputViewModel.coordinateConverter,
         links = links,
         userPreferencesValues = userPreferencesValues,
         onBack = onBack,
+        onGetAutomationOutput = { automation, getLinkByUUID ->
+            outputViewModel.getAutomationOutput(automation, getLinkByUUID)
+        },
         onNavigateToBillingScreen = onNavigateToBillingScreen,
         onNavigateToLinksScreen = onNavigateToLinksScreen,
         onValueChange = { transform: (preferences: MutablePreferences) -> Unit ->
@@ -175,9 +181,11 @@ private fun UserPreferencesScreen(
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
+    coordinateConverter: CoordinateConverter,
     links: List<Link>,
     userPreferencesValues: UserPreferencesValues,
     onBack: () -> Unit,
+    onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
     onNavigateToBillingScreen: () -> Unit,
     onNavigateToLinksScreen: () -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
@@ -217,6 +225,7 @@ private fun UserPreferencesScreen(
                         }
                     }
                 },
+                onGetAutomationOutput = onGetAutomationOutput,
                 onNavigateToGroup = { id ->
                     coroutineScope.launch {
                         navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, id)
@@ -234,6 +243,7 @@ private fun UserPreferencesScreen(
                     billingAppNameResId = billingAppNameResId,
                     billingFeatures = billingFeatures,
                     billingStatus = billingStatus,
+                    coordinateConverter = coordinateConverter,
                     links = links,
                     values = userPreferencesValues,
                     wide = wide,
@@ -246,6 +256,7 @@ private fun UserPreferencesScreen(
                             }
                         }
                     },
+                    onGetAutomationOutput = onGetAutomationOutput,
                     onNavigateToBillingScreen = onNavigateToBillingScreen,
                     onValueChange = onValueChange,
                 )
@@ -267,6 +278,7 @@ private fun UserPreferencesListPane(
     containerColor: Color,
     links: List<Link>,
     onBack: () -> Unit,
+    onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
     onNavigateToGroup: (id: UserPreferencesGroupId) -> Unit,
     onNavigateToLinksScreen: () -> Unit,
 ) {
@@ -276,7 +288,7 @@ private fun UserPreferencesListPane(
     LaunchedEffect(values, billingStatus, links) {
         automationDelayEnabled = billingStatus is BillingStatus.Purchased &&
             AutomationFeature in billingFeatures &&
-            values.automation.toOutput { links.findByUUID(it) } is Output.HasAutomationDelay
+            onGetAutomationOutput(values.automation) { links.findByUUID(it) } is Output.HasAutomationDelay
     }
 
     ScrollablePane(
@@ -335,6 +347,7 @@ private fun UserPreferencesListPane(
                                 appDetails = appDetails,
                                 links = links,
                                 descriptionEnabled = false,
+                                onGetAutomationOutput = onGetAutomationOutput,
                             )
                         },
                         onClick = { onNavigateToGroup(UserPreferencesGroupId.AUTOMATION) },
@@ -477,10 +490,11 @@ private fun AutomationPreferenceValue(
     appDetails: AppDetails,
     links: List<Link>,
     descriptionEnabled: Boolean = true,
+    onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
 ) {
     var output by retain { mutableStateOf<Output?>(null) }
     LaunchedEffect(value, links) {
-        output = value.toOutput { links.findByUUID(it) }
+        output = onGetAutomationOutput(value) { links.findByUUID(it) }
     }
     output?.let { output ->
         val label = output.automationLabel(appDetails)
@@ -524,10 +538,12 @@ private fun UserPreferencesDetailPane(
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
+    coordinateConverter: CoordinateConverter,
     links: List<Link>,
     values: UserPreferencesValues,
     wide: Boolean,
     onBack: () -> Unit,
+    onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
     onNavigateToBillingScreen: () -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
@@ -564,7 +580,12 @@ private fun UserPreferencesDetailPane(
                     },
                     onValueChange = onValueChange,
                 ) { value ->
-                    AutomationPreferenceValue(value, appDetails, links)
+                    AutomationPreferenceValue(
+                        value = value,
+                        appDetails = appDetails,
+                        links = links,
+                        onGetAutomationOutput = onGetAutomationOutput,
+                    )
                 }
             }
 
@@ -647,11 +668,9 @@ private fun UserPreferencesDetailPane(
                     Column {
                         CoordinateFormatPreferenceValue(option)
                         Text(
-                            Point.example.let { examplePoint ->
-                                when (option) {
-                                    CoordinateFormat.DEC -> CoordsFormat.formatDecCoords(examplePoint)
-                                    CoordinateFormat.DEG_MIN_SEC -> CoordsFormat.formatDegMinSecCoords(examplePoint)
-                                }
+                            when (option) {
+                                CoordinateFormat.DEC -> CoordinateFormatter.formatDecCoords(WGS84Point.example)
+                                CoordinateFormat.DEG_MIN_SEC -> CoordinateFormatter.formatDegMinSecCoords(WGS84Point.example)
                             },
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -976,6 +995,9 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 UserPreferencesScreen(
                     initialGroupId = null,
                     apps = emptyMap(),
@@ -983,9 +1005,11 @@ private fun DefaultPreview() {
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1001,6 +1025,9 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 UserPreferencesScreen(
                     initialGroupId = null,
                     apps = emptyMap(),
@@ -1008,9 +1035,11 @@ private fun DarkPreview() {
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1026,6 +1055,9 @@ private fun TabletPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 UserPreferencesScreen(
                     initialGroupId = null,
                     apps = emptyMap(),
@@ -1033,9 +1065,11 @@ private fun TabletPreview() {
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1051,6 +1085,9 @@ private fun ConnectionPermissionPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
                     apps = emptyMap(),
@@ -1058,9 +1095,11 @@ private fun ConnectionPermissionPreview() {
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1076,6 +1115,9 @@ private fun DarkConnectionPermissionPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
                     apps = emptyMap(),
@@ -1083,9 +1125,11 @@ private fun DarkConnectionPermissionPreview() {
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1101,6 +1145,9 @@ private fun TabletConnectionPermissionPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
                     apps = emptyMap(),
@@ -1108,9 +1155,11 @@ private fun TabletConnectionPermissionPreview() {
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1126,6 +1175,9 @@ private fun CoordinateFormatPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.COORDINATE_FORMAT,
                     apps = emptyMap(),
@@ -1133,9 +1185,11 @@ private fun CoordinateFormatPreview() {
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1151,6 +1205,9 @@ private fun DarkCoordinateFormatPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.COORDINATE_FORMAT,
                     apps = emptyMap(),
@@ -1158,9 +1215,11 @@ private fun DarkCoordinateFormatPreview() {
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1176,6 +1235,9 @@ private fun TabletCoordinateFormatPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.COORDINATE_FORMAT,
                     apps = emptyMap(),
@@ -1183,9 +1245,11 @@ private fun TabletCoordinateFormatPreview() {
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1202,14 +1266,16 @@ private fun AutomationPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION,
                     apps = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                        PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                     ),
                     appDetails = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -1221,12 +1287,14 @@ private fun AutomationPreview() {
                         expired = false,
                         refundable = true,
                     ),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
                     ),
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1243,14 +1311,16 @@ private fun DarkAutomationPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION,
                     apps = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                        PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                     ),
                     appDetails = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -1262,12 +1332,14 @@ private fun DarkAutomationPreview() {
                         expired = false,
                         refundable = true,
                     ),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
                     ),
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1284,14 +1356,16 @@ private fun TabletAutomationPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION,
                     apps = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                        PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                     ),
                     appDetails = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -1303,12 +1377,14 @@ private fun TabletAutomationPreview() {
                         expired = false,
                         refundable = true,
                     ),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
                     ),
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1325,14 +1401,16 @@ private fun AutomationFeatureNotAvailablePreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION,
                     apps = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                        PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                     ),
                     appDetails = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -1340,12 +1418,14 @@ private fun AutomationFeatureNotAvailablePreview() {
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.NotPurchased(pending = false),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
                     ),
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1362,14 +1442,16 @@ private fun DarkAutomationFeatureNotAvailablePreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION,
                     apps = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                        PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                     ),
                     appDetails = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -1377,12 +1459,14 @@ private fun DarkAutomationFeatureNotAvailablePreview() {
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.NotPurchased(pending = false),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
                     ),
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1399,14 +1483,16 @@ private fun TabletAutomationFeatureNotAvailablePreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION,
                     apps = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                        PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                     ),
                     appDetails = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -1414,12 +1500,14 @@ private fun TabletAutomationFeatureNotAvailablePreview() {
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.NotPurchased(pending = false),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
                     ),
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1435,6 +1523,9 @@ private fun AutomationDelayPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION_DELAY,
                     apps = emptyMap(),
@@ -1446,12 +1537,14 @@ private fun AutomationDelayPreview() {
                         expired = false,
                         refundable = true,
                     ),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
                     ),
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1467,6 +1560,9 @@ private fun DarkAutomationDelayPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION_DELAY,
                     apps = emptyMap(),
@@ -1478,12 +1574,14 @@ private fun DarkAutomationDelayPreview() {
                         expired = false,
                         refundable = true,
                     ),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
                     ),
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1499,6 +1597,9 @@ private fun TableAutomationDelayPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION_DELAY,
                     apps = emptyMap(),
@@ -1510,12 +1611,14 @@ private fun TableAutomationDelayPreview() {
                         expired = false,
                         refundable = true,
                     ),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
                     ),
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1532,24 +1635,26 @@ private fun HiddenAppsPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
                     apps = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to emptySet(),
-                        ORGANIC_MAPS_PACKAGE_NAME to emptySet(),
-                        OSMAND_PLUS_PACKAGE_NAME to emptySet(),
+                        PackageNames.COMAPS_FDROID to emptySet(),
+                        PackageNames.ORGANIC_MAPS to emptySet(),
+                        PackageNames.OSMAND_PLUS to emptySet(),
                     ),
                     appDetails = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to AppDetail(
+                        PackageNames.COMAPS_FDROID to AppDetail(
                             "CoMaps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        ORGANIC_MAPS_PACKAGE_NAME to AppDetail(
+                        PackageNames.ORGANIC_MAPS to AppDetail(
                             "Organic Maps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -1557,11 +1662,13 @@ private fun HiddenAppsPreview() {
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
-                        hiddenApps = setOf(ORGANIC_MAPS_PACKAGE_NAME),
+                        hiddenApps = setOf(PackageNames.ORGANIC_MAPS),
                     ),
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1578,24 +1685,26 @@ private fun DarkHiddenAppsPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
                     apps = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to emptySet(),
-                        ORGANIC_MAPS_PACKAGE_NAME to emptySet(),
-                        OSMAND_PLUS_PACKAGE_NAME to emptySet(),
+                        PackageNames.COMAPS_FDROID to emptySet(),
+                        PackageNames.ORGANIC_MAPS to emptySet(),
+                        PackageNames.OSMAND_PLUS to emptySet(),
                     ),
                     appDetails = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to AppDetail(
+                        PackageNames.COMAPS_FDROID to AppDetail(
                             "CoMaps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        ORGANIC_MAPS_PACKAGE_NAME to AppDetail(
+                        PackageNames.ORGANIC_MAPS to AppDetail(
                             "Organic Maps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -1603,11 +1712,13 @@ private fun DarkHiddenAppsPreview() {
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
-                        hiddenApps = setOf(ORGANIC_MAPS_PACKAGE_NAME),
+                        hiddenApps = setOf(PackageNames.ORGANIC_MAPS),
                     ),
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1624,24 +1735,26 @@ private fun TabletHiddenAppsPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
                     apps = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to emptySet(),
-                        ORGANIC_MAPS_PACKAGE_NAME to emptySet(),
-                        OSMAND_PLUS_PACKAGE_NAME to emptySet(),
+                        PackageNames.COMAPS_FDROID to emptySet(),
+                        PackageNames.ORGANIC_MAPS to emptySet(),
+                        PackageNames.OSMAND_PLUS to emptySet(),
                     ),
                     appDetails = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to AppDetail(
+                        PackageNames.COMAPS_FDROID to AppDetail(
                             "CoMaps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        ORGANIC_MAPS_PACKAGE_NAME to AppDetail(
+                        PackageNames.ORGANIC_MAPS to AppDetail(
                             "Organic Maps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -1649,11 +1762,13 @@ private fun TabletHiddenAppsPreview() {
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
-                        hiddenApps = setOf(ORGANIC_MAPS_PACKAGE_NAME),
+                        hiddenApps = setOf(PackageNames.ORGANIC_MAPS),
                     ),
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1670,24 +1785,26 @@ private fun HiddenAppsLoadingPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
                     apps = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to emptySet(),
-                        ORGANIC_MAPS_PACKAGE_NAME to emptySet(),
-                        OSMAND_PLUS_PACKAGE_NAME to emptySet(),
+                        PackageNames.COMAPS_FDROID to emptySet(),
+                        PackageNames.ORGANIC_MAPS to emptySet(),
+                        PackageNames.OSMAND_PLUS to emptySet(),
                     ),
                     appDetails = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to AppDetail(
+                        PackageNames.COMAPS_FDROID to AppDetail(
                             "CoMaps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        ORGANIC_MAPS_PACKAGE_NAME to AppDetail(
+                        PackageNames.ORGANIC_MAPS to AppDetail(
                             "Organic Maps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -1695,9 +1812,11 @@ private fun HiddenAppsLoadingPreview() {
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(),
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1714,24 +1833,26 @@ private fun DarkHiddenAppsLoadingPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
                     apps = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to emptySet(),
-                        ORGANIC_MAPS_PACKAGE_NAME to emptySet(),
-                        OSMAND_PLUS_PACKAGE_NAME to emptySet(),
+                        PackageNames.COMAPS_FDROID to emptySet(),
+                        PackageNames.ORGANIC_MAPS to emptySet(),
+                        PackageNames.OSMAND_PLUS to emptySet(),
                     ),
                     appDetails = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to AppDetail(
+                        PackageNames.COMAPS_FDROID to AppDetail(
                             "CoMaps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        ORGANIC_MAPS_PACKAGE_NAME to AppDetail(
+                        PackageNames.ORGANIC_MAPS to AppDetail(
                             "Organic Maps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -1739,9 +1860,11 @@ private fun DarkHiddenAppsLoadingPreview() {
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(),
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1758,24 +1881,26 @@ private fun TabletHiddenAppsLoadingPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
                     apps = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to emptySet(),
-                        ORGANIC_MAPS_PACKAGE_NAME to emptySet(),
-                        OSMAND_PLUS_PACKAGE_NAME to emptySet(),
+                        PackageNames.COMAPS_FDROID to emptySet(),
+                        PackageNames.ORGANIC_MAPS to emptySet(),
+                        PackageNames.OSMAND_PLUS to emptySet(),
                     ),
                     appDetails = mapOf(
-                        COMAPS_FDROID_PACKAGE_NAME to AppDetail(
+                        PackageNames.COMAPS_FDROID to AppDetail(
                             "CoMaps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        ORGANIC_MAPS_PACKAGE_NAME to AppDetail(
+                        PackageNames.ORGANIC_MAPS to AppDetail(
                             "Organic Maps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -1783,9 +1908,11 @@ private fun TabletHiddenAppsLoadingPreview() {
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(),
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1801,6 +1928,9 @@ private fun DeveloperOptionsPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.DEVELOPER_OPTIONS,
                     apps = emptyMap(),
@@ -1808,12 +1938,14 @@ private fun DeveloperOptionsPreview() {
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
                     ),
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1829,6 +1961,9 @@ private fun DarkDeveloperOptionsPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.DEVELOPER_OPTIONS,
                     apps = emptyMap(),
@@ -1836,12 +1971,14 @@ private fun DarkDeveloperOptionsPreview() {
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
                     ),
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1857,6 +1994,9 @@ private fun TableDeveloperOptionsPreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.DEVELOPER_OPTIONS,
                     apps = emptyMap(),
@@ -1864,12 +2004,14 @@ private fun TableDeveloperOptionsPreview() {
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
+                    coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
                     ),
                     onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},

@@ -41,11 +41,11 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.InputRepository
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.inputs.InputDocumentation
 import page.ooooo.geoshare.lib.inputs.InputDocumentationId
 import page.ooooo.geoshare.lib.inputs.InputDocumentationItem
-import page.ooooo.geoshare.lib.inputs.allInputs
 import page.ooooo.geoshare.ui.components.InputsSettingsButton
 import page.ooooo.geoshare.ui.components.NavigableBasicListDetailScaffold
 import page.ooooo.geoshare.ui.components.ParagraphText
@@ -55,12 +55,11 @@ import page.ooooo.geoshare.ui.components.SegmentedListLabel
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InputsScreen(
     initialDocumentationId: InputDocumentationId?,
     onBack: () -> Unit = {},
-    viewModel: InputsViewModel = hiltViewModel(),
+    viewModel: InputViewModel = hiltViewModel(),
 ) {
     val allDocumentations by viewModel.allDocumentations.collectAsStateWithLifecycle()
     val recentDocumentations by viewModel.recentDocumentations.collectAsStateWithLifecycle()
@@ -350,10 +349,11 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             Column {
+                val inputRepository = InputRepository()
                 InputsScreen(
                     initialDocumentationId = null,
-                    allDocumentations = allInputs.map { it.documentation },
-                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.map { it.documentation },
+                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -369,10 +369,11 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             Column {
+                val inputRepository = InputRepository()
                 InputsScreen(
                     initialDocumentationId = null,
-                    allDocumentations = allInputs.map { it.documentation },
-                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.map { it.documentation },
+                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -388,10 +389,11 @@ private fun TabletPreview() {
     AppTheme {
         Surface {
             Column {
+                val inputRepository = InputRepository()
                 InputsScreen(
                     initialDocumentationId = null,
-                    allDocumentations = allInputs.map { it.documentation },
-                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.map { it.documentation },
+                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -407,9 +409,10 @@ private fun NoRecentPreview() {
     AppTheme {
         Surface {
             Column {
+                val inputRepository = InputRepository()
                 InputsScreen(
                     initialDocumentationId = null,
-                    allDocumentations = allInputs.map { it.documentation },
+                    allDocumentations = inputRepository.all.map { it.documentation },
                     recentDocumentations = emptyList(),
                     onBack = {},
                 )
@@ -424,9 +427,10 @@ private fun DarkNoRecentPreview() {
     AppTheme {
         Surface {
             Column {
+                val inputRepository = InputRepository()
                 InputsScreen(
                     initialDocumentationId = null,
-                    allDocumentations = allInputs.map { it.documentation },
+                    allDocumentations = inputRepository.all.map { it.documentation },
                     recentDocumentations = emptyList(),
                     onBack = {},
                 )
@@ -441,9 +445,10 @@ private fun TabletNoRecentPreview() {
     AppTheme {
         Surface {
             Column {
+                val inputRepository = InputRepository()
                 InputsScreen(
                     initialDocumentationId = null,
-                    allDocumentations = allInputs.map { it.documentation },
+                    allDocumentations = inputRepository.all.map { it.documentation },
                     recentDocumentations = emptyList(),
                     onBack = {},
                 )
@@ -458,10 +463,11 @@ private fun OpenStreetMapPreview() {
     AppTheme {
         Surface {
             Column {
+                val inputRepository = InputRepository()
                 InputsScreen(
                     initialDocumentationId = InputDocumentationId.OPEN_STREET_MAP,
-                    allDocumentations = allInputs.map { it.documentation },
-                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.map { it.documentation },
+                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -477,10 +483,11 @@ private fun DarkOpenStreetMapPreview() {
     AppTheme {
         Surface {
             Column {
+                val inputRepository = InputRepository()
                 InputsScreen(
                     initialDocumentationId = InputDocumentationId.OPEN_STREET_MAP,
-                    allDocumentations = allInputs.map { it.documentation },
-                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.map { it.documentation },
+                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -496,10 +503,11 @@ private fun TabletOpenStreetMapPreview() {
     AppTheme {
         Surface {
             Column {
+                val inputRepository = InputRepository()
                 InputsScreen(
                     initialDocumentationId = InputDocumentationId.OPEN_STREET_MAP,
-                    allDocumentations = allInputs.map { it.documentation },
-                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.map { it.documentation },
+                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -515,10 +523,11 @@ private fun GeoUriPreview() {
     AppTheme {
         Surface {
             Column {
+                val inputRepository = InputRepository()
                 InputsScreen(
                     initialDocumentationId = InputDocumentationId.GEO_URI,
-                    allDocumentations = allInputs.map { it.documentation },
-                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.map { it.documentation },
+                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -534,10 +543,11 @@ private fun DarkGeoUriPreview() {
     AppTheme {
         Surface {
             Column {
+                val inputRepository = InputRepository()
                 InputsScreen(
                     initialDocumentationId = InputDocumentationId.GEO_URI,
-                    allDocumentations = allInputs.map { it.documentation },
-                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.map { it.documentation },
+                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -553,10 +563,11 @@ private fun TabletGeoUriPreview() {
     AppTheme {
         Surface {
             Column {
+                val inputRepository = InputRepository()
                 InputsScreen(
                     initialDocumentationId = InputDocumentationId.GEO_URI,
-                    allDocumentations = allInputs.map { it.documentation },
-                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.map { it.documentation },
+                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},

@@ -6,9 +6,9 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toScale
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.decodeGe0Hash
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
 
 object MapsMeInput : Input {
     private const val HASH = """[A-Za-z0-9\-_]{2,}"""
@@ -50,4 +50,12 @@ object MapsMeInput : Input {
             }
         }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is MapsMeInput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
 }

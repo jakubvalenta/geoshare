@@ -5,8 +5,8 @@ import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.BehaviorTest
 import page.ooooo.geoshare.BehaviorTest.Companion.NETWORK_TIMEOUT
 import page.ooooo.geoshare.data.local.preferences.Permission
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Points
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
 interface InputBehaviorTest : BehaviorTest {
@@ -26,7 +26,12 @@ interface InputBehaviorTest : BehaviorTest {
         onElementOrNull(1_000L) { viewIdResourceName == "geoShareMainBackButton" }?.click()
     }
 
-    fun UiAutomatorTestScope.testUri(expectedPoints: Points, unsafeUriString: String, timeoutMs: Long = NETWORK_TIMEOUT) {
+    fun UiAutomatorTestScope.testUri(
+        expectedPoints: Points,
+        unsafeUriString: String,
+        accurate: Boolean? = null,
+        timeoutMs: Long = NETWORK_TIMEOUT,
+    ) {
         // Go to main form
         goToMainForm()
 
@@ -34,11 +39,16 @@ interface InputBehaviorTest : BehaviorTest {
         shareUri(unsafeUriString)
         confirmDialogIfVisible()
 
-        assertConversionSucceeded(expectedPoints, timeoutMs)
+        assertConversionSucceeded(expectedPoints, accurate, timeoutMs)
     }
 
-    fun UiAutomatorTestScope.testUri(expectedPoint: Point, unsafeUriString: String, timeoutMs: Long = NETWORK_TIMEOUT) =
-        testUri(persistentListOf(expectedPoint), unsafeUriString, timeoutMs)
+    fun UiAutomatorTestScope.testUri(
+        expectedPoint: Point,
+        unsafeUriString: String,
+        accurate: Boolean? = null,
+        timeoutMs: Long = NETWORK_TIMEOUT,
+    ) =
+        testUri(persistentListOf(expectedPoint), unsafeUriString, accurate, timeoutMs)
 
     fun UiAutomatorTestScope.testTextUri(expectedPoints: Points, unsafeText: String) {
         // It would be preferable to test sharing of the text with the app, but this shell command doesn't work when

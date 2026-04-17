@@ -2,13 +2,13 @@ package page.ooooo.geoshare.lib.inputs
 
 import android.webkit.WebSettings
 import io.ktor.utils.io.ByteReadChannel
-import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
 
 interface Input {
     val uriPattern: Regex
@@ -37,7 +37,7 @@ interface HtmlInput : Input {
     suspend fun parseHtml(
         htmlUrlString: String,
         channel: ByteReadChannel,
-        pointsFromUri: ImmutableList<Point>,
+        pointsFromUri: Points,
         uriQuote: UriQuote = DefaultUriQuote,
         log: ILog = DefaultLog,
     ): ParseHtmlResult

@@ -34,9 +34,9 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.Locale
@@ -167,7 +167,7 @@ object AndroidTools {
                 },
             )) {
                 getOrPut(packageName) { mutableSetOf() }.add(
-                    if (packageName.startsWith(TOMTOM_PACKAGE_NAME_PREFIX)) {
+                    if (packageName.startsWith(PackageNames.TOMTOM_PREFIX)) {
                         DataType.GPX_ONE_POINT_DATA
                     } else {
                         DataType.GPX_DATA

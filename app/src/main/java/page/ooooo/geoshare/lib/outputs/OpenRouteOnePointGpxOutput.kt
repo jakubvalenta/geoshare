@@ -6,19 +6,24 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.formats.GpxFormat
-import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.formatters.GpxFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.writeFile
 import page.ooooo.geoshare.ui.components.DrawableIconDescriptor
 import page.ooooo.geoshare.ui.components.IconDescriptor
 import page.ooooo.geoshare.ui.components.ResourceIconDescriptor
+import javax.inject.Inject
 
 /**
  * This output creates a GPX route starting at current device location and opens it in [packageName].
  *
  * It's only useful for TomTom, because TomTom doesn't support geo: URIs.
  */
-data class OpenRouteOnePointGpxOutput(val packageName: String) :
+class OpenRouteOnePointGpxOutput @Inject constructor(
+    val packageName: String,
+    private val coordinateConverter: CoordinateConverter,
+) :
     PointOutput.WithLocation,
     Output.HasErrorText,
     Output.HasAutomationDelay,
@@ -33,7 +38,7 @@ data class OpenRouteOnePointGpxOutput(val packageName: String) :
         location?.let { location ->
             // Notice that we use the .xml extension, because that's what TomTom requires.
             writeFile(actionContext.context.filesDir, "routes", "${System.currentTimeMillis()}.xml") {
-                GpxFormat.writeGpxRoute(persistentListOf(location, value), this)
+                GpxFormatter.writeGpxRoute(coordinateConverter.toWGS84(persistentListOf(location, value)), this)
             }?.let { file ->
                 actionContext.androidTools.openAppFile(actionContext.context, packageName, file)
             }
@@ -91,4 +96,13 @@ data class OpenRouteOnePointGpxOutput(val packageName: String) :
             appDetails[packageName]?.label ?: packageName,
             counterSec,
         )
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        other as OpenRouteOnePointGpxOutput
+        return packageName == other.packageName
+    }
+
+    override fun hashCode() = packageName.hashCode()
 }

@@ -1,6 +1,7 @@
 package page.ooooo.geoshare
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
@@ -11,10 +12,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import page.ooooo.geoshare.BehaviorTest.Companion.ELEMENT_DOES_NOT_EXIST_TIMEOUT
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
-import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.formats.CoordsFormat
-import page.ooooo.geoshare.lib.point.GCJ02Point
-import page.ooooo.geoshare.lib.point.Source
+import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.GCJ02Point
+import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
 @RunWith(AndroidJUnit4::class)
@@ -22,6 +25,10 @@ class UserPreferencesBehaviorTest : BehaviorTest {
 
     @Test
     fun whenCoordinateFormatIsSet_showsCoordinatesInThatFormat() = uiAutomator {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+
         // Launch application and close intro
         launchApplication()
         closeIntro()
@@ -33,7 +40,11 @@ class UserPreferencesBehaviorTest : BehaviorTest {
         onElement {
             if (viewIdResourceName == "geoShareResultSuccessLastPointCoordinates") {
                 assertEquals(
-                    CoordsFormat.formatDecCoords(GCJ02Point(52.5067296, 13.2599309, source = Source.MAP_CENTER)),
+                    CoordinateFormatter.formatDecCoords(
+                        coordinateConverter.toWGS84(
+                            GCJ02Point(52.5067296, 13.2599309, source = Source.MAP_CENTER)
+                        )
+                    ),
                     textAsString(),
                 )
                 true
@@ -52,7 +63,11 @@ class UserPreferencesBehaviorTest : BehaviorTest {
         onElement {
             if (viewIdResourceName == "geoShareResultSuccessLastPointCoordinates") {
                 assertEquals(
-                    CoordsFormat.formatDegMinSecCoords(GCJ02Point(52.5067296, 13.2599309, source = Source.MAP_CENTER)),
+                    CoordinateFormatter.formatDegMinSecCoords(
+                        coordinateConverter.toWGS84(
+                            GCJ02Point(52.5067296, 13.2599309, source = Source.MAP_CENTER)
+                        )
+                    ),
                     textAsString(),
                 )
                 true
@@ -64,7 +79,7 @@ class UserPreferencesBehaviorTest : BehaviorTest {
 
     @Test
     fun whenAppIsHidden_itIsNotShownOnResultScreen() = uiAutomator {
-        assumeAppInstalled(OSMAND_PLUS_PACKAGE_NAME)
+        assumeAppInstalled(PackageNames.OSMAND_PLUS)
 
         // Launch application and close intro
         launchApplication()
@@ -75,7 +90,7 @@ class UserPreferencesBehaviorTest : BehaviorTest {
 
         // Hide an app
         onMainScrollablePane()
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareApp_${OSMAND_PLUS_PACKAGE_NAME}" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareApp_${PackageNames.OSMAND_PLUS}" }
             .longClick()
         onElement { viewIdResourceName == "geoShareAppHide" }.click()
 
@@ -89,7 +104,7 @@ class UserPreferencesBehaviorTest : BehaviorTest {
         waitForStableInActiveWindow(stableIntervalMs = 1_000L) // Wait for the app to get hidden
         assertNull(
             onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) {
-                viewIdResourceName == "geoShareApp_${OSMAND_PLUS_PACKAGE_NAME}"
+                viewIdResourceName == "geoShareApp_${PackageNames.OSMAND_PLUS}"
             }
         )
 
@@ -97,20 +112,20 @@ class UserPreferencesBehaviorTest : BehaviorTest {
         goToUserPreferencesList()
         goToUserPreferencesDetail(UserPreferencesGroupId.HIDDEN_APPS)
         onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareVisibleAppToggle_${OSMAND_PLUS_PACKAGE_NAME}" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareVisibleAppToggle_${PackageNames.OSMAND_PLUS}" }
             .click()
         goToMainScreenFromUserPreferencesDetail()
 
         // Shows the app
         onMainScrollablePane()
             .scrollToElement(Direction.DOWN, timeoutMs = 3_000L) {
-                viewIdResourceName == "geoShareApp_${OSMAND_PLUS_PACKAGE_NAME}"
+                viewIdResourceName == "geoShareApp_${PackageNames.OSMAND_PLUS}"
             }
     }
 
     @Test
     fun whenLinkIsHidden_itIsNotShownOnResultScreen() = uiAutomator {
-        assumeAppInstalled(OSMAND_PLUS_PACKAGE_NAME)
+        assumeAppInstalled(PackageNames.OSMAND_PLUS)
 
         // Launch application and close intro
         launchApplication()

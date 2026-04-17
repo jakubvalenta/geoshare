@@ -7,9 +7,10 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
+import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 
 object MapyComInput : ShortUriInput, Input.HasRandomUri {
     private const val COORDS = """(\d{1,2}(?:\.\d{1,16})?)[NS], (\d{1,3}(?:\.\d{1,16})?)[WE]"""
@@ -66,5 +67,13 @@ object MapyComInput : ShortUriInput, Input.HasRandomUri {
     override val loadingIndicatorTitleResId = R.string.converter_mapy_com_loading_indicator_title
 
     override fun genRandomUri(point: Point) =
-        point.formatUriString("https://mapy.com/en/zakladni?x={lon}&y={lat}&z={z}")
+        UriFormatter.formatUriString(point, "https://mapy.com/en/zakladni?x={lon}&y={lat}&z={z}")
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is MapyComInput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
 }

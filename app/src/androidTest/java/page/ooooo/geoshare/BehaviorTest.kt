@@ -19,7 +19,6 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.head
 import io.ktor.http.isSuccess
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -27,19 +26,18 @@ import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Before
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
+import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.network.NetworkTools.Companion.CONNECT_TIMEOUT
 import page.ooooo.geoshare.lib.network.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE
 import page.ooooo.geoshare.lib.network.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE_DELAY
 import page.ooooo.geoshare.lib.network.NetworkTools.Companion.MAX_RETRIES
 import page.ooooo.geoshare.lib.network.NetworkTools.Companion.REQUEST_TIMEOUT
-import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
-import page.ooooo.geoshare.lib.formats.CoordsFormat
-import page.ooooo.geoshare.lib.geo.quickIsPointInChina
-import page.ooooo.geoshare.lib.point.BD09MCPoint
-import page.ooooo.geoshare.lib.point.GCJ02Point
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Source
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 import java.net.InetAddress
 import java.net.SocketException
@@ -118,7 +116,7 @@ interface BehaviorTest {
 
     fun onDialog(
         resourceName: String,
-        timeoutMs: Long = 20_000L,
+        timeoutMs: Long = 10_000L,
         block: DialogScope.() -> Unit,
     ) = uiAutomator {
         val dialog = onElement(timeoutMs) { viewIdResourceName == resourceName }
@@ -204,9 +202,14 @@ interface BehaviorTest {
      * phone's language and location.
      */
     fun UiAutomatorTestScope.assertConversionSucceeded(
-        expectedPoints: ImmutableList<Point>,
+        expectedPoints: Points,
+        accurate: Boolean? = null,
         timeoutMs: Long = NETWORK_TIMEOUT,
     ) {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+
         onElement(timeoutMs) {
             when (viewIdResourceName) {
                 "geoShareResultSuccessLastPointName" -> true
@@ -247,8 +250,13 @@ interface BehaviorTest {
             ?.let { point ->
                 CoordinateFormat.entries.map { coordinateFormat ->
                     when (coordinateFormat) {
-                        CoordinateFormat.DEC -> CoordsFormat.formatDecCoords(point)
-                        CoordinateFormat.DEG_MIN_SEC -> CoordsFormat.formatDegMinSecCoords(point)
+                        CoordinateFormat.DEC -> CoordinateFormatter.formatDecCoords(
+                            coordinateConverter.toWGS84(point)
+                        )
+
+                        CoordinateFormat.DEG_MIN_SEC -> CoordinateFormatter.formatDegMinSecCoords(
+                            coordinateConverter.toWGS84(point)
+                        )
                     }
                 }
             }
@@ -267,13 +275,7 @@ interface BehaviorTest {
             }
         lastPoint.source.let { expectedSource ->
             onElement { viewIdResourceName == "geoShareResultSuccessLastPointSource_${expectedSource}" }
-            if ((lastPoint is GCJ02Point || lastPoint is BD09MCPoint) &&
-                lastPoint.lat?.let { lat ->
-                    lastPoint.lon?.let { lon ->
-                        quickIsPointInChina(lon, lat)
-                    }
-                } == true
-            ) {
+            if (!(accurate ?: lastPoint.isAccurate())) {
                 onElement { viewIdResourceName == "geoShareResultSuccessLastPointCheckSRS" }
             } else if (expectedSource == Source.JAVASCRIPT) {
                 onElement { viewIdResourceName == "geoShareResultSuccessLastPointCheckJavaScript" }
@@ -298,23 +300,24 @@ interface BehaviorTest {
 
     fun UiAutomatorTestScope.assertConversionSucceeded(
         expectedPoint: Point,
+        accurate: Boolean? = null,
         timeoutMs: Long = NETWORK_TIMEOUT,
     ) =
-        assertConversionSucceeded(persistentListOf(expectedPoint), timeoutMs)
+        assertConversionSucceeded(persistentListOf(expectedPoint), accurate, timeoutMs)
 
     fun UiAutomatorTestScope.waitAndAssertGoogleMapsContainsElement(block: AccessibilityNodeInfo.() -> Boolean) {
         // Wait for Google Maps
-        onElement(20_000L) { packageName == GOOGLE_MAPS_PACKAGE_NAME }
+        onElement(20_000L) { packageName == PackageNames.GOOGLE_MAPS }
 
         // If there is a Google Maps sign in screen, skip it
         onElementOrNull(3_000L) {
-            packageName == GOOGLE_MAPS_PACKAGE_NAME && @Suppress("SpellCheckingInspection") when (textAsString()) {
+            packageName == PackageNames.GOOGLE_MAPS && @Suppress("SpellCheckingInspection") when (textAsString()) {
                 "Make it your map", "Profitez d'une carte personnalisée" -> true
                 else -> false
             }
         }?.let {
             onElement {
-                packageName == GOOGLE_MAPS_PACKAGE_NAME && when (textAsString()?.lowercase()) {
+                packageName == PackageNames.GOOGLE_MAPS && when (textAsString()?.lowercase()) {
                     "skip", "ignorer" -> true
                     else -> false
                 }
@@ -322,12 +325,12 @@ interface BehaviorTest {
         }
 
         // Verify Google Maps content
-        onElement(20_000L) { packageName == GOOGLE_MAPS_PACKAGE_NAME && this.block() }
+        onElement(20_000L) { packageName == PackageNames.GOOGLE_MAPS && this.block() }
     }
 
     fun UiAutomatorTestScope.waitAndAssertTomTomContainsElement(block: AccessibilityNodeInfo.() -> Boolean) {
         // Wait for TomTom
-        onElement(30_000L) { packageName == TOMTOM_PACKAGE_NAME }
+        onElement(30_000L) { packageName == PackageNames.TOMTOM }
 
         // If there is location permission, grant it
         grantLocationPermissionIfNecessary()
@@ -341,7 +344,7 @@ interface BehaviorTest {
         }?.click()
 
         // Verify TomTom content
-        onElement { packageName == TOMTOM_PACKAGE_NAME && this.block() }
+        onElement { packageName == PackageNames.TOMTOM && this.block() }
     }
 
     fun UiAutomatorTestScope.shareUri(unsafeUriString: String) {

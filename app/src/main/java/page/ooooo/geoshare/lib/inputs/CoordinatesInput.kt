@@ -7,14 +7,14 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toScale
-import page.ooooo.geoshare.lib.formats.CoordsFormat
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
+import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
+import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 
 object CoordinatesInput : Input, Input.HasRandomUri {
-    @Suppress("SpellCheckingInspection")
-    private const val CHARS = """[\p{Zs},°'′"″NSWE]"""
+    private const val CHARS = @Suppress("SpellCheckingInspection") """[\p{Zs},°'′"″NSWE]"""
     private const val SPACE = """\p{Zs}*"""
     private const val LAT_SIG = """(-?)"""
     private const val LAT_DEG = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
@@ -31,7 +31,9 @@ object CoordinatesInput : Input, Input.HasRandomUri {
         nameResId = R.string.converter_coordinates_name,
         items = listOf(
             InputDocumentationItem.Text(20) {
-                stringResource(R.string.example, CoordsFormat.formatDegMinSecCoords(Point.example))
+                stringResource(
+                    R.string.example, CoordinateFormatter.formatDegMinSecCoords(WGS84Point.example)
+                )
             },
         ),
     )
@@ -129,5 +131,13 @@ object CoordinatesInput : Input, Input.HasRandomUri {
     }
 
     override fun genRandomUri(point: Point) =
-        point.formatUriString("N {lat}, E {lon}")
+        UriFormatter.formatUriString(point, "N {lat}, E {lon}")
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is CoordinatesInput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
 }

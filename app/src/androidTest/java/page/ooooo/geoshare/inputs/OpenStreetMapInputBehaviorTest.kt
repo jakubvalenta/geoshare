@@ -4,8 +4,8 @@ import androidx.test.uiautomator.uiAutomator
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class OpenStreetMapInputBehaviorTest : InputBehaviorTest {
     @Test

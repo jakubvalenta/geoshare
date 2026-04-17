@@ -19,9 +19,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.formats.CoordsFormat
-import page.ooooo.geoshare.lib.outputs.CopyGeoUriOutput
-import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable
@@ -40,7 +39,7 @@ fun ScreenshotOpen() {
             y = 100,
         ) {
             ScreenshotText(
-                CoordsFormat.formatDecCoords(Point.example),
+                CoordinateFormatter.formatDecCoords(WGS84Point.example),
                 scale,
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                 style = MaterialTheme.typography.bodyLarge,
@@ -53,7 +52,10 @@ fun ScreenshotOpen() {
             y = 220,
         ) {
             ScreenshotText(
-                CopyGeoUriOutput.label(emptyMap()),
+                stringResource(
+                    R.string.conversion_succeeded_copy_link,
+                    stringResource(R.string.converter_geo_name),
+                ),
                 scale,
                 Modifier
                     .border(

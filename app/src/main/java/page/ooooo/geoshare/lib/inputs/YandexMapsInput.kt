@@ -3,7 +3,6 @@ package page.ooooo.geoshare.lib.inputs
 import androidx.annotation.StringRes
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readLine
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
@@ -13,10 +12,12 @@ import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
-import page.ooooo.geoshare.lib.point.NaivePoint
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
+import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.NaivePoint
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 
 object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
     override val uriPattern = Regex("""(?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/$URI_REST""")
@@ -95,7 +96,7 @@ object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
     override suspend fun parseHtml(
         htmlUrlString: String,
         channel: ByteReadChannel,
-        pointsFromUri: ImmutableList<Point>,
+        pointsFromUri: Points,
         uriQuote: UriQuote,
         log: ILog,
     ) = buildParseHtmlResult {
@@ -131,5 +132,13 @@ object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
     override val loadingIndicatorTitleResId = R.string.converter_yandex_maps_loading_indicator_title
 
     override fun genRandomUri(point: Point) =
-        point.formatUriString("https://yandex.com/maps?ll={lon}%2C{lat}&z={z}")
+        UriFormatter.formatUriString(point, "https://yandex.com/maps?ll={lon}%2C{lat}&z={z}")
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is YandexMapsInput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
 }

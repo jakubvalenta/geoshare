@@ -11,11 +11,8 @@ import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.DefaultUriQuote
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.firstGraphemeOrNull
-import page.ooooo.geoshare.lib.point.Srs
-import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.geo.Srs
 import page.ooooo.geoshare.ui.components.CharacterIconDescriptor
 import page.ooooo.geoshare.ui.components.IconDescriptor
 import page.ooooo.geoshare.ui.components.ResourceIconDescriptor
@@ -48,9 +45,6 @@ data class Link(
 
     val enabled: Boolean
         get() = appEnabled || sheetEnabled || chipEnabled
-
-    fun formatUriString(point: Point, uriQuote: UriQuote = DefaultUriQuote): String? =
-        point.formatUriString(coordsUriTemplate, nameUriTemplate, srs, uriQuote = uriQuote)
 
     val menuIcon: IconDescriptor
         get() = when (type) {

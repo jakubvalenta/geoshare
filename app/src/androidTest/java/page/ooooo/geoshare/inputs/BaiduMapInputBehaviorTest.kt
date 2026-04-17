@@ -5,8 +5,9 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import page.ooooo.geoshare.BehaviorTest.Companion.NETWORK_TIMEOUT
-import page.ooooo.geoshare.lib.point.BD09MCPoint
-import page.ooooo.geoshare.lib.point.Source
+import page.ooooo.geoshare.lib.geo.BD09MCPoint
+import page.ooooo.geoshare.lib.geo.GCJ02Point
+import page.ooooo.geoshare.lib.geo.Source
 
 class BaiduMapInputBehaviorTest : InputBehaviorTest {
     @Test
@@ -17,10 +18,52 @@ class BaiduMapInputBehaviorTest : InputBehaviorTest {
             "https://map.baidu.com/@13520653,3317203,13z",
         )
 
-        // Place
+        // POI
         testUri(
             BD09MCPoint(3315902.2199999997, 13502918.375, 16.0, name = "黄岩客运中心", source = Source.MAP_CENTER),
             @Suppress("SpellCheckingInspection") "https://map.baidu.com/poi/%E9%BB%84%E5%B2%A9%E5%AE%A2%E8%BF%90%E4%B8%AD%E5%BF%83/@13502918.375,3315902.2199999997,16z?uid=fef3b5922f87e66c63180999&info_merge=1&isBizPoi=false&ugc_type=3&ugc_ver=1&device_ratio=2&compat=1&routetype=drive&en_uid=fef3b5922f87e66c63180999&pcevaname=pc4.1&querytype=detailConInfo&da_src=shareurl",
+        )
+
+        // POI within Taiwan
+        testUri(
+            GCJ02Point(
+                25.057843815261702, 121.46399336269734,
+                z = 17.0,
+                name = "地图上的点",
+                source = Source.MAP_CENTER,
+            ),
+            @Suppress("SpellCheckingInspection") "https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13522176,2865337,17z?querytype=share&poiShareId=pb81fb1b0172f25114bd52ce2cd&da_src=shareurl",
+        )
+
+        // Map center within Hong Kong
+        testUri(
+            GCJ02Point(
+                22.28961378075748, 114.17707923795504,
+                z = 19.0,
+                source = Source.MAP_CENTER,
+            ),
+            "https://map.baidu.com/@12711001.38,2530657.04,19z",
+        )
+
+        // Map center within western Japan
+        testUri(
+            GCJ02Point(
+                34.308010260830606, 130.89147646937502,
+                z = 19.0,
+                source = Source.MAP_CENTER,
+            ),
+            "https://map.baidu.com/@14571652.5,4046737.5,19z",
+        )
+
+        // Map center within eastern Japan
+        testUri(
+            GCJ02Point(
+                43.32229116408107, 145.58037496052287,
+                z = 19.0,
+                source = Source.MAP_CENTER,
+            ),
+            "https://map.baidu.com/@16206826.38,5332511.04,19z",
+            accurate = false,
         )
 
         // Directions
@@ -58,7 +101,7 @@ class BaiduMapInputBehaviorTest : InputBehaviorTest {
             assumeHttpHeadIsSuccess("https://maponline1.bdimg.com/tile/?qt=vtile&x=13490&y=6210&z=14&styles=pl&udt=20230101&scaler=1&p=1")
         }
 
-        // Shared point
+        // Shared coordinates
         testUri(
             BD09MCPoint(3619117.0, 13392243.0, 17.0, name = "地图上的点", source = Source.URI),
             "https://j.map.baidu.com/64/lqEk", // Resolves to https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13392243,3619117,17z...
@@ -66,7 +109,7 @@ class BaiduMapInputBehaviorTest : InputBehaviorTest {
             timeoutMs = NETWORK_TIMEOUT * 2,
         )
 
-        // Shared place
+        // Shared POI
         testUri(
             BD09MCPoint(3316047.58, 13502465.77, 19.0, name = "黄岩客运中心", source = Source.URI),
             "https://j.map.baidu.com/44/lth", // Resolves to https://map.baidu.com/poi/%E9%BB%84%E5%B2%A9%E5%AE%A2%E8%BF%90%E4%B8%AD%E5%BF%83/@13502465.77,3316047.58,19z...
@@ -74,7 +117,7 @@ class BaiduMapInputBehaviorTest : InputBehaviorTest {
             timeoutMs = NETWORK_TIMEOUT * 2,
         )
 
-        // Shared point that requires CSS
+        // Shared POI that requires CSS
         testUri(
             BD09MCPoint(3750567.0, 13224572.0, 17.0, name = "地图上的点", source = Source.URI),
             "https://j.map.baidu.com/a7/GXfM", // Resolves to https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13224572,3750567,17z...

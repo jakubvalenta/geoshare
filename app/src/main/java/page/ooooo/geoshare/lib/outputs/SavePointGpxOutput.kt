@@ -10,11 +10,15 @@ import kotlinx.coroutines.withContext
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.formats.GpxFormat
+import page.ooooo.geoshare.lib.formatters.GpxFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.getTimestamp
-import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.geo.Point
+import javax.inject.Inject
 
-object SavePointGpxOutput : PointOutput.WithFile, SaveFileOutput {
+class SavePointGpxOutput @Inject constructor(
+    private val coordinateConverter: CoordinateConverter,
+) : PointOutput.WithFile, SaveFileOutput {
     override fun getFilename(resources: Resources) =
         resources.getString(
             R.string.conversion_succeeded_save_gpx_filename,
@@ -26,11 +30,19 @@ object SavePointGpxOutput : PointOutput.WithFile, SaveFileOutput {
 
     override suspend fun execute(uri: Uri, value: Point, actionContext: ActionContext) = withContext(Dispatchers.IO) {
         AndroidTools.openFileUri(actionContext.context, uri) {
-            GpxFormat.writeGpxPoints(persistentListOf(value), this)
+            GpxFormatter.writeGpxPoints(coordinateConverter.toWGS84(persistentListOf(value)), this)
         }
     }
 
     @Composable
     override fun label(appDetails: AppDetails) =
         stringResource(R.string.output_gpx_point_save)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is SavePointGpxOutput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
 }

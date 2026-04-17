@@ -9,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import page.ooooo.geoshare.ui.BillingViewModel
+import page.ooooo.geoshare.ui.ConversionViewModel
 import page.ooooo.geoshare.ui.MainNavigation
 import page.ooooo.geoshare.ui.theme.AppTheme
 

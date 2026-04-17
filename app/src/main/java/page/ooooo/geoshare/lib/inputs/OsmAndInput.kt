@@ -9,9 +9,10 @@ import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toZLatLonPoint
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
+import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 
 object OsmAndInput : Input, Input.HasRandomUri {
     override val uriPattern = Regex("""(?:https?://)?(?:www\.)?osmand\.net/$URI_REST""")
@@ -57,5 +58,13 @@ object OsmAndInput : Input, Input.HasRandomUri {
     }
 
     override fun genRandomUri(point: Point) =
-        point.formatUriString("https://osmand.net/map?pin={lat}%2C{lon}")
+        UriFormatter.formatUriString(point, "https://osmand.net/map?pin={lat}%2C{lon}")
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is OsmAndInput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
 }

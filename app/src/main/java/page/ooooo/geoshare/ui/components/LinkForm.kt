@@ -54,17 +54,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeGoogleMapsStreetViewLink
-import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.database.LinkType
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.Srs
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.CopyLinkUriOutput
 import page.ooooo.geoshare.lib.outputs.ShareLinkUriOutput
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.Srs
-import page.ooooo.geoshare.lib.point.WGS84Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -73,6 +74,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun LinkForm(
     appEnabled: Boolean,
     chipEnabled: Boolean,
+    coordinateConverter: CoordinateConverter,
     coordsUriTemplate: String,
     group: String,
     name: String,
@@ -125,8 +127,8 @@ fun LinkForm(
             nameUriTemplate = nameUriTemplate,
         )
     }
-    val copyOutput = remember(link) { CopyLinkUriOutput(link) }
-    val shareOutput = remember(link) { ShareLinkUriOutput(link) }
+    val copyOutput = remember(link) { CopyLinkUriOutput(link, coordinateConverter) }
+    val shareOutput = remember(link) { ShareLinkUriOutput(link, coordinateConverter) }
 
     Column(modifier) {
         TextField(
@@ -197,11 +199,11 @@ fun LinkForm(
                         item {
                             SuggestionChip(
                                 onClick = {
-                                    Link(
-                                        coordsUriTemplate = coordsUriTemplate,
-                                        nameUriTemplate = nameUriTemplate,
-                                        srs = srs,
-                                    ).formatUriString(point.copy(name = name))?.let {
+                                    UriFormatter.formatUriString(
+                                        coordinateConverter.toSrs(point.copy(name = name), srs),
+                                        coordsUriTemplate,
+                                        nameUriTemplate,
+                                    )?.let {
                                         AndroidTools.openWebUri(context, it)
                                     }
                                 },
@@ -272,7 +274,7 @@ fun LinkForm(
                         }
                         ResultSuccessSheetItem(
                             headlineText = copyOutput.label(appDetails),
-                            supportingText = copyOutput.getDescription(Point.example),
+                            supportingText = copyOutput.getDescription(WGS84Point.example),
                             icon = copyOutput.getIcon(appDetails),
                         )
                     }
@@ -344,10 +346,25 @@ fun LinkForm(
                 )
                 DropdownField(
                     value = srs,
-                    options = mapOf(
-                        Srs.WGS84 to stringResource(R.string.srs_wgs84),
-                        Srs.GCJ02 to stringResource(R.string.srs_gcj02),
-                    ),
+                    options = Srs.entries.associateWith { srs ->
+                        when (srs) {
+                            Srs.WGS84 -> stringResource(R.string.srs_wgs84)
+
+                            Srs.GCJ02 -> stringResource(R.string.srs_gcj02)
+
+                            Srs.GCJ02_MAINLAND_CHINA -> stringResource(
+                                R.string.srs_description,
+                                stringResource(R.string.srs_gcj02),
+                                stringResource(R.string.srs_description_mainland_china),
+                            )
+
+                            Srs.GCJ02_GREATER_CHINA_AND_TAIWAN -> stringResource(
+                                R.string.srs_description,
+                                stringResource(R.string.srs_gcj02),
+                                stringResource(R.string.srs_description_greater_china_and_taiwan),
+                            )
+                        }
+                    },
                     onValueChange = onSetSrs,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -406,7 +423,8 @@ fun LinkForm(
                                 onClick = { onSetType(value) },
                                 leadingIcon = {
                                     IconFromDescriptor(
-                                        shareOutput.copy(link = link.copy(type = value)).getMenuIcon(appDetails),
+                                        ShareLinkUriOutput(link.copy(type = value), coordinateConverter)
+                                            .getMenuIcon(appDetails),
                                         contentDescription = null,
                                     )
                                 },
@@ -473,9 +491,13 @@ private fun LinkFormEnabledCheckbox(
 private fun DefaultPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             LinkForm(
                 appEnabled = false,
                 chipEnabled = false,
+                coordinateConverter = coordinateConverter,
                 coordsUriTemplate = "",
                 group = "",
                 name = "",
@@ -503,9 +525,13 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             LinkForm(
                 appEnabled = false,
                 chipEnabled = false,
+                coordinateConverter = coordinateConverter,
                 coordsUriTemplate = "",
                 group = "",
                 name = "",
@@ -533,10 +559,14 @@ private fun DarkPreview() {
 private fun UpdatePreview() {
     AppTheme {
         Surface {
-            val link = defaultFakeLinks[2]
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val link = FakeGoogleMapsStreetViewLink
             LinkForm(
                 appEnabled = link.appEnabled,
                 chipEnabled = link.chipEnabled,
+                coordinateConverter = coordinateConverter,
                 coordsUriTemplate = link.coordsUriTemplate,
                 group = link.group,
                 name = link.name,
@@ -568,10 +598,14 @@ private fun UpdatePreview() {
 private fun DarkUpdatePreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val link = FakeGoogleMapsStreetViewLink
             LinkForm(
                 appEnabled = link.appEnabled,
                 chipEnabled = link.chipEnabled,
+                coordinateConverter = coordinateConverter,
                 coordsUriTemplate = link.coordsUriTemplate,
                 group = link.group,
                 name = link.name,
@@ -599,10 +633,14 @@ private fun DarkUpdatePreview() {
 private fun UpdateExpandedPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val link = FakeGoogleMapsStreetViewLink
             LinkForm(
                 appEnabled = link.appEnabled,
                 chipEnabled = link.chipEnabled,
+                coordinateConverter = coordinateConverter,
                 coordsUriTemplate = link.coordsUriTemplate,
                 group = link.group,
                 name = link.name,
@@ -635,10 +673,14 @@ private fun UpdateExpandedPreview() {
 private fun DarkUpdateExpandedPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             val link = FakeGoogleMapsStreetViewLink
             LinkForm(
                 appEnabled = link.appEnabled,
                 chipEnabled = link.chipEnabled,
+                coordinateConverter = coordinateConverter,
                 coordsUriTemplate = link.coordsUriTemplate,
                 group = link.group,
                 name = link.name,

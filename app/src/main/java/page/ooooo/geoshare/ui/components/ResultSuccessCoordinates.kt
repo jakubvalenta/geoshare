@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -29,22 +30,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.formats.CoordsFormat
-import page.ooooo.geoshare.lib.geo.quickIsPointInChina
+import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.GCJ02Point
+import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
-import page.ooooo.geoshare.lib.outputs.getOutputsForPointChips
-import page.ooooo.geoshare.lib.outputs.getOutputsForPointsChips
-import page.ooooo.geoshare.lib.point.BD09MCPoint
-import page.ooooo.geoshare.lib.point.GCJ02Point
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Points
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -54,11 +53,12 @@ fun ResultSuccessCoordinates(
     points: Points,
     appDetails: AppDetails,
     coordinateFormat: CoordinateFormat,
+    coordinateConverter: CoordinateConverter,
     outputsForPointChips: List<PointOutput>,
     outputsForPointsChips: List<PointsOutput>,
-    initialExpanded: Boolean = false,
     onExecute: (action: Action<*>) -> Unit,
     onSelect: (index: Int?) -> Unit,
+    initialExpanded: Boolean = false,
 ) {
     val lastPoint = points.lastOrNull() ?: return
     val spacing = LocalSpacing.current
@@ -89,8 +89,13 @@ fun ResultSuccessCoordinates(
                 SelectionContainer {
                     Text(
                         when (coordinateFormat) {
-                            CoordinateFormat.DEC -> CoordsFormat.formatDecCoords(lastPoint)
-                            CoordinateFormat.DEG_MIN_SEC -> CoordsFormat.formatDegMinSecCoords(lastPoint)
+                            CoordinateFormat.DEC -> CoordinateFormatter.formatDecCoords(
+                                coordinateConverter.toWGS84(lastPoint)
+                            )
+
+                            CoordinateFormat.DEG_MIN_SEC -> CoordinateFormatter.formatDegMinSecCoords(
+                                coordinateConverter.toWGS84(lastPoint)
+                            )
                         },
                         Modifier
                             .weight(1f)
@@ -119,14 +124,7 @@ fun ResultSuccessCoordinates(
                 )
             }
         }
-        if (
-            (lastPoint is GCJ02Point || lastPoint is BD09MCPoint) &&
-            lastPoint.lat?.let { lat ->
-                lastPoint.lon?.let { lon ->
-                    quickIsPointInChina(lon, lat)
-                }
-            } == true
-        ) {
+        if (!lastPoint.isAccurate()) {
             ResultSuccessCoordinatesCheck(
                 stringResource(R.string.conversion_succeeded_check_srs),
                 Modifier.testTag("geoShareResultSuccessLastPointCheckSRS"),
@@ -193,6 +191,7 @@ fun ResultSuccessCoordinates(
                                     point = point,
                                     index = index,
                                     coordinateFormat = coordinateFormat,
+                                    coordinateConverter = coordinateConverter,
                                     onSelect = { onSelect(index) },
                                 )
                             }
@@ -245,12 +244,19 @@ private fun DefaultPreview() {
             color = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+            )
             ResultSuccessCoordinates(
-                points = persistentListOf(Point.example),
+                points = persistentListOf(WGS84Point.example),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
-                outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
-                outputsForPointsChips = getOutputsForPointsChips(),
+                coordinateConverter = coordinateConverter,
+                outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
+                outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 onExecute = {},
                 onSelect = {},
             )
@@ -266,12 +272,19 @@ private fun DarkPreview() {
             color = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+            )
             ResultSuccessCoordinates(
-                points = persistentListOf(Point.example),
+                points = persistentListOf(WGS84Point.example),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
-                outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
-                outputsForPointsChips = getOutputsForPointsChips(),
+                coordinateConverter = coordinateConverter,
+                outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
+                outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 onExecute = {},
                 onSelect = {},
             )
@@ -287,12 +300,19 @@ private fun DescriptionPreview() {
             color = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+            )
             ResultSuccessCoordinates(
                 points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI)),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
-                outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
-                outputsForPointsChips = getOutputsForPointsChips(),
+                coordinateConverter = coordinateConverter,
+                outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
+                outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 onExecute = {},
                 onSelect = {},
             )
@@ -308,12 +328,19 @@ private fun DarkDescriptionPreview() {
             color = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+            )
             ResultSuccessCoordinates(
                 points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI)),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
-                outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
-                outputsForPointsChips = getOutputsForPointsChips(),
+                coordinateConverter = coordinateConverter,
+                outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
+                outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 onExecute = {},
                 onSelect = {},
             )
@@ -329,15 +356,22 @@ private fun NamePreview() {
             color = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+            )
             ResultSuccessCoordinates(
                 points = persistentListOf(
-                    Point.example,
+                    WGS84Point.example,
                     GCJ02Point(31.22850685422705, 121.47552456472106, z = 11.0, source = Source.MAP_CENTER),
                 ),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
-                outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
-                outputsForPointsChips = getOutputsForPointsChips(),
+                coordinateConverter = coordinateConverter,
+                outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
+                outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 onExecute = {},
                 onSelect = {},
             )
@@ -353,15 +387,22 @@ private fun DarkNamePreview() {
             color = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+            )
             ResultSuccessCoordinates(
                 points = persistentListOf(
-                    Point.example,
+                    WGS84Point.example,
                     GCJ02Point(31.22850685422705, 121.47552456472106, z = 11.0, source = Source.MAP_CENTER),
                 ),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
-                outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
-                outputsForPointsChips = getOutputsForPointsChips(),
+                coordinateConverter = coordinateConverter,
+                outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
+                outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 onExecute = {},
                 onSelect = {},
             )
@@ -377,20 +418,27 @@ private fun PointsPreview() {
             color = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+            )
             ResultSuccessCoordinates(
                 points = persistentListOf(
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
                 ),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
-                outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
-                outputsForPointsChips = getOutputsForPointsChips(),
+                coordinateConverter = coordinateConverter,
+                outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
+                outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 initialExpanded = true,
                 onExecute = {},
                 onSelect = {},
@@ -407,20 +455,27 @@ private fun DarkPointsPreview() {
             color = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+            )
             ResultSuccessCoordinates(
                 points = persistentListOf(
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
                 ),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
-                outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
-                outputsForPointsChips = getOutputsForPointsChips(),
+                coordinateConverter = coordinateConverter,
+                outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
+                outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 initialExpanded = true,
                 onExecute = {},
                 onSelect = {},
@@ -437,16 +492,23 @@ private fun PointsWithNamePreview() {
             color = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+            )
             ResultSuccessCoordinates(
                 points = persistentListOf(
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(name = "Berlin, Germany", z = 13.0),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(name = "Berlin, Germany", z = 13.0),
                 ),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
-                outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
-                outputsForPointsChips = getOutputsForPointsChips(),
+                coordinateConverter = coordinateConverter,
+                outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
+                outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 initialExpanded = true,
                 onExecute = {},
                 onSelect = {},
@@ -463,16 +525,23 @@ private fun DarkPointsWithNamePreview() {
             color = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+            )
             ResultSuccessCoordinates(
                 points = persistentListOf(
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(),
-                    Point.genRandomPoint(name = "Berlin, Germany", z = 13.0),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(),
+                    WGS84Point.genRandomPoint(name = "Berlin, Germany", z = 13.0),
                 ),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
-                outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
-                outputsForPointsChips = getOutputsForPointsChips(),
+                coordinateConverter = coordinateConverter,
+                outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
+                outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 initialExpanded = true,
                 onExecute = {},
                 onSelect = {},

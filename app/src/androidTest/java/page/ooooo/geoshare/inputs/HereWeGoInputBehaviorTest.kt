@@ -2,8 +2,8 @@ package page.ooooo.geoshare.inputs
 
 import androidx.test.uiautomator.uiAutomator
 import org.junit.Test
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class HereWeGoInputBehaviorTest : InputBehaviorTest {
     @Test

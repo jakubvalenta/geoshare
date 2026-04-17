@@ -6,17 +6,26 @@ import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.formats.GoogleMapsUriFormat
-import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.ui.components.ResourceIconDescriptor
+import javax.inject.Inject
 
 /**
  * This output creates a 'google.streetview:' URI, which some apps support to launch street view, and opens it in
  * [packageName].
  */
-data class OpenStreetViewGoogleUriOutput(override val packageName: String) : OpenPointOutput {
+class OpenStreetViewGoogleUriOutput @Inject constructor(
+    override val packageName: String,
+    private val coordinateConverter: CoordinateConverter,
+) : OpenPointOutput {
     override fun getText(value: Point, uriQuote: UriQuote) =
-        GoogleMapsUriFormat.formatStreetViewUriString(value, uriQuote)
+        GoogleMapsUriFormatter.formatStreetViewUriString(
+            coordinateConverter.toSrs(value, PackageNames.getSrs(packageName)),
+            uriQuote,
+        )
 
     @Composable
     override fun label(appDetails: AppDetails) =
@@ -31,4 +40,13 @@ data class OpenStreetViewGoogleUriOutput(override val packageName: String) : Ope
             R.string.conversion_succeeded_open_app_street_view,
             appDetails[packageName]?.label ?: packageName,
         )
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        other as OpenStreetViewGoogleUriOutput
+        return packageName == other.packageName
+    }
+
+    override fun hashCode() = packageName.hashCode()
 }

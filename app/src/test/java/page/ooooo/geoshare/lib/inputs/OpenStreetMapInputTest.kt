@@ -5,10 +5,10 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 
-class OpenStreetMapInputTest : BaseInputTest() {
+class OpenStreetMapInputTest : InputTest {
     override val input = OpenStreetMapInput
 
     @Test

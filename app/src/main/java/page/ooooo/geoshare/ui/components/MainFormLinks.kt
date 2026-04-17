@@ -16,19 +16,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.Input
-import page.ooooo.geoshare.lib.inputs.allInputs
-import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun MainFormLinks(
+    allInputs: List<Input>,
+    modifier: Modifier = Modifier,
     onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
     onUpdateInput: (newInputUriString: String) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     val resources = LocalResources.current
     val spacing = LocalSpacing.current
@@ -54,7 +54,7 @@ fun MainFormLinks(
             Text(stringResource(R.string.main_navigate_to_intro))
         }
         TextButton({
-            val randomPoint = Point.genRandomPoint(
+            val randomPoint = WGS84Point.genRandomPoint(
                 name = resources.getString(R.string.intro_how_to_share_google_maps_screenshot_place),
             )
             allInputs
@@ -83,6 +83,7 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             MainFormLinks(
+                allInputs = emptyList(),
                 onNavigateToInputsScreen = {},
                 onNavigateToIntroScreen = {},
                 onSetErrorMessageResId = {},
@@ -98,6 +99,7 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             MainFormLinks(
+                allInputs = emptyList(),
                 onNavigateToInputsScreen = {},
                 onNavigateToIntroScreen = {},
                 onSetErrorMessageResId = {},

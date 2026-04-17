@@ -5,7 +5,6 @@ import androidx.annotation.StringRes
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.find
@@ -14,8 +13,9 @@ import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLonLatNamePoint
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
-import page.ooooo.geoshare.lib.point.BD09MCPoint
-import page.ooooo.geoshare.lib.point.Source
+import page.ooooo.geoshare.lib.geo.BD09MCPoint
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.network.NetworkTools
 
 object BaiduMapInput : ShortUriInput, WebInput {
     private const val X = """(\d+(?:\.\d+)?)"""
@@ -47,9 +47,10 @@ object BaiduMapInput : ShortUriInput, WebInput {
                     !queryParams["poiShareUid"].isNullOrEmpty() ||
                     queryParams["s"]?.contains("uid=") == true
                 ) {
-                    // Shared point or shared place
+                    // Shared coordinates or shared POI
                     // https://map.baidu.com/?poiShareId={id}
                     // https://map.baidu.com/?shareurl=1&poiShareUid={uid}
+                    // https://map.baidu.com/?newmap=1&s=inf%26uid%3D{uid}
                     webUriString = toString()
                 }
 
@@ -61,7 +62,7 @@ object BaiduMapInput : ShortUriInput, WebInput {
                 }
 
             } else if (firstPart == "poi") {
-                // Place
+                // POI
                 // https://map.baidu.com/poi/{name}/@{x},{y},{z}
                 Regex(CENTER).matchEntire(parts.getOrNull(2))?.toLonLatZPoint(Source.MAP_CENTER)?.let {
                     points = persistentListOf(BD09MCPoint(it).copy(name = parts.getOrNull(1)))
@@ -125,4 +126,12 @@ object BaiduMapInput : ShortUriInput, WebInput {
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_baidu_map_loading_indicator_title
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return other is BaiduMapInput
+    }
+
+    override fun hashCode() = javaClass.hashCode()
 }

@@ -2,12 +2,13 @@ package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
-import page.ooooo.geoshare.lib.point.Source
-import page.ooooo.geoshare.lib.point.WGS84Point
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 
-class CoordinatesInputTest : BaseInputTest() {
+class CoordinatesInputTest : InputTest {
     override val input = CoordinatesInput
 
     @Test

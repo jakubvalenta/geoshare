@@ -16,7 +16,7 @@ import page.ooooo.geoshare.data.local.database.AppDatabase
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.database.LinkDao
 import page.ooooo.geoshare.data.local.database.LinkType
-import page.ooooo.geoshare.lib.point.Srs
+import page.ooooo.geoshare.lib.geo.Srs
 import java.io.IOException
 import java.util.UUID
 
@@ -71,7 +71,7 @@ class InitialLinksTest {
             Link(
                 group = "Google Maps",
                 name = "Google Maps",
-                srs = Srs.GCJ02,
+                srs = Srs.GCJ02_MAINLAND_CHINA,
                 chipEnabled = true,
                 sheetEnabled = true,
                 coordsUriTemplate = "https://www.google.com/maps/search/?api=1&query={lat}%2C{lon}",
@@ -81,7 +81,7 @@ class InitialLinksTest {
             Link(
                 group = "Google Maps",
                 name = "Google Maps navigation",
-                srs = Srs.GCJ02,
+                srs = Srs.GCJ02_MAINLAND_CHINA,
                 type = LinkType.NAVIGATION,
                 sheetEnabled = true,
                 coordsUriTemplate = "https://www.google.com/maps/dir/?api=1&destination={lat}%2C{lon}",
@@ -91,7 +91,7 @@ class InitialLinksTest {
             Link(
                 group = "Google Maps",
                 name = "Google Street View",
-                srs = Srs.GCJ02,
+                srs = Srs.GCJ02_MAINLAND_CHINA,
                 type = LinkType.STREET_VIEW,
                 coordsUriTemplate = "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint={lat}%2C{lon}",
                 nameUriTemplate = "https://www.google.com/maps/search/?api=1&query={q}",

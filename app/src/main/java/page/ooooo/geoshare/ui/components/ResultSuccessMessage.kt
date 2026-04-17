@@ -41,12 +41,12 @@ import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.FakeLinkRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingImpl
 import page.ooooo.geoshare.lib.billing.BillingProduct
@@ -61,11 +61,13 @@ import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.ConversionStateContext
 import page.ooooo.geoshare.lib.conversion.LocationFindingFailed
 import page.ooooo.geoshare.lib.conversion.LocationPermissionReceived
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.SharePointsGpxOutput
-import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
@@ -284,16 +286,19 @@ private fun ActionFinishedPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionFinished(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(Point.example),
-                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                    points = persistentListOf(WGS84Point.example),
+                    action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
+                        .toAction(WGS84Point.example),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                    PackageNames.OSMAND_PLUS to AppDetail(
                         "OsmAnd",
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
@@ -318,16 +323,19 @@ private fun DarkActionFinishedPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionFinished(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(Point.example),
-                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                    points = persistentListOf(WGS84Point.example),
+                    action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
+                        .toAction(WGS84Point.example),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                    PackageNames.OSMAND_PLUS to AppDetail(
                         "OsmAnd",
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
@@ -353,16 +361,19 @@ private fun ActionFinishedFeatureNotAvailablePreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessMessage(
                     currentState = ActionFinished(
                         inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                        points = persistentListOf(Point.example),
-                        action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                        points = persistentListOf(WGS84Point.example),
+                        action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
+                            .toAction(WGS84Point.example),
                         isAutomation = true,
                     ),
                     appDetails = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -386,16 +397,19 @@ private fun DarkActionFinishedFeatureNotAvailablePreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessMessage(
                     currentState = ActionFinished(
                         inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                        points = persistentListOf(Point.example),
-                        action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                        points = persistentListOf(WGS84Point.example),
+                        action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
+                            .toAction(WGS84Point.example),
                         isAutomation = true,
                     ),
                     appDetails = mapOf(
-                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        PackageNames.OSMAND_PLUS to AppDetail(
                             "OsmAnd",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
@@ -419,23 +433,30 @@ private fun ActionWaitingPreview() {
         Surface {
             val context = LocalContext.current
             val resources = LocalResources.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+            )
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionWaiting(
                     stateContext = ConversionStateContext(
                         linkRepository = FakeLinkRepository(),
+                        outputRepository = outputRepository,
                         resources = resources,
                         userPreferencesRepository = FakeUserPreferencesRepository(),
                         billing = BillingImpl(LocalContext.current),
                     ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(Point.example),
-                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                    points = persistentListOf(WGS84Point.example),
+                    action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
+                        .toAction(WGS84Point.example),
                     isAutomation = true,
                     delay = 3.seconds,
                 ),
                 appDetails = mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                    PackageNames.OSMAND_PLUS to AppDetail(
                         "OsmAnd",
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
@@ -461,23 +482,30 @@ private fun DarkActionWaitingPreview() {
         Surface {
             val context = LocalContext.current
             val resources = LocalResources.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+            )
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionWaiting(
                     stateContext = ConversionStateContext(
                         linkRepository = FakeLinkRepository(),
+                        outputRepository = outputRepository,
                         resources = resources,
                         userPreferencesRepository = FakeUserPreferencesRepository(),
                         billing = BillingImpl(LocalContext.current),
                     ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(Point.example),
-                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                    points = persistentListOf(WGS84Point.example),
+                    action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
+                        .toAction(WGS84Point.example),
                     isAutomation = true,
                     delay = 3.seconds,
                 ),
                 appDetails = mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                    PackageNames.OSMAND_PLUS to AppDetail(
                         "OsmAnd",
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
@@ -503,22 +531,29 @@ private fun LocationPermissionReceivedPreview() {
         Surface {
             val context = LocalContext.current
             val resources = LocalResources.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+            )
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = LocationPermissionReceived(
                     stateContext = ConversionStateContext(
                         linkRepository = FakeLinkRepository(),
+                        outputRepository = outputRepository,
                         resources = resources,
                         userPreferencesRepository = FakeUserPreferencesRepository(),
                         billing = BillingImpl(LocalContext.current),
                     ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(Point.example),
-                    action = OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME).toAction(Point.example),
+                    points = persistentListOf(WGS84Point.example),
+                    action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter)
+                        .toAction(WGS84Point.example),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                    PackageNames.OSMAND_PLUS to AppDetail(
                         "OsmAnd",
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
@@ -544,22 +579,29 @@ private fun DarkLocationPermissionReceivedPreview() {
         Surface {
             val context = LocalContext.current
             val resources = LocalResources.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+            )
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = LocationPermissionReceived(
                     stateContext = ConversionStateContext(
                         linkRepository = FakeLinkRepository(),
+                        outputRepository = outputRepository,
                         resources = resources,
                         userPreferencesRepository = FakeUserPreferencesRepository(),
                         billing = BillingImpl(LocalContext.current),
                     ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(Point.example),
-                    action = OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME).toAction(Point.example),
+                    points = persistentListOf(WGS84Point.example),
+                    action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter)
+                        .toAction(WGS84Point.example),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                    PackageNames.OSMAND_PLUS to AppDetail(
                         "OsmAnd",
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
@@ -584,16 +626,19 @@ private fun SucceededPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(Point.example),
-                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                    points = persistentListOf(WGS84Point.example),
+                    action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
+                        .toAction(WGS84Point.example),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                    PackageNames.OSMAND_PLUS to AppDetail(
                         "OsmAnd",
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
@@ -618,16 +663,19 @@ private fun DarSucceededPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(Point.example),
-                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                    points = persistentListOf(WGS84Point.example),
+                    action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
+                        .toAction(WGS84Point.example),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                    PackageNames.OSMAND_PLUS to AppDetail(
                         "OsmAnd",
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
@@ -652,16 +700,19 @@ private fun SucceededNoMessagePreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(Point.example),
-                    action = SharePointsGpxOutput.toAction(persistentListOf(Point.example)),
+                    points = persistentListOf(WGS84Point.example),
+                    action = SharePointsGpxOutput(coordinateConverter)
+                        .toAction(persistentListOf(WGS84Point.example)),
                     isAutomation = false,
                 ),
                 appDetails = mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                    PackageNames.OSMAND_PLUS to AppDetail(
                         "OsmAnd",
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
@@ -686,16 +737,19 @@ private fun DarkSucceededNoMessagePreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(Point.example),
-                    action = SharePointsGpxOutput.toAction(persistentListOf(Point.example)),
+                    points = persistentListOf(WGS84Point.example),
+                    action = SharePointsGpxOutput(coordinateConverter)
+                        .toAction(persistentListOf(WGS84Point.example)),
                     isAutomation = false,
                 ),
                 appDetails = mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                    PackageNames.OSMAND_PLUS to AppDetail(
                         "OsmAnd",
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
@@ -720,16 +774,19 @@ private fun FailedPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionFailed(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(Point.example),
-                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                    points = persistentListOf(WGS84Point.example),
+                    action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
+                        .toAction(WGS84Point.example),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                    PackageNames.OSMAND_PLUS to AppDetail(
                         "OsmAnd",
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
@@ -754,16 +811,19 @@ private fun DarkFailedPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionFailed(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(Point.example),
-                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                    points = persistentListOf(WGS84Point.example),
+                    action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
+                        .toAction(WGS84Point.example),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                    PackageNames.OSMAND_PLUS to AppDetail(
                         "OsmAnd",
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
