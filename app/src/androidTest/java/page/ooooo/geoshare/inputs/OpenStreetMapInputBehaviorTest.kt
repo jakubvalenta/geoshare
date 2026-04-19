@@ -15,6 +15,14 @@ class OpenStreetMapInputBehaviorTest : InputBehaviorTest {
             WGS84Point(51.49, -0.13, z = 16.0, source = Source.MAP_CENTER),
             "https://www.openstreetmap.org/#map=16/51.49/-0.13",
         )
+        testUri(
+            WGS84Point(51.49, -0.13, z = 16.0, source = Source.URI),
+            "https://www.openstreetmap.org/?lat=51.49&lon=-0.13&zoom=16",
+        )
+        testUri(
+            WGS84Point(51.49, -0.13, source = Source.URI),
+            "https://www.openstreetmap.org/?lat=51.49&lon=-0.13",
+        )
 
         // Directions
         testUri(

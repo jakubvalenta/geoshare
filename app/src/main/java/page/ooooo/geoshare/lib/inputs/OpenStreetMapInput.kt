@@ -9,6 +9,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
@@ -55,6 +56,16 @@ object OpenStreetMapInput : HtmlInput, Input.HasRandomUri {
             Regex("""map=$Z/$LAT/$LON.*""").matchEntire(fragment)?.toZLatLonPoint(Source.MAP_CENTER)?.let {
                 points = persistentListOf(WGS84Point(it))
                 return@run
+            }
+
+            // Coordinates
+            // https://www.openstreetmap.org/?lat={lat}&lon={lon}&zoom={z}
+            LAT_PATTERN.matchEntire(queryParams["lat"])?.doubleGroupOrNull()?.let { lat ->
+                LON_PATTERN.matchEntire(queryParams["lon"])?.doubleGroupOrNull()?.let { lon ->
+                    val z = Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()
+                    points = persistentListOf(WGS84Point(lat, lon, z, source = Source.URI))
+                    return@run
+                }
             }
 
             // Directions
