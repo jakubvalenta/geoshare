@@ -64,6 +64,10 @@ class OpenStreetMapInputTest : InputTest {
             parseUri("https://www.openstreetmap.org/?lat=51.49&lon=-0.13&zoom=16"),
         )
         assertEquals(
+            ParseUriResult(persistentListOf(WGS84Point(51.49, -0.13, z = 16.0, source = Source.URI))),
+            parseUri("https://www.openstreetmap.org/?lat=51.49&lon=-0.13&z=16"),
+        )
+        assertEquals(
             ParseUriResult(persistentListOf(WGS84Point(51.49, -0.13, source = Source.URI))),
             parseUri("https://www.openstreetmap.org/?lat=51.49&lon=-0.13"),
         )
