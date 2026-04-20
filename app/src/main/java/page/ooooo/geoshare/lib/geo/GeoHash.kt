@@ -140,7 +140,7 @@ fun decodeWazeGeoHash(hash: String) = decodeGeoHash(
 )
 
 // TODO Doc string
-fun decodeOpenLocationCode(codeString: String, locality: String? = null): NaivePoint? =
+fun decodePlusCode(codeString: String, locality: String? = null): NaivePoint? =
     OpenLocationCode(codeString)
         .run {
             if (isFull) {
