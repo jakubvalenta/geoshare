@@ -17,18 +17,17 @@ object CartesIGNInput : Input, Input.HasRandomUri {
         id = InputDocumentationId.CARTES_IGN,
         nameResId = R.string.converter_cartes_ign_name,
         items = listOf(
-            InputDocumentationItem.Url(39, "https://cartes-ign.ign.fr/"),
+            InputDocumentationItem.Url(39, "https://cartes-ign.ign.fr"),
         ),
     )
 
     override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {
         uri.run {
-            val z = Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()
-
             // Coordinates
             // https://cartes-ign.ign.fr?lng={lon}&lat={lat}&z={z}
             LAT_PATTERN.matchEntire(queryParams["lat"])?.doubleGroupOrNull()?.let { lat ->
                 LON_PATTERN.matchEntire(queryParams["lng"])?.doubleGroupOrNull()?.let { lon ->
+                    val z = Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()
                     points = persistentListOf(WGS84Point(lat, lon, z, source = Source.URI))
                     return@run
                 }

@@ -362,7 +362,6 @@
 
                 <data
                     android:host="cartes-ign.ign.fr"
-                    android:path="/"
                     android:scheme="https" />
             </intent-filter>
             <!-- Geo URI -->
