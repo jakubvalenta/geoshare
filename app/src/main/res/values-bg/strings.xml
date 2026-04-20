@@ -264,4 +264,6 @@
     <string name="conversion_succeeded_check_experimental">Местоположението може да е неточно поради експериментален метод на извличане.</string>
     <string name="conversion_succeeded_check_map_center">Местоположението може да е центърът на картата, а не маркер.</string>
     <string name="conversion_succeeded_check_srs">Местоположението може да е неточно поради преобразуване на координатната система.</string>
+    <string name="srs_description_mainland_china">континентален Китай</string>
+    <string name="srs_description_greater_china_and_taiwan">по-голям Китай и Тайван</string>
 </resources>
