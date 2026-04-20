@@ -9,7 +9,7 @@ import kotlin.uuid.Uuid
 
 @Database(
     entities = [Link::class],
-    version = 3,
+    version = 4,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun getLinkDao(): LinkDao
@@ -49,7 +49,7 @@ abstract class AppDatabase : RoomDatabase() {
                     1,
                     1,
                     1,
-                    "https://www.openstreetmap.org/#map={z}/{lat}/{lon}",
+                    @Suppress("SpellCheckingInspection") "https://www.openstreetmap.org/?mlat={lat}&mlon={lon}#map={z}/{lat}/{lon}",
                     "https://www.openstreetmap.org/search?query={q}",
                     1772395295367L,
                     Uuid.parse("a771fd79-291e-4e55-9952-601f87b05bfe").toByteArray(),
@@ -199,29 +199,27 @@ abstract class AppDatabase : RoomDatabase() {
                     Uuid.parse("fd89f6f0-694e-4d96-b604-ed15e2530a2d").toByteArray(),
                 )
             )
-            @Suppress("SpellCheckingInspection")
             db.execSQL(
                 "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "",
-                    "KartaView",
+                    @Suppress("SpellCheckingInspection") "KartaView",
                     "WGS84",
                     "STREET_VIEW",
                     0,
                     0,
                     0,
-                    "https://kartaview.org/map/@{lat}%2C{lon},{z}z",
+                    @Suppress("SpellCheckingInspection") "https://kartaview.org/map/@{lat}%2C{lon},{z}z",
                     "",
                     1772579164207L,
                     Uuid.parse("7e09855d-d29b-4c18-944f-7fa440db3528").toByteArray(),
                 )
             )
-            @Suppress("SpellCheckingInspection")
             db.execSQL(
                 "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "",
-                    "Mapilio",
+                    @Suppress("SpellCheckingInspection") "Mapilio",
                     "WGS84",
                     "STREET_VIEW",
                     0,
@@ -233,12 +231,11 @@ abstract class AppDatabase : RoomDatabase() {
                     Uuid.parse("c206d165-b2db-4030-a415-203e92cacb66").toByteArray(),
                 )
             )
-            @Suppress("SpellCheckingInspection")
             db.execSQL(
                 "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "",
-                    "Panoramax",
+                    @Suppress("SpellCheckingInspection") "Panoramax",
                     "WGS84",
                     "STREET_VIEW",
                     0,
@@ -298,6 +295,22 @@ abstract class AppDatabase : RoomDatabase() {
                     Uuid.parse("94e1350a-3599-43b3-858b-59750a6f8680").toByteArray(),
                 )
             )
+            db.execSQL(
+                "INSERT OR REPLACE INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                arrayOf<Any>(
+                    "",
+                    "Zoom Earth",
+                    "WGS84",
+                    "DISPLAY",
+                    0,
+                    0,
+                    0,
+                    "https://zoom.earth/maps/satellite/#view={lat},{lon},{z}",
+                    "",
+                    1776348228136,
+                    Uuid.parse("a0b5b493-31a7-410d-9fe2-285974738ff1").toByteArray(),
+                )
+            )
         }
 
         val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -318,29 +331,27 @@ abstract class AppDatabase : RoomDatabase() {
                         Uuid.parse("fd89f6f0-694e-4d96-b604-ed15e2530a2d").toByteArray(),
                     )
                 )
-                @Suppress("SpellCheckingInspection")
                 db.execSQL(
                     "INSERT OR REPLACE INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "",
-                        "KartaView",
+                        @Suppress("SpellCheckingInspection") "KartaView",
                         "WGS84",
                         "STREET_VIEW",
                         0,
                         0,
                         0,
-                        "https://kartaview.org/map/@{lat}%2C{lon},{z}z",
+                        @Suppress("SpellCheckingInspection") "https://kartaview.org/map/@{lat}%2C{lon},{z}z",
                         "",
                         1772579164207L,
                         Uuid.parse("7e09855d-d29b-4c18-944f-7fa440db3528").toByteArray(),
                     )
                 )
-                @Suppress("SpellCheckingInspection")
                 db.execSQL(
                     "INSERT OR REPLACE INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "",
-                        "Mapilio",
+                        @Suppress("SpellCheckingInspection") "Mapilio",
                         "WGS84",
                         "STREET_VIEW",
                         0,
@@ -352,12 +363,11 @@ abstract class AppDatabase : RoomDatabase() {
                         Uuid.parse("c206d165-b2db-4030-a415-203e92cacb66").toByteArray(),
                     )
                 )
-                @Suppress("SpellCheckingInspection")
                 db.execSQL(
                     "INSERT OR REPLACE INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "",
-                        "Panoramax",
+                        @Suppress("SpellCheckingInspection") "Panoramax",
                         "WGS84",
                         "STREET_VIEW",
                         0,
@@ -444,6 +454,35 @@ abstract class AppDatabase : RoomDatabase() {
                         "GCJ02_MAINLAND_CHINA",
                         Uuid.parse("9d7cd113-ce01-4b8b-82fe-856956b8b20a").toByteArray(),
                         "GCJ02",
+                    )
+                )
+            }
+        }
+
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "UPDATE Link SET coordsUriTemplate = ? WHERE uuid = ? AND coordsUriTemplate = ?",
+                    arrayOf<Any>(
+                        @Suppress("SpellCheckingInspection") "https://www.openstreetmap.org/?mlat={lat}&mlon={lon}#map={z}/{lat}/{lon}",
+                        Uuid.parse("a771fd79-291e-4e55-9952-601f87b05bfe").toByteArray(),
+                        "https://www.openstreetmap.org/#map={z}/{lat}/{lon}",
+                    )
+                )
+                db.execSQL(
+                    "INSERT OR REPLACE INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    arrayOf<Any>(
+                        "",
+                        "Zoom Earth",
+                        "WGS84",
+                        "DISPLAY",
+                        0,
+                        0,
+                        0,
+                        "https://zoom.earth/maps/satellite/#view={lat},{lon},{z}",
+                        "",
+                        1776348228136,
+                        Uuid.parse("a0b5b493-31a7-410d-9fe2-285974738ff1").toByteArray(),
                     )
                 )
             }
