@@ -260,4 +260,10 @@
     </plurals>
     <string name="intro_how_to_share_google_maps_screenshot_place">Bırakılan işaretçi</string>
     <string name="about_text"><![CDATA[<p>%1$s, ücretsiz ve açık kaynaklı bir uygulamadır <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> veya daha sonraki lisans altında dağıtılmaktadır.</p><br><p>Kodu <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>’ta bulabilirsiniz, ayrıca <a href="https://github.com/jakubvalenta/geoshare/issues">sorun bildirebilirsiniz</a>.</p><br><p>Görüşleriniz bizim için değerlidir. Bana <a href="mailto:%2$s">%2$s</a>’den ulaşabilirsiniz.</p>]]></string>
+    <string name="conversion_succeeded_check_experimental">Deneysel bir ekstraksiyon yöntemi nedeniyle konum doğruluğunda hatalar olabilir.</string>
+    <string name="licenses">Lisanslar</string>
+    <string name="conversion_succeeded_check_map_center">Konum, bir işaretçi değil harita merkezi olabilir.</string>
+    <string name="conversion_succeeded_check_srs">Koordinat sistemi dönüşümü nedeniyle konum bilgisi hatalı olabilir.</string>
+    <string name="srs_description_mainland_china">Çin anakarası</string>
+    <string name="srs_description_greater_china_and_taiwan">Büyük Çin ve Tayvan</string>
 </resources>
