@@ -139,23 +139,17 @@ fun decodeWazeGeoHash(hash: String) = decodeGeoHash(
     roundingMode = GeoHashRoundingMode.MIDDLE,
 )
 
-// TODO Doc string
-fun decodePlusCode(codeString: String, locality: String? = null): NaivePoint? =
+/**
+ * See https://github.com/google/open-location-code
+ */
+fun decodePlusCode(codeString: String): NaivePoint? =
     OpenLocationCode(codeString)
         .run {
             if (isFull) {
                 // The code is full
                 this
-            } else if (locality != null) {
-                // TODO Complete the code using a geocoding service
-                // val referencePoint = TODO()
-                // if (referencePoint != null) {
-                //     this.recover(referencePoint.lat, referencePoint.lon)
-                // } else {
-                //     null
-                // }
-                null
             } else {
+                // TODO Complete the code using a geocoding service
                 null
             }
         }
@@ -164,7 +158,6 @@ fun decodePlusCode(codeString: String, locality: String? = null): NaivePoint? =
             NaivePoint(
                 lat = area.centerLatitude,
                 lon = area.centerLongitude,
-                name = locality,
                 source = Source.HASH,
             )
         }

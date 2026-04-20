@@ -12,13 +12,16 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.decodePlusCode
 
 /**
- * See https://en.wikipedia.org/wiki/Open_Location_Code
+ * See https://plus.codes/
  */
 object PlusCodeInput : Input {
-    private const val CHAR = @Suppress("SpellCheckingInspection") """[2-9CFGHJMPQRVWXcfghjmpqrvwx]"""
-    private const val HASH = """$CHAR{2,8}\+$CHAR{2,7}"""
+    /**
+     * See https://github.com/google/open-location-code/blob/main/Documentation/Reference/App_Developers.md#supporting-global-codes
+     */
+    private const val GLOBAL_CODE =
+        @Suppress("SpellCheckingInspection") """[23456789C][23456789CFGHJMPQRV][23456789CFGHJMPQRVWX]{6}\+[23456789CFGHJMPQRVWX]{2,7}"""
 
-    override val uriPattern = Regex("""($HASH)(?: $URI_REST)?""")
+    override val uriPattern = Regex("""($GLOBAL_CODE)(?:\s|$)""", RegexOption.IGNORE_CASE)
 
     override val documentation = InputDocumentation(
         id = InputDocumentationId.PLUS_CODE,
@@ -34,19 +37,22 @@ object PlusCodeInput : Input {
 
     override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {
         uri.run {
-            // Plus Code (full or short, with or without locality)
-            // e.g. `28WR+CW Comstock Park, Michigan`
-            uriPattern.matchEntire(path)?.let { m ->
-                m.groupOrNull(1)?.let { hash ->
-                    val locality = m.groupOrNull(2)
-                    decodePlusCode(hash, locality)?.let {
-                        points = persistentListOf(
-                            WGS84Point(it).copy(lat = it.lat?.toScale(6), lon = it.lon?.toScale(6))
-                        )
-                        return@run
-                    }
+            // Use Uri.toString() instead of Uri.path, so that the '+' character is not replaced with space
+            val input = toString()
+
+            // Global code
+            // e.g. `796RWF8Q+WF`
+            uriPattern.matchEntire(input)?.groupOrNull()?.let { codeString ->
+                decodePlusCode(codeString)?.let {
+                    points = persistentListOf(
+                        WGS84Point(it).copy(lat = it.lat?.toScale(6), lon = it.lon?.toScale(6))
+                    )
+                    return@run
                 }
             }
+
+            // TODO Local code (with or without locality)
+            // e.g. `28WR+CW` or `28WR+CW Comstock Park, Michigan`
         }
     }
 }

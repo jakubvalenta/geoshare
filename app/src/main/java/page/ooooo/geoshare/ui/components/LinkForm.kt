@@ -183,13 +183,11 @@ fun LinkForm(
         )
         listOf(
             WGS84Point(
-                -3.075833,
-                37.353333,
+                -3.075833, 37.353333,
                 source = Source.GENERATED,
             ) to stringResource(R.string.links_form_test_world),
             WGS84Point(
-                39.915833,
-                116.390833,
+                39.915833, 116.390833,
                 source = Source.GENERATED,
             ) to stringResource(R.string.links_form_test_china),
         ).let { testPointsWithName ->
