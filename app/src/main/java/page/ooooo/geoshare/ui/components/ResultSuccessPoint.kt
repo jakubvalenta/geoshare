@@ -27,6 +27,7 @@ import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -93,7 +94,7 @@ private fun DefaultPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             ResultSuccessPoint(
-                point = WGS84Point.example,
+                point = WGS84Point(NaivePoint.example),
                 index = 2,
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
                 coordinateConverter = coordinateConverter,
@@ -112,7 +113,7 @@ private fun DarkPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             ResultSuccessPoint(
-                point = WGS84Point.example,
+                point = WGS84Point(NaivePoint.example),
                 index = 2,
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
                 coordinateConverter = coordinateConverter,
@@ -131,7 +132,7 @@ private fun LongNamePreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             ResultSuccessPoint(
-                point = WGS84Point.genRandomPoint(name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany"),
+                point = WGS84Point(NaivePoint.genRandomPoint(name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany")),
                 index = 2,
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
                 coordinateConverter = coordinateConverter,
@@ -150,7 +151,7 @@ private fun DarkLongNamePreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             ResultSuccessPoint(
-                point = WGS84Point.genRandomPoint(name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany"),
+                point = WGS84Point(NaivePoint.genRandomPoint(name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany")),
                 index = 2,
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
                 coordinateConverter = coordinateConverter,

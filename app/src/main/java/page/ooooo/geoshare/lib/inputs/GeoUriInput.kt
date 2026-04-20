@@ -12,6 +12,7 @@ import page.ooooo.geoshare.lib.extensions.toLatLonNamePoint
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
 import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
@@ -25,7 +26,7 @@ object GeoUriInput : Input, Input.HasRandomUri {
         nameResId = R.string.converter_geo_name,
         items = listOf(
             InputDocumentationItem.Text(3) {
-                stringResource(R.string.example, GeoUriFormatter.formatGeoUriString(WGS84Point.example))
+                stringResource(R.string.example, GeoUriFormatter.formatGeoUriString(WGS84Point(NaivePoint.example)))
             },
         ),
     )

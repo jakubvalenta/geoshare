@@ -8,10 +8,18 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.formatters.PlusCodeFormatter
-import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
+import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.decodePlusCode
 
 /**
+ * Plus Codes input.
+ *
+ * To make sure Plus Codes pasted from Google Maps, which use the GCJ02 Mainland China coordinate system, are accurate,
+ * this input produces [GCJ02MainlandChinaPoint] points. This means Plus Codes within Mainland China pasted from an app
+ * other than Google Maps will probably be inaccurate, but we assume there are few apps other than Google Maps that use
+ * Plus Codes.
+ *
  * See https://plus.codes/
  */
 object PlusCodeInput : Input {
@@ -29,7 +37,8 @@ object PlusCodeInput : Input {
         items = listOf(
             InputDocumentationItem.Text(39) {
                 stringResource(
-                    R.string.example, PlusCodeFormatter.formatPlusCode(WGS84Point.example) ?: ""
+                    R.string.example,
+                    PlusCodeFormatter.formatPlusCode(GCJ02MainlandChinaPoint(NaivePoint.example)) ?: ""
                 )
             },
         ),
@@ -45,7 +54,7 @@ object PlusCodeInput : Input {
             uriPattern.matchEntire(input)?.groupOrNull()?.let { codeString ->
                 decodePlusCode(codeString)?.let {
                     points = persistentListOf(
-                        WGS84Point(it).copy(lat = it.lat?.toScale(6), lon = it.lon?.toScale(6))
+                        GCJ02MainlandChinaPoint(it).copy(lat = it.lat?.toScale(6), lon = it.lon?.toScale(6))
                     )
                     return@run
                 }

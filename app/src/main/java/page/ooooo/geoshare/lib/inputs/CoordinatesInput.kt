@@ -9,6 +9,7 @@ import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
@@ -32,7 +33,7 @@ object CoordinatesInput : Input, Input.HasRandomUri {
         items = listOf(
             InputDocumentationItem.Text(20) {
                 stringResource(
-                    R.string.example, CoordinateFormatter.formatDegMinSecCoords(WGS84Point.example)
+                    R.string.example, CoordinateFormatter.formatDegMinSecCoords(WGS84Point(NaivePoint.example))
                 )
             },
         ),

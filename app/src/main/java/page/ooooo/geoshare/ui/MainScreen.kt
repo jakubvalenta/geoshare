@@ -120,6 +120,7 @@ import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.lib.extensions.truncateMiddle
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
@@ -1175,8 +1176,8 @@ private fun SucceededPreview() {
             currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
-                    WGS84Point.genRandomPoint(),
-                    WGS84Point.example,
+                    WGS84Point(NaivePoint.genRandomPoint()),
+                    WGS84Point(NaivePoint.example),
                 ),
                 action = NoopAction,
                 isAutomation = false,
@@ -1253,8 +1254,8 @@ private fun DarkSucceededPreview() {
             currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
-                    WGS84Point.genRandomPoint(),
-                    WGS84Point.example,
+                    WGS84Point(NaivePoint.genRandomPoint()),
+                    WGS84Point(NaivePoint.example),
                 ),
                 action = NoopAction,
                 isAutomation = false,
@@ -1331,8 +1332,8 @@ private fun SmallSucceededPreview() {
             currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
-                    WGS84Point.genRandomPoint(),
-                    WGS84Point.example,
+                    WGS84Point(NaivePoint.genRandomPoint()),
+                    WGS84Point(NaivePoint.example),
                 ),
                 action = NoopAction,
                 isAutomation = false,
@@ -1409,8 +1410,8 @@ private fun TabletSucceededPreview() {
             currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
-                    WGS84Point.genRandomPoint(),
-                    WGS84Point.example,
+                    WGS84Point(NaivePoint.genRandomPoint()),
+                    WGS84Point(NaivePoint.example),
                 ),
                 action = NoopAction,
                 isAutomation = false,
@@ -1487,8 +1488,8 @@ private fun DarkTabletSucceededPreview() {
             currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
-                    WGS84Point.genRandomPoint(),
-                    WGS84Point.example,
+                    WGS84Point(NaivePoint.genRandomPoint()),
+                    WGS84Point(NaivePoint.example),
                 ),
                 action = NoopAction,
                 isAutomation = false,
@@ -1564,7 +1565,7 @@ private fun AutomationPreview() {
                     billing = BillingImpl(LocalContext.current),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                points = persistentListOf(WGS84Point.example),
+                points = persistentListOf(WGS84Point(NaivePoint.example)),
                 action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
                     .toAction(WGS84Point(source = Source.GENERATED)),
                 isAutomation = true,
@@ -1641,7 +1642,7 @@ private fun DarkAutomationPreview() {
                     billing = BillingImpl(LocalContext.current),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                points = persistentListOf(WGS84Point.example),
+                points = persistentListOf(WGS84Point(NaivePoint.example)),
                 action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
                     .toAction(WGS84Point(source = Source.GENERATED)),
                 isAutomation = true,
@@ -1718,7 +1719,7 @@ private fun TabletAutomationPreview() {
                     billing = BillingImpl(LocalContext.current),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                points = persistentListOf(WGS84Point.example),
+                points = persistentListOf(WGS84Point(NaivePoint.example)),
                 action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
                     .toAction(WGS84Point(source = Source.GENERATED)),
                 isAutomation = true,

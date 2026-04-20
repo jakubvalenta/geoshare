@@ -7,6 +7,7 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import javax.inject.Inject
@@ -22,7 +23,7 @@ class CopyCoordsDegMinSecOutput @Inject constructor(
         stringResource(R.string.conversion_succeeded_copy_coordinates)
 
     override fun getAutomationDescription() = @Composable {
-        getText(WGS84Point.example)
+        getText(WGS84Point(NaivePoint.example))
     }
 
     @Composable

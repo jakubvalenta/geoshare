@@ -5,8 +5,8 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class PlusCodeInputTest : InputTest {
     override val input = PlusCodeInput
@@ -45,18 +45,42 @@ class PlusCodeInputTest : InputTest {
     @Test
     fun parseUri_globalCode() = runTest {
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(-1.289938, 36.820313, source = Source.HASH))),
+            ParseUriResult(
+                persistentListOf(
+                    GCJ02MainlandChinaPoint(-1.289938, 36.820313, source = Source.HASH)
+                )
+            ),
             parseUri(@Suppress("SpellCheckingInspection") "6GCRPR6C+24"),
         )
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(14.917313, -23.5113130, source = Source.HASH))),
+            ParseUriResult(persistentListOf(GCJ02MainlandChinaPoint(14.917313, -23.5113130, source = Source.HASH))),
             parseUri("796RWF8Q+WF"),
         )
     }
 
-    // TODO Test global code within mainland China
+    @Test
+    fun parseUri_globalCodeWithinMainlandChina() = runTest {
+        assertEquals(
+            ParseUriResult(
+                persistentListOf(
+                    GCJ02MainlandChinaPoint(39.917312, 116.397078, source = Source.HASH)
+                )
+            ),
+            parseUri(@Suppress("SpellCheckingInspection") "8PFRW98W+WRG"),
+        )
+    }
 
-    // TODO Test global code within western Japan
+    @Test
+    fun parseUri_globalCodeWithinWesternJapan() = runTest {
+        assertEquals(
+            ParseUriResult(
+                persistentListOf(
+                    GCJ02MainlandChinaPoint(34.594538, 133.758328, source = Source.HASH)
+                )
+            ),
+            parseUri(@Suppress("SpellCheckingInspection") "8Q6MHQV5+R88"),
+        )
+    }
 
     @Test
     fun parseUri_localCode() = runTest {

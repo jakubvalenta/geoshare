@@ -61,6 +61,7 @@ import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.Srs
 import page.ooooo.geoshare.lib.geo.WGS84Point
@@ -272,7 +273,7 @@ fun LinkForm(
                         }
                         ResultSuccessSheetItem(
                             headlineText = copyOutput.label(appDetails),
-                            supportingText = copyOutput.getDescription(WGS84Point.example),
+                            supportingText = copyOutput.getDescription(WGS84Point(NaivePoint.example)),
                             icon = copyOutput.getIcon(appDetails),
                         )
                     }
