@@ -38,7 +38,7 @@ map app.
 - OpenStreetMap
 - Organic Maps
 - OsmAnd
-- Plus Codes
+- Plus Codes (global only)
 - Urbi
 - Waze
 - Yandex Maps

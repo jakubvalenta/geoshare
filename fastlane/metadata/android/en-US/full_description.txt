@@ -16,7 +16,7 @@ Share a map link with GeoShare and the app will open it in another installed map
 - OpenStreetMap
 - Organic Maps
 - OsmAnd
-- Plus Codes
+- Plus Codes (global only)
 - Urbi
 - Waze
 - Yandex Maps
