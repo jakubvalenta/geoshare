@@ -8,6 +8,7 @@ enum class InputDocumentationId {
     AMAP,
     APPLE_MAPS,
     BAIDU_MAP,
+    CARTES_IGN,
     COORDINATES,
     DEBUG,
     GEO_URI,

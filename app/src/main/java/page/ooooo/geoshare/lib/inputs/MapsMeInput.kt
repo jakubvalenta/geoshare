@@ -50,12 +50,4 @@ object MapsMeInput : Input {
             }
         }
     }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        return other is MapsMeInput
-    }
-
-    override fun hashCode() = javaClass.hashCode()
 }

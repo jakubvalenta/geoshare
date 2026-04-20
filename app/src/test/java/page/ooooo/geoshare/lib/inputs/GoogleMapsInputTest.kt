@@ -53,7 +53,7 @@ class GoogleMapsInputTest : InputTest {
     fun uriPattern_unknownScheme() {
         assertEquals(
             "www.google.com/maps/@52.5067296,13.2599309,6z",
-            input.uriPattern.find("ftp://www.google.com/maps/@52.5067296,13.2599309,6z")?.value,
+            getUri("ftp://www.google.com/maps/@52.5067296,13.2599309,6z"),
         )
     }
 

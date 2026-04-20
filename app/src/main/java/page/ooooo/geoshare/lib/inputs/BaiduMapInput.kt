@@ -126,12 +126,4 @@ object BaiduMapInput : ShortUriInput, WebInput {
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_baidu_map_loading_indicator_title
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        return other is BaiduMapInput
-    }
-
-    override fun hashCode() = javaClass.hashCode()
 }

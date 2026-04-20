@@ -53,7 +53,7 @@ class OpenStreetMapInputTest : InputTest {
     fun uriPattern_unknownScheme() {
         assertEquals(
             "www.openstreetmap.org/#map=16/51.49/-0.13",
-            input.uriPattern.find("ftp://www.openstreetmap.org/#map=16/51.49/-0.13")?.value,
+            getUri("ftp://www.openstreetmap.org/#map=16/51.49/-0.13"),
         )
     }
 

@@ -36,15 +36,15 @@ class MapsMeInputTest : InputTest {
     fun uriPattern_unknownScheme() {
         assertEquals(
             "ge0.me/AbCMCNp0LO/Madagascar",
-            input.uriPattern.find("ftp://ge0.me/AbCMCNp0LO/Madagascar")?.value,
+            getUri("ftp://ge0.me/AbCMCNp0LO/Madagascar"),
         )
         assertEquals(
             @Suppress("SpellCheckingInspection") "omaps.app/AbCMCNp0LO/Madagascar",
-            input.uriPattern.find("ftp://omaps.app/AbCMCNp0LO/Madagascar")?.value,
+            getUri("ftp://omaps.app/AbCMCNp0LO/Madagascar"),
         )
         assertEquals(
             "comaps.at/AbCMCNp0LO/Madagascar",
-            input.uriPattern.find("ftp://comaps.at/AbCMCNp0LO/Madagascar")?.value,
+            getUri("ftp://comaps.at/AbCMCNp0LO/Madagascar"),
         )
     }
 

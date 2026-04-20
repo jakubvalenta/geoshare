@@ -54,12 +54,4 @@ object AmapInput : ShortUriInput, Input.HasRandomUri {
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "https://wb.amap.com/?q={lat}%2C{lon}")
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        return other is AmapInput
-    }
-
-    override fun hashCode() = javaClass.hashCode()
 }

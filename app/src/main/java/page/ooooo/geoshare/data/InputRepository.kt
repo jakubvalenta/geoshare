@@ -4,6 +4,7 @@ import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.lib.inputs.AmapInput
 import page.ooooo.geoshare.lib.inputs.AppleMapsInput
 import page.ooooo.geoshare.lib.inputs.BaiduMapInput
+import page.ooooo.geoshare.lib.inputs.CartesIGNInput
 import page.ooooo.geoshare.lib.inputs.CoordinatesInput
 import page.ooooo.geoshare.lib.inputs.DebugInput
 import page.ooooo.geoshare.lib.inputs.GeoUriInput
@@ -35,6 +36,7 @@ class InputRepository @Inject constructor() {
         AppleMapsInput,
         AmapInput,
         BaiduMapInput,
+        CartesIGNInput,
         HereWeGoInput,
         MagicEarthInput,
         MapyComInput,

@@ -59,12 +59,4 @@ object OsmAndInput : Input, Input.HasRandomUri {
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "https://osmand.net/map?pin={lat}%2C{lon}")
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        return other is OsmAndInput
-    }
-
-    override fun hashCode() = javaClass.hashCode()
 }

@@ -41,7 +41,7 @@ class HereWeGoInputTest : InputTest {
     fun uriPattern_unknownScheme() {
         assertEquals(
             "wego.here.com/?map=50.21972,-0.68453,6.93",
-            input.uriPattern.find("ftp://wego.here.com/?map=50.21972,-0.68453,6.93")?.value,
+            getUri("ftp://wego.here.com/?map=50.21972,-0.68453,6.93"),
         )
     }
 
