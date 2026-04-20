@@ -62,7 +62,8 @@ object OpenStreetMapInput : HtmlInput, Input.HasRandomUri {
             // https://www.openstreetmap.org/?lat={lat}&lon={lon}&zoom={z}
             LAT_PATTERN.matchEntire(queryParams["lat"])?.doubleGroupOrNull()?.let { lat ->
                 LON_PATTERN.matchEntire(queryParams["lon"])?.doubleGroupOrNull()?.let { lon ->
-                    val z = Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()
+                    val z = listOf("z", "zoom")
+                        .firstNotNullOfOrNull { key -> Z_PATTERN.matchEntire(queryParams[key])?.doubleGroupOrNull() }
                     points = persistentListOf(WGS84Point(lat, lon, z, source = Source.URI))
                     return@run
                 }

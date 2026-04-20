@@ -60,6 +60,22 @@ class OpenStreetMapInputTest : InputTest {
     @Test
     fun parseUri_coordinates() = runTest {
         assertEquals(
+            ParseUriResult(persistentListOf(WGS84Point(51.49, -0.13, z = 16.0, source = Source.URI))),
+            parseUri("https://www.openstreetmap.org/?lat=51.49&lon=-0.13&zoom=16"),
+        )
+        assertEquals(
+            ParseUriResult(persistentListOf(WGS84Point(51.49, -0.13, z = 16.0, source = Source.URI))),
+            parseUri("https://www.openstreetmap.org/?lat=51.49&lon=-0.13&z=16"),
+        )
+        assertEquals(
+            ParseUriResult(persistentListOf(WGS84Point(51.49, -0.13, source = Source.URI))),
+            parseUri("https://www.openstreetmap.org/?lat=51.49&lon=-0.13"),
+        )
+    }
+
+    @Test
+    fun parseUri_mapCenter() = runTest {
+        assertEquals(
             ParseUriResult(persistentListOf(WGS84Point(51.49, -0.13, z = 16.0, source = Source.MAP_CENTER))),
             parseUri("https://www.openstreetmap.org/#map=16/51.49/-0.13"),
         )
