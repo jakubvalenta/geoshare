@@ -28,7 +28,7 @@ object OpenLocationCodeInput : Input {
         items = listOf(
             InputDocumentationItem.Text(39) {
                 stringResource(
-                    R.string.example, OpenLocationCodeFormatter.formatOpenLocationCode(WGS84Point.example)
+                    R.string.example, OpenLocationCodeFormatter.formatOpenLocationCode(WGS84Point.example) ?: ""
                 )
             },
         ),

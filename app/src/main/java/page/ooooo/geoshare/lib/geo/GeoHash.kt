@@ -1,6 +1,6 @@
 package page.ooooo.geoshare.lib.geo
 
-import com.google.openlocation.OpenLocationCode
+import com.google.openlocationcode.OpenLocationCode
 import page.ooooo.geoshare.lib.extensions.toScale
 import kotlin.math.max
 import kotlin.math.pow
@@ -143,19 +143,18 @@ fun decodeWazeGeoHash(hash: String) = decodeGeoHash(
 fun decodeOpenLocationCode(codeString: String, locality: String? = null): NaivePoint? =
     OpenLocationCode(codeString)
         .run {
-            if (isFull()) {
+            if (isFull) {
                 // The code is full
                 this
             } else if (locality != null) {
-                // Complete the code using locality
-                val localityCodeString = Locality.getLocalityCode(locality)
-                if (localityCodeString != null) {
-                    val localityCode = OpenLocationCode(localityCodeString)
-                    val localityArea = localityCode.decode()
-                    this.recover(localityArea.getCenterLatitude(), localityArea.getCenterLongitude())
-                } else {
-                    null
-                }
+                // TODO Complete the code using a geocoding service
+                // val referencePoint = TODO()
+                // if (referencePoint != null) {
+                //     this.recover(referencePoint.lat, referencePoint.lon)
+                // } else {
+                //     null
+                // }
+                null
             } else {
                 null
             }
@@ -163,10 +162,9 @@ fun decodeOpenLocationCode(codeString: String, locality: String? = null): NaiveP
         ?.decode()
         ?.let { area ->
             NaivePoint(
-                lat = area.getCenterLatitude(),
-                lon = area.getCenterLongitude(),
+                lat = area.centerLatitude,
+                lon = area.centerLongitude,
                 name = locality,
                 source = Source.HASH,
             )
         }
-}
