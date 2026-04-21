@@ -10,6 +10,7 @@ import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.formatters.PlusCodeFormatter
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.NaivePoint
+import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.decodePlusCode
 
 /**
@@ -22,7 +23,7 @@ import page.ooooo.geoshare.lib.geo.decodePlusCode
  *
  * See https://plus.codes/
  */
-object PlusCodeInput : Input {
+object PlusCodeInput : Input, Input.HasRandomUri {
     /**
      * See https://github.com/google/open-location-code/blob/main/Documentation/Reference/App_Developers.md#supporting-global-codes
      */
@@ -68,4 +69,7 @@ object PlusCodeInput : Input {
             // e.g. `28WR+CW` or `28WR+CW Comstock Park, Michigan`
         }
     }
+
+    override fun genRandomUri(point: Point): String? =
+        PlusCodeFormatter.formatPlusCode(GCJ02MainlandChinaPoint(point.lat, point.lon, source = point.source))
 }
