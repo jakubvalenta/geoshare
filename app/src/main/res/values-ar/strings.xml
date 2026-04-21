@@ -296,4 +296,5 @@
     <string name="conversion_succeeded_check_srs">قد يكون الموقع غير دقيق بسبب تحويل نظام الإحداثيات.</string>
     <string name="srs_description_mainland_china">بر الصين الرئيسي</string>
     <string name="srs_description_greater_china_and_taiwan">الصين الكبرى وتايوان</string>
+    <string name="converter_cartes_ign_name">Cartes IGN</string>
 </resources>
