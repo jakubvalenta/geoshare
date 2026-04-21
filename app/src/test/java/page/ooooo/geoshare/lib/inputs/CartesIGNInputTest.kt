@@ -37,7 +37,7 @@ class CartesIGNInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
+    fun parseUri_unknownPathOrParams() = runTest {
         assertEquals(ParseUriResult(), parseUri("https://cartes-ign.ign.fr/"))
         assertEquals(ParseUriResult(), parseUri("https://cartes-ign.ign.fr/?spam=1"))
     }

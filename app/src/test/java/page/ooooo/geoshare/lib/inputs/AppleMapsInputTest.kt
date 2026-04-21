@@ -49,7 +49,7 @@ class AppleMapsInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
+    fun parseUri_unknownPathOrParams() = runTest {
         assertEquals(ParseUriResult(), parseUri("https://maps.apple.com"))
         assertEquals(ParseUriResult(), parseUri("https://maps.apple.com/"))
         assertEquals(ParseUriResult(), parseUri("https://maps.apple.com/?spam=1"))

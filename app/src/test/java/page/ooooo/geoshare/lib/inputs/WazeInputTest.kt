@@ -78,7 +78,7 @@ class WazeInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
+    fun parseUri_unknownPathOrParams() = runTest {
         assertEquals(ParseUriResult(), parseUri("https://waze.com"))
         assertEquals(ParseUriResult(), parseUri("https://waze.com/"))
         assertEquals(ParseUriResult(), parseUri("https://waze.com/ul"))

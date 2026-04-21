@@ -3,7 +3,6 @@ package page.ooooo.geoshare.lib.inputs
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
@@ -92,8 +91,58 @@ class GoogleMapsInputTest : InputTest {
         )
     }
 
+
     @Test
-    fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
+    fun shortUriPattern_mapsAppGooGlCorrect() {
+        assertEquals("https://maps.app.goo.gl/foo", getShortUri("https://maps.app.goo.gl/foo"))
+    }
+
+    @Test
+    fun shortUriPattern_mapsAppGooGlWithQueryStringCorrect() {
+        assertEquals("https://maps.app.goo.gl/foo", getShortUri("https://maps.app.goo.gl/foo?g_st=isi"))
+    }
+
+    @Test
+    fun shortUriPattern_mapsAppGooGlMissingPath() {
+        assertNull(getShortUri("https://maps.app.goo.gl/"))
+    }
+
+    @Test
+    fun shortUriPattern_appGooGlCorrect() {
+        assertEquals("https://app.goo.gl/maps/foo", getShortUri("https://app.goo.gl/maps/foo"))
+    }
+
+    @Test
+    fun shortUriPattern_appGooGlUnknownPath() {
+        assertEquals("https://app.goo.gl/maps", getShortUri("https://app.goo.gl/maps"))
+        assertEquals("https://app.goo.gl/maps/", getShortUri("https://app.goo.gl/maps/"))
+        assertEquals("https://app.goo.gl/foo/bar", getShortUri("https://app.goo.gl/foo/bar"))
+    }
+
+    @Test
+    fun shortUriPattern_gooGlCorrect() {
+        assertEquals("https://goo.gl/maps/foo", getShortUri("https://goo.gl/maps/foo"))
+    }
+
+    @Test
+    fun shortUriPattern_gooGlUnknownPath() {
+        assertEquals("https://goo.gl/maps", getShortUri("https://goo.gl/maps"))
+        assertEquals("https://goo.gl/maps/", getShortUri("https://goo.gl/maps/"))
+        assertEquals("https://goo.gl/foo/bar", getShortUri("https://goo.gl/foo/bar"))
+    }
+
+    @Test
+    fun shortUriPattern_gCoCorrect() {
+        assertEquals("https://g.co/kgs/foo", getShortUri("https://g.co/kgs/foo"))
+    }
+
+    @Test
+    fun shortUriPattern_unknownHost() {
+        assertNull(getShortUri("https://www.example.com/foo"))
+    }
+
+    @Test
+    fun parseUri_unknownPathOrParams() = runTest {
         assertEquals(
             ParseUriResult(
                 persistentListOf(),
@@ -1158,54 +1207,5 @@ class GoogleMapsInputTest : InputTest {
             ParseHtmlResult(redirectUriString = "spam"),
             parseHtml("""<html><a href="" data-url="spam"></a></html>"""),
         )
-    }
-
-    @Test
-    fun shortUriPattern_mapsAppGooGlCorrect() {
-        assertNotNull(getShortUri("https://maps.app.goo.gl/foo"))
-    }
-
-    @Test
-    fun shortUriPattern_mapsAppGooGlWithQueryStringCorrect() {
-        assertNotNull(getShortUri("https://maps.app.goo.gl/foo?g_st=isi"))
-    }
-
-    @Test
-    fun shortUriPattern_mapsAppGooGlMissingPath() {
-        assertNull(getShortUri("https://maps.app.goo.gl/"))
-    }
-
-    @Test
-    fun shortUriPattern_appGooGlCorrect() {
-        assertNotNull(getShortUri("https://app.goo.gl/maps/foo"))
-    }
-
-    @Test
-    fun shortUriPattern_appGooGlWrongPath() {
-        assertNotNull(getShortUri("https://app.goo.gl/maps"))
-        assertNotNull(getShortUri("https://app.goo.gl/maps/"))
-        assertNotNull(getShortUri("https://app.goo.gl/foo/bar"))
-    }
-
-    @Test
-    fun shortUriPattern_gooGlCorrect() {
-        assertNotNull(getShortUri("https://goo.gl/maps/foo"))
-    }
-
-    @Test
-    fun shortUriPattern_gooGlWrongPath() {
-        assertNotNull(getShortUri("https://goo.gl/maps"))
-        assertNotNull(getShortUri("https://goo.gl/maps/"))
-        assertNotNull(getShortUri("https://goo.gl/foo/bar"))
-    }
-
-    @Test
-    fun shortUriPattern_gCoCorrect() {
-        assertNotNull(getShortUri("https://g.co/kgs/foo"))
-    }
-
-    @Test
-    fun shortUriPattern_unknownDomain() {
-        assertNull(getShortUri("https://www.example.com/foo"))
     }
 }

@@ -55,7 +55,7 @@ class GeoUriInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
+    fun parseUri_unknownPathOrParams() = runTest {
         assertEquals(ParseUriResult(), parseUri("geo:"))
         assertEquals(ParseUriResult(), parseUri("geo:?spam=1"))
     }
