@@ -261,4 +261,5 @@
     <string name="conversion_succeeded_check_srs">由于坐标系转换，位置可能不准确。</string>
     <string name="srs_description_mainland_china">中国内地（不含港澳台）</string>
     <string name="srs_description_greater_china_and_taiwan">中国全境（含港澳台）</string>
+    <string name="converter_cartes_ign_name">Cartes IGN</string>
 </resources>
