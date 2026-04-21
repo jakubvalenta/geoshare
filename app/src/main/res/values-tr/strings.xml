@@ -266,4 +266,5 @@
     <string name="conversion_succeeded_check_srs">Koordinat sistemi dönüşümü nedeniyle konum bilgisi hatalı olabilir.</string>
     <string name="srs_description_mainland_china">Çin anakarası</string>
     <string name="srs_description_greater_china_and_taiwan">Büyük Çin ve Tayvan</string>
+    <string name="converter_cartes_ign_name">Cartes IGN</string>
 </resources>
