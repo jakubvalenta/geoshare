@@ -16,7 +16,7 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
  * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/
  */
 object MagicEarthInput : Input, Input.HasRandomUri {
-    override val uriPattern = Regex("""(?:(?:https?://)?magicearth.com|magicearth:/)/\?$URI_REST""")
+    override val uriPattern = Regex("""((?:(?:https?://)?magicearth.com|magicearth:/)/\?$URI_REST)""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.MAGIC_EARTH,
         nameResId = R.string.converter_magic_earth_name,

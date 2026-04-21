@@ -5,7 +5,6 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class PlusCodeFormatterTest {
     @Test

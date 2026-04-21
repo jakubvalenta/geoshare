@@ -27,10 +27,12 @@ object PlusCodeInput : Input {
      * See https://github.com/google/open-location-code/blob/main/Documentation/Reference/App_Developers.md#supporting-global-codes
      */
     private const val GLOBAL_CODE =
-        @Suppress("SpellCheckingInspection") """[23456789C][23456789CFGHJMPQRV][23456789CFGHJMPQRVWX]{6}\+[23456789CFGHJMPQRVWX]{2,7}"""
+        @Suppress("SpellCheckingInspection") """[23456789C][23456789CFGHJMPQRV][23456789CFGHJMPQRVWX]{6}(?:\+|%2B)[23456789CFGHJMPQRVWX]{2,7}"""
 
-    // TODO Add support for https://plus.codes and https://www.google.com/ URLs
-    override val uriPattern = Regex("""($GLOBAL_CODE)(?:\s|$)""", RegexOption.IGNORE_CASE)
+    override val uriPattern = Regex(
+        """(?:^|\s|https://www\.google\.com/maps/place/|https://plus\.codes/)($GLOBAL_CODE)(?:\s|/|$)""",
+        RegexOption.IGNORE_CASE,
+    )
 
     override val documentation = InputDocumentation(
         id = InputDocumentationId.PLUS_CODE,

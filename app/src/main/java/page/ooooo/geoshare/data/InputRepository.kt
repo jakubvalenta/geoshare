@@ -33,6 +33,7 @@ class InputRepository @Inject constructor() {
      */
     val all = listOf(
         GeoUriInput,
+        PlusCodeInput,
         GoogleMapsInput,
         AppleMapsInput,
         AmapInput,
@@ -47,7 +48,6 @@ class InputRepository @Inject constructor() {
         UrbiInput,
         WazeInput,
         YandexMapsInput,
-        PlusCodeInput,
         CoordinatesInput,
     ).run {
         if (BuildConfig.DEBUG) {

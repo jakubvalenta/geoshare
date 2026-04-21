@@ -20,7 +20,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
-    override val uriPattern = Regex("""(?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/$URI_REST""")
+    override val uriPattern = Regex("""((?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/$URI_REST)""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.YANDEX_MAPS,
         nameResId = R.string.converter_yandex_maps_name,

@@ -21,9 +21,16 @@ import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 
+/**
+ * Google Maps input.
+ *
+ * This input does not handle Plus Codes, e.g. https://www.google.com/maps/place/8FJ3HVHW%2B96. It just puts Plus Codes
+ * in the point name. The reason is that Plus Codes are handled by [PlusCodeInput], which has higher priority, so URIs
+ * containing Plus Codes should never reach [GoogleMapsInput].
+ */
 object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri {
     override val uriPattern =
-        Regex("""(?:https?://)?(?:(?:(?:www|maps)\.)?google(?:\.[a-z]{2,3})?\.[a-z]{2,3}|(?:maps\.)?(?:app\.)?goo\.gl|g\.co)[/?#]$URI_REST""")
+        Regex("""((?:https?://)?(?:(?:(?:www|maps)\.)?google(?:\.[a-z]{2,3})?\.[a-z]{2,3}|(?:maps\.)?(?:app\.)?goo\.gl|g\.co)[/?#]$URI_REST)""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.GOOGLE_MAPS,
         nameResId = R.string.converter_google_maps_name,
@@ -174,8 +181,9 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
                         pointPattern.matchEntire(part)?.toLatLonPoint(Source.URI)?.let {
                             mutableNaivePoints.add(it.copy(z = z))
                         }
-                        // Name
+                        // Name or Plus Code
                         // /{name}
+                        // https://www.google.com/maps/place/{code}
                             ?: mutableNaivePoints.add(NaivePoint(z = z, name = part, source = Source.URI))
                     }
                 }

@@ -15,7 +15,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 object OsmAndInput : Input, Input.HasRandomUri {
-    override val uriPattern = Regex("""(?:https?://)?(?:www\.)?osmand\.net/$URI_REST""")
+    override val uriPattern = Regex("""((?:https?://)?(?:www\.)?osmand\.net/$URI_REST)""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.OSM_AND,
         nameResId = R.string.converter_osm_and_name,

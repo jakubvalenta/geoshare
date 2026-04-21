@@ -19,7 +19,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 object HereWeGoInput : Input, Input.HasRandomUri {
     private const val SIMPLIFIED_BASE64 = """[A-Za-z0-9+/]+=*"""
 
-    override val uriPattern = Regex("""(?:https?://)?(?:share|wego)\.here\.com/$URI_REST""")
+    override val uriPattern = Regex("""((?:https?://)?(?:share|wego)\.here\.com/$URI_REST)""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.HERE_WEGO,
         nameResId = R.string.converter_here_wego_name,

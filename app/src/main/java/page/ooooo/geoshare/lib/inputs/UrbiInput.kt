@@ -22,7 +22,7 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 
 object UrbiInput : HtmlInput, Input.HasRandomUri {
     override val uriPattern =
-        Regex("""(?:https?://)?(?:www\.)?(?:(?:go|maps)\.)?(?:2gis|urbi|urbi-[a-z]{2})(?:\.[a-z]{2,3})?\.[a-z]{2,3}/$URI_REST""")
+        Regex("""((?:https?://)?(?:www\.)?(?:(?:go|maps)\.)?(?:2gis|urbi|urbi-[a-z]{2})(?:\.[a-z]{2,3})?\.[a-z]{2,3}/$URI_REST)""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.URBI,
         nameResId = R.string.converter_urbi_name,

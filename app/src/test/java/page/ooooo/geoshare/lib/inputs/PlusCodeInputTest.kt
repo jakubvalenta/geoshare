@@ -22,8 +22,16 @@ class PlusCodeInputTest : InputTest {
             getUri("796RWF8Q+WF"),
         )
         assertEquals(
-            @Suppress("SpellCheckingInspection") "8FJ3HVHW+96",
-            getUri("https://plus.codes/8FJ3HVHW+96"),
+            @Suppress("SpellCheckingInspection") "8FJ3HVHW%2B96",
+            getUri("https://plus.codes/8FJ3HVHW%2B96"),
+        )
+        assertEquals(
+            @Suppress("SpellCheckingInspection") "8FJ3HVHW%2B96",
+            getUri("https://www.google.com/maps/place/8FJ3HVHW%2B96"),
+        )
+        assertEquals(
+            @Suppress("SpellCheckingInspection") "8FJ3HVHW%2B96",
+            getUri(@Suppress("SpellCheckingInspection") "https://www.google.com/maps/place/8FJ3HVHW%2B96/@42.5784375,1.8955625,17z/"),
         )
     }
 
@@ -35,8 +43,16 @@ class PlusCodeInputTest : InputTest {
         assertEquals("WF8Q+WF", getUri("WF8Q+WF"))
         assertEquals("28WR+CW", getUri("28WR+CW"))
         assertEquals(
-            @Suppress("SpellCheckingInspection") "HVHW+96",
-            getUri("https://plus.codes/HVHW+96"),
+            @Suppress("SpellCheckingInspection") "HVHW%2B96",
+            getUri("https://plus.codes/HVHW%2B96"),
+        )
+        assertEquals(
+            @Suppress("SpellCheckingInspection") "HVHW%2B96",
+            getUri("https://www.google.com/maps/place/HVHW%2B96"),
+        )
+        assertEquals(
+            @Suppress("SpellCheckingInspection") "HVHW%2B96",
+            getUri(@Suppress("SpellCheckingInspection") "https://www.google.com/maps/place/HVHW%2B96/@42.5784375,1.8955625,17z/"),
         )
     }
 
@@ -52,8 +68,16 @@ class PlusCodeInputTest : InputTest {
             getUri("28WR+CW Comstock Park, Michigan"),
         )
         assertEquals(
-            @Suppress("SpellCheckingInspection") "HVHW+96 Angoustrine-Villeneuve-des-Escaldes, France",
-            getUri("https://plus.codes/HVHW+96%20Angoustrine-Villeneuve-des-Escaldes,%20France"),
+            @Suppress("SpellCheckingInspection") "HVHW%2B96%20Angoustrine-Villeneuve-des-Escaldes,%20France",
+            getUri("https://plus.codes/HVHW%2B96%20Angoustrine-Villeneuve-des-Escaldes,%20France"),
+        )
+        assertEquals(
+            @Suppress("SpellCheckingInspection") "HVHW%2B96%20Angoustrine-Villeneuve-des-Escaldes,%20France",
+            getUri("https://www.google.com/maps/place/HVHW%2B96%20Angoustrine-Villeneuve-des-Escaldes,%20France"),
+        )
+        assertEquals(
+            @Suppress("SpellCheckingInspection") "HVHW%2B96%20Angoustrine-Villeneuve-des-Escaldes,%20France",
+            getUri(@Suppress("SpellCheckingInspection") "https://www.google.com/maps/place/HVHW%2B96%20Angoustrine-Villeneuve-des-Escaldes,%20France/@42.5784375,1.8955625,17z/"),
         )
     }
 
@@ -63,8 +87,12 @@ class PlusCodeInputTest : InputTest {
         assertEquals("WF8Q+WF", getUri(@Suppress("SpellCheckingInspection") "WF8Q+WF  Praia, Cabo Verde"))
         assertEquals("28WR+CW", getUri("28WR+CW  Comstock Park, Michigan"))
         assertEquals(
-            @Suppress("SpellCheckingInspection") "HVHW+96",
-            getUri(@Suppress("SpellCheckingInspection") "https://plus.codes/HVHW+96  Angoustrine-Villeneuve-des-Escaldes, France"),
+            @Suppress("SpellCheckingInspection") "HVHW%2B96",
+            getUri(@Suppress("SpellCheckingInspection") "https://plus.codes/HVHW%2B96  Angoustrine-Villeneuve-des-Escaldes, France"),
+        )
+        assertEquals(
+            @Suppress("SpellCheckingInspection") "HVHW%2B96",
+            getUri(@Suppress("SpellCheckingInspection") "https://www.google.com/maps/place/HVHW%2B96  Angoustrine-Villeneuve-des-Escaldes, France"),
         )
     }
 
@@ -88,8 +116,8 @@ class PlusCodeInputTest : InputTest {
             getUri("28WR+CW foo\tbar")
         )
         assertEquals(
-            @Suppress("SpellCheckingInspection") "HVHW+96 Angoustrine-Villeneuve-des-Escaldes, France",
-            getUri(@Suppress("SpellCheckingInspection") "https://plus.codes/HVHW+96 Angoustrine-Villeneuve-des-Escaldes, France"),
+            @Suppress("SpellCheckingInspection") "HVHW%2B96 Angoustrine-Villeneuve-des-Escaldes, France",
+            getUri(@Suppress("SpellCheckingInspection") "https://plus.codes/HVHW%2B96 Angoustrine-Villeneuve-des-Escaldes, France"),
         )
     }
 
@@ -111,6 +139,18 @@ class PlusCodeInputTest : InputTest {
         assertEquals(
             ParseUriResult(persistentListOf(GCJ02MainlandChinaPoint(14.917313, -23.5113130, source = Source.HASH))),
             parseUri("796RWF8Q+WF"),
+        )
+    }
+
+    @Test
+    fun parseUri_globalCodeUriEncoded() = runTest {
+        assertEquals(
+            ParseUriResult(
+                persistentListOf(
+                    GCJ02MainlandChinaPoint(42.578438, 1.895563, source = Source.HASH)
+                )
+            ),
+            parseUri(@Suppress("SpellCheckingInspection") "8FJ3HVHW%2B96"),
         )
     }
 
