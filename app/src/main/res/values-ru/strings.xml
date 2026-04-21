@@ -282,4 +282,5 @@
     <string name="conversion_succeeded_check_srs">Местоположение может быть неточным из-за преобразования системы координат.</string>
     <string name="srs_description_mainland_china">материковый Китай</string>
     <string name="srs_description_greater_china_and_taiwan">Большой Китай и Тайвань</string>
+    <string name="converter_cartes_ign_name">Cartes IGN</string>
 </resources>
