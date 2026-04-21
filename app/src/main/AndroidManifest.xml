@@ -678,6 +678,17 @@
                     android:path="/map"
                     android:scheme="https" />
             </intent-filter>
+            <!-- Plus Codes -->
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="plus.codes"
+                    android:scheme="https" />
+            </intent-filter>
             <!-- Waze -->
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW" />

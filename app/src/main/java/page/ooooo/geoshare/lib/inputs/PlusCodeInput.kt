@@ -29,12 +29,14 @@ object PlusCodeInput : Input {
     private const val GLOBAL_CODE =
         @Suppress("SpellCheckingInspection") """[23456789C][23456789CFGHJMPQRV][23456789CFGHJMPQRVWX]{6}\+[23456789CFGHJMPQRVWX]{2,7}"""
 
+    // TODO Add support for https://plus.codes and https://www.google.com/ URLs
     override val uriPattern = Regex("""($GLOBAL_CODE)(?:\s|$)""", RegexOption.IGNORE_CASE)
 
     override val documentation = InputDocumentation(
         id = InputDocumentationId.PLUS_CODE,
         nameResId = R.string.converter_plus_code_name,
         items = listOf(
+            InputDocumentationItem.Url(39, "https://plus.codes"),
             InputDocumentationItem.Text(39) {
                 stringResource(
                     R.string.example,
