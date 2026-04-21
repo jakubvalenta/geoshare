@@ -266,4 +266,5 @@
     <string name="conversion_succeeded_check_srs">Местоположението може да е неточно поради преобразуване на координатната система.</string>
     <string name="srs_description_mainland_china">континентален Китай</string>
     <string name="srs_description_greater_china_and_taiwan">по-голям Китай и Тайван</string>
+    <string name="converter_cartes_ign_name">Карти IGN</string>
 </resources>
