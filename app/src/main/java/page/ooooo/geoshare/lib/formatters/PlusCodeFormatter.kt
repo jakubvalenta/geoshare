@@ -1,6 +1,8 @@
 package page.ooooo.geoshare.lib.formatters
 
 import com.google.openlocationcode.OpenLocationCode
+import page.ooooo.geoshare.lib.DefaultUriQuote
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 
 object PlusCodeFormatter {
@@ -15,4 +17,7 @@ object PlusCodeFormatter {
                 OpenLocationCode(lat, lon, 11).code
             }
         }
+
+    fun formatGoogleMapsPlusCodeUri(point: GCJ02MainlandChinaPoint, uriQuote: UriQuote = DefaultUriQuote): String? =
+        formatPlusCode(point)?.let { "https://www.google.com/maps/place/${uriQuote.encode(it)}" }
 }
