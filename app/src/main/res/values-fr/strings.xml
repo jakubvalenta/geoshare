@@ -273,4 +273,5 @@
     <string name="conversion_succeeded_check_srs">La localisation peut être imprécise en raison de la conversion du système de coordonnées.</string>
     <string name="srs_description_mainland_china">Chine continentale</string>
     <string name="srs_description_greater_china_and_taiwan">Grande Chine et Taïwan</string>
+    <string name="converter_cartes_ign_name">Cartes IGN</string>
 </resources>
