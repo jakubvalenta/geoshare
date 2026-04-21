@@ -12,7 +12,7 @@ class CoordinatesInputTest : InputTest {
     override val input = CoordinatesInput
 
     @Test
-    fun uriPattern_supportedUrl() {
+    fun uriPattern_coordinates() {
         assertEquals("50.21972°\u00a0N, 0.68453°\u00a0W", getUri("50.21972°\u00a0N, 0.68453°\u00a0W"))
         assertEquals("31°57′N 35°56′E", getUri("31°57′N 35°56′E"))
     }
@@ -23,7 +23,7 @@ class CoordinatesInputTest : InputTest {
     }
 
     @Test
-    fun uriPattern_exampleUrl() {
+    fun uriPattern_unknownHost() {
         assertNull(getUri("https://example.com/"))
     }
 
@@ -31,6 +31,26 @@ class CoordinatesInputTest : InputTest {
     fun parseUri_unknownPath() = runTest {
         assertEquals(ParseUriResult(), parseUri(""))
         assertEquals(ParseUriResult(), parseUri("spam"))
+    }
+
+    @Test
+    fun uriPattern_spaces() {
+        assertEquals(
+            "https://maps.apple.com/?q=foobar",
+            getUri("https://maps.apple.com/?q=foobar ")
+        )
+        assertEquals(
+            "https://maps.apple.com/?q=foo bar",
+            getUri("https://maps.apple.com/?q=foo bar ")
+        )
+        assertEquals(
+            "https://maps.apple.com/?q=foo",
+            getUri("https://maps.apple.com/?q=foo  bar")
+        )
+        assertEquals(
+            "https://maps.apple.com/?q=foo",
+            getUri("https://maps.apple.com/?q=foo\tbar")
+        )
     }
 
     @Test

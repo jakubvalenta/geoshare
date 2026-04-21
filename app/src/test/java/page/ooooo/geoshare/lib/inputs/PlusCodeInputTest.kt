@@ -43,6 +43,26 @@ class PlusCodeInputTest : InputTest {
     }
 
     @Test
+    fun uriPattern_spaces() {
+        assertEquals(
+            "https://maps.apple.com/?q=foobar",
+            getUri("https://maps.apple.com/?q=foobar ")
+        )
+        assertEquals(
+            "https://maps.apple.com/?q=foo bar",
+            getUri("https://maps.apple.com/?q=foo bar ")
+        )
+        assertEquals(
+            "https://maps.apple.com/?q=foo",
+            getUri("https://maps.apple.com/?q=foo  bar")
+        )
+        assertEquals(
+            "https://maps.apple.com/?q=foo",
+            getUri("https://maps.apple.com/?q=foo\tbar")
+        )
+    }
+
+    @Test
     fun parseUri_globalCode() = runTest {
         assertEquals(
             ParseUriResult(

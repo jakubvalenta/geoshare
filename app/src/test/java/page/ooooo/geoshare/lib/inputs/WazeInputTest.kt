@@ -78,6 +78,26 @@ class WazeInputTest : InputTest {
     }
 
     @Test
+    fun uriPattern_spaces() {
+        assertEquals(
+            "https://maps.apple.com/?q=foobar",
+            getUri("https://maps.apple.com/?q=foobar ")
+        )
+        assertEquals(
+            "https://maps.apple.com/?q=foo bar",
+            getUri("https://maps.apple.com/?q=foo bar ")
+        )
+        assertEquals(
+            "https://maps.apple.com/?q=foo",
+            getUri("https://maps.apple.com/?q=foo  bar")
+        )
+        assertEquals(
+            "https://maps.apple.com/?q=foo",
+            getUri("https://maps.apple.com/?q=foo\tbar")
+        )
+    }
+
+    @Test
     fun parseUri_unknownPathOrParams() = runTest {
         assertEquals(ParseUriResult(), parseUri("https://waze.com"))
         assertEquals(ParseUriResult(), parseUri("https://waze.com/"))

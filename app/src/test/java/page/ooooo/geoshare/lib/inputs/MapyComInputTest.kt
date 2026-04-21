@@ -64,6 +64,26 @@ class MapyComInputTest : InputTest {
     }
 
     @Test
+    fun uriPattern_spaces() {
+        assertEquals(
+            "https://maps.apple.com/?q=foobar",
+            getUri("https://maps.apple.com/?q=foobar ")
+        )
+        assertEquals(
+            "https://maps.apple.com/?q=foo bar",
+            getUri("https://maps.apple.com/?q=foo bar ")
+        )
+        assertEquals(
+            "https://maps.apple.com/?q=foo",
+            getUri("https://maps.apple.com/?q=foo  bar")
+        )
+        assertEquals(
+            "https://maps.apple.com/?q=foo",
+            getUri("https://maps.apple.com/?q=foo\tbar")
+        )
+    }
+
+    @Test
     fun shortUriPattern_correct() {
         assertEquals("https://mapy.com/s/jakuhelasu", getShortUri("https://mapy.com/s/jakuhelasu"))
         assertEquals("https://www.mapy.com/s/jakuhelasu", getShortUri("https://www.mapy.com/s/jakuhelasu"))
