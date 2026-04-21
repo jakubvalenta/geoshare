@@ -45,20 +45,20 @@ class AmapInputTest : InputTest {
     @Test
     fun uriPattern_spaces() {
         assertEquals(
-            "https://maps.apple.com/?q=foobar",
-            getUri("https://maps.apple.com/?q=foobar ")
+            "https://wb.amap.com/?q=foobar",
+            getUri("https://wb.amap.com/?q=foobar ")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo bar",
-            getUri("https://maps.apple.com/?q=foo bar ")
+            "https://wb.amap.com/?q=foo bar",
+            getUri("https://wb.amap.com/?q=foo bar ")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo  bar")
+            "https://wb.amap.com/?q=foo",
+            getUri("https://wb.amap.com/?q=foo  bar")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo\tbar")
+            "https://wb.amap.com/?q=foo",
+            getUri("https://wb.amap.com/?q=foo\tbar")
         )
     }
 

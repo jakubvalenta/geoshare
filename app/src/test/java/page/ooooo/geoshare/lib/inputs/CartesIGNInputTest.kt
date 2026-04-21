@@ -39,20 +39,20 @@ class CartesIGNInputTest : InputTest {
     @Test
     fun uriPattern_spaces() {
         assertEquals(
-            "https://maps.apple.com/?q=foobar",
-            getUri("https://maps.apple.com/?q=foobar ")
+            "https://cartes-ign.ign.fr?q=foobar",
+            getUri("https://cartes-ign.ign.fr?q=foobar ")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo bar",
-            getUri("https://maps.apple.com/?q=foo bar ")
+            "https://cartes-ign.ign.fr?q=foo bar",
+            getUri("https://cartes-ign.ign.fr?q=foo bar ")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo  bar")
+            "https://cartes-ign.ign.fr?q=foo",
+            getUri("https://cartes-ign.ign.fr?q=foo  bar")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo\tbar")
+            "https://cartes-ign.ign.fr?q=foo",
+            getUri("https://cartes-ign.ign.fr?q=foo\tbar")
         )
     }
 

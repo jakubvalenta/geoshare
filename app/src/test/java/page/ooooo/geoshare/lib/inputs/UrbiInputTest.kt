@@ -125,20 +125,20 @@ class UrbiInputTest : InputTest {
     @Test
     fun uriPattern_spaces() {
         assertEquals(
-            "https://maps.apple.com/?q=foobar",
-            getUri("https://maps.apple.com/?q=foobar ")
+            "https://2gis.com/?q=foobar",
+            getUri("https://2gis.com/?q=foobar ")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo bar",
-            getUri("https://maps.apple.com/?q=foo bar ")
+            "https://2gis.com/?q=foo bar",
+            getUri("https://2gis.com/?q=foo bar ")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo  bar")
+            "https://2gis.com/?q=foo",
+            getUri("https://2gis.com/?q=foo  bar")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo\tbar")
+            "https://2gis.com/?q=foo",
+            getUri("https://2gis.com/?q=foo\tbar")
         )
     }
 

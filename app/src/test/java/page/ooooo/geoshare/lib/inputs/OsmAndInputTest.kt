@@ -36,20 +36,20 @@ class OsmAndInputTest : InputTest {
     @Test
     fun uriPattern_spaces() {
         assertEquals(
-            "https://maps.apple.com/?q=foobar",
-            getUri("https://maps.apple.com/?q=foobar ")
+            "https://osmand.net/?q=foobar",
+            getUri("https://osmand.net/?q=foobar ")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo bar",
-            getUri("https://maps.apple.com/?q=foo bar ")
+            "https://osmand.net/?q=foo bar",
+            getUri("https://osmand.net/?q=foo bar ")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo  bar")
+            "https://osmand.net/?q=foo",
+            getUri("https://osmand.net/?q=foo  bar")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo\tbar")
+            "https://osmand.net/?q=foo",
+            getUri("https://osmand.net/?q=foo\tbar")
         )
     }
 

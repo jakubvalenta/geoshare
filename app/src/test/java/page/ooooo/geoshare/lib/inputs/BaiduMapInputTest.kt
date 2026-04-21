@@ -68,20 +68,20 @@ class BaiduMapInputTest : InputTest {
     @Test
     fun uriPattern_spaces() {
         assertEquals(
-            "https://maps.apple.com/?q=foobar",
-            getUri("https://maps.apple.com/?q=foobar ")
+            "https://map.baidu.com/?q=foobar",
+            getUri("https://map.baidu.com/?q=foobar ")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo bar",
-            getUri("https://maps.apple.com/?q=foo bar ")
+            "https://map.baidu.com/?q=foo bar",
+            getUri("https://map.baidu.com/?q=foo bar ")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo  bar")
+            "https://map.baidu.com/?q=foo",
+            getUri("https://map.baidu.com/?q=foo  bar")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo\tbar")
+            "https://map.baidu.com/?q=foo",
+            getUri("https://map.baidu.com/?q=foo\tbar")
         )
     }
 

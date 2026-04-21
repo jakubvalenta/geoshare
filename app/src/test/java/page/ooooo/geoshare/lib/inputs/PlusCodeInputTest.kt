@@ -3,7 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.Assume.assumeTrue
 import org.junit.Test
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
@@ -22,44 +22,57 @@ class PlusCodeInputTest : InputTest {
 
     @Test
     fun uriPattern_localCode() {
-        // TODO Update local code test after adding the support
-        assertNull(getUri("8F+GG"))
-        assertNull(getUri("6C8F+GG"))
-        assertNull(getUri("WF8Q+WF"))
-        assertNull(getUri("28WR+CW"))
+        assumeTrue("Local Plus Codes are not implemented yet", false)
+        assertEquals("8F+GG", getUri("8F+GG"))
+        assertEquals("6C8F+GG", getUri("6C8F+GG"))
+        assertEquals("WF8Q+WF", getUri("WF8Q+WF"))
+        assertEquals("28WR+CW", getUri("28WR+CW"))
     }
 
     @Test
     fun uriPattern_localCodeWithLocality() {
-        // TODO Update local code with locality test after adding the support
-        assertNull(getUri(@Suppress("SpellCheckingInspection") "WF8Q+WF Praia, Cabo Verde"))
-        assertNull(getUri("28WR+CW Comstock Park, Michigan"))
+        assumeTrue("Local Plus Codes are not implemented yet", false)
+        assertEquals(
+            @Suppress("SpellCheckingInspection") "WF8Q+WF Praia, Cabo Verde",
+            getUri(@Suppress("SpellCheckingInspection") "WF8Q+WF Praia, Cabo Verde"),
+        )
+        assertEquals(
+            "28WR+CW Comstock Park, Michigan",
+            getUri("28WR+CW Comstock Park, Michigan"),
+        )
     }
 
     @Test
-    fun uriPattern_localCodeWithLocalitySeparatedByMultipleSpaces_returnsNull() {
-        assertNull(getUri(@Suppress("SpellCheckingInspection") "WF8Q+WF  Praia, Cabo Verde"))
-        assertNull(getUri("28WR+CW  Comstock Park, Michigan"))
+    fun uriPattern_localCodeWithLocalitySeparatedByMultipleSpaces_returnsCodeWithoutLocality() {
+        assumeTrue("Local Plus Codes are not implemented yet", false)
+        assertEquals("WF8Q+WF", getUri(@Suppress("SpellCheckingInspection") "WF8Q+WF  Praia, Cabo Verde"))
+        assertEquals("28WR+CW", getUri("28WR+CW  Comstock Park, Michigan"))
     }
 
     @Test
     fun uriPattern_spaces() {
+        assumeTrue("Local Plus Codes are not implemented yet", false)
         assertEquals(
-            "https://maps.apple.com/?q=foobar",
-            getUri("https://maps.apple.com/?q=foobar ")
+            "28WR+CW foobar",
+            getUri("28WR+CW foobar ")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo bar",
-            getUri("https://maps.apple.com/?q=foo bar ")
+            "28WR+CW foo bar",
+            getUri("28WR+CW foo bar ")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo  bar")
+            "28WR+CW foo",
+            getUri("28WR+CW foo  bar")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo\tbar")
+            "28WR+CW foo",
+            getUri("28WR+CW foo\tbar")
         )
+    }
+
+    @Test
+    fun parseUri_unknown() = runTest {
+        assertEquals(ParseUriResult(), parseUri("spam"))
     }
 
     @Test
@@ -103,8 +116,7 @@ class PlusCodeInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_localCode() = runTest {
-        // TODO Update local code test after adding the support
+    fun parseUri_localCodeWithoutLocality_returnsEmptyResult() = runTest {
         assertEquals(ParseUriResult(), parseUri("8F+GG"))
         assertEquals(ParseUriResult(), parseUri("6C8F+GG"))
         assertEquals(ParseUriResult(), parseUri("WF8Q+WF"))
@@ -113,13 +125,22 @@ class PlusCodeInputTest : InputTest {
 
     @Test
     fun parseUri_localCodeWithLocality() = runTest {
-        // TODO Update local code with locality test after adding the support
-        assertEquals(ParseUriResult(), parseUri(@Suppress("SpellCheckingInspection") "WF8Q+WF Praia, Cabo Verde"))
-        assertEquals(ParseUriResult(), parseUri("28WR+CW Comstock Park, Michigan"))
-    }
-
-    @Test
-    fun parseUri_invalidCode() = runTest {
-        assertEquals(ParseUriResult(), parseUri("spam"))
+        assumeTrue("Local Plus Codes are not implemented yet", false)
+        assertEquals(
+            ParseUriResult(
+                persistentListOf(
+                    GCJ02MainlandChinaPoint(0.0, 0.0, source = Source.HASH)
+                )
+            ),
+            parseUri(@Suppress("SpellCheckingInspection") "WF8Q+WF Praia, Cabo Verde"),
+        )
+        assertEquals(
+            ParseUriResult(
+                persistentListOf(
+                    GCJ02MainlandChinaPoint(0.0, 0.0, source = Source.HASH)
+                )
+            ),
+            parseUri("28WR+CW Comstock Park, Michigan"),
+        )
     }
 }

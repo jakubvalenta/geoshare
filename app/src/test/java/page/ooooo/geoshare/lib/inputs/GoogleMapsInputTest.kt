@@ -94,20 +94,20 @@ class GoogleMapsInputTest : InputTest {
     @Test
     fun uriPattern_spaces() {
         assertEquals(
-            "https://maps.apple.com/?q=foobar",
-            getUri("https://maps.apple.com/?q=foobar ")
+            "https://maps.google.com/?q=foobar",
+            getUri("https://maps.google.com/?q=foobar ")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo bar",
-            getUri("https://maps.apple.com/?q=foo bar ")
+            "https://maps.google.com/?q=foo bar",
+            getUri("https://maps.google.com/?q=foo bar ")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo  bar")
+            "https://maps.google.com/?q=foo",
+            getUri("https://maps.google.com/?q=foo  bar")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo\tbar")
+            "https://maps.google.com/?q=foo",
+            getUri("https://maps.google.com/?q=foo\tbar")
         )
     }
 

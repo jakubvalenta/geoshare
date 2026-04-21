@@ -80,20 +80,20 @@ class WazeInputTest : InputTest {
     @Test
     fun uriPattern_spaces() {
         assertEquals(
-            "https://maps.apple.com/?q=foobar",
-            getUri("https://maps.apple.com/?q=foobar ")
+            "https://waze.com/?q=foobar",
+            getUri("https://waze.com/?q=foobar ")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo bar",
-            getUri("https://maps.apple.com/?q=foo bar ")
+            "https://waze.com/?q=foo bar",
+            getUri("https://waze.com/?q=foo bar ")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo  bar")
+            "https://waze.com/?q=foo",
+            getUri("https://waze.com/?q=foo  bar")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo\tbar")
+            "https://waze.com/?q=foo",
+            getUri("https://waze.com/?q=foo\tbar")
         )
     }
 

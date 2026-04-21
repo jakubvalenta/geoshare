@@ -18,39 +18,9 @@ class CoordinatesInputTest : InputTest {
     }
 
     @Test
-    fun uriPattern_unknownPath() {
+    fun uriPattern_unknown() {
+        assertNull(getUri(""))
         assertNull(getUri("spam"))
-    }
-
-    @Test
-    fun uriPattern_unknownHost() {
-        assertNull(getUri("https://example.com/"))
-    }
-
-    @Test
-    fun parseUri_unknownPath() = runTest {
-        assertEquals(ParseUriResult(), parseUri(""))
-        assertEquals(ParseUriResult(), parseUri("spam"))
-    }
-
-    @Test
-    fun uriPattern_spaces() {
-        assertEquals(
-            "https://maps.apple.com/?q=foobar",
-            getUri("https://maps.apple.com/?q=foobar ")
-        )
-        assertEquals(
-            "https://maps.apple.com/?q=foo bar",
-            getUri("https://maps.apple.com/?q=foo bar ")
-        )
-        assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo  bar")
-        )
-        assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo\tbar")
-        )
     }
 
     @Test

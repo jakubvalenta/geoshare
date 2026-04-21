@@ -66,20 +66,20 @@ class MapyComInputTest : InputTest {
     @Test
     fun uriPattern_spaces() {
         assertEquals(
-            "https://maps.apple.com/?q=foobar",
-            getUri("https://maps.apple.com/?q=foobar ")
+            "https://mapy.com/en/zakladni?q=foobar",
+            getUri("https://mapy.com/en/zakladni?q=foobar ")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo bar",
-            getUri("https://maps.apple.com/?q=foo bar ")
+            "https://mapy.com/en/zakladni?q=foo bar",
+            getUri("https://mapy.com/en/zakladni?q=foo bar ")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo  bar")
+            "https://mapy.com/en/zakladni?q=foo",
+            getUri("https://mapy.com/en/zakladni?q=foo  bar")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo\tbar")
+            "https://mapy.com/en/zakladni?q=foo",
+            getUri("https://mapy.com/en/zakladni?q=foo\tbar")
         )
     }
 

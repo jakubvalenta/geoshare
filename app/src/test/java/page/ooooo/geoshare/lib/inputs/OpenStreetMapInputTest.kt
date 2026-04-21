@@ -60,20 +60,20 @@ class OpenStreetMapInputTest : InputTest {
     @Test
     fun uriPattern_spaces() {
         assertEquals(
-            "https://maps.apple.com/?q=foobar",
-            getUri("https://maps.apple.com/?q=foobar ")
+            "https://www.openstreetmap.org/?q=foobar",
+            getUri("https://www.openstreetmap.org/?q=foobar ")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo bar",
-            getUri("https://maps.apple.com/?q=foo bar ")
+            "https://www.openstreetmap.org/?q=foo bar",
+            getUri("https://www.openstreetmap.org/?q=foo bar ")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo  bar")
+            "https://www.openstreetmap.org/?q=foo",
+            getUri("https://www.openstreetmap.org/?q=foo  bar")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo\tbar")
+            "https://www.openstreetmap.org/?q=foo",
+            getUri("https://www.openstreetmap.org/?q=foo\tbar")
         )
     }
 

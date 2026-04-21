@@ -43,20 +43,20 @@ class MagicEarthInputTest : InputTest {
     @Test
     fun uriPattern_spaces() {
         assertEquals(
-            "https://maps.apple.com/?q=foobar",
-            getUri("https://maps.apple.com/?q=foobar ")
+            "https://magicearth.com/?q=foobar",
+            getUri("https://magicearth.com/?q=foobar ")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo bar",
-            getUri("https://maps.apple.com/?q=foo bar ")
+            "https://magicearth.com/?q=foo bar",
+            getUri("https://magicearth.com/?q=foo bar ")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo  bar")
+            "https://magicearth.com/?q=foo",
+            getUri("https://magicearth.com/?q=foo  bar")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo\tbar")
+            "https://magicearth.com/?q=foo",
+            getUri("https://magicearth.com/?q=foo\tbar")
         )
     }
 

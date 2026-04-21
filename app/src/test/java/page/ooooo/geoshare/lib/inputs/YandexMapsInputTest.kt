@@ -50,20 +50,20 @@ class YandexMapsInputTest : InputTest {
     @Test
     fun uriPattern_spaces() {
         assertEquals(
-            "https://maps.apple.com/?q=foobar",
-            getUri("https://maps.apple.com/?q=foobar ")
+            "https://yandex.com/maps?q=foobar",
+            getUri("https://yandex.com/maps?q=foobar ")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo bar",
-            getUri("https://maps.apple.com/?q=foo bar ")
+            "https://yandex.com/maps?q=foo bar",
+            getUri("https://yandex.com/maps?q=foo bar ")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo  bar")
+            "https://yandex.com/maps?q=foo",
+            getUri("https://yandex.com/maps?q=foo  bar")
         )
         assertEquals(
-            "https://maps.apple.com/?q=foo",
-            getUri("https://maps.apple.com/?q=foo\tbar")
+            "https://yandex.com/maps?q=foo",
+            getUri("https://yandex.com/maps?q=foo\tbar")
         )
     }
 
