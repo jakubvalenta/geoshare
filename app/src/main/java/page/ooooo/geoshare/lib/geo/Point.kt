@@ -4,7 +4,6 @@ import androidx.compose.runtime.Immutable
 import com.lbt05.evil_transform.TransformUtil
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.extensions.toTrimmedString
-import kotlin.random.Random
 
 sealed interface Point {
     val lat: Double?
@@ -51,24 +50,6 @@ data class WGS84Point(
     )
 
     override fun isAccurate() = true
-
-    companion object {
-        val example = genRandomPoint(minLat = 0.0, maxLon = -100.0)
-
-        fun genRandomPoint(
-            minLat: Double = -50.0,
-            maxLat: Double = 80.0,
-            minLon: Double = -180.0,
-            maxLon: Double = 180.0,
-            z: Double = 16.0,
-            name: String? = null,
-            source: Source = Source.GENERATED,
-        ): WGS84Point = WGS84Point(
-            Random.nextDouble(minLat, maxLat).toScale(6),
-            Random.nextDouble(minLon, maxLon).toScale(6),
-            z, name, source,
-        )
-    }
 }
 
 /**

@@ -3,7 +3,6 @@ package page.ooooo.geoshare.lib.inputs
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assume.assumeTrue
 import org.junit.Test
@@ -14,15 +13,11 @@ class AmapInputTest : InputTest {
     override val input = AmapInput
 
     @Test
-    fun uriPattern_fullUrlWithinMainlandChina() {
+    fun uriPattern_fullUrl() {
         assertEquals(
             "https://wb.amap.com/?q=31.222811749011463%2C121.46840706467624%2C%E4%B8%8A%E6%B5%B7%E5%B8%82%E9%BB%84%E6%B5%A6%E5%8C%BA%E5%B7%A8%E9%B9%BF%E8%B7%AF15-17%E5%8F%B7&src=app_C3090",
             getUri("https://wb.amap.com/?q=31.222811749011463%2C121.46840706467624%2C%E4%B8%8A%E6%B5%B7%E5%B8%82%E9%BB%84%E6%B5%A6%E5%8C%BA%E5%B7%A8%E9%B9%BF%E8%B7%AF15-17%E5%8F%B7&src=app_C3090")
         )
-    }
-
-    @Test
-    fun uriPattern_fullUrlOutsideMainlandChina() {
         assertEquals(
             "https://wb.amap.com/?p=P0JANYX6NL%2C45.8289525077221%2C1.266689300537103%2C%E5%88%A9%E6%91%A9%E6%97%A5%E4%B8%BB%E6%95%99%E5%BA%A7%E5%A0%82%2C42+Rue+Prte+Panet%2C+87000+Limoges%2C+%E6%B3%95%E5%9B%BD&src=app_C3090",
             getUri("https://wb.amap.com/?p=P0JANYX6NL%2C45.8289525077221%2C1.266689300537103%2C%E5%88%A9%E6%91%A9%E6%97%A5%E4%B8%BB%E6%95%99%E5%BA%A7%E5%A0%82%2C42+Rue+Prte+Panet%2C+87000+Limoges%2C+%E6%B3%95%E5%9B%BD&src=app_C3090")
@@ -30,13 +25,8 @@ class AmapInputTest : InputTest {
     }
 
     @Test
-    fun uriPattern_shortUrlWithinMainlandChina() {
+    fun uriPattern_shortUrl() {
         assertEquals("https://surl.amap.com/4mkKGuyJ2bz", getUri("https://surl.amap.com/4mkKGuyJ2bz"))
-    }
-
-    @Test
-    fun uriPattern_shortUrlOutsideMainlandChina() {
-        assertEquals("https://surl.amap.com/509F4oaxo3QT", getUri("https://surl.amap.com/509F4oaxo3QT"))
     }
 
     @Test
@@ -53,7 +43,37 @@ class AmapInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
+    fun uriPattern_spaces() {
+        assertEquals(
+            "https://wb.amap.com/?q=foobar",
+            getUri("https://wb.amap.com/?q=foobar ")
+        )
+        assertEquals(
+            "https://wb.amap.com/?q=foo bar",
+            getUri("https://wb.amap.com/?q=foo bar ")
+        )
+        assertEquals(
+            "https://wb.amap.com/?q=foo",
+            getUri("https://wb.amap.com/?q=foo  bar")
+        )
+        assertEquals(
+            "https://wb.amap.com/?q=foo",
+            getUri("https://wb.amap.com/?q=foo\tbar")
+        )
+    }
+
+    @Test
+    fun shortUriPattern_correct() {
+        assertEquals("https://surl.amap.com/4mkKGuyJ2bz", getShortUri("https://surl.amap.com/4mkKGuyJ2bz"))
+    }
+
+    @Test
+    fun shortUriPattern_unknownHost() {
+        assertNull(getShortUri("https://www.example.com/4mkKGuyJ2bz"))
+    }
+
+    @Test
+    fun parseUri_unknownPathOrParams() = runTest {
         assertEquals(ParseUriResult(), parseUri("https://wb.amap.com"))
         assertEquals(ParseUriResult(), parseUri("https://wb.amap.com/"))
         assertEquals(ParseUriResult(), parseUri("https://wb.amap.com/?spam=1"))
@@ -155,15 +175,5 @@ class AmapInputTest : InputTest {
             ),
             parseUri("https://wb.amap.com/?p=P0JANYX6NL%2C45.8289525077221%2C1.266689300537103"),
         )
-    }
-
-    @Test
-    fun shortUriPattern_correct() {
-        assertNotNull(getShortUri("https://surl.amap.com/4mkKGuyJ2bz"))
-    }
-
-    @Test
-    fun shortUriPattern_unknownDomain() {
-        assertNull(getShortUri("https://www.example.com/4mkKGuyJ2bz"))
     }
 }

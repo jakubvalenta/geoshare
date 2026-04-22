@@ -12,7 +12,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 object CartesIGNInput : Input, Input.HasRandomUri {
-    override val uriPattern = Regex("""(?:https?://)?cartes-ign\.ign\.fr$URI_REST""")
+    override val uriPattern = Regex("""((?:https?://)?cartes-ign\.ign\.fr$URI_REST)""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.CARTES_IGN,
         nameResId = R.string.converter_cartes_ign_name,

@@ -66,6 +66,26 @@ class BaiduMapInputTest : InputTest {
     }
 
     @Test
+    fun uriPattern_spaces() {
+        assertEquals(
+            "https://map.baidu.com/?q=foobar",
+            getUri("https://map.baidu.com/?q=foobar ")
+        )
+        assertEquals(
+            "https://map.baidu.com/?q=foo bar",
+            getUri("https://map.baidu.com/?q=foo bar ")
+        )
+        assertEquals(
+            "https://map.baidu.com/?q=foo",
+            getUri("https://map.baidu.com/?q=foo  bar")
+        )
+        assertEquals(
+            "https://map.baidu.com/?q=foo",
+            getUri("https://map.baidu.com/?q=foo\tbar")
+        )
+    }
+
+    @Test
     fun parseUri_center() = runTest {
         assertEquals(
             ParseUriResult(persistentListOf(BD09MCPoint(3317203.0, 13520653.0, 13.0, source = Source.MAP_CENTER))),

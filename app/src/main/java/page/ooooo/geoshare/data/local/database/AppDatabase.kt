@@ -9,7 +9,7 @@ import kotlin.uuid.Uuid
 
 @Database(
     entities = [Link::class],
-    version = 4,
+    version = 5,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun getLinkDao(): LinkDao
@@ -117,6 +117,22 @@ abstract class AppDatabase : RoomDatabase() {
                     "https://www.google.com/maps/search/?api=1&query={q}",
                     1772395295367L,
                     Uuid.parse("9d7cd113-ce01-4b8b-82fe-856956b8b20a").toByteArray(),
+                )
+            )
+            db.execSQL(
+                "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                arrayOf<Any>(
+                    "Google Maps",
+                    "Google Maps Plus Code",
+                    "GCJ02_MAINLAND_CHINA",
+                    "DISPLAY",
+                    0,
+                    0,
+                    1,
+                    "https://www.google.com/maps/place/{plus_code}",
+                    "",
+                    1776849143380,
+                    Uuid.parse("5c891351-3f66-4aa2-83c4-f13c5a67fdef").toByteArray(),
                 )
             )
             db.execSQL(
@@ -296,7 +312,7 @@ abstract class AppDatabase : RoomDatabase() {
                 )
             )
             db.execSQL(
-                "INSERT OR REPLACE INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "",
                     "Zoom Earth",
@@ -483,6 +499,27 @@ abstract class AppDatabase : RoomDatabase() {
                         "",
                         1776348228136,
                         Uuid.parse("a0b5b493-31a7-410d-9fe2-285974738ff1").toByteArray(),
+                    )
+                )
+            }
+        }
+
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "INSERT OR REPLACE INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    arrayOf<Any>(
+                        "Google Maps",
+                        "Google Maps Plus Code",
+                        "GCJ02_MAINLAND_CHINA",
+                        "DISPLAY",
+                        0,
+                        0,
+                        1,
+                        "https://www.google.com/maps/place/{plus_code}",
+                        "",
+                        1776849143380,
+                        Uuid.parse("5c891351-3f66-4aa2-83c4-f13c5a67fdef").toByteArray(),
                     )
                 )
             }

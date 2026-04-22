@@ -58,6 +58,26 @@ class OpenStreetMapInputTest : InputTest {
     }
 
     @Test
+    fun uriPattern_spaces() {
+        assertEquals(
+            "https://www.openstreetmap.org/?q=foobar",
+            getUri("https://www.openstreetmap.org/?q=foobar ")
+        )
+        assertEquals(
+            "https://www.openstreetmap.org/?q=foo bar",
+            getUri("https://www.openstreetmap.org/?q=foo bar ")
+        )
+        assertEquals(
+            "https://www.openstreetmap.org/?q=foo",
+            getUri("https://www.openstreetmap.org/?q=foo  bar")
+        )
+        assertEquals(
+            "https://www.openstreetmap.org/?q=foo",
+            getUri("https://www.openstreetmap.org/?q=foo\tbar")
+        )
+    }
+
+    @Test
     fun parseUri_coordinates() = runTest {
         assertEquals(
             ParseUriResult(persistentListOf(WGS84Point(51.49, -0.13, z = 16.0, source = Source.URI))),

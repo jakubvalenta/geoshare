@@ -41,6 +41,7 @@ import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.Action
@@ -259,7 +260,7 @@ private fun DefaultPreview() {
                     ),
                     outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
                     outputsForSharing = outputRepository.getOutputsForSharing(),
-                    points = persistentListOf(WGS84Point.example),
+                    points = persistentListOf(WGS84Point(NaivePoint.example)),
                     onDisableLinkGroup = {},
                     onExecute = {},
                     onHideApp = {},
@@ -337,7 +338,7 @@ private fun DarkPreview() {
                     ),
                     outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
                     outputsForSharing = outputRepository.getOutputsForSharing(),
-                    points = persistentListOf(WGS84Point.example),
+                    points = persistentListOf(WGS84Point(NaivePoint.example)),
                     onDisableLinkGroup = {},
                     onExecute = {},
                     onHideApp = {},
@@ -370,7 +371,7 @@ private fun LoadingPreview() {
                     ),
                     outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
                     outputsForSharing = outputRepository.getOutputsForSharing(),
-                    points = persistentListOf(WGS84Point.example),
+                    points = persistentListOf(WGS84Point(NaivePoint.example)),
                     onDisableLinkGroup = {},
                     onExecute = {},
                     onHideApp = {},
@@ -403,7 +404,7 @@ private fun DarkLoadingPreview() {
                     ),
                     outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
                     outputsForSharing = outputRepository.getOutputsForSharing(),
-                    points = persistentListOf(WGS84Point.example),
+                    points = persistentListOf(WGS84Point(NaivePoint.example)),
                     onDisableLinkGroup = {},
                     onExecute = {},
                     onHideApp = {},
@@ -430,7 +431,7 @@ private fun EmptyPreview() {
                     outputsForApps = emptyMap(),
                     outputsForLinks = emptyMap(),
                     outputsForSharing = outputRepository.getOutputsForSharing(),
-                    points = persistentListOf(WGS84Point.example),
+                    points = persistentListOf(WGS84Point(NaivePoint.example)),
                     onDisableLinkGroup = {},
                     onExecute = {},
                     onHideApp = {},
@@ -457,7 +458,7 @@ private fun DarkEmptyPreview() {
                     outputsForApps = outputRepository.getOutputsForApps(emptyMap(), emptySet()),
                     outputsForLinks = emptyMap(),
                     outputsForSharing = outputRepository.getOutputsForSharing(),
-                    points = persistentListOf(WGS84Point.example),
+                    points = persistentListOf(WGS84Point(NaivePoint.example)),
                     onDisableLinkGroup = {},
                     onExecute = {},
                     onHideApp = {},

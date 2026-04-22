@@ -19,7 +19,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 object AppleMapsInput : HtmlInput, Input.HasRandomUri {
-    override val uriPattern = Regex("""(?:https?://)?maps\.apple(\.com)?[/?#]$URI_REST""")
+    override val uriPattern = Regex("""((?:https?://)?maps\.apple(\.com)?[/?#]$URI_REST)""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.APPLE_MAPS,
         nameResId = R.string.converter_apple_maps_name,

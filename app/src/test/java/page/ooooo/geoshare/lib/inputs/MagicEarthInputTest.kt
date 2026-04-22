@@ -41,7 +41,27 @@ class MagicEarthInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
+    fun uriPattern_spaces() {
+        assertEquals(
+            "https://magicearth.com/?q=foobar",
+            getUri("https://magicearth.com/?q=foobar ")
+        )
+        assertEquals(
+            "https://magicearth.com/?q=foo bar",
+            getUri("https://magicearth.com/?q=foo bar ")
+        )
+        assertEquals(
+            "https://magicearth.com/?q=foo",
+            getUri("https://magicearth.com/?q=foo  bar")
+        )
+        assertEquals(
+            "https://magicearth.com/?q=foo",
+            getUri("https://magicearth.com/?q=foo\tbar")
+        )
+    }
+
+    @Test
+    fun parseUri_unknownPathOrParams() = runTest {
         assertEquals(ParseUriResult(), parseUri("https://magicearth.com/"))
         assertEquals(ParseUriResult(), parseUri("https://magicearth.com/?spam=1"))
     }

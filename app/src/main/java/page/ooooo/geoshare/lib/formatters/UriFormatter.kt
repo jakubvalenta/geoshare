@@ -22,6 +22,14 @@ object UriFormatter {
                     .replace("{lon}", uriQuote.encode(lonStr))
                     .replace("{z}", uriQuote.encode(zOrDefaultStr))
                     .replace("{name}", uriQuote.encode(cleanName.orEmpty()))
+                    .replace(
+                        "{plus_code}",
+                        if ("{plus_code}" in coordsUriTemplate) {
+                            PlusCodeFormatter.formatPlusCode(point)?.let { uriQuote.encode(it) } ?: ""
+                        } else {
+                            ""
+                        },
+                    )
                     .takeIf { it.isNotEmpty() }
             }
         } ?: cleanName?.let { cleanName ->

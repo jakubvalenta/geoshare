@@ -3,7 +3,6 @@ package page.ooooo.geoshare.lib.inputs
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.lib.geo.Source
@@ -65,7 +64,46 @@ class MapyComInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
+    fun uriPattern_spaces() {
+        assertEquals(
+            "https://mapy.com/en/zakladni?q=foobar",
+            getUri("https://mapy.com/en/zakladni?q=foobar ")
+        )
+        assertEquals(
+            "https://mapy.com/en/zakladni?q=foo bar",
+            getUri("https://mapy.com/en/zakladni?q=foo bar ")
+        )
+        assertEquals(
+            "https://mapy.com/en/zakladni?q=foo",
+            getUri("https://mapy.com/en/zakladni?q=foo  bar")
+        )
+        assertEquals(
+            "https://mapy.com/en/zakladni?q=foo",
+            getUri("https://mapy.com/en/zakladni?q=foo\tbar")
+        )
+    }
+
+    @Test
+    fun shortUriPattern_correct() {
+        assertEquals("https://mapy.com/s/jakuhelasu", getShortUri("https://mapy.com/s/jakuhelasu"))
+        assertEquals("https://www.mapy.com/s/jakuhelasu", getShortUri("https://www.mapy.com/s/jakuhelasu"))
+        assertEquals("https://mapy.cz/s/jakuhelasu", getShortUri("https://mapy.cz/s/jakuhelasu"))
+    }
+
+    @Test
+    fun shortUriPattern_unknownPath() {
+        assertNull(getShortUri("https://mapy.com/"))
+        assertNull(getShortUri("https://mapy.com/s"))
+        assertNull(getShortUri("https://mapy.com/s/"))
+    }
+
+    @Test
+    fun shortUriPattern_unknownHost() {
+        assertNull(getShortUri("https://www.example.com/foo"))
+    }
+
+    @Test
+    fun parseUri_unknownPathOrParams() = runTest {
         assertEquals(ParseUriResult(), parseUri("https://mapy.com"))
         assertEquals(ParseUriResult(), parseUri("https://mapy.com/en"))
         assertEquals(ParseUriResult(), parseUri("https://mapy.com/en/"))
@@ -131,24 +169,5 @@ class MapyComInputTest : InputTest {
             ParseUriResult(persistentListOf(WGS84Point(-41.9966006, 6.1223825, source = Source.TEXT))),
             parseUri(uriString = "41.9966006S, 6.1223825E"),
         )
-    }
-
-    @Test
-    fun shortUriPattern_correct() {
-        assertNotNull(getShortUri("https://mapy.com/s/jakuhelasu"))
-        assertNotNull(getShortUri("https://www.mapy.com/s/jakuhelasu"))
-        assertNotNull(getShortUri("https://mapy.cz/s/jakuhelasu"))
-    }
-
-    @Test
-    fun shortUriPattern_wrongPath() {
-        assertNull(getShortUri("https://mapy.com/"))
-        assertNull(getShortUri("https://mapy.com/s"))
-        assertNull(getShortUri("https://mapy.com/s/"))
-    }
-
-    @Test
-    fun shortUriPattern_unknownDomain() {
-        assertNull(getShortUri("https://www.example.com/foo"))
     }
 }

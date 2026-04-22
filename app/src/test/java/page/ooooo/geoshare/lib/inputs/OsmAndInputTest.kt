@@ -34,6 +34,26 @@ class OsmAndInputTest : InputTest {
     }
 
     @Test
+    fun uriPattern_spaces() {
+        assertEquals(
+            "https://osmand.net/?q=foobar",
+            getUri("https://osmand.net/?q=foobar ")
+        )
+        assertEquals(
+            "https://osmand.net/?q=foo bar",
+            getUri("https://osmand.net/?q=foo bar ")
+        )
+        assertEquals(
+            "https://osmand.net/?q=foo",
+            getUri("https://osmand.net/?q=foo  bar")
+        )
+        assertEquals(
+            "https://osmand.net/?q=foo",
+            getUri("https://osmand.net/?q=foo\tbar")
+        )
+    }
+
+    @Test
     fun parseUri_pin() = runTest {
         assertEquals(
             ParseUriResult(persistentListOf(WGS84Point(52.51628, 13.37771, source = Source.URI))),

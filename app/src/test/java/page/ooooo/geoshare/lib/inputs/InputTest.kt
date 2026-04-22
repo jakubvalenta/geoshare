@@ -5,12 +5,13 @@ import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.extensions.groupOrNull
 
 interface InputTest {
     val input: Input
 
     fun getUri(uriString: String): String? =
-        input.uriPattern.find(uriString)?.value
+        input.uriPattern.find(uriString)?.groupOrNull()
 
     fun getShortUri(uriString: String): String? =
         (input as ShortUriInput).shortUriPattern.find(uriString)?.value

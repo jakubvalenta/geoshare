@@ -12,25 +12,15 @@ class CoordinatesInputTest : InputTest {
     override val input = CoordinatesInput
 
     @Test
-    fun uriPattern_supportedUrl() {
+    fun uriPattern_coordinates() {
         assertEquals("50.21972°\u00a0N, 0.68453°\u00a0W", getUri("50.21972°\u00a0N, 0.68453°\u00a0W"))
         assertEquals("31°57′N 35°56′E", getUri("31°57′N 35°56′E"))
     }
 
     @Test
-    fun uriPattern_unknownPath() {
+    fun uriPattern_unknown() {
+        assertNull(getUri(""))
         assertNull(getUri("spam"))
-    }
-
-    @Test
-    fun uriPattern_exampleUrl() {
-        assertNull(getUri("https://example.com/"))
-    }
-
-    @Test
-    fun parseUri_unknownPath() = runTest {
-        assertEquals(ParseUriResult(), parseUri(""))
-        assertEquals(ParseUriResult(), parseUri("spam"))
     }
 
     @Test

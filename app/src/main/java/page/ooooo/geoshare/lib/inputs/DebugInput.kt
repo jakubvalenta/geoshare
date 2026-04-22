@@ -10,7 +10,7 @@ import page.ooooo.geoshare.lib.UriQuote
  * a commercial website.
  */
 object DebugInput : WebInput {
-    override val uriPattern = Regex("""(?:https?://)?(?:www\.)?example\.com(?:/\S+|$)""")
+    override val uriPattern = Regex("""((?:https?://)?(?:www\.)?example\.com(?:/\S+|$))""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.DEBUG,
         nameResId = R.string.converter_debug_name,

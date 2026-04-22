@@ -29,6 +29,7 @@ map app.
 - 2GIS
 - Amap (AutoNavi)
 - Baidu Map (beta)
+- Cartes IGN
 - CoMaps
 - HERE WeGo
 - Magic Earth
@@ -37,6 +38,7 @@ map app.
 - OpenStreetMap
 - Organic Maps
 - OsmAnd
+- Plus Codes (global only)
 - Urbi
 - Waze
 - Yandex Maps

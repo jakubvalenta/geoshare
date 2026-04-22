@@ -63,6 +63,7 @@ import page.ooooo.geoshare.lib.conversion.LocationFindingFailed
 import page.ooooo.geoshare.lib.conversion.LocationPermissionReceived
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
@@ -292,9 +293,9 @@ private fun ActionFinishedPreview() {
             ResultSuccessMessage(
                 currentState = ActionFinished(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(WGS84Point.example),
+                    points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-                        .toAction(WGS84Point.example),
+                        .toAction(WGS84Point(NaivePoint.example)),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
@@ -329,9 +330,9 @@ private fun DarkActionFinishedPreview() {
             ResultSuccessMessage(
                 currentState = ActionFinished(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(WGS84Point.example),
+                    points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-                        .toAction(WGS84Point.example),
+                        .toAction(WGS84Point(NaivePoint.example)),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
@@ -367,9 +368,9 @@ private fun ActionFinishedFeatureNotAvailablePreview() {
                 ResultSuccessMessage(
                     currentState = ActionFinished(
                         inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                        points = persistentListOf(WGS84Point.example),
+                        points = persistentListOf(WGS84Point(NaivePoint.example)),
                         action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-                            .toAction(WGS84Point.example),
+                            .toAction(WGS84Point(NaivePoint.example)),
                         isAutomation = true,
                     ),
                     appDetails = mapOf(
@@ -403,9 +404,9 @@ private fun DarkActionFinishedFeatureNotAvailablePreview() {
                 ResultSuccessMessage(
                     currentState = ActionFinished(
                         inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                        points = persistentListOf(WGS84Point.example),
+                        points = persistentListOf(WGS84Point(NaivePoint.example)),
                         action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-                            .toAction(WGS84Point.example),
+                            .toAction(WGS84Point(NaivePoint.example)),
                         isAutomation = true,
                     ),
                     appDetails = mapOf(
@@ -449,9 +450,9 @@ private fun ActionWaitingPreview() {
                         billing = BillingImpl(LocalContext.current),
                     ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(WGS84Point.example),
+                    points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-                        .toAction(WGS84Point.example),
+                        .toAction(WGS84Point(NaivePoint.example)),
                     isAutomation = true,
                     delay = 3.seconds,
                 ),
@@ -498,9 +499,9 @@ private fun DarkActionWaitingPreview() {
                         billing = BillingImpl(LocalContext.current),
                     ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(WGS84Point.example),
+                    points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-                        .toAction(WGS84Point.example),
+                        .toAction(WGS84Point(NaivePoint.example)),
                     isAutomation = true,
                     delay = 3.seconds,
                 ),
@@ -547,9 +548,9 @@ private fun LocationPermissionReceivedPreview() {
                         billing = BillingImpl(LocalContext.current),
                     ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(WGS84Point.example),
+                    points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter)
-                        .toAction(WGS84Point.example),
+                        .toAction(WGS84Point(NaivePoint.example)),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
@@ -595,9 +596,9 @@ private fun DarkLocationPermissionReceivedPreview() {
                         billing = BillingImpl(LocalContext.current),
                     ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(WGS84Point.example),
+                    points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter)
-                        .toAction(WGS84Point.example),
+                        .toAction(WGS84Point(NaivePoint.example)),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
@@ -632,9 +633,9 @@ private fun SucceededPreview() {
             ResultSuccessMessage(
                 currentState = ActionSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(WGS84Point.example),
+                    points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-                        .toAction(WGS84Point.example),
+                        .toAction(WGS84Point(NaivePoint.example)),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
@@ -669,9 +670,9 @@ private fun DarSucceededPreview() {
             ResultSuccessMessage(
                 currentState = ActionSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(WGS84Point.example),
+                    points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-                        .toAction(WGS84Point.example),
+                        .toAction(WGS84Point(NaivePoint.example)),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
@@ -706,9 +707,9 @@ private fun SucceededNoMessagePreview() {
             ResultSuccessMessage(
                 currentState = ActionSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(WGS84Point.example),
+                    points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = SharePointsGpxOutput(coordinateConverter)
-                        .toAction(persistentListOf(WGS84Point.example)),
+                        .toAction(persistentListOf(WGS84Point(NaivePoint.example))),
                     isAutomation = false,
                 ),
                 appDetails = mapOf(
@@ -743,9 +744,9 @@ private fun DarkSucceededNoMessagePreview() {
             ResultSuccessMessage(
                 currentState = ActionSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(WGS84Point.example),
+                    points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = SharePointsGpxOutput(coordinateConverter)
-                        .toAction(persistentListOf(WGS84Point.example)),
+                        .toAction(persistentListOf(WGS84Point(NaivePoint.example))),
                     isAutomation = false,
                 ),
                 appDetails = mapOf(
@@ -780,9 +781,9 @@ private fun FailedPreview() {
             ResultSuccessMessage(
                 currentState = ActionFailed(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(WGS84Point.example),
+                    points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-                        .toAction(WGS84Point.example),
+                        .toAction(WGS84Point(NaivePoint.example)),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(
@@ -817,9 +818,9 @@ private fun DarkFailedPreview() {
             ResultSuccessMessage(
                 currentState = ActionFailed(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(WGS84Point.example),
+                    points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-                        .toAction(WGS84Point.example),
+                        .toAction(WGS84Point(NaivePoint.example)),
                     isAutomation = true,
                 ),
                 appDetails = mapOf(

@@ -23,6 +23,7 @@ import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.Action
@@ -127,7 +128,7 @@ private fun DefaultPreview() {
                 coordinateConverter = coordinateConverter,
             )
             ResultSuccessSheet(
-                points = persistentListOf(WGS84Point.example, WGS84Point.genRandomPoint()),
+                points = persistentListOf(WGS84Point(NaivePoint.example), WGS84Point(NaivePoint.genRandomPoint())),
                 selectedPointIndex = 1,
                 appDetails = emptyMap(),
                 outputsForPoint = outputRepository.getOutputsForPoint(defaultFakeLinks),
@@ -155,7 +156,7 @@ private fun DarkPreview() {
                 coordinateConverter = coordinateConverter,
             )
             ResultSuccessSheet(
-                points = persistentListOf(WGS84Point.example, WGS84Point.genRandomPoint()),
+                points = persistentListOf(WGS84Point(NaivePoint.example), WGS84Point(NaivePoint.genRandomPoint())),
                 selectedPointIndex = 1,
                 appDetails = emptyMap(),
                 outputsForPoint = outputRepository.getOutputsForPoint(defaultFakeLinks),
@@ -179,7 +180,7 @@ private fun LastPointPreview() {
                 coordinateConverter = coordinateConverter,
             )
             ResultSuccessSheet(
-                points = persistentListOf(WGS84Point.example),
+                points = persistentListOf(WGS84Point(NaivePoint.example)),
                 selectedPointIndex = 0,
                 appDetails = emptyMap(),
                 outputsForPoint = outputRepository.getOutputsForPoint(defaultFakeLinks),
@@ -207,7 +208,7 @@ private fun DarkLastPointPreview() {
                 coordinateConverter = coordinateConverter,
             )
             ResultSuccessSheet(
-                points = persistentListOf(WGS84Point.example),
+                points = persistentListOf(WGS84Point(NaivePoint.example)),
                 selectedPointIndex = 0,
                 appDetails = emptyMap(),
                 outputsForPoint = outputRepository.getOutputsForPoint(defaultFakeLinks),

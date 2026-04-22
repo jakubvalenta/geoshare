@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
+import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 
@@ -39,7 +40,7 @@ fun ScreenshotOpen() {
             y = 100,
         ) {
             ScreenshotText(
-                CoordinateFormatter.formatDecCoords(WGS84Point.example),
+                CoordinateFormatter.formatDecCoords(WGS84Point(NaivePoint.example)),
                 scale,
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                 style = MaterialTheme.typography.bodyLarge,

@@ -16,6 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -54,8 +55,10 @@ fun MainFormLinks(
             Text(stringResource(R.string.main_navigate_to_intro))
         }
         TextButton({
-            val randomPoint = WGS84Point.genRandomPoint(
-                name = resources.getString(R.string.intro_how_to_share_google_maps_screenshot_place),
+            val randomPoint = WGS84Point(
+                NaivePoint.genRandomPoint(
+                    name = resources.getString(R.string.intro_how_to_share_google_maps_screenshot_place),
+                )
             )
             allInputs
                 .shuffled()

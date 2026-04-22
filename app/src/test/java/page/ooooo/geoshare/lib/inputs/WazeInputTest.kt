@@ -78,7 +78,27 @@ class WazeInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
+    fun uriPattern_spaces() {
+        assertEquals(
+            "https://waze.com/?q=foobar",
+            getUri("https://waze.com/?q=foobar ")
+        )
+        assertEquals(
+            "https://waze.com/?q=foo bar",
+            getUri("https://waze.com/?q=foo bar ")
+        )
+        assertEquals(
+            "https://waze.com/?q=foo",
+            getUri("https://waze.com/?q=foo  bar")
+        )
+        assertEquals(
+            "https://waze.com/?q=foo",
+            getUri("https://waze.com/?q=foo\tbar")
+        )
+    }
+
+    @Test
+    fun parseUri_unknownPathOrParams() = runTest {
         assertEquals(ParseUriResult(), parseUri("https://waze.com"))
         assertEquals(ParseUriResult(), parseUri("https://waze.com/"))
         assertEquals(ParseUriResult(), parseUri("https://waze.com/ul"))

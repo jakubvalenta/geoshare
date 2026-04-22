@@ -46,7 +46,27 @@ class HereWeGoInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
+    fun uriPattern_spaces() {
+        assertEquals(
+            "https://wego.here.com/?q=foobar",
+            getUri("https://wego.here.com/?q=foobar ")
+        )
+        assertEquals(
+            "https://wego.here.com/?q=foo bar",
+            getUri("https://wego.here.com/?q=foo bar ")
+        )
+        assertEquals(
+            "https://wego.here.com/?q=foo",
+            getUri("https://wego.here.com/?q=foo  bar")
+        )
+        assertEquals(
+            "https://wego.here.com/?q=foo",
+            getUri("https://wego.here.com/?q=foo\tbar")
+        )
+    }
+
+    @Test
+    fun parseUri_unknownPathOrParams() = runTest {
         assertEquals(ParseUriResult(), parseUri("https://wego.here.com"))
         assertEquals(ParseUriResult(), parseUri("https://wego.here.com/"))
         assertEquals(ParseUriResult(), parseUri("https://wego.here.com/?spam=1"))

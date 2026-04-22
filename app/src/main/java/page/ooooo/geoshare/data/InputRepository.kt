@@ -13,6 +13,7 @@ import page.ooooo.geoshare.lib.inputs.HereWeGoInput
 import page.ooooo.geoshare.lib.inputs.MagicEarthInput
 import page.ooooo.geoshare.lib.inputs.MapsMeInput
 import page.ooooo.geoshare.lib.inputs.MapyComInput
+import page.ooooo.geoshare.lib.inputs.PlusCodeInput
 import page.ooooo.geoshare.lib.inputs.OpenStreetMapInput
 import page.ooooo.geoshare.lib.inputs.OsmAndInput
 import page.ooooo.geoshare.lib.inputs.UrbiInput
@@ -32,6 +33,7 @@ class InputRepository @Inject constructor() {
      */
     val all = listOf(
         GeoUriInput,
+        PlusCodeInput,
         GoogleMapsInput,
         AppleMapsInput,
         AmapInput,

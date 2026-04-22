@@ -123,6 +123,26 @@ class UrbiInputTest : InputTest {
     }
 
     @Test
+    fun uriPattern_spaces() {
+        assertEquals(
+            "https://2gis.com/?q=foobar",
+            getUri("https://2gis.com/?q=foobar ")
+        )
+        assertEquals(
+            "https://2gis.com/?q=foo bar",
+            getUri("https://2gis.com/?q=foo bar ")
+        )
+        assertEquals(
+            "https://2gis.com/?q=foo",
+            getUri("https://2gis.com/?q=foo  bar")
+        )
+        assertEquals(
+            "https://2gis.com/?q=foo",
+            getUri("https://2gis.com/?q=foo\tbar")
+        )
+    }
+
+    @Test
     fun parseUri_point() = runTest {
         assertEquals(
             ParseUriResult(persistentListOf(WGS84Point(25.284889, 55.172173, source = Source.URI))),

@@ -61,6 +61,7 @@ import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.Srs
 import page.ooooo.geoshare.lib.geo.WGS84Point
@@ -183,13 +184,11 @@ fun LinkForm(
         )
         listOf(
             WGS84Point(
-                -3.075833,
-                37.353333,
+                -3.075833, 37.353333,
                 source = Source.GENERATED,
             ) to stringResource(R.string.links_form_test_world),
             WGS84Point(
-                39.915833,
-                116.390833,
+                39.915833, 116.390833,
                 source = Source.GENERATED,
             ) to stringResource(R.string.links_form_test_china),
         ).let { testPointsWithName ->
@@ -274,7 +273,7 @@ fun LinkForm(
                         }
                         ResultSuccessSheetItem(
                             headlineText = copyOutput.label(appDetails),
-                            supportingText = copyOutput.getDescription(WGS84Point.example),
+                            supportingText = copyOutput.getDescription(WGS84Point(NaivePoint.example)),
                             icon = copyOutput.getIcon(appDetails),
                         )
                     }

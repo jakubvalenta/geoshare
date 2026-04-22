@@ -1,6 +1,8 @@
 package page.ooooo.geoshare.lib.geo
 
 import androidx.compose.runtime.Immutable
+import page.ooooo.geoshare.lib.extensions.toScale
+import kotlin.random.Random
 
 /**
  * Point without spatial reference system (SRS) information.
@@ -17,4 +19,22 @@ data class NaivePoint(
     val source: Source,
 ) {
     fun hasCoordinates(): Boolean = lat != null && lon != null
+
+    companion object {
+        val example = genRandomPoint(minLat = 0.0, maxLon = -100.0)
+
+        fun genRandomPoint(
+            minLat: Double = -50.0,
+            maxLat: Double = 80.0,
+            minLon: Double = -180.0,
+            maxLon: Double = 180.0,
+            z: Double = 16.0,
+            name: String? = null,
+            source: Source = Source.GENERATED,
+        ): NaivePoint = NaivePoint(
+            Random.nextDouble(minLat, maxLat).toScale(6),
+            Random.nextDouble(minLon, maxLon).toScale(6),
+            z, name, source,
+        )
+    }
 }

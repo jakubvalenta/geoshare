@@ -49,6 +49,26 @@ class MapsMeInputTest : InputTest {
     }
 
     @Test
+    fun uriPattern_spaces() {
+        assertEquals(
+            "https://ge0.me/?q=foobar",
+            getUri("https://ge0.me/?q=foobar ")
+        )
+        assertEquals(
+            "https://ge0.me/?q=foo bar",
+            getUri("https://ge0.me/?q=foo bar ")
+        )
+        assertEquals(
+            "https://ge0.me/?q=foo",
+            getUri("https://ge0.me/?q=foo  bar")
+        )
+        assertEquals(
+            "https://ge0.me/?q=foo",
+            getUri("https://ge0.me/?q=foo\tbar")
+        )
+    }
+
+    @Test
     fun parseUri_noPath() = runTest {
         assertEquals(ParseUriResult(), parseUri("ge0:"))
         assertEquals(ParseUriResult(), parseUri("http://ge0.me"))

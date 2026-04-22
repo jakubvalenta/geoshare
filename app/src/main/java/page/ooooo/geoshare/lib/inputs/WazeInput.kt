@@ -27,7 +27,7 @@ import page.ooooo.geoshare.lib.geo.decodeWazeGeoHash
 object WazeInput : HtmlInput, Input.HasRandomUri {
     private const val HASH = @Suppress("SpellCheckingInspection") """[0-9bcdefghjkmnpqrstuvwxyz]+"""
 
-    override val uriPattern = Regex("""(?:https?://)?(?:(?:www|ul)\.)?waze\.com/$URI_REST""")
+    override val uriPattern = Regex("""((?:https?://)?(?:(?:www|ul)\.)?waze\.com/$URI_REST)""")
 
     override val documentation = InputDocumentation(
         id = InputDocumentationId.WAZE,

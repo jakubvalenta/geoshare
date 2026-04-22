@@ -12,6 +12,7 @@ import page.ooooo.geoshare.lib.extensions.toLatLonNamePoint
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
 import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
@@ -19,13 +20,13 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 object GeoUriInput : Input, Input.HasRandomUri {
     private const val NAME_REGEX = """\((.+)\)"""
 
-    override val uriPattern = Regex("""geo:$LAT_NUM,$LON_NUM\?q=$LAT_NUM,\s*$LON_NUM|geo:$URI_REST""")
+    override val uriPattern = Regex("""(geo:$LAT_NUM,$LON_NUM\?q=$LAT_NUM,\s*$LON_NUM|geo:$URI_REST)""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.GEO_URI,
         nameResId = R.string.converter_geo_name,
         items = listOf(
             InputDocumentationItem.Text(3) {
-                stringResource(R.string.example, GeoUriFormatter.formatGeoUriString(WGS84Point.example))
+                stringResource(R.string.example, GeoUriFormatter.formatGeoUriString(WGS84Point(NaivePoint.example)))
             },
         ),
     )

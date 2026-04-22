@@ -3,7 +3,6 @@ package page.ooooo.geoshare.lib.inputs
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.lib.geo.Source
@@ -49,7 +48,45 @@ class YandexMapsInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
+    fun uriPattern_spaces() {
+        assertEquals(
+            "https://yandex.com/maps?q=foobar",
+            getUri("https://yandex.com/maps?q=foobar ")
+        )
+        assertEquals(
+            "https://yandex.com/maps?q=foo bar",
+            getUri("https://yandex.com/maps?q=foo bar ")
+        )
+        assertEquals(
+            "https://yandex.com/maps?q=foo",
+            getUri("https://yandex.com/maps?q=foo  bar")
+        )
+        assertEquals(
+            "https://yandex.com/maps?q=foo",
+            getUri("https://yandex.com/maps?q=foo\tbar")
+        )
+    }
+
+    @Test
+    fun shortUriPattern_correct() {
+        assertEquals("https://yandex.com/maps/-/CLAvMI18", getShortUri("https://yandex.com/maps/-/CLAvMI18"))
+    }
+
+    @Test
+    fun shortUriPattern_unknownPath() {
+        assertNull(getShortUri("https://yandex.com/"))
+        assertNull(getShortUri("https://yandex.com/maps/"))
+        assertNull(getShortUri("https://yandex.com/maps/-/"))
+        assertNull(getShortUri("https://yandex.com/foo"))
+    }
+
+    @Test
+    fun shortUriPattern_unknownHost() {
+        assertNull(getShortUri("https://www.example.com/foo"))
+    }
+
+    @Test
+    fun parseUri_unknownPathOrParams() = runTest {
         assertEquals(ParseUriResult(), parseUri("https://yandex.com"))
         assertEquals(ParseUriResult(), parseUri("https://yandex.com/"))
         assertEquals(ParseUriResult(), parseUri("https://yandex.com/maps"))
@@ -168,23 +205,5 @@ class YandexMapsInputTest : InputTest {
     @Test
     fun parseHtml_doesNotContainCoordinates_returnsNull() = runTest {
         assertEquals(ParseHtmlResult(), parseHtml("""<html></html>"""))
-    }
-
-    @Test
-    fun shortUriPattern_correct() {
-        assertNotNull(getShortUri("https://yandex.com/maps/-/CLAvMI18"))
-    }
-
-    @Test
-    fun shortUriPattern_wrongPath() {
-        assertNull(getShortUri("https://yandex.com/"))
-        assertNull(getShortUri("https://yandex.com/maps/"))
-        assertNull(getShortUri("https://yandex.com/maps/-/"))
-        assertNull(getShortUri("https://yandex.com/foo"))
-    }
-
-    @Test
-    fun shortUriPattern_unknownDomain() {
-        assertNull(getShortUri("https://www.example.com/foo"))
     }
 }

@@ -15,7 +15,7 @@ const val Z = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
  *
  * "https://maps.google.com/maps?daddr=2088 Albion Rd"
  */
-const val URI_REST = """.+?(?= {2}|\n|$)"""
+const val URI_REST = """[\S ]*?\S(?= {2}|\n|\t|\s*$)"""
 
 /**
  * Name when it appears in URI query param

@@ -9,6 +9,7 @@ import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
@@ -25,14 +26,14 @@ object CoordinatesInput : Input, Input.HasRandomUri {
     private const val LON_MIN = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
     private const val LON_SEC = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
 
-    override val uriPattern = Regex("""[\d.\-\p{Zs},°'′"″NSWE]*\d[\d.\-\p{Zs},°'′"″NSWE]*""")
+    override val uriPattern = Regex("""([\d.\-\p{Zs},°'′"″NSWE]*\d[\d.\-\p{Zs},°'′"″NSWE]*)""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.COORDINATES,
         nameResId = R.string.converter_coordinates_name,
         items = listOf(
             InputDocumentationItem.Text(20) {
                 stringResource(
-                    R.string.example, CoordinateFormatter.formatDegMinSecCoords(WGS84Point.example)
+                    R.string.example, CoordinateFormatter.formatDegMinSecCoords(WGS84Point(NaivePoint.example))
                 )
             },
         ),

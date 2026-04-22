@@ -1,5 +1,5 @@
 [versions]
-aboutLibraries = "14.0.0"
+aboutLibraries = "14.0.1"
 accompanistDrawablePainter = "0.37.3"
 agp = "9.0.1"
 androidBillingClient = "8.3.0"
@@ -22,10 +22,11 @@ jts = "1.20.0"
 kotlin = "2.3.20"
 kotlinxCollectionsImmutable = "0.4.0"
 kotlinxCoroutinesTest = "1.10.2"
-kotlinxSerializationJson = "1.10.0"
+kotlinxSerializationJson = "1.11.0"
 ksp = "2.3.4"
 ktor = "3.4.2"
 mockitoKotlin = "6.3.0"
+openLocationCode = "1.0.4"
 
 [libraries]
 aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "aboutLibraries" }
@@ -63,6 +64,7 @@ kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collec
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
+openlocationcode = { module = "com.google.openlocationcode:openlocationcode", version.ref = "openLocationCode" }
 
 [plugins]
 aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin.android", version.ref = "aboutLibraries" }

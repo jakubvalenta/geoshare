@@ -19,6 +19,7 @@ enum class InputDocumentationId {
     MAPY_COM,
     OPEN_STREET_MAP,
     OSM_AND,
+    PLUS_CODE,
     URBI,
     WAZE,
     YANDEX_MAPS,

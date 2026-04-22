@@ -37,7 +37,27 @@ class CartesIGNInputTest : InputTest {
     }
 
     @Test
-    fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
+    fun uriPattern_spaces() {
+        assertEquals(
+            "https://cartes-ign.ign.fr?q=foobar",
+            getUri("https://cartes-ign.ign.fr?q=foobar ")
+        )
+        assertEquals(
+            "https://cartes-ign.ign.fr?q=foo bar",
+            getUri("https://cartes-ign.ign.fr?q=foo bar ")
+        )
+        assertEquals(
+            "https://cartes-ign.ign.fr?q=foo",
+            getUri("https://cartes-ign.ign.fr?q=foo  bar")
+        )
+        assertEquals(
+            "https://cartes-ign.ign.fr?q=foo",
+            getUri("https://cartes-ign.ign.fr?q=foo\tbar")
+        )
+    }
+
+    @Test
+    fun parseUri_unknownPathOrParams() = runTest {
         assertEquals(ParseUriResult(), parseUri("https://cartes-ign.ign.fr/"))
         assertEquals(ParseUriResult(), parseUri("https://cartes-ign.ign.fr/?spam=1"))
     }

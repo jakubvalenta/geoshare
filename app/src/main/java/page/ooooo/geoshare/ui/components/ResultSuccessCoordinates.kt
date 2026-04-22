@@ -38,6 +38,7 @@ import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
@@ -251,7 +252,7 @@ private fun DefaultPreview() {
                 coordinateConverter = coordinateConverter,
             )
             ResultSuccessCoordinates(
-                points = persistentListOf(WGS84Point.example),
+                points = persistentListOf(WGS84Point(NaivePoint.example)),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
@@ -279,7 +280,7 @@ private fun DarkPreview() {
                 coordinateConverter = coordinateConverter,
             )
             ResultSuccessCoordinates(
-                points = persistentListOf(WGS84Point.example),
+                points = persistentListOf(WGS84Point(NaivePoint.example)),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
@@ -364,7 +365,7 @@ private fun NamePreview() {
             )
             ResultSuccessCoordinates(
                 points = persistentListOf(
-                    WGS84Point.example,
+                    WGS84Point(NaivePoint.example),
                     GCJ02Point(31.22850685422705, 121.47552456472106, z = 11.0, source = Source.MAP_CENTER),
                 ),
                 appDetails = emptyMap(),
@@ -395,7 +396,7 @@ private fun DarkNamePreview() {
             )
             ResultSuccessCoordinates(
                 points = persistentListOf(
-                    WGS84Point.example,
+                    WGS84Point(NaivePoint.example),
                     GCJ02Point(31.22850685422705, 121.47552456472106, z = 11.0, source = Source.MAP_CENTER),
                 ),
                 appDetails = emptyMap(),
@@ -426,13 +427,13 @@ private fun PointsPreview() {
             )
             ResultSuccessCoordinates(
                 points = persistentListOf(
-                    WGS84Point.genRandomPoint(),
-                    WGS84Point.genRandomPoint(),
-                    WGS84Point.genRandomPoint(),
-                    WGS84Point.genRandomPoint(),
-                    WGS84Point.genRandomPoint(),
-                    WGS84Point.genRandomPoint(),
-                    WGS84Point.genRandomPoint(),
+                    WGS84Point(NaivePoint.genRandomPoint()),
+                    WGS84Point(NaivePoint.genRandomPoint()),
+                    WGS84Point(NaivePoint.genRandomPoint()),
+                    WGS84Point(NaivePoint.genRandomPoint()),
+                    WGS84Point(NaivePoint.genRandomPoint()),
+                    WGS84Point(NaivePoint.genRandomPoint()),
+                    WGS84Point(NaivePoint.genRandomPoint()),
                 ),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
@@ -463,13 +464,13 @@ private fun DarkPointsPreview() {
             )
             ResultSuccessCoordinates(
                 points = persistentListOf(
-                    WGS84Point.genRandomPoint(),
-                    WGS84Point.genRandomPoint(),
-                    WGS84Point.genRandomPoint(),
-                    WGS84Point.genRandomPoint(),
-                    WGS84Point.genRandomPoint(),
-                    WGS84Point.genRandomPoint(),
-                    WGS84Point.genRandomPoint(),
+                    WGS84Point(NaivePoint.genRandomPoint()),
+                    WGS84Point(NaivePoint.genRandomPoint()),
+                    WGS84Point(NaivePoint.genRandomPoint()),
+                    WGS84Point(NaivePoint.genRandomPoint()),
+                    WGS84Point(NaivePoint.genRandomPoint()),
+                    WGS84Point(NaivePoint.genRandomPoint()),
+                    WGS84Point(NaivePoint.genRandomPoint()),
                 ),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
@@ -500,9 +501,9 @@ private fun PointsWithNamePreview() {
             )
             ResultSuccessCoordinates(
                 points = persistentListOf(
-                    WGS84Point.genRandomPoint(),
-                    WGS84Point.genRandomPoint(),
-                    WGS84Point.genRandomPoint(name = "Berlin, Germany", z = 13.0),
+                    WGS84Point(NaivePoint.genRandomPoint()),
+                    WGS84Point(NaivePoint.genRandomPoint()),
+                    WGS84Point(NaivePoint.genRandomPoint(name = "Berlin, Germany", z = 13.0)),
                 ),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
@@ -533,9 +534,9 @@ private fun DarkPointsWithNamePreview() {
             )
             ResultSuccessCoordinates(
                 points = persistentListOf(
-                    WGS84Point.genRandomPoint(),
-                    WGS84Point.genRandomPoint(),
-                    WGS84Point.genRandomPoint(name = "Berlin, Germany", z = 13.0),
+                    WGS84Point(NaivePoint.genRandomPoint()),
+                    WGS84Point(NaivePoint.genRandomPoint()),
+                    WGS84Point(NaivePoint.genRandomPoint(name = "Berlin, Germany", z = 13.0)),
                 ),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,

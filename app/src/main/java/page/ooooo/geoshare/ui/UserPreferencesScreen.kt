@@ -94,6 +94,7 @@ import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.ui.components.FeatureBadgeSmall
@@ -669,8 +670,12 @@ private fun UserPreferencesDetailPane(
                         CoordinateFormatPreferenceValue(option)
                         Text(
                             when (option) {
-                                CoordinateFormat.DEC -> CoordinateFormatter.formatDecCoords(WGS84Point.example)
-                                CoordinateFormat.DEG_MIN_SEC -> CoordinateFormatter.formatDegMinSecCoords(WGS84Point.example)
+                                CoordinateFormat.DEC -> CoordinateFormatter.formatDecCoords(WGS84Point(NaivePoint.example))
+                                CoordinateFormat.DEG_MIN_SEC -> CoordinateFormatter.formatDegMinSecCoords(
+                                    WGS84Point(
+                                        NaivePoint.example
+                                    )
+                                )
                             },
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )

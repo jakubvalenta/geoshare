@@ -23,6 +23,7 @@ import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingStatus
+import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.inputs.HtmlInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.ShortUriInput
@@ -89,7 +90,7 @@ data class ReceivedUriString(
             )
         }
         for (input in stateContext.inputs) {
-            val uriString = input.uriPattern.find(inputUriString)?.value
+            val uriString = input.uriPattern.find(inputUriString)?.groupOrNull()
             if (uriString != null) {
                 val uri = Uri.parse(uriString, stateContext.uriQuote)
                 return ReceivedUri(stateContext, inputUriString, input, uri, null)
