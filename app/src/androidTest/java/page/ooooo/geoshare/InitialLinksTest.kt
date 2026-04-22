@@ -98,6 +98,15 @@ class InitialLinksTest {
                 uuid = UUID.fromString("9d7cd113-ce01-4b8b-82fe-856956b8b20a"),
             ),
             Link(
+                group = "Google Maps",
+                name = "Google Maps Plus Code",
+                srs = Srs.GCJ02_MAINLAND_CHINA,
+                appEnabled = false,
+                sheetEnabled = true,
+                coordsUriTemplate = "https://www.google.com/maps/place/{plus_code}",
+                uuid = UUID.fromString("5c891351-3f66-4aa2-83c4-f13c5a67fdef"),
+            ),
+            Link(
                 group = "Apple Maps",
                 name = "Apple Maps",
                 sheetEnabled = true,
