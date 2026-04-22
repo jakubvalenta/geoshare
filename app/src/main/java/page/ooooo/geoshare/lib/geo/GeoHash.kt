@@ -149,15 +149,9 @@ fun decodePlusCode(codeString: String): NaivePoint? =
                 // The code is full
                 this
             } else {
-                // TODO Complete the code using a geocoding service
+                // Complete the code using a geocoding service (not implemented yet)
                 null
             }
         }
         ?.decode()
-        ?.let { area ->
-            NaivePoint(
-                lat = area.centerLatitude,
-                lon = area.centerLongitude,
-                source = Source.HASH,
-            )
-        }
+        ?.run { NaivePoint(lat = centerLatitude, lon = centerLongitude, source = Source.HASH) }

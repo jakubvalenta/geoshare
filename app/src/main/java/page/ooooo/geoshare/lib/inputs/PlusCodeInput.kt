@@ -65,7 +65,7 @@ object PlusCodeInput : Input, Input.HasRandomUri {
                 }
             }
 
-            // TODO Local code (with or without locality)
+            // Local code (not implemented yet)
             // e.g. `28WR+CW` or `28WR+CW Comstock Park, Michigan`
         }
     }
