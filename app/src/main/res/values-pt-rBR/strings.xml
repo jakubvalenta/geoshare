@@ -268,4 +268,10 @@
     <string name="conversion_failed_parse_html_error_with_reason">Falha ao processar página da web devido a: %1$s</string>
     <string name="network_exception_too_many_requests">solicitações demais</string>
     <string name="licenses">Licenças</string>
+    <string name="conversion_succeeded_check_experimental">A localização pode ser imprecisa devido a um método de extração experimental.</string>
+    <string name="conversion_succeeded_check_srs">A localização pode ser imprecisa devido ao sistema de conversão de coordenadas.</string>
+    <string name="converter_cartes_ign_name">Cartes IGN</string>
+    <string name="srs_description_mainland_china">China continental</string>
+    <string name="srs_description_greater_china_and_taiwan">China e Taiwan geral</string>
+    <string name="conversion_succeeded_check_map_center">A localização pode ser um centro de mapa, não um alfinete.</string>
 </resources>
