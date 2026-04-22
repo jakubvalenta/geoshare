@@ -25,24 +25,7 @@ class MigrationTest {
     fun migrateAll() {
         // Create the earliest version of the database.
         helper.createDatabase(testDb, 1).apply {
-            execSQL(
-                """
-                INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES
-                (
-                    'test-group',
-                    'test-name',
-                    'GCJ02',
-                    'NAVIGATION',
-                    1,
-                    0,
-                    1,
-                    'https://example.com/?ll={lat}%2C{lon}',
-                    'https://example.com/?q={name}',
-                    1772395295367,
-                    'c9808988-c999-4885-b405-51b4a75d3f5f'
-                )
-                """.trimIndent()
-            )
+            AppDatabase.restoreInitialData(this)
             close()
         }
 
