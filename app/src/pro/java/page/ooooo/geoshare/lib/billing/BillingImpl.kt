@@ -155,10 +155,11 @@ class BillingImpl(
                         is BillingStatus.NotPurchased -> {}
 
                         is BillingStatus.Purchased -> {
-                            log.i(
-                                TAG,
-                                "Purchase query: not changing status, because the previous status was purchased and we don't want to overwrite it",
-                            )
+                            // Don't change status from purchased to not purchased, because this callback is called
+                            // twice in quick succession (once for one-time products and once for subscriptions). And
+                            // we don't want to overwrite a purchased one-time product with a not purchased subscription
+                            // or the other way around.
+                            log.i(TAG, "Purchase query: not changing status from purchased to not purchased")
                         }
                     }
                 }
@@ -320,6 +321,8 @@ class BillingImpl(
             }
 
     private fun queryPurchases() {
+        // Reset status, so that it can change from purchased to not purchased, when a product is refunded
+        _status.value = BillingStatus.Loading() // TODO Test
         for (productType in listOf(ProductType.INAPP, ProductType.SUBS)) {
             val queryPurchasesParams = QueryPurchasesParams.newBuilder().setProductType(productType).build()
             billingClient.queryPurchasesAsync(queryPurchasesParams, this)
