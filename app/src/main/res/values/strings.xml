@@ -12,7 +12,7 @@
     <string name="billing_intro_not_purchased" translatable="false">Upgrade to</string>
     <string name="billing_intro_purchased" translatable="false">You have</string>
     <string name="billing_manage_subscription" translatable="false">Manage your subscription</string>
-    <string name="billing_manage_subscription_description" translatable="false">Cancel, pause, or change payment method:</string>
+    <string name="billing_manage_subscription_description" translatable="false">Cancel, pause, or change payment method</string>
     <string name="billing_manage_error" translatable="false">Failed to open Google Play</string>
     <string name="billing_offers_empty" translatable="false">%1$s is not available in your region</string>
     <string name="billing_offers_error" translatable="false">Failed to fetch offers</string>
@@ -24,7 +24,7 @@
     <string name="billing_purchase_error_cancelled" translatable="false">Purchase cancelled</string>
     <string name="billing_purchase_error_unknown" translatable="false">Failed to make the purchase</string>
     <string name="billing_purchase_success" translatable="false">Thanks for buying %1$s</string>
-    <string name="billing_refund_description" translatable="false">Refund within 48h since the purchase:</string>
+    <string name="billing_refund_description" translatable="false">Refund within 48h since the purchase</string>
     <string name="billing_setup_error_unknown" translatable="false">Failed to fetch purchases</string>
     <string name="billing_status_expired" translatable="false">Your subscription expires soon</string>
     <string name="billing_status_pending" translatable="false">Your payment is pending</string>
