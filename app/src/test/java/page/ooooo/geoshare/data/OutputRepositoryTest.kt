@@ -21,7 +21,6 @@ import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDegMinSecAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyLinkUriAutomation
-import page.ooooo.geoshare.data.local.preferences.CopyPlusCodeUriAutomation
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayMagicEarthUriAutomation
@@ -46,7 +45,6 @@ import page.ooooo.geoshare.lib.outputs.CopyCoordsDecOutput
 import page.ooooo.geoshare.lib.outputs.CopyCoordsDegMinSecOutput
 import page.ooooo.geoshare.lib.outputs.CopyGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.CopyLinkUriOutput
-import page.ooooo.geoshare.lib.outputs.CopyPlusCodeUriOutput
 import page.ooooo.geoshare.lib.outputs.NoopOutput
 import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.OpenDisplayMagicEarthUriOutput
@@ -82,7 +80,6 @@ class OutputRepositoryTest {
                 CopyCoordsDecOutput(coordinateConverter),
                 CopyCoordsDegMinSecOutput(coordinateConverter),
                 CopyGeoUriOutput(coordinateConverter),
-                CopyPlusCodeUriOutput(coordinateConverter),
                 CopyLinkUriOutput(FakeAppleMapsDisplayLink, coordinateConverter),
                 CopyLinkUriOutput(FakeAppleMapsNavigationLink, coordinateConverter),
                 CopyLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter),
@@ -305,7 +302,6 @@ class OutputRepositoryTest {
                     CopyCoordsDecOutput(coordinateConverter),
                     CopyCoordsDegMinSecOutput(coordinateConverter),
                     CopyGeoUriOutput(coordinateConverter),
-                    CopyPlusCodeUriOutput(coordinateConverter),
                     ShareDisplayGeoUriOutput(coordinateConverter),
                     ShareNavigationGoogleUriOutput(coordinateConverter),
                     ShareStreetViewGoogleUriOutput(coordinateConverter),
@@ -352,7 +348,6 @@ class OutputRepositoryTest {
                     CopyCoordsDecAutomation,
                     CopyCoordsDegMinSecAutomation,
                     CopyGeoUriAutomation,
-                    CopyPlusCodeUriAutomation,
                     ShareDisplayGeoUriAutomation,
                     ShareNavigationGoogleUriAutomation,
                     ShareStreetViewGoogleUriAutomation,
@@ -410,7 +405,6 @@ class OutputRepositoryTest {
                 CopyCoordsDecOutput(coordinateConverter),
                 CopyCoordsDegMinSecOutput(coordinateConverter),
                 CopyGeoUriOutput(coordinateConverter),
-                CopyPlusCodeUriOutput(coordinateConverter),
                 CopyLinkUriOutput(FakeGoogleMapsNavigationLink, coordinateConverter),
                 CopyLinkUriOutput(FakeGoogleMapsStreetViewLink, coordinateConverter),
                 CopyLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter),
@@ -432,7 +426,6 @@ class OutputRepositoryTest {
                 CopyCoordsDecAutomation,
                 CopyCoordsDegMinSecAutomation,
                 CopyGeoUriAutomation,
-                CopyPlusCodeUriAutomation,
                 CopyLinkUriAutomation(UUID.fromString("64b0b360-24ec-4113-9056-314223c6e19a")),
                 CopyLinkUriAutomation(UUID.fromString("9d7cd113-ce01-4b8b-82fe-856956b8b20a")),
                 CopyLinkUriAutomation(UUID.fromString("7bd96da4-beba-4a30-9dbd-b437a49a1dc0")),

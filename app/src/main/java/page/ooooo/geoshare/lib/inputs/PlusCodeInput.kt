@@ -11,6 +11,7 @@ import page.ooooo.geoshare.lib.formatters.PlusCodeFormatter
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.decodePlusCode
 
 /**
@@ -43,7 +44,7 @@ object PlusCodeInput : Input, Input.HasRandomUri {
             InputDocumentationItem.Text(39) {
                 stringResource(
                     R.string.example,
-                    PlusCodeFormatter.formatPlusCode(GCJ02MainlandChinaPoint(NaivePoint.example)) ?: ""
+                    PlusCodeFormatter.formatPlusCode(WGS84Point(NaivePoint.example)) ?: ""
                 )
             },
         ),
@@ -71,5 +72,5 @@ object PlusCodeInput : Input, Input.HasRandomUri {
     }
 
     override fun genRandomUri(point: Point): String? =
-        PlusCodeFormatter.formatPlusCode(GCJ02MainlandChinaPoint(point.lat, point.lon, source = point.source))
+        PlusCodeFormatter.formatPlusCode(point)
 }

@@ -15,7 +15,6 @@ import page.ooooo.geoshare.data.local.preferences.CopyLinkNavigationGoogleUriAut
 import page.ooooo.geoshare.data.local.preferences.CopyLinkNavigationMagicEarthUriAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyLinkStreetViewGoogleUriAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyLinkUriAutomation
-import page.ooooo.geoshare.data.local.preferences.CopyPlusCodeUriAutomation
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayMagicEarthUriAutomation
@@ -41,7 +40,6 @@ import page.ooooo.geoshare.lib.outputs.CopyCoordsDecOutput
 import page.ooooo.geoshare.lib.outputs.CopyCoordsDegMinSecOutput
 import page.ooooo.geoshare.lib.outputs.CopyGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.CopyLinkUriOutput
-import page.ooooo.geoshare.lib.outputs.CopyPlusCodeUriOutput
 import page.ooooo.geoshare.lib.outputs.NoopOutput
 import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.OpenDisplayMagicEarthUriOutput
@@ -76,7 +74,6 @@ class OutputRepository @Inject constructor(
             CopyCoordsDecOutput(coordinateConverter),
             CopyCoordsDegMinSecOutput(coordinateConverter),
             CopyGeoUriOutput(coordinateConverter),
-            CopyPlusCodeUriOutput(coordinateConverter),
             *links
                 .filter { it.sheetEnabled }
                 .groupBy { it.groupOrName }
@@ -211,9 +208,6 @@ class OutputRepository @Inject constructor(
                 getLinkByUUID(UUID.fromString("9d7cd113-ce01-4b8b-82fe-856956b8b20a"))?.let { link ->
                     CopyLinkUriOutput(link, coordinateConverter)
                 }
-
-            is CopyPlusCodeUriAutomation ->
-                CopyPlusCodeUriOutput(coordinateConverter)
 
             is NoopAutomation ->
                 NoopOutput()

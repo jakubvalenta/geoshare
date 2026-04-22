@@ -4,6 +4,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.lib.FakeUriQuote
+import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
@@ -57,6 +58,41 @@ class UriFormatterTest {
                 coordsUriTemplate = "https://maps.apple.com/?ll={lat}%2C{lon}&z={z}&q={name}",
                 uriQuote = FakeUriQuote,
             ),
+        )
+    }
+
+    @Test
+    fun formatUriString_whenPointIsOutsideMainlandChinaAndCoordsTemplateHasPlusCode_returnsCoordsTemplateWithFilledPlusCode() {
+        assertEquals(
+            "https://www.google.com/maps/place/9C2C4VFG%2B9JM",
+            UriFormatter.formatUriString(
+                WGS84Point(50.123456, -11.123456, source = Source.GENERATED),
+                coordsUriTemplate = "https://www.google.com/maps/place/{plus_code}",
+                uriQuote = FakeUriQuote,
+            ),
+        )
+    }
+
+    @Test
+    fun formatUriString_whenPointIsWithinMainlandChinaAndCoordsTemplateHasPlusCode_returnsCoordsTemplateWithFilledPlusCode() {
+        assertEquals(
+            "https://www.google.com/maps/place/8PFRW98W%2BWRG",
+            UriFormatter.formatUriString(
+                GCJ02Point(39.917313, 116.397063, source = Source.GENERATED),
+                coordsUriTemplate = "https://www.google.com/maps/place/{plus_code}",
+                uriQuote = FakeUriQuote,
+            ),
+        )
+    }
+
+    @Test
+    fun formatUriString_whenPointIsEmptyAndCoordsTemplateHasPlusCode_returnsNull() {
+        assertNull(
+            UriFormatter.formatUriString(
+                WGS84Point(source = Source.GENERATED),
+                coordsUriTemplate = "https://www.google.com/maps/place/{plus_code}",
+                uriQuote = FakeUriQuote,
+            )
         )
     }
 
