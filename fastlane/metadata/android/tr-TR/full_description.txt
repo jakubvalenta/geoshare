@@ -7,6 +7,7 @@ GeoShare ile bir harita bağlantısı paylaşın ve uygulama bunu yüklü başka
 - 2GIS
 - Amap (AutoNavi)
 - Baidu Harita (beta)
+- Cartes IGN
 - CoMaps
 - HERE WeGo
 - Magic Earth
@@ -15,6 +16,7 @@ GeoShare ile bir harita bağlantısı paylaşın ve uygulama bunu yüklü başka
 - OpenStreetMap
 - Organic Maps
 - OsmAnd
+- Plus Codes (yalnızca küresel)
 - Urbi
 - Waze
 - Yandex Haritalar
