@@ -97,7 +97,7 @@
     <string name="inputs_all">Všechny mapové služby</string>
     <string name="inputs_recent">Nedávno přidané</string>
     <string name="inputs_default_handler">Otevírá se v %1$s</string>
-    <string name="conversion_loading_indicator_description">Pokus %1$d z %2$d kvůli %3$s.</string>
+    <string name="conversion_loading_indicator_description">Pokus %1$d z %2$d kvůli: %3$s</string>
     <string name="conversion_automation_copy_link_succeeded">Odkaz byl automaticky zkopírován</string>
     <string name="conversion_automation_copy_succeeded">Souřadnice byly automaticky zkopírovány</string>
     <string name="conversion_automation_open_app_failed">Nepodařilo se automaticky otevřít %1$s</string>
@@ -266,4 +266,19 @@
     <string name="user_preferences_apps_title">Aplikace</string>
     <string name="user_preferences_section_input">Vstup</string>
     <string name="user_preferences_section_output">Výstup</string>
+    <string name="conversion_succeeded_check_experimental">Poloha může být nepřesná kvůli experimentálnímu způsobu zpracování odkazu.</string>
+    <string name="conversion_succeeded_check_map_center">Poloha může být střed mapy, ne špendlík.</string>
+    <string name="conversion_succeeded_check_srs">Poloha může být nepřesná kvůli převodu systému souřadnic.</string>
+    <string name="converter_cartes_ign_name">Cartes IGN</string>
+    <string name="converter_plus_code_name">Plus Codes</string>
+    <string name="conversion_failed_unshorten_error_with_reason">Nepodařilo se zpracovat krátký odkaz kvůli: %1$s</string>
+    <string name="conversion_failed_reason_invalid_url">neplatné URL</string>
+    <string name="conversion_failed_reason_missing_header">chybějící HTTP hlavička</string>
+    <string name="conversion_failed_reason_no_points">žádné body nenalezeny</string>
+    <string name="conversion_failed_reason_timeout">časový limit vypršel</string>
+    <string name="conversion_failed_parse_html_error_with_reason">Nepodařilo se zpracovat webovou stránku kvůli: %1$s</string>
+    <string name="licenses">Licence</string>
+    <string name="network_exception_too_many_requests">příliš mnoho požadavků</string>
+    <string name="srs_description_mainland_china">Kontinentální Čína</string>
+    <string name="srs_description_greater_china_and_taiwan">Velká Čína a Tchaj-wan</string>
 </resources>
