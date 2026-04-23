@@ -283,4 +283,5 @@
     <string name="srs_description_mainland_china">материковый Китай</string>
     <string name="srs_description_greater_china_and_taiwan">Большой Китай и Тайвань</string>
     <string name="converter_cartes_ign_name">Cartes IGN</string>
+    <string name="converter_plus_code_name">Plus Codes</string>
 </resources>
