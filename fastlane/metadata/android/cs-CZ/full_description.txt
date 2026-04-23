@@ -7,6 +7,7 @@ Sdílejte odkaz na mapy s GeoShare a tato aplikace jej otevře v jiné mapové a
 - 2GIS
 - Amap (AutoNavi)
 - Baidu Map (beta)
+- Cartes IGN
 - CoMaps
 - HERE WeGo
 - Magic Earth
@@ -15,6 +16,7 @@ Sdílejte odkaz na mapy s GeoShare a tato aplikace jej otevře v jiné mapové a
 - OpenStreetMap
 - Organic Maps
 - OsmAnd
+- Plus Codes (pouze globální)
 - Urbi
 - Waze
 - Yandex Maps
