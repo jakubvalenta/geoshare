@@ -267,4 +267,5 @@
     <string name="srs_description_mainland_china">континентален Китай</string>
     <string name="srs_description_greater_china_and_taiwan">по-голям Китай и Тайван</string>
     <string name="converter_cartes_ign_name">Карти IGN</string>
+    <string name="converter_plus_code_name">Плюс кодове</string>
 </resources>
