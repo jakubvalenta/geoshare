@@ -321,8 +321,7 @@ class BillingImpl(
             }
 
     private fun queryPurchases() {
-        // Reset status, so that it can change from purchased to not purchased, when a product is refunded
-        _status.value = BillingStatus.Loading() // TODO Test
+        _status.value = BillingStatus.Loading()
         for (productType in listOf(ProductType.INAPP, ProductType.SUBS)) {
             val queryPurchasesParams = QueryPurchasesParams.newBuilder().setProductType(productType).build()
             billingClient.queryPurchasesAsync(queryPurchasesParams, this)

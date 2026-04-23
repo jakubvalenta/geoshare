@@ -488,7 +488,7 @@ class BillingImplTest {
     }
 
     @Test
-    fun status_whenFirstPurchasesResponseContainsKnownProductAndSecondResponseContainsUnknownProduct_isPurchased() {
+    fun status_whenFirstPurchasesResponseContainsKnownProductAndSecondResponseDoesNotContainKnownProduct_isPurchased() {
         val purchaseTimeValue = System.currentTimeMillis()
         val responseProductIds = listOf(
             "test_lifetime",
@@ -532,6 +532,56 @@ class BillingImplTest {
                 expired = false,
                 refundable = true,
             ),
+            billingImpl.status.value,
+        )
+    }
+
+    @Test
+    fun status_whenFirstPurchasesResponseContainsKnownProductAndResponseAfterStartConnectionDoesNotContainKnownProduct_isNotPurchased() {
+        val purchaseTimeValue = System.currentTimeMillis()
+        val responseProductIds = listOf(
+            // First startConnection() call
+            "test_lifetime",
+            "spam",
+            // Second startConnection() call
+            "spam",
+            "spam",
+        ).iterator()
+        val billingClient = object : FakeBillingClient() {
+            override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
+                p1.onQueryPurchasesResponse(
+                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
+                        mock<Purchase> {
+                            on { products } doReturn listOf(responseProductIds.next())
+                            on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
+                            on { purchaseTime } doReturn purchaseTimeValue
+                            on { purchaseToken } doReturn "test_purchase_token_purchased"
+                        },
+                    )
+                )
+            }
+
+            override fun startConnection(p0: BillingClientStateListener) {
+                p0.onBillingSetupFinished(
+                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build()
+                )
+            }
+        }
+        val billingClientBuilder = FakeBillingClientBuilder(billingClient)
+        val billingImpl = BillingImpl(
+            context,
+            billingClientBuilder,
+            products = persistentListOf(
+                BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
+                BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
+            ),
+            resources = resources,
+            log = FakeLog,
+        )
+        billingImpl.startConnection()
+        billingImpl.startConnection()
+        assertEquals(
+            BillingStatus.NotPurchased(pending = false),
             billingImpl.status.value,
         )
     }
