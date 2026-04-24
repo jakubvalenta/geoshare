@@ -2866,7 +2866,7 @@ class ConversionStateTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val automation = CopyCoordsDecAutomation
-        val mockStatus = MutableStateFlow<BillingStatus>(BillingStatus.NotPurchased(pending = false))
+        val mockStatus = MutableStateFlow<BillingStatus>(BillingStatus.NotPurchased())
         val mockBilling: Billing = mock {
             on { status } doReturn mockStatus
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))

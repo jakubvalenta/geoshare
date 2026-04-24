@@ -112,17 +112,14 @@ class BillingImpl(
                     }
                 }
                 val newBillingStatus = purchases.getBillingStatus(products, refundableDuration)
+                log.i(TAG, "Purchase update: $newBillingStatus")
+                _status.value = newBillingStatus
                 if (newBillingStatus is BillingStatus.Purchased) {
-                    log.i(TAG, "Purchase update: purchased")
-                    _status.value = newBillingStatus
                     _message.value = Message(
                         resources.getString(
                             R.string.billing_purchase_success, resources.getString(appNameResId)
                         )
                     )
-                } else {
-                    log.i(TAG, "Purchase update: not purchased")
-                    _status.value = newBillingStatus
                 }
             }
 
@@ -142,25 +139,31 @@ class BillingImpl(
         when (billingResult.responseCode) {
             BillingClient.BillingResponseCode.OK -> {
                 val newBillingStatus = purchases.getBillingStatus(products, refundableDuration)
-                if (newBillingStatus is BillingStatus.Purchased) {
-                    log.i(TAG, "Purchase query: purchased")
-                    _status.value = newBillingStatus
-                } else {
-                    log.i(TAG, "Purchase query: not purchased")
-                    when (_status.value) {
-                        is BillingStatus.Loading -> {
-                            _status.value = newBillingStatus
-                        }
+                log.i(TAG, "Purchase query: previous status ${_status.value}, new status $newBillingStatus")
+                // Set new status depending on the previous status. For example set status from not purchased to
+                // purchased, but don't set status from purchased to not purchased. The reason is that this callback is
+                // called twice in quick succession (once for one-time products and once for subscriptions). And
+                // we don't want to overwrite a purchased one-time product with a not purchased subscription, for
+                // example.
+                when (newBillingStatus) {
+                    is BillingStatus.Loading -> {}
 
-                        is BillingStatus.NotPurchased -> {}
-
-                        is BillingStatus.Purchased -> {
-                            // Don't change status from purchased to not purchased, because this callback is called
-                            // twice in quick succession (once for one-time products and once for subscriptions). And
-                            // we don't want to overwrite a purchased one-time product with a not purchased subscription
-                            // or the other way around.
-                            log.i(TAG, "Purchase query: not changing status from purchased to not purchased")
+                    is BillingStatus.Pending -> {
+                        when (_status.value) {
+                            is BillingStatus.Loading, is BillingStatus.NotPurchased -> _status.value = newBillingStatus
+                            is BillingStatus.Pending, is BillingStatus.Purchased -> {}
                         }
+                    }
+
+                    is BillingStatus.NotPurchased -> {
+                        when (_status.value) {
+                            is BillingStatus.Loading -> _status.value = newBillingStatus
+                            is BillingStatus.Pending, is BillingStatus.NotPurchased, is BillingStatus.Purchased -> {}
+                        }
+                    }
+
+                    is BillingStatus.Purchased -> {
+                        _status.value = newBillingStatus
                     }
                 }
             }

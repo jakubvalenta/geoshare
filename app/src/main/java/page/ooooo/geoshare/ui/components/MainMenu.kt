@@ -176,7 +176,7 @@ private fun DefaultPreview() {
                         MainMenu(
                             currentState = Initial(),
                             billingAppNameResId = R.string.app_name_pro,
-                            billingStatus = BillingStatus.NotPurchased(pending = false),
+                            billingStatus = BillingStatus.NotPurchased(),
                             changelogShown = false,
                             onNavigateToAboutScreen = {},
                             onNavigateToBillingScreen = {},
@@ -207,7 +207,7 @@ private fun DarkPreview() {
                         MainMenu(
                             currentState = Initial(),
                             billingAppNameResId = R.string.app_name_pro,
-                            billingStatus = BillingStatus.NotPurchased(pending = false),
+                            billingStatus = BillingStatus.NotPurchased(),
                             changelogShown = false,
                             onNavigateToAboutScreen = {},
                             onNavigateToBillingScreen = {},

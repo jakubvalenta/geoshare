@@ -222,38 +222,32 @@ private fun BillingMainPane(
     AnimatedMessage(
         state = billingStatus,
         isMessageShown = { billingStatus ->
-            billingStatus is BillingStatus.Purchased ||
-                billingStatus is BillingStatus.NotPurchased && billingStatus.pending ||
-                billingStatus is BillingStatus.NotPurchased && (billingOffers as? BillingOffers.Done)?.offers?.isEmpty() == true
+            billingStatus is BillingStatus.Purchased || billingStatus is BillingStatus.Pending || billingStatus is BillingStatus.NotPurchased && (billingOffers as? BillingOffers.Done)?.offers?.isEmpty() == true
         },
         animationsEnabled = animationsEnabled,
     ) { billingStatus ->
         when (billingStatus) {
-            is BillingStatus.Purchased if !billingStatus.expired ->
-                BillingStatusCard(
-                    stringResource(R.string.billing_purchase_success, stringResource(R.string.app_name_pro)),
-                    Modifier.testTag("geoShareBillingStatusPurchased"),
-                )
+            is BillingStatus.Purchased if !billingStatus.expired -> BillingStatusCard(
+                stringResource(R.string.billing_purchase_success, stringResource(R.string.app_name_pro)),
+                Modifier.testTag("geoShareBillingStatusPurchased"),
+            )
 
-            is BillingStatus.Purchased ->
-                BillingStatusCard(
-                    stringResource(R.string.billing_status_expired),
-                    Modifier.testTag("geoShareBillingStatusExpired"),
-                )
+            is BillingStatus.Purchased -> BillingStatusCard(
+                stringResource(R.string.billing_status_expired),
+                Modifier.testTag("geoShareBillingStatusExpired"),
+            )
 
-            is BillingStatus.NotPurchased if billingStatus.pending ->
-                BillingStatusCard(
-                    stringResource(R.string.billing_status_pending),
-                    Modifier.testTag("geoShareBillingStatusPending"),
-                )
+            is BillingStatus.Pending -> BillingStatusCard(
+                stringResource(R.string.billing_status_pending),
+                Modifier.testTag("geoShareBillingStatusPending"),
+            )
 
-            is BillingStatus.NotPurchased if (billingOffers as? BillingOffers.Done)?.offers?.isEmpty() == true ->
-                BillingStatusCard(
-                    stringResource(
-                        R.string.billing_offers_empty,
-                        stringResource(R.string.app_name_pro),
-                    ),
-                )
+            is BillingStatus.NotPurchased if (billingOffers as? BillingOffers.Done)?.offers?.isEmpty() == true -> BillingStatusCard(
+                stringResource(
+                    R.string.billing_offers_empty,
+                    stringResource(R.string.app_name_pro),
+                ),
+            )
 
             else -> {}
         }
@@ -436,7 +430,7 @@ private fun BillingSupportingPane(
     var selectedOffer by remember(sortedBillingOffers) { mutableStateOf(sortedBillingOffers.firstOrNull()) }
 
     when (billingStatus) {
-        is BillingStatus.NotPurchased if sortedBillingOffers.isNotEmpty() -> {
+        is BillingStatus.Pending, is BillingStatus.NotPurchased -> if (sortedBillingOffers.isNotEmpty()) {
             ScaffoldAction(
                 innerPadding = innerPadding,
                 bottomCorners = bottomCorners,
@@ -504,8 +498,6 @@ private fun BillingSupportingPane(
             }
         }
 
-        is BillingStatus.NotPurchased -> {}
-
         is BillingStatus.Purchased -> {
             when (billingStatus.product.type) {
                 BillingProduct.Type.DONATION -> {}
@@ -517,8 +509,7 @@ private fun BillingSupportingPane(
                     ) {
                         Text(
                             stringResource(
-                                R.string.billing_refund_description,
-                                billingRefundableDuration.toInt(DurationUnit.HOURS)
+                                R.string.billing_refund_description, billingRefundableDuration.toInt(DurationUnit.HOURS)
                             ),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             style = MaterialTheme.typography.bodyMedium,
@@ -571,7 +562,7 @@ private fun DefaultPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(pending = false),
+            billingStatus = BillingStatus.NotPurchased(),
             animationsEnabled = false,
             onBack = {},
             onDismissMessage = {},
@@ -591,7 +582,7 @@ private fun DarkPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(pending = false),
+            billingStatus = BillingStatus.NotPurchased(),
             animationsEnabled = false,
             onBack = {},
             onDismissMessage = {},
@@ -611,7 +602,7 @@ private fun TabletPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(pending = false),
+            billingStatus = BillingStatus.NotPurchased(),
             animationsEnabled = false,
             onBack = {},
             onDismissMessage = {},
@@ -631,7 +622,7 @@ private fun PendingPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(pending = true),
+            billingStatus = BillingStatus.Pending(),
             animationsEnabled = false,
             onBack = {},
             onDismissMessage = {},
@@ -651,7 +642,7 @@ private fun DarkPendingPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(pending = true),
+            billingStatus = BillingStatus.Pending(),
             animationsEnabled = false,
             onBack = {},
             onDismissMessage = {},
@@ -671,7 +662,7 @@ private fun TabletPendingPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(pending = true),
+            billingStatus = BillingStatus.Pending(),
             animationsEnabled = false,
             onBack = {},
             onDismissMessage = {},
@@ -1051,7 +1042,7 @@ private fun EmptyPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf()),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(pending = false),
+            billingStatus = BillingStatus.NotPurchased(),
             animationsEnabled = false,
             onBack = {},
             onDismissMessage = {},
@@ -1071,7 +1062,7 @@ private fun DarkEmptyPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf()),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(pending = false),
+            billingStatus = BillingStatus.NotPurchased(),
             animationsEnabled = false,
             onBack = {},
             onDismissMessage = {},
@@ -1091,7 +1082,7 @@ private fun TabletEmptyPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf()),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(pending = false),
+            billingStatus = BillingStatus.NotPurchased(),
             animationsEnabled = false,
             onBack = {},
             onDismissMessage = {},
@@ -1171,7 +1162,7 @@ private fun LoadingOffersPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Loading(),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(pending = false),
+            billingStatus = BillingStatus.NotPurchased(),
             animationsEnabled = false,
             onBack = {},
             onDismissMessage = {},
@@ -1191,7 +1182,7 @@ private fun DarkLoadingOffersPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Loading(),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(pending = false),
+            billingStatus = BillingStatus.NotPurchased(),
             animationsEnabled = false,
             onBack = {},
             onDismissMessage = {},
@@ -1211,7 +1202,7 @@ private fun TabletLoadingOffersPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Loading(),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(pending = false),
+            billingStatus = BillingStatus.NotPurchased(),
             animationsEnabled = false,
             onBack = {},
             onDismissMessage = {},

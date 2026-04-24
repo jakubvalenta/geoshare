@@ -307,7 +307,7 @@ class BillingImplTest {
     }
 
     @Test
-    fun status_whenPurchasesResponseContainsKnownProductWithStatePending_isNotPurchased() {
+    fun status_whenPurchasesResponseContainsKnownProductWithStatePending_isPending() {
         val purchaseTimeValue = System.currentTimeMillis()
         val billingClient = object : FakeBillingClient() {
             override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
@@ -341,10 +341,7 @@ class BillingImplTest {
             log = FakeLog,
         )
         billingImpl.startConnection()
-        assertEquals(
-            BillingStatus.NotPurchased(pending = true),
-            billingImpl.status.value,
-        )
+        assertTrue(billingImpl.status.value is BillingStatus.Pending)
     }
 
     @Test
@@ -382,10 +379,7 @@ class BillingImplTest {
             log = FakeLog,
         )
         billingImpl.startConnection()
-        assertEquals(
-            BillingStatus.NotPurchased(pending = false),
-            billingImpl.status.value,
-        )
+        assertTrue(billingImpl.status.value is BillingStatus.NotPurchased)
     }
 
     @Test
@@ -481,10 +475,7 @@ class BillingImplTest {
             log = FakeLog,
         )
         billingImpl.startConnection()
-        assertEquals(
-            BillingStatus.NotPurchased(pending = false),
-            billingImpl.status.value,
-        )
+        assertTrue(billingImpl.status.value is BillingStatus.NotPurchased)
     }
 
     @Test
@@ -537,7 +528,7 @@ class BillingImplTest {
     }
 
     @Test
-    fun status_whenFirstPurchasesResponseContainsPendingProductAndSecondResponseDoesNotContainKnownProduct_isNotPurchasedPending() {
+    fun status_whenFirstPurchasesResponseDoesNotContainKnownProductAndSecondResponseContainsPendingProduct_isPending() {
         val purchaseTimeValue = System.currentTimeMillis()
         val responsePurchaseStates = listOf(
             Purchase.PurchaseState.UNSPECIFIED_STATE,
@@ -575,10 +566,7 @@ class BillingImplTest {
             log = FakeLog,
         )
         billingImpl.startConnection()
-        assertEquals(
-            BillingStatus.NotPurchased(pending = true),
-            billingImpl.status.value,
-        )
+        assertTrue(billingImpl.status.value is BillingStatus.Pending)
     }
 
     @Test
@@ -625,10 +613,7 @@ class BillingImplTest {
         )
         billingImpl.startConnection()
         billingImpl.startConnection()
-        assertEquals(
-            BillingStatus.NotPurchased(pending = false),
-            billingImpl.status.value,
-        )
+        assertTrue(billingImpl.status.value is BillingStatus.NotPurchased)
     }
 
     @Test
@@ -1679,10 +1664,7 @@ class BillingImplTest {
                 log = FakeLog,
             )
             billingImpl.launchBillingFlow(mock(), "offer_lifetime_details")
-            assertEquals(
-                BillingStatus.NotPurchased(pending = false),
-                billingImpl.status.value,
-            )
+            assertTrue(billingImpl.status.value is BillingStatus.NotPurchased)
             assertNull(billingImpl.message.value)
         }
 
@@ -1748,17 +1730,11 @@ class BillingImplTest {
 
         // Start connection. It queries product "spam", so status becomes NotPurchased
         billingImpl.startConnection()
-        assertEquals(
-            BillingStatus.NotPurchased(pending = false),
-            billingImpl.status.value,
-        )
+        assertTrue(billingImpl.status.value is BillingStatus.NotPurchased)
 
         // Now that connection is ready, in-app messages run, but result is NO_ACTION_NEEDED, so status remains NotPurchased
         job.join()
-        assertEquals(
-            BillingStatus.NotPurchased(pending = false),
-            billingImpl.status.value,
-        )
+        assertTrue(billingImpl.status.value is BillingStatus.NotPurchased)
     }
 
     @Test
@@ -1825,10 +1801,7 @@ class BillingImplTest {
 
         // Start connection. It queries product "spam", so status becomes NotPurchased
         billingImpl.startConnection()
-        assertEquals(
-            BillingStatus.NotPurchased(pending = false),
-            billingImpl.status.value,
-        )
+        assertTrue(billingImpl.status.value is BillingStatus.NotPurchased)
 
         // Now that connection is ready, in-app messages query product "test_lifetime", so status becomes Purchased
         job.join()

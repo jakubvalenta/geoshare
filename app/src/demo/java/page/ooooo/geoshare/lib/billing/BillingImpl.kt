@@ -45,7 +45,7 @@ class BillingImpl(
         _message.value = null
         CoroutineScope(Dispatchers.Default).launch {
             delay(2.seconds)
-            _status.value = BillingStatus.NotPurchased(pending = false)
+            _status.value = BillingStatus.NotPurchased()
         }
     }
 
@@ -60,7 +60,7 @@ class BillingImpl(
             products.firstOrNull { product -> product.id == offer.productId }
         }
         if (product != null) {
-            _status.value = BillingStatus.NotPurchased(pending = true)
+            _status.value = BillingStatus.Pending()
             delay(3.seconds)
             _status.value = BillingStatus.Purchased(product, expired = false, refundable = true)
         } else {
@@ -74,7 +74,7 @@ class BillingImpl(
             BillingProduct.Type.DONATION -> {}
 
             BillingProduct.Type.ONE_TIME -> {
-                _status.value = BillingStatus.NotPurchased(pending = false)
+                _status.value = BillingStatus.NotPurchased()
             }
 
             BillingProduct.Type.SUBSCRIPTION -> {
@@ -83,7 +83,7 @@ class BillingImpl(
                     ?.takeUnless { it.expired }
                     ?.copy(expired = true)
                     // If the status is expired, make it not purchased
-                    ?: BillingStatus.NotPurchased(pending = false)
+                    ?: BillingStatus.NotPurchased()
             }
         }
     }

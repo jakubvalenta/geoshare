@@ -1422,7 +1422,7 @@ private fun AutomationFeatureNotAvailablePreview() {
                     ),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-                    billingStatus = BillingStatus.NotPurchased(pending = false),
+                    billingStatus = BillingStatus.NotPurchased(),
                     coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
@@ -1463,7 +1463,7 @@ private fun DarkAutomationFeatureNotAvailablePreview() {
                     ),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-                    billingStatus = BillingStatus.NotPurchased(pending = false),
+                    billingStatus = BillingStatus.NotPurchased(),
                     coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
@@ -1504,7 +1504,7 @@ private fun TabletAutomationFeatureNotAvailablePreview() {
                     ),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-                    billingStatus = BillingStatus.NotPurchased(pending = false),
+                    billingStatus = BillingStatus.NotPurchased(),
                     coordinateConverter = coordinateConverter,
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(

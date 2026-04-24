@@ -553,7 +553,7 @@ data class ConversionSucceeded(
                     when (it) {
                         is BillingStatus.Loading -> false
 
-                        is BillingStatus.NotPurchased -> true
+                        is BillingStatus.Pending, is BillingStatus.NotPurchased -> true
 
                         is BillingStatus.Purchased -> {
                             // If billing status appeared within timeout, cache it
