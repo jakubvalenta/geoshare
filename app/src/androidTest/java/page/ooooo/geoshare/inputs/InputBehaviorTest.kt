@@ -52,7 +52,7 @@ interface InputBehaviorTest : BehaviorTest {
 
     fun UiAutomatorTestScope.testTextUri(expectedPoints: Points, unsafeText: String) {
         // It would be preferable to test sharing of the text with the app, but this shell command doesn't work when
-        // there are spaces in the texts, so we put the text in the main screen of the app instead.
+        // there are spaces in the text. So instead, we type the text in the main form of the app.
         // device.executeShellCommand(
         //     "am start -a android.intent.action.SEND -t text/plain -e android.intent.extra.TEXT $unsafeText -n ${BuildConfig.APPLICATION_ID}.debug/${BuildConfig.APPLICATION_ID}.ConversionActivity ${BuildConfig.APPLICATION_ID}.debug"
         // )
@@ -63,6 +63,7 @@ interface InputBehaviorTest : BehaviorTest {
         // Set main input
         val mainInput = onElement { viewIdResourceName == "geoShareMainInputUriStringTextField" }
         mainInput.setText(unsafeText)
+        quickWaitForStableInActiveWindow() // Wait for the submit button to get its final position, after setting text
 
         // Submit main form
         if (mainInput.isFocused) {
