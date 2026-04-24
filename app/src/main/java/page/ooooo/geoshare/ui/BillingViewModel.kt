@@ -46,6 +46,10 @@ class BillingViewModel @Inject constructor(
 
     // Methods
 
+    fun consumePurchases() {
+        billing.consumePurchases()
+    }
+
     fun launchBillingFlow(activity: Activity, offerToken: String) {
         viewModelScope.launch {
             billing.launchBillingFlow(activity, offerToken)

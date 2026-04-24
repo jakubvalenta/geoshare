@@ -20,6 +20,7 @@ fun List<Purchase>.getBillingStatus(products: List<BillingProduct>, refundableDu
                         product = product,
                         expired = product.type == BillingProduct.Type.SUBSCRIPTION && !purchase.isAutoRenewing,
                         refundable = purchase.purchaseTime > System.currentTimeMillis() - refundableDuration.inWholeMilliseconds,
+                        token = purchase.purchaseToken,
                     )
                 }
             }

@@ -14,5 +14,6 @@ sealed interface BillingStatus {
         val product: BillingProduct,
         val expired: Boolean,
         val refundable: Boolean,
+        val token: String,
     ) : BillingStatus
 }

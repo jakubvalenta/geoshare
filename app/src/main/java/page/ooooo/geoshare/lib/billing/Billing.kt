@@ -22,6 +22,8 @@ interface Billing {
 
     suspend fun queryOffers(): BillingOffers
 
+    fun consumePurchases()
+
     suspend fun launchBillingFlow(activity: Activity, offerToken: String)
 
     fun manageProduct(activity: Activity, product: BillingProduct)

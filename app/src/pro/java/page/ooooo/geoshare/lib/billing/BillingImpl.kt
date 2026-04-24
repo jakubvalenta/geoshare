@@ -14,6 +14,7 @@ import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClient.ProductType
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.ConsumeParams
 import com.android.billingclient.api.InAppMessageParams
 import com.android.billingclient.api.InAppMessageResponseListener
 import com.android.billingclient.api.InAppMessageResult
@@ -271,6 +272,26 @@ class BillingImpl(
             }
         } catch (_: ActivityNotFoundException) {
             _message.value = Message(resources.getString(R.string.billing_manage_error), isError = true)
+        }
+    }
+
+    override fun consumePurchases() {
+        (_status.value as? BillingStatus.Purchased)?.token?.let { token ->
+            val consumeParams = ConsumeParams.newBuilder()
+                .setPurchaseToken(token)
+                .build()
+
+            billingClient.consumeAsync(consumeParams) { billingResult, _ ->
+                when (billingResult.responseCode) {
+                    BillingClient.BillingResponseCode.OK -> {
+                        log.i(TAG, "Consume: ok")
+                    }
+
+                    else -> {
+                        log.e(TAG, "Consume: error ${billingResult.debugMessage}")
+                    }
+                }
+            }
         }
     }
 
