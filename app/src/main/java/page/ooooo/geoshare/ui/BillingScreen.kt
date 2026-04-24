@@ -56,8 +56,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.persistentListOf
+import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Message
+import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingOffers
 import page.ooooo.geoshare.lib.billing.BillingProduct
@@ -127,7 +129,7 @@ private fun BillingScreen(
     billingStatus: BillingStatus,
     animationsEnabled: Boolean = true,
     onBack: () -> Unit,
-    onConsumePurchases: () -> Unit, // TODO
+    onConsumePurchases: () -> Unit,
     onDismissMessage: () -> Unit,
     onLaunchBillingFlow: (offerToken: String) -> Unit,
     onManageBillingProduct: (product: BillingProduct) -> Unit,
@@ -187,6 +189,7 @@ private fun BillingScreen(
                         billingStatus = billingStatus,
                         innerPadding = innerPadding,
                         bottomCorners = false,
+                        onConsumePurchases = onConsumePurchases,
                         onLaunchBillingFlow = onLaunchBillingFlow,
                         onManageBillingProduct = onManageBillingProduct,
                     )
@@ -200,6 +203,7 @@ private fun BillingScreen(
                         billingStatus = billingStatus,
                         innerPadding = PaddingValues.Zero,
                         bottomCorners = true,
+                        onConsumePurchases = onConsumePurchases,
                         onLaunchBillingFlow = onLaunchBillingFlow,
                         onManageBillingProduct = onManageBillingProduct,
                     )
@@ -379,7 +383,10 @@ private fun BillingStatusCard(text: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun BillingLegalText() {
+private fun BillingLegalText(onConsumePurchases: () -> Unit) {
+    val context = LocalContext.current
+    val address = stringResource(R.string.about_support_email)
+
     Text(
         buildAnnotatedString {
             withLink(
@@ -392,12 +399,27 @@ private fun BillingLegalText() {
             }
             append(" • ")
             withLink(
-                LinkAnnotation.Url(
-                    "mailto:" + stringResource(R.string.about_support_email),
+                LinkAnnotation.Clickable(
+                    "supportEmail",
                     TextLinkStyles(SpanStyle(textDecoration = TextDecoration.Underline)),
-                )
+                ) {
+                    AndroidTools.composeEmail(context, address)
+                }
             ) {
                 append(stringResource(R.string.billing_support_email))
+            }
+            if (BuildConfig.DEBUG) {
+                append(" • ")
+                withLink(
+                    LinkAnnotation.Clickable(
+                        "consumePurchases",
+                        TextLinkStyles(SpanStyle(textDecoration = TextDecoration.Underline)),
+                    ) {
+                        onConsumePurchases()
+                    }
+                ) {
+                    append(stringResource(R.string.billing_consume_purchases))
+                }
             }
         },
         Modifier
@@ -416,6 +438,7 @@ private fun BillingSupportingPane(
     billingStatus: BillingStatus,
     innerPadding: PaddingValues,
     bottomCorners: Boolean,
+    onConsumePurchases: () -> Unit,
     onLaunchBillingFlow: (offerToken: String) -> Unit,
     onManageBillingProduct: (product: BillingProduct) -> Unit,
 ) {
@@ -496,7 +519,7 @@ private fun BillingSupportingPane(
                         onLaunchBillingFlow(selectedOffer.token)
                     }
                 }
-                BillingLegalText()
+                BillingLegalText(onConsumePurchases)
             }
         }
 
@@ -522,7 +545,7 @@ private fun BillingSupportingPane(
                         ) {
                             onManageBillingProduct(billingStatus.product)
                         }
-                        BillingLegalText()
+                        BillingLegalText(onConsumePurchases)
                     }
                 }
 
@@ -542,7 +565,7 @@ private fun BillingSupportingPane(
                         ) {
                             onManageBillingProduct(billingStatus.product)
                         }
-                        BillingLegalText()
+                        BillingLegalText(onConsumePurchases)
                     }
                 }
             }

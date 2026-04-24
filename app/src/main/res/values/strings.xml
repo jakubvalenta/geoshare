@@ -2,6 +2,7 @@
     <string name="app_name" translatable="false">GeoShare</string>
     <string name="app_name_pro" translatable="false">GeoShare Pro</string>
     <string name="not_available">Not available</string>
+    <string name="billing_consume_purchases" translatable="false">Consume purchases</string>
     <string name="billing_feature_all" translatable="false">All features of the basic version</string>
     <string name="billing_feature_automation_description" translatable="false">Save time by performing an action automatically when a map link is converted to coordinates. You can:</string>
     <string name="billing_feature_automation_item_copy" translatable="false">Copy to clipboard</string>
