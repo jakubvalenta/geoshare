@@ -15,6 +15,7 @@ Partagez un lien de carte avec GeoShare et l'application l'ouvrira dans une autr
 - OpenStreetMap
 - Organic Maps
 - OsmAnd
+- Codes Plus (uniquement à l'international)
 - Urbi
 - Waze
 - Yandex Maps
