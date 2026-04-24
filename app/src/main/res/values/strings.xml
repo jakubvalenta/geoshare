@@ -223,7 +223,7 @@
     <string name="user_preferences_automation_title">Automation</string>
     <string name="user_preferences_automation_delay_sec_title">Automation delay</string>
     <string name="user_preferences_automation_delay_sec_description">Set how long the app waits before launching an automated action (e.g. before automatically opening a map app).</string>
-    <string name="user_preferences_billing_cached_product_id" translatable="false">Cached product id</string>
+    <string name="user_preferences_billing_cached_purchase" translatable="false">Cached purchase</string>
     <string name="user_preferences_connection_description">To support short links and links that don’t contain geographic coordinates in the URL, %1$s can connect to the map service (Google Maps, Apple Maps, etc.).</string>
     <string name="user_preferences_connection_option_always">Allow</string>
     <string name="user_preferences_connection_option_ask">Ask before connecting</string>

@@ -22,7 +22,14 @@ class BillingImpl(@Suppress("unused") context: Context) : Billing {
     override val products = persistentListOf(product)
     override val refundableDuration = Duration.ZERO
 
-    override val status = flowOf(BillingStatus.Purchased(product, expired = false, refundable = false))
+    override val status = flowOf(
+        BillingStatus.Purchased(
+            product,
+            expired = false,
+            refundable = false,
+            token = "free_purchased",
+        )
+    )
         .stateIn(
             CoroutineScope(Dispatchers.Default),
             SharingStarted.WhileSubscribed(5000),
@@ -41,6 +48,8 @@ class BillingImpl(@Suppress("unused") context: Context) : Billing {
     override fun endConnection() {}
 
     override suspend fun queryOffers(): BillingOffers = BillingOffers.Done(persistentListOf())
+
+    override fun consumePurchases() {}
 
     override suspend fun launchBillingFlow(activity: Activity, offerToken: String) {}
 

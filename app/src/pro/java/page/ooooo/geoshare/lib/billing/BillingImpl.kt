@@ -280,16 +280,13 @@ class BillingImpl(
             val consumeParams = ConsumeParams.newBuilder()
                 .setPurchaseToken(token)
                 .build()
-
             billingClient.consumeAsync(consumeParams) { billingResult, _ ->
                 when (billingResult.responseCode) {
-                    BillingClient.BillingResponseCode.OK -> {
+                    BillingClient.BillingResponseCode.OK ->
                         log.i(TAG, "Consume: ok")
-                    }
 
-                    else -> {
+                    else ->
                         log.e(TAG, "Consume: error ${billingResult.debugMessage}")
-                    }
                 }
             }
         }

@@ -68,7 +68,7 @@ import page.ooooo.geoshare.data.local.database.findByUUID
 import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
 import page.ooooo.geoshare.data.local.preferences.AutomationPreference
-import page.ooooo.geoshare.data.local.preferences.BillingCachedProductIdPreference
+import page.ooooo.geoshare.data.local.preferences.CachedPurchasePreference
 import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
@@ -713,7 +713,7 @@ private fun UserPreferencesDetailPane(
                 )
                 item {
                     ParagraphHtml(
-                        stringResource(R.string.user_preferences_billing_cached_product_id),
+                        stringResource(R.string.user_preferences_billing_cached_purchase),
                         Modifier.padding(
                             top = LocalSpacing.current.mediumAdaptive,
                             bottom = LocalSpacing.current.smallAdaptive,
@@ -721,7 +721,7 @@ private fun UserPreferencesDetailPane(
                     )
                 }
                 userPreferencesTextControl(
-                    userPreference = BillingCachedProductIdPreference,
+                    userPreference = CachedPurchasePreference,
                     values = values,
                     onValueChange = onValueChange,
                 )

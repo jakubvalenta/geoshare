@@ -49,7 +49,7 @@ class FakeUserPreferencesRepository @Inject constructor() : UserPreferencesRepos
 val defaultFakeUserPreferences = UserPreferencesValues(
     automation = NoopAutomation,
     automationDelay = 5.seconds,
-    billingCachedProductId = "",
+    cachedPurchase = null,
     changelogShownForVersionCode = 22,
     connectionPermission = Permission.ALWAYS,
     coordinateFormat = CoordinateFormat.DEC,

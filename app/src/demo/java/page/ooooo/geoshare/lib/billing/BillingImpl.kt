@@ -20,7 +20,6 @@ class BillingImpl(
     context: Context,
     private val resources: Resources = context.resources,
 ) : Billing {
-
     @StringRes
     override val appNameResId = R.string.app_name_pro
     override val features = persistentListOf(AutomationFeature, CustomLinkFeature)
@@ -53,6 +52,10 @@ class BillingImpl(
 
     override suspend fun queryOffers(): BillingOffers = BillingOffers.Done(offers)
 
+    override fun consumePurchases() {
+        _status.value = BillingStatus.NotPurchased()
+    }
+
     override suspend fun launchBillingFlow(activity: Activity, offerToken: String) {
         _message.value = null
         delay(1.seconds)
@@ -62,7 +65,12 @@ class BillingImpl(
         if (product != null) {
             _status.value = BillingStatus.Pending()
             delay(3.seconds)
-            _status.value = BillingStatus.Purchased(product, expired = false, refundable = true)
+            _status.value = BillingStatus.Purchased(
+                product,
+                expired = false,
+                refundable = true,
+                token = "demo_purchased",
+            )
         } else {
             _message.value = Message(resources.getString(R.string.billing_purchase_error_unknown), isError = true)
         }

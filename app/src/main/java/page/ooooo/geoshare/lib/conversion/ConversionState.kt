@@ -16,7 +16,8 @@ import kotlinx.coroutines.withContext
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
 import page.ooooo.geoshare.data.local.preferences.AutomationPreference
-import page.ooooo.geoshare.data.local.preferences.BillingCachedProductIdPreference
+import page.ooooo.geoshare.data.local.preferences.CachedPurchase
+import page.ooooo.geoshare.data.local.preferences.CachedPurchasePreference
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.Permission
@@ -558,8 +559,8 @@ data class ConversionSucceeded(
                         is BillingStatus.Purchased -> {
                             // If billing status appeared within timeout, cache it
                             stateContext.userPreferencesRepository.setValue(
-                                BillingCachedProductIdPreference,
-                                it.product.id,
+                                CachedPurchasePreference,
+                                CachedPurchase(productId = it.product.id, token = it.token)
                             )
                             true
                         }
@@ -570,17 +571,22 @@ data class ConversionSucceeded(
         } catch (_: TimeoutCancellationException) {
             // If billing status didn't appear, try to read it from cache
             stateContext.log.w(null, "Automation: Billing status didn't appear within $billingStatusTimeout")
-            stateContext.userPreferencesRepository.getValue(BillingCachedProductIdPreference)
-                ?.let { productId -> stateContext.billing.products.firstOrNull { product -> productId == product.id } }
-                .let { product ->
-                    if (product != null) {
-                        stateContext.log.w(null, "Automation: Found cached billing status")
-                        // TODO Cache purchase token too
-                        BillingStatus.Purchased(product, expired = false, refundable = true, token = "placeholder")
-                    } else {
-                        stateContext.log.w(null, "Automation: Didn't find cached billing status")
-                        BillingStatus.Loading()
-                    }
+            stateContext.userPreferencesRepository.getValue(CachedPurchasePreference)
+                ?.let { cachedPurchase ->
+                    stateContext.billing.products.firstOrNull { product -> cachedPurchase.productId == product.id }
+                        ?.let { product ->
+                            stateContext.log.w(null, "Automation: Found cached billing status")
+                            BillingStatus.Purchased(
+                                product,
+                                expired = false,
+                                refundable = true,
+                                token = cachedPurchase.token,
+                            )
+                        }
+                }
+                ?: run {
+                    stateContext.log.w(null, "Automation: Didn't find cached billing status")
+                    BillingStatus.Loading()
                 }
         }
 
