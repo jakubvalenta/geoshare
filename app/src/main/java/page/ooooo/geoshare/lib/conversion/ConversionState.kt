@@ -575,7 +575,8 @@ data class ConversionSucceeded(
                 .let { product ->
                     if (product != null) {
                         stateContext.log.w(null, "Automation: Found cached billing status")
-                        BillingStatus.Purchased(product, expired = false, refundable = true)
+                        // TODO Cache purchase token too
+                        BillingStatus.Purchased(product, expired = false, refundable = true, token = "placeholder")
                     } else {
                         stateContext.log.w(null, "Automation: Didn't find cached billing status")
                         BillingStatus.Loading()

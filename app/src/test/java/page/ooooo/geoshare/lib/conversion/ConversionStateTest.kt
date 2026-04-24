@@ -2764,6 +2764,7 @@ class ConversionStateTest {
                     product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                     expired = false,
                     refundable = true,
+                    token = "test_purchased",
                 )
             )
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
@@ -2797,6 +2798,7 @@ class ConversionStateTest {
                     product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                     expired = false,
                     refundable = true,
+                    token = "test_purchased",
                 )
             )
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
@@ -2849,6 +2851,7 @@ class ConversionStateTest {
             product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
             expired = false,
             refundable = true,
+            token = "test_purchased",
         )
         advanceUntilIdle()
         assertEquals(
@@ -2889,6 +2892,7 @@ class ConversionStateTest {
             product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
             expired = false,
             refundable = true,
+            token = "test_purchased",
         )
         advanceUntilIdle()
         assertNull(res)
@@ -2926,6 +2930,7 @@ class ConversionStateTest {
             product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
             expired = false,
             refundable = true,
+            token = "test_purchased",
         )
         advanceUntilIdle()
         assertNull(res)
@@ -2947,6 +2952,7 @@ class ConversionStateTest {
                     product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                     expired = false,
                     refundable = true,
+                    token = "test_purchased",
                 )
             )
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
@@ -2979,6 +2985,7 @@ class ConversionStateTest {
                     product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                     expired = false,
                     refundable = true,
+                    token = "test_purchased",
                 )
             )
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
@@ -3013,6 +3020,7 @@ class ConversionStateTest {
                     product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                     expired = false,
                     refundable = true,
+                    token = "test_purchased",
                 )
             )
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
@@ -3045,6 +3053,7 @@ class ConversionStateTest {
                     product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                     expired = false,
                     refundable = true,
+                    token = "test_purchased",
                 )
             )
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
@@ -3075,6 +3084,7 @@ class ConversionStateTest {
                     product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                     expired = false,
                     refundable = true,
+                    token = "test_purchased",
                 )
             )
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
@@ -3108,6 +3118,7 @@ class ConversionStateTest {
                     product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                     expired = false,
                     refundable = true,
+                    token = "test_purchased",
                 )
             )
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
