@@ -218,7 +218,7 @@ object AndroidTools {
             context,
             Intent(Intent.ACTION_VIEW).apply {
                 setDataAndType(uri, context.contentResolver.getType(uri))
-                setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                 setPackage(packageName)
             },
         )
@@ -244,7 +244,7 @@ object AndroidTools {
             createChooser(
                 Intent(Intent.ACTION_VIEW).apply {
                     setDataAndType(uri, context.contentResolver.getType(uri))
-                    setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                 },
             ),
         )
