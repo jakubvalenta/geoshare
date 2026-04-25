@@ -34,7 +34,6 @@
     <string name="user_preferences_connection_option_ask">Попитай, преди да се свържеш</string>
     <string name="no">Не</string>
     <string name="conversion_failed_missing_url">Липсващ URL адрес</string>
-    <string name="conversion_failed_unshorten_error">Неуспешно разрешаване на кратка връзка</string>
     <string name="conversion_succeeded_apps_not_found">Не е инсталирано приложение за карти</string>
     <string name="copying_finished">Копирано в клипборда</string>
     <string name="about_title">Относно</string>
@@ -44,7 +43,6 @@
     <string name="faq_title">ЧЗВ</string>
     <string name="conversion_failed_connection_permission_denied">Тази връзка не се поддържа без свързване с картографската услуга</string>
     <string name="conversion_failed_parse_url_error">Неуспешно обработване на връзка към карта</string>
-    <string name="conversion_failed_parse_html_error">Неуспешно извличане на уеб страница от услугата за карти</string>
     <string name="user_preferences_title">Предпочитания</string>
     <string name="about_text"><![CDATA[<p>%1$s е безплатно приложение с отворен код, разпространявано под <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> или по-нов лиценз.</p><br><p>Можете да намерите кода на <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, където можете също да <a href="https://github.com/jakubvalenta/geoshare/issues">докладвате за проблеми</a>.</p><br><p>Вашите отзиви са добре дошли. Можете да се свържете с мен на <a href="mailto:%2$s">%2$s</a>.</p>]]></string>
     <string name="user_preferences_connection_description">За да поддържа кратки връзки и връзки, които не съдържат географски координати в URL адреса, %1$s може да се свърже с картографската услуга (Google Maps, Apple Maps и др.).</string>

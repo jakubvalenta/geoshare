@@ -25,10 +25,8 @@
     <string name="no">No</string>
     <string name="conversion_failed_missing_url">URL mancante</string>
     <string name="conversion_failed_parse_url_error">Errore nella creazione del link geo:</string>
-    <string name="conversion_failed_unshorten_error">Impossibile risolvere il collegamento abbreviato</string>
     <string name="copying_finished">Link geo: copiato</string>
     <string name="conversion_succeeded_apps_not_found">Nessuna app in grado di aprire link geo: installata</string>
-    <string name="conversion_failed_parse_html_error">Impossibile recuperare la pagina di Google Maps</string>
     <string name="conversion_failed_connection_permission_denied">Questo link non è supportato senza collegarsi a Google</string>
     <string name="intro_how_to_share_google_maps_caption">Condividi una posizione dall’applicazione di mappe o dal browser web.</string>
     <string name="about_app_icon_content_description">Icona app</string>

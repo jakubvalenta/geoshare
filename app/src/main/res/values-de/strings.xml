@@ -72,12 +72,10 @@
     <string name="user_preferences_connection_option_ask">Vor dem Verbinden fragen</string>
     <string name="no">Nein</string>
     <string name="conversion_failed_missing_url">Fehlende URL</string>
-    <string name="conversion_failed_unshorten_error">Kurzlink konnte nicht aufgelöst werden</string>
     <string name="conversion_failed_parse_url_error">Kartenlink konnte nicht verarbeitet werden</string>
     <string name="conversion_succeeded_apps_not_found">Es ist keine Karten-App installiert</string>
     <string name="copying_finished">In die Zwischenablage kopiert</string>
     <string name="conversion_failed_connection_permission_denied">Dieser Link wird ohne Verbindung zum Kartendienst nicht unterstützt</string>
-    <string name="conversion_failed_parse_html_error">Das Herunterladen der Webseite vom Kartendienst ist fehlgeschlagen</string>
     <string name="conversion_failed_unsupported_service">Nicht unterstützter Kartendienst</string>
     <string name="user_preferences_connection_title">Verbindung zu Kartendienst (Google, Apple usw.) zulassen?</string>
     <string name="user_preferences_connection_description">Um kurze Kartenlinks zu unterstützen und Koordinaten von der Webseite des Kartendienstes zu bekommen, wenn der Link sie nicht enthält, kann %1$s sich mit dem Kartendienst verbinden. Mehr Infos findest du auf dem FAQ-Bildschirm.</string>
