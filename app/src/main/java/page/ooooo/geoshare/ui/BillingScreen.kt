@@ -386,6 +386,7 @@ private fun BillingLegalText(onConsumePurchases: () -> Unit) {
     val context = LocalContext.current
     val supportEmail = stringResource(R.string.about_support_email)
     val termsUrl = stringResource(R.string.about_terms_url)
+    val emailClickEnabled = AndroidTools.hasEmailApp(context)
 
     CompositionLocalProvider(
         LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant,
@@ -407,10 +408,10 @@ private fun BillingLegalText(onConsumePurchases: () -> Unit) {
             SelectionContainer {
                 Text(
                     supportEmail,
-                    Modifier.clickable {
+                    Modifier.clickable(enabled = emailClickEnabled) {
                         AndroidTools.composeEmail(context, supportEmail)
                     },
-                    textDecoration = TextDecoration.Underline,
+                    textDecoration = if (emailClickEnabled) TextDecoration.Underline else null,
                 )
             }
             if (BuildConfig.DEBUG) {
