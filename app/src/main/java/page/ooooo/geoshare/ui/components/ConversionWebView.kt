@@ -118,13 +118,13 @@ fun ConversionWebView(
 
                 // Notice that we don't set custom user agent, because it makes Google Maps serve an error page
 
-                setWebChromeClient(object : WebChromeClient() {
+                webChromeClient = object : WebChromeClient() {
                     override fun onConsoleMessage(cm: ConsoleMessage): Boolean =
                         // Return true for messages that should be excluded from logcat
                         (cm.messageLevel() != ConsoleMessage.MessageLevel.ERROR &&
                             cm.messageLevel() != ConsoleMessage.MessageLevel.WARNING) ||
                             cm.message().startsWith("Mixed Content")
-                })
+                }
 
                 addJavascriptInterface(
                     object {

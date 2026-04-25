@@ -14,14 +14,13 @@ kotlin {
 
 android {
     namespace = "page.ooooo.geoshare"
-    compileSdk = 36
-    compileSdkMinor = 1
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "page.ooooo.geoshare"
         minSdk = 25
         // noinspection EditedTargetSdkVersion
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 38
         versionName = "6.1.0"
 
