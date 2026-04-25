@@ -34,7 +34,6 @@
     <string name="user_preferences_connection_option_ask">Preguntar antes de conectar</string>
     <string name="no">No</string>
     <string name="conversion_failed_missing_url">URL ausente</string>
-    <string name="conversion_failed_unshorten_error">Error al resolver el enlace corto</string>
     <string name="conversion_failed_parse_url_error">Error al procesar el enlace de mapa</string>
     <string name="conversion_succeeded_apps_not_found">No hay ninguna aplicación de mapas instalada</string>
     <string name="copying_finished">Se copiaron al portapapeles</string>
@@ -47,7 +46,6 @@
     <string name="main_input_uri_clear_content_description">Limpiar</string>
     <string name="about_text"><![CDATA[<p>%1$s es una aplicación libre y de código abierto distribuido bajo la licencia <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> o superior.</p><br><p>Puede encontrar el código por <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, donde puede también<a href="https://github.com/jakubvalenta/geoshare/issues">reportar incidentes</a>.</p><br><p>Sus comentarios son bienvenidos. Puede contactarme vía <a href="mailto:%2$s">%2$s</a>.</p>]]></string>
     <string name="user_preferences_connection_title">¿Permitir conectarse al servicio de mapas (Google, Apple, etc.)?</string>
-    <string name="conversion_failed_parse_html_error">Error al obtener la página web del servicio de mapas</string>
     <string name="conversion_succeeded_skip">Copiar enlace original</string>
     <string name="intro_how_to_share_google_maps_screenshot_title">Compartiendo con</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Pin caído</string>

@@ -60,7 +60,7 @@ class BillingImplTest {
                             on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn purchaseTimeValue
-                            on { purchaseToken } doReturn "test_purchase_token_purchased"
+                            on { purchaseToken } doReturn "test_purchased"
                         },
                     )
                 )
@@ -97,7 +97,7 @@ class BillingImplTest {
                             on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn purchaseTimeValue
-                            on { purchaseToken } doReturn "test_purchase_token_purchased"
+                            on { purchaseToken } doReturn "test_purchased"
                         },
                     )
                 )
@@ -139,7 +139,7 @@ class BillingImplTest {
                             on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn purchaseTimeValue
-                            on { purchaseToken } doReturn "test_purchase_token_purchased"
+                            on { purchaseToken } doReturn "test_purchased"
                         },
                     )
                 )
@@ -181,7 +181,7 @@ class BillingImplTest {
                             on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn purchaseTimeValue
-                            on { purchaseToken } doReturn "test_purchase_token_purchased"
+                            on { purchaseToken } doReturn "test_purchased"
                         },
                     )
                 )
@@ -210,6 +210,7 @@ class BillingImplTest {
                 product = billingImpl.products.first { it.id == "test_lifetime" },
                 expired = false,
                 refundable = true,
+                token = "test_purchased",
             ),
             billingImpl.status.value,
         )
@@ -226,7 +227,7 @@ class BillingImplTest {
                             on { products } doReturn listOf("test_monthly")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn purchaseTimeValue
-                            on { purchaseToken } doReturn "test_purchase_token_purchased"
+                            on { purchaseToken } doReturn "test_purchased"
                             on { isAutoRenewing } doReturn false
                         },
                     )
@@ -256,6 +257,7 @@ class BillingImplTest {
                 product = billingImpl.products.first { it.id == "test_monthly" },
                 expired = true,
                 refundable = true,
+                token = "test_purchased",
             ),
             billingImpl.status.value,
         )
@@ -272,7 +274,7 @@ class BillingImplTest {
                             on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn purchaseTimeValue
-                            on { purchaseToken } doReturn "test_purchase_token_purchased"
+                            on { purchaseToken } doReturn "test_purchased"
                         },
                     )
                 )
@@ -301,13 +303,14 @@ class BillingImplTest {
                 product = billingImpl.products.first { it.id == "test_lifetime" },
                 expired = false,
                 refundable = false,
+                token = "test_purchased",
             ),
             billingImpl.status.value,
         )
     }
 
     @Test
-    fun status_whenPurchasesResponseContainsKnownProductWithStatePending_isNotPurchased() {
+    fun status_whenPurchasesResponseContainsKnownProductWithStatePending_isPending() {
         val purchaseTimeValue = System.currentTimeMillis()
         val billingClient = object : FakeBillingClient() {
             override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
@@ -317,7 +320,7 @@ class BillingImplTest {
                             on { products } doReturn listOf("spam")
                             on { purchaseState } doReturn Purchase.PurchaseState.PENDING
                             on { purchaseTime } doReturn purchaseTimeValue
-                            on { purchaseToken } doReturn "test_purchase_token_purchased"
+                            on { purchaseToken } doReturn "test_purchased"
                         },
                     )
                 )
@@ -341,10 +344,7 @@ class BillingImplTest {
             log = FakeLog,
         )
         billingImpl.startConnection()
-        assertEquals(
-            BillingStatus.NotPurchased(pending = true),
-            billingImpl.status.value,
-        )
+        assertTrue(billingImpl.status.value is BillingStatus.Pending)
     }
 
     @Test
@@ -358,7 +358,7 @@ class BillingImplTest {
                             on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.UNSPECIFIED_STATE
                             on { purchaseTime } doReturn purchaseTimeValue
-                            on { purchaseToken } doReturn "test_purchase_token_purchased"
+                            on { purchaseToken } doReturn "test_purchased"
                         },
                     )
                 )
@@ -382,10 +382,7 @@ class BillingImplTest {
             log = FakeLog,
         )
         billingImpl.startConnection()
-        assertEquals(
-            BillingStatus.NotPurchased(pending = false),
-            billingImpl.status.value,
-        )
+        assertTrue(billingImpl.status.value is BillingStatus.NotPurchased)
     }
 
     @Test
@@ -399,20 +396,20 @@ class BillingImplTest {
                             on { products } doReturn listOf("spam_1")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn purchaseTimeValue
-                            on { purchaseToken } doReturn "test_purchase_token_purchased"
+                            on { purchaseToken } doReturn "test_purchased"
                         },
                         mock<Purchase> {
                             on { products } doReturn listOf("test_monthly")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn purchaseTimeValue
-                            on { purchaseToken } doReturn "test_purchase_token_purchased"
+                            on { purchaseToken } doReturn "test_purchased"
                             on { isAutoRenewing } doReturn true
                         },
                         mock<Purchase> {
                             on { products } doReturn listOf("spam_2")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn purchaseTimeValue
-                            on { purchaseToken } doReturn "test_purchase_token_purchased"
+                            on { purchaseToken } doReturn "test_purchased"
                         },
                     )
                 )
@@ -441,6 +438,7 @@ class BillingImplTest {
                 product = billingImpl.products.first { it.id == "test_monthly" },
                 expired = false,
                 refundable = true,
+                token = "test_purchased",
             ),
             billingImpl.status.value,
         )
@@ -457,7 +455,7 @@ class BillingImplTest {
                             on { products } doReturn listOf("spam")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn purchaseTimeValue
-                            on { purchaseToken } doReturn "test_purchase_token_purchased"
+                            on { purchaseToken } doReturn "test_purchased"
                         },
                     )
                 )
@@ -481,14 +479,11 @@ class BillingImplTest {
             log = FakeLog,
         )
         billingImpl.startConnection()
-        assertEquals(
-            BillingStatus.NotPurchased(pending = false),
-            billingImpl.status.value,
-        )
+        assertTrue(billingImpl.status.value is BillingStatus.NotPurchased)
     }
 
     @Test
-    fun status_whenFirstPurchasesResponseContainsKnownProductAndSecondResponseContainsUnknownProduct_isPurchased() {
+    fun status_whenFirstPurchasesResponseContainsKnownProductAndSecondResponseDoesNotContainKnownProduct_isPurchased() {
         val purchaseTimeValue = System.currentTimeMillis()
         val responseProductIds = listOf(
             "test_lifetime",
@@ -502,7 +497,7 @@ class BillingImplTest {
                             on { products } doReturn listOf(responseProductIds.next())
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn purchaseTimeValue
-                            on { purchaseToken } doReturn "test_purchase_token_purchased"
+                            on { purchaseToken } doReturn "test_purchased"
                         },
                     )
                 )
@@ -531,9 +526,99 @@ class BillingImplTest {
                 product = billingImpl.products.first { it.id == "test_lifetime" },
                 expired = false,
                 refundable = true,
+                token = "test_purchased",
             ),
             billingImpl.status.value,
         )
+    }
+
+    @Test
+    fun status_whenFirstPurchasesResponseDoesNotContainKnownProductAndSecondResponseContainsPendingProduct_isPending() {
+        val purchaseTimeValue = System.currentTimeMillis()
+        val responsePurchaseStates = listOf(
+            Purchase.PurchaseState.UNSPECIFIED_STATE,
+            Purchase.PurchaseState.PENDING,
+        ).iterator()
+        val billingClient = object : FakeBillingClient() {
+            override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
+                p1.onQueryPurchasesResponse(
+                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
+                        mock<Purchase> {
+                            on { products } doReturn listOf("test_lifetime")
+                            on { purchaseState } doReturn responsePurchaseStates.next()
+                            on { purchaseTime } doReturn purchaseTimeValue
+                            on { purchaseToken } doReturn "test_purchased"
+                        },
+                    )
+                )
+            }
+
+            override fun startConnection(p0: BillingClientStateListener) {
+                p0.onBillingSetupFinished(
+                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build()
+                )
+            }
+        }
+        val billingClientBuilder = FakeBillingClientBuilder(billingClient)
+        val billingImpl = BillingImpl(
+            context,
+            billingClientBuilder,
+            products = persistentListOf(
+                BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
+                BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
+            ),
+            resources = resources,
+            log = FakeLog,
+        )
+        billingImpl.startConnection()
+        assertTrue(billingImpl.status.value is BillingStatus.Pending)
+    }
+
+    @Test
+    fun status_whenFirstPurchasesResponseContainsKnownProductAndResponseAfterStartConnectionDoesNotContainKnownProduct_isNotPurchased() {
+        val purchaseTimeValue = System.currentTimeMillis()
+        val responseProductIds = listOf(
+            // First startConnection() call
+            "test_lifetime",
+            "spam",
+            // Second startConnection() call
+            "spam",
+            "spam",
+        ).iterator()
+        val billingClient = object : FakeBillingClient() {
+            override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
+                p1.onQueryPurchasesResponse(
+                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
+                        mock<Purchase> {
+                            on { products } doReturn listOf(responseProductIds.next())
+                            on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
+                            on { purchaseTime } doReturn purchaseTimeValue
+                            on { purchaseToken } doReturn "test_purchased"
+                        },
+                    )
+                )
+            }
+
+            override fun startConnection(p0: BillingClientStateListener) {
+                p0.onBillingSetupFinished(
+                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build()
+                )
+            }
+        }
+        val billingClientBuilder = FakeBillingClientBuilder(billingClient)
+        val billingImpl = BillingImpl(
+            context,
+            billingClientBuilder,
+            products = persistentListOf(
+                BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
+                BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
+            ),
+            resources = resources,
+            log = FakeLog,
+        )
+        billingImpl.startConnection()
+        billingImpl.startConnection()
+        assertTrue(billingImpl.status.value is BillingStatus.NotPurchased)
     }
 
     @Test
@@ -949,7 +1034,7 @@ class BillingImplTest {
                             on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn System.currentTimeMillis()
-                            on { purchaseToken } doReturn "test_purchase_token_purchased"
+                            on { purchaseToken } doReturn "test_purchased"
                         })
                 )
                 return BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build()
@@ -1023,7 +1108,7 @@ class BillingImplTest {
                             on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn System.currentTimeMillis()
-                            on { purchaseToken } doReturn "test_purchase_token_purchased"
+                            on { purchaseToken } doReturn "test_purchased"
                         })
                 )
                 return BillingResult.newBuilder().setResponseCode(BillingResponseCode.ERROR).build()
@@ -1098,7 +1183,7 @@ class BillingImplTest {
                             on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn System.currentTimeMillis()
-                            on { purchaseToken } doReturn "test_purchase_token_purchased"
+                            on { purchaseToken } doReturn "test_purchased"
                         })
                 )
                 return BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build()
@@ -1173,7 +1258,7 @@ class BillingImplTest {
                             on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn System.currentTimeMillis()
-                            on { purchaseToken } doReturn "test_purchase_token_purchased"
+                            on { purchaseToken } doReturn "test_purchased"
                         })
                 )
                 return BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build()
@@ -1250,35 +1335,35 @@ class BillingImplTest {
                                 on { products } doReturn listOf("test_lifetime")
                                 on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                                 on { purchaseTime } doReturn System.currentTimeMillis()
-                                on { purchaseToken } doReturn "test_purchase_token_purchased_1"
+                                on { purchaseToken } doReturn "test_purchased_1"
                                 on { isAcknowledged } doReturn false
                             },
                             mock<Purchase> {
                                 on { products } doReturn listOf("test_lifetime")
                                 on { purchaseState } doReturn Purchase.PurchaseState.PENDING
                                 on { purchaseTime } doReturn System.currentTimeMillis()
-                                on { purchaseToken } doReturn "test_purchase_token_pending"
+                                on { purchaseToken } doReturn "test_pending"
                                 on { isAcknowledged } doReturn false
                             },
                             mock<Purchase> {
                                 on { products } doReturn listOf("test_lifetime")
                                 on { purchaseState } doReturn Purchase.PurchaseState.UNSPECIFIED_STATE
                                 on { purchaseTime } doReturn System.currentTimeMillis()
-                                on { purchaseToken } doReturn "test_purchase_token_unspecified_state"
+                                on { purchaseToken } doReturn "test_unspecified_state"
                                 on { isAcknowledged } doReturn false
                             },
                             mock<Purchase> {
                                 on { products } doReturn listOf("test_lifetime")
                                 on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                                 on { purchaseTime } doReturn System.currentTimeMillis()
-                                on { purchaseToken } doReturn "test_purchase_token_purchased_2"
+                                on { purchaseToken } doReturn "test_purchased_2"
                                 on { isAcknowledged } doReturn false
                             },
                             mock<Purchase> {
                                 on { products } doReturn listOf("test_lifetime")
                                 on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                                 on { purchaseTime } doReturn System.currentTimeMillis()
-                                on { purchaseToken } doReturn "test_purchase_token_purchased_acknowledged"
+                                on { purchaseToken } doReturn "test_purchased_acknowledged"
                                 on { isAcknowledged } doReturn true
                             },
                         )
@@ -1318,7 +1403,7 @@ class BillingImplTest {
             )
             billingImpl.launchBillingFlow(mock(), "offer_lifetime_details")
             assertEquals(
-                listOf("test_purchase_token_purchased_1", "test_purchase_token_purchased_2"),
+                listOf("test_purchased_1", "test_purchased_2"),
                 acknowledgedPurchaseParamsList.map { it.purchaseToken },
             )
             assertTrue(billingImpl.status.value is BillingStatus.Purchased)
@@ -1360,7 +1445,7 @@ class BillingImplTest {
                         BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
                             mock<Purchase> {
                                 on { products } doReturn listOf("test_lifetime")
-                                on { purchaseToken } doReturn "test_purchase_token_purchased"
+                                on { purchaseToken } doReturn "test_purchased"
                                 on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                                 on { purchaseTime } doReturn System.currentTimeMillis()
                                 on { isAcknowledged } doReturn false
@@ -1406,6 +1491,7 @@ class BillingImplTest {
                     BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
                     expired = false,
                     refundable = true,
+                    token = "test_purchased",
                 ),
                 billingImpl.status.value,
             )
@@ -1456,7 +1542,7 @@ class BillingImplTest {
                         BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
                             mock<Purchase> {
                                 on { products } doReturn listOf("test_monthly")
-                                on { purchaseToken } doReturn "test_purchase_token_purchased"
+                                on { purchaseToken } doReturn "test_purchased"
                                 on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                                 on { purchaseTime } doReturn System.currentTimeMillis() - 49.hours.inWholeMilliseconds
                                 on { isAcknowledged } doReturn false
@@ -1503,6 +1589,7 @@ class BillingImplTest {
                     BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
                     expired = false,
                     refundable = false,
+                    token = "test_purchased",
                 ),
                 billingImpl.status.value,
             )
@@ -1543,7 +1630,7 @@ class BillingImplTest {
                         BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
                             mock<Purchase> {
                                 on { products } doReturn listOf("spam")
-                                on { purchaseToken } doReturn "test_purchase_token_purchased"
+                                on { purchaseToken } doReturn "test_purchased"
                                 on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                                 on { purchaseTime } doReturn System.currentTimeMillis()
                                 on { isAcknowledged } doReturn false
@@ -1584,10 +1671,7 @@ class BillingImplTest {
                 log = FakeLog,
             )
             billingImpl.launchBillingFlow(mock(), "offer_lifetime_details")
-            assertEquals(
-                BillingStatus.NotPurchased(pending = false),
-                billingImpl.status.value,
-            )
+            assertTrue(billingImpl.status.value is BillingStatus.NotPurchased)
             assertNull(billingImpl.message.value)
         }
 
@@ -1622,7 +1706,7 @@ class BillingImplTest {
                             on { products } doReturn listOf(purchasedProductIds.next())
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn purchaseTimeValue
-                            on { purchaseToken } doReturn "test_purchase_token_purchased"
+                            on { purchaseToken } doReturn "test_purchased"
                         },
                     )
                 )
@@ -1653,17 +1737,11 @@ class BillingImplTest {
 
         // Start connection. It queries product "spam", so status becomes NotPurchased
         billingImpl.startConnection()
-        assertEquals(
-            BillingStatus.NotPurchased(pending = false),
-            billingImpl.status.value,
-        )
+        assertTrue(billingImpl.status.value is BillingStatus.NotPurchased)
 
         // Now that connection is ready, in-app messages run, but result is NO_ACTION_NEEDED, so status remains NotPurchased
         job.join()
-        assertEquals(
-            BillingStatus.NotPurchased(pending = false),
-            billingImpl.status.value,
-        )
+        assertTrue(billingImpl.status.value is BillingStatus.NotPurchased)
     }
 
     @Test
@@ -1698,7 +1776,7 @@ class BillingImplTest {
                             on { products } doReturn listOf(productId)
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn purchaseTimeValue
-                            on { purchaseToken } doReturn "test_purchase_token_purchased"
+                            on { purchaseToken } doReturn "test_purchased"
                             on { isAutoRenewing } doReturn autoRenewing
                         },
                     )
@@ -1730,10 +1808,7 @@ class BillingImplTest {
 
         // Start connection. It queries product "spam", so status becomes NotPurchased
         billingImpl.startConnection()
-        assertEquals(
-            BillingStatus.NotPurchased(pending = false),
-            billingImpl.status.value,
-        )
+        assertTrue(billingImpl.status.value is BillingStatus.NotPurchased)
 
         // Now that connection is ready, in-app messages query product "test_lifetime", so status becomes Purchased
         job.join()
@@ -1742,6 +1817,7 @@ class BillingImplTest {
                 product = billingImpl.products.first { it.id == "test_lifetime" },
                 expired = false,
                 refundable = true,
+                token = "test_purchased",
             ),
             billingImpl.status.value,
         )

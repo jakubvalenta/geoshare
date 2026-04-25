@@ -56,7 +56,7 @@ fun MainMenu(
     val spacing = LocalSpacing.current
     var expanded by retain { mutableStateOf(false) }
 
-    if (currentState is Initial && billingStatus is BillingStatus.NotPurchased) {
+    if (currentState is Initial && billingStatus !is BillingStatus.Loading && billingStatus !is BillingStatus.Purchased) {
         FeatureBadgeSmall(
             onClick = onNavigateToBillingScreen,
             modifier = Modifier.testTag("geoShareMainBillingIcon"),
@@ -136,6 +136,7 @@ fun MainMenu(
                 },
             )
             if (
+                billingStatus is BillingStatus.Pending ||
                 billingStatus is BillingStatus.NotPurchased ||
                 billingStatus is BillingStatus.Purchased && billingStatus.product.type != BillingProduct.Type.DONATION
             ) {
@@ -176,7 +177,7 @@ private fun DefaultPreview() {
                         MainMenu(
                             currentState = Initial(),
                             billingAppNameResId = R.string.app_name_pro,
-                            billingStatus = BillingStatus.NotPurchased(pending = false),
+                            billingStatus = BillingStatus.NotPurchased(),
                             changelogShown = false,
                             onNavigateToAboutScreen = {},
                             onNavigateToBillingScreen = {},
@@ -207,7 +208,7 @@ private fun DarkPreview() {
                         MainMenu(
                             currentState = Initial(),
                             billingAppNameResId = R.string.app_name_pro,
-                            billingStatus = BillingStatus.NotPurchased(pending = false),
+                            billingStatus = BillingStatus.NotPurchased(),
                             changelogShown = false,
                             onNavigateToAboutScreen = {},
                             onNavigateToBillingScreen = {},
@@ -242,6 +243,7 @@ private fun DonationPreview() {
                                 product = BillingProduct("test", BillingProduct.Type.DONATION),
                                 expired = false,
                                 refundable = true,
+                                token = "test_purchased",
                             ),
                             changelogShown = false,
                             onNavigateToAboutScreen = {},
@@ -277,6 +279,7 @@ private fun DarkDonationPreview() {
                                 product = BillingProduct("test", BillingProduct.Type.DONATION),
                                 expired = false,
                                 refundable = true,
+                                token = "test_purchased",
                             ),
                             changelogShown = false,
                             onNavigateToAboutScreen = {},

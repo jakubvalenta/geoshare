@@ -27,32 +27,39 @@ interface TextPreference<T> : UserPreference<T> {
     val key: Preferences.Key<String>
     val default: T
 
-    fun serialize(value: T): String
+    fun serialize(value: T, log: ILog = DefaultLog): String
 
-    fun deserialize(value: String?): T
+    fun deserialize(value: String?, log: ILog = DefaultLog): T
 
     fun isValid(value: String?): Boolean = true
 
-    override fun getValue(preferences: Preferences, log: ILog): T = deserialize(preferences[key])
+    override fun getValue(preferences: Preferences, log: ILog): T =
+        deserialize(preferences[key], log)
 
-    override fun setValue(preferences: MutablePreferences, value: T, log: ILog) = preferences.set(key, serialize(value))
+    override fun setValue(preferences: MutablePreferences, value: T, log: ILog) =
+        preferences.set(key, serialize(value, log))
 }
 
 interface NullableIntPreference : TextPreference<Int?> {
-    override fun serialize(value: Int?) = value.toString()
+    override fun serialize(value: Int?, log: ILog) =
+        value.toString()
 
-    override fun deserialize(value: String?) = value?.toIntOrNull() ?: default
+    override fun deserialize(value: String?, log: ILog) =
+        value?.toIntOrNull() ?: default
 }
 
 interface DurationPreference : TextPreference<Duration> {
     val minSec: Int
     val maxSec: Int
 
-    override fun serialize(value: Duration) = value.toInt(DurationUnit.SECONDS).toString()
+    override fun serialize(value: Duration, log: ILog) =
+        value.toInt(DurationUnit.SECONDS).toString()
 
-    override fun deserialize(value: String?) = value?.toIntOrNull()?.coerceIn(minSec, maxSec)?.seconds ?: default
+    override fun deserialize(value: String?, log: ILog) =
+        value?.toIntOrNull()?.coerceIn(minSec, maxSec)?.seconds ?: default
 
-    override fun isValid(value: String?) = value?.toIntOrNull()?.let { it in minSec..maxSec } == true
+    override fun isValid(value: String?) =
+        value?.toIntOrNull()?.let { it in minSec..maxSec } == true
 }
 
 interface OptionsPreference<T> : UserPreference<T> {
@@ -268,45 +275,60 @@ object AutomationDelayPreference : DurationPreference {
     override fun getValue(values: UserPreferencesValues) = values.automationDelay
 }
 
-object BillingCachedProductIdPreference : TextPreference<String?> {
-    override val key = stringPreferencesKey("billing_product_id")
-    override val default = ""
+object CachedPurchasePreference : TextPreference<CachedPurchase?> {
+    override val key = stringPreferencesKey("cached_purchase")
+    override val default = null
     val loading = default
 
-    override fun serialize(value: String?) = value.orEmpty()
+    override fun serialize(value: CachedPurchase?, log: ILog) =
+        try {
+            Json.encodeToString(value)
+        } catch (tr: SerializationException) {
+            // Silently ignore serialization errors, because the value should always serialize
+            log.e(TAG, "Serialization error", tr)
+            ""
+        }
 
-    override fun deserialize(value: String?) = value?.ifEmpty { null }
+    override fun deserialize(value: String?, log: ILog) =
+        value?.let {
+            try {
+                Json.decodeFromString<CachedPurchase?>(it)
+            } catch (tr: IllegalArgumentException) {
+                log.e(TAG, "Deserialization error", tr)
+                null
+            }
+        }
 
-    override fun getValue(values: UserPreferencesValues) = values.billingCachedProductId
+    override fun getValue(values: UserPreferencesValues) = values.cachedPurchase
+
+    private const val TAG = "BillingCachedProductPreference"
 }
 
 /**
  * A set of strings stored as a JSON array.
  */
-interface SetPreference : UserPreference<Set<String>?> {
-    val key: Preferences.Key<String>
-    val default: Set<String>?
+interface SetPreference : TextPreference<Set<String>?> {
+    override val key: Preferences.Key<String>
+    override val default: Set<String>?
 
-    override fun getValue(preferences: Preferences, log: ILog): Set<String>? {
-        val serializedString = preferences[key] ?: return default
-        return try {
-            Json.decodeFromString<Set<String>?>(serializedString)
-        } catch (tr: IllegalArgumentException) {
-            log.e(TAG, "Deserialization error", tr)
-            null
-        }
-    }
-
-    override fun setValue(preferences: MutablePreferences, value: Set<String>?, log: ILog) {
-        val serializedString = try {
+    override fun serialize(value: Set<String>?, log: ILog) =
+        try {
             Json.encodeToString(value)
         } catch (tr: SerializationException) {
-            // Silently ignore serialization errors, because a set of strings should always serialize
+            // Silently ignore serialization errors, because the value should always serialize
             log.e(TAG, "Serialization error", tr)
-            return
+            ""
         }
-        preferences[key] = serializedString
-    }
+
+    override fun deserialize(value: String?, log: ILog) =
+        value?.let {
+            try {
+                Json.decodeFromString<Set<String>?>(it)
+            } catch (tr: IllegalArgumentException) {
+                log.e(TAG, "Deserialization error", tr)
+                null
+            }
+        }
 
     companion object {
         private const val TAG = "SetPreference"
@@ -342,7 +364,7 @@ object ChangelogShownForVersionCodePreference : NullableIntPreference {
 data class UserPreferencesValues(
     val automation: Automation = AutomationPreference.loading,
     val automationDelay: Duration = AutomationDelayPreference.loading,
-    val billingCachedProductId: String? = BillingCachedProductIdPreference.loading,
+    val cachedPurchase: CachedPurchase? = CachedPurchasePreference.loading,
     val changelogShownForVersionCode: Int? = ChangelogShownForVersionCodePreference.loading,
     val connectionPermission: Permission = ConnectionPermissionPreference.loading,
     val coordinateFormat: CoordinateFormat = CoordinateFormatPreference.loading,

@@ -6,7 +6,6 @@ import page.ooooo.geoshare.R
 sealed interface Feature {
     val titleResId: Int
     val descriptionResId: Int
-    val itemsResIds: List<Int>
 }
 
 object AutomationFeature : Feature {
@@ -15,12 +14,6 @@ object AutomationFeature : Feature {
 
     @StringRes
     override val descriptionResId = R.string.billing_feature_automation_description
-
-    override val itemsResIds = listOf(
-        R.string.billing_feature_automation_item_open_app,
-        R.string.billing_feature_automation_item_navigate,
-        R.string.billing_feature_automation_item_copy,
-    )
 }
 
 object CustomLinkFeature : Feature {
@@ -29,6 +22,4 @@ object CustomLinkFeature : Feature {
 
     @StringRes
     override val descriptionResId = R.string.billing_feature_custom_link_description
-
-    override val itemsResIds = emptyList<Int>()
 }

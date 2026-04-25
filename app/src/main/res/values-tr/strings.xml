@@ -161,7 +161,6 @@
     <string name="user_preferences_automation_delay_sec_title">Otomasyon gecikmesi</string>
     <string name="user_preferences_automation_delay_sec_description">Uygulamanın otomatik bir işlem başlatmadan önce (örneğin, harita uygulamasını otomatik olarak açmadan önce) ne kadar süre bekleyeceğini ayarlayın.</string>
     <string name="user_preferences_number_error_range" tools:ignore="PluralsCandidate">Değer %1$d ile %2$d arasında olmalıdır</string>
-    <string name="conversion_failed_unshorten_error">Kısa bağlantı çözümlenemedi</string>
     <string name="inputs_link">Bağlantı</string>
     <string name="network_exception_connect_timeout">bağlantı zaman aşımı</string>
     <string name="network_exception_eof">bağlantı kapatılması</string>
@@ -181,7 +180,6 @@
         <item quantity="one">GPX otomatik olarak %1$ds’de kaydediliyor</item>
         <item quantity="other">GPX otomatik olarak %1$ds’de kaydediliyor</item>
     </plurals>
-    <string name="conversion_failed_parse_html_error">Harita servisinden web sayfası alınamadı</string>
     <string name="inputs_settings">Android ayarlarına giderek, bağlantıların her zaman %1$s’de açılmasını seçin</string>
     <string name="user_preferences_coordinate_format_title">Koordinat formatı</string>
     <string name="conversion_succeeded_hide">Gizle</string>

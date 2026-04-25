@@ -20,7 +20,6 @@ class BillingImpl(
     context: Context,
     private val resources: Resources = context.resources,
 ) : Billing {
-
     @StringRes
     override val appNameResId = R.string.app_name_pro
     override val features = persistentListOf(AutomationFeature, CustomLinkFeature)
@@ -45,13 +44,17 @@ class BillingImpl(
         _message.value = null
         CoroutineScope(Dispatchers.Default).launch {
             delay(2.seconds)
-            _status.value = BillingStatus.NotPurchased(pending = false)
+            _status.value = BillingStatus.NotPurchased()
         }
     }
 
     override fun endConnection() {}
 
     override suspend fun queryOffers(): BillingOffers = BillingOffers.Done(offers)
+
+    override fun consumePurchases() {
+        _status.value = BillingStatus.NotPurchased()
+    }
 
     override suspend fun launchBillingFlow(activity: Activity, offerToken: String) {
         _message.value = null
@@ -60,9 +63,14 @@ class BillingImpl(
             products.firstOrNull { product -> product.id == offer.productId }
         }
         if (product != null) {
-            _status.value = BillingStatus.NotPurchased(pending = true)
+            _status.value = BillingStatus.Pending()
             delay(3.seconds)
-            _status.value = BillingStatus.Purchased(product, expired = false, refundable = true)
+            _status.value = BillingStatus.Purchased(
+                product,
+                expired = false,
+                refundable = true,
+                token = "demo_purchased",
+            )
         } else {
             _message.value = Message(resources.getString(R.string.billing_purchase_error_unknown), isError = true)
         }
@@ -74,7 +82,7 @@ class BillingImpl(
             BillingProduct.Type.DONATION -> {}
 
             BillingProduct.Type.ONE_TIME -> {
-                _status.value = BillingStatus.NotPurchased(pending = false)
+                _status.value = BillingStatus.NotPurchased()
             }
 
             BillingProduct.Type.SUBSCRIPTION -> {
@@ -83,7 +91,7 @@ class BillingImpl(
                     ?.takeUnless { it.expired }
                     ?.copy(expired = true)
                     // If the status is expired, make it not purchased
-                    ?: BillingStatus.NotPurchased(pending = false)
+                    ?: BillingStatus.NotPurchased()
             }
         }
     }

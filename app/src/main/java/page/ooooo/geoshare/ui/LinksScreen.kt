@@ -315,7 +315,7 @@ private fun LinksListPane(
         }
         item {
             FeatureBadged(
-                enabled = billingStatus is BillingStatus.NotPurchased && CustomLinkFeature in billingFeatures,
+                enabled = CustomLinkFeature in billingFeatures && billingStatus !is BillingStatus.Loading && billingStatus !is BillingStatus.Purchased,
                 badge = { modifier ->
                     FeatureBadgeSmall(
                         { onNavigateToContentKey(-1) },
@@ -489,12 +489,12 @@ private fun LinksDetailPane(
                         modifier = Modifier
                             .width(600.dp)
                             .padding(top = spacing.smallAdaptive, bottom = spacing.tinyAdaptive),
-                        enabled = billingStatus is BillingStatus.Purchased && CustomLinkFeature in billingFeatures,
+                        enabled = CustomLinkFeature in billingFeatures && billingStatus is BillingStatus.Purchased,
                     )
                 }
             }
         }
-        if (billingStatus is BillingStatus.NotPurchased && CustomLinkFeature in billingFeatures) {
+        if (CustomLinkFeature in billingFeatures && billingStatus !is BillingStatus.Loading && billingStatus !is BillingStatus.Purchased) {
             FeatureWall(
                 billingAppNameResId = billingAppNameResId,
                 modifier = Modifier.testTag("geoShareCustomLinkFeatureWall"),
@@ -544,6 +544,7 @@ private fun DefaultPreview() {
                         BillingProduct("test", BillingProduct.Type.DONATION),
                         expired = false,
                         refundable = true,
+                        token = "test_purchased",
                     ),
                     chipEnabled = false,
                     coordinateConverter = coordinateConverter,
@@ -598,6 +599,7 @@ private fun DarkPreview() {
                         BillingProduct("test", BillingProduct.Type.DONATION),
                         expired = false,
                         refundable = true,
+                        token = "test_purchased",
                     ),
                     chipEnabled = false,
                     coordinateConverter = coordinateConverter,
@@ -652,6 +654,7 @@ private fun TabletPreview() {
                         BillingProduct("test", BillingProduct.Type.DONATION),
                         expired = false,
                         refundable = true,
+                        token = "test_purchased",
                     ),
                     chipEnabled = false,
                     coordinateConverter = coordinateConverter,
@@ -706,6 +709,7 @@ private fun InsertPreview() {
                         BillingProduct("test", BillingProduct.Type.DONATION),
                         expired = false,
                         refundable = true,
+                        token = "test_purchased",
                     ),
                     chipEnabled = false,
                     coordinateConverter = coordinateConverter,
@@ -760,6 +764,7 @@ private fun DarkInsertPreview() {
                         BillingProduct("test", BillingProduct.Type.DONATION),
                         expired = false,
                         refundable = true,
+                        token = "test_purchased",
                     ),
                     chipEnabled = false,
                     coordinateConverter = coordinateConverter,
@@ -815,6 +820,7 @@ private fun TabletInsertPreview() {
                         BillingProduct("test", BillingProduct.Type.DONATION),
                         expired = false,
                         refundable = true,
+                        token = "test_purchased",
                     ),
                     chipEnabled = false,
                     coordinateConverter = coordinateConverter,
@@ -865,7 +871,7 @@ private fun InsertNotPurchasedPreview() {
                     appEnabled = false,
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-                    billingStatus = BillingStatus.NotPurchased(pending = false),
+                    billingStatus = BillingStatus.NotPurchased(),
                     chipEnabled = false,
                     coordsUriTemplate = "",
                     group = "",
@@ -915,7 +921,7 @@ private fun DarkInsertNotPurchasedPreview() {
                     appEnabled = false,
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-                    billingStatus = BillingStatus.NotPurchased(pending = false),
+                    billingStatus = BillingStatus.NotPurchased(),
                     chipEnabled = false,
                     coordinateConverter = coordinateConverter,
                     coordsUriTemplate = "",
@@ -966,7 +972,7 @@ private fun TabletInsertNotPurchasedPreview() {
                     appEnabled = false,
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-                    billingStatus = BillingStatus.NotPurchased(pending = false),
+                    billingStatus = BillingStatus.NotPurchased(),
                     chipEnabled = false,
                     coordinateConverter = coordinateConverter,
                     coordsUriTemplate = "",
@@ -1022,6 +1028,7 @@ private fun UpdatePreview() {
                         BillingProduct("test", BillingProduct.Type.DONATION),
                         expired = false,
                         refundable = true,
+                        token = "test_purchased",
                     ),
                     chipEnabled = link.chipEnabled,
                     coordinateConverter = coordinateConverter,
@@ -1078,6 +1085,7 @@ private fun DarkUpdatePreview() {
                         BillingProduct("test", BillingProduct.Type.DONATION),
                         expired = false,
                         refundable = true,
+                        token = "test_purchased",
                     ),
                     chipEnabled = link.chipEnabled,
                     coordinateConverter = coordinateConverter,
@@ -1134,6 +1142,7 @@ private fun TabletUpdatePreview() {
                         BillingProduct("test", BillingProduct.Type.DONATION),
                         expired = false,
                         refundable = true,
+                        token = "test_purchased",
                     ),
                     chipEnabled = link.chipEnabled,
                     coordinateConverter = coordinateConverter,

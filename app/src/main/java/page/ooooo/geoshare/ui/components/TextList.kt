@@ -4,11 +4,13 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -17,6 +19,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.theme.AppTheme
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 data class TextListScope(val bulletSpace: Dp, val bulletWidth: Dp)
 
@@ -61,24 +64,23 @@ fun TextListBullet() {
 
 // Previews
 
-
 @Preview(showBackground = true)
 @Composable
 private fun DefaultPreview() {
     AppTheme {
         Surface {
-            TextList {
-                TextListItem(Modifier.padding(bottom = 15.dp)) {
-                    Text(stringResource(R.string.user_preferences_automation_description))
-                }
-                TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
-                    Text(stringResource(R.string.billing_feature_automation_item_open_app))
-                }
-                TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
-                    Text(stringResource(R.string.billing_feature_automation_item_navigate))
-                }
-                TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
-                    Text(stringResource(R.string.billing_feature_automation_item_copy))
+            val spacing = LocalSpacing.current
+            CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
+                TextList(verticalSpace = spacing.tiny) {
+                    listOf(
+                        R.string.faq_how_text_2_item_http,
+                        R.string.faq_how_text_2_item_html,
+                        R.string.faq_how_text_2_item_web,
+                    ).forEach { textResId ->
+                        TextListItem(bullet = { TextListBullet() }) {
+                            Text(stringResource(textResId))
+                        }
+                    }
                 }
             }
         }
@@ -90,18 +92,18 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         Surface {
-            TextList {
-                TextListItem(Modifier.padding(bottom = 15.dp)) {
-                    Text(stringResource(R.string.user_preferences_automation_description))
-                }
-                TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
-                    Text(stringResource(R.string.billing_feature_automation_item_open_app))
-                }
-                TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
-                    Text(stringResource(R.string.billing_feature_automation_item_navigate))
-                }
-                TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
-                    Text(stringResource(R.string.billing_feature_automation_item_copy))
+            val spacing = LocalSpacing.current
+            CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
+                TextList(verticalSpace = spacing.tiny) {
+                    listOf(
+                        R.string.faq_how_text_2_item_http,
+                        R.string.faq_how_text_2_item_html,
+                        R.string.faq_how_text_2_item_web,
+                    ).forEach { textResId ->
+                        TextListItem(bullet = { TextListBullet() }) {
+                            Text(stringResource(textResId))
+                        }
+                    }
                 }
             }
         }

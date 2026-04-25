@@ -5,14 +5,15 @@ import androidx.compose.runtime.Immutable
 sealed interface BillingStatus {
     class Loading : BillingStatus
 
-    data class NotPurchased(
-        val pending: Boolean,
-    ) : BillingStatus
+    class Pending : BillingStatus
+
+    class NotPurchased : BillingStatus
 
     @Immutable
     data class Purchased(
         val product: BillingProduct,
         val expired: Boolean,
         val refundable: Boolean,
+        val token: String,
     ) : BillingStatus
 }

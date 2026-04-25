@@ -7,7 +7,7 @@ interface BillingFlowParamsBuilder {
     fun setProductDetailsParamsList(productDetailsParamsList: List<BillingFlowParams.ProductDetailsParams>): BillingFlowParamsBuilder
 }
 
-class DefaultBillingFlowParamsBuilder() : BillingFlowParamsBuilder {
+class DefaultBillingFlowParamsBuilder : BillingFlowParamsBuilder {
     private val builder = BillingFlowParams.newBuilder()
 
     override fun build(): BillingFlowParams = builder.build()

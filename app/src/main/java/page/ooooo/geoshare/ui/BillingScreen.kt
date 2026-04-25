@@ -3,7 +3,9 @@ package page.ooooo.geoshare.ui
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.res.Configuration
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -22,6 +25,7 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LoadingIndicator
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
@@ -43,21 +47,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.LinkAnnotation
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextLinkStyles
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.persistentListOf
+import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Message
+import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingOffers
 import page.ooooo.geoshare.lib.billing.BillingProduct
@@ -76,7 +77,6 @@ import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
 import page.ooooo.geoshare.ui.components.ScaffoldAction
 import page.ooooo.geoshare.ui.components.SegmentedList
 import page.ooooo.geoshare.ui.components.TextList
-import page.ooooo.geoshare.ui.components.TextListBullet
 import page.ooooo.geoshare.ui.components.TextListItem
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -105,6 +105,7 @@ fun BillingScreen(
         billingRefundableDuration = billingRefundableDuration,
         billingStatus = billingStatus,
         onBack = onBack,
+        onConsumePurchases = { billingViewModel.consumePurchases() },
         onDismissMessage = { billingViewModel.dismissMessage() },
         onLaunchBillingFlow = { offerToken ->
             billingViewModel.launchBillingFlow(context as Activity, offerToken)
@@ -126,6 +127,7 @@ private fun BillingScreen(
     billingStatus: BillingStatus,
     animationsEnabled: Boolean = true,
     onBack: () -> Unit,
+    onConsumePurchases: () -> Unit,
     onDismissMessage: () -> Unit,
     onLaunchBillingFlow: (offerToken: String) -> Unit,
     onManageBillingProduct: (product: BillingProduct) -> Unit,
@@ -185,6 +187,7 @@ private fun BillingScreen(
                         billingStatus = billingStatus,
                         innerPadding = innerPadding,
                         bottomCorners = false,
+                        onConsumePurchases = onConsumePurchases,
                         onLaunchBillingFlow = onLaunchBillingFlow,
                         onManageBillingProduct = onManageBillingProduct,
                     )
@@ -198,6 +201,7 @@ private fun BillingScreen(
                         billingStatus = billingStatus,
                         innerPadding = PaddingValues.Zero,
                         bottomCorners = true,
+                        onConsumePurchases = onConsumePurchases,
                         onLaunchBillingFlow = onLaunchBillingFlow,
                         onManageBillingProduct = onManageBillingProduct,
                     )
@@ -223,37 +227,33 @@ private fun BillingMainPane(
         state = billingStatus,
         isMessageShown = { billingStatus ->
             billingStatus is BillingStatus.Purchased ||
-                billingStatus is BillingStatus.NotPurchased && billingStatus.pending ||
+                billingStatus is BillingStatus.Pending ||
                 billingStatus is BillingStatus.NotPurchased && (billingOffers as? BillingOffers.Done)?.offers?.isEmpty() == true
         },
         animationsEnabled = animationsEnabled,
     ) { billingStatus ->
         when (billingStatus) {
-            is BillingStatus.Purchased if !billingStatus.expired ->
-                BillingStatusCard(
-                    stringResource(R.string.billing_purchase_success, stringResource(R.string.app_name_pro)),
-                    Modifier.testTag("geoShareBillingStatusPurchased"),
-                )
+            is BillingStatus.Purchased if !billingStatus.expired -> BillingStatusCard(
+                stringResource(R.string.billing_purchase_success, stringResource(R.string.app_name_pro)),
+                Modifier.testTag("geoShareBillingStatusPurchased"),
+            )
 
-            is BillingStatus.Purchased ->
-                BillingStatusCard(
-                    stringResource(R.string.billing_status_expired),
-                    Modifier.testTag("geoShareBillingStatusExpired"),
-                )
+            is BillingStatus.Purchased -> BillingStatusCard(
+                stringResource(R.string.billing_status_expired),
+                Modifier.testTag("geoShareBillingStatusExpired"),
+            )
 
-            is BillingStatus.NotPurchased if billingStatus.pending ->
-                BillingStatusCard(
-                    stringResource(R.string.billing_status_pending),
-                    Modifier.testTag("geoShareBillingStatusPending"),
-                )
+            is BillingStatus.Pending -> BillingStatusCard(
+                stringResource(R.string.billing_status_pending),
+                Modifier.testTag("geoShareBillingStatusPending"),
+            )
 
-            is BillingStatus.NotPurchased if (billingOffers as? BillingOffers.Done)?.offers?.isEmpty() == true ->
-                BillingStatusCard(
-                    stringResource(
-                        R.string.billing_offers_empty,
-                        stringResource(R.string.app_name_pro),
-                    ),
-                )
+            is BillingStatus.NotPurchased if (billingOffers as? BillingOffers.Done)?.offers?.isEmpty() == true -> BillingStatusCard(
+                stringResource(
+                    R.string.billing_offers_empty,
+                    stringResource(R.string.app_name_pro),
+                ),
+            )
 
             else -> {}
         }
@@ -349,11 +349,6 @@ private fun BillingMainPane(
                         TextListItem(Modifier.padding(bottom = spacing.tinyAdaptive)) {
                             Text(stringResource(feature.descriptionResId))
                         }
-                        feature.itemsResIds.forEach { itemResId ->
-                            TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
-                                Text(stringResource(itemResId))
-                            }
-                        }
                     }
                 }
             }
@@ -383,33 +378,50 @@ private fun BillingStatusCard(text: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun BillingLegalText() {
-    Text(
-        buildAnnotatedString {
-            withLink(
-                LinkAnnotation.Url(
-                    stringResource(R.string.about_terms_url),
-                    TextLinkStyles(SpanStyle(textDecoration = TextDecoration.Underline)),
+private fun BillingLegalText(onConsumePurchases: () -> Unit) {
+    val context = LocalContext.current
+    val supportEmail = stringResource(R.string.about_support_email)
+    val termsUrl = stringResource(R.string.about_terms_url)
+    val emailClickEnabled = AndroidTools.hasEmailApp(context)
+
+    CompositionLocalProvider(
+        LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant,
+        LocalTextStyle provides MaterialTheme.typography.bodySmall,
+    ) {
+        FlowRow(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = LocalSpacing.current.windowPadding),
+        ) {
+            Text(
+                stringResource(R.string.billing_terms_of_service),
+                Modifier.clickable {
+                    AndroidTools.openWebUri(context, termsUrl)
+                },
+                textDecoration = TextDecoration.Underline,
+            )
+            Text(" • ")
+            SelectionContainer {
+                Text(
+                    supportEmail,
+                    Modifier.clickable(enabled = emailClickEnabled) {
+                        AndroidTools.composeEmail(context, supportEmail)
+                    },
+                    textDecoration = if (emailClickEnabled) TextDecoration.Underline else null,
                 )
-            ) {
-                append(stringResource(R.string.billing_terms_of_service))
             }
-            append(" • ")
-            withLink(
-                LinkAnnotation.Url(
-                    "mailto:" + stringResource(R.string.about_support_email),
-                    TextLinkStyles(SpanStyle(textDecoration = TextDecoration.Underline)),
+            if (BuildConfig.DEBUG) {
+                Text(" • ")
+                Text(
+                    stringResource(R.string.billing_consume_purchases),
+                    Modifier.clickable {
+                        onConsumePurchases()
+                    },
+                    textDecoration = TextDecoration.Underline,
                 )
-            ) {
-                append(stringResource(R.string.billing_support_email))
             }
-        },
-        Modifier
-            .fillMaxWidth()
-            .padding(horizontal = LocalSpacing.current.windowPadding),
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        style = MaterialTheme.typography.bodySmall,
-    )
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -420,6 +432,7 @@ private fun BillingSupportingPane(
     billingStatus: BillingStatus,
     innerPadding: PaddingValues,
     bottomCorners: Boolean,
+    onConsumePurchases: () -> Unit,
     onLaunchBillingFlow: (offerToken: String) -> Unit,
     onManageBillingProduct: (product: BillingProduct) -> Unit,
 ) {
@@ -436,7 +449,7 @@ private fun BillingSupportingPane(
     var selectedOffer by remember(sortedBillingOffers) { mutableStateOf(sortedBillingOffers.firstOrNull()) }
 
     when (billingStatus) {
-        is BillingStatus.NotPurchased if sortedBillingOffers.isNotEmpty() -> {
+        is BillingStatus.Pending, is BillingStatus.NotPurchased -> if (sortedBillingOffers.isNotEmpty()) {
             ScaffoldAction(
                 innerPadding = innerPadding,
                 bottomCorners = bottomCorners,
@@ -500,11 +513,9 @@ private fun BillingSupportingPane(
                         onLaunchBillingFlow(selectedOffer.token)
                     }
                 }
-                BillingLegalText()
+                BillingLegalText(onConsumePurchases)
             }
         }
-
-        is BillingStatus.NotPurchased -> {}
 
         is BillingStatus.Purchased -> {
             when (billingStatus.product.type) {
@@ -517,8 +528,7 @@ private fun BillingSupportingPane(
                     ) {
                         Text(
                             stringResource(
-                                R.string.billing_refund_description,
-                                billingRefundableDuration.toInt(DurationUnit.HOURS)
+                                R.string.billing_refund_description, billingRefundableDuration.toInt(DurationUnit.HOURS)
                             ),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             style = MaterialTheme.typography.bodyMedium,
@@ -529,7 +539,7 @@ private fun BillingSupportingPane(
                         ) {
                             onManageBillingProduct(billingStatus.product)
                         }
-                        BillingLegalText()
+                        BillingLegalText(onConsumePurchases)
                     }
                 }
 
@@ -549,7 +559,7 @@ private fun BillingSupportingPane(
                         ) {
                             onManageBillingProduct(billingStatus.product)
                         }
-                        BillingLegalText()
+                        BillingLegalText(onConsumePurchases)
                     }
                 }
             }
@@ -571,9 +581,10 @@ private fun DefaultPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(pending = false),
+            billingStatus = BillingStatus.NotPurchased(),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -591,9 +602,10 @@ private fun DarkPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(pending = false),
+            billingStatus = BillingStatus.NotPurchased(),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -611,9 +623,10 @@ private fun TabletPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(pending = false),
+            billingStatus = BillingStatus.NotPurchased(),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -631,9 +644,10 @@ private fun PendingPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(pending = true),
+            billingStatus = BillingStatus.Pending(),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -651,9 +665,10 @@ private fun DarkPendingPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(pending = true),
+            billingStatus = BillingStatus.Pending(),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -671,9 +686,10 @@ private fun TabletPendingPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(pending = true),
+            billingStatus = BillingStatus.Pending(),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -695,9 +711,11 @@ private fun PurchasedDonationPreview() {
                 BillingProduct("test", BillingProduct.Type.DONATION),
                 expired = false,
                 refundable = true,
+                token = "test_purchased",
             ),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -719,9 +737,11 @@ private fun DarkPurchasedDonationPreview() {
                 BillingProduct("test", BillingProduct.Type.DONATION),
                 expired = false,
                 refundable = true,
+                token = "test_purchased",
             ),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -743,9 +763,11 @@ private fun TabletPurchasedDonationPreview() {
                 BillingProduct("test", BillingProduct.Type.DONATION),
                 expired = false,
                 refundable = true,
+                token = "test_purchased",
             ),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -767,9 +789,11 @@ private fun PurchasedOneTimePreview() {
                 BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 expired = false,
                 refundable = true,
+                token = "test_purchased",
             ),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -791,9 +815,11 @@ private fun DarkPurchasedOneTimePreview() {
                 BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 expired = false,
                 refundable = true,
+                token = "test_purchased",
             ),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -815,9 +841,11 @@ private fun TabletPurchasedOneTimePreview() {
                 BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 expired = false,
                 refundable = true,
+                token = "test_purchased",
             ),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -839,9 +867,11 @@ private fun PurchasedOneTimeNotRefundablePreview() {
                 BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 expired = false,
                 refundable = true,
+                token = "test_purchased",
             ),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -863,9 +893,11 @@ private fun DarkPurchasedOneTimeNotRefundablePreview() {
                 BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 expired = false,
                 refundable = true,
+                token = "test_purchased",
             ),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -887,9 +919,11 @@ private fun TabletPurchasedOneTimeNotRefundablePreview() {
                 BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 expired = false,
                 refundable = true,
+                token = "test_purchased",
             ),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -911,9 +945,11 @@ private fun PurchasedSubscriptionPreview() {
                 BillingProduct("test", BillingProduct.Type.SUBSCRIPTION),
                 expired = false,
                 refundable = true,
+                token = "test_purchased",
             ),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -935,9 +971,11 @@ private fun DarkPurchasedSubscriptionPreview() {
                 BillingProduct("test", BillingProduct.Type.SUBSCRIPTION),
                 expired = false,
                 refundable = true,
+                token = "test_purchased",
             ),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -959,9 +997,11 @@ private fun TabletPurchasedSubscriptionPreview() {
                 BillingProduct("test", BillingProduct.Type.SUBSCRIPTION),
                 expired = false,
                 refundable = true,
+                token = "test_purchased",
             ),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -983,9 +1023,11 @@ private fun PurchasedSubscriptionExpiredPreview() {
                 BillingProduct("test", BillingProduct.Type.SUBSCRIPTION),
                 expired = true,
                 refundable = true,
+                token = "test_purchased",
             ),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -1007,9 +1049,11 @@ private fun DarkPurchasedSubscriptionExpiredPreview() {
                 BillingProduct("test", BillingProduct.Type.SUBSCRIPTION),
                 expired = true,
                 refundable = true,
+                token = "test_purchased",
             ),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -1031,9 +1075,11 @@ private fun TabletPurchasedSubscriptionExpiredPreview() {
                 BillingProduct("test", BillingProduct.Type.SUBSCRIPTION),
                 expired = true,
                 refundable = true,
+                token = "test_purchased",
             ),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -1051,9 +1097,10 @@ private fun EmptyPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf()),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(pending = false),
+            billingStatus = BillingStatus.NotPurchased(),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -1071,9 +1118,10 @@ private fun DarkEmptyPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf()),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(pending = false),
+            billingStatus = BillingStatus.NotPurchased(),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -1091,9 +1139,10 @@ private fun TabletEmptyPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf()),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(pending = false),
+            billingStatus = BillingStatus.NotPurchased(),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -1114,6 +1163,7 @@ private fun LoadingPreview() {
             billingStatus = BillingStatus.Loading(),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -1134,6 +1184,7 @@ private fun DarkLoadingPreview() {
             billingStatus = BillingStatus.Loading(),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -1154,6 +1205,7 @@ private fun TabletLoadingPreview() {
             billingStatus = BillingStatus.Loading(),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -1171,9 +1223,10 @@ private fun LoadingOffersPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Loading(),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(pending = false),
+            billingStatus = BillingStatus.NotPurchased(),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -1191,9 +1244,10 @@ private fun DarkLoadingOffersPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Loading(),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(pending = false),
+            billingStatus = BillingStatus.NotPurchased(),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},
@@ -1211,9 +1265,10 @@ private fun TabletLoadingOffersPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Loading(),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(pending = false),
+            billingStatus = BillingStatus.NotPurchased(),
             animationsEnabled = false,
             onBack = {},
+            onConsumePurchases = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},

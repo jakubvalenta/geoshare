@@ -253,6 +253,15 @@ object AndroidTools {
     fun openWebUri(context: Context, uriString: String): Boolean =
         startActivity(context, Intent(Intent.ACTION_VIEW, uriString.toUri()))
 
+    private fun createEmailIntent(address: String): Intent =
+        Intent(Intent.ACTION_SENDTO, "mailto:$address".toUri())
+
+    fun composeEmail(context: Context, address: String): Boolean =
+        startActivity(context, createEmailIntent(address))
+
+    fun hasEmailApp(context: Context): Boolean =
+        createEmailIntent("").resolveActivity(context.packageManager) != null
+
     fun hasLocationPermission(context: Context): Boolean =
         context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
             context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED

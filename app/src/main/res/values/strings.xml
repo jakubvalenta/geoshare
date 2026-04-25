@@ -2,17 +2,15 @@
     <string name="app_name" translatable="false">GeoShare</string>
     <string name="app_name_pro" translatable="false">GeoShare Pro</string>
     <string name="not_available">Not available</string>
+    <string name="billing_consume_purchases" translatable="false">consume purchases</string>
     <string name="billing_feature_all" translatable="false">All features of the basic version</string>
-    <string name="billing_feature_automation_description" translatable="false">Save time by performing an action automatically when a map link is converted to coordinates. You can:</string>
-    <string name="billing_feature_automation_item_copy" translatable="false">Copy to clipboard</string>
-    <string name="billing_feature_automation_item_navigate" translatable="false">Launch navigation in TomTom, Waze, MagicEarth…</string>
-    <string name="billing_feature_automation_item_open_app" translatable="false">Show map</string>
+    <string name="billing_feature_automation_description" translatable="false">Save time by performing an action automatically when a map link is converted to coordinates: open map app, launch navigation (TomTom, Waze, etc.), copy to clipboard, save GPX.</string>
     <string name="billing_feature_custom_link" translatable="false">Custom web maps</string>
     <string name="billing_feature_custom_link_description" translatable="false">Open a location in your favorite (or private) web map.</string>
     <string name="billing_intro_not_purchased" translatable="false">Upgrade to</string>
     <string name="billing_intro_purchased" translatable="false">You have</string>
     <string name="billing_manage_subscription" translatable="false">Manage your subscription</string>
-    <string name="billing_manage_subscription_description" translatable="false">Cancel, pause, or change payment method:</string>
+    <string name="billing_manage_subscription_description" translatable="false">Cancel, pause, or change payment method</string>
     <string name="billing_manage_error" translatable="false">Failed to open Google Play</string>
     <string name="billing_offers_empty" translatable="false">%1$s is not available in your region</string>
     <string name="billing_offers_error" translatable="false">Failed to fetch offers</string>
@@ -24,14 +22,13 @@
     <string name="billing_purchase_error_cancelled" translatable="false">Purchase cancelled</string>
     <string name="billing_purchase_error_unknown" translatable="false">Failed to make the purchase</string>
     <string name="billing_purchase_success" translatable="false">Thanks for buying %1$s</string>
-    <string name="billing_refund_description" translatable="false">Refund within 48h since the purchase:</string>
+    <string name="billing_refund_description" translatable="false">Refund within 48h since the purchase</string>
     <string name="billing_setup_error_unknown" translatable="false">Failed to fetch purchases</string>
     <string name="billing_status_expired" translatable="false">Your subscription expires soon</string>
     <string name="billing_status_pending" translatable="false">Your payment is pending</string>
     <string name="billing_subscription_cancel_description" translatable="false">Cancel anytime</string>
     <string name="billing_subscription_monthly" translatable="false">Monthly subscription</string>
-    <string name="billing_terms_of_service" translatable="false">Terms of service</string>
-    <string name="billing_support_email" translatable="false">Support email</string>
+    <string name="billing_terms_of_service" translatable="false">terms of service</string>
     <string name="conversion_succeeded_check_experimental">Location might be inaccurate due to an experimental extraction method.</string>
     <string name="conversion_succeeded_check_map_center">Location might be a map center, not a pin.</string>
     <string name="conversion_succeeded_check_srs">Location might be inaccurate due to coordinate system conversion.</string>
@@ -223,7 +220,7 @@
     <string name="user_preferences_automation_title">Automation</string>
     <string name="user_preferences_automation_delay_sec_title">Automation delay</string>
     <string name="user_preferences_automation_delay_sec_description">Set how long the app waits before launching an automated action (e.g. before automatically opening a map app).</string>
-    <string name="user_preferences_billing_cached_product_id" translatable="false">Cached product id</string>
+    <string name="user_preferences_billing_cached_purchase" translatable="false">Cached purchase</string>
     <string name="user_preferences_connection_description">To support short links and links that don’t contain geographic coordinates in the URL, %1$s can connect to the map service (Google Maps, Apple Maps, etc.).</string>
     <string name="user_preferences_connection_option_always">Allow</string>
     <string name="user_preferences_connection_option_ask">Ask before connecting</string>
@@ -238,7 +235,6 @@
     <string name="user_preferences_changelog_shown_for_version_code_title" translatable="false">For which version of the app was changelog last shown?</string>
     <string name="user_preferences_number_error_range" tools:ignore="PluralsCandidate">Value must be between %1$d and %2$d</string>
     <string name="conversion_failed_missing_url">Missing URL</string>
-    <string name="conversion_failed_unshorten_error">Failed to resolve short link</string>
     <string name="conversion_failed_unshorten_error_with_reason">Failed to resolve short link due to: %1$s</string>
     <string name="conversion_failed_parse_url_error">Failed to process map link</string>
     <string name="conversion_failed_reason_invalid_url">invalid URL</string>
@@ -248,7 +244,6 @@
     <string name="conversion_succeeded_apps_not_found">No map app is installed</string>
     <string name="copying_finished">Copied to clipboard</string>
     <string name="conversion_failed_connection_permission_denied">This link is not supported without connecting to the map service</string>
-    <string name="conversion_failed_parse_html_error">Failed to fetch web page from the map service</string>
     <string name="conversion_failed_parse_html_error_with_reason">Failed to process web page due to: %1$s</string>
     <string name="conversion_failed_unsupported_service">Unsupported map service</string>
     <string name="conversion_failed_cancelled">Cancelled</string>

@@ -33,7 +33,8 @@ import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
 import page.ooooo.geoshare.data.local.preferences.AutomationPreference
-import page.ooooo.geoshare.data.local.preferences.BillingCachedProductIdPreference
+import page.ooooo.geoshare.data.local.preferences.CachedPurchase
+import page.ooooo.geoshare.data.local.preferences.CachedPurchasePreference
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
@@ -2681,7 +2682,7 @@ class ConversionStateTest {
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(AutomationPreference) } doReturn automation
-            on { setValue(eq(BillingCachedProductIdPreference), any()) } doReturn Unit
+            on { setValue(eq(CachedPurchasePreference), any()) } doReturn Unit
         }
         val stateContext = mockStateContext(
             userPreferencesRepository = mockUserPreferencesRepository,
@@ -2690,7 +2691,7 @@ class ConversionStateTest {
         val state = ConversionSucceeded(stateContext, inputUriString, points)
         assertNull(state.transition())
         verify(mockUserPreferencesRepository, never()).setValue(
-            eq(BillingCachedProductIdPreference),
+            eq(CachedPurchasePreference),
             any(),
         )
     }
@@ -2707,8 +2708,9 @@ class ConversionStateTest {
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(AutomationPreference) } doReturn automation
-            on { getValue(BillingCachedProductIdPreference) } doReturn "spam"
-            on { setValue(eq(BillingCachedProductIdPreference), any()) } doReturn Unit
+            on { getValue(CachedPurchasePreference) } doReturn
+                CachedPurchase(productId = "spam", token = "spam_purchased")
+            on { setValue(eq(CachedPurchasePreference), any()) } doReturn Unit
         }
         val stateContext = mockStateContext(
             userPreferencesRepository = mockUserPreferencesRepository,
@@ -2717,7 +2719,7 @@ class ConversionStateTest {
         val state = ConversionSucceeded(stateContext, inputUriString, points)
         assertNull(state.transition())
         verify(mockUserPreferencesRepository, never()).setValue(
-            eq(BillingCachedProductIdPreference),
+            eq(CachedPurchasePreference),
             any(),
         )
     }
@@ -2735,8 +2737,9 @@ class ConversionStateTest {
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(AutomationPreference) } doReturn automation
-            on { getValue(BillingCachedProductIdPreference) } doReturn "test"
-            on { setValue(eq(BillingCachedProductIdPreference), any()) } doReturn Unit
+            on { getValue(CachedPurchasePreference) } doReturn
+                CachedPurchase(productId = "test", token = "test_purchased")
+            on { setValue(eq(CachedPurchasePreference), any()) } doReturn Unit
         }
         val stateContext = mockStateContext(
             userPreferencesRepository = mockUserPreferencesRepository,
@@ -2748,7 +2751,7 @@ class ConversionStateTest {
             state.transition(),
         )
         verify(mockUserPreferencesRepository, never()).setValue(
-            eq(BillingCachedProductIdPreference),
+            eq(CachedPurchasePreference),
             any(),
         )
     }
@@ -2764,6 +2767,7 @@ class ConversionStateTest {
                     product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                     expired = false,
                     refundable = true,
+                    token = "test_purchased",
                 )
             )
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
@@ -2771,7 +2775,7 @@ class ConversionStateTest {
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(AutomationPreference) } doReturn automation
-            on { setValue(eq(BillingCachedProductIdPreference), any()) } doReturn Unit
+            on { setValue(eq(CachedPurchasePreference), any()) } doReturn Unit
         }
         val stateContext = mockStateContext(
             userPreferencesRepository = mockUserPreferencesRepository,
@@ -2780,8 +2784,8 @@ class ConversionStateTest {
         val state = ConversionSucceeded(stateContext, inputUriString, points)
         assertNull(state.transition())
         verify(mockUserPreferencesRepository).setValue(
-            BillingCachedProductIdPreference,
-            "test",
+            CachedPurchasePreference,
+            CachedPurchase(productId = "test", token = "test_purchased"),
         )
     }
 
@@ -2797,6 +2801,7 @@ class ConversionStateTest {
                     product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                     expired = false,
                     refundable = true,
+                    token = "test_purchased",
                 )
             )
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
@@ -2815,8 +2820,8 @@ class ConversionStateTest {
             state.transition(),
         )
         verify(mockUserPreferencesRepository).setValue(
-            BillingCachedProductIdPreference,
-            "test",
+            CachedPurchasePreference,
+            CachedPurchase(productId = "test", token = "test_purchased"),
         )
     }
 
@@ -2849,6 +2854,7 @@ class ConversionStateTest {
             product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
             expired = false,
             refundable = true,
+            token = "test_purchased",
         )
         advanceUntilIdle()
         assertEquals(
@@ -2856,8 +2862,8 @@ class ConversionStateTest {
             res,
         )
         verify(mockUserPreferencesRepository).setValue(
-            BillingCachedProductIdPreference,
-            "test",
+            CachedPurchasePreference,
+            CachedPurchase(productId = "test", token = "test_purchased"),
         )
     }
 
@@ -2866,7 +2872,7 @@ class ConversionStateTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val automation = CopyCoordsDecAutomation
-        val mockStatus = MutableStateFlow<BillingStatus>(BillingStatus.NotPurchased(pending = false))
+        val mockStatus = MutableStateFlow<BillingStatus>(BillingStatus.NotPurchased())
         val mockBilling: Billing = mock {
             on { status } doReturn mockStatus
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
@@ -2889,11 +2895,12 @@ class ConversionStateTest {
             product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
             expired = false,
             refundable = true,
+            token = "test_purchased",
         )
         advanceUntilIdle()
         assertNull(res)
         verify(mockUserPreferencesRepository, never()).setValue(
-            eq(BillingCachedProductIdPreference),
+            eq(CachedPurchasePreference),
             any(),
         )
     }
@@ -2926,11 +2933,12 @@ class ConversionStateTest {
             product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
             expired = false,
             refundable = true,
+            token = "test_purchased",
         )
         advanceUntilIdle()
         assertNull(res)
         verify(mockUserPreferencesRepository, never()).setValue(
-            eq(BillingCachedProductIdPreference),
+            eq(CachedPurchasePreference),
             any(),
         )
     }
@@ -2947,6 +2955,7 @@ class ConversionStateTest {
                     product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                     expired = false,
                     refundable = true,
+                    token = "test_purchased",
                 )
             )
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
@@ -2979,6 +2988,7 @@ class ConversionStateTest {
                     product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                     expired = false,
                     refundable = true,
+                    token = "test_purchased",
                 )
             )
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
@@ -3013,6 +3023,7 @@ class ConversionStateTest {
                     product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                     expired = false,
                     refundable = true,
+                    token = "test_purchased",
                 )
             )
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
@@ -3045,6 +3056,7 @@ class ConversionStateTest {
                     product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                     expired = false,
                     refundable = true,
+                    token = "test_purchased",
                 )
             )
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
@@ -3075,6 +3087,7 @@ class ConversionStateTest {
                     product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                     expired = false,
                     refundable = true,
+                    token = "test_purchased",
                 )
             )
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
@@ -3108,6 +3121,7 @@ class ConversionStateTest {
                     product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                     expired = false,
                     refundable = true,
+                    token = "test_purchased",
                 )
             )
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
