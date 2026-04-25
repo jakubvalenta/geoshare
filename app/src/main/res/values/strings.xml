@@ -4,10 +4,7 @@
     <string name="not_available">Not available</string>
     <string name="billing_consume_purchases" translatable="false">consume purchases</string>
     <string name="billing_feature_all" translatable="false">All features of the basic version</string>
-    <string name="billing_feature_automation_description" translatable="false">Save time by performing an action automatically when a map link is converted to coordinates. You can:</string>
-    <string name="billing_feature_automation_item_copy" translatable="false">Copy to clipboard</string>
-    <string name="billing_feature_automation_item_navigate" translatable="false">Launch navigation in TomTom, Waze, MagicEarth…</string>
-    <string name="billing_feature_automation_item_open_app" translatable="false">Show map</string>
+    <string name="billing_feature_automation_description" translatable="false">Save time by performing an action automatically when a map link is converted to coordinates: open map app, launch navigation (TomTom, Waze, etc.), copy to clipboard, save GPX.</string>
     <string name="billing_feature_custom_link" translatable="false">Custom web maps</string>
     <string name="billing_feature_custom_link_description" translatable="false">Open a location in your favorite (or private) web map.</string>
     <string name="billing_intro_not_purchased" translatable="false">Upgrade to</string>

@@ -77,7 +77,6 @@ import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
 import page.ooooo.geoshare.ui.components.ScaffoldAction
 import page.ooooo.geoshare.ui.components.SegmentedList
 import page.ooooo.geoshare.ui.components.TextList
-import page.ooooo.geoshare.ui.components.TextListBullet
 import page.ooooo.geoshare.ui.components.TextListItem
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -347,11 +346,6 @@ private fun BillingMainPane(
                         }
                         TextListItem(Modifier.padding(bottom = spacing.tinyAdaptive)) {
                             Text(stringResource(feature.descriptionResId))
-                        }
-                        feature.itemsResIds.forEach { itemResId ->
-                            TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
-                                Text(stringResource(itemResId))
-                            }
                         }
                     }
                 }
