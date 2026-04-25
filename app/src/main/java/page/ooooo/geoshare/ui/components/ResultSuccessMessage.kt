@@ -221,7 +221,7 @@ private fun DefaultResultMessageRow(
             style = MaterialTheme.typography.headlineSmall,
         )
         FeatureBadged(
-            enabled = billingStatus is BillingStatus.NotPurchased && AutomationFeature in billingFeatures,
+            enabled = AutomationFeature in billingFeatures && billingStatus !is BillingStatus.Loading && billingStatus !is BillingStatus.Purchased,
             badge = { modifier ->
                 FeatureBadgeSmall(
                     onNavigateToUserPreferencesAutomationScreen,

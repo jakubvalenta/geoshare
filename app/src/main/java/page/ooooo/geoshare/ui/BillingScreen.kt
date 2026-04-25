@@ -226,7 +226,9 @@ private fun BillingMainPane(
     AnimatedMessage(
         state = billingStatus,
         isMessageShown = { billingStatus ->
-            billingStatus is BillingStatus.Purchased || billingStatus is BillingStatus.Pending || billingStatus is BillingStatus.NotPurchased && (billingOffers as? BillingOffers.Done)?.offers?.isEmpty() == true
+            billingStatus is BillingStatus.Purchased ||
+                billingStatus is BillingStatus.Pending ||
+                billingStatus is BillingStatus.NotPurchased && (billingOffers as? BillingOffers.Done)?.offers?.isEmpty() == true
         },
         animationsEnabled = animationsEnabled,
     ) { billingStatus ->

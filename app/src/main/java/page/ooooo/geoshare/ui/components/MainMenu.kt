@@ -56,7 +56,7 @@ fun MainMenu(
     val spacing = LocalSpacing.current
     var expanded by retain { mutableStateOf(false) }
 
-    if (currentState is Initial && billingStatus is BillingStatus.NotPurchased) {
+    if (currentState is Initial && billingStatus !is BillingStatus.Loading && billingStatus !is BillingStatus.Purchased) {
         FeatureBadgeSmall(
             onClick = onNavigateToBillingScreen,
             modifier = Modifier.testTag("geoShareMainBillingIcon"),
@@ -136,6 +136,7 @@ fun MainMenu(
                 },
             )
             if (
+                billingStatus is BillingStatus.Pending ||
                 billingStatus is BillingStatus.NotPurchased ||
                 billingStatus is BillingStatus.Purchased && billingStatus.product.type != BillingProduct.Type.DONATION
             ) {

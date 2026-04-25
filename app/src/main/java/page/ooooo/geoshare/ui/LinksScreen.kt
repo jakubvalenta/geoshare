@@ -315,7 +315,7 @@ private fun LinksListPane(
         }
         item {
             FeatureBadged(
-                enabled = billingStatus is BillingStatus.NotPurchased && CustomLinkFeature in billingFeatures,
+                enabled = CustomLinkFeature in billingFeatures && billingStatus !is BillingStatus.Loading && billingStatus !is BillingStatus.Purchased,
                 badge = { modifier ->
                     FeatureBadgeSmall(
                         { onNavigateToContentKey(-1) },
@@ -489,12 +489,12 @@ private fun LinksDetailPane(
                         modifier = Modifier
                             .width(600.dp)
                             .padding(top = spacing.smallAdaptive, bottom = spacing.tinyAdaptive),
-                        enabled = billingStatus is BillingStatus.Purchased && CustomLinkFeature in billingFeatures,
+                        enabled = CustomLinkFeature in billingFeatures && billingStatus is BillingStatus.Purchased,
                     )
                 }
             }
         }
-        if (billingStatus is BillingStatus.NotPurchased && CustomLinkFeature in billingFeatures) {
+        if (CustomLinkFeature in billingFeatures && billingStatus !is BillingStatus.Loading && billingStatus !is BillingStatus.Purchased) {
             FeatureWall(
                 billingAppNameResId = billingAppNameResId,
                 modifier = Modifier.testTag("geoShareCustomLinkFeatureWall"),

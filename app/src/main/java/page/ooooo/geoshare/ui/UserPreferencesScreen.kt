@@ -330,7 +330,7 @@ private fun UserPreferencesListPane(
                     UserPreferencesGroup(
                         id = UserPreferencesGroupId.AUTOMATION,
                         headline = { stringResource(R.string.user_preferences_automation_title) },
-                        trailingContent = if (billingStatus is BillingStatus.NotPurchased && AutomationFeature in billingFeatures) {
+                        trailingContent = if (AutomationFeature in billingFeatures && billingStatus !is BillingStatus.Loading && billingStatus !is BillingStatus.Purchased) {
                             {
                                 FeatureBadgeSmall(onClick = { onNavigateToGroup(UserPreferencesGroupId.AUTOMATION) })
                             }
@@ -551,7 +551,7 @@ private fun UserPreferencesDetailPane(
                 description = {
                     stringResource(R.string.user_preferences_automation_description)
                 },
-                featureNotPurchased = billingStatus is BillingStatus.NotPurchased && AutomationFeature in billingFeatures,
+                featureNotPurchased = AutomationFeature in billingFeatures && billingStatus !is BillingStatus.Loading && billingStatus !is BillingStatus.Purchased,
                 onBack = onBack,
                 onNavigateToBillingScreen = onNavigateToBillingScreen,
             ) {
@@ -564,7 +564,7 @@ private fun UserPreferencesDetailPane(
                         links,
                     ),
                     values = values,
-                    enabled = billingStatus is BillingStatus.Purchased && AutomationFeature in billingFeatures,
+                    enabled = AutomationFeature in billingFeatures && billingStatus is BillingStatus.Purchased,
                     getItemTestTag = { option ->
                         try {
                             Json.encodeToString(option)
@@ -592,7 +592,7 @@ private fun UserPreferencesDetailPane(
                 description = {
                     stringResource(R.string.user_preferences_automation_delay_sec_description)
                 },
-                featureNotPurchased = billingStatus is BillingStatus.NotPurchased && AutomationFeature in billingFeatures,
+                featureNotPurchased = AutomationFeature in billingFeatures && billingStatus !is BillingStatus.Loading && billingStatus !is BillingStatus.Purchased,
                 onBack = onBack,
                 onNavigateToBillingScreen = onNavigateToBillingScreen,
             ) {
