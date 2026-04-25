@@ -3,7 +3,9 @@ package page.ooooo.geoshare.ui
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.res.Configuration
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -22,6 +25,7 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LoadingIndicator
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
@@ -43,14 +47,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.LinkAnnotation
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextLinkStyles
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -385,49 +384,47 @@ private fun BillingStatusCard(text: String, modifier: Modifier = Modifier) {
 @Composable
 private fun BillingLegalText(onConsumePurchases: () -> Unit) {
     val context = LocalContext.current
-    val address = stringResource(R.string.about_support_email)
+    val supportEmail = stringResource(R.string.about_support_email)
+    val termsUrl = stringResource(R.string.about_terms_url)
 
-    Text(
-        buildAnnotatedString {
-            withLink(
-                LinkAnnotation.Url(
-                    stringResource(R.string.about_terms_url),
-                    TextLinkStyles(SpanStyle(textDecoration = TextDecoration.Underline)),
+    CompositionLocalProvider(
+        LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant,
+        LocalTextStyle provides MaterialTheme.typography.bodySmall,
+    ) {
+        FlowRow(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = LocalSpacing.current.windowPadding),
+        ) {
+            Text(
+                stringResource(R.string.billing_terms_of_service),
+                Modifier.clickable {
+                    AndroidTools.openWebUri(context, termsUrl)
+                },
+                textDecoration = TextDecoration.Underline,
+            )
+            Text(" • ")
+            SelectionContainer {
+                Text(
+                    supportEmail,
+                    Modifier.clickable {
+                        AndroidTools.composeEmail(context, supportEmail)
+                    },
+                    textDecoration = TextDecoration.Underline,
                 )
-            ) {
-                append(stringResource(R.string.billing_terms_of_service))
-            }
-            append(" • ")
-            withLink(
-                LinkAnnotation.Clickable(
-                    "supportEmail",
-                    TextLinkStyles(SpanStyle(textDecoration = TextDecoration.Underline)),
-                ) {
-                    AndroidTools.composeEmail(context, address)
-                }
-            ) {
-                append(stringResource(R.string.billing_support_email))
             }
             if (BuildConfig.DEBUG) {
-                append(" • ")
-                withLink(
-                    LinkAnnotation.Clickable(
-                        "consumePurchases",
-                        TextLinkStyles(SpanStyle(textDecoration = TextDecoration.Underline)),
-                    ) {
+                Text(" • ")
+                Text(
+                    stringResource(R.string.billing_consume_purchases),
+                    Modifier.clickable {
                         onConsumePurchases()
-                    }
-                ) {
-                    append(stringResource(R.string.billing_consume_purchases))
-                }
+                    },
+                    textDecoration = TextDecoration.Underline,
+                )
             }
-        },
-        Modifier
-            .fillMaxWidth()
-            .padding(horizontal = LocalSpacing.current.windowPadding),
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        style = MaterialTheme.typography.bodySmall,
-    )
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)

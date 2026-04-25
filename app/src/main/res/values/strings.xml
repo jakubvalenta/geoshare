@@ -2,7 +2,7 @@
     <string name="app_name" translatable="false">GeoShare</string>
     <string name="app_name_pro" translatable="false">GeoShare Pro</string>
     <string name="not_available">Not available</string>
-    <string name="billing_consume_purchases" translatable="false">Consume purchases</string>
+    <string name="billing_consume_purchases" translatable="false">consume purchases</string>
     <string name="billing_feature_all" translatable="false">All features of the basic version</string>
     <string name="billing_feature_automation_description" translatable="false">Save time by performing an action automatically when a map link is converted to coordinates. You can:</string>
     <string name="billing_feature_automation_item_copy" translatable="false">Copy to clipboard</string>
@@ -31,8 +31,7 @@
     <string name="billing_status_pending" translatable="false">Your payment is pending</string>
     <string name="billing_subscription_cancel_description" translatable="false">Cancel anytime</string>
     <string name="billing_subscription_monthly" translatable="false">Monthly subscription</string>
-    <string name="billing_terms_of_service" translatable="false">Terms of service</string>
-    <string name="billing_support_email" translatable="false">Support email</string>
+    <string name="billing_terms_of_service" translatable="false">terms of service</string>
     <string name="conversion_succeeded_check_experimental">Location might be inaccurate due to an experimental extraction method.</string>
     <string name="conversion_succeeded_check_map_center">Location might be a map center, not a pin.</string>
     <string name="conversion_succeeded_check_srs">Location might be inaccurate due to coordinate system conversion.</string>
