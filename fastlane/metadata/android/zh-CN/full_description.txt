@@ -7,6 +7,7 @@
 - 2GIS
 - 高德地图
 - 百度地图（测试）
+- Cartes IGN
 - CoMaps
 - HERE WeGo
 - Magic Earth
@@ -15,6 +16,7 @@
 - OpenStreetMap
 - Organic Maps
 - OsmAnd
+- Plus Codes（仅限全球）
 - Urbi
 - Waze
 - Yandex Maps
