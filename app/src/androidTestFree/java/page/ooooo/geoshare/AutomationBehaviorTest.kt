@@ -143,7 +143,10 @@ class AutomationBehaviorTest : BehaviorTest {
         goToUserPreferencesList()
         goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
         val automation = SavePointsGpxAutomation
-        onElement { viewIdResourceName == "geoShareUserPreferenceAutomation_${Json.encodeToString<Automation>(automation)}" }.click()
+        val serializedString = Json.encodeToString<Automation>(automation)
+        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceAutomation_${serializedString}" }
+            .click()
 
         // Share a geo: URI with the app
         shareUri("geo:52.47254,13.4345")
