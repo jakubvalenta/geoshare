@@ -162,7 +162,7 @@ data class GrantedUnshortenPermission(
     override suspend fun transition(): State {
         val url = uri.toUrl()
         if (url == null) {
-            stateContext.log.e(null, "Unshorten: Failed to get URL for $uri")
+            stateContext.log.e(ConversionState.TAG, "Unshorten: Failed to get URL for $uri")
             return ConversionFailed(
                 stateContext.resources.getString(
                     R.string.conversion_failed_unshorten_error_with_reason,
@@ -178,10 +178,10 @@ data class GrantedUnshortenPermission(
             }
             if (unshortenedUrlString != null) {
                 val unshortenedUri = Uri.parse(unshortenedUrlString, stateContext.uriQuote).toAbsoluteUri(uri)
-                stateContext.log.i(null, "Unshorten: Resolved short URI $uri to $unshortenedUri")
+                stateContext.log.i(ConversionState.TAG, "Unshorten: Resolved short URI $uri to $unshortenedUri")
                 UnshortenedUrl(stateContext, inputUriString, input, unshortenedUri, Permission.ALWAYS)
             } else {
-                stateContext.log.w(null, "Unshorten: Missing location header for $url")
+                stateContext.log.w(ConversionState.TAG, "Unshorten: Missing location header for $url")
                 ConversionFailed(
                     stateContext.resources.getString(
                         R.string.conversion_failed_unshorten_error_with_reason,
@@ -247,7 +247,7 @@ data class UnshortenedUrl(
     override suspend fun transition(): State =
         withContext(dispatcher) { input.parseUri(uri, stateContext.uriQuote) }.run {
             if (points.lastOrNull()?.hasCoordinates() == true) {
-                stateContext.log.i(null, "URI Pattern: Converted $uri to $points")
+                stateContext.log.i(ConversionState.TAG, "URI Pattern: Converted $uri to $points")
                 ConversionSucceeded(stateContext, inputUriString, points)
             } else if (htmlUriString != null) {
                 if (input is HtmlInput) {
@@ -264,7 +264,7 @@ data class UnshortenedUrl(
                         Permission.NEVER -> DeniedParseHtmlPermission(stateContext, inputUriString, points)
                     }
                 } else {
-                    stateContext.log.e(null, "URI Pattern: Input doesn't support HTML parsing")
+                    stateContext.log.e(ConversionState.TAG, "URI Pattern: Input doesn't support HTML parsing")
                     DeniedParseHtmlPermission(stateContext, inputUriString, points)
                 }
             } else if (webUriString != null) {
@@ -282,14 +282,14 @@ data class UnshortenedUrl(
                         Permission.NEVER -> DeniedParseHtmlPermission(stateContext, inputUriString, points)
                     }
                 } else {
-                    stateContext.log.e(null, "URI Pattern: Input doesn't support web parsing")
+                    stateContext.log.e(ConversionState.TAG, "URI Pattern: Input doesn't support web parsing")
                     DeniedParseHtmlPermission(stateContext, inputUriString, points)
                 }
             } else if (points.lastOrNull()?.hasName() == true) {
-                stateContext.log.i(null, "URI Pattern: Converted $uri to $points")
+                stateContext.log.i(ConversionState.TAG, "URI Pattern: Converted $uri to $points")
                 ConversionSucceeded(stateContext, inputUriString, points)
             } else {
-                stateContext.log.i(null, "URI Pattern: Failed to parse $uri")
+                stateContext.log.i(ConversionState.TAG, "URI Pattern: Failed to parse $uri")
                 ConversionFailed(
                     stateContext.resources.getString(R.string.conversion_failed_parse_url_error),
                     inputUriString,
@@ -336,7 +336,7 @@ data class GrantedParseHtmlPermission(
     override suspend fun transition(): State {
         val htmlUrl = Uri.parse(htmlUriString, stateContext.uriQuote).toUrl()
         if (htmlUrl == null) {
-            stateContext.log.e(null, "HTML Pattern: Failed to get HTML URL for $uri")
+            stateContext.log.e(ConversionState.TAG, "HTML Pattern: Failed to get HTML URL for $uri")
             return ConversionFailed(
                 stateContext.resources.getString(
                     R.string.conversion_failed_parse_html_error_with_reason,
@@ -345,7 +345,7 @@ data class GrantedParseHtmlPermission(
                 inputUriString
             )
         }
-        stateContext.log.i(null, "HTML Pattern: Downloading $htmlUrl")
+        stateContext.log.i(ConversionState.TAG, "HTML Pattern: Downloading $htmlUrl")
         return try {
             stateContext.networkTools.httpGetBodyAsByteReadChannel(
                 htmlUrl,
@@ -361,25 +361,27 @@ data class GrantedParseHtmlPermission(
                 )
             }.run {
                 if (points.lastOrNull()?.hasCoordinates() == true) {
-                    stateContext.log.i(null, "HTML Pattern: Parsed $htmlUrl to $points")
+                    stateContext.log.i(ConversionState.TAG, "HTML Pattern: Parsed $htmlUrl to $points")
                     ConversionSucceeded(stateContext, inputUriString, points)
                 } else if (redirectUriString != null) {
-                    stateContext.log.i(null, "HTML Pattern: Parsed $htmlUrl to redirect URI $redirectUriString")
+                    stateContext.log.i(
+                        ConversionState.TAG, "HTML Pattern: Parsed $htmlUrl to redirect URI $redirectUriString"
+                    )
                     val redirectUri = Uri.parse(redirectUriString, stateContext.uriQuote).toAbsoluteUri(uri)
                     ReceivedUri(stateContext, inputUriString, input, redirectUri, Permission.ALWAYS)
                 } else if (webUriString != null) {
                     if (input is WebInput) {
-                        stateContext.log.i(null, "HTML Pattern: URI $htmlUrl requires web parsing")
+                        stateContext.log.i(ConversionState.TAG, "HTML Pattern: URI $htmlUrl requires web parsing")
                         GrantedParseWebPermission(stateContext, inputUriString, input, uri, pointsFromUri, webUriString)
                     } else {
-                        stateContext.log.e(null, "HTML Pattern: Input doesn't support web parsing")
+                        stateContext.log.e(ConversionState.TAG, "HTML Pattern: Input doesn't support web parsing")
                         DeniedParseHtmlPermission(stateContext, inputUriString, pointsFromUri)
                     }
                 } else if (points.lastOrNull()?.hasName() == true) {
-                    stateContext.log.i(null, "HTML Pattern: Parsed $htmlUrl to $points")
+                    stateContext.log.i(ConversionState.TAG, "HTML Pattern: Parsed $htmlUrl to $points")
                     ConversionSucceeded(stateContext, inputUriString, points)
                 } else {
-                    stateContext.log.w(null, "HTML Pattern: Failed to parse $htmlUrl")
+                    stateContext.log.w(ConversionState.TAG, "HTML Pattern: Failed to parse $htmlUrl")
                     ConversionFailed(
                         stateContext.resources.getString(
                             R.string.conversion_failed_parse_html_error_with_reason,
@@ -560,7 +562,7 @@ data class ConversionSucceeded(
                             // If billing status appeared within timeout, cache it
                             stateContext.userPreferencesRepository.setValue(
                                 CachedPurchasePreference,
-                                CachedPurchase(productId = it.product.id, token = it.token)
+                                CachedPurchase(productId = it.product.id, token = it.token),
                             )
                             true
                         }
@@ -570,12 +572,14 @@ data class ConversionSucceeded(
                 .first()
         } catch (_: TimeoutCancellationException) {
             // If billing status didn't appear, try to read it from cache
-            stateContext.log.w(null, "Automation: Billing status didn't appear within $billingStatusTimeout")
+            stateContext.log.w(
+                ConversionState.TAG, "Automation: Billing status didn't appear within $billingStatusTimeout"
+            )
             stateContext.userPreferencesRepository.getValue(CachedPurchasePreference)
                 ?.let { cachedPurchase ->
                     stateContext.billing.products.firstOrNull { product -> cachedPurchase.productId == product.id }
                         ?.let { product ->
-                            stateContext.log.w(null, "Automation: Found cached billing status")
+                            stateContext.log.w(ConversionState.TAG, "Automation: Found cached billing status")
                             BillingStatus.Purchased(
                                 product,
                                 expired = false,
@@ -585,7 +589,7 @@ data class ConversionSucceeded(
                         }
                 }
                 ?: run {
-                    stateContext.log.w(null, "Automation: Didn't find cached billing status")
+                    stateContext.log.w(ConversionState.TAG, "Automation: Didn't find cached billing status")
                     BillingStatus.Loading()
                 }
         }
