@@ -290,13 +290,15 @@ object CachedPurchasePreference : TextPreference<CachedPurchase?> {
         }
 
     override fun deserialize(value: String?, log: ILog) =
-        value?.let {
+        if (value != null) {
             try {
-                Json.decodeFromString<CachedPurchase?>(it)
+                Json.decodeFromString<CachedPurchase?>(value)
             } catch (tr: IllegalArgumentException) {
                 log.e(TAG, "Deserialization error", tr)
-                null
+                default
             }
+        } else {
+            default
         }
 
     override fun getValue(values: UserPreferencesValues) = values.cachedPurchase
@@ -321,13 +323,15 @@ interface SetPreference : TextPreference<Set<String>?> {
         }
 
     override fun deserialize(value: String?, log: ILog) =
-        value?.let {
+        if (value != null) {
             try {
-                Json.decodeFromString<Set<String>?>(it)
+                Json.decodeFromString<Set<String>?>(value)
             } catch (tr: IllegalArgumentException) {
                 log.e(TAG, "Deserialization error", tr)
-                null
+                default
             }
+        } else {
+            default
         }
 
     companion object {
