@@ -272,4 +272,5 @@
     <string name="srs_description_mainland_china">China continental</string>
     <string name="srs_description_greater_china_and_taiwan">China e Taiwan geral</string>
     <string name="conversion_succeeded_check_map_center">A localização pode ser um centro de mapa, não um alfinete.</string>
+    <string name="converter_plus_code_name">Códigos Plus</string>
 </resources>

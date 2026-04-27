@@ -7,6 +7,7 @@ Compartilhe um link de mapa com o GeoShare e o app abrirá ele em outro app de m
 - 2GIS
 - Amap (AutoNavi)
 - Baidu Map (beta)
+- Cartes IGN
 - CoMaps
 - HERE WeGo
 - Magic Earth
@@ -15,6 +16,7 @@ Compartilhe um link de mapa com o GeoShare e o app abrirá ele em outro app de m
 - OpenStreetMap
 - Organic Maps
 - OsmAnd
+- Códigos Plus (apenas globais)
 - Urbi
 - Waze
 - Yandex Maps
