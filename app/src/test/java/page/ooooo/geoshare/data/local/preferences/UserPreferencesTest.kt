@@ -48,6 +48,7 @@ class UserPreferencesTest {
                 listOf(
                     OpenDisplayMagicEarthUriAutomation(PackageNames.MAGIC_EARTH),
                     OpenNavigationMagicEarthUriAutomation(PackageNames.MAGIC_EARTH),
+                    SendViaAppAutomation(PackageNames.SIGNAL),
                     OpenRouteOnePointGpxAutomation(PackageNames.TOMTOM),
                     OpenDisplayGeoUriAutomation(PackageNames.TEST),
                 ),
@@ -76,11 +77,13 @@ class UserPreferencesTest {
                 .getOptionGroups(
                     apps = mapOf(
                         PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
+                        PackageNames.SIGNAL to setOf(DataType.SEND_PLAIN_TEXT),
                         PackageNames.TEST to setOf(DataType.GEO_URI),
                         PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
                     ),
                     appDetails = mapOf(
                         PackageNames.MAGIC_EARTH to AppDetail("Magic Earth", mock()),
+                        PackageNames.SIGNAL to AppDetail("Signal", mock()),
                         PackageNames.TEST to AppDetail("ZZZ sort last", mock()),
                         PackageNames.TOMTOM to AppDetail("TomTom", mock()),
                     ),

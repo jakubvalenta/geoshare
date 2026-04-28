@@ -248,6 +248,9 @@ object AutomationPreference : OptionsPreference<Automation> {
                     if (DataType.GPX_ONE_POINT_DATA in dataTypes) {
                         add(OpenRouteOnePointGpxAutomation(packageName))
                     }
+                    if (DataType.SEND_PLAIN_TEXT in dataTypes) {
+                        add(SendViaAppAutomation(packageName))
+                    }
                 }
             }
             .takeIf { it.isNotEmpty() },

@@ -272,7 +272,7 @@ object AndroidTools {
     fun openWebUri(context: Context, uriString: String): Boolean =
         startActivity(context, Intent(Intent.ACTION_VIEW, uriString.toUri()))
 
-    fun sendPlainText(context: Context, packageName: String, text: String): Boolean =
+    fun sendViaApp(context: Context, packageName: String, text: String): Boolean =
         startActivity(context, Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             setPackage(packageName)

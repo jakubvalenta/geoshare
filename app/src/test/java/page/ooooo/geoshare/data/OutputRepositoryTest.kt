@@ -31,6 +31,7 @@ import page.ooooo.geoshare.data.local.preferences.OpenStreetViewGoogleUriAutomat
 import page.ooooo.geoshare.data.local.preferences.SavePointGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.SaveRouteGpxAutomation
+import page.ooooo.geoshare.data.local.preferences.SendViaAppAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareLinkUriAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareNavigationGoogleUriAutomation
@@ -57,6 +58,7 @@ import page.ooooo.geoshare.lib.outputs.OpenStreetViewGoogleUriOutput
 import page.ooooo.geoshare.lib.outputs.SavePointGpxOutput
 import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
 import page.ooooo.geoshare.lib.outputs.SaveRouteGpxOutput
+import page.ooooo.geoshare.lib.outputs.SendViaAppOutput
 import page.ooooo.geoshare.lib.outputs.ShareDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.ShareLinkUriOutput
 import page.ooooo.geoshare.lib.outputs.ShareNavigationGoogleUriOutput
@@ -126,6 +128,9 @@ class OutputRepositoryTest {
                     OpenDisplayMagicEarthUriOutput(PackageNames.MAGIC_EARTH, coordinateConverter),
                     OpenNavigationMagicEarthUriOutput(PackageNames.MAGIC_EARTH, coordinateConverter),
                 ),
+                PackageNames.SIGNAL to listOf(
+                    SendViaAppOutput(PackageNames.SIGNAL, coordinateConverter),
+                ),
                 PackageNames.TOMTOM to listOf(
                     OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter),
                 ),
@@ -141,6 +146,7 @@ class OutputRepositoryTest {
                         DataType.GPX_DATA,
                     ),
                     PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
+                    PackageNames.SIGNAL to setOf(DataType.SEND_PLAIN_TEXT),
                     PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
                     "${PackageNames.TEST}.empty" to emptySet(),
                 ),
@@ -176,7 +182,7 @@ class OutputRepositoryTest {
     }
 
     @Test
-    fun getOutputsForSharing_returnsOutputsThatSupportHardCodedDataTypes() {
+    fun getOutputsForSharing_returnsHardCodedOutputs() {
         assertEquals(
             listOf(
                 ShareDisplayGeoUriOutput(coordinateConverter),
@@ -316,6 +322,7 @@ class OutputRepositoryTest {
                 listOf(
                     OpenDisplayMagicEarthUriOutput(PackageNames.MAGIC_EARTH, coordinateConverter),
                     OpenNavigationMagicEarthUriOutput(PackageNames.MAGIC_EARTH, coordinateConverter),
+                    SendViaAppOutput(PackageNames.SIGNAL, coordinateConverter),
                     OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter),
                     OpenDisplayGeoUriOutput(PackageNames.TEST, coordinateConverter),
                 ),
@@ -362,6 +369,7 @@ class OutputRepositoryTest {
                 listOf(
                     OpenDisplayMagicEarthUriAutomation(PackageNames.MAGIC_EARTH),
                     OpenNavigationMagicEarthUriAutomation(PackageNames.MAGIC_EARTH),
+                    SendViaAppAutomation(PackageNames.SIGNAL),
                     OpenRouteOnePointGpxAutomation(PackageNames.TOMTOM),
                     OpenDisplayGeoUriAutomation(PackageNames.TEST),
                 ),
