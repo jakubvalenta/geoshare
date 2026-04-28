@@ -14,7 +14,7 @@ import page.ooooo.geoshare.ui.components.ResourceIconDescriptor
 import javax.inject.Inject
 
 /**
- * This output creates a geo: URI and opens it in [packageName]. So it's the most important of all outputs.
+ * Creates a geo: URI and opens it in [packageName]. It's the most important of all outputs.
  */
 class OpenDisplayGeoUriOutput @Inject constructor(
     override val packageName: String,

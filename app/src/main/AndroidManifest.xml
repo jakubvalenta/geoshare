@@ -30,6 +30,10 @@
             <data android:mimeType="application/gpx+xml" />
         </intent>
         <intent>
+            <action android:name="android.intent.action.SEND" />
+            <data android:mimeType="text/plain" />
+        </intent>
+        <intent>
             <action android:name="android.intent.action.SENDTO" />
             <data android:scheme="mailto" />
         </intent>
