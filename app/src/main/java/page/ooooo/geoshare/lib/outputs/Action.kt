@@ -10,7 +10,13 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 /**
- * Action is an [output] with the [value] that's needed to execute it.
+ * Action is an [output] with the [value] ([Point] or [Points]) that's needed to execute it.
+ *
+ * For example a [CopyCoordsDecOutput] output with a [Point] value is an [Action], which copies the point to clipboard
+ * when executed.
+ *
+ * There are several implementations of this interface which allow executing the [output] with more data than just a
+ * [value]. See [BasicAction], [ContactAction], [FileAction], [LocationAction], etc.
  */
 sealed interface Action<T> {
     val value: T
@@ -19,6 +25,9 @@ sealed interface Action<T> {
     fun getDescription(value: T, uriQuote: UriQuote = DefaultUriQuote): String?
 }
 
+/**
+ * Basic action is an [Action] that doesn't require anything other than a [value] ([Point] or [Points]) to be executed.
+ */
 sealed interface BasicAction<T> : Action<T> {
     suspend fun execute(actionContext: ActionContext): Boolean
 
@@ -45,15 +54,19 @@ sealed interface BasicAction<T> : Action<T> {
     }
 }
 
-sealed interface LocationAction<T> : Action<T> {
-    suspend fun execute(location: Point, actionContext: ActionContext): Boolean
+/**
+ * Contact action is an [Action] that requires a [value] ([Point] or [Points]) and a content: [Uri] of a contact to be
+ * executed.
+ */
+sealed interface ContactAction<T> : Action<T> {
+    suspend fun execute(uri: Uri, actionContext: ActionContext): Boolean
 
     data class WithPoint(
         override val value: Point,
-        override val output: PointOutput.WithLocation,
-    ) : LocationAction<Point> {
-        override suspend fun execute(location: Point, actionContext: ActionContext) =
-            output.execute(location, value, actionContext)
+        override val output: PointOutput.WithFile,
+    ) : ContactAction<Point> {
+        override suspend fun execute(uri: Uri, actionContext: ActionContext) =
+            output.execute(uri, value, actionContext)
 
         override fun getDescription(value: Point, uriQuote: UriQuote) =
             output.getDescription(value)
@@ -61,16 +74,20 @@ sealed interface LocationAction<T> : Action<T> {
 
     data class WithPoints(
         override val value: Points,
-        override val output: PointsOutput.WithLocation,
-    ) : LocationAction<Points> {
-        override suspend fun execute(location: Point, actionContext: ActionContext) =
-            output.execute(location, value, actionContext)
+        override val output: PointsOutput.WithFile,
+    ) : ContactAction<Points> {
+        override suspend fun execute(uri: Uri, actionContext: ActionContext) =
+            output.execute(uri, value, actionContext)
 
         override fun getDescription(value: Points, uriQuote: UriQuote) =
             output.getDescription(value)
     }
 }
 
+/**
+ * File action is an [Action] that requires a [value] ([Point] or [Points]) and a content: [Uri] of a file to be
+ * executed.
+ */
 sealed interface FileAction<T> : Action<T> {
     fun getFilename(resources: Resources): String
 
@@ -103,6 +120,36 @@ sealed interface FileAction<T> : Action<T> {
 
         override suspend fun execute(uri: Uri, actionContext: ActionContext) =
             output.execute(uri, value, actionContext)
+
+        override fun getDescription(value: Points, uriQuote: UriQuote) =
+            output.getDescription(value)
+    }
+}
+
+/**
+ * Location action is an [Action] that requires a [value] ([Point] or [Points]) and current device location [Point] to
+ * be executed.
+ */
+sealed interface LocationAction<T> : Action<T> {
+    suspend fun execute(location: Point, actionContext: ActionContext): Boolean
+
+    data class WithPoint(
+        override val value: Point,
+        override val output: PointOutput.WithLocation,
+    ) : LocationAction<Point> {
+        override suspend fun execute(location: Point, actionContext: ActionContext) =
+            output.execute(location, value, actionContext)
+
+        override fun getDescription(value: Point, uriQuote: UriQuote) =
+            output.getDescription(value)
+    }
+
+    data class WithPoints(
+        override val value: Points,
+        override val output: PointsOutput.WithLocation,
+    ) : LocationAction<Points> {
+        override suspend fun execute(location: Point, actionContext: ActionContext) =
+            output.execute(location, value, actionContext)
 
         override fun getDescription(value: Points, uriQuote: UriQuote) =
             output.getDescription(value)

@@ -41,6 +41,7 @@ import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.outputs.ContactAction
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -644,6 +645,7 @@ data class ActionReady(
 ) : ConversionState, ConversionState.HasResult {
     override suspend fun transition(): State = when (action) {
         is BasicAction -> BasicActionReady(inputUriString, points, action, isAutomation)
+        is ContactAction -> ContactRequested(inputUriString, points, action, isAutomation)
         is FileAction -> FileUriRequested(inputUriString, points, action, isAutomation)
         is LocationAction -> LocationRationaleRequested(inputUriString, points, action, isAutomation)
     }
@@ -654,6 +656,14 @@ data class BasicActionReady(
     override val points: Points,
     val action: BasicAction<*>,
     val isAutomation: Boolean,
+) : ConversionState, ConversionState.HasResult
+
+data class ContactActionReady(
+    override val inputUriString: String,
+    override val points: Points,
+    val action: ContactAction<*>,
+    val isAutomation: Boolean,
+    val uri: android.net.Uri,
 ) : ConversionState, ConversionState.HasResult
 
 data class FileActionReady(
@@ -722,6 +732,13 @@ data class ActionFinished(
     override val inputUriString: String,
     override val points: Points,
     val action: Action<*>,
+    val isAutomation: Boolean,
+) : ConversionState, ConversionState.HasResult
+
+data class ContactRequested(
+    override val inputUriString: String,
+    override val points: Points,
+    val action: ContactAction<*>,
     val isAutomation: Boolean,
 ) : ConversionState, ConversionState.HasResult
 

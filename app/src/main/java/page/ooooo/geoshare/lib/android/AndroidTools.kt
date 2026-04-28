@@ -14,6 +14,7 @@ import android.os.Build
 import android.os.CancellationSignal
 import android.os.Looper
 import android.os.SystemClock
+import android.provider.ContactsContract
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
@@ -34,6 +35,8 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
@@ -277,6 +280,14 @@ object AndroidTools {
             type = "text/plain"
             setPackage(packageName)
             putExtra(Intent.EXTRA_TEXT, text)
+        })
+
+    fun editContactLocation(context: Context, uri: Uri, point: WGS84Point): Boolean =
+        startActivity(context, Intent(Intent.ACTION_EDIT).apply {
+            data = uri
+            putExtra(ContactsContract.Intents.Insert.POSTAL, CoordinateFormatter.formatDecCoords(point))
+            // TODO Save it in a location field
+            // TODO Then open the contact
         })
 
     private fun createEmailIntent(address: String): Intent =
