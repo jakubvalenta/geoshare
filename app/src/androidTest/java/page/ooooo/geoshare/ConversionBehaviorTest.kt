@@ -483,7 +483,30 @@ class ConversionBehaviorTest : BehaviorTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun allowsOpeningTomTom() = uiAutomator {
+    fun opensMessagingApp() = uiAutomator {
+        runBlocking {
+            // Test using Telegram fork, because it's available on F-Droid
+            val messagingAppPackageName = PackageNames.TELEGRAM_FORK
+
+            assumeAppInstalled(messagingAppPackageName)
+
+            // Share a geo: URI with the app
+            shareUri("geo:52.47254,13.4345")
+
+            // Tap the messaging app icon
+            onMainScrollablePane()
+                // Scroll by percents, because it's more reliable than scrolling to the app icon
+                .scroll(Direction.DOWN, 2f)
+            onElement { viewIdResourceName == "geoShareApp_${messagingAppPackageName}" }.click()
+
+            // Opens the messaging app
+            onElement { this.packageName == messagingAppPackageName }
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun opensTomTom() = uiAutomator {
         runBlocking {
             assumeAppInstalled(PackageNames.TOMTOM)
             assumeDomainResolvable("tomtom.com")
@@ -539,7 +562,7 @@ class ConversionBehaviorTest : BehaviorTest {
     }
 
     @Test
-    fun allowsSavingGpx() = uiAutomator {
+    fun savesGpxRoute() = uiAutomator {
         // Launch application and close intro
         launchApplication()
         closeIntro()

@@ -1,0 +1,1 @@
+- Allow sending point via selected messaging apps.

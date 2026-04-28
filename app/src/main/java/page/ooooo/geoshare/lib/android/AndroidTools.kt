@@ -128,6 +128,14 @@ object AndroidTools {
         }
     }
 
+    private val ALLOWED_MESSAGING_APPS = setOf(
+        PackageNames.SIGNAL,
+        PackageNames.TELEGRAM,
+        PackageNames.TELEGRAM_FORK,
+        PackageNames.SIGNAL,
+        PackageNames.WHATSAPP,
+    )
+
     fun queryApps(packageManager: PackageManager): DataTypes =
         buildMap<String, MutableSet<DataType>> {
             for (packageName in queryPackageNames(
@@ -173,6 +181,17 @@ object AndroidTools {
                         DataType.GPX_DATA
                     }
                 )
+            }
+            for (packageName in queryPackageNames(
+                packageManager,
+                Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                },
+            )) {
+                // Allow only selected messaging apps, so that the app list is not flooded with apps no one will use
+                if (packageName in ALLOWED_MESSAGING_APPS) {
+                    getOrPut(packageName) { mutableSetOf() }.add(DataType.SEND_PLAIN_TEXT)
+                }
             }
         }
 
@@ -252,6 +271,13 @@ object AndroidTools {
 
     fun openWebUri(context: Context, uriString: String): Boolean =
         startActivity(context, Intent(Intent.ACTION_VIEW, uriString.toUri()))
+
+    fun sendViaApp(context: Context, packageName: String, text: String): Boolean =
+        startActivity(context, Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            setPackage(packageName)
+            putExtra(Intent.EXTRA_TEXT, text)
+        })
 
     private fun createEmailIntent(address: String): Intent =
         Intent(Intent.ACTION_SENDTO, "mailto:$address".toUri())

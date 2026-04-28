@@ -19,6 +19,7 @@ import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenRouteOnePointGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
+import page.ooooo.geoshare.data.local.preferences.SendViaAppAutomation
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
@@ -29,7 +30,7 @@ import kotlin.time.Duration.Companion.seconds
 class AutomationBehaviorTest : BehaviorTest {
 
     @Test
-    fun automationCopiesCoordinates() = uiAutomator {
+    fun copiesCoordinates() = uiAutomator {
         // Launch application and close intro
         launchApplication()
         closeIntro()
@@ -51,7 +52,7 @@ class AutomationBehaviorTest : BehaviorTest {
     }
 
     @Test
-    fun automationOpensApp() = uiAutomator {
+    fun opensApp() = uiAutomator {
         assumeAppInstalled(PackageNames.GOOGLE_MAPS)
 
         // Launch application and close intro
@@ -87,7 +88,39 @@ class AutomationBehaviorTest : BehaviorTest {
     }
 
     @Test
-    fun automationOpensTomTom() = uiAutomator {
+    fun opensMessagingApp() = uiAutomator {
+        runBlocking {
+            // Test using Telegram fork, because it's available on F-Droid
+            val messagingAppPackageName = PackageNames.TELEGRAM_FORK
+
+            assumeAppInstalled(messagingAppPackageName)
+
+            // Launch application and close intro
+            launchApplication()
+            closeIntro()
+
+            // Configure automation
+            goToUserPreferencesList()
+            goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
+            val automation = SendViaAppAutomation(messagingAppPackageName)
+            val serializedString = Json.encodeToString<Automation>(automation)
+            onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
+                .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceAutomation_${serializedString}" }
+                .click()
+
+            // Share a geo: URI with the app
+            shareUri("geo:52.47254,13.4345")
+
+            // Shows automation counter
+            onElement { viewIdResourceName == "geoShareResultSuccessAutomationCounter" }
+
+            // Opens the messaging app
+            onElement { this.packageName == messagingAppPackageName }
+        }
+    }
+
+    @Test
+    fun opensTomTom() = uiAutomator {
         runBlocking {
             assumeAppInstalled(PackageNames.TOMTOM)
             assumeDomainResolvable("tomtom.com")
@@ -134,7 +167,7 @@ class AutomationBehaviorTest : BehaviorTest {
     }
 
     @Test
-    fun automationSavesGpx() = uiAutomator {
+    fun savesGpxRoute() = uiAutomator {
         // Launch application and close intro
         launchApplication()
         closeIntro()
