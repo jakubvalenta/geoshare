@@ -37,6 +37,7 @@ When you like Google Maps for finding places, but you prefer a different app for
 - Allows opening a location in <b>web maps</b>, pre-installed ones or your own.
 - Allows saving a location as a <b>GPX file</b>.
 - Allows sending a location via a <b>messaging app</b>.
+- Allows saving a location to a <b>contact</b>.
 - Retries on <b>patchy internet connection</b>.
 - Allows <b>pasting map links</b> directly into the app, instead of sharing them with it.
 - Interface adapts to <b>tablets</b>.
