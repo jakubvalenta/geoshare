@@ -24,11 +24,15 @@ object PackageNames {
     const val ORGANIC_MAPS = "app.organicmaps"
     const val OSMAND = "net.osmand"
     const val OSMAND_PLUS = "net.osmand.plus"
+    const val SIGNAL = "org.thoughtcrime.securesms"
     const val SYGIC = "com.sygic.aura"
+    const val TELEGRAM = "org.telegram.messenger"
+    const val TELEGRAM_FORK = "org.forkgram.messenger"
     const val TEST = "com.example.test"
     const val TOMTOM_PREFIX = "com.tomtom."
     const val TOMTOM = "${TOMTOM_PREFIX}speedcams.android.map"
     const val VESPUCCI = "de.blau.android"
+    const val WHATSAPP = "com.whatsapp"
 
     fun getSrs(packageName: String?): Srs =
         when (packageName) {

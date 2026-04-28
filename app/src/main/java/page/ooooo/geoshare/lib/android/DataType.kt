@@ -7,4 +7,5 @@ enum class DataType {
     GPX_DATA,
     GPX_ONE_POINT_DATA,
     MAGIC_EARTH_URI,
+    SEND_PLAIN_TEXT,
 }
