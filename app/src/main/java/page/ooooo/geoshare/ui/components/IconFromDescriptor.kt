@@ -37,7 +37,7 @@ fun IconFromDescriptor(
         is DrawableIconDescriptor -> Image(
             rememberDrawablePainter(descriptor.drawable),
             contentDescription,
-            modifier.widthIn(max = size),
+            modifier.requiredSize(size), // Possible stretches the icon, but better showing one tiny icon in a grid
         )
 
         is CharacterIconDescriptor -> CharIcon(

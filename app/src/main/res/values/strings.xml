@@ -122,6 +122,7 @@
     <string name="output_open_navigation">Navigate</string>
     <string name="output_open_street_view">Street view</string>
     <string name="output_open_link">Open %1$s link</string>
+    <string name="output_send">Send location</string>
     <string name="converter_amap_name">Amap (AutoNavi)</string>
     <string name="converter_amap_loading_indicator_title">Connecting to Amap…</string>
     <string name="converter_amap_permission_title">Connect to Amap?</string>
@@ -175,6 +176,7 @@
         <item quantity="one">Automatically saving GPX in %1$ds</item>
         <item quantity="other">Automatically saving GPX in %1$ds</item>
     </plurals>
+    <string name="conversion_automation_send">Send location via %1$s</string>
     <string name="conversion_automation_share_failed">Failed to automatically share link</string>
     <string name="conversion_automation_share_succeeded">Automatically shared link</string>
     <plurals name="conversion_automation_share_waiting">

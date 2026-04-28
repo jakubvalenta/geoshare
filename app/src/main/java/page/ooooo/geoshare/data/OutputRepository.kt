@@ -55,6 +55,7 @@ import page.ooooo.geoshare.lib.outputs.PointsOutput
 import page.ooooo.geoshare.lib.outputs.SavePointGpxOutput
 import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
 import page.ooooo.geoshare.lib.outputs.SaveRouteGpxOutput
+import page.ooooo.geoshare.lib.outputs.SendDisplayGoogleUriOutput
 import page.ooooo.geoshare.lib.outputs.ShareDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.ShareLinkUriOutput
 import page.ooooo.geoshare.lib.outputs.ShareNavigationGoogleUriOutput
@@ -118,6 +119,9 @@ class OutputRepository @Inject constructor(
                 }
                 if (DataType.GPX_ONE_POINT_DATA in dataTypes) {
                     add(OpenRouteOnePointGpxOutput(packageName, coordinateConverter))
+                }
+                if (DataType.SEND_PLAIN_TEXT in dataTypes) {
+                    add(SendDisplayGoogleUriOutput(packageName, coordinateConverter))
                 }
             }
         }
