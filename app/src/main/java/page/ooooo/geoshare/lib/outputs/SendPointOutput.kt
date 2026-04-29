@@ -18,7 +18,7 @@ import javax.inject.Inject
 /**
  * Creates a Google Maps display URI and sends it via [packageName], which is often a messaging app.
  */
-class SendViaAppOutput @Inject constructor(
+class SendPointOutput @Inject constructor(
     override val packageName: String,
     private val coordinateConverter: CoordinateConverter,
 ) : OpenPointOutput {
@@ -39,7 +39,7 @@ class SendViaAppOutput @Inject constructor(
 
     @Composable
     override fun label(appDetails: AppDetails) =
-        stringResource(R.string.output_send_via_app)
+        stringResource(R.string.output_send)
 
     override fun getMenuIcon(appDetails: AppDetails) =
         ImageVectorIconDescriptor(Icons.AutoMirrored.Default.Send)
@@ -50,14 +50,14 @@ class SendViaAppOutput @Inject constructor(
     @Composable
     override fun automationLabel(appDetails: AppDetails) =
         stringResource(
-            R.string.conversion_automation_send_via_app,
+            R.string.output_send_via,
             appDetails[packageName]?.label ?: packageName,
         )
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
-        other as SendViaAppOutput
+        other as SendPointOutput
         return packageName == other.packageName
     }
 

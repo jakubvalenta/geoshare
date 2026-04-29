@@ -1,1 +1,2 @@
-- Allow sending point via selected messaging apps.
+- Added the option to send a point via selected messaging apps.
+- Added the option to save a point to a contact.
