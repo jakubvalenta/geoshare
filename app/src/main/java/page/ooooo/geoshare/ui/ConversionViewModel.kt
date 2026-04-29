@@ -29,8 +29,6 @@ import page.ooooo.geoshare.lib.conversion.ActionFinished
 import page.ooooo.geoshare.lib.conversion.ActionRan
 import page.ooooo.geoshare.lib.conversion.ActionReady
 import page.ooooo.geoshare.lib.conversion.BasicActionReady
-import page.ooooo.geoshare.lib.conversion.ContactActionReady
-import page.ooooo.geoshare.lib.conversion.ContactRequested
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
 import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.ConversionStateContext
@@ -145,49 +143,6 @@ class ConversionViewModel @Inject constructor(
 
     fun finishBasicAction(success: Boolean?) {
         (stateContext.currentState as? BasicActionReady)?.let { currentState ->
-            transition {
-                ActionRan(
-                    currentState.inputUriString,
-                    currentState.points,
-                    currentState.action,
-                    currentState.isAutomation,
-                    success,
-                )
-            }
-        }
-    }
-
-    // Contact action
-
-    fun receiveContactUri(contactUri: Uri) {
-        (stateContext.currentState as? ContactRequested)?.let { currentState ->
-            transition {
-                ContactActionReady(
-                    currentState.inputUriString,
-                    currentState.points,
-                    currentState.action,
-                    currentState.isAutomation,
-                    contactUri,
-                )
-            }
-        }
-    }
-
-    fun cancelContactUriRequest() {
-        (stateContext.currentState as? ContactRequested)?.let { currentState ->
-            transition {
-                ActionFinished(
-                    currentState.inputUriString,
-                    currentState.points,
-                    currentState.action,
-                    currentState.isAutomation,
-                )
-            }
-        }
-    }
-
-    fun finishContactAction(success: Boolean?) {
-        (stateContext.currentState as? ContactActionReady)?.let { currentState ->
             transition {
                 ActionRan(
                     currentState.inputUriString,

@@ -66,18 +66,6 @@ sealed interface PointOutput : Output {
     }
 
     /**
-     * Output that takes a single [Point] and a contact URI.
-     *
-     * Example: Save a point in the address field of a contact
-     */
-    sealed interface WithContact : PointOutput {
-        @Suppress("SameReturnValue")
-        suspend fun execute(contactUri: Uri, value: Point, actionContext: ActionContext): Boolean
-
-        override fun toAction(value: Point) = ContactAction.WithPoint(value, this)
-    }
-
-    /**
      * Output that takes a single [Point] and a file writer.
      *
      * Example: Save a route from current location to a point as GPX

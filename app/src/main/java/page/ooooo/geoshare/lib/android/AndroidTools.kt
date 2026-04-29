@@ -35,7 +35,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
@@ -281,18 +280,15 @@ object AndroidTools {
             putExtra(Intent.EXTRA_TEXT, text)
         })
 
-    fun saveToContact(context: Context, contactUri: Uri, point: WGS84Point): Boolean =
-        startActivity(context, Intent(Intent.ACTION_EDIT).apply {
-            data = contactUri
-            putExtra(ContactsContract.Intents.Insert.POSTAL, CoordinateFormatter.formatDecCoords(point))
+    fun insertOrEditContactAddress(context: Context, address: String): Boolean =
+        startActivity(context, Intent(Intent.ACTION_INSERT_OR_EDIT).apply {
+            type = ContactsContract.Contacts.CONTENT_ITEM_TYPE
+            putExtra(ContactsContract.Intents.Insert.POSTAL, address)
             putExtra(
                 ContactsContract.Intents.Insert.POSTAL_TYPE,
                 ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS,
             )
         })
-
-    fun openContact(context: Context, contactUri: Uri): Boolean =
-        startActivity(context, Intent(Intent.ACTION_VIEW, contactUri))
 
     private fun createEmailIntent(address: String): Intent =
         Intent(Intent.ACTION_SENDTO, "mailto:$address".toUri())

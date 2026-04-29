@@ -6,7 +6,6 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.res.Configuration
-import android.provider.ContactsContract
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -99,8 +98,6 @@ import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.conversion.ActionFinished
 import page.ooooo.geoshare.lib.conversion.ActionWaiting
 import page.ooooo.geoshare.lib.conversion.BasicActionReady
-import page.ooooo.geoshare.lib.conversion.ContactActionReady
-import page.ooooo.geoshare.lib.conversion.ContactRequested
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
 import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.ConversionStateContext
@@ -206,12 +203,6 @@ fun MainScreen(
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             conversionViewModel.receiveLocationPermission()
         }
-    val pickContactLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            result.data?.data?.takeIf { result.resultCode == Activity.RESULT_OK }?.let { uri ->
-                conversionViewModel.receiveContactUri(uri)
-            } ?: conversionViewModel.cancelContactUriRequest()
-        }
     val saveFileLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             result.data?.data?.takeIf { result.resultCode == Activity.RESULT_OK }?.let { uri ->
@@ -232,30 +223,6 @@ fun MainScreen(
                     )
                     val success = currentState.action.execute(actionContext)
                     conversionViewModel.finishBasicAction(success)
-                }
-
-                // Contact action
-
-                is ContactRequested -> {
-                    try {
-                        pickContactLauncher.launch(
-                            Intent(Intent.ACTION_PICK).apply {
-                                type = ContactsContract.Contacts.CONTENT_TYPE
-                            }
-                        )
-                    } catch (_: ActivityNotFoundException) {
-                        conversionViewModel.cancelContactUriRequest()
-                    }
-                }
-
-                is ContactActionReady -> {
-                    val actionContext = ActionContext(
-                        context = context,
-                        clipboard = clipboard,
-                        resources = resources,
-                    )
-                    val success = currentState.action.execute(currentState.contactUri, actionContext)
-                    conversionViewModel.finishContactAction(success)
                 }
 
                 // File action

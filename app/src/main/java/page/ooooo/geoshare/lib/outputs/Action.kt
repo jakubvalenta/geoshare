@@ -16,7 +16,7 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
  * when executed.
  *
  * There are several implementations of this interface which allow executing the [output] with more data than just a
- * [value]. See [BasicAction], [ContactAction], [FileAction], [LocationAction], etc.
+ * [value]. See [BasicAction], [FileAction], [LocationAction], etc.
  */
 sealed interface Action<T> {
     val value: T
@@ -50,25 +50,6 @@ sealed interface BasicAction<T> : Action<T> {
             output.execute(value, actionContext)
 
         override fun getDescription(value: Points, uriQuote: UriQuote) =
-            output.getDescription(value)
-    }
-}
-
-/**
- * Contact action is an [Action] that requires a [value] ([Point] or [Points]) and a content: [Uri] of a contact to be
- * executed.
- */
-sealed interface ContactAction<T> : Action<T> {
-    suspend fun execute(uri: Uri, actionContext: ActionContext): Boolean
-
-    data class WithPoint(
-        override val value: Point,
-        override val output: PointOutput.WithContact,
-    ) : ContactAction<Point> {
-        override suspend fun execute(uri: Uri, actionContext: ActionContext) =
-            output.execute(uri, value, actionContext)
-
-        override fun getDescription(value: Point, uriQuote: UriQuote) =
             output.getDescription(value)
     }
 }

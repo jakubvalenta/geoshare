@@ -5,7 +5,6 @@ import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -14,7 +13,10 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
 import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
+import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
 import page.ooooo.geoshare.lib.geo.GCJ02Point
+import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import kotlin.time.Duration.Companion.seconds
@@ -567,19 +569,8 @@ class ConversionBehaviorTest : BehaviorTest {
         launchApplication()
         closeIntro()
 
-        // Share a Google Maps coordinates link with the app
-        shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
-
-        // Wait for the conversion to succeed
-        assertConversionSucceeded(
-            persistentListOf(
-                WGS84Point(
-                    52.5067296, 13.2599309,
-                    11.0,
-                    source = Source.MAP_CENTER,
-                )
-            )
-        )
+        // Share a geo: URI with the app
+        shareUri("geo:52.47254,13.4345")
 
         // Open copy menu
         onElement { viewIdResourceName == "geoShareResultSuccessLastPointMenu" }.click()
@@ -588,7 +579,7 @@ class ConversionBehaviorTest : BehaviorTest {
             // Expand the sheet
             swipe(Direction.UP, 1f)
 
-            // Tap "Save GPX"
+            // Tap Save GPX
             onElement { viewIdResourceName == "geoShareResultSuccessSheet" }
                 .scroll(Direction.DOWN, 10f)
             onElement { viewIdResourceName == "geoShareResultSuccessSheet" }
@@ -611,5 +602,46 @@ class ConversionBehaviorTest : BehaviorTest {
                 @Suppress("SpellCheckingInspection") "Fichier GPX enregistré",
             )
         }
+    }
+
+    @Test
+    fun savesPointToContact() = uiAutomator {
+        // Launch application and close intro
+        launchApplication()
+        closeIntro()
+
+        // Share a geo: URI with the app
+        val point = WGS84Point(NaivePoint.genRandomPoint())
+        shareUri(GeoUriFormatter.formatGeoUriString(point))
+
+        // Open copy menu
+        onElement { viewIdResourceName == "geoShareResultSuccessLastPointMenu" }.click()
+
+        onElement { viewIdResourceName == "geoShareResultSuccessSheet" }.apply {
+            // Expand the sheet
+            swipe(Direction.UP, 1f)
+
+            // Tap Save to contact
+            onElement { viewIdResourceName == "geoShareResultSuccessSheet" }
+                .scroll(Direction.DOWN, 10f)
+            onElement { viewIdResourceName == "geoShareResultSuccessSheet" }
+                // Scroll again, because only now can the lazy column pane scroll all the way to the bottom
+                .scrollToElement(Direction.DOWN) {
+                    viewIdResourceName == "geoShareResultSuccessSheetItemHeadline" &&
+                        textAsString() in
+                        setOf("Save to contact") // TODO Add French translation
+                }
+                .click()
+        }
+
+        // Insert or edit the test contact
+        insertOrEditContact()
+
+        // Open the test contact
+        openContact()
+
+        // The test contact contains coordinates
+        val expectedCoordinates = CoordinateFormatter.formatDecCoords(point)
+        onElement { textAsString() == expectedCoordinates }
     }
 }

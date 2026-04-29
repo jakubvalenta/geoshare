@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.lib.outputs
 
-import android.net.Uri
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.runtime.Composable
@@ -8,6 +7,7 @@ import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.ui.components.ImageVectorIconDescriptor
@@ -19,13 +19,17 @@ import javax.inject.Inject
 class SavePointToContactOutput @Inject constructor(
     private val coordinateConverter: CoordinateConverter,
 ) :
-    PointOutput.WithContact,
+    PointOutput.WithoutLocation,
     Output.HasErrorText,
     Output.HasAutomationErrorText {
 
-    override suspend fun execute(contactUri: Uri, value: Point, actionContext: ActionContext) =
-        AndroidTools.saveToContact(actionContext.context, contactUri, coordinateConverter.toWGS84(value)) &&
-            AndroidTools.openContact(actionContext.context, contactUri)
+    override suspend fun execute(value: Point, actionContext: ActionContext) =
+        AndroidTools.insertOrEditContactAddress(
+            actionContext.context,
+            CoordinateFormatter.formatDecCoords(
+                coordinateConverter.toWGS84(value)
+            ),
+        )
 
     @Composable
     override fun label(appDetails: AppDetails) =
