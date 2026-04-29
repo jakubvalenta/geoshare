@@ -3218,7 +3218,7 @@ class ConversionStateTest {
     }
 
     @Test
-    fun actionReady_actionIsCopyAction_returnsBasicActionReady() = runTest {
+    fun actionReady_actionIsCopy_returnsBasicActionReady() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
@@ -3254,7 +3254,7 @@ class ConversionStateTest {
     }
 
     @Test
-    fun actionReady_actionIsShareGpxRouteAction_returnsLocationRationaleRequested() = runTest {
+    fun actionReady_actionIsShareGpxRoute_returnsLocationRationaleRequested() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val action = OpenRouteOnePointGpxOutput(PackageNames.GOOGLE_MAPS, coordinateConverter).toAction(points.last())

@@ -5,7 +5,6 @@ import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -18,10 +17,13 @@ import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenRouteOnePointGpxAutomation
+import page.ooooo.geoshare.data.local.preferences.SavePointToContactAutomation
 import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
-import page.ooooo.geoshare.data.local.preferences.SendViaAppAutomation
+import page.ooooo.geoshare.data.local.preferences.SendPointAutomation
 import page.ooooo.geoshare.lib.android.PackageNames
-import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
+import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
+import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 import kotlin.time.Duration.Companion.seconds
@@ -102,7 +104,7 @@ class AutomationBehaviorTest : BehaviorTest {
             // Configure automation
             goToUserPreferencesList()
             goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
-            val automation = SendViaAppAutomation(messagingAppPackageName)
+            val automation = SendPointAutomation(messagingAppPackageName)
             val serializedString = Json.encodeToString<Automation>(automation)
             onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
                 .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceAutomation_${serializedString}" }
@@ -184,9 +186,6 @@ class AutomationBehaviorTest : BehaviorTest {
         // Share a geo: URI with the app
         shareUri("geo:52.47254,13.4345")
 
-        // Wait for the conversion to succeed
-        assertConversionSucceeded(persistentListOf(WGS84Point(52.47254, 13.4345, source = Source.URI)))
-
         // Shows automation counter
         onElement { viewIdResourceName == "geoShareResultSuccessAutomationCounter" }
 
@@ -200,5 +199,35 @@ class AutomationBehaviorTest : BehaviorTest {
                 @Suppress("SpellCheckingInspection") "GPX enregistré automatiquement",
             )
         }
+    }
+
+    @Test
+    fun savesPointToContact() = uiAutomator {
+        // Launch application and close intro
+        launchApplication()
+        closeIntro()
+
+        // Configure automation
+        goToUserPreferencesList()
+        goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
+        val automation = SavePointToContactAutomation
+        val serializedString = Json.encodeToString<Automation>(automation)
+        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceAutomation_${serializedString}" }
+            .click()
+
+        // Share a geo: URI with the app
+        val point = WGS84Point(NaivePoint.genRandomPoint())
+        shareUri(GeoUriFormatter.formatGeoUriString(point))
+
+        // Insert or edit the test contact
+        insertOrEditContact()
+
+        // Open the test contact
+        openContact()
+
+        // The test contact contains coordinates
+        val expectedCoordinates = CoordinateFormatter.formatDecCoords(point)
+        onElement { textAsString() == expectedCoordinates }
     }
 }

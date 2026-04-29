@@ -63,6 +63,7 @@ navigation, you can easily switch from Google Maps to your favorite
 - Allows opening a location in **web maps**, pre-installed ones or your own.
 - Allows saving a location as a **GPX file**.
 - Allows sending a location via a **messaging app**.
+- Allows saving a location to a **contact**.
 - Retries on **patchy internet connection**.
 - Allows **pasting map links** directly into the app, instead of sharing them
   with it.

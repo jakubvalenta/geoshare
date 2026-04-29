@@ -25,9 +25,10 @@ import page.ooooo.geoshare.data.local.preferences.OpenRouteGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenRouteOnePointGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenStreetViewGoogleUriAutomation
 import page.ooooo.geoshare.data.local.preferences.SavePointGpxAutomation
+import page.ooooo.geoshare.data.local.preferences.SavePointToContactAutomation
 import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.SaveRouteGpxAutomation
-import page.ooooo.geoshare.data.local.preferences.SendViaAppAutomation
+import page.ooooo.geoshare.data.local.preferences.SendPointAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareLinkUriAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareNavigationGoogleUriAutomation
@@ -54,9 +55,10 @@ import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
 import page.ooooo.geoshare.lib.outputs.SavePointGpxOutput
+import page.ooooo.geoshare.lib.outputs.SavePointToContactOutput
 import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
 import page.ooooo.geoshare.lib.outputs.SaveRouteGpxOutput
-import page.ooooo.geoshare.lib.outputs.SendViaAppOutput
+import page.ooooo.geoshare.lib.outputs.SendPointOutput
 import page.ooooo.geoshare.lib.outputs.ShareDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.ShareLinkUriOutput
 import page.ooooo.geoshare.lib.outputs.ShareNavigationGoogleUriOutput
@@ -88,6 +90,7 @@ class OutputRepository @Inject constructor(
             ShareNavigationGoogleUriOutput(coordinateConverter),
             ShareStreetViewGoogleUriOutput(coordinateConverter),
             SavePointGpxOutput(coordinateConverter),
+            SavePointToContactOutput(coordinateConverter),
         )
 
     fun getOutputsForPoints(): List<PointsOutput> =
@@ -122,7 +125,7 @@ class OutputRepository @Inject constructor(
                     add(OpenRouteOnePointGpxOutput(packageName, coordinateConverter))
                 }
                 if (DataType.SEND_PLAIN_TEXT in dataTypes) {
-                    add(SendViaAppOutput(packageName, coordinateConverter))
+                    add(SendPointOutput(packageName, coordinateConverter))
                 }
             }
         }
@@ -146,6 +149,7 @@ class OutputRepository @Inject constructor(
             ShareStreetViewGoogleUriOutput(coordinateConverter),
             ShareRouteGpxOutput(coordinateConverter),
             SharePointsGpxOutput(coordinateConverter),
+            SavePointToContactOutput(coordinateConverter),
         )
 
     fun getOutputsForPointChips(links: List<Link>): List<PointOutput> =
@@ -266,9 +270,12 @@ class OutputRepository @Inject constructor(
             is SaveRouteGpxAutomation ->
                 SaveRouteGpxOutput(coordinateConverter)
 
-            is SendViaAppAutomation ->
+            is SavePointToContactAutomation ->
+                SavePointToContactOutput(coordinateConverter)
+
+            is SendPointAutomation ->
                 automation.packageName?.let { packageName ->
-                    SendViaAppOutput(packageName, coordinateConverter)
+                    SendPointOutput(packageName, coordinateConverter)
                 }
 
             is ShareDisplayGeoUriAutomation ->

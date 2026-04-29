@@ -38,6 +38,7 @@ class UserPreferencesTest {
                     ShareNavigationGoogleUriAutomation,
                     ShareStreetViewGoogleUriAutomation,
                     SavePointGpxAutomation,
+                    SavePointToContactAutomation,
                 ),
                 listOf(
                     ShareRouteGpxAutomation,
@@ -48,7 +49,7 @@ class UserPreferencesTest {
                 listOf(
                     OpenDisplayMagicEarthUriAutomation(PackageNames.MAGIC_EARTH),
                     OpenNavigationMagicEarthUriAutomation(PackageNames.MAGIC_EARTH),
-                    SendViaAppAutomation(PackageNames.SIGNAL),
+                    SendPointAutomation(PackageNames.SIGNAL),
                     OpenRouteOnePointGpxAutomation(PackageNames.TOMTOM),
                     OpenDisplayGeoUriAutomation(PackageNames.TEST),
                 ),
@@ -108,6 +109,7 @@ class UserPreferencesTest {
                     ShareNavigationGoogleUriAutomation,
                     ShareStreetViewGoogleUriAutomation,
                     SavePointGpxAutomation,
+                    SavePointToContactAutomation,
                 ),
                 listOf(
                     ShareRouteGpxAutomation,

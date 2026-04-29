@@ -54,7 +54,7 @@ sealed interface OpenPointOutput :
             actionContext.androidTools.openApp(actionContext.context, packageName, uriString)
         } ?: false
 
-    override fun getIcon(appDetails: AppDetails): IconDescriptor? =
+    override fun getIcon(appDetails: AppDetails) =
         appDetails[packageName]?.let { DrawableIconDescriptor(it.icon) }
 
     @Composable
@@ -106,7 +106,7 @@ sealed interface OpenPointsOutput :
             actionContext.androidTools.openAppFile(actionContext.context, packageName, file)
         } ?: false
 
-    override fun getIcon(appDetails: AppDetails): IconDescriptor? =
+    override fun getIcon(appDetails: AppDetails) =
         appDetails[packageName]?.let { DrawableIconDescriptor(it.icon) }
 
     override fun getMenuIcon(appDetails: AppDetails) =
