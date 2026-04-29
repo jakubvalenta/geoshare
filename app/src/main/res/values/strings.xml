@@ -122,6 +122,7 @@
     <string name="output_open_navigation">Navigate</string>
     <string name="output_open_street_view">Street view</string>
     <string name="output_open_link">Open %1$s link</string>
+    <string name="output_save_to_contact">Save to contact</string>
     <string name="output_send_via_app">Send point</string>
     <string name="converter_amap_name">Amap (AutoNavi)</string>
     <string name="converter_amap_loading_indicator_title">Connecting to Amap…</string>

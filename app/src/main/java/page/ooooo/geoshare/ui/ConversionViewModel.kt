@@ -159,7 +159,7 @@ class ConversionViewModel @Inject constructor(
 
     // Contact action
 
-    fun receiveContactUri(uri: Uri) {
+    fun receiveContactUri(contactUri: Uri) {
         (stateContext.currentState as? ContactRequested)?.let { currentState ->
             transition {
                 ContactActionReady(
@@ -167,7 +167,7 @@ class ConversionViewModel @Inject constructor(
                     currentState.points,
                     currentState.action,
                     currentState.isAutomation,
-                    uri,
+                    contactUri,
                 )
             }
         }

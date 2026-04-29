@@ -663,7 +663,7 @@ data class ContactActionReady(
     override val points: Points,
     val action: ContactAction<*>,
     val isAutomation: Boolean,
-    val uri: android.net.Uri,
+    val contactUri: android.net.Uri,
 ) : ConversionState, ConversionState.HasResult
 
 data class FileActionReady(

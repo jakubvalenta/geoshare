@@ -63,23 +63,12 @@ sealed interface ContactAction<T> : Action<T> {
 
     data class WithPoint(
         override val value: Point,
-        override val output: PointOutput.WithFile,
+        override val output: PointOutput.WithContact,
     ) : ContactAction<Point> {
         override suspend fun execute(uri: Uri, actionContext: ActionContext) =
             output.execute(uri, value, actionContext)
 
         override fun getDescription(value: Point, uriQuote: UriQuote) =
-            output.getDescription(value)
-    }
-
-    data class WithPoints(
-        override val value: Points,
-        override val output: PointsOutput.WithFile,
-    ) : ContactAction<Points> {
-        override suspend fun execute(uri: Uri, actionContext: ActionContext) =
-            output.execute(uri, value, actionContext)
-
-        override fun getDescription(value: Points, uriQuote: UriQuote) =
             output.getDescription(value)
     }
 }

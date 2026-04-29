@@ -16,7 +16,7 @@ import page.ooooo.geoshare.ui.components.ResourceIconDescriptor
 import javax.inject.Inject
 
 /**
- * This output creates a GPX route starting at current device location and opens it in [packageName].
+ * When executed, this output creates a GPX route starting at current device location and opens it in [packageName].
  *
  * It's only useful for TomTom, because TomTom doesn't support geo: URIs.
  */
@@ -48,7 +48,7 @@ class OpenRouteOnePointGpxOutput @Inject constructor(
     override fun label(appDetails: AppDetails) =
         stringResource(R.string.output_open_navigation)
 
-    override fun getIcon(appDetails: AppDetails): IconDescriptor? =
+    override fun getIcon(appDetails: AppDetails) =
         appDetails[packageName]?.let { DrawableIconDescriptor(it.icon) }
 
     override fun getMenuIcon(appDetails: AppDetails) =

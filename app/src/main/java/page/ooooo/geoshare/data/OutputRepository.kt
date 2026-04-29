@@ -54,6 +54,7 @@ import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
 import page.ooooo.geoshare.lib.outputs.SavePointGpxOutput
+import page.ooooo.geoshare.lib.outputs.SavePointToContactOutput
 import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
 import page.ooooo.geoshare.lib.outputs.SaveRouteGpxOutput
 import page.ooooo.geoshare.lib.outputs.SendViaAppOutput
@@ -88,6 +89,7 @@ class OutputRepository @Inject constructor(
             ShareNavigationGoogleUriOutput(coordinateConverter),
             ShareStreetViewGoogleUriOutput(coordinateConverter),
             SavePointGpxOutput(coordinateConverter),
+            SavePointToContactOutput(coordinateConverter),
         )
 
     fun getOutputsForPoints(): List<PointsOutput> =
@@ -146,6 +148,7 @@ class OutputRepository @Inject constructor(
             ShareStreetViewGoogleUriOutput(coordinateConverter),
             ShareRouteGpxOutput(coordinateConverter),
             SharePointsGpxOutput(coordinateConverter),
+            SavePointToContactOutput(coordinateConverter),
         )
 
     fun getOutputsForPointChips(links: List<Link>): List<PointOutput> =

@@ -36,7 +36,6 @@ import kotlinx.coroutines.withTimeoutOrNull
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
-import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
@@ -282,9 +281,9 @@ object AndroidTools {
             putExtra(Intent.EXTRA_TEXT, text)
         })
 
-    fun editContactLocation(context: Context, uri: Uri, point: WGS84Point): Boolean =
+    fun saveToContact(context: Context, contactUri: Uri, point: WGS84Point): Boolean =
         startActivity(context, Intent(Intent.ACTION_EDIT).apply {
-            data = uri
+            data = contactUri
             putExtra(ContactsContract.Intents.Insert.POSTAL, CoordinateFormatter.formatDecCoords(point))
             // TODO Save it in a location field
             // TODO Then open the contact

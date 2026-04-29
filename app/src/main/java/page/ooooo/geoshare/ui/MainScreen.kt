@@ -241,7 +241,7 @@ fun MainScreen(
                         pickContactLauncher.launch(
                             Intent(Intent.ACTION_PICK).apply {
                                 type = ContactsContract.Contacts.CONTENT_TYPE
-                            },
+                            }
                         )
                     } catch (_: ActivityNotFoundException) {
                         conversionViewModel.cancelContactUriRequest()
@@ -254,7 +254,7 @@ fun MainScreen(
                         clipboard = clipboard,
                         resources = resources,
                     )
-                    val success = currentState.action.execute(currentState.uri, actionContext)
+                    val success = currentState.action.execute(currentState.contactUri, actionContext)
                     conversionViewModel.finishContactAction(success)
                 }
 
@@ -267,7 +267,7 @@ fun MainScreen(
                                 addCategory(Intent.CATEGORY_OPENABLE)
                                 type = currentState.action.mimeType
                                 putExtra(Intent.EXTRA_TITLE, currentState.action.getFilename(resources))
-                            },
+                            }
                         )
                     } catch (_: ActivityNotFoundException) {
                         conversionViewModel.cancelFileUriRequest()
