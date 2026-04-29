@@ -285,9 +285,14 @@ object AndroidTools {
         startActivity(context, Intent(Intent.ACTION_EDIT).apply {
             data = contactUri
             putExtra(ContactsContract.Intents.Insert.POSTAL, CoordinateFormatter.formatDecCoords(point))
-            // TODO Save it in a location field
-            // TODO Then open the contact
+            putExtra(
+                ContactsContract.Intents.Insert.POSTAL_TYPE,
+                ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS,
+            )
         })
+
+    fun openContact(context: Context, contactUri: Uri): Boolean =
+        startActivity(context, Intent(Intent.ACTION_VIEW, contactUri))
 
     private fun createEmailIntent(address: String): Intent =
         Intent(Intent.ACTION_SENDTO, "mailto:$address".toUri())

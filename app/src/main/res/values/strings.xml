@@ -123,7 +123,10 @@
     <string name="output_open_street_view">Street view</string>
     <string name="output_open_link">Open %1$s link</string>
     <string name="output_save_to_contact">Save to contact</string>
-    <string name="output_send_via_app">Send point</string>
+    <string name="output_save_to_contact_automation_failed">Failed to automatically save point to contact</string>
+    <string name="output_save_to_contact_failed">Failed to save point to contact</string>
+    <string name="output_send">Send point</string>
+    <string name="output_send_via">Send point via %1$s</string>
     <string name="converter_amap_name">Amap (AutoNavi)</string>
     <string name="converter_amap_loading_indicator_title">Connecting to Amap…</string>
     <string name="converter_amap_permission_title">Connect to Amap?</string>
@@ -177,7 +180,6 @@
         <item quantity="one">Automatically saving GPX in %1$ds</item>
         <item quantity="other">Automatically saving GPX in %1$ds</item>
     </plurals>
-    <string name="conversion_automation_send_via_app">Send point via %1$s</string>
     <string name="conversion_automation_share_failed">Failed to automatically share link</string>
     <string name="conversion_automation_share_succeeded">Automatically shared link</string>
     <plurals name="conversion_automation_share_waiting">

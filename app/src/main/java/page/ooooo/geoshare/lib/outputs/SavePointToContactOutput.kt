@@ -18,10 +18,14 @@ import javax.inject.Inject
  */
 class SavePointToContactOutput @Inject constructor(
     private val coordinateConverter: CoordinateConverter,
-) : PointOutput.WithContact {
+) :
+    PointOutput.WithContact,
+    Output.HasErrorText,
+    Output.HasAutomationErrorText {
 
     override suspend fun execute(contactUri: Uri, value: Point, actionContext: ActionContext) =
-        AndroidTools.saveToContact(actionContext.context, contactUri, coordinateConverter.toWGS84(value))
+        AndroidTools.saveToContact(actionContext.context, contactUri, coordinateConverter.toWGS84(value)) &&
+            AndroidTools.openContact(actionContext.context, contactUri)
 
     @Composable
     override fun label(appDetails: AppDetails) =
@@ -29,6 +33,14 @@ class SavePointToContactOutput @Inject constructor(
 
     override fun getMenuIcon(appDetails: AppDetails) =
         ImageVectorIconDescriptor(Icons.Default.AccountBox)
+
+    @Composable
+    override fun errorText(appDetails: AppDetails) =
+        stringResource(R.string.output_save_to_contact_failed)
+
+    @Composable
+    override fun automationErrorText(appDetails: AppDetails) =
+        stringResource(R.string.output_save_to_contact_automation_failed)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

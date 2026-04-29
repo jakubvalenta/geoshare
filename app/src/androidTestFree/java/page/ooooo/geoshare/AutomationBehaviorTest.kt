@@ -19,7 +19,7 @@ import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenRouteOnePointGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
-import page.ooooo.geoshare.data.local.preferences.SendViaAppAutomation
+import page.ooooo.geoshare.data.local.preferences.SendPointAutomation
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
@@ -102,7 +102,7 @@ class AutomationBehaviorTest : BehaviorTest {
             // Configure automation
             goToUserPreferencesList()
             goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
-            val automation = SendViaAppAutomation(messagingAppPackageName)
+            val automation = SendPointAutomation(messagingAppPackageName)
             val serializedString = Json.encodeToString<Automation>(automation)
             onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
                 .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceAutomation_${serializedString}" }
