@@ -29,9 +29,10 @@ import page.ooooo.geoshare.data.local.preferences.OpenNavigationMagicEarthUriAut
 import page.ooooo.geoshare.data.local.preferences.OpenRouteOnePointGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenStreetViewGoogleUriAutomation
 import page.ooooo.geoshare.data.local.preferences.SavePointGpxAutomation
+import page.ooooo.geoshare.data.local.preferences.SavePointToContactAutomation
 import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.SaveRouteGpxAutomation
-import page.ooooo.geoshare.data.local.preferences.SendViaAppAutomation
+import page.ooooo.geoshare.data.local.preferences.SendPointAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareLinkUriAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareNavigationGoogleUriAutomation
@@ -56,9 +57,10 @@ import page.ooooo.geoshare.lib.outputs.OpenRouteGpxOutput
 import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 import page.ooooo.geoshare.lib.outputs.OpenStreetViewGoogleUriOutput
 import page.ooooo.geoshare.lib.outputs.SavePointGpxOutput
+import page.ooooo.geoshare.lib.outputs.SavePointToContactOutput
 import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
 import page.ooooo.geoshare.lib.outputs.SaveRouteGpxOutput
-import page.ooooo.geoshare.lib.outputs.SendViaAppOutput
+import page.ooooo.geoshare.lib.outputs.SendPointOutput
 import page.ooooo.geoshare.lib.outputs.ShareDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.ShareLinkUriOutput
 import page.ooooo.geoshare.lib.outputs.ShareNavigationGoogleUriOutput
@@ -92,6 +94,7 @@ class OutputRepositoryTest {
                 ShareNavigationGoogleUriOutput(coordinateConverter),
                 ShareStreetViewGoogleUriOutput(coordinateConverter),
                 SavePointGpxOutput(coordinateConverter),
+                SavePointToContactOutput(coordinateConverter),
             ),
             outputRepository.getOutputsForPoint(defaultFakeLinks),
         )
@@ -129,7 +132,7 @@ class OutputRepositoryTest {
                     OpenNavigationMagicEarthUriOutput(PackageNames.MAGIC_EARTH, coordinateConverter),
                 ),
                 PackageNames.SIGNAL to listOf(
-                    SendViaAppOutput(PackageNames.SIGNAL, coordinateConverter),
+                    SendPointOutput(PackageNames.SIGNAL, coordinateConverter),
                 ),
                 PackageNames.TOMTOM to listOf(
                     OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter),
@@ -190,6 +193,7 @@ class OutputRepositoryTest {
                 ShareStreetViewGoogleUriOutput(coordinateConverter),
                 ShareRouteGpxOutput(coordinateConverter),
                 SharePointsGpxOutput(coordinateConverter),
+                SavePointToContactOutput(coordinateConverter),
             ),
             outputRepository.getOutputsForSharing(),
         )
@@ -312,6 +316,7 @@ class OutputRepositoryTest {
                     ShareNavigationGoogleUriOutput(coordinateConverter),
                     ShareStreetViewGoogleUriOutput(coordinateConverter),
                     SavePointGpxOutput(coordinateConverter),
+                    SavePointToContactOutput(coordinateConverter),
                 ),
                 listOf(
                     ShareRouteGpxOutput(coordinateConverter),
@@ -322,7 +327,7 @@ class OutputRepositoryTest {
                 listOf(
                     OpenDisplayMagicEarthUriOutput(PackageNames.MAGIC_EARTH, coordinateConverter),
                     OpenNavigationMagicEarthUriOutput(PackageNames.MAGIC_EARTH, coordinateConverter),
-                    SendViaAppOutput(PackageNames.SIGNAL, coordinateConverter),
+                    SendPointOutput(PackageNames.SIGNAL, coordinateConverter),
                     OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter),
                     OpenDisplayGeoUriOutput(PackageNames.TEST, coordinateConverter),
                 ),
@@ -359,6 +364,7 @@ class OutputRepositoryTest {
                     ShareNavigationGoogleUriAutomation,
                     ShareStreetViewGoogleUriAutomation,
                     SavePointGpxAutomation,
+                    SavePointToContactAutomation,
                 ),
                 listOf(
                     ShareRouteGpxAutomation,
@@ -369,7 +375,7 @@ class OutputRepositoryTest {
                 listOf(
                     OpenDisplayMagicEarthUriAutomation(PackageNames.MAGIC_EARTH),
                     OpenNavigationMagicEarthUriAutomation(PackageNames.MAGIC_EARTH),
-                    SendViaAppAutomation(PackageNames.SIGNAL),
+                    SendPointAutomation(PackageNames.SIGNAL),
                     OpenRouteOnePointGpxAutomation(PackageNames.TOMTOM),
                     OpenDisplayGeoUriAutomation(PackageNames.TEST),
                 ),

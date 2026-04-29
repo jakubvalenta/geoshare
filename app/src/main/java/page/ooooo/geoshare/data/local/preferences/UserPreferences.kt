@@ -216,6 +216,7 @@ object AutomationPreference : OptionsPreference<Automation> {
             ShareNavigationGoogleUriAutomation,
             ShareStreetViewGoogleUriAutomation,
             SavePointGpxAutomation,
+            SavePointToContactAutomation,
         ),
         listOf(
             ShareRouteGpxAutomation,
@@ -249,7 +250,7 @@ object AutomationPreference : OptionsPreference<Automation> {
                         add(OpenRouteOnePointGpxAutomation(packageName))
                     }
                     if (DataType.SEND_PLAIN_TEXT in dataTypes) {
-                        add(SendViaAppAutomation(packageName))
+                        add(SendPointAutomation(packageName))
                     }
                 }
             }

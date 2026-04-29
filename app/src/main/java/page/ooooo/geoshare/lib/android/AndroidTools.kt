@@ -14,6 +14,7 @@ import android.os.Build
 import android.os.CancellationSignal
 import android.os.Looper
 import android.os.SystemClock
+import android.provider.ContactsContract
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
@@ -277,6 +278,16 @@ object AndroidTools {
             type = "text/plain"
             setPackage(packageName)
             putExtra(Intent.EXTRA_TEXT, text)
+        })
+
+    fun insertOrEditContactAddress(context: Context, address: String): Boolean =
+        startActivity(context, Intent(Intent.ACTION_INSERT_OR_EDIT).apply {
+            type = ContactsContract.Contacts.CONTENT_ITEM_TYPE
+            putExtra(ContactsContract.Intents.Insert.POSTAL, address)
+            putExtra(
+                ContactsContract.Intents.Insert.POSTAL_TYPE,
+                ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS,
+            )
         })
 
     private fun createEmailIntent(address: String): Intent =

@@ -109,8 +109,12 @@ object SavePointsGpxAutomation : Automation
 object SaveRouteGpxAutomation : Automation
 
 @Serializable
-@SerialName("SEND_VIA_APP")
-data class SendViaAppAutomation(val packageName: String?) : Automation
+@SerialName("SAVE_POINT_TO_CONTACT")
+object SavePointToContactAutomation : Automation
+
+@Serializable
+@SerialName("SEND_POINT")
+data class SendPointAutomation(val packageName: String?) : Automation
 
 @Serializable
 @SerialName("SHARE")
