@@ -629,7 +629,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 .scrollToElement(Direction.DOWN) {
                     viewIdResourceName == "geoShareResultSuccessSheetItemHeadline" &&
                         textAsString() in
-                        setOf("Save to contact") // TODO Add French translation
+                        setOf("Save to contact", @Suppress("SpellCheckingInspection") "Enregistrer dans un contact")
                 }
                 .click()
         }

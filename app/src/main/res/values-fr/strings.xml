@@ -273,4 +273,5 @@
     <string name="srs_description_greater_china_and_taiwan">Grande Chine et Taïwan</string>
     <string name="converter_cartes_ign_name">Cartes IGN</string>
     <string name="converter_plus_code_name">Codes Plus</string>
+    <string name="output_save_to_contact">Enregistrer dans un contact</string>
 </resources>
