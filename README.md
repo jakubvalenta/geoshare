@@ -212,6 +212,7 @@ export STORE_FILE=path/to/keystore.js
 export STORE_PASSWORD=mypassword
 export KEY_ALIAS=com.example.android
 export KEY_PASSWORD=mypassword
+make clean
 make build
 ```
 
