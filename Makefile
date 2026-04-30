@@ -24,6 +24,10 @@ bundle: | check-env
 		-Pandroid.injected.signing.key.alias="$(KEY_ALIAS)" \
 		-Pandroid.injected.signing.key.password="$(KEY_PASSWORD)"
 
+.PHONE: clean
+clean:
+	rm -r app/build || true
+
 .PHONY: check-env
 check-env:
 ifeq ($(STORE_FILE),)
