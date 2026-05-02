@@ -16,6 +16,7 @@ import page.ooooo.geoshare.data.local.preferences.CopyLinkNavigationMagicEarthUr
 import page.ooooo.geoshare.data.local.preferences.CopyLinkStreetViewGoogleUriAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyLinkUriAutomation
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
+import page.ooooo.geoshare.data.local.preferences.OpenDisplayCartesIGNUrlAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayMagicEarthUriAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenNavigationGoogleUriAutomation
@@ -43,6 +44,7 @@ import page.ooooo.geoshare.lib.outputs.CopyCoordsDegMinSecOutput
 import page.ooooo.geoshare.lib.outputs.CopyGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.CopyLinkUriOutput
 import page.ooooo.geoshare.lib.outputs.NoopOutput
+import page.ooooo.geoshare.lib.outputs.OpenDisplayCartesIGNUrlOutput
 import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.OpenDisplayMagicEarthUriOutput
 import page.ooooo.geoshare.lib.outputs.OpenNavigationGoogleUriOutput
@@ -106,6 +108,9 @@ class OutputRepository @Inject constructor(
             buildList {
                 if (DataType.GEO_URI in dataTypes) {
                     add(OpenDisplayGeoUriOutput(packageName, coordinateConverter))
+                }
+                if (DataType.CARTES_IGN_URL in dataTypes) {
+                    add(OpenDisplayCartesIGNUrlOutput(packageName, coordinateConverter))
                 }
                 if (DataType.MAGIC_EARTH_URI in dataTypes) {
                     add(OpenDisplayMagicEarthUriOutput(packageName, coordinateConverter))
@@ -224,6 +229,11 @@ class OutputRepository @Inject constructor(
             is OpenDisplayGeoUriAutomation ->
                 automation.packageName?.let { packageName ->
                     OpenDisplayGeoUriOutput(packageName, coordinateConverter)
+                }
+
+            is OpenDisplayCartesIGNUrlAutomation ->
+                automation.packageName?.let { packageName ->
+                    OpenDisplayCartesIGNUrlOutput(packageName, coordinateConverter)
                 }
 
             is OpenDisplayMagicEarthUriAutomation ->

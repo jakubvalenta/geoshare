@@ -22,6 +22,7 @@ import page.ooooo.geoshare.data.local.preferences.CopyCoordsDegMinSecAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyLinkUriAutomation
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
+import page.ooooo.geoshare.data.local.preferences.OpenDisplayCartesIGNUrlAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayMagicEarthUriAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenNavigationGoogleUriAutomation
@@ -48,6 +49,7 @@ import page.ooooo.geoshare.lib.outputs.CopyCoordsDegMinSecOutput
 import page.ooooo.geoshare.lib.outputs.CopyGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.CopyLinkUriOutput
 import page.ooooo.geoshare.lib.outputs.NoopOutput
+import page.ooooo.geoshare.lib.outputs.OpenDisplayCartesIGNUrlOutput
 import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.OpenDisplayMagicEarthUriOutput
 import page.ooooo.geoshare.lib.outputs.OpenNavigationGoogleUriOutput
@@ -127,6 +129,9 @@ class OutputRepositoryTest {
                     OpenRouteGpxOutput(PackageNames.GOOGLE_MAPS, coordinateConverter),
                     OpenPointsGpxOutput(PackageNames.GOOGLE_MAPS, coordinateConverter),
                 ),
+                PackageNames.CARTES_IGN to listOf(
+                    OpenDisplayCartesIGNUrlOutput(PackageNames.CARTES_IGN, coordinateConverter),
+                ),
                 PackageNames.MAGIC_EARTH to listOf(
                     OpenDisplayMagicEarthUriOutput(PackageNames.MAGIC_EARTH, coordinateConverter),
                     OpenNavigationMagicEarthUriOutput(PackageNames.MAGIC_EARTH, coordinateConverter),
@@ -148,6 +153,7 @@ class OutputRepositoryTest {
                         DataType.GOOGLE_STREET_VIEW_URI,
                         DataType.GPX_DATA,
                     ),
+                    PackageNames.CARTES_IGN to setOf(DataType.CARTES_IGN_URL),
                     PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
                     PackageNames.SIGNAL to setOf(DataType.SEND_PLAIN_TEXT),
                     PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
@@ -325,6 +331,7 @@ class OutputRepositoryTest {
                     SavePointsGpxOutput(coordinateConverter),
                 ),
                 listOf(
+                    OpenDisplayCartesIGNUrlOutput(PackageNames.CARTES_IGN, coordinateConverter),
                     OpenDisplayMagicEarthUriOutput(PackageNames.MAGIC_EARTH, coordinateConverter),
                     OpenNavigationMagicEarthUriOutput(PackageNames.MAGIC_EARTH, coordinateConverter),
                     SendPointOutput(PackageNames.SIGNAL, coordinateConverter),
@@ -373,6 +380,7 @@ class OutputRepositoryTest {
                     SavePointsGpxAutomation,
                 ),
                 listOf(
+                    OpenDisplayCartesIGNUrlAutomation(PackageNames.CARTES_IGN),
                     OpenDisplayMagicEarthUriAutomation(PackageNames.MAGIC_EARTH),
                     OpenNavigationMagicEarthUriAutomation(PackageNames.MAGIC_EARTH),
                     SendPointAutomation(PackageNames.SIGNAL),
