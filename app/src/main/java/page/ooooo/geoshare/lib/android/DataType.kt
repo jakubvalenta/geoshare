@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.android
 
 enum class DataType {
+    CARTES_IGN_URL,
     GEO_URI,
     GOOGLE_NAVIGATION_URI,
     GOOGLE_STREET_VIEW_URI,

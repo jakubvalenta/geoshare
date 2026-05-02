@@ -69,6 +69,10 @@ object NoopAutomation : Automation
 data class OpenDisplayGeoUriAutomation(val packageName: String?) : Automation
 
 @Serializable
+@SerialName("OPEN_DISPLAY_CARTES_IGN_URL")
+data class OpenDisplayCartesIGNUrlAutomation(val packageName: String?) : Automation
+
+@Serializable
 @SerialName("OPEN_DISPLAY_MAGIC_EARTH_URI")
 data class OpenDisplayMagicEarthUriAutomation(val packageName: String?) : Automation
 
