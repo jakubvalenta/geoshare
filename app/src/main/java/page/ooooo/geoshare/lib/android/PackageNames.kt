@@ -8,6 +8,7 @@ import page.ooooo.geoshare.lib.geo.Srs
 object PackageNames {
     const val AMAP = "com.autonavi.minimap"
     const val BAIDU_MAP = "com.baidu.BaiduMap"
+    const val CARTES_IGN = "fr.ign.geoportail"
     const val COMAPS_FDROID = "app.comaps.fdroid"
     const val COMAPS_PREFIX = "app.comaps."
     const val GARMIN_PREFIX = "com.garmin."

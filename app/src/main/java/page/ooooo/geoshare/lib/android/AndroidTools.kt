@@ -159,6 +159,16 @@ object AndroidTools {
             }
             for (packageName in queryPackageNames(
                 packageManager,
+                Intent(Intent.ACTION_VIEW, "https://cartes-ign.ign.fr".toUri()),
+            )) {
+                getOrPut(packageName) { mutableSetOf() }.apply {
+                    add(DataType.CARTES_IGN_URL)
+                    // Remove support for geo: URIs from the Cartes IGN app, because it doesn't support these URIs well
+                    remove(DataType.GEO_URI)
+                }
+            }
+            for (packageName in queryPackageNames(
+                packageManager,
                 Intent(Intent.ACTION_VIEW, "magicearth:".toUri()),
             )) {
                 getOrPut(packageName) { mutableSetOf() }.apply {
