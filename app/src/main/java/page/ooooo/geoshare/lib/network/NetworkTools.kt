@@ -20,6 +20,7 @@ import io.ktor.http.Cookie
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.isSuccess
 import io.ktor.network.sockets.SocketTimeoutException
 import io.ktor.util.network.UnresolvedAddressException
 import io.ktor.utils.io.ByteReadChannel
@@ -39,36 +40,44 @@ open class NetworkTools(
     private val engine: HttpClientEngine = CIO.create(),
     private val log: ILog = DefaultLog,
 ) {
-    data class Retry(val count: Int, val tr: NetworkException)
+    data class Attempt(val number: Int, val cause: NetworkException)
 
     /**
-     * Make a HEAD request to [url] and return the value of the response Location header.
+     * Makes a HEAD request to [url] and returns the value of the response Location header.
+     *
+     * To enable retrying, pass [maxAttempts] and [lastAttempt]. [maxAttempts] sets the maximum number of requests to
+     * make including the first request. [lastAttempt] tracks how many attempts have already been made. We use this
+     * custom retrying instead of the [io.ktor.client.plugins.HttpRequestRetry] plugin, so that the caller can notify
+     * the user while requests are being retried.
      *
      * The network request is executed on [dispatcher].
      */
     @Throws(NetworkException::class)
     open suspend fun httpHeadLocationHeader(
         url: URL,
-        retry: Retry? = null,
+        lastAttempt: Attempt? = null,
+        maxAttempts: Int = 1,
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
     ): String? = withContext(dispatcher) {
         connect(
             engine,
             url,
             method = HttpMethod.Head,
-            expectedStatusCodes = listOf(
-                HttpStatusCode.MovedPermanently,
-                HttpStatusCode.Found,
-            ),
             followRedirects = false,
-            retry = retry,
+            lastAttempt = lastAttempt,
+            maxAttempts = maxAttempts,
         ) { response ->
             response.headers[HttpHeaders.Location]
         }
     }
 
     /**
-     * Make a GET request to [url] and invoke [block] with the resulting [ByteReadChannel].
+     * Makes a GET request to [url] and invokes [block] with the resulting [ByteReadChannel].
+     *
+     * To enable retrying, pass [maxAttempts] and [lastAttempt]. [maxAttempts] sets the maximum number of requests to
+     * make including the first request. [lastAttempt] tracks how many attempts have already been made. We use this
+     * custom retrying instead of the [io.ktor.client.plugins.HttpRequestRetry] plugin, so that the caller can notify
+     * the user while requests are being retried.
      *
      * The network request as well as the [block] are executed on [dispatcher]. When the [block] finishes, the channel
      * is closed.
@@ -76,59 +85,70 @@ open class NetworkTools(
     @Throws(NetworkException::class)
     open suspend fun <T> httpGetBodyAsByteReadChannel(
         url: URL,
-        retry: Retry? = null,
+        lastAttempt: Attempt? = null,
+        maxAttempts: Int = 1,
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
         block: suspend (channel: ByteReadChannel) -> T,
     ): T = withContext(dispatcher) {
-        connect(engine, url, retry = retry) { response ->
+        connect(engine, url, lastAttempt = lastAttempt, maxAttempts = maxAttempts) { response ->
             val channel: ByteReadChannel = response.body()
             block(channel)
         }
     }
 
     /**
-     * Make a GET request to [url], follow all redirects, and return the final URL that the request redirected to.
+     * Makes a GET request to [url], follows all redirects, and returns the final URL that the request redirected to.
+     *
+     * To enable retrying, pass [maxAttempts] and [lastAttempt]. [maxAttempts] sets the maximum number of requests to
+     * make including the first request. [lastAttempt] tracks how many attempts have already been made. We use this
+     * custom retrying instead of the [io.ktor.client.plugins.HttpRequestRetry] plugin, so that the caller can notify
+     * the user while requests are being retried.
      *
      * The network request is executed on [dispatcher].
      */
     @Throws(NetworkException::class)
     open suspend fun httpGetRedirectedUrlString(
         url: URL,
-        retry: Retry? = null,
+        lastAttempt: Attempt? = null,
+        maxAttempts: Int = 1,
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
     ): String = withContext(dispatcher) {
-        connect(engine, url, retry = retry) { response ->
+        connect(engine, url, lastAttempt = lastAttempt, maxAttempts = maxAttempts) { response ->
             response.request.url.toString()
         }
     }
 
     /**
-     * Make an HTTP request to [url] using [method] and invoke [block] with the [HttpResponse].
+     * Internal method that makes HTTP request to [url] using [method] and invokes [block] with the [HttpResponse].
+     * This method is exposed only due to unit tests. Use high-level methods such as [httpGetBodyAsByteReadChannel].
      *
-     * Throw [NetworkException] if there is a connection error or if the HTTP response code is not in
-     * [expectedStatusCodes].
+     * Throws [NetworkException] if there is a connection error or if the HTTP response code is unexpected. Expected
+     * response codes are 2xx if [followRedirects] is true or 3xx if [followRedirects] is false.
      *
-     * This is an internal method that is exposed only due to unit tests. You should normally use high-level methods
-     * such as [httpGetBodyAsByteReadChannel] instead.
+     * To enable retrying, pass [maxAttempts] and [lastAttempt]. [maxAttempts] sets the maximum number of requests to
+     * make including the first request. [lastAttempt] tracks how many attempts have already been made. We use this
+     * custom retrying instead of the [io.ktor.client.plugins.HttpRequestRetry] plugin, so that the caller can notify
+     * the user while requests are being retried.
      */
     @Throws(NetworkException::class)
     open suspend fun <T> connect(
         engine: HttpClientEngine,
         url: URL,
         method: HttpMethod = HttpMethod.Get,
-        expectedStatusCodes: List<HttpStatusCode> = listOf(HttpStatusCode.OK),
         followRedirects: Boolean = true,
-        retry: Retry? = null,
+        lastAttempt: Attempt? = null,
+        maxAttempts: Int = 1,
         block: suspend (response: HttpResponse) -> T,
     ): T {
-        if (retry != null && retry.count > 0) {
-            if (retry.count > MAX_RETRIES) {
-                log.w(null, "Maximum number of $MAX_RETRIES retries reached for $url")
-                throw UnrecoverableNetworkException(retry.tr.messageResId, retry.tr.cause)
+        if (lastAttempt != null && lastAttempt.number > 1) {
+            if (lastAttempt.number > maxAttempts) {
+                log.w(null, "Maximum number of $maxAttempts attempts reached for $url")
+                throw UnrecoverableNetworkException(lastAttempt.cause.messageResId, lastAttempt.cause.cause)
             }
-            val timeMillis = (EXPONENTIAL_DELAY_BASE.pow(retry.count - 1) * EXPONENTIAL_DELAY_BASE_DELAY).roundToLong()
-            log.i(null, "Waiting ${timeMillis}ms before retry ${retry.count} of $MAX_RETRIES for $url")
-            delay(timeMillis)
+            val delayMillis = (EXPONENTIAL_DELAY_BASE.pow(lastAttempt.number - 2) * EXPONENTIAL_DELAY_BASE_DELAY)
+                .roundToLong()
+            log.i(null, "Waiting ${delayMillis}ms before attempt ${lastAttempt.number} of $maxAttempts for $url")
+            delay(delayMillis)
         }
         return HttpClient(engine) {
             this.followRedirects = followRedirects
@@ -150,7 +170,7 @@ open class NetworkTools(
             }
             HttpResponseValidator {
                 validateResponse { response ->
-                    if (response.status !in expectedStatusCodes) {
+                    if (!response.status.isSuccess() || !followRedirects && !response.status.isRedirect()) {
                         throw when (response.status.value) {
                             in 500..599 -> ServerResponseException(response, "<not implemented>")
                             else -> ResponseException(response, "<not implemented>")
@@ -211,10 +231,11 @@ open class NetworkTools(
         }
     }
 
+    fun HttpStatusCode.isRedirect(): Boolean = value in (300 until 399)
+
     companion object {
         const val DESKTOP_USER_AGENT =
             @Suppress("SpellCheckingInspection") "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
-        const val MAX_RETRIES = 9
         const val EXPONENTIAL_DELAY_BASE = 2.0
         const val EXPONENTIAL_DELAY_BASE_DELAY = 1_000L
         const val REQUEST_TIMEOUT = 256_000L

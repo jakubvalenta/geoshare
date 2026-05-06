@@ -55,7 +55,8 @@ class NetworkToolsTest {
             method = eq(HttpMethod.Head),
             expectedStatusCodes = eq(listOf(HttpStatusCode.MovedPermanently, HttpStatusCode.Found)),
             followRedirects = eq(false),
-            retry = eq(null),
+            lastAttempt = eq(null),
+            maxAttempts = eq(1),
             block = any(),
         )
     }
@@ -72,7 +73,8 @@ class NetworkToolsTest {
             method = eq(HttpMethod.Head),
             expectedStatusCodes = eq(listOf(HttpStatusCode.MovedPermanently, HttpStatusCode.Found)),
             followRedirects = eq(false),
-            retry = eq(null),
+            lastAttempt = eq(null),
+            maxAttempts = eq(1),
             block = any(),
         )
     }
@@ -95,7 +97,8 @@ class NetworkToolsTest {
             method = eq(HttpMethod.Get),
             expectedStatusCodes = eq(listOf(HttpStatusCode.OK)),
             followRedirects = eq(true),
-            retry = eq(null),
+            lastAttempt = eq(null),
+            maxAttempts = eq(1),
             block = any(),
         )
     }
@@ -115,7 +118,8 @@ class NetworkToolsTest {
             method = eq(HttpMethod.Get),
             expectedStatusCodes = eq(listOf(HttpStatusCode.OK)),
             followRedirects = eq(true),
-            retry = eq(null),
+            lastAttempt = eq(null),
+            maxAttempts = eq(1),
             block = any(),
         )
     }
@@ -221,7 +225,7 @@ class NetworkToolsTest {
     }
 
     @Test
-    fun connect_retryIsNull_doesNotWait() = runTest {
+    fun connect_lastAttemptIsNull_doesNotWait() = runTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
@@ -235,7 +239,7 @@ class NetworkToolsTest {
     }
 
     @Test
-    fun connect_retryIsZero_doesNotWait() = runTest {
+    fun connect_lastAttemptNumberIsOne_doesNotWait() = runTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
@@ -246,7 +250,8 @@ class NetworkToolsTest {
                 mockNetworkTools.connect(
                     mockEngine,
                     url,
-                    retry = NetworkTools.Retry(0, tr),
+                    lastAttempt = NetworkTools.Attempt(1, tr),
+                    maxAttempts = 10,
                 ) { response -> response.body<String>() },
             )
         }
@@ -254,7 +259,7 @@ class NetworkToolsTest {
     }
 
     @Test
-    fun connect_retryIsOne_waits() = runTest {
+    fun connect_lastAttemptNumberIsTwo_waits() = runTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
@@ -265,7 +270,8 @@ class NetworkToolsTest {
                 mockNetworkTools.connect(
                     mockEngine,
                     url,
-                    retry = NetworkTools.Retry(1, tr),
+                    lastAttempt = NetworkTools.Attempt(2, tr),
+                    maxAttempts = 10,
                 ) { response -> response.body<String>() }
             )
         }
@@ -273,7 +279,7 @@ class NetworkToolsTest {
     }
 
     @Test
-    fun connect_retryIsTwo_waits() = runTest {
+    fun connect_lastAttemptNumberIsThree_waits() = runTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
@@ -287,7 +293,8 @@ class NetworkToolsTest {
                 mockNetworkTools.connect(
                     mockEngine,
                     url,
-                    retry = NetworkTools.Retry(2, tr),
+                    lastAttempt = NetworkTools.Attempt(3, tr),
+                    maxAttempts = 10,
                 ) { response -> response.body<String>() }
             )
         }
@@ -295,7 +302,7 @@ class NetworkToolsTest {
     }
 
     @Test
-    fun connect_retryIsThree_waits() = runTest {
+    fun connect_lastAttemptNumberIsFour_waits() = runTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
@@ -306,7 +313,8 @@ class NetworkToolsTest {
                 mockNetworkTools.connect(
                     mockEngine,
                     url,
-                    retry = NetworkTools.Retry(3, tr),
+                    lastAttempt = NetworkTools.Attempt(4, tr),
+                    maxAttempts = 10,
                 ) { response -> response.body<String>() },
             )
         }
@@ -314,7 +322,7 @@ class NetworkToolsTest {
     }
 
     @Test
-    fun connect_retryIsMaxRetries_waits() = runTest {
+    fun connect_lastAttemptNumberIsMaxAttempts_waits() = runTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
@@ -325,7 +333,8 @@ class NetworkToolsTest {
                 mockNetworkTools.connect(
                     mockEngine,
                     url,
-                    retry = NetworkTools.Retry(9, tr),
+                    lastAttempt = NetworkTools.Attempt(10, tr),
+                    maxAttempts = 10,
                 ) { response -> response.body<String>() },
             )
         }
@@ -333,7 +342,7 @@ class NetworkToolsTest {
     }
 
     @Test
-    fun connect_retryIsGreaterThanMaxRetries_doesNotWaitAndThrowsUnrecoverableException() = runTest {
+    fun connect_lastAttemptNumberIsGreaterThanMaxAttempts_doesNotWaitAndThrowsUnrecoverableException() = runTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
@@ -346,7 +355,8 @@ class NetworkToolsTest {
                     mockNetworkTools.connect(
                         mockEngine,
                         url,
-                        retry = NetworkTools.Retry(10, tr),
+                        lastAttempt = NetworkTools.Attempt(11, tr),
+                        maxAttempts = 10,
                     ) { response -> response.body<String>() },
                 )
             } catch (tr: Exception) {

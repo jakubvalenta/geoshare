@@ -2265,7 +2265,7 @@ private fun LoadingIndicatorPreview() {
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsInput,
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
-                retry = NetworkTools.Retry(
+                lastAttempt = NetworkTools.Attempt(
                     2,
                     RecoverableNetworkException(R.string.network_exception_connect_timeout, Exception()),
                 )
@@ -2339,7 +2339,7 @@ private fun DarkLoadingIndicatorPreview() {
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsInput,
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
-                retry = NetworkTools.Retry(
+                lastAttempt = NetworkTools.Attempt(
                     2,
                     RecoverableNetworkException(R.string.network_exception_connect_timeout, Exception()),
                 )
@@ -2413,7 +2413,7 @@ private fun TabletLoadingIndicatorPreview() {
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsInput,
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
-                retry = NetworkTools.Retry(
+                lastAttempt = NetworkTools.Attempt(
                     2,
                     RecoverableNetworkException(R.string.network_exception_connect_timeout, Exception()),
                 )

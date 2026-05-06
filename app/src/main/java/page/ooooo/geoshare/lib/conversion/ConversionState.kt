@@ -157,7 +157,8 @@ data class GrantedUnshortenPermission(
     val inputUriString: String,
     val input: ShortUriInput,
     val uri: Uri,
-    val retry: NetworkTools.Retry? = null,
+    val lastAttempt: NetworkTools.Attempt? = null,
+    val maxAttempts: Int = 10,
 ) : ConversionState, ConversionState.HasLargeLoadingIndicator {
     override suspend fun transition(): State {
         val url = uri.toUrl()
@@ -173,8 +174,13 @@ data class GrantedUnshortenPermission(
         }
         return try {
             val unshortenedUrlString = when (input.shortUriMethod) {
-                ShortUriInput.Method.GET -> stateContext.networkTools.httpGetRedirectedUrlString(url, retry)
-                ShortUriInput.Method.HEAD -> stateContext.networkTools.httpHeadLocationHeader(url, retry)
+                ShortUriInput.Method.GET -> stateContext.networkTools.httpGetRedirectedUrlString(
+                    url, lastAttempt = lastAttempt, maxAttempts = maxAttempts,
+                )
+
+                ShortUriInput.Method.HEAD -> stateContext.networkTools.httpHeadLocationHeader(
+                    url, lastAttempt = lastAttempt, maxAttempts = maxAttempts,
+                )
             }
             if (unshortenedUrlString != null) {
                 val unshortenedUri = Uri.parse(unshortenedUrlString, stateContext.uriQuote).toAbsoluteUri(uri)
@@ -198,7 +204,7 @@ data class GrantedUnshortenPermission(
                 inputUriString,
                 input,
                 uri,
-                retry = NetworkTools.Retry((retry?.count ?: 0) + 1, tr),
+                NetworkTools.Attempt(lastAttempt?.number?.plus(1) ?: 1, tr),
             )
         } catch (tr: UnrecoverableNetworkException) {
             ConversionFailed(
@@ -213,12 +219,12 @@ data class GrantedUnshortenPermission(
 
     override fun getLargeLoadingIndicator() = LoadingIndicator.Large(
         title = stateContext.resources.getString(input.loadingIndicatorTitleResId),
-        description = retry?.let { retry ->
+        description = lastAttempt?.let {
             stateContext.resources.getString(
                 R.string.conversion_loading_indicator_description,
-                retry.count + 1,
-                NetworkTools.MAX_RETRIES + 1,
-                stateContext.resources.getString(retry.tr.messageResId),
+                it.number,
+                maxAttempts,
+                stateContext.resources.getString(it.cause.messageResId),
             )
         },
     )
@@ -330,7 +336,8 @@ data class GrantedParseHtmlPermission(
     val uri: Uri,
     val pointsFromUri: Points,
     val htmlUriString: String,
-    val retry: NetworkTools.Retry? = null,
+    val lastAttempt: NetworkTools.Attempt? = null,
+    val maxAttempts: Int = 10,
     val dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : ConversionState, ConversionState.HasLargeLoadingIndicator {
     override suspend fun transition(): State {
@@ -349,7 +356,8 @@ data class GrantedParseHtmlPermission(
         return try {
             stateContext.networkTools.httpGetBodyAsByteReadChannel(
                 htmlUrl,
-                retry,
+                lastAttempt = lastAttempt,
+                maxAttempts = maxAttempts,
                 dispatcher = Dispatchers.Default
             ) { channel ->
                 input.parseHtml(
@@ -401,7 +409,7 @@ data class GrantedParseHtmlPermission(
                 uri,
                 pointsFromUri,
                 htmlUriString,
-                retry = NetworkTools.Retry((retry?.count ?: 0) + 1, tr),
+                lastAttempt = NetworkTools.Attempt(lastAttempt?.number?.plus(1) ?: 1, tr),
             )
         } catch (tr: UnrecoverableNetworkException) {
             ConversionFailed(
@@ -416,12 +424,12 @@ data class GrantedParseHtmlPermission(
 
     override fun getLargeLoadingIndicator() = LoadingIndicator.Large(
         title = stateContext.resources.getString(input.loadingIndicatorTitleResId),
-        description = retry?.let { retry ->
+        description = lastAttempt?.let {
             stateContext.resources.getString(
                 R.string.conversion_loading_indicator_description,
-                retry.count + 1,
-                NetworkTools.MAX_RETRIES + 1,
-                stateContext.resources.getString(retry.tr.messageResId),
+                it.number,
+                maxAttempts,
+                stateContext.resources.getString(it.cause.messageResId),
             )
         },
     )

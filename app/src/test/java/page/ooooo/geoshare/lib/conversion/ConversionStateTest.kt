@@ -91,7 +91,8 @@ class ConversionStateTest {
     private open class MockNetworkTools : NetworkTools() {
         override suspend fun httpHeadLocationHeader(
             url: URL,
-            retry: Retry?,
+            lastAttempt: Attempt?,
+            maxAttempts: Int,
             dispatcher: CoroutineDispatcher,
         ): String? = onRequestLocationHeader(url)
 
@@ -101,7 +102,8 @@ class ConversionStateTest {
 
         override suspend fun httpGetRedirectedUrlString(
             url: URL,
-            retry: Retry?,
+            lastAttempt: Attempt?,
+            maxAttempts: Int,
             dispatcher: CoroutineDispatcher,
         ): String = onGetRedirectUrlString(url)
 
@@ -111,7 +113,8 @@ class ConversionStateTest {
 
         override suspend fun <T> httpGetBodyAsByteReadChannel(
             url: URL,
-            retry: Retry?,
+            lastAttempt: Attempt?,
+            maxAttempts: Int,
             dispatcher: CoroutineDispatcher,
             block: suspend (source: ByteReadChannel) -> T,
         ): T = block(onGetSource(url).byteInputStream().toByteReadChannel())
@@ -571,7 +574,7 @@ class ConversionStateTest {
         }
 
     @Test
-    fun grantedUnshortenPermission_requestLocationHeaderThrowsSocketTimeoutException_returnsGrantedUnshortenPermissionWithRetry() =
+    fun grantedUnshortenPermission_requestLocationHeaderThrowsSocketTimeoutException_returnsGrantedUnshortenPermissionWithLastAttempt() =
         runTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -591,14 +594,14 @@ class ConversionStateTest {
             )
             assertEquals(
                 GrantedUnshortenPermission(
-                    stateContext, inputUriString, GoogleMapsInput, uri, NetworkTools.Retry(1, tr),
+                    stateContext, inputUriString, GoogleMapsInput, uri, NetworkTools.Attempt(1, tr),
                 ),
                 state.transition(),
             )
         }
 
     @Test
-    fun grantedUnshortenPermission_requestLocationHeaderThrowsSocketTimeoutExceptionAndRetryIsOne_returnsGrantedUnshortenPermissionWithRetryWithIncreasedCount() =
+    fun grantedUnshortenPermission_requestLocationHeaderThrowsSocketTimeoutExceptionAndLastAttemptNumberIsOne_returnsGrantedUnshortenPermissionWithLastAttemptWithIncreasedCount() =
         runTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -618,7 +621,7 @@ class ConversionStateTest {
                 inputUriString,
                 GoogleMapsInput,
                 uri,
-                retry = NetworkTools.Retry(
+                lastAttempt = NetworkTools.Attempt(
                     1,
                     RecoverableNetworkException(
                         R.string.network_exception_socket_timeout,
@@ -628,7 +631,7 @@ class ConversionStateTest {
             )
             assertEquals(
                 GrantedUnshortenPermission(
-                    stateContext, inputUriString, GoogleMapsInput, uri, NetworkTools.Retry(2, tr),
+                    stateContext, inputUriString, GoogleMapsInput, uri, NetworkTools.Attempt(2, tr),
                 ),
                 state.transition(),
             )
@@ -838,48 +841,50 @@ class ConversionStateTest {
     }
 
     @Test
-    fun grantedUnshortenPermission_getLargeLoadingIndicator_retryIsNull_returnsIndicatorWithoutDescription() = runTest {
-        val inputUriString = "https://maps.app.goo.gl/foo"
-        val uri = Uri.parse(inputUriString, uriQuote)
-        val stateContext = mockStateContext()
-        val state = GrantedUnshortenPermission(
-            stateContext,
-            inputUriString,
-            GoogleMapsInput,
-            uri,
-            retry = null,
-        )
-        assertEquals(
-            LoadingIndicator.Large(
-                title = "Connecting to Google...",
-            ),
-            state.getLargeLoadingIndicator(),
-        )
-    }
+    fun grantedUnshortenPermission_getLargeLoadingIndicator_lastAttemptIsNull_returnsIndicatorWithoutDescription() =
+        runTest {
+            val inputUriString = "https://maps.app.goo.gl/foo"
+            val uri = Uri.parse(inputUriString, uriQuote)
+            val stateContext = mockStateContext()
+            val state = GrantedUnshortenPermission(
+                stateContext,
+                inputUriString,
+                GoogleMapsInput,
+                uri,
+                lastAttempt = null,
+            )
+            assertEquals(
+                LoadingIndicator.Large(
+                    title = "Connecting to Google...",
+                ),
+                state.getLargeLoadingIndicator(),
+            )
+        }
 
     @Test
-    fun grantedUnshortenPermission_getLargeLoadingIndicator_retryIsOne_returnsIndicatorWithDescription() = runTest {
-        val inputUriString = "https://maps.app.goo.gl/foo"
-        val uri = Uri.parse(inputUriString, uriQuote)
-        val stateContext = mockStateContext()
-        val state = GrantedUnshortenPermission(
-            stateContext,
-            inputUriString,
-            GoogleMapsInput,
-            uri,
-            retry = NetworkTools.Retry(
-                1,
-                RecoverableNetworkException(R.string.network_exception_eof, EOFException()),
-            ),
-        )
-        assertEquals(
-            LoadingIndicator.Large(
-                title = "Connecting to Google...",
-                description = "Attempt 2 out of 10 due to connection closed.",
-            ),
-            state.getLargeLoadingIndicator(),
-        )
-    }
+    fun grantedUnshortenPermission_getLargeLoadingIndicator_lastAttemptNumberIsTwo_returnsIndicatorWithDescription() =
+        runTest {
+            val inputUriString = "https://maps.app.goo.gl/foo"
+            val uri = Uri.parse(inputUriString, uriQuote)
+            val stateContext = mockStateContext()
+            val state = GrantedUnshortenPermission(
+                stateContext,
+                inputUriString,
+                GoogleMapsInput,
+                uri,
+                lastAttempt = NetworkTools.Attempt(
+                    2,
+                    RecoverableNetworkException(R.string.network_exception_eof, EOFException()),
+                ),
+            )
+            assertEquals(
+                LoadingIndicator.Large(
+                    title = "Connecting to Google...",
+                    description = "Attempt 2 out of 10 due to connection closed.",
+                ),
+                state.getLargeLoadingIndicator(),
+            )
+        }
 
     @Test
     fun deniedConnectionPermission_returnsConversionFailed() = runTest {
@@ -1621,7 +1626,7 @@ class ConversionStateTest {
         }
 
     @Test
-    fun grantedParseHtmlPermission_getSourceThrowsSocketTimeoutException_returnsGrantedParseHtmlPermissionWithRetry() =
+    fun grantedParseHtmlPermission_getSourceThrowsSocketTimeoutException_returnsGrantedParseHtmlPermissionWithLastAttempt() =
         runTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -1653,14 +1658,14 @@ class ConversionStateTest {
                     uri,
                     pointsFromUri,
                     htmlUriString,
-                    NetworkTools.Retry(1, tr),
+                    NetworkTools.Attempt(1, tr),
                 ),
                 state.transition(),
             )
         }
 
     @Test
-    fun grantedParseHtmlPermission_getSourceThrowsSocketTimeoutExceptionAndRetryIsOne_returnsGrantedParseHtmlPermissionWithRetryTwo() =
+    fun grantedParseHtmlPermission_getSourceThrowsSocketTimeoutExceptionAndLastAttemptNumberIsOne_returnsGrantedParseHtmlPermissionWithLastAttemptTwo() =
         runTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -1683,7 +1688,7 @@ class ConversionStateTest {
                 uri,
                 pointsFromUri,
                 htmlUriString,
-                retry = NetworkTools.Retry(1, tr),
+                lastAttempt = NetworkTools.Attempt(1, tr),
             )
             assertEquals(
                 GrantedParseHtmlPermission(
@@ -1693,7 +1698,7 @@ class ConversionStateTest {
                     uri,
                     pointsFromUri,
                     htmlUriString,
-                    NetworkTools.Retry(2, tr),
+                    NetworkTools.Attempt(2, tr),
                 ),
                 state.transition(),
             )
@@ -2188,56 +2193,58 @@ class ConversionStateTest {
         }
 
     @Test
-    fun grantedParseHtmlPermission_getLargeLoadingIndicator_retryIsNull_returnsIndicatorWithoutDescription() = runTest {
-        val inputUriString = "https://maps.app.goo.gl/foo"
-        val uri = Uri.parse(inputUriString, uriQuote)
-        val pointsFromUri = persistentListOf(WGS84Point(name = "bar", source = Source.GENERATED))
-        val htmlUriString = "$inputUriString/html"
-        val stateContext = mockStateContext()
-        val state = GrantedParseHtmlPermission(
-            stateContext,
-            inputUriString,
-            GoogleMapsInput,
-            uri,
-            pointsFromUri,
-            htmlUriString,
-            retry = null,
-        )
-        assertEquals(
-            LoadingIndicator.Large(
-                title = "Connecting to Google...",
-            ),
-            state.getLargeLoadingIndicator(),
-        )
-    }
+    fun grantedParseHtmlPermission_getLargeLoadingIndicator_lastAttemptIsNull_returnsIndicatorWithoutDescription() =
+        runTest {
+            val inputUriString = "https://maps.app.goo.gl/foo"
+            val uri = Uri.parse(inputUriString, uriQuote)
+            val pointsFromUri = persistentListOf(WGS84Point(name = "bar", source = Source.GENERATED))
+            val htmlUriString = "$inputUriString/html"
+            val stateContext = mockStateContext()
+            val state = GrantedParseHtmlPermission(
+                stateContext,
+                inputUriString,
+                GoogleMapsInput,
+                uri,
+                pointsFromUri,
+                htmlUriString,
+                lastAttempt = null,
+            )
+            assertEquals(
+                LoadingIndicator.Large(
+                    title = "Connecting to Google...",
+                ),
+                state.getLargeLoadingIndicator(),
+            )
+        }
 
     @Test
-    fun grantedParseHtmlPermission_getLargeLoadingIndicator_retryIsOne_returnsIndicatorWithDescription() = runTest {
-        val inputUriString = "https://maps.app.goo.gl/foo"
-        val uri = Uri.parse(inputUriString, uriQuote)
-        val pointsFromUri = persistentListOf(WGS84Point(name = "bar", source = Source.GENERATED))
-        val htmlUriString = "$inputUriString/html"
-        val stateContext = mockStateContext()
-        val state = GrantedParseHtmlPermission(
-            stateContext,
-            inputUriString,
-            GoogleMapsInput,
-            uri,
-            pointsFromUri,
-            htmlUriString,
-            retry = NetworkTools.Retry(
-                1,
-                RecoverableNetworkException(R.string.network_exception_eof, EOFException()),
-            ),
-        )
-        assertEquals(
-            LoadingIndicator.Large(
-                title = "Connecting to Google...",
-                description = "Attempt 2 out of 10 due to connection closed.",
-            ),
-            state.getLargeLoadingIndicator(),
-        )
-    }
+    fun grantedParseHtmlPermission_getLargeLoadingIndicator_lastAttemptNumberIsTwo_returnsIndicatorWithDescription() =
+        runTest {
+            val inputUriString = "https://maps.app.goo.gl/foo"
+            val uri = Uri.parse(inputUriString, uriQuote)
+            val pointsFromUri = persistentListOf(WGS84Point(name = "bar", source = Source.GENERATED))
+            val htmlUriString = "$inputUriString/html"
+            val stateContext = mockStateContext()
+            val state = GrantedParseHtmlPermission(
+                stateContext,
+                inputUriString,
+                GoogleMapsInput,
+                uri,
+                pointsFromUri,
+                htmlUriString,
+                lastAttempt = NetworkTools.Attempt(
+                    2,
+                    RecoverableNetworkException(R.string.network_exception_eof, EOFException()),
+                ),
+            )
+            assertEquals(
+                LoadingIndicator.Large(
+                    title = "Connecting to Google...",
+                    description = "Attempt 2 out of 10 due to connection closed.",
+                ),
+                state.getLargeLoadingIndicator(),
+            )
+        }
 
     @Test
     fun deniedParseHtmlPermission_lastPointHasCoords_returnsConversionSucceeded() = runTest {
