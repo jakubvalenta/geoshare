@@ -187,8 +187,8 @@
     <string name="network_exception_connect_timeout">Zeitüberschreitung bei der Verbindung</string>
     <string name="network_exception_eof">Verbindung geschlossen</string>
     <string name="network_exception_request_timeout">Zeitüberschreitung bei der Anfrage</string>
-    <string name="network_exception_response_error">Antwortfehler</string>
-    <string name="network_exception_server_response_error">Antwort-Serverfehler</string>
+    <string name="network_exception_response_error">Antwortfehler %1$d</string>
+    <string name="network_exception_server_response_error">Antwort-Serverfehler %1$d</string>
     <string name="network_exception_socket_timeout">Socket-Zeitüberschreitung</string>
     <string name="network_exception_unknown">unbekannter Fehler</string>
     <string name="network_exception_unresolved_address">ungelöste Adresse</string>

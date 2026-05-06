@@ -210,7 +210,7 @@ data class GrantedUnshortenPermission(
             ConversionFailed(
                 stateContext.resources.getString(
                     R.string.conversion_failed_unshorten_error_with_reason,
-                    stateContext.resources.getString(tr.messageResId),
+                    tr.getMessage(stateContext.resources),
                 ),
                 inputUriString,
             )
@@ -224,7 +224,7 @@ data class GrantedUnshortenPermission(
                 R.string.conversion_loading_indicator_description,
                 it.number,
                 maxAttempts,
-                stateContext.resources.getString(it.cause.messageResId),
+                it.cause.getMessage(stateContext.resources),
             )
         },
     )
@@ -415,7 +415,7 @@ data class GrantedParseHtmlPermission(
             ConversionFailed(
                 stateContext.resources.getString(
                     R.string.conversion_failed_parse_html_error_with_reason,
-                    stateContext.resources.getString(tr.messageResId),
+                    tr.getMessage(stateContext.resources),
                 ),
                 inputUriString,
             )
@@ -429,7 +429,7 @@ data class GrantedParseHtmlPermission(
                 R.string.conversion_loading_indicator_description,
                 it.number,
                 maxAttempts,
-                stateContext.resources.getString(it.cause.messageResId),
+                it.cause.getMessage(stateContext.resources),
             )
         },
     )

@@ -29,10 +29,18 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
-import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.network.ConnectTimeoutNetworkException
+import page.ooooo.geoshare.lib.network.ConnectionClosedNetworkException
+import page.ooooo.geoshare.lib.network.MaxAttemptsReachedNetworkException
 import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.network.RecoverableNetworkException
+import page.ooooo.geoshare.lib.network.RequestTimeoutNetworkException
+import page.ooooo.geoshare.lib.network.ResponseNetworkException
+import page.ooooo.geoshare.lib.network.ServerResponseNetworkException
+import page.ooooo.geoshare.lib.network.SocketTimeoutNetworkException
+import page.ooooo.geoshare.lib.network.UnknownNetworkException
 import page.ooooo.geoshare.lib.network.UnrecoverableNetworkException
+import page.ooooo.geoshare.lib.network.UnresolvedAddressNetworkException
 import java.net.SocketTimeoutException
 import java.net.URL
 import kotlin.time.Duration.Companion.seconds
@@ -239,14 +247,13 @@ class NetworkToolsTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
-        val tr = RecoverableNetworkException(R.string.network_exception_unknown, SocketTimeoutException())
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
                 "test content",
                 mockNetworkTools.connect(
                     mockEngine,
                     url,
-                    lastAttempt = NetworkTools.Attempt(1, tr),
+                    lastAttempt = NetworkTools.Attempt(1, SocketTimeoutNetworkException(SocketTimeoutException())),
                     maxAttempts = 10,
                 ) { response -> response.body<String>() },
             )
@@ -259,14 +266,13 @@ class NetworkToolsTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
-        val tr = RecoverableNetworkException(R.string.network_exception_unknown, SocketTimeoutException())
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
                 "test content",
                 mockNetworkTools.connect(
                     mockEngine,
                     url,
-                    lastAttempt = NetworkTools.Attempt(2, tr),
+                    lastAttempt = NetworkTools.Attempt(2, SocketTimeoutNetworkException(SocketTimeoutException())),
                     maxAttempts = 10,
                 ) { response -> response.body<String>() }
             )
@@ -279,17 +285,13 @@ class NetworkToolsTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
-        val tr = RecoverableNetworkException(
-            R.string.network_exception_unknown,
-            SocketTimeoutException(),
-        )
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
                 "test content",
                 mockNetworkTools.connect(
                     mockEngine,
                     url,
-                    lastAttempt = NetworkTools.Attempt(3, tr),
+                    lastAttempt = NetworkTools.Attempt(3, SocketTimeoutNetworkException(SocketTimeoutException())),
                     maxAttempts = 10,
                 ) { response -> response.body<String>() }
             )
@@ -302,14 +304,13 @@ class NetworkToolsTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
-        val tr = RecoverableNetworkException(R.string.network_exception_unknown, SocketTimeoutException())
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
                 "test content",
                 mockNetworkTools.connect(
                     mockEngine,
                     url,
-                    lastAttempt = NetworkTools.Attempt(4, tr),
+                    lastAttempt = NetworkTools.Attempt(4, SocketTimeoutNetworkException(SocketTimeoutException())),
                     maxAttempts = 10,
                 ) { response -> response.body<String>() },
             )
@@ -322,14 +323,13 @@ class NetworkToolsTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
-        val tr = RecoverableNetworkException(R.string.network_exception_unknown, SocketTimeoutException())
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
                 "test content",
                 mockNetworkTools.connect(
                     mockEngine,
                     url,
-                    lastAttempt = NetworkTools.Attempt(10, tr),
+                    lastAttempt = NetworkTools.Attempt(10, SocketTimeoutNetworkException(SocketTimeoutException())),
                     maxAttempts = 10,
                 ) { response -> response.body<String>() },
             )
@@ -342,7 +342,6 @@ class NetworkToolsTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
-        val tr = RecoverableNetworkException(R.string.network_exception_unknown, SocketTimeoutException())
         val workDuration = testScheduler.timeSource.measureTime {
             var threw: Exception? = null
             try {
@@ -351,7 +350,7 @@ class NetworkToolsTest {
                     mockNetworkTools.connect(
                         mockEngine,
                         url,
-                        lastAttempt = NetworkTools.Attempt(11, tr),
+                        lastAttempt = NetworkTools.Attempt(11, SocketTimeoutNetworkException(SocketTimeoutException())),
                         maxAttempts = 10,
                     ) { response -> response.body<String>() },
                 )
@@ -359,14 +358,9 @@ class NetworkToolsTest {
                 threw = tr
             }
             assertTrue(threw is UnrecoverableNetworkException)
-            assertEquals(
-                tr.messageResId,
-                (threw as? UnrecoverableNetworkException)?.messageResId,
-            )
-            assertEquals(
-                tr.cause,
-                (threw as? UnrecoverableNetworkException)?.cause,
-            )
+            assertTrue(threw is MaxAttemptsReachedNetworkException)
+            assertTrue(threw?.cause is SocketTimeoutNetworkException)
+            assertTrue(threw?.cause?.cause is io.ktor.client.network.sockets.SocketTimeoutException)
         }
         assertEquals(0.seconds, workDuration)
     }
@@ -436,10 +430,7 @@ class NetworkToolsTest {
                     threw = tr
                 }
                 assertTrue(threw is UnrecoverableNetworkException)
-                assertEquals(
-                    R.string.network_exception_response_error,
-                    (threw as? UnrecoverableNetworkException)?.messageResId,
-                )
+                assertTrue(threw is ResponseNetworkException)
                 assertTrue(threw?.cause is ResponseException)
                 assertFalse(threw?.cause is ServerResponseException)
                 val lastRequest = mockEngine.requestHistory.last()
@@ -479,7 +470,7 @@ class NetworkToolsTest {
     @Test
     fun connect_requestReturns4xx_throwsUnrecoverableException() = runTest {
         val url = URL("https://example.com/")
-        for (status in listOf(HttpStatusCode.BadRequest, HttpStatusCode.NotFound)) {
+        for (status in listOf(HttpStatusCode.BadRequest, HttpStatusCode.NotFound, HttpStatusCode.TooManyRequests)) {
             val mockEngine = MockEngine { respond("test content", status) }
             val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
             var threw: Exception? = null
@@ -489,10 +480,7 @@ class NetworkToolsTest {
                 threw = tr
             }
             assertTrue(threw is UnrecoverableNetworkException)
-            assertEquals(
-                R.string.network_exception_response_error,
-                (threw as? UnrecoverableNetworkException)?.messageResId,
-            )
+            assertTrue(threw is ResponseNetworkException)
             assertTrue(threw?.cause is ResponseException)
             assertFalse(threw?.cause is ServerResponseException)
             val lastRequest = mockEngine.requestHistory.last()
@@ -500,29 +488,6 @@ class NetworkToolsTest {
             assertEquals(lastRequest.method, HttpMethod.Get)
             assertTrue(clientConfig.followRedirects)
         }
-    }
-
-    @Test
-    fun connect_requestReturns429_throwsUnrecoverableException() = runTest {
-        val url = URL("https://example.com/")
-        val mockEngine = MockEngine { respond("test content", HttpStatusCode.TooManyRequests) }
-        val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
-        var threw: Exception? = null
-        try {
-            mockNetworkTools.connect(mockEngine, url) { response -> response.body<String>() }
-        } catch (tr: Exception) {
-            threw = tr
-        }
-        assertTrue(threw is UnrecoverableNetworkException)
-        assertEquals(
-            R.string.network_exception_too_many_requests,
-            (threw as? UnrecoverableNetworkException)?.messageResId,
-        )
-        assertTrue(threw?.cause is ResponseException)
-        val lastRequest = mockEngine.requestHistory.last()
-        val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
-        assertEquals(lastRequest.method, HttpMethod.Get)
-        assertTrue(clientConfig.followRedirects)
     }
 
     @Test
@@ -539,10 +504,7 @@ class NetworkToolsTest {
                 threw = tr
             }
             assertTrue(threw is RecoverableNetworkException)
-            assertEquals(
-                R.string.network_exception_server_response_error,
-                (threw as? RecoverableNetworkException)?.messageResId,
-            )
+            assertTrue(threw is ServerResponseNetworkException)
             assertTrue(threw?.cause is ServerResponseException)
             val lastRequest = mockEngine.requestHistory.last()
             val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
@@ -563,10 +525,7 @@ class NetworkToolsTest {
             threw = tr
         }
         assertTrue(threw is RecoverableNetworkException)
-        assertEquals(
-            R.string.network_exception_unresolved_address,
-            (threw as? RecoverableNetworkException)?.messageResId,
-        )
+        assertTrue(threw is UnresolvedAddressNetworkException)
         assertTrue(threw?.cause is UnresolvedAddressException)
     }
 
@@ -582,10 +541,7 @@ class NetworkToolsTest {
             threw = tr
         }
         assertTrue(threw is RecoverableNetworkException)
-        assertEquals(
-            R.string.network_exception_request_timeout,
-            (threw as? RecoverableNetworkException)?.messageResId,
-        )
+        assertTrue(threw is RequestTimeoutNetworkException)
         assertTrue(threw?.cause is HttpRequestTimeoutException)
     }
 
@@ -601,10 +557,7 @@ class NetworkToolsTest {
             threw = tr
         }
         assertTrue(threw is RecoverableNetworkException)
-        assertEquals(
-            R.string.network_exception_socket_timeout,
-            (threw as? RecoverableNetworkException)?.messageResId,
-        )
+        assertTrue(threw is SocketTimeoutNetworkException)
         assertTrue(threw?.cause is SocketTimeoutException)
     }
 
@@ -620,10 +573,7 @@ class NetworkToolsTest {
             threw = tr
         }
         assertTrue(threw is RecoverableNetworkException)
-        assertEquals(
-            R.string.network_exception_connect_timeout,
-            (threw as? RecoverableNetworkException)?.messageResId,
-        )
+        assertTrue(threw is ConnectTimeoutNetworkException)
         assertTrue(threw?.cause is ConnectTimeoutException)
     }
 
@@ -639,10 +589,7 @@ class NetworkToolsTest {
             threw = tr
         }
         assertTrue(threw is RecoverableNetworkException)
-        assertEquals(
-            R.string.network_exception_eof,
-            (threw as? RecoverableNetworkException)?.messageResId,
-        )
+        assertTrue(threw is ConnectionClosedNetworkException)
         assertTrue(threw?.cause is EOFException)
     }
 
@@ -660,10 +607,7 @@ class NetworkToolsTest {
             threw = tr
         }
         assertTrue(threw is UnrecoverableNetworkException)
-        assertEquals(
-            R.string.network_exception_unknown,
-            (threw as? UnrecoverableNetworkException)?.messageResId,
-        )
+        assertTrue(threw is UnknownNetworkException)
         assertTrue(threw?.cause is MyException)
     }
 }

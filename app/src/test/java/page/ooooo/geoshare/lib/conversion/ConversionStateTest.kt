@@ -2,6 +2,7 @@ package page.ooooo.geoshare.lib.conversion
 
 import android.content.Context
 import android.content.res.Resources
+import io.ktor.http.HttpStatusCode
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.jvm.javaio.toByteReadChannel
 import kotlinx.collections.immutable.persistentListOf
@@ -68,9 +69,10 @@ import page.ooooo.geoshare.lib.inputs.ParseHtmlResult
 import page.ooooo.geoshare.lib.inputs.ParseUriResult
 import page.ooooo.geoshare.lib.inputs.ShortUriInput
 import page.ooooo.geoshare.lib.inputs.WebInput
+import page.ooooo.geoshare.lib.network.ConnectionClosedNetworkException
 import page.ooooo.geoshare.lib.network.NetworkTools
-import page.ooooo.geoshare.lib.network.RecoverableNetworkException
-import page.ooooo.geoshare.lib.network.UnrecoverableNetworkException
+import page.ooooo.geoshare.lib.network.ResponseNetworkException
+import page.ooooo.geoshare.lib.network.SocketTimeoutNetworkException
 import page.ooooo.geoshare.lib.outputs.CopyCoordsDecOutput
 import page.ooooo.geoshare.lib.outputs.NoopAction
 import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
@@ -135,8 +137,8 @@ class ConversionStateTest {
             getString(R.string.conversion_failed_parse_html_error_with_reason, "no points")
         } doReturn "Failed to process web page due to: no points"
         on {
-            getString(R.string.conversion_failed_parse_html_error_with_reason, "server response error")
-        } doReturn "Failed to process web page due to: server response error"
+            getString(R.string.conversion_failed_parse_html_error_with_reason, "response error 404")
+        } doReturn "Failed to process web page due to: response error 404"
         on {
             getString(R.string.conversion_failed_parse_html_error_with_reason, "timeout")
         } doReturn "Failed to process web page due to: timeout"
@@ -152,8 +154,8 @@ class ConversionStateTest {
             getString(R.string.conversion_failed_unshorten_error_with_reason, "missing HTTP header")
         } doReturn "Failed to resolve short link due to: missing HTTP header"
         on {
-            getString(R.string.conversion_failed_unshorten_error_with_reason, "server response error")
-        } doReturn "Failed to resolve short link due to: server response error"
+            getString(R.string.conversion_failed_unshorten_error_with_reason, "response error 404")
+        } doReturn "Failed to resolve short link due to: response error 404"
         on { getString(R.string.conversion_failed_unsupported_service) } doReturn "Unsupported map service"
         on { getString(R.string.converter_google_maps_loading_indicator_title) } doReturn "Connecting to Google..."
         on {
@@ -161,7 +163,9 @@ class ConversionStateTest {
         } doReturn "Attempt 2 out of 10 due to connection closed."
         on { getString(R.string.conversion_succeeded_location_loading_indicator_title) } doReturn "Finding your location..."
         on { getString(R.string.network_exception_eof) } doReturn "connection closed"
-        on { getString(R.string.network_exception_server_response_error) } doReturn "server response error"
+        on {
+            getString(R.string.network_exception_response_error, HttpStatusCode.NotFound.value)
+        } doReturn "response error 404"
     }
     private val mockContext: Context = mock {}
     private val geometries = Geometries(mockContext)
@@ -578,12 +582,12 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val tr = RecoverableNetworkException(R.string.network_exception_socket_timeout, SocketTimeoutException())
+            val cause = SocketTimeoutNetworkException(SocketTimeoutException())
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
                     override fun onRequestLocationHeader(url: URL): String? =
                         if (url.toString() == inputUriString) {
-                            throw tr
+                            throw cause
                         } else {
                             super.onRequestLocationHeader(url)
                         }
@@ -594,7 +598,11 @@ class ConversionStateTest {
             )
             assertEquals(
                 GrantedUnshortenPermission(
-                    stateContext, inputUriString, GoogleMapsInput, uri, NetworkTools.Attempt(1, tr),
+                    stateContext,
+                    inputUriString,
+                    GoogleMapsInput,
+                    uri,
+                    NetworkTools.Attempt(1, cause),
                 ),
                 state.transition(),
             )
@@ -605,12 +613,12 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val tr = RecoverableNetworkException(R.string.network_exception_socket_timeout, SocketTimeoutException())
+            val cause = SocketTimeoutNetworkException(SocketTimeoutException())
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
                     override fun onRequestLocationHeader(url: URL): String? =
                         if (url.toString() == inputUriString) {
-                            throw tr
+                            throw cause
                         } else {
                             super.onRequestLocationHeader(url)
                         }
@@ -621,56 +629,22 @@ class ConversionStateTest {
                 inputUriString,
                 GoogleMapsInput,
                 uri,
-                lastAttempt = NetworkTools.Attempt(
-                    1,
-                    RecoverableNetworkException(
-                        R.string.network_exception_socket_timeout,
-                        SocketTimeoutException()
-                    ),
-                )
+                lastAttempt = NetworkTools.Attempt(1, cause),
             )
             assertEquals(
                 GrantedUnshortenPermission(
-                    stateContext, inputUriString, GoogleMapsInput, uri, NetworkTools.Attempt(2, tr),
-                ),
-                state.transition(),
-            )
-        }
-
-    @Test
-    fun grantedUnshortenPermission_requestLocationHeaderThrowsUnexpectedResponseCodeException_returnsConversionFailed() =
-        runTest {
-            val inputUriString = "https://maps.app.goo.gl/foo"
-            val uri = Uri.parse(inputUriString, uriQuote)
-            val stateContext = mockStateContext(
-                networkTools = object : MockNetworkTools() {
-                    override fun onRequestLocationHeader(url: URL): String? =
-                        if (url.toString() == inputUriString) {
-                            throw UnrecoverableNetworkException(
-                                R.string.network_exception_server_response_error, Exception()
-                            )
-                        } else {
-                            super.onRequestLocationHeader(url)
-                        }
-                },
-            )
-            val state = GrantedUnshortenPermission(
-                stateContext, inputUriString, GoogleMapsInput, uri
-            )
-            assertEquals(
-                ConversionFailed(
-                    mockResources.getString(
-                        R.string.conversion_failed_unshorten_error_with_reason,
-                        mockResources.getString(R.string.network_exception_server_response_error),
-                    ),
+                    stateContext,
                     inputUriString,
+                    GoogleMapsInput,
+                    uri,
+                    NetworkTools.Attempt(2, cause),
                 ),
                 state.transition(),
             )
         }
 
     @Test
-    fun grantedUnshortenPermission_requestLocationHeaderThrowsUnexpectedResponseCodeExceptionWithSocketTimeoutExceptionCause_returnsConversionFailedWithConnectionErrorMessage() =
+    fun grantedUnshortenPermission_requestLocationHeaderThrowsResponseException_returnsConversionFailed() =
         runTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -678,9 +652,7 @@ class ConversionStateTest {
                 networkTools = object : MockNetworkTools() {
                     override fun onRequestLocationHeader(url: URL): String? =
                         if (url.toString() == inputUriString) {
-                            throw UnrecoverableNetworkException(
-                                R.string.network_exception_server_response_error, SocketTimeoutException()
-                            )
+                            throw ResponseNetworkException(HttpStatusCode.NotFound, Exception())
                         } else {
                             super.onRequestLocationHeader(url)
                         }
@@ -693,7 +665,10 @@ class ConversionStateTest {
                 ConversionFailed(
                     mockResources.getString(
                         R.string.conversion_failed_unshorten_error_with_reason,
-                        mockResources.getString(R.string.network_exception_server_response_error),
+                        mockResources.getString(
+                            R.string.network_exception_response_error,
+                            HttpStatusCode.NotFound.value
+                        ),
                     ),
                     inputUriString,
                 ),
@@ -874,7 +849,7 @@ class ConversionStateTest {
                 uri,
                 lastAttempt = NetworkTools.Attempt(
                     2,
-                    RecoverableNetworkException(R.string.network_exception_eof, EOFException()),
+                    ConnectionClosedNetworkException(EOFException()),
                 ),
             )
             assertEquals(
@@ -1632,11 +1607,11 @@ class ConversionStateTest {
             val uri = Uri.parse(inputUriString, uriQuote)
             val pointsFromUri = persistentListOf(WGS84Point(name = "bar", source = Source.GENERATED))
             val htmlUriString = "$inputUriString/html"
-            val tr = RecoverableNetworkException(R.string.network_exception_socket_timeout, SocketTimeoutException())
+            val cause = SocketTimeoutNetworkException(SocketTimeoutException())
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
                     override fun onGetSource(url: URL): String = if (url.toString() == htmlUriString) {
-                        throw tr
+                        throw cause
                     } else {
                         super.onGetSource(url)
                     }
@@ -1658,7 +1633,7 @@ class ConversionStateTest {
                     uri,
                     pointsFromUri,
                     htmlUriString,
-                    NetworkTools.Attempt(1, tr),
+                    NetworkTools.Attempt(1, cause),
                 ),
                 state.transition(),
             )
@@ -1671,11 +1646,11 @@ class ConversionStateTest {
             val uri = Uri.parse(inputUriString, uriQuote)
             val pointsFromUri = persistentListOf(WGS84Point(name = "bar", source = Source.GENERATED))
             val htmlUriString = "$inputUriString/html"
-            val tr = RecoverableNetworkException(R.string.network_exception_socket_timeout, SocketTimeoutException())
+            val cause = SocketTimeoutNetworkException(SocketTimeoutException())
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
                     override fun onGetSource(url: URL): String = if (url.toString() == htmlUriString) {
-                        throw tr
+                        throw cause
                     } else {
                         super.onGetSource(url)
                     }
@@ -1688,7 +1663,7 @@ class ConversionStateTest {
                 uri,
                 pointsFromUri,
                 htmlUriString,
-                lastAttempt = NetworkTools.Attempt(1, tr),
+                lastAttempt = NetworkTools.Attempt(1, cause),
             )
             assertEquals(
                 GrantedParseHtmlPermission(
@@ -1698,14 +1673,14 @@ class ConversionStateTest {
                     uri,
                     pointsFromUri,
                     htmlUriString,
-                    NetworkTools.Attempt(2, tr),
+                    NetworkTools.Attempt(2, cause),
                 ),
                 state.transition(),
             )
         }
 
     @Test
-    fun grantedParseHtmlPermission_getSourceThrowsUnexpectedResponseCodeException_returnsConversionFailed() =
+    fun grantedParseHtmlPermission_getSourceThrowsResponseException_returnsConversionFailed() =
         runTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -1714,9 +1689,7 @@ class ConversionStateTest {
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
                     override fun onGetSource(url: URL): String = if (url.toString() == htmlUriString) {
-                        throw UnrecoverableNetworkException(
-                            R.string.network_exception_server_response_error, Exception()
-                        )
+                        throw ResponseNetworkException(HttpStatusCode.NotFound, Exception())
                     } else {
                         super.onGetSource(url)
                     }
@@ -1734,7 +1707,10 @@ class ConversionStateTest {
                 ConversionFailed(
                     mockResources.getString(
                         R.string.conversion_failed_parse_html_error_with_reason,
-                        mockResources.getString(R.string.network_exception_server_response_error),
+                        mockResources.getString(
+                            R.string.network_exception_response_error,
+                            HttpStatusCode.NotFound.value,
+                        ),
                     ),
                     inputUriString,
                 ),
@@ -1743,7 +1719,7 @@ class ConversionStateTest {
         }
 
     @Test
-    fun grantedParseHtmlPermission_getSourceThrowsUnexpectedResponseCodeExceptionWithSocketTimeoutExceptionCause_returnsConversionFailedWithConnectionErrorMessage() =
+    fun grantedParseHtmlPermission_getSourceThrowsResponseExceptionWithSocketTimeoutExceptionCause_returnsConversionFailedWithConnectionErrorMessage() =
         runTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -1752,9 +1728,7 @@ class ConversionStateTest {
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
                     override fun onGetSource(url: URL): String = if (url.toString() == htmlUriString) {
-                        throw UnrecoverableNetworkException(
-                            R.string.network_exception_server_response_error, SocketTimeoutException()
-                        )
+                        throw ResponseNetworkException(HttpStatusCode.NotFound, Exception())
                     } else {
                         super.onGetSource(url)
                     }
@@ -1772,7 +1746,10 @@ class ConversionStateTest {
                 ConversionFailed(
                     mockResources.getString(
                         R.string.conversion_failed_parse_html_error_with_reason,
-                        mockResources.getString(R.string.network_exception_server_response_error),
+                        mockResources.getString(
+                            R.string.network_exception_response_error,
+                            HttpStatusCode.NotFound.value,
+                        ),
                     ),
                     inputUriString
                 ),
@@ -2234,7 +2211,7 @@ class ConversionStateTest {
                 htmlUriString,
                 lastAttempt = NetworkTools.Attempt(
                     2,
-                    RecoverableNetworkException(R.string.network_exception_eof, EOFException()),
+                    ConnectionClosedNetworkException(EOFException()),
                 ),
             )
             assertEquals(

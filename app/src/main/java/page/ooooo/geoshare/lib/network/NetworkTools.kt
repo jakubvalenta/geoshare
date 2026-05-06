@@ -29,7 +29,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.io.EOFException
-import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.ILog
 import java.net.URL
@@ -40,7 +39,7 @@ open class NetworkTools(
     private val engine: HttpClientEngine = CIO.create(),
     private val log: ILog = DefaultLog,
 ) {
-    data class Attempt(val number: Int, val cause: NetworkException)
+    data class Attempt(val number: Int, val cause: RecoverableNetworkException)
 
     /**
      * Makes a HEAD request to [url] and returns the value of the response Location header.
@@ -143,7 +142,7 @@ open class NetworkTools(
         if (lastAttempt != null && lastAttempt.number > 1) {
             if (lastAttempt.number > maxAttempts) {
                 log.w(null, "Maximum number of $maxAttempts attempts reached for $url")
-                throw UnrecoverableNetworkException(lastAttempt.cause.messageResId, lastAttempt.cause.cause)
+                throw MaxAttemptsReachedNetworkException(lastAttempt.cause)
             }
             val delayMillis = (EXPONENTIAL_DELAY_BASE.pow(lastAttempt.number - 2) * EXPONENTIAL_DELAY_BASE_DELAY)
                 .roundToLong()
@@ -195,37 +194,28 @@ open class NetworkTools(
                 }.execute(block)
             } catch (tr: UnresolvedAddressException) {
                 log.w(null, "Unresolved address for $url", tr)
-                throw RecoverableNetworkException(R.string.network_exception_unresolved_address, tr)
+                throw UnresolvedAddressNetworkException(tr)
             } catch (tr: HttpRequestTimeoutException) {
                 log.w(null, "Request timeout for $url", tr)
-                throw RecoverableNetworkException(R.string.network_exception_request_timeout, tr)
+                throw RequestTimeoutNetworkException(tr)
             } catch (tr: SocketTimeoutException) {
                 log.w(null, "Socket timeout for $url", tr)
-                throw RecoverableNetworkException(R.string.network_exception_socket_timeout, tr)
+                throw SocketTimeoutNetworkException(tr)
             } catch (tr: ConnectTimeoutException) {
                 log.w(null, "Connect timeout for $url", tr)
-                throw RecoverableNetworkException(R.string.network_exception_connect_timeout, tr)
+                throw ConnectTimeoutNetworkException(tr)
             } catch (tr: EOFException) {
                 log.w(null, "EOF exception for $url", tr)
-                throw RecoverableNetworkException(R.string.network_exception_eof, tr)
+                throw ConnectionClosedNetworkException(tr)
             } catch (tr: ServerResponseException) {
                 log.w(null, "Server error ${tr.response.status} for $url", tr)
-                throw RecoverableNetworkException(R.string.network_exception_server_response_error, tr)
+                throw ServerResponseNetworkException(tr.response.status, tr)
             } catch (tr: ResponseException) {
-                when (tr.response.status.value) {
-                    429 -> {
-                        log.w(null, "Too many requests for $url", tr)
-                        throw UnrecoverableNetworkException(R.string.network_exception_too_many_requests, tr)
-                    }
-
-                    else -> {
-                        log.w(null, "Unexpected response code ${tr.response.status} for $url", tr)
-                        throw UnrecoverableNetworkException(R.string.network_exception_response_error, tr)
-                    }
-                }
+                log.w(null, "Unexpected response code ${tr.response.status} for $url", tr)
+                throw ResponseNetworkException(tr.response.status, tr)
             } catch (tr: Exception) {
                 log.e(null, "Unknown network exception for $url", tr)
-                throw UnrecoverableNetworkException(R.string.network_exception_unknown, tr)
+                throw UnknownNetworkException(tr)
             }
         }
     }
