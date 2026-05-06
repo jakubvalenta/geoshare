@@ -18,7 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
 import androidx.compose.material3.adaptive.layout.PaneScaffoldDirective
@@ -81,7 +81,7 @@ fun BasicSupportingPaneScaffold(
     val layoutDirection = LocalLayoutDirection.current
     val spacing = LocalSpacing.current
 
-    val defaultDirective = calculatePaneScaffoldDirective(currentWindowAdaptiveInfo())
+    val defaultDirective = calculatePaneScaffoldDirective(currentWindowAdaptiveInfoV2())
     val customDirective = remember(defaultDirective) {
         defaultDirective.copy(
             maxVerticalPartitions = 1,
