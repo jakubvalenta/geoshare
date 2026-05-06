@@ -102,10 +102,10 @@ fun ScreenshotOpenByDefault() {
                             )
                             Column(verticalArrangement = Arrangement.spacedBy(26.dp)) {
                                 mapOf(
-                                    "app.goog.gl" to false,
+                                    "app.goo.gl" to false,
                                     "goo.gl" to false,
                                     "google.com" to false,
-                                    "maps.app.goog.gl" to true,
+                                    "maps.app.goo.gl" to true,
                                     "maps.apple" to false,
                                     "maps.apple.com" to false,
                                     "maps.google.com" to true,
