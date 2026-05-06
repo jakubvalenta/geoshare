@@ -170,11 +170,10 @@ open class NetworkTools(
             }
             HttpResponseValidator {
                 validateResponse { response ->
-                    if (!response.status.isSuccess() || !followRedirects && !response.status.isRedirect()) {
-                        throw when (response.status.value) {
-                            in 500..599 -> ServerResponseException(response, "<not implemented>")
-                            else -> ResponseException(response, "<not implemented>")
-                        }
+                    when {
+                        response.status.isSuccess() || !followRedirects && response.status.isRedirect() -> {}
+                        response.status.isServerError() -> throw ServerResponseException(response, "<not implemented>")
+                        else -> throw ResponseException(response, "<not implemented>")
                     }
                 }
             }
@@ -231,7 +230,9 @@ open class NetworkTools(
         }
     }
 
-    fun HttpStatusCode.isRedirect(): Boolean = value in (300 until 399)
+    fun HttpStatusCode.isRedirect(): Boolean = value in (300 until 400)
+
+    fun HttpStatusCode.isServerError(): Boolean = value in (500 until 600)
 
     companion object {
         const val DESKTOP_USER_AGENT =

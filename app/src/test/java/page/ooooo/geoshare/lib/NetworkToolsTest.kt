@@ -53,7 +53,6 @@ class NetworkToolsTest {
             engine = eq(mockEngine),
             url = eq(url),
             method = eq(HttpMethod.Head),
-            expectedStatusCodes = eq(listOf(HttpStatusCode.MovedPermanently, HttpStatusCode.Found)),
             followRedirects = eq(false),
             lastAttempt = eq(null),
             maxAttempts = eq(1),
@@ -71,7 +70,6 @@ class NetworkToolsTest {
             engine = eq(mockEngine),
             url = eq(url),
             method = eq(HttpMethod.Head),
-            expectedStatusCodes = eq(listOf(HttpStatusCode.MovedPermanently, HttpStatusCode.Found)),
             followRedirects = eq(false),
             lastAttempt = eq(null),
             maxAttempts = eq(1),
@@ -95,7 +93,6 @@ class NetworkToolsTest {
             engine = eq(mockEngine),
             url = eq(url),
             method = eq(HttpMethod.Get),
-            expectedStatusCodes = eq(listOf(HttpStatusCode.OK)),
             followRedirects = eq(true),
             lastAttempt = eq(null),
             maxAttempts = eq(1),
@@ -116,7 +113,6 @@ class NetworkToolsTest {
             engine = eq(mockEngine),
             url = eq(url),
             method = eq(HttpMethod.Get),
-            expectedStatusCodes = eq(listOf(HttpStatusCode.OK)),
             followRedirects = eq(true),
             lastAttempt = eq(null),
             maxAttempts = eq(1),
@@ -376,120 +372,138 @@ class NetworkToolsTest {
     }
 
     @Test
-    fun connect_requestReturns301_returnsResponseIncludingLocationHeader() = runTest {
+    fun connect_requestReturns2xx_andFollowRedirectsIsDefault_returnsResponseIncludingLocationHeader() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine {
-            respond(
-                content = "test content",
-                status = HttpStatusCode.MovedPermanently,
-                headers = headersOf(
-                    HttpHeaders.Location,
-                    "https://example.com/redirect"
-                ),
+        for (status in listOf(HttpStatusCode.OK, HttpStatusCode.Created)) {
+            val mockEngine = MockEngine {
+                respond(
+                    content = "test content",
+                    status = status,
+                    headers = headersOf(
+                        HttpHeaders.Location,
+                        "https://example.com/redirect"
+                    ),
+                )
+            }
+            val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
+            assertEquals(
+                "https://example.com/redirect",
+                mockNetworkTools.connect(
+                    mockEngine,
+                    url,
+                ) { response -> response.headers[HttpHeaders.Location] }
             )
         }
-        val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
-        assertEquals(
-            "https://example.com/redirect",
-            mockNetworkTools.connect(
-                mockEngine,
-                url,
-                expectedStatusCodes = listOf(HttpStatusCode.MovedPermanently, HttpStatusCode.Found),
-                followRedirects = false,
-            ) { response -> response.headers[HttpHeaders.Location] }
-        )
     }
 
     @Test
-    fun connect_requestReturns302_returnsResponseIncludingLocationHeader() = runTest {
+    fun connect_requestReturns2xx_andFollowRedirectsIsFalse_returnsResponseIncludingLocationHeader() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine {
-            respond(
-                content = "test content",
-                status = HttpStatusCode.Found,
-                headers = headersOf(
-                    HttpHeaders.Location,
-                    "https://example.com/redirect"
-                ),
+        for (status in listOf(HttpStatusCode.OK, HttpStatusCode.Created)) {
+            val mockEngine = MockEngine {
+                respond(
+                    content = "test content",
+                    status = status,
+                    headers = headersOf(
+                        HttpHeaders.Location,
+                        "https://example.com/redirect"
+                    ),
+                )
+            }
+            val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
+            assertEquals(
+                "https://example.com/redirect",
+                mockNetworkTools.connect(
+                    mockEngine,
+                    url,
+                    followRedirects = false,
+                ) { response -> response.headers[HttpHeaders.Location] }
             )
         }
-        val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
-        assertEquals(
-            "https://example.com/redirect",
-            mockNetworkTools.connect(
-                mockEngine,
-                url,
-                expectedStatusCodes = listOf(HttpStatusCode.MovedPermanently, HttpStatusCode.Found),
-                followRedirects = false,
-            ) { response -> response.headers[HttpHeaders.Location] }
-        )
     }
 
     @Test
-    fun connect_requestReturns404AndExpectedStatusCodesIsNotPassed_throwsUnrecoverableException() = runTest {
-        val url = URL("https://example.com/")
-        val mockEngine = MockEngine { respond("test content", HttpStatusCode.NotFound) }
-        val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
-        var threw: Exception? = null
-        try {
-            mockNetworkTools.connect(mockEngine, url) { response -> response.body<String>() }
-        } catch (tr: Exception) {
-            threw = tr
+    fun connect_requestReturns3xxAndFollowRedirectsIsDefault_throwsUnrecoverableException() =
+        runTest {
+            val url = URL("https://example.com/")
+            for (status in listOf(HttpStatusCode.MovedPermanently, HttpStatusCode.Found)) {
+                val mockEngine = MockEngine { respond("test content", status) }
+                val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
+                var threw: Exception? = null
+                try {
+                    mockNetworkTools.connect(mockEngine, url) { response -> response.body<String>() }
+                } catch (tr: Exception) {
+                    threw = tr
+                }
+                assertTrue(threw is UnrecoverableNetworkException)
+                assertEquals(
+                    R.string.network_exception_response_error,
+                    (threw as? UnrecoverableNetworkException)?.messageResId,
+                )
+                assertTrue(threw?.cause is ResponseException)
+                assertFalse(threw?.cause is ServerResponseException)
+                val lastRequest = mockEngine.requestHistory.last()
+                val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
+                assertEquals(lastRequest.method, HttpMethod.Get)
+                assertTrue(clientConfig.followRedirects)
+            }
         }
-        assertTrue(threw is UnrecoverableNetworkException)
-        assertEquals(
-            R.string.network_exception_response_error,
-            (threw as? UnrecoverableNetworkException)?.messageResId,
-        )
-        assertTrue(threw?.cause is ResponseException)
-        assertFalse(threw?.cause is ServerResponseException)
-        val lastRequest = mockEngine.requestHistory.last()
-        val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
-        assertEquals(lastRequest.method, HttpMethod.Get)
-        assertTrue(clientConfig.followRedirects)
-    }
 
     @Test
-    fun connect_requestReturns404AndExpectedStatusCodesDoesNotContainIt_throwsUnrecoverableException() = runTest {
-        val url = URL("https://example.com/")
-        val mockEngine = MockEngine { respond("test content", HttpStatusCode.NotFound) }
-        val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
-        var threw: Exception? = null
-        try {
-            mockNetworkTools.connect(
-                mockEngine,
-                url,
-                expectedStatusCodes = listOf(HttpStatusCode.NoContent)
-            ) { response -> response.body<String>() }
-        } catch (tr: Exception) {
-            threw = tr
+    fun connect_requestReturns3xxAndFollowRedirectsIsFalse_returnsResponseIncludingLocationHeader() =
+        runTest {
+            val url = URL("https://example.com/")
+            for (status in listOf(HttpStatusCode.MovedPermanently, HttpStatusCode.Found)) {
+                val mockEngine = MockEngine {
+                    respond(
+                        content = "test content",
+                        status = status,
+                        headers = headersOf(
+                            HttpHeaders.Location,
+                            "https://example.com/redirect"
+                        ),
+                    )
+                }
+                val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
+                assertEquals(
+                    "https://example.com/redirect",
+                    mockNetworkTools.connect(
+                        mockEngine,
+                        url,
+                        followRedirects = false,
+                    ) { response -> response.headers[HttpHeaders.Location] }
+                )
+            }
         }
-        assertTrue(threw is UnrecoverableNetworkException)
-        assertEquals(
-            R.string.network_exception_response_error,
-            (threw as? UnrecoverableNetworkException)?.messageResId,
-        )
-        assertTrue(threw?.cause is ResponseException)
-        assertFalse(threw?.cause is ServerResponseException)
-    }
 
     @Test
-    fun connect_requestReturns404AndExpectedStatusCodesContainsIt_returnsResponse() = runTest {
+    fun connect_requestReturns4xx_throwsUnrecoverableException() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine { respond("test content", HttpStatusCode.NotFound) }
-        val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
-        assertEquals(
-            "test content",
-            mockNetworkTools.connect(
-                mockEngine,
-                url,
-                expectedStatusCodes = listOf(HttpStatusCode.NotFound)
-            ) { response -> response.body<String>() }
-        )
+        for (status in listOf(HttpStatusCode.BadRequest, HttpStatusCode.NotFound)) {
+            val mockEngine = MockEngine { respond("test content", status) }
+            val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
+            var threw: Exception? = null
+            try {
+                mockNetworkTools.connect(mockEngine, url) { response -> response.body<String>() }
+            } catch (tr: Exception) {
+                threw = tr
+            }
+            assertTrue(threw is UnrecoverableNetworkException)
+            assertEquals(
+                R.string.network_exception_response_error,
+                (threw as? UnrecoverableNetworkException)?.messageResId,
+            )
+            assertTrue(threw?.cause is ResponseException)
+            assertFalse(threw?.cause is ServerResponseException)
+            val lastRequest = mockEngine.requestHistory.last()
+            val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
+            assertEquals(lastRequest.method, HttpMethod.Get)
+            assertTrue(clientConfig.followRedirects)
+        }
     }
 
     @Test
-    fun connect_requestReturns429AndExpectedStatusCodesIsDefault_throwsUnrecoverableException() = runTest {
+    fun connect_requestReturns429_throwsUnrecoverableException() = runTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("test content", HttpStatusCode.TooManyRequests) }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
@@ -512,41 +526,29 @@ class NetworkToolsTest {
     }
 
     @Test
-    fun connect_requestReturns500AndExpectedStatusCodesIsDefault_throwsRecoverableException() = runTest {
+    fun connect_requestReturns5xx_throwsRecoverableException() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine { respond("test content", HttpStatusCode.InternalServerError) }
-        val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
-        var threw: Exception? = null
-        try {
-            mockNetworkTools.connect(mockEngine, url) { response -> response.body<String>() }
-        } catch (tr: Exception) {
-            threw = tr
-        }
-        assertTrue(threw is RecoverableNetworkException)
-        assertEquals(
-            R.string.network_exception_server_response_error,
-            (threw as? RecoverableNetworkException)?.messageResId,
-        )
-        assertTrue(threw?.cause is ServerResponseException)
-        val lastRequest = mockEngine.requestHistory.last()
-        val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
-        assertEquals(lastRequest.method, HttpMethod.Get)
-        assertTrue(clientConfig.followRedirects)
-    }
 
-    @Test
-    fun connect_requestReturns500AndExpectedStatusCodesContainsIt_returnsResponse() = runTest {
-        val url = URL("https://example.com/")
-        val mockEngine = MockEngine { respond("test content", HttpStatusCode.InternalServerError) }
-        val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
-        assertEquals(
-            "test content",
-            mockNetworkTools.connect(
-                mockEngine,
-                url,
-                expectedStatusCodes = listOf(HttpStatusCode.InternalServerError),
-            ) { response -> response.body<String>() },
-        )
+        for (status in listOf(HttpStatusCode.InternalServerError, HttpStatusCode.BadGateway)) {
+            val mockEngine = MockEngine { respond("test content", status) }
+            val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
+            var threw: Exception? = null
+            try {
+                mockNetworkTools.connect(mockEngine, url) { response -> response.body<String>() }
+            } catch (tr: Exception) {
+                threw = tr
+            }
+            assertTrue(threw is RecoverableNetworkException)
+            assertEquals(
+                R.string.network_exception_server_response_error,
+                (threw as? RecoverableNetworkException)?.messageResId,
+            )
+            assertTrue(threw?.cause is ServerResponseException)
+            val lastRequest = mockEngine.requestHistory.last()
+            val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
+            assertEquals(lastRequest.method, HttpMethod.Get)
+            assertTrue(clientConfig.followRedirects)
+        }
     }
 
     @Test
