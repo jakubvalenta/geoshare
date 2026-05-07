@@ -101,7 +101,7 @@ object OpenStreetMapInput : HtmlInput, Input.HasRandomUri {
         val pattern = Regex(""""lat":$LAT,"lon":$LON""")
 
         val mutablePoints = mutableListOf<WGS84Point>()
-        val name = pointsFromUri.lastOrNull()?.name
+        val name = prevPoints?.lastOrNull()?.name
 
         while (true) {
             val line = channel.readLine() ?: break

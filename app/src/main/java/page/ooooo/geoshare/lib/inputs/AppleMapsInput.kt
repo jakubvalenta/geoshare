@@ -90,7 +90,7 @@ object AppleMapsInput : HtmlInput, Input.HasRandomUri {
 
         var lat: Double? = null
         var lon: Double? = null
-        val name = pointsFromUri.lastOrNull()?.name
+        val name = prevPoints?.lastOrNull()?.name
 
         while (true) {
             val line = channel.readLine() ?: break

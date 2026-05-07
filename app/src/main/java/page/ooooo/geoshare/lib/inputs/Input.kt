@@ -9,6 +9,7 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
+import java.net.URL
 
 interface Input {
     val uriPattern: Regex
@@ -49,4 +50,46 @@ interface WebInput : Input {
 
     fun extendWebSettings(settings: WebSettings) {}
     fun shouldInterceptRequest(requestUrlString: String): Boolean = false
+}
+
+sealed interface NewInput {
+    val pattern: Regex? get() = null
+    val documentation: InputDocumentation? get() = null
+
+    interface HasPermission {
+        val permissionTitleResId: Int
+        val loadingIndicatorTitleResId: Int
+    }
+}
+
+interface ShortLinkGetInput : NewInput, NewInput.HasPermission {
+    suspend fun parse(unshortenedUri: Uri): ParseResult
+}
+
+interface ShortLinkHeadInput : NewInput, NewInput.HasPermission {
+    suspend fun parse(unshortenedUri: Uri): ParseResult
+}
+
+interface NewUriInput : NewInput {
+    suspend fun parse(uri: Uri, uriQuote: UriQuote = DefaultUriQuote): ParseResult
+}
+
+interface NewHtmlInput : NewInput, NewInput.HasPermission {
+    suspend fun parse(
+        channel: ByteReadChannel,
+        prevPoints: Points? = null,
+        uriQuote: UriQuote = DefaultUriQuote,
+        log: ILog = DefaultLog,
+    ): ParseResult
+}
+
+interface NewWebInput : NewInput, NewInput.HasPermission {
+    fun extendWebSettings(settings: WebSettings) {}
+    fun shouldInterceptRequest(requestUrlString: String): Boolean = false
+
+    suspend fun parse(webUrlString: String): ParseResult
+}
+
+interface ApiInput : NewInput, NewInput.HasPermission {
+    suspend fun parse(url: URL): ParseResult
 }

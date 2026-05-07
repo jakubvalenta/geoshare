@@ -10,7 +10,7 @@ import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-class GoogleMapsInputBehaviorTest : InputBehaviorTest {
+class GoogleMapsUriInputBehaviorTest : InputBehaviorTest {
     @Test
     fun googleMaps() = uiAutomator {
         // Coordinates in data

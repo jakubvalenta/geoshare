@@ -187,7 +187,7 @@ fun ResultSuccessMessage(
 
             is ConversionState.HasSmallLoadingIndicator -> ResultMessageRow {
                 ResultMessageText(
-                    targetState.getSmallLoadingIndicator().message,
+                    targetState.getLoadingIndicator().message,
                     Modifier.testTag("geoShareResultSuccessSmallLoadingIndicatorMessage"),
                 )
                 FilledIconButton(
@@ -292,7 +292,7 @@ private fun ActionFinishedPreview() {
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionFinished(
-                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
                         .toAction(WGS84Point(NaivePoint.example)),
@@ -330,7 +330,7 @@ private fun DarkActionFinishedPreview() {
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionFinished(
-                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
                         .toAction(WGS84Point(NaivePoint.example)),
@@ -369,7 +369,7 @@ private fun ActionFinishedFeatureNotAvailablePreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessMessage(
                     currentState = ActionFinished(
-                        inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                        rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         points = persistentListOf(WGS84Point(NaivePoint.example)),
                         action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
                             .toAction(WGS84Point(NaivePoint.example)),
@@ -405,7 +405,7 @@ private fun DarkActionFinishedFeatureNotAvailablePreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessMessage(
                     currentState = ActionFinished(
-                        inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                        rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         points = persistentListOf(WGS84Point(NaivePoint.example)),
                         action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
                             .toAction(WGS84Point(NaivePoint.example)),
@@ -451,7 +451,7 @@ private fun ActionWaitingPreview() {
                         userPreferencesRepository = FakeUserPreferencesRepository(),
                         billing = BillingImpl(LocalContext.current),
                     ),
-                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
                         .toAction(WGS84Point(NaivePoint.example)),
@@ -501,7 +501,7 @@ private fun DarkActionWaitingPreview() {
                         userPreferencesRepository = FakeUserPreferencesRepository(),
                         billing = BillingImpl(LocalContext.current),
                     ),
-                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
                         .toAction(WGS84Point(NaivePoint.example)),
@@ -551,7 +551,7 @@ private fun LocationPermissionReceivedPreview() {
                         userPreferencesRepository = FakeUserPreferencesRepository(),
                         billing = BillingImpl(LocalContext.current),
                     ),
-                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter)
                         .toAction(WGS84Point(NaivePoint.example)),
@@ -600,7 +600,7 @@ private fun DarkLocationPermissionReceivedPreview() {
                         userPreferencesRepository = FakeUserPreferencesRepository(),
                         billing = BillingImpl(LocalContext.current),
                     ),
-                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter)
                         .toAction(WGS84Point(NaivePoint.example)),
@@ -638,7 +638,7 @@ private fun SucceededPreview() {
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionSucceeded(
-                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
                         .toAction(WGS84Point(NaivePoint.example)),
@@ -676,7 +676,7 @@ private fun DarSucceededPreview() {
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionSucceeded(
-                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
                         .toAction(WGS84Point(NaivePoint.example)),
@@ -714,7 +714,7 @@ private fun SucceededNoMessagePreview() {
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionSucceeded(
-                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = SharePointsGpxOutput(coordinateConverter)
                         .toAction(persistentListOf(WGS84Point(NaivePoint.example))),
@@ -752,7 +752,7 @@ private fun DarkSucceededNoMessagePreview() {
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionSucceeded(
-                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = SharePointsGpxOutput(coordinateConverter)
                         .toAction(persistentListOf(WGS84Point(NaivePoint.example))),
@@ -790,7 +790,7 @@ private fun FailedPreview() {
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionFailed(
-                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
                         .toAction(WGS84Point(NaivePoint.example)),
@@ -828,7 +828,7 @@ private fun DarkFailedPreview() {
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionFailed(
-                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
                         .toAction(WGS84Point(NaivePoint.example)),

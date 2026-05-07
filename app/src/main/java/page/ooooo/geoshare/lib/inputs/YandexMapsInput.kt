@@ -104,7 +104,7 @@ object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
         val namePattern = Regex("""itemProp="name"[^>]*>([^<]+)""")
 
         var naivePoint: NaivePoint? = null
-        var name = pointsFromUri.lastOrNull()?.name
+        var name = prevResult?.points?.lastOrNull()?.name
 
         while (true) {
             val line = channel.readLine() ?: break

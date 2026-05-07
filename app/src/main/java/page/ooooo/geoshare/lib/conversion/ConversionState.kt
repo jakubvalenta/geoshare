@@ -25,10 +25,6 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.inputs.HtmlInput
-import page.ooooo.geoshare.lib.inputs.Input
-import page.ooooo.geoshare.lib.inputs.ShortUriInput
-import page.ooooo.geoshare.lib.inputs.WebInput
 import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.network.RecoverableNetworkException
 import page.ooooo.geoshare.lib.network.UnrecoverableNetworkException
@@ -41,6 +37,15 @@ import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.inputs.ApiInput
+import page.ooooo.geoshare.lib.inputs.NewHtmlInput
+import page.ooooo.geoshare.lib.inputs.NewInput
+import page.ooooo.geoshare.lib.inputs.NewUriInput
+import page.ooooo.geoshare.lib.inputs.NewWebInput
+import page.ooooo.geoshare.lib.inputs.ParseResult
+import page.ooooo.geoshare.lib.inputs.ShortLinkGetInput
+import page.ooooo.geoshare.lib.inputs.ShortLinkHeadInput
+import java.net.MalformedURLException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -49,15 +54,12 @@ interface ConversionState : State {
 
     interface HasError {
         val message: String
-        val inputUriString: String
+        val rawData: String
     }
 
-    interface HasSmallLoadingIndicator {
-        fun getSmallLoadingIndicator(): LoadingIndicator.Small
-    }
-
-    interface HasLargeLoadingIndicator {
-        fun getLargeLoadingIndicator(): LoadingIndicator.Large
+    interface HasResult {
+        val rawData: String
+        val points: Points
     }
 
     interface HasPermission {
@@ -67,9 +69,12 @@ interface ConversionState : State {
         suspend fun deny(doNotAsk: Boolean): State
     }
 
-    interface HasResult {
-        val inputUriString: String
-        val points: Points
+    interface HasSmallLoadingIndicator {
+        fun getLoadingIndicator(): LoadingIndicator.Small
+    }
+
+    interface HasLargeLoadingIndicator {
+        fun getLoadingIndicator(): LoadingIndicator.Large?
     }
 
     companion object {
@@ -79,473 +84,289 @@ interface ConversionState : State {
 
 class Initial : ConversionState
 
-data class ReceivedUriString(
+data class ReceivedData(
     val stateContext: ConversionStateContext,
-    val inputUriString: String,
+    val rawData: String,
 ) : ConversionState {
     override suspend fun transition(): State {
-        if (inputUriString.isEmpty()) {
+        if (rawData.isEmpty()) {
             return ConversionFailed(
                 stateContext.resources.getString(R.string.conversion_failed_missing_url),
-                "",
+                rawData,
             )
         }
         for (input in stateContext.inputs) {
-            val uriString = input.uriPattern.find(inputUriString)?.groupOrNull()
-            if (uriString != null) {
-                val uri = Uri.parse(uriString, stateContext.uriQuote)
-                return ReceivedUri(stateContext, inputUriString, input, uri, null)
+            val data = input.pattern?.find(rawData)?.groupOrNull()
+            if (data != null) {
+                return FoundInput(stateContext, rawData, data, input)
             }
         }
         return ConversionFailed(
             stateContext.resources.getString(R.string.conversion_failed_unsupported_service),
-            inputUriString,
+            rawData,
         )
     }
 }
 
-data class ReceivedUri(
+data class FoundInput(
     val stateContext: ConversionStateContext,
-    val inputUriString: String,
-    val input: Input,
-    val uri: Uri,
-    val permission: Permission?,
+    val rawData: String,
+    val data: String,
+    val input: NewInput,
+    val permission: Permission? = null,
+    val prevPoints: Points? = null,
 ) : ConversionState {
-    override suspend fun transition(): State {
-        if (input is ShortUriInput) {
-            val shortUriString = input.shortUriPattern.find(uri.toString())?.value
-            if (shortUriString != null) {
-                val uri = Uri.parse(shortUriString, stateContext.uriQuote)
-                return when (permission ?: stateContext.userPreferencesRepository.getValue(
-                    ConnectionPermissionPreference
-                )) {
-                    Permission.ALWAYS -> GrantedUnshortenPermission(stateContext, inputUriString, input, uri)
-                    Permission.ASK -> RequestedUnshortenPermission(stateContext, inputUriString, input, uri)
-                    Permission.NEVER -> DeniedConnectionPermission(stateContext, inputUriString, input)
-                }
+    override suspend fun transition() =
+        if (input is NewInput.HasPermission) {
+            when (permission ?: stateContext.userPreferencesRepository.getValue(
+                ConnectionPermissionPreference
+            )) {
+                Permission.ALWAYS -> GrantedPermission(
+                    stateContext,
+                    rawData,
+                    data,
+                    input,
+                    loadingIndicatorTitleResId = input.loadingIndicatorTitleResId,
+                    permission = Permission.ALWAYS,
+                    prevPoints = prevPoints,
+                )
+
+                Permission.ASK -> RequestedPermission(
+                    stateContext,
+                    rawData,
+                    data,
+                    input,
+                    permissionTitleResId = input.permissionTitleResId,
+                    loadingIndicatorTitleResId = input.loadingIndicatorTitleResId,
+                )
+
+                Permission.NEVER -> DeniedPermission(stateContext, rawData, input)
             }
+        } else {
+            GrantedPermission(stateContext, rawData, data, input)
         }
-        return UnshortenedUrl(stateContext, inputUriString, input, uri, permission)
-    }
 }
 
-data class RequestedUnshortenPermission(
+data class RequestedPermission(
     val stateContext: ConversionStateContext,
-    val inputUriString: String,
-    val input: ShortUriInput,
-    val uri: Uri,
+    val rawData: String,
+    val data: String,
+    val input: NewInput,
+    override val permissionTitleResId: Int,
+    val loadingIndicatorTitleResId: Int,
 ) : ConversionState, ConversionState.HasPermission {
-    override val permissionTitleResId: Int = input.permissionTitleResId
-
     override suspend fun grant(doNotAsk: Boolean): State {
         if (doNotAsk) {
             stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.ALWAYS)
         }
-        return GrantedUnshortenPermission(stateContext, inputUriString, input, uri)
+        return GrantedPermission(stateContext, rawData, data, input, loadingIndicatorTitleResId, Permission.ALWAYS)
     }
 
     override suspend fun deny(doNotAsk: Boolean): State {
         if (doNotAsk) {
             stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.NEVER)
         }
-        return DeniedConnectionPermission(stateContext, inputUriString, input)
-    }
-}
-
-data class GrantedUnshortenPermission(
-    val stateContext: ConversionStateContext,
-    val inputUriString: String,
-    val input: ShortUriInput,
-    val uri: Uri,
-    val lastAttempt: NetworkTools.Attempt? = null,
-    val maxAttempts: Int = 10,
-) : ConversionState, ConversionState.HasLargeLoadingIndicator {
-    override suspend fun transition(): State {
-        val url = uri.toUrl()
-        if (url == null) {
-            stateContext.log.e(ConversionState.TAG, "Unshorten: Failed to get URL for $uri")
-            return ConversionFailed(
-                stateContext.resources.getString(
-                    R.string.conversion_failed_unshorten_error_with_reason,
-                    stateContext.resources.getString(R.string.conversion_failed_reason_invalid_url),
-                ),
-                inputUriString,
-            )
-        }
-        return try {
-            val unshortenedUrlString = when (input.shortUriMethod) {
-                ShortUriInput.Method.GET -> stateContext.networkTools.httpGetRedirectedUrlString(
-                    url, lastAttempt = lastAttempt, maxAttempts = maxAttempts,
-                )
-
-                ShortUriInput.Method.HEAD -> stateContext.networkTools.httpHeadLocationHeader(
-                    url, lastAttempt = lastAttempt, maxAttempts = maxAttempts,
-                )
-            }
-            if (unshortenedUrlString != null) {
-                val unshortenedUri = Uri.parse(unshortenedUrlString, stateContext.uriQuote).toAbsoluteUri(uri)
-                stateContext.log.i(ConversionState.TAG, "Unshorten: Resolved short URI $uri to $unshortenedUri")
-                UnshortenedUrl(stateContext, inputUriString, input, unshortenedUri, Permission.ALWAYS)
-            } else {
-                stateContext.log.w(ConversionState.TAG, "Unshorten: Missing location header for $url")
-                ConversionFailed(
-                    stateContext.resources.getString(
-                        R.string.conversion_failed_unshorten_error_with_reason,
-                        stateContext.resources.getString(R.string.conversion_failed_reason_missing_header),
-                    ),
-                    inputUriString,
-                )
-            }
-        } catch (_: CancellationException) {
-            ConversionFailed(stateContext.resources.getString(R.string.conversion_failed_cancelled), inputUriString)
-        } catch (tr: RecoverableNetworkException) {
-            GrantedUnshortenPermission(
-                stateContext,
-                inputUriString,
-                input,
-                uri,
-                NetworkTools.Attempt(lastAttempt?.number?.plus(1) ?: 1, tr),
-            )
-        } catch (tr: UnrecoverableNetworkException) {
-            ConversionFailed(
-                stateContext.resources.getString(
-                    R.string.conversion_failed_unshorten_error_with_reason,
-                    tr.getMessage(stateContext.resources),
-                ),
-                inputUriString,
-            )
-        }
-    }
-
-    override fun getLargeLoadingIndicator() = LoadingIndicator.Large(
-        title = stateContext.resources.getString(input.loadingIndicatorTitleResId),
-        description = lastAttempt?.let {
-            stateContext.resources.getString(
-                R.string.conversion_loading_indicator_description,
-                it.number,
-                maxAttempts,
-                it.cause.getMessage(stateContext.resources),
-            )
-        },
-    )
-}
-
-data class DeniedConnectionPermission(
-    val stateContext: ConversionStateContext,
-    val inputUriString: String,
-    val input: Input,
-) : ConversionState {
-    override suspend fun transition(): State =
-        ConversionFailed(
-            stateContext.resources.getString(R.string.conversion_failed_connection_permission_denied),
-            inputUriString,
-        )
-}
-
-data class UnshortenedUrl(
-    val stateContext: ConversionStateContext,
-    val inputUriString: String,
-    val input: Input,
-    val uri: Uri,
-    val permission: Permission?,
-    val dispatcher: CoroutineDispatcher = Dispatchers.Default,
-) : ConversionState {
-    override suspend fun transition(): State =
-        withContext(dispatcher) { input.parseUri(uri, stateContext.uriQuote) }.run {
-            if (points.lastOrNull()?.hasCoordinates() == true) {
-                stateContext.log.i(ConversionState.TAG, "URI Pattern: Converted $uri to $points")
-                ConversionSucceeded(stateContext, inputUriString, points)
-            } else if (htmlUriString != null) {
-                if (input is HtmlInput) {
-                    when (permission
-                        ?: stateContext.userPreferencesRepository.getValue(ConnectionPermissionPreference)) {
-                        Permission.ALWAYS -> GrantedParseHtmlPermission(
-                            stateContext, inputUriString, input, uri, points, htmlUriString
-                        )
-
-                        Permission.ASK -> RequestedParseHtmlPermission(
-                            stateContext, inputUriString, input, uri, points, htmlUriString
-                        )
-
-                        Permission.NEVER -> DeniedParseHtmlPermission(stateContext, inputUriString, points)
-                    }
-                } else {
-                    stateContext.log.e(ConversionState.TAG, "URI Pattern: Input doesn't support HTML parsing")
-                    DeniedParseHtmlPermission(stateContext, inputUriString, points)
-                }
-            } else if (webUriString != null) {
-                if (input is WebInput) {
-                    when (permission
-                        ?: stateContext.userPreferencesRepository.getValue(ConnectionPermissionPreference)) {
-                        Permission.ALWAYS -> GrantedParseWebPermission(
-                            stateContext, inputUriString, input, uri, points, webUriString
-                        )
-
-                        Permission.ASK -> RequestedParseWebPermission(
-                            stateContext, inputUriString, input, uri, points, webUriString
-                        )
-
-                        Permission.NEVER -> DeniedParseHtmlPermission(stateContext, inputUriString, points)
-                    }
-                } else {
-                    stateContext.log.e(ConversionState.TAG, "URI Pattern: Input doesn't support web parsing")
-                    DeniedParseHtmlPermission(stateContext, inputUriString, points)
-                }
-            } else if (points.lastOrNull()?.hasName() == true) {
-                stateContext.log.i(ConversionState.TAG, "URI Pattern: Converted $uri to $points")
-                ConversionSucceeded(stateContext, inputUriString, points)
-            } else {
-                stateContext.log.i(ConversionState.TAG, "URI Pattern: Failed to parse $uri")
-                ConversionFailed(
-                    stateContext.resources.getString(R.string.conversion_failed_parse_url_error),
-                    inputUriString,
-                )
-            }
-        }
-}
-
-data class RequestedParseHtmlPermission(
-    val stateContext: ConversionStateContext,
-    val inputUriString: String,
-    val input: HtmlInput,
-    val uri: Uri,
-    val pointsFromUri: Points,
-    val htmlUriString: String,
-) : ConversionState, ConversionState.HasPermission {
-    override val permissionTitleResId: Int = input.permissionTitleResId
-
-    override suspend fun grant(doNotAsk: Boolean): State {
-        if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.ALWAYS)
-        }
-        return GrantedParseHtmlPermission(stateContext, inputUriString, input, uri, pointsFromUri, htmlUriString)
-    }
-
-    override suspend fun deny(doNotAsk: Boolean): State {
-        if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.NEVER)
-        }
-        return DeniedParseHtmlPermission(stateContext, inputUriString, pointsFromUri)
-    }
-}
-
-data class GrantedParseHtmlPermission(
-    val stateContext: ConversionStateContext,
-    val inputUriString: String,
-    val input: HtmlInput,
-    val uri: Uri,
-    val pointsFromUri: Points,
-    val htmlUriString: String,
-    val lastAttempt: NetworkTools.Attempt? = null,
-    val maxAttempts: Int = 10,
-    val dispatcher: CoroutineDispatcher = Dispatchers.Default,
-) : ConversionState, ConversionState.HasLargeLoadingIndicator {
-    override suspend fun transition(): State {
-        val htmlUrl = Uri.parse(htmlUriString, stateContext.uriQuote).toUrl()
-        if (htmlUrl == null) {
-            stateContext.log.e(ConversionState.TAG, "HTML Pattern: Failed to get HTML URL for $uri")
-            return ConversionFailed(
-                stateContext.resources.getString(
-                    R.string.conversion_failed_parse_html_error_with_reason,
-                    stateContext.resources.getString(R.string.conversion_failed_reason_invalid_url),
-                ),
-                inputUriString
-            )
-        }
-        stateContext.log.i(ConversionState.TAG, "HTML Pattern: Downloading $htmlUrl")
-        return try {
-            stateContext.networkTools.httpGetBodyAsByteReadChannel(
-                htmlUrl,
-                lastAttempt = lastAttempt,
-                maxAttempts = maxAttempts,
-                dispatcher = Dispatchers.Default
-            ) { channel ->
-                input.parseHtml(
-                    htmlUrl.toString(),
-                    channel,
-                    pointsFromUri,
-                    uriQuote = stateContext.uriQuote,
-                    log = stateContext.log,
-                )
-            }.run {
-                if (points.lastOrNull()?.hasCoordinates() == true) {
-                    stateContext.log.i(ConversionState.TAG, "HTML Pattern: Parsed $htmlUrl to $points")
-                    ConversionSucceeded(stateContext, inputUriString, points)
-                } else if (redirectUriString != null) {
-                    stateContext.log.i(
-                        ConversionState.TAG, "HTML Pattern: Parsed $htmlUrl to redirect URI $redirectUriString"
-                    )
-                    val redirectUri = Uri.parse(redirectUriString, stateContext.uriQuote).toAbsoluteUri(uri)
-                    ReceivedUri(stateContext, inputUriString, input, redirectUri, Permission.ALWAYS)
-                } else if (webUriString != null) {
-                    if (input is WebInput) {
-                        stateContext.log.i(ConversionState.TAG, "HTML Pattern: URI $htmlUrl requires web parsing")
-                        GrantedParseWebPermission(stateContext, inputUriString, input, uri, pointsFromUri, webUriString)
-                    } else {
-                        stateContext.log.e(ConversionState.TAG, "HTML Pattern: Input doesn't support web parsing")
-                        DeniedParseHtmlPermission(stateContext, inputUriString, pointsFromUri)
-                    }
-                } else if (points.lastOrNull()?.hasName() == true) {
-                    stateContext.log.i(ConversionState.TAG, "HTML Pattern: Parsed $htmlUrl to $points")
-                    ConversionSucceeded(stateContext, inputUriString, points)
-                } else {
-                    stateContext.log.w(ConversionState.TAG, "HTML Pattern: Failed to parse $htmlUrl")
-                    ConversionFailed(
-                        stateContext.resources.getString(
-                            R.string.conversion_failed_parse_html_error_with_reason,
-                            stateContext.resources.getString(R.string.conversion_failed_reason_no_points),
-                        ),
-                        inputUriString,
-                    )
-                }
-            }
-        } catch (_: CancellationException) {
-            ConversionFailed(stateContext.resources.getString(R.string.conversion_failed_cancelled), inputUriString)
-        } catch (tr: RecoverableNetworkException) {
-            GrantedParseHtmlPermission(
-                stateContext,
-                inputUriString,
-                input,
-                uri,
-                pointsFromUri,
-                htmlUriString,
-                lastAttempt = NetworkTools.Attempt(lastAttempt?.number?.plus(1) ?: 1, tr),
-            )
-        } catch (tr: UnrecoverableNetworkException) {
-            ConversionFailed(
-                stateContext.resources.getString(
-                    R.string.conversion_failed_parse_html_error_with_reason,
-                    tr.getMessage(stateContext.resources),
-                ),
-                inputUriString,
-            )
-        }
-    }
-
-    override fun getLargeLoadingIndicator() = LoadingIndicator.Large(
-        title = stateContext.resources.getString(input.loadingIndicatorTitleResId),
-        description = lastAttempt?.let {
-            stateContext.resources.getString(
-                R.string.conversion_loading_indicator_description,
-                it.number,
-                maxAttempts,
-                it.cause.getMessage(stateContext.resources),
-            )
-        },
-    )
-}
-
-data class DeniedParseHtmlPermission(
-    val stateContext: ConversionStateContext,
-    val inputUriString: String,
-    val points: Points,
-) : ConversionState {
-    override suspend fun transition() = if (points.lastOrNull()?.let { it.hasCoordinates() || it.hasName() } == true) {
-        ConversionSucceeded(stateContext, inputUriString, points)
-    } else {
-        ConversionFailed(
-            stateContext.resources.getString(R.string.conversion_failed_connection_permission_denied),
-            inputUriString,
-        )
-    }
-}
-
-data class RequestedParseWebPermission(
-    val stateContext: ConversionStateContext,
-    val inputUriString: String,
-    val input: WebInput,
-    val uri: Uri,
-    val pointsFromUri: Points,
-    val webUriString: String,
-) : ConversionState, ConversionState.HasPermission {
-    override val permissionTitleResId: Int = input.permissionTitleResId
-
-    override suspend fun grant(doNotAsk: Boolean): State {
-        if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.ALWAYS)
-        }
-        return GrantedParseWebPermission(stateContext, inputUriString, input, uri, pointsFromUri, webUriString)
-    }
-
-    override suspend fun deny(doNotAsk: Boolean): State {
-        if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.NEVER)
-        }
-        return DeniedParseHtmlPermission(stateContext, inputUriString, pointsFromUri)
+        return DeniedPermission(stateContext, rawData, input)
     }
 }
 
 /**
- * When GrantedParseWebPermission is the current state, the UI should load [webUriString] in a WebView and call
- * [onUrlChange] once the page loaded in the WebView changes its URL. A page usually changes its URL by calling
+ * TODO Documentation
+ *
+ * When GrantedParseWebPermission is the current state, the UI should load [data] as a URL in a WebView and call
+ * [onWebUrlChange] once the page loaded in the WebView changes its URL. A page usually changes its URL by calling
  * JavaScript `history.pushState()`.
  *
- * Transitioning this waits for [onUrlChange] to be called within [timeout]. If it doesn't happen, it returns a failure.
+ * Transitioning this waits for [onWebUrlChange] to be called within [timeout]. If it doesn't happen, it returns a failure.
  *
- * To allow communication between [transition] and [onUrlChange], this state contains a mutable private state
- * [currentUrlString]. This doesn't feel elegant and should be implemented differently, when we figure out how.
+ * To allow communication between [transition] and [onWebUrlChange], this state contains a mutable private state
+ * [webUrlStringFlow]. This doesn't feel elegant and should be implemented differently, when we figure out how.
  */
-data class GrantedParseWebPermission(
+data class GrantedPermission(
     val stateContext: ConversionStateContext,
-    val inputUriString: String,
-    val input: WebInput,
-    val uri: Uri,
-    val pointsFromUri: Points,
-    val webUriString: String,
-    val timeout: Duration = 60.seconds,
+    val rawData: String,
+    val data: String,
+    val input: NewInput,
+    val loadingIndicatorTitleResId: Int? = null,
+    val permission: Permission? = null,
+    val prevPoints: Points? = null,
+    val lastAttempt: NetworkTools.Attempt? = null,
+    val maxAttempts: Int = 10,
+    val timeout: Duration = 60.seconds, // TODO Rename
+    val dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : ConversionState, ConversionState.HasLargeLoadingIndicator {
-    private val currentUrlString = MutableStateFlow<String?>(null)
+    private val webUrlStringFlow = MutableStateFlow<String?>(null)
 
     @OptIn(FlowPreview::class)
-    override suspend fun transition(): State =
-        try {
-            val urlString = currentUrlString
-                .filterNotNull()
-                .timeout(timeout)
-                .first()
-            val matchingUriString = input.uriPattern.find(urlString)?.value
-            matchingUriString?.let { uriString ->
-                input.parseUri(Uri.parse(uriString, stateContext.uriQuote), stateContext.uriQuote)
-            }.run {
-                if (this?.points != null && this.points.isNotEmpty()) {
-                    stateContext.log.i(ConversionState.TAG, "Parsed web URL $matchingUriString to $points")
-                    ConversionSucceeded(stateContext, inputUriString, points)
-                } else {
-                    stateContext.log.w(ConversionState.TAG, "Failed to parse web URL $webUriString")
-                    ConversionFailed(
-                        stateContext.resources.getString(
-                            R.string.conversion_failed_parse_html_error_with_reason,
-                            stateContext.resources.getString(R.string.conversion_failed_reason_no_points),
-                        ),
-                        inputUriString,
-                    )
+    override suspend fun transition(): State {
+        val result: ParseResult = try {
+            withContext(dispatcher) {
+                when (input) {
+                    is ShortLinkGetInput -> {
+                        val uri = Uri.parse(data, stateContext.uriQuote)
+                        val url = uri.toUrl()
+                        val unshortenedUrlString = stateContext.networkTools.httpGetRedirectedUrlString(
+                            url, lastAttempt = lastAttempt, maxAttempts = maxAttempts
+                        )
+                        val unshortenedUri =
+                            Uri.parse(unshortenedUrlString, stateContext.uriQuote).toAbsoluteUri(uri)
+                        stateContext.log.i(
+                            ConversionState.TAG,
+                            "Unshorten: Resolved short URI $data to $unshortenedUri",
+                        )
+                        input.parse(unshortenedUri)
+                    }
+
+                    is ShortLinkHeadInput -> {
+                        val uri = Uri.parse(data, stateContext.uriQuote)
+                        val url = uri.toUrl()
+                        val unshortenedUrlString = stateContext.networkTools.httpHeadLocationHeader(
+                            url, lastAttempt = lastAttempt, maxAttempts = maxAttempts
+                        )
+                        val unshortenedUri =
+                            Uri.parse(unshortenedUrlString, stateContext.uriQuote).toAbsoluteUri(uri)
+                        stateContext.log.i(
+                            ConversionState.TAG,
+                            "Unshorten: Resolved short URI $data to $unshortenedUri",
+                        )
+                        input.parse(unshortenedUri)
+                    }
+
+                    is NewUriInput -> {
+                        val uri = Uri.parse(data, stateContext.uriQuote)
+                        input.parse(uri, stateContext.uriQuote)
+                    }
+
+                    is NewHtmlInput -> {
+                        val url = Uri.parse(data, stateContext.uriQuote).toUrl()
+                        stateContext.log.i(ConversionState.TAG, "Parse: Downloading $url")
+                        stateContext.networkTools.httpGetBodyAsByteReadChannel(
+                            url, lastAttempt = lastAttempt, maxAttempts = maxAttempts, dispatcher = Dispatchers.Default
+                        ) { channel ->
+                            input.parse(channel, prevPoints, uriQuote = stateContext.uriQuote, log = stateContext.log)
+                        }
+                    }
+
+                    is NewWebInput -> {
+                        // Wait for webUrlString to be set
+                        val webUrlString = webUrlStringFlow
+                            .filterNotNull()
+                            .timeout(timeout)
+                            .first()
+                        input.parse(webUrlString)
+                    }
+
+                    is ApiInput -> {
+                        val url = Uri.parse(data, stateContext.uriQuote).toUrl()
+                        input.parse(url)
+                    }
                 }
             }
         } catch (_: TimeoutCancellationException) {
-            stateContext.log.e(ConversionState.TAG, "Parse web: Timed out")
-            ConversionFailed(
+            stateContext.log.e(ConversionState.TAG, "Parse: Timed out")
+            return ConversionFailed(
                 stateContext.resources.getString(
                     R.string.conversion_failed_parse_html_error_with_reason,
                     stateContext.resources.getString(R.string.conversion_failed_reason_timeout),
                 ),
-                inputUriString,
+                rawData,
             )
         } catch (_: CancellationException) {
-            ConversionFailed(stateContext.resources.getString(R.string.conversion_failed_cancelled), inputUriString)
+            return ConversionFailed(
+                stateContext.resources.getString(R.string.conversion_failed_cancelled),
+                rawData
+            )
+        } catch (_: MalformedURLException) {
+            return ConversionFailed(
+                stateContext.resources.getString(
+                    R.string.conversion_failed_unshorten_error_with_reason,
+                    stateContext.resources.getString(R.string.conversion_failed_reason_invalid_url),
+                ),
+                rawData,
+            )
+        } catch (tr: RecoverableNetworkException) {
+            return GrantedPermission(
+                stateContext,
+                rawData,
+                data,
+                input,
+                loadingIndicatorTitleResId,
+                permission,
+                prevPoints,
+                NetworkTools.Attempt(lastAttempt?.number?.plus(1) ?: 1, tr),
+            )
+        } catch (tr: UnrecoverableNetworkException) {
+            return ConversionFailed(
+                stateContext.resources.getString(
+                    R.string.conversion_failed_unshorten_error_with_reason,
+                    tr.getMessage(stateContext.resources),
+                ),
+                rawData,
+            )
         }
-
-    fun onUrlChange(urlString: String) {
-        currentUrlString.value = urlString
+        return result.run {
+            if (points.lastOrNull()?.hasCoordinates() == true) {
+                stateContext.log.i(ConversionState.TAG, "Parse: Converted $data to $points")
+                ConversionSucceeded(stateContext, rawData, points)
+            } else if (nextInput != null) {
+                stateContext.log.i(ConversionState.TAG, "Parse: Going to next input $nextInput") // TODO toString()
+                FoundInput(stateContext, rawData, nextData ?: data, nextInput, permission, points)
+            } else if (points.lastOrNull()?.hasName() == true) {
+                stateContext.log.i(ConversionState.TAG, "Parse: Converted $data to $points")
+                ConversionSucceeded(stateContext, rawData, points)
+            } else {
+                stateContext.log.i(ConversionState.TAG, "Parse: Failed to parse $data")
+                ConversionFailed(
+                    stateContext.resources.getString(R.string.conversion_failed_parse_url_error),
+                    rawData,
+                )
+                // TODO Specific errors
+                // ConversionFailed(
+                //     stateContext.resources.getString(
+                //         R.string.conversion_failed_parse_html_error_with_reason,
+                //         stateContext.resources.getString(R.string.conversion_failed_reason_no_points),
+                //     ),
+                //     rawData,
+                // )
+            }
+        }
     }
 
-    override fun getLargeLoadingIndicator() = LoadingIndicator.Large(
-        title = stateContext.resources.getString(input.loadingIndicatorTitleResId),
-    )
+    // TODO
+    fun onWebUrlChange(urlString: String) {
+        webUrlStringFlow.value = urlString
+    }
+
+    override fun getLoadingIndicator() = loadingIndicatorTitleResId?.let { loadingIndicatorTitleResId ->
+        LoadingIndicator.Large(
+            title = stateContext.resources.getString(loadingIndicatorTitleResId),
+            description = lastAttempt?.let {
+                stateContext.resources.getString(
+                    R.string.conversion_loading_indicator_description,
+                    it.number,
+                    maxAttempts,
+                    it.cause.getMessage(stateContext.resources),
+                )
+            },
+        )
+    }
+}
+
+data class DeniedPermission(
+    val stateContext: ConversionStateContext,
+    val rawData: String,
+    val input: NewInput,
+) : ConversionState {
+    override suspend fun transition(): State =
+        ConversionFailed(
+            stateContext.resources.getString(R.string.conversion_failed_connection_permission_denied),
+            rawData,
+        )
 }
 
 data class ConversionSucceeded(
     val stateContext: ConversionStateContext,
-    override val inputUriString: String,
+    override val rawData: String,
     override val points: Points,
     val billingStatusTimeout: Duration = 3.seconds,
 ) : ConversionState, ConversionState.HasResult {
@@ -613,9 +434,9 @@ data class ConversionSucceeded(
             }
             if (output is Output.HasAutomationDelay) {
                 val delay = stateContext.userPreferencesRepository.getValue(AutomationDelayPreference)
-                return ActionWaiting(stateContext, inputUriString, points, action, isAutomation = true, delay = delay)
+                return ActionWaiting(stateContext, rawData, points, action, isAutomation = true, delay = delay)
             }
-            return ActionReady(inputUriString, points, action, isAutomation = true)
+            return ActionReady(rawData, points, action, isAutomation = true)
         }
         return null
     }
@@ -623,12 +444,12 @@ data class ConversionSucceeded(
 
 data class ConversionFailed(
     override val message: String,
-    override val inputUriString: String,
+    override val rawData: String,
 ) : ConversionState, ConversionState.HasError
 
 data class ActionWaiting(
     val stateContext: ConversionStateContext,
-    override val inputUriString: String,
+    override val rawData: String,
     override val points: Points,
     val action: Action<*>,
     @Suppress("SameParameterValue") val isAutomation: Boolean,
@@ -638,34 +459,34 @@ data class ActionWaiting(
         if (delay.isPositive()) {
             delay(delay)
         }
-        ActionReady(inputUriString, points, action, isAutomation)
+        ActionReady(rawData, points, action, isAutomation)
     } catch (_: CancellationException) {
-        ActionFinished(inputUriString, points, action, isAutomation)
+        ActionFinished(rawData, points, action, isAutomation)
     }
 }
 
 data class ActionReady(
-    override val inputUriString: String,
+    override val rawData: String,
     override val points: Points,
     val action: Action<*>,
     val isAutomation: Boolean,
 ) : ConversionState, ConversionState.HasResult {
     override suspend fun transition(): State = when (action) {
-        is BasicAction -> BasicActionReady(inputUriString, points, action, isAutomation)
-        is FileAction -> FileUriRequested(inputUriString, points, action, isAutomation)
-        is LocationAction -> LocationRationaleRequested(inputUriString, points, action, isAutomation)
+        is BasicAction -> BasicActionReady(rawData, points, action, isAutomation)
+        is FileAction -> FileUriRequested(rawData, points, action, isAutomation)
+        is LocationAction -> LocationRationaleRequested(rawData, points, action, isAutomation)
     }
 }
 
 data class BasicActionReady(
-    override val inputUriString: String,
+    override val rawData: String,
     override val points: Points,
     val action: BasicAction<*>,
     val isAutomation: Boolean,
 ) : ConversionState, ConversionState.HasResult
 
 data class FileActionReady(
-    override val inputUriString: String,
+    override val rawData: String,
     override val points: Points,
     val action: FileAction<*>,
     val isAutomation: Boolean,
@@ -673,7 +494,7 @@ data class FileActionReady(
 ) : ConversionState, ConversionState.HasResult
 
 data class LocationActionReady(
-    override val inputUriString: String,
+    override val rawData: String,
     override val points: Points,
     val action: LocationAction<*>,
     val isAutomation: Boolean,
@@ -681,21 +502,21 @@ data class LocationActionReady(
 ) : ConversionState, ConversionState.HasResult
 
 data class ActionRan(
-    override val inputUriString: String,
+    override val rawData: String,
     override val points: Points,
     val action: Action<*>,
     val isAutomation: Boolean,
     val success: Boolean?,
 ) : ConversionState, ConversionState.HasResult {
     override suspend fun transition(): State = when (success) {
-        true -> ActionSucceeded(inputUriString, points, action, isAutomation)
-        false -> ActionFailed(inputUriString, points, action, isAutomation)
-        else -> ActionFinished(inputUriString, points, action, isAutomation)
+        true -> ActionSucceeded(rawData, points, action, isAutomation)
+        false -> ActionFailed(rawData, points, action, isAutomation)
+        else -> ActionFinished(rawData, points, action, isAutomation)
     }
 }
 
 data class ActionSucceeded(
-    override val inputUriString: String,
+    override val rawData: String,
     override val points: Points,
     val action: Action<*>,
     val isAutomation: Boolean,
@@ -706,12 +527,12 @@ data class ActionSucceeded(
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return ActionFinished(inputUriString, points, action, isAutomation)
+        return ActionFinished(rawData, points, action, isAutomation)
     }
 }
 
 data class ActionFailed(
-    override val inputUriString: String,
+    override val rawData: String,
     override val points: Points,
     val action: Action<*>,
     val isAutomation: Boolean,
@@ -722,33 +543,33 @@ data class ActionFailed(
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return ActionFinished(inputUriString, points, action, isAutomation)
+        return ActionFinished(rawData, points, action, isAutomation)
     }
 }
 
 data class ActionFinished(
-    override val inputUriString: String,
+    override val rawData: String,
     override val points: Points,
     val action: Action<*>,
     val isAutomation: Boolean,
 ) : ConversionState, ConversionState.HasResult
 
 data class FileUriRequested(
-    override val inputUriString: String,
+    override val rawData: String,
     override val points: Points,
     val action: FileAction<*>,
     val isAutomation: Boolean,
 ) : ConversionState, ConversionState.HasResult
 
 data class LocationRationaleRequested(
-    override val inputUriString: String,
+    override val rawData: String,
     override val points: Points,
     val action: LocationAction<*>,
     val isAutomation: Boolean,
 ) : ConversionState, ConversionState.HasResult
 
 data class LocationRationaleShown(
-    override val inputUriString: String,
+    override val rawData: String,
     override val points: Points,
     val action: LocationAction<*>,
     val isAutomation: Boolean,
@@ -757,14 +578,14 @@ data class LocationRationaleShown(
     override val permissionTitleResId = R.string.conversion_succeeded_location_rationale_dialog_title
 
     override suspend fun grant(doNotAsk: Boolean): State =
-        LocationRationaleConfirmed(inputUriString, points, action, isAutomation)
+        LocationRationaleConfirmed(rawData, points, action, isAutomation)
 
     override suspend fun deny(doNotAsk: Boolean): State =
-        ActionFinished(inputUriString, points, action, isAutomation)
+        ActionFinished(rawData, points, action, isAutomation)
 }
 
 data class LocationRationaleConfirmed(
-    override val inputUriString: String,
+    override val rawData: String,
     override val points: Points,
     val action: LocationAction<*>,
     val isAutomation: Boolean,
@@ -772,32 +593,32 @@ data class LocationRationaleConfirmed(
 
 data class LocationPermissionReceived(
     val stateContext: ConversionStateContext,
-    override val inputUriString: String,
+    override val rawData: String,
     override val points: Points,
     val action: LocationAction<*>,
     val isAutomation: Boolean,
 ) : ConversionState, ConversionState.HasSmallLoadingIndicator, ConversionState.HasResult {
-    override fun getSmallLoadingIndicator() = LoadingIndicator.Small(
+    override fun getLoadingIndicator() = LoadingIndicator.Small(
         stateContext.resources.getString(R.string.conversion_succeeded_location_loading_indicator_title)
     )
 }
 
 data class LocationReceived(
-    override val inputUriString: String,
+    override val rawData: String,
     override val points: Points,
     val action: LocationAction<*>,
     val isAutomation: Boolean,
     val location: Point?,
 ) : ConversionState, ConversionState.HasResult {
     override suspend fun transition(): State = if (location == null) {
-        LocationFindingFailed(inputUriString, points, action, isAutomation)
+        LocationFindingFailed(rawData, points, action, isAutomation)
     } else {
-        LocationActionReady(inputUriString, points, action, isAutomation = isAutomation, location = location)
+        LocationActionReady(rawData, points, action, isAutomation = isAutomation, location = location)
     }
 }
 
 data class LocationFindingFailed(
-    override val inputUriString: String,
+    override val rawData: String,
     override val points: Points,
     val action: LocationAction<*>,
     val isAutomation: Boolean,
@@ -808,6 +629,6 @@ data class LocationFindingFailed(
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return ActionFinished(inputUriString, points, action, isAutomation)
+        return ActionFinished(rawData, points, action, isAutomation)
     }
 }

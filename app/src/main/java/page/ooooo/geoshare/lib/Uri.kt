@@ -173,22 +173,19 @@ data class Uri(
         this
     }
 
-    fun toUrl(): URL? = try {
-        URL(
-            if (host.isEmpty()) {
-                path.trimStart('/').let { path ->
-                    if (path.isEmpty()) {
-                        throw MalformedURLException("Missing host or path")
-                    }
-                    this.copy(scheme = scheme.ifEmpty { "https" }, host = path, path = "")
+    @Throws(MalformedURLException::class)
+    fun toUrl(): URL = URL(
+        if (host.isEmpty()) {
+            path.trimStart('/').let { path ->
+                if (path.isEmpty()) {
+                    throw MalformedURLException("Missing host or path")
                 }
-            } else {
-                this.copy(scheme = scheme.ifEmpty { "https" })
-            }.toString()
-        )
-    } catch (_: MalformedURLException) {
-        null
-    }
+                this.copy(scheme = scheme.ifEmpty { "https" }, host = path, path = "")
+            }
+        } else {
+            this.copy(scheme = scheme.ifEmpty { "https" })
+        }.toString()
+    )
 
     override fun toString() = StringBuilder().apply {
         if (scheme.isNotEmpty()) {

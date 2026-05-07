@@ -57,7 +57,7 @@ open class NetworkTools(
         lastAttempt: Attempt? = null,
         maxAttempts: Int = 1,
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    ): String? = withContext(dispatcher) {
+    ): String = withContext(dispatcher) {
         connect(
             engine,
             url,
@@ -66,7 +66,7 @@ open class NetworkTools(
             lastAttempt = lastAttempt,
             maxAttempts = maxAttempts,
         ) { response ->
-            response.headers[HttpHeaders.Location]
+            response.headers[HttpHeaders.Location] ?: throw MissingHeaderNetworkException()
         }
     }
 

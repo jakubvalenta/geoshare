@@ -120,7 +120,7 @@ object WazeInput : HtmlInput, Input.HasRandomUri {
     ) = buildParseHtmlResult {
         val pattern = Regex(""""latLng":\{"lat":$LAT,"lng":$LON\}""")
 
-        val name = pointsFromUri.lastOrNull()?.name
+        val name = prevPoints?.lastOrNull()?.name
 
         while (true) {
             val line = channel.readLine() ?: break

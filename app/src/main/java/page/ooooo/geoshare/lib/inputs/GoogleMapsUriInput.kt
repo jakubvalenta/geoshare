@@ -1,11 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
-import androidx.annotation.StringRes
-import io.ktor.utils.io.ByteReadChannel
-import io.ktor.utils.io.readLine
 import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
@@ -18,44 +14,32 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
-import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 
 /**
- * Google Maps input.
+ * Handles Google Maps full URIs.
  *
- * This input does not handle Plus Codes, e.g. https://www.google.com/maps/place/8FJ3HVHW%2B96. It just puts Plus Codes
- * in the point name. The reason is that Plus Codes are handled by [PlusCodeInput], which has higher priority, so URIs
- * containing Plus Codes should never reach [GoogleMapsInput].
+ * If the URI contains a Plus Code, e.g. https://www.google.com/maps/place/8FJ3HVHW%2B96, it doesn't process the code
+ * but only puts it in the point name. The reason is that Plus Codes are handled by [PlusCodeInput], which has higher
+ * priority, so URIs containing Plus Codes should never reach [GoogleMapsUriInput].
  */
-object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri {
-    override val uriPattern =
-        Regex("""((?:https?://)?(?:(?:(?:www|maps)\.)?google(?:\.[a-z]{2,3})?\.[a-z]{2,3}|(?:maps\.)?(?:app\.)?goo\.gl|g\.co)[/?#]$URI_REST)""")
+object GoogleMapsUriInput : NewUriInput, Input.HasRandomUri {
+    override val pattern =
+        Regex("""((?:https?://)?(?:(?:www|maps)\.)?google(?:\.[a-z]{2,3})?\.[a-z]{2,3}[/?#]$URI_REST)""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.GOOGLE_MAPS,
         nameResId = R.string.converter_google_maps_name,
         items = listOf(
-            InputDocumentationItem.Url(5, "https://maps.app.goo.gl"),
-            InputDocumentationItem.Url(5, "https://app.goo.gl/maps"),
             InputDocumentationItem.Url(5, "https://maps.google.com"),
-            InputDocumentationItem.Url(5, "https://goo.gl/maps"),
             InputDocumentationItem.Url(5, "https://google.com/maps"),
             InputDocumentationItem.Url(5, "https://www.google.com/maps"),
-            InputDocumentationItem.Url(10, "https://g.co/kgs"),
         ),
     )
-    override val shortUriPattern = Regex("""(?:https?://)?(?:(?:maps\.)?(?:app\.)?goo\.gl|g\.co)/[/A-Za-z0-9_-]+""")
-    override val shortUriMethod = ShortUriInput.Method.HEAD
 
-    override suspend fun parseUri(uri: Uri, uriQuote: UriQuote): ParseUriResult = buildParseUriResult {
-        val mutableNaivePoints = mutableListOf<NaivePoint>()
+    override suspend fun parse(uri: Uri, uriQuote: UriQuote) = buildParseResult {
+        uri.run {
+            val mutableNaivePoints = mutableListOf<NaivePoint>()
 
-        // Google Maps Go
-        // https://maps.app.goo.gl/?link={url}
-        val cleanUri = uri.queryParams["link"]?.takeIf { it.isNotEmpty() }?.let { Uri.parse(it, uriQuote) }
-            ?: uri
-
-        cleanUri.run {
             val z = Z_PATTERN.matchEntire(queryParams["zoom"])?.doubleGroupOrNull()
 
             // API directions
@@ -72,7 +56,7 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
                     mutableNaivePoints.addAll(naivePoints.map { it.copy(z = z) })
                     if (naivePoints.any { !it.hasCoordinates() }) {
                         // Go to HTML parsing unless all points have coordinates
-                        htmlUriString = toString()
+                        nextInput = GoogleMapsHtmlInput
                     }
                     return@run
                 }
@@ -116,7 +100,7 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
                 Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull()?.let { name ->
                     mutableNaivePoints.add(NaivePoint(z = z, name = name, source = Source.URI))
                     // Go to HTML parsing
-                    htmlUriString = toString()
+                    nextInput = GoogleMapsHtmlInput
                     return@run
                 }
             }
@@ -191,126 +175,12 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
 
             if (mutableNaivePoints.lastOrNull()?.hasCoordinates() != true && firstPart in partsThatSupportHtmlParsing) {
                 // Go to HTML parsing if needed
-                htmlUriString = toString()
+                nextInput = GoogleMapsHtmlInput
             }
-        }
 
-        points = mutableNaivePoints.map { GCJ02MainlandChinaPoint(it) }.toImmutableList()
+            points = mutableNaivePoints.map { GCJ02MainlandChinaPoint(it) }.toImmutableList()
+        }
     }
-
-    override suspend fun parseHtml(
-        htmlUrlString: String,
-        channel: ByteReadChannel,
-        pointsFromUri: Points,
-        uriQuote: UriQuote,
-        log: ILog,
-    ) = buildParseHtmlResult {
-        val directionsPreviewPattern = Regex("""%213d$LAT%214d$LON""")
-        val pointPattern = Regex("""\[(?:null,null,|null,\[)$LAT,$LON]""")
-        val defaultPointLinkPattern = Regex("""/@$LAT,$LON""")
-        val defaultPointAppInitStatePattern =
-            Regex("""APP_INITIALIZATION_STATE=\[\[\[[\d.-]+,$LON,$LAT""")
-        val genericMetaTagPattern = Regex(
-            @Suppress("SpellCheckingInspection") """<meta content="Google Maps" itemprop="name""""
-        )
-        val uriPattern = Regex("""data-url="([^"]+)"""")
-
-        val mutableNaivePoints = mutableListOf<NaivePoint>()
-        var defaultNaivePoint: NaivePoint? = null
-        var genericMetaTagFound = false
-        val name = pointsFromUri.lastOrNull()?.name
-
-        while (true) {
-            val line = channel.readLine() ?: break
-            if (!genericMetaTagFound && genericMetaTagPattern.find(line) != null) {
-                log.d("GoogleMapsInput", "HTML Pattern: Generic meta tag matched line $line")
-                genericMetaTagFound = true
-            }
-            if (
-                mutableNaivePoints.addAll(
-                    directionsPreviewPattern.findAll(line).mapNotNull { m ->
-                        m.toLatLonPoint(Source.HTML)?.copy(name = name)
-                    }
-                )
-            ) {
-                log.d("GoogleMapsInput", "HTML Pattern: Directions preview pattern matched line $line")
-                // Stop parsing, so that we don't add points that we've just parsed again from SCRIPT tags
-                break
-            }
-            if (
-                mutableNaivePoints.addAll(
-                    pointPattern.findAll(line).mapNotNull { m ->
-                        m.toLatLonPoint(Source.JAVASCRIPT)?.copy(name = name)
-                    }
-                )
-            ) {
-                log.d("GoogleMapsInput", "HTML Pattern: Point pattern matched line $line")
-            }
-            if (defaultNaivePoint == null) {
-                defaultPointLinkPattern.find(line)?.toLatLonPoint(Source.JAVASCRIPT)?.let {
-                    log.d("GoogleMapsInput", "HTML Pattern: Default point pattern 1 matched line $line")
-                    defaultNaivePoint = it.copy(name = name)
-                }
-            }
-            if (defaultNaivePoint == null && !genericMetaTagFound) {
-                // When the HTML contains a generic "Google Maps" META tag instead of a specific one like
-                // "Berlin - Germany", then it seems that the APP_INITIALIZATION_STATE doesn't contain correct
-                // coordinates. It contains coordinates of the IP address that the HTTP request came from. So let's
-                // ignore these coordinates.
-                defaultPointAppInitStatePattern.find(line)?.toLonLatPoint(Source.JAVASCRIPT)?.let {
-                    log.d("GoogleMapsInput", "HTML Pattern: Default point pattern 2 matched line $line")
-                    defaultNaivePoint = it.copy(name = name)
-                }
-            }
-            if (redirectUriString == null) {
-                uriPattern.find(line)?.groupOrNull()?.let {
-                    log.d("GoogleMapsInput", "HTML Pattern: URI pattern matched line $line")
-                    redirectUriString = it
-                }
-            }
-        }
-
-        if (mutableNaivePoints.isEmpty()) {
-            if (defaultNaivePoint != null) {
-                mutableNaivePoints.add(defaultNaivePoint)
-            } else if (redirectUriString == null) {
-                // Go to web parsing
-                webUriString = htmlUrlString
-            }
-        }
-
-        points = mutableNaivePoints.map { GCJ02MainlandChinaPoint(it) }.toImmutableList()
-    }
-
-    override fun shouldInterceptRequest(requestUrlString: String) =
-        // Assets
-        requestUrlString.endsWith(".gif")
-            || requestUrlString.endsWith(".ico")
-            || requestUrlString.endsWith(".png")
-            || requestUrlString.endsWith(".svg")
-            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "fonts.gstatic.com/")
-            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "maps.gstatic.com/")
-            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "googleusercontent.com/")
-            || requestUrlString.contains("/gps-cs-s/")
-            || requestUrlString.contains("/ss/")
-            || requestUrlString.contains("/thumbnail")
-
-            // Map tiles
-            || requestUrlString.contains("/kh/")
-            || requestUrlString.contains("/maps/vt")
-
-            // Tracking
-            || requestUrlString.contains("/generate_204")
-            || requestUrlString.contains("/log204")
-            || requestUrlString.contains("google.com/gen_204")
-            || requestUrlString.contains("google.com/log")
-            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "googlesyndication.com/")
-
-    @StringRes
-    override val permissionTitleResId = R.string.converter_google_maps_permission_title
-
-    @StringRes
-    override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(

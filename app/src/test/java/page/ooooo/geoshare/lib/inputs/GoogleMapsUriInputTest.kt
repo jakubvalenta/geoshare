@@ -8,8 +8,8 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 
-class GoogleMapsInputTest : InputTest {
-    override val input = GoogleMapsInput
+class GoogleMapsUriInputTest : InputTest {
+    override val input = GoogleMapsUriInput
 
     @Test
     fun uriPattern_fullUrl() {
