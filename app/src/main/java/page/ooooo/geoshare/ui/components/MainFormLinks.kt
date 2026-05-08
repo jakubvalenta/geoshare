@@ -24,7 +24,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun MainFormLinks(
-    allInputs: List<Input>,
+    allInputs: List<Input<*>>,
     modifier: Modifier = Modifier,
     onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,

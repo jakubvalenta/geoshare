@@ -352,8 +352,8 @@ private fun DefaultPreview() {
                 val inputRepository = InputRepository()
                 InputsScreen(
                     initialDocumentationId = null,
-                    allDocumentations = inputRepository.all.map { it.documentation },
-                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.mapNotNull { it.documentation },
+                    recentDocumentations = inputRepository.all.mapNotNull { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -372,8 +372,8 @@ private fun DarkPreview() {
                 val inputRepository = InputRepository()
                 InputsScreen(
                     initialDocumentationId = null,
-                    allDocumentations = inputRepository.all.map { it.documentation },
-                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.mapNotNull { it.documentation },
+                    recentDocumentations = inputRepository.all.mapNotNull { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -392,8 +392,8 @@ private fun TabletPreview() {
                 val inputRepository = InputRepository()
                 InputsScreen(
                     initialDocumentationId = null,
-                    allDocumentations = inputRepository.all.map { it.documentation },
-                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.mapNotNull { it.documentation },
+                    recentDocumentations = inputRepository.all.mapNotNull { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -412,7 +412,7 @@ private fun NoRecentPreview() {
                 val inputRepository = InputRepository()
                 InputsScreen(
                     initialDocumentationId = null,
-                    allDocumentations = inputRepository.all.map { it.documentation },
+                    allDocumentations = inputRepository.all.mapNotNull { it.documentation },
                     recentDocumentations = emptyList(),
                     onBack = {},
                 )
@@ -430,7 +430,7 @@ private fun DarkNoRecentPreview() {
                 val inputRepository = InputRepository()
                 InputsScreen(
                     initialDocumentationId = null,
-                    allDocumentations = inputRepository.all.map { it.documentation },
+                    allDocumentations = inputRepository.all.mapNotNull { it.documentation },
                     recentDocumentations = emptyList(),
                     onBack = {},
                 )
@@ -448,7 +448,7 @@ private fun TabletNoRecentPreview() {
                 val inputRepository = InputRepository()
                 InputsScreen(
                     initialDocumentationId = null,
-                    allDocumentations = inputRepository.all.map { it.documentation },
+                    allDocumentations = inputRepository.all.mapNotNull { it.documentation },
                     recentDocumentations = emptyList(),
                     onBack = {},
                 )
@@ -466,8 +466,8 @@ private fun OpenStreetMapPreview() {
                 val inputRepository = InputRepository()
                 InputsScreen(
                     initialDocumentationId = InputDocumentationId.OPEN_STREET_MAP,
-                    allDocumentations = inputRepository.all.map { it.documentation },
-                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.mapNotNull { it.documentation },
+                    recentDocumentations = inputRepository.all.mapNotNull { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -486,8 +486,8 @@ private fun DarkOpenStreetMapPreview() {
                 val inputRepository = InputRepository()
                 InputsScreen(
                     initialDocumentationId = InputDocumentationId.OPEN_STREET_MAP,
-                    allDocumentations = inputRepository.all.map { it.documentation },
-                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.mapNotNull { it.documentation },
+                    recentDocumentations = inputRepository.all.mapNotNull { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -506,8 +506,8 @@ private fun TabletOpenStreetMapPreview() {
                 val inputRepository = InputRepository()
                 InputsScreen(
                     initialDocumentationId = InputDocumentationId.OPEN_STREET_MAP,
-                    allDocumentations = inputRepository.all.map { it.documentation },
-                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.mapNotNull { it.documentation },
+                    recentDocumentations = inputRepository.all.mapNotNull { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -526,8 +526,8 @@ private fun GeoUriPreview() {
                 val inputRepository = InputRepository()
                 InputsScreen(
                     initialDocumentationId = InputDocumentationId.GEO_URI,
-                    allDocumentations = inputRepository.all.map { it.documentation },
-                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.mapNotNull { it.documentation },
+                    recentDocumentations = inputRepository.all.mapNotNull { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -546,8 +546,8 @@ private fun DarkGeoUriPreview() {
                 val inputRepository = InputRepository()
                 InputsScreen(
                     initialDocumentationId = InputDocumentationId.GEO_URI,
-                    allDocumentations = inputRepository.all.map { it.documentation },
-                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.mapNotNull { it.documentation },
+                    recentDocumentations = inputRepository.all.mapNotNull { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -566,8 +566,8 @@ private fun TabletGeoUriPreview() {
                 val inputRepository = InputRepository()
                 InputsScreen(
                     initialDocumentationId = InputDocumentationId.GEO_URI,
-                    allDocumentations = inputRepository.all.map { it.documentation },
-                    recentDocumentations = inputRepository.all.map { it.documentation }.filter { documentation ->
+                    allDocumentations = inputRepository.all.mapNotNull { it.documentation },
+                    recentDocumentations = inputRepository.all.mapNotNull { it.documentation }.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},

@@ -16,7 +16,7 @@ object BaiduMapWebInput : WebInput {
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_baidu_map_loading_indicator_title
 
-    override suspend fun parse(data: URL, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
+    override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
         nextInput = BaiduMapUriInput
     }
 
