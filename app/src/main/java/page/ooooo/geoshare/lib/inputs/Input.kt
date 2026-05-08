@@ -13,8 +13,6 @@ import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.network.NetworkTools
 import java.net.URL
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 sealed interface Input<T> {
     val documentation: InputDocumentation? get() = null
@@ -44,13 +42,15 @@ interface SyncInput<T> : Input<T> {
         networkTools: NetworkTools,
         lastAttempt: NetworkTools.Attempt?,
         maxAttempts: Int,
-        timeout: Duration = 60.seconds,
         uriQuote: UriQuote = DefaultUriQuote,
         log: ILog = DefaultLog,
     ): T
 }
 
-interface AsyncInput<T> : Input<T>
+interface WebInput : Input<String>, Input.HasPermission {
+    fun extendWebSettings(settings: WebSettings) {}
+    fun shouldInterceptRequest(requestUrlString: String): Boolean = false
+}
 
 interface TextInput : SyncInput<String> {
     val pattern: Regex
@@ -62,7 +62,6 @@ interface TextInput : SyncInput<String> {
         networkTools: NetworkTools,
         lastAttempt: NetworkTools.Attempt?,
         maxAttempts: Int,
-        timeout: Duration,
         uriQuote: UriQuote,
         log: ILog,
     ) = match
@@ -78,7 +77,6 @@ interface UriInput : SyncInput<Uri> {
         networkTools: NetworkTools,
         lastAttempt: NetworkTools.Attempt?,
         maxAttempts: Int,
-        timeout: Duration,
         uriQuote: UriQuote,
         log: ILog,
     ) = Uri.parse(match, uriQuote)
@@ -90,7 +88,6 @@ interface ShortLinkGetInput : UriInput, Input.HasPermission {
         networkTools: NetworkTools,
         lastAttempt: NetworkTools.Attempt?,
         maxAttempts: Int,
-        timeout: Duration,
         uriQuote: UriQuote,
         log: ILog,
     ): Uri {
@@ -114,7 +111,6 @@ interface ShortLinkHeadInput : UriInput, Input.HasPermission {
         networkTools: NetworkTools,
         lastAttempt: NetworkTools.Attempt?,
         maxAttempts: Int,
-        timeout: Duration,
         uriQuote: UriQuote,
         log: ILog,
     ): Uri {
@@ -138,7 +134,6 @@ interface HtmlInput : SyncInput<ByteReadChannel>, Input.HasPermission {
         networkTools: NetworkTools,
         lastAttempt: NetworkTools.Attempt?,
         maxAttempts: Int,
-        timeout: Duration,
         uriQuote: UriQuote,
         log: ILog,
     ): ByteReadChannel {
@@ -157,18 +152,12 @@ interface HtmlInput : SyncInput<ByteReadChannel>, Input.HasPermission {
     }
 }
 
-interface WebInput : AsyncInput<URL>, Input.HasPermission {
-    fun extendWebSettings(settings: WebSettings) {}
-    fun shouldInterceptRequest(requestUrlString: String): Boolean = false
-}
-
 interface ApiInput : SyncInput<String>, Input.HasPermission {
     override suspend fun getData(
         match: String,
         networkTools: NetworkTools,
         lastAttempt: NetworkTools.Attempt?,
         maxAttempts: Int,
-        timeout: Duration,
         uriQuote: UriQuote,
         log: ILog,
     ): String {

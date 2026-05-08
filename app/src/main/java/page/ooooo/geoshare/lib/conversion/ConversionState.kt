@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.conversion
 
+import android.net.Uri
 import androidx.annotation.StringRes
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
@@ -25,8 +26,9 @@ import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
-import page.ooooo.geoshare.lib.inputs.AsyncInput
+import page.ooooo.geoshare.lib.inputs.WebInput
 import page.ooooo.geoshare.lib.inputs.Input
+import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.inputs.SyncInput
 import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.network.RecoverableNetworkException
@@ -163,16 +165,6 @@ data class RequestedPermission<T>(
     }
 }
 
-/**
- * TODO Documentation
- *
- * When GrantedPermission is the current state, the UI should load [match] as a URL in a WebView and call
- * [setData] once the page loaded in the WebView changes its URL. A page usually changes its URL by calling JavaScript
- * function `history.pushState()`.
- *
- * While transitioning, this state waits for [setData] to be called. If it's not called within [asyncTimeout], it returns
- * failure.
- */
 data class GrantedPermission<T>(
     val stateContext: ConversionStateContext,
     val source: String,
@@ -183,56 +175,59 @@ data class GrantedPermission<T>(
     val prevPoints: Points? = null,
     val lastAttempt: NetworkTools.Attempt? = null,
     val maxAttempts: Int = 10,
-    val asyncTimeout: Duration = 60.seconds,
+) : ConversionState {
+    override suspend fun transition(): State =
+        when (input) {
+            is SyncInput -> GrantedPermissionSync(
+                stateContext,
+                source,
+                match,
+                input,
+                loadingIndicatorTitleResId,
+                permission,
+                prevPoints,
+                lastAttempt,
+                maxAttempts,
+            )
+
+            is WebInput -> GrantedPermissionWeb(
+                stateContext,
+                source,
+                match,
+                input,
+                permission,
+                prevPoints,
+            )
+        }
+}
+
+data class GrantedPermissionSync<T>(
+    val stateContext: ConversionStateContext,
+    val source: String,
+    val match: String,
+    val input: SyncInput<T>,
+    val loadingIndicatorTitleResId: Int? = null,
+    val permission: Permission? = null,
+    val prevPoints: Points? = null,
+    val lastAttempt: NetworkTools.Attempt? = null,
+    val maxAttempts: Int = 10,
     val dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : ConversionState, ConversionState.HasLargeLoadingIndicator {
-    private val dataFlow = MutableStateFlow<T?>(null)
-
     @OptIn(FlowPreview::class)
-    override suspend fun transition(): State {
-        val result = try {
-            withContext(dispatcher) {
-                val data = when (input) {
-                    is SyncInput ->
-                        input.getData(
-                            match,
-                            networkTools = stateContext.networkTools,
-                            lastAttempt = lastAttempt,
-                            maxAttempts = maxAttempts,
-                            timeout = asyncTimeout,
-                            uriQuote = stateContext.uriQuote,
-                            log = stateContext.log,
-                        )
-
-                    is AsyncInput ->
-                        dataFlow
-                            .filterNotNull()
-                            .timeout(asyncTimeout)
-                            .first()
-                }
-                input.parse(
-                    data,
-                    prevPoints = prevPoints,
-                    uriQuote = stateContext.uriQuote,
-                    log = stateContext.log,
-                )
-            }
-        } catch (_: TimeoutCancellationException) {
-            stateContext.log.e(ConversionState.TAG, "Parse: Timed out")
-            return ConversionFailed(
-                stateContext.resources.getString(
-                    R.string.conversion_failed_parse_html_error_with_reason,
-                    stateContext.resources.getString(R.string.conversion_failed_reason_timeout),
-                ),
-                source,
+    override suspend fun transition(): State = withContext(dispatcher) {
+        try {
+            val data = input.getData(
+                match, stateContext.networkTools, lastAttempt, maxAttempts, stateContext.uriQuote, stateContext.log
             )
+            val result = input.parse(data, prevPoints, stateContext.uriQuote, stateContext.log)
+            Parsed(stateContext, source, match, input, result, permission, prevPoints)
         } catch (_: CancellationException) {
-            return ConversionFailed(
+            ConversionFailed(
                 stateContext.resources.getString(R.string.conversion_failed_cancelled),
                 source
             )
         } catch (_: MalformedURLException) {
-            return ConversionFailed(
+            ConversionFailed(
                 stateContext.resources.getString(
                     R.string.conversion_failed_unshorten_error_with_reason,
                     stateContext.resources.getString(R.string.conversion_failed_reason_invalid_url),
@@ -240,7 +235,7 @@ data class GrantedPermission<T>(
                 source,
             )
         } catch (tr: RecoverableNetworkException) {
-            return GrantedPermission(
+            GrantedPermission(
                 stateContext,
                 source,
                 match,
@@ -251,7 +246,7 @@ data class GrantedPermission<T>(
                 NetworkTools.Attempt(lastAttempt?.number?.plus(1) ?: 1, tr),
             )
         } catch (tr: UnrecoverableNetworkException) {
-            return ConversionFailed(
+            ConversionFailed(
                 stateContext.resources.getString(
                     R.string.conversion_failed_unshorten_error_with_reason,
                     tr.getMessage(stateContext.resources),
@@ -259,36 +254,6 @@ data class GrantedPermission<T>(
                 source,
             )
         }
-        return result.run {
-            if (points.lastOrNull()?.hasCoordinates() == true) {
-                stateContext.log.i(ConversionState.TAG, "Parse: Converted $match to $points")
-                ConversionSucceeded(stateContext, source, points)
-            } else if (nextInput != null) {
-                stateContext.log.i(ConversionState.TAG, "Parse: Going to next input $nextInput") // TODO toString()
-                FoundInput(stateContext, source, nextMatch ?: match, nextInput, permission, points)
-            } else if (points.lastOrNull()?.hasName() == true) {
-                stateContext.log.i(ConversionState.TAG, "Parse: Converted $match to $points")
-                ConversionSucceeded(stateContext, source, points)
-            } else {
-                stateContext.log.i(ConversionState.TAG, "Parse: Failed to parse $match")
-                ConversionFailed(
-                    stateContext.resources.getString(R.string.conversion_failed_parse_url_error),
-                    source,
-                )
-                // TODO Specific errors
-                // ConversionFailed(
-                //     stateContext.resources.getString(
-                //         R.string.conversion_failed_parse_html_error_with_reason,
-                //         stateContext.resources.getString(R.string.conversion_failed_reason_no_points),
-                //     ),
-                //     source,
-                // )
-            }
-        }
-    }
-
-    fun setData(data: T) {
-        dataFlow.value = data
     }
 
     override fun getLoadingIndicator() = loadingIndicatorTitleResId?.let { loadingIndicatorTitleResId ->
@@ -303,6 +268,59 @@ data class GrantedPermission<T>(
                 )
             },
         )
+    }
+}
+
+/**
+ * TODO Documentation
+ *
+ * When GrantedPermission is the current state, the UI should load [match] as a URL in a WebView and call
+ * [setData] once the page loaded in the WebView changes its URL. A page usually changes its URL by calling JavaScript
+ * function `history.pushState()`.
+ *
+ * While transitioning, this state waits for [setData] to be called. If it's not called within [timeout], it returns
+ * failure.
+ */
+data class GrantedPermissionWeb(
+    val stateContext: ConversionStateContext,
+    val source: String,
+    val match: String,
+    val input: WebInput,
+    val permission: Permission? = null,
+    val prevPoints: Points? = null,
+    val timeout: Duration = 60.seconds,
+    val dispatcher: CoroutineDispatcher = Dispatchers.Default,
+) : ConversionState {
+    private val dataFlow = MutableStateFlow<String?>(null)
+
+    fun setData(data: String) {
+        dataFlow.value = data
+    }
+
+    @OptIn(FlowPreview::class)
+    override suspend fun transition(): State = withContext(dispatcher) {
+        try {
+            val data = dataFlow
+                .filterNotNull()
+                .timeout(timeout)
+                .first()
+            val result = input.parse(data, prevPoints, stateContext.uriQuote, stateContext.log)
+            Parsed(stateContext, source, match, input, result, permission, prevPoints)
+        } catch (_: TimeoutCancellationException) {
+            stateContext.log.e(ConversionState.TAG, "Parse: Timed out")
+            ConversionFailed(
+                stateContext.resources.getString(
+                    R.string.conversion_failed_parse_html_error_with_reason,
+                    stateContext.resources.getString(R.string.conversion_failed_reason_timeout),
+                ),
+                source,
+            )
+        } catch (_: CancellationException) {
+            ConversionFailed(
+                stateContext.resources.getString(R.string.conversion_failed_cancelled),
+                source
+            )
+        }
     }
 }
 
@@ -396,6 +414,44 @@ data class ConversionSucceeded(
     }
 }
 
+data class Parsed(
+    val stateContext: ConversionStateContext,
+    val source: String,
+    val match: String,
+    val input: Input<*>,
+    val result: ParseResult,
+    val permission: Permission? = null,
+    val prevPoints: Points? = null,
+) : ConversionState {
+    override suspend fun transition(): State =
+        result.run {
+            if (points.lastOrNull()?.hasCoordinates() == true) {
+                stateContext.log.i(ConversionState.TAG, "Parse: Converted $match to $points")
+                ConversionSucceeded(stateContext, source, points)
+            } else if (nextInput != null) {
+                stateContext.log.i(ConversionState.TAG, "Parse: Going to next input $nextInput") // TODO toString()
+                FoundInput(stateContext, source, nextMatch ?: match, nextInput, permission, points)
+            } else if (points.lastOrNull()?.hasName() == true) {
+                stateContext.log.i(ConversionState.TAG, "Parse: Converted $match to $points")
+                ConversionSucceeded(stateContext, source, points)
+            } else {
+                stateContext.log.i(ConversionState.TAG, "Parse: Failed to parse $match")
+                ConversionFailed(
+                    stateContext.resources.getString(R.string.conversion_failed_parse_url_error),
+                    source,
+                )
+                // TODO Specific errors
+                // ConversionFailed(
+                //     stateContext.resources.getString(
+                //         R.string.conversion_failed_parse_html_error_with_reason,
+                //         stateContext.resources.getString(R.string.conversion_failed_reason_no_points),
+                //     ),
+                //     source,
+                // )
+            }
+        }
+}
+
 data class ConversionFailed(
     override val message: String,
     override val source: String,
@@ -444,7 +500,7 @@ data class FileActionReady(
     override val points: Points,
     val action: FileAction<*>,
     val isAutomation: Boolean,
-    val uri: android.net.Uri,
+    val uri: Uri,
 ) : ConversionState, ConversionState.HasResult
 
 data class LocationActionReady(

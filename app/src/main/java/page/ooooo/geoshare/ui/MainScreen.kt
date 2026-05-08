@@ -103,7 +103,8 @@ import page.ooooo.geoshare.lib.conversion.ConversionStateContext
 import page.ooooo.geoshare.lib.conversion.ConversionSucceeded
 import page.ooooo.geoshare.lib.conversion.FileActionReady
 import page.ooooo.geoshare.lib.conversion.FileUriRequested
-import page.ooooo.geoshare.lib.conversion.GrantedPermission
+import page.ooooo.geoshare.lib.conversion.GrantedPermissionSync
+import page.ooooo.geoshare.lib.conversion.GrantedPermissionWeb
 import page.ooooo.geoshare.lib.conversion.Initial
 import page.ooooo.geoshare.lib.conversion.LoadingIndicator
 import page.ooooo.geoshare.lib.conversion.LocationActionReady
@@ -122,7 +123,6 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsWebInput
 import page.ooooo.geoshare.lib.inputs.Input
-import page.ooooo.geoshare.lib.inputs.WebInput
 import page.ooooo.geoshare.lib.network.ConnectTimeoutNetworkException
 import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.outputs.Action
@@ -382,7 +382,7 @@ fun MainScreen(
 @Composable
 private fun MainScreen(
     currentState: State,
-    allInputs: List<Input>,
+    allInputs: List<Input<*>>,
     appDetails: AppDetails,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
@@ -642,7 +642,7 @@ private fun MainScreen(
     }
 
     when (currentState) {
-        is RequestedPermission -> {
+        is RequestedPermission<*> -> {
             PermissionDialog(
                 title = stringResource(currentState.permissionTitleResId),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
@@ -762,7 +762,7 @@ private fun MainMainPane(
 
 @Composable
 private fun MainBottomPane(currentState: State) {
-    if (currentState is GrantedPermission && currentState.input is WebInput) {
+    if (currentState is GrantedPermissionWeb) {
         BoxWithConstraints(
             Modifier
                 .fillMaxSize()
@@ -781,7 +781,7 @@ private fun MainBottomPane(currentState: State) {
             )
             ConversionWebView(
                 unsafeUrl = currentState.match,
-                onUrlChange = { currentState.onWebUrlChange(it) },
+                onUrlChange = { currentState.setData(it) },
                 extendWebSettings = { currentState.input.extendWebSettings(it) },
                 shouldInterceptRequest = { currentState.input.shouldInterceptRequest(it) },
             )
@@ -791,7 +791,7 @@ private fun MainBottomPane(currentState: State) {
 
 @Composable
 private fun MainSupportingPane(
-    allInputs: List<Input>,
+    allInputs: List<Input<*>>,
     appDetails: AppDetails,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
@@ -1739,7 +1739,7 @@ private fun WebViewPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        val currentState = GrantedPermission(
+        val currentState = GrantedPermissionWeb(
             stateContext = ConversionStateContext(
                 linkRepository = FakeLinkRepository(),
                 outputRepository = outputRepository,
@@ -1750,7 +1750,6 @@ private fun WebViewPreview() {
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://www.example.com/",
             input = GoogleMapsWebInput,
-            loadingIndicatorTitleResId = GoogleMapsWebInput.loadingIndicatorTitleResId,
         )
         MainScreen(
             currentState = currentState,
@@ -1768,7 +1767,7 @@ private fun WebViewPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
-            largeLoadingIndicator = currentState.getLoadingIndicator(),
+            largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -1811,7 +1810,7 @@ private fun DarkWebViewPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        val currentState = GrantedPermission(
+        val currentState = GrantedPermissionWeb(
             stateContext = ConversionStateContext(
                 linkRepository = FakeLinkRepository(),
                 outputRepository = outputRepository,
@@ -1822,7 +1821,6 @@ private fun DarkWebViewPreview() {
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://www.example.com/",
             input = GoogleMapsWebInput,
-            loadingIndicatorTitleResId = GoogleMapsWebInput.loadingIndicatorTitleResId,
         )
         MainScreen(
             currentState = currentState,
@@ -1840,7 +1838,7 @@ private fun DarkWebViewPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
-            largeLoadingIndicator = currentState.getLoadingIndicator(),
+            largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -1883,7 +1881,7 @@ private fun TabletWebViewPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        val currentState = GrantedPermission(
+        val currentState = GrantedPermissionWeb(
             stateContext = ConversionStateContext(
                 linkRepository = FakeLinkRepository(),
                 outputRepository = outputRepository,
@@ -1894,7 +1892,6 @@ private fun TabletWebViewPreview() {
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://www.example.com/",
             input = GoogleMapsWebInput,
-            loadingIndicatorTitleResId = GoogleMapsWebInput.loadingIndicatorTitleResId,
         )
         MainScreen(
             currentState = currentState,
@@ -1912,7 +1909,7 @@ private fun TabletWebViewPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
-            largeLoadingIndicator = currentState.getLoadingIndicator(),
+            largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -2198,7 +2195,7 @@ private fun LoadingIndicatorPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        val currentState = GrantedPermission(
+        val currentState = GrantedPermissionSync(
             stateContext = ConversionStateContext(
                 linkRepository = FakeLinkRepository(),
                 outputRepository = outputRepository,
@@ -2274,7 +2271,7 @@ private fun DarkLoadingIndicatorPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        val currentState = GrantedPermission(
+        val currentState = GrantedPermissionSync(
             stateContext = ConversionStateContext(
                 linkRepository = FakeLinkRepository(),
                 outputRepository = outputRepository,
@@ -2350,7 +2347,7 @@ private fun TabletLoadingIndicatorPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        val currentState = GrantedPermission(
+        val currentState = GrantedPermissionSync(
             stateContext = ConversionStateContext(
                 linkRepository = FakeLinkRepository(),
                 outputRepository = outputRepository,
