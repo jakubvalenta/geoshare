@@ -36,7 +36,6 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.network.NetworkTools.Companion.CONNECT_TIMEOUT
 import page.ooooo.geoshare.lib.network.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE
 import page.ooooo.geoshare.lib.network.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE_DELAY
-import page.ooooo.geoshare.lib.network.NetworkTools.Companion.MAX_RETRIES
 import page.ooooo.geoshare.lib.network.NetworkTools.Companion.REQUEST_TIMEOUT
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 import java.net.InetAddress
@@ -80,7 +79,8 @@ interface BehaviorTest {
 
     companion object {
         const val ELEMENT_DOES_NOT_EXIST_TIMEOUT = 500L
-        val NETWORK_TIMEOUT = (1..MAX_RETRIES).fold(CONNECT_TIMEOUT + REQUEST_TIMEOUT) { acc, curr ->
+        const val MAX_ATTEMPTS = 10
+        val NETWORK_TIMEOUT = (1..MAX_ATTEMPTS).fold(CONNECT_TIMEOUT + REQUEST_TIMEOUT) { acc, curr ->
             acc + (EXPONENTIAL_DELAY_BASE.pow(curr - 1) * EXPONENTIAL_DELAY_BASE_DELAY).roundToLong() + CONNECT_TIMEOUT + REQUEST_TIMEOUT
         }
     }
