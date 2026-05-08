@@ -1,10 +1,9 @@
 package page.ooooo.geoshare.lib.inputs
 
-import android.webkit.WebSettings
-import androidx.annotation.StringRes
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.find
@@ -14,31 +13,29 @@ import page.ooooo.geoshare.lib.extensions.toLonLatNamePoint
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
+import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.network.NetworkTools
 
-object BaiduMapInput : ShortUriInput, WebInput {
+object BaiduMapUriInput : UriInput {
     private const val X = """(\d+(?:\.\d+)?)"""
     private const val Y = """(\d+(?:\.\d+)?)"""
     private const val CENTER = """@$X,$Y,${Z}z.*"""
     private const val WAYPOINT = """1\$\$\$\$$X,$Y\$\$([^$]+)"""
 
-    override val uriPattern = Regex("""((?:https?://)?(?:j\.)?map\.baidu\.com/$URI_REST)""")
+    override val pattern = Regex("""((?:https?://)?(?:j\.)?map\.baidu\.com/$URI_REST)""")
+
     override val documentation = InputDocumentation(
-        id = InputDocumentationId.BAIDU_MAP,
+        id = InputDocumentationId.BAIDU_MAP, // TODO Group documentations by id
         nameResId = R.string.converter_baidu_map_name,
         items = listOf(
-            InputDocumentationItem.Url(35, "https://j.map.baidu.com"),
             InputDocumentationItem.Url(33, "https://map.baidu.com"),
         ),
     )
-    override val shortUriPattern = Regex("""(?:https?://)?j\.map\.baidu\.com/\S+""")
-    override val shortUriMethod = ShortUriInput.Method.HEAD
 
     @Suppress("SpellCheckingInspection")
-    override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {
-        uri.run {
-            val parts = uri.pathParts.drop(1)
+    override suspend fun parse(data: Uri, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
+        data.run {
+            val parts = data.pathParts.drop(1)
             val firstPart = parts.firstOrNull() ?: return@run
 
             if (firstPart == "") {
@@ -51,7 +48,7 @@ object BaiduMapInput : ShortUriInput, WebInput {
                     // https://map.baidu.com/?poiShareId={id}
                     // https://map.baidu.com/?shareurl=1&poiShareUid={uid}
                     // https://map.baidu.com/?newmap=1&s=inf%26uid%3D{uid}
-                    webUriString = toString()
+                    nextInput = BaiduMapWebInput
                 }
 
             } else if (firstPart.startsWith('@')) {
@@ -95,35 +92,9 @@ object BaiduMapInput : ShortUriInput, WebInput {
                     ?: run {
                         // Mobile place detail without coords
                         // "https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid={uid}/act=read_share&vt=map&da_from=weixin&openna=1"
-                        webUriString = toString()
+                        nextInput = BaiduMapWebInput
                     }
             }
         }
     }
-
-    override fun extendWebSettings(settings: WebSettings) {
-        settings.domStorageEnabled = true
-        settings.userAgentString = NetworkTools.DESKTOP_USER_AGENT
-    }
-
-    override fun shouldInterceptRequest(requestUrlString: String) =
-        // Assets
-        requestUrlString.endsWith(".ico")
-            || (requestUrlString.endsWith(".png") && !requestUrlString.contains("/image/api/"))
-            || requestUrlString.endsWith("/static/common/images/new/loading")
-            // Notice that we don't block .css, so that links such as https://j.map.baidu.com/a7/GXfM redirect to the
-            // correct URL
-
-            // Map tiles
-            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "bdimg.com/tile/")
-
-            // Tracking
-            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "/alog.min.js")
-            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "map.baidu.com/newmap_test/static/common/images/transparent.gif")
-
-    @StringRes
-    override val permissionTitleResId = R.string.converter_baidu_map_permission_title
-
-    @StringRes
-    override val loadingIndicatorTitleResId = R.string.converter_baidu_map_loading_indicator_title
 }

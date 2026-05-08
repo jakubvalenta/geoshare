@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class OsmAndInputTest : InputTest {
-    override val input = OsmAndInput
+    override val input = OsmAndUriInput
 
     @Test
     fun uriPattern_fullUrl() {

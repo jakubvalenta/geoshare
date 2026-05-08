@@ -15,97 +15,93 @@ import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 
-object GoogleMapsHtmlInput : NewHtmlInput {
+object GoogleMapsHtmlInput : HtmlInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_google_maps_permission_title
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
-    override suspend fun parse(
-        channel: ByteReadChannel,
-        prevPoints: Points?,
-        uriQuote: UriQuote,
-        log: ILog,
-    ) = buildParseResult {
-        val directionsPreviewPattern = Regex("""%213d$LAT%214d$LON""")
-        val pointPattern = Regex("""\[(?:null,null,|null,\[)$LAT,$LON]""")
-        val defaultPointLinkPattern = Regex("""/@$LAT,$LON""")
-        val defaultPointAppInitStatePattern =
-            Regex("""APP_INITIALIZATION_STATE=\[\[\[[\d.-]+,$LON,$LAT""")
-        val genericMetaTagPattern = Regex(
-            @Suppress("SpellCheckingInspection") """<meta content="Google Maps" itemprop="name""""
-        )
-        val uriPattern = Regex("""data-url="([^"]+)"""")
+    override suspend fun parse(data: ByteReadChannel, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
+        buildParseResult {
+            val directionsPreviewPattern = Regex("""%213d$LAT%214d$LON""")
+            val pointPattern = Regex("""\[(?:null,null,|null,\[)$LAT,$LON]""")
+            val defaultPointLinkPattern = Regex("""/@$LAT,$LON""")
+            val defaultPointAppInitStatePattern =
+                Regex("""APP_INITIALIZATION_STATE=\[\[\[[\d.-]+,$LON,$LAT""")
+            val genericMetaTagPattern = Regex(
+                @Suppress("SpellCheckingInspection") """<meta content="Google Maps" itemprop="name""""
+            )
+            val uriPattern = Regex("""data-url="([^"]+)"""")
 
-        val mutableNaivePoints = mutableListOf<NaivePoint>()
-        var defaultNaivePoint: NaivePoint? = null
-        var genericMetaTagFound = false
-        var redirectUriString: String? = null
-        val name = prevPoints?.lastOrNull()?.name
+            val mutableNaivePoints = mutableListOf<NaivePoint>()
+            var defaultNaivePoint: NaivePoint? = null
+            var genericMetaTagFound = false
+            var redirectUriString: String? = null
+            val name = prevPoints?.lastOrNull()?.name
 
-        while (true) {
-            val line = channel.readLine() ?: break
-            if (!genericMetaTagFound && genericMetaTagPattern.find(line) != null) {
-                log.d("GoogleMapsInput", "HTML Pattern: Generic meta tag matched line $line")
-                genericMetaTagFound = true
-            }
-            if (
-                mutableNaivePoints.addAll(
-                    directionsPreviewPattern.findAll(line).mapNotNull { m ->
-                        m.toLatLonPoint(Source.HTML)?.copy(name = name)
+            while (true) {
+                val line = data.readLine() ?: break
+                if (!genericMetaTagFound && genericMetaTagPattern.find(line) != null) {
+                    log.d("GoogleMapsInput", "HTML Pattern: Generic meta tag matched line $line")
+                    genericMetaTagFound = true
+                }
+                if (
+                    mutableNaivePoints.addAll(
+                        directionsPreviewPattern.findAll(line).mapNotNull { m ->
+                            m.toLatLonPoint(Source.HTML)?.copy(name = name)
+                        }
+                    )
+                ) {
+                    log.d("GoogleMapsInput", "HTML Pattern: Directions preview pattern matched line $line")
+                    // Stop parsing, so that we don't add points that we've just parsed again from SCRIPT tags
+                    break
+                }
+                if (
+                    mutableNaivePoints.addAll(
+                        pointPattern.findAll(line).mapNotNull { m ->
+                            m.toLatLonPoint(Source.JAVASCRIPT)?.copy(name = name)
+                        }
+                    )
+                ) {
+                    log.d("GoogleMapsInput", "HTML Pattern: Point pattern matched line $line")
+                }
+                if (defaultNaivePoint == null) {
+                    defaultPointLinkPattern.find(line)?.toLatLonPoint(Source.JAVASCRIPT)?.let {
+                        log.d("GoogleMapsInput", "HTML Pattern: Default point pattern 1 matched line $line")
+                        defaultNaivePoint = it.copy(name = name)
                     }
-                )
-            ) {
-                log.d("GoogleMapsInput", "HTML Pattern: Directions preview pattern matched line $line")
-                // Stop parsing, so that we don't add points that we've just parsed again from SCRIPT tags
-                break
-            }
-            if (
-                mutableNaivePoints.addAll(
-                    pointPattern.findAll(line).mapNotNull { m ->
-                        m.toLatLonPoint(Source.JAVASCRIPT)?.copy(name = name)
+                }
+                if (defaultNaivePoint == null && !genericMetaTagFound) {
+                    // When the HTML contains a generic "Google Maps" META tag instead of a specific one like
+                    // "Berlin - Germany", then it seems that the APP_INITIALIZATION_STATE doesn't contain correct
+                    // coordinates. It contains coordinates of the IP address that the HTTP request came from. So let's
+                    // ignore these coordinates.
+                    defaultPointAppInitStatePattern.find(line)?.toLonLatPoint(Source.JAVASCRIPT)?.let {
+                        log.d("GoogleMapsInput", "HTML Pattern: Default point pattern 2 matched line $line")
+                        defaultNaivePoint = it.copy(name = name)
                     }
-                )
-            ) {
-                log.d("GoogleMapsInput", "HTML Pattern: Point pattern matched line $line")
-            }
-            if (defaultNaivePoint == null) {
-                defaultPointLinkPattern.find(line)?.toLatLonPoint(Source.JAVASCRIPT)?.let {
-                    log.d("GoogleMapsInput", "HTML Pattern: Default point pattern 1 matched line $line")
-                    defaultNaivePoint = it.copy(name = name)
+                }
+                if (redirectUriString == null) {
+                    uriPattern.find(line)?.groupOrNull()?.let {
+                        log.d("GoogleMapsInput", "HTML Pattern: URI pattern matched line $line")
+                        redirectUriString = it
+                    }
                 }
             }
-            if (defaultNaivePoint == null && !genericMetaTagFound) {
-                // When the HTML contains a generic "Google Maps" META tag instead of a specific one like
-                // "Berlin - Germany", then it seems that the APP_INITIALIZATION_STATE doesn't contain correct
-                // coordinates. It contains coordinates of the IP address that the HTTP request came from. So let's
-                // ignore these coordinates.
-                defaultPointAppInitStatePattern.find(line)?.toLonLatPoint(Source.JAVASCRIPT)?.let {
-                    log.d("GoogleMapsInput", "HTML Pattern: Default point pattern 2 matched line $line")
-                    defaultNaivePoint = it.copy(name = name)
-                }
-            }
-            if (redirectUriString == null) {
-                uriPattern.find(line)?.groupOrNull()?.let {
-                    log.d("GoogleMapsInput", "HTML Pattern: URI pattern matched line $line")
-                    redirectUriString = it
-                }
-            }
-        }
 
-        if (mutableNaivePoints.isEmpty()) {
-            if (defaultNaivePoint != null) {
-                mutableNaivePoints.add(defaultNaivePoint)
-            } else if (redirectUriString != null) {
-                nextData = redirectUriString
-                nextInput = GoogleMapsWebInput
-            } else {
-                // Go to web parsing
-                nextInput = GoogleMapsWebInput
+            if (mutableNaivePoints.isEmpty()) {
+                if (defaultNaivePoint != null) {
+                    mutableNaivePoints.add(defaultNaivePoint)
+                } else if (redirectUriString != null) {
+                    nextMatch = redirectUriString
+                    nextInput = GoogleMapsWebInput
+                } else {
+                    // Go to web parsing
+                    nextInput = GoogleMapsWebInput
+                }
             }
-        }
 
-        points = mutableNaivePoints.map { GCJ02MainlandChinaPoint(it) }.toImmutableList()
-    }
+            points = mutableNaivePoints.map { GCJ02MainlandChinaPoint(it) }.toImmutableList()
+        }
 }

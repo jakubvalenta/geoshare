@@ -2,6 +2,7 @@ package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
@@ -9,14 +10,15 @@ import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 /**
  * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/
  */
-object MagicEarthInput : Input, Input.HasRandomUri {
-    override val uriPattern = Regex("""((?:(?:https?://)?magicearth.com|magicearth:/)/\?$URI_REST)""")
+object MagicEarthUriInput : UriInput, Input.HasRandomUri {
+    override val pattern = Regex("""((?:(?:https?://)?magicearth.com|magicearth:/)/\?$URI_REST)""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.MAGIC_EARTH,
         nameResId = R.string.converter_magic_earth_name,
@@ -25,8 +27,8 @@ object MagicEarthInput : Input, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {
-        uri.run {
+    override suspend fun parse(data: Uri, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
+        data.run {
             val z = listOf("z", "zoom")
                 .firstNotNullOfOrNull { key -> Z_PATTERN.matchEntire(queryParams[key])?.doubleGroupOrNull() }
 

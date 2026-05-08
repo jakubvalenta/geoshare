@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class WazeInputTest : InputTest {
-    override val input = WazeInput
+    override val input = WazeUriInput
 
     @Test
     fun uriPattern_fullUrl() {

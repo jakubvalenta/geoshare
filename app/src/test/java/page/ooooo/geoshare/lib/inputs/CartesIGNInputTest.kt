@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class CartesIGNInputTest : InputTest {
-    override val input = CartesIGNInput
+    override val input = CartesIGNUriInput
 
     @Test
     fun uriPattern_fullUrl() {

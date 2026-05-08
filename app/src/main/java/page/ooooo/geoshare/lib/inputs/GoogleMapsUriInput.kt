@@ -2,6 +2,7 @@ package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
@@ -14,6 +15,7 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 
 /**
@@ -23,7 +25,7 @@ import page.ooooo.geoshare.lib.geo.Source
  * but only puts it in the point name. The reason is that Plus Codes are handled by [PlusCodeInput], which has higher
  * priority, so URIs containing Plus Codes should never reach [GoogleMapsUriInput].
  */
-object GoogleMapsUriInput : NewUriInput, Input.HasRandomUri {
+object GoogleMapsUriInput : UriInput, Input.HasRandomUri {
     override val pattern =
         Regex("""((?:https?://)?(?:(?:www|maps)\.)?google(?:\.[a-z]{2,3})?\.[a-z]{2,3}[/?#]$URI_REST)""")
     override val documentation = InputDocumentation(
@@ -36,8 +38,8 @@ object GoogleMapsUriInput : NewUriInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parse(uri: Uri, uriQuote: UriQuote) = buildParseResult {
-        uri.run {
+    override suspend fun parse(data: Uri, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
+        data.run {
             val mutableNaivePoints = mutableListOf<NaivePoint>()
 
             val z = Z_PATTERN.matchEntire(queryParams["zoom"])?.doubleGroupOrNull()

@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class YandexMapsInputTest : InputTest {
-    override val input = YandexMapsInput
+    override val input = YandexMapsUriInput
 
     @Test
     fun uriPattern_fullUrl() {

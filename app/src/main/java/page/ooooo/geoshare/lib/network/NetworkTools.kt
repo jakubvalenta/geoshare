@@ -15,6 +15,7 @@ import io.ktor.client.plugins.cookies.ConstantCookiesStorage
 import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.request.prepareRequest
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.request
 import io.ktor.http.Cookie
 import io.ktor.http.HttpHeaders
@@ -92,6 +93,21 @@ open class NetworkTools(
         connect(engine, url, lastAttempt = lastAttempt, maxAttempts = maxAttempts) { response ->
             val channel: ByteReadChannel = response.body()
             block(channel)
+        }
+    }
+
+    /**
+     * TODO Documentation
+     */
+    @Throws(NetworkException::class)
+    open suspend fun httpGetBodyAsText(
+        url: URL,
+        lastAttempt: Attempt? = null,
+        maxAttempts: Int = 1,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    ): String = withContext(dispatcher) {
+        connect(engine, url, lastAttempt = lastAttempt, maxAttempts = maxAttempts) { response ->
+            response.bodyAsText()
         }
     }
 

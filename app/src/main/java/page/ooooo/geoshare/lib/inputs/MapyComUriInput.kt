@@ -1,21 +1,22 @@
 package page.ooooo.geoshare.lib.inputs
 
-import androidx.annotation.StringRes
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-object MapyComInput : ShortUriInput, Input.HasRandomUri {
+object MapyComUriInput : UriInput, Input.HasRandomUri {
     private const val COORDS = """(\d{1,2}(?:\.\d{1,16})?)[NS], (\d{1,3}(?:\.\d{1,16})?)[WE]"""
 
-    override val uriPattern =
+    override val pattern =
         Regex("""($COORDS|(?:https?://)?(?:(?:hapticke|www)\.)?mapy\.[a-z]{2,3}[/?]$URI_REST)""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.MAPY_COM,
@@ -27,11 +28,9 @@ object MapyComInput : ShortUriInput, Input.HasRandomUri {
             InputDocumentationItem.Url(23, "https://www.mapy.cz"),
         ),
     )
-    override val shortUriPattern = Regex("""(?:https?://)?(?:www\.)?mapy\.[a-z]{2,3}/s/\S+""")
-    override val shortUriMethod = ShortUriInput.Method.GET
 
-    override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {
-        uri.run {
+    override suspend fun parse(data: Uri, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
+        data.run {
             // Coordinates -- use this part of the text, because it's more precise than the URL
             // e.g. `Vega de Tera 41.9966006N, 6.1223825W https://mapy.com/s/deduduzeha`
             Regex(COORDS).matchEntire(path)?.let { m ->
@@ -59,12 +58,6 @@ object MapyComInput : ShortUriInput, Input.HasRandomUri {
             }
         }
     }
-
-    @StringRes
-    override val permissionTitleResId = R.string.converter_mapy_com_permission_title
-
-    @StringRes
-    override val loadingIndicatorTitleResId = R.string.converter_mapy_com_loading_indicator_title
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "https://mapy.com/en/zakladni?x={lon}&y={lat}&z={z}")

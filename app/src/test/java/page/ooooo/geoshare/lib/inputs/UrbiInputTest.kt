@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class UrbiInputTest : InputTest {
-    override val input = UrbiInput
+    override val input = UrbiUriInput
 
     @Test
     fun uriPattern_fullUrl() {

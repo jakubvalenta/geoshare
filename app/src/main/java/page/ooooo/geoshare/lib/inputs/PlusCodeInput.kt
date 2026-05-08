@@ -3,14 +3,14 @@ package page.ooooo.geoshare.lib.inputs
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.formatters.PlusCodeFormatter
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.decodePlusCode
 
@@ -24,14 +24,14 @@ import page.ooooo.geoshare.lib.geo.decodePlusCode
  *
  * See https://plus.codes/
  */
-object PlusCodeInput : Input, Input.HasRandomUri {
+object PlusCodeInput : TextInput, Input.HasRandomUri {
     /**
      * See https://github.com/google/open-location-code/blob/main/Documentation/Reference/App_Developers.md#supporting-global-codes
      */
     private const val GLOBAL_CODE =
         @Suppress("SpellCheckingInspection") """[23456789C][23456789CFGHJMPQRV][23456789CFGHJMPQRVWX]{6}(?:\+|%2B)[23456789CFGHJMPQRVWX]{2,7}"""
 
-    override val uriPattern = Regex(
+    override val pattern = Regex(
         """(?:^|\s|https://www\.google\.com/maps/place/|https://plus\.codes/)($GLOBAL_CODE)(?:\s|/|$)""",
         RegexOption.IGNORE_CASE,
     )
@@ -50,25 +50,18 @@ object PlusCodeInput : Input, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {
-        uri.run {
-            // Use Uri.toString() instead of Uri.path, so that the '+' character is not replaced with space
-            val input = toString()
-
-            // Global code
-            // e.g. `796RWF8Q+WF`
-            uriPattern.matchEntire(input)?.groupOrNull()?.let { codeString ->
-                decodePlusCode(codeString)?.let {
-                    points = persistentListOf(
-                        GCJ02MainlandChinaPoint(it).copy(lat = it.lat?.toScale(6), lon = it.lon?.toScale(6))
-                    )
-                    return@run
-                }
-            }
-
-            // Local code (not implemented yet)
-            // e.g. `28WR+CW` or `28WR+CW Comstock Park, Michigan`
+    override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
+        // Global code
+        // e.g. `796RWF8Q+WF`
+        decodePlusCode(data)?.let {
+            points = persistentListOf(
+                GCJ02MainlandChinaPoint(it).copy(lat = it.lat?.toScale(6), lon = it.lon?.toScale(6))
+            )
+            return@buildParseResult
         }
+
+        // Local code (not implemented yet)
+        // e.g. `28WR+CW` or `28WR+CW Comstock Park, Michigan`
     }
 
     override fun genRandomUri(point: Point): String? =

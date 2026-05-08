@@ -2,94 +2,179 @@ package page.ooooo.geoshare.lib.inputs
 
 import android.webkit.WebSettings
 import io.ktor.utils.io.ByteReadChannel
+import kotlinx.coroutines.Dispatchers
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.network.NetworkTools
 import java.net.URL
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
-interface Input {
-    val uriPattern: Regex
-    val documentation: InputDocumentation
+sealed interface Input<T> {
+    val documentation: InputDocumentation? get() = null
 
-    suspend fun parseUri(uri: Uri, uriQuote: UriQuote = DefaultUriQuote): ParseUriResult
+    fun match(source: String): String? = null
+
+    suspend fun parse(
+        data: T,
+        prevPoints: Points? = null,
+        uriQuote: UriQuote = DefaultUriQuote,
+        log: ILog = DefaultLog,
+    ): ParseResult
+
+    interface HasPermission {
+        val permissionTitleResId: Int
+        val loadingIndicatorTitleResId: Int
+    }
 
     interface HasRandomUri {
         fun genRandomUri(point: Point): String?
     }
 }
 
-interface ShortUriInput : Input {
-    enum class Method { GET, HEAD }
-
-    val shortUriPattern: Regex
-    val shortUriMethod: Method
-    val permissionTitleResId: Int
-    val loadingIndicatorTitleResId: Int
-}
-
-interface HtmlInput : Input {
-    val permissionTitleResId: Int
-    val loadingIndicatorTitleResId: Int
-
-    suspend fun parseHtml(
-        htmlUrlString: String,
-        channel: ByteReadChannel,
-        pointsFromUri: Points,
+interface SyncInput<T> : Input<T> {
+    suspend fun getData(
+        match: String,
+        networkTools: NetworkTools,
+        lastAttempt: NetworkTools.Attempt?,
+        maxAttempts: Int,
+        timeout: Duration = 60.seconds,
         uriQuote: UriQuote = DefaultUriQuote,
         log: ILog = DefaultLog,
-    ): ParseHtmlResult
+    ): T
 }
 
-interface WebInput : Input {
-    val permissionTitleResId: Int
-    val loadingIndicatorTitleResId: Int
+interface AsyncInput<T> : Input<T>
 
-    fun extendWebSettings(settings: WebSettings) {}
-    fun shouldInterceptRequest(requestUrlString: String): Boolean = false
+interface TextInput : SyncInput<String> {
+    val pattern: Regex
+
+    override fun match(source: String) = pattern.find(source)?.groupOrNull()
+
+    override suspend fun getData(
+        match: String,
+        networkTools: NetworkTools,
+        lastAttempt: NetworkTools.Attempt?,
+        maxAttempts: Int,
+        timeout: Duration,
+        uriQuote: UriQuote,
+        log: ILog,
+    ) = match
 }
 
-sealed interface NewInput {
-    val pattern: Regex? get() = null
-    val documentation: InputDocumentation? get() = null
+interface UriInput : SyncInput<Uri> {
+    val pattern: Regex
 
-    interface HasPermission {
-        val permissionTitleResId: Int
-        val loadingIndicatorTitleResId: Int
+    override fun match(source: String) = pattern.find(source)?.groupOrNull()
+
+    override suspend fun getData(
+        match: String,
+        networkTools: NetworkTools,
+        lastAttempt: NetworkTools.Attempt?,
+        maxAttempts: Int,
+        timeout: Duration,
+        uriQuote: UriQuote,
+        log: ILog,
+    ) = Uri.parse(match, uriQuote)
+}
+
+interface ShortLinkGetInput : UriInput, Input.HasPermission {
+    override suspend fun getData(
+        match: String,
+        networkTools: NetworkTools,
+        lastAttempt: NetworkTools.Attempt?,
+        maxAttempts: Int,
+        timeout: Duration,
+        uriQuote: UriQuote,
+        log: ILog,
+    ): Uri {
+        val uri = Uri.parse(match, uriQuote)
+        val unshortenedUrlString = networkTools.httpGetRedirectedUrlString(
+            uri.toUrl(), lastAttempt = lastAttempt, maxAttempts = maxAttempts
+        )
+        val unshortenedUri = Uri.parse(unshortenedUrlString, uriQuote).toAbsoluteUri(uri)
+        log.i(TAG, "Resolved short URI $match to $unshortenedUri")
+        return unshortenedUri
+    }
+
+    private companion object {
+        private const val TAG = "ShortLinkGetInput"
     }
 }
 
-interface ShortLinkGetInput : NewInput, NewInput.HasPermission {
-    suspend fun parse(unshortenedUri: Uri): ParseResult
+interface ShortLinkHeadInput : UriInput, Input.HasPermission {
+    override suspend fun getData(
+        match: String,
+        networkTools: NetworkTools,
+        lastAttempt: NetworkTools.Attempt?,
+        maxAttempts: Int,
+        timeout: Duration,
+        uriQuote: UriQuote,
+        log: ILog,
+    ): Uri {
+        val uri = Uri.parse(match, uriQuote)
+        val unshortenedUrlString = networkTools.httpHeadLocationHeader(
+            uri.toUrl(), lastAttempt = lastAttempt, maxAttempts = maxAttempts
+        )
+        val unshortenedUri = Uri.parse(unshortenedUrlString, uriQuote).toAbsoluteUri(uri)
+        log.i(TAG, " Resolved short URI $match to $unshortenedUri")
+        return unshortenedUri
+    }
+
+    private companion object {
+        private const val TAG = "ShortLinkHeadInput"
+    }
 }
 
-interface ShortLinkHeadInput : NewInput, NewInput.HasPermission {
-    suspend fun parse(unshortenedUri: Uri): ParseResult
+interface HtmlInput : SyncInput<ByteReadChannel>, Input.HasPermission {
+    override suspend fun getData(
+        match: String,
+        networkTools: NetworkTools,
+        lastAttempt: NetworkTools.Attempt?,
+        maxAttempts: Int,
+        timeout: Duration,
+        uriQuote: UriQuote,
+        log: ILog,
+    ): ByteReadChannel {
+        val uri = Uri.parse(match, uriQuote)
+        log.i(TAG, "Downloading $uri")
+        // TODO dispatcher param
+        networkTools.httpGetBodyAsByteReadChannel(
+            uri.toUrl(), lastAttempt = lastAttempt, maxAttempts = maxAttempts, dispatcher = Dispatchers.Default
+        ) { channel ->
+            TODO()
+        }
+    }
+
+    private companion object {
+        private const val TAG = "HtmlInput"
+    }
 }
 
-interface NewUriInput : NewInput {
-    suspend fun parse(uri: Uri, uriQuote: UriQuote = DefaultUriQuote): ParseResult
-}
-
-interface NewHtmlInput : NewInput, NewInput.HasPermission {
-    suspend fun parse(
-        channel: ByteReadChannel,
-        prevPoints: Points? = null,
-        uriQuote: UriQuote = DefaultUriQuote,
-        log: ILog = DefaultLog,
-    ): ParseResult
-}
-
-interface NewWebInput : NewInput, NewInput.HasPermission {
+interface WebInput : AsyncInput<URL>, Input.HasPermission {
     fun extendWebSettings(settings: WebSettings) {}
     fun shouldInterceptRequest(requestUrlString: String): Boolean = false
-
-    suspend fun parse(webUrlString: String): ParseResult
 }
 
-interface ApiInput : NewInput, NewInput.HasPermission {
-    suspend fun parse(url: URL): ParseResult
+interface ApiInput : SyncInput<String>, Input.HasPermission {
+    override suspend fun getData(
+        match: String,
+        networkTools: NetworkTools,
+        lastAttempt: NetworkTools.Attempt?,
+        maxAttempts: Int,
+        timeout: Duration,
+        uriQuote: UriQuote,
+        log: ILog,
+    ): String {
+        val uri = Uri.parse(match, uriQuote)
+        return networkTools.httpGetBodyAsText(
+            uri.toUrl(), lastAttempt = lastAttempt, maxAttempts = maxAttempts
+        )
+    }
 }

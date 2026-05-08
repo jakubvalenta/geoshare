@@ -3,6 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
@@ -11,11 +12,12 @@ import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toZLatLonPoint
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-object OsmAndInput : Input, Input.HasRandomUri {
-    override val uriPattern = Regex("""((?:https?://)?(?:www\.)?osmand\.net/$URI_REST)""")
+object OsmAndUriInput : UriInput, Input.HasRandomUri {
+    override val pattern = Regex("""((?:https?://)?(?:www\.)?osmand\.net/$URI_REST)""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.OSM_AND,
         nameResId = R.string.converter_osm_and_name,
@@ -24,8 +26,8 @@ object OsmAndInput : Input, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {
-        uri.run {
+    override suspend fun parse(data: Uri, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
+        data.run {
             val z = Regex("""$Z/.*""").matchEntire(fragment)?.doubleGroupOrNull()
 
             // Directions

@@ -2,16 +2,19 @@ package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.geo.Points
+import java.net.URL
 
-object GoogleMapsWebInput : NewWebInput {
+object GoogleMapsWebInput : WebInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_google_maps_permission_title
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
-    override suspend fun parse(webUrlString: String): ParseResult = buildParseResult {
-        nextData = webUrlString
+    override suspend fun parse(data: URL, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
         nextInput = GoogleMapsUriInput
     }
 

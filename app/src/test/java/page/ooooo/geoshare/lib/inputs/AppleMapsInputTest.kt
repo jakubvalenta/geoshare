@@ -12,7 +12,7 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
  * See https://developer.apple.com/library/archive/featuredarticles/iPhoneURLScheme_Reference/MapLinks/MapLinks.html
  */
 class AppleMapsInputTest : InputTest {
-    override val input = AppleMapsInput
+    override val input = AppleMapsUriInput
 
     @Test
     fun uriPattern_fullUrl() {

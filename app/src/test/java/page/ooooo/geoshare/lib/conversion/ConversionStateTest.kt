@@ -205,7 +205,7 @@ class ConversionStateTest {
     fun receivedUriString_inputUriStringIsEmpty_returnsConversionFailed() = runTest {
         val inputUriString = ""
         val stateContext = mockStateContext()
-        val state = ReceivedData(stateContext, "")
+        val state = ReceivedSourceData(stateContext, "")
         assertEquals(
             ConversionFailed(mockResources.getString(R.string.conversion_failed_missing_url), inputUriString),
             state.transition(),
@@ -217,7 +217,7 @@ class ConversionStateTest {
         val inputUriString = "geo:1,2?q="
         val uri = Uri.parse(inputUriString, uriQuote)
         val stateContext = mockStateContext()
-        val state = ReceivedData(stateContext, inputUriString)
+        val state = ReceivedSourceData(stateContext, inputUriString)
         assertEquals(
             FoundInput(stateContext, inputUriString, GeoUriInput, uri, null),
             state.transition(),
@@ -230,7 +230,7 @@ class ConversionStateTest {
         val matchedInputUriString = "https://maps.google.com/foo"
         val uri = Uri.parse(matchedInputUriString, uriQuote)
         val stateContext = mockStateContext()
-        val state = ReceivedData(stateContext, inputUriString)
+        val state = ReceivedSourceData(stateContext, inputUriString)
         assertEquals(
             FoundInput(stateContext, inputUriString, GoogleMapsUriInput, uri, null),
             state.transition(),
@@ -242,7 +242,7 @@ class ConversionStateTest {
         val inputUriString = "https://maps.google.com/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
         val stateContext = mockStateContext()
-        val state = ReceivedData(stateContext, inputUriString)
+        val state = ReceivedSourceData(stateContext, inputUriString)
         assertEquals(
             FoundInput(stateContext, inputUriString, GoogleMapsUriInput, uri, null),
             state.transition(),
@@ -253,7 +253,7 @@ class ConversionStateTest {
     fun receivedUriString_inputUriStringIsNotValidUrl_returnsConversionFailed() = runTest {
         val inputUriString = "https://[invalid:ipv6]/"
         val stateContext = mockStateContext()
-        val state = ReceivedData(stateContext, inputUriString)
+        val state = ReceivedSourceData(stateContext, inputUriString)
         assertEquals(
             ConversionFailed(mockResources.getString(R.string.conversion_failed_unsupported_service), inputUriString),
             state.transition(),
@@ -264,7 +264,7 @@ class ConversionStateTest {
     fun receivedUriString_inputUriStringDoesNotHaveScheme_returnsConversionFailed() = runTest {
         val inputUriString = "maps.google.com/"
         val stateContext = mockStateContext()
-        val state = ReceivedData(stateContext, inputUriString)
+        val state = ReceivedSourceData(stateContext, inputUriString)
         assertEquals(
             ConversionFailed(mockResources.getString(R.string.conversion_failed_unsupported_service), inputUriString),
             state.transition(),
@@ -275,7 +275,7 @@ class ConversionStateTest {
     fun receivedUriString_inputUriStringHasRelativeScheme_returnsConversionFailed() = runTest {
         val inputUriString = "//maps.google.com/"
         val stateContext = mockStateContext()
-        val state = ReceivedData(stateContext, inputUriString)
+        val state = ReceivedSourceData(stateContext, inputUriString)
         assertEquals(
             ConversionFailed(mockResources.getString(R.string.conversion_failed_unsupported_service), inputUriString),
             state.transition(),
@@ -286,7 +286,7 @@ class ConversionStateTest {
     fun receivedUriString_inputUriStringDoesNotHaveHttpsScheme_returnsConversionFailed() = runTest {
         val inputUriString = "ftp://maps.google.com/"
         val stateContext = mockStateContext()
-        val state = ReceivedData(stateContext, inputUriString)
+        val state = ReceivedSourceData(stateContext, inputUriString)
         assertEquals(
             ConversionFailed(mockResources.getString(R.string.conversion_failed_unsupported_service), inputUriString),
             state.transition(),
@@ -297,7 +297,7 @@ class ConversionStateTest {
     fun receivedUriString_inputUriStringDoesNotMatchAnyInput_returnsConversionFailed() = runTest {
         val inputUriString = "https://maps.example.com/foo"
         val stateContext = mockStateContext()
-        val state = ReceivedData(stateContext, inputUriString)
+        val state = ReceivedSourceData(stateContext, inputUriString)
         assertEquals(
             ConversionFailed(mockResources.getString(R.string.conversion_failed_unsupported_service), inputUriString),
             state.transition(),
@@ -321,7 +321,7 @@ class ConversionStateTest {
         val inputUriString = "https://maps.app.goo.gl/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
         val mockInput = object : Input {
-            override val uriPattern = Regex(".")
+            override val pattern = Regex(".")
             override val documentation =
                 InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
 
@@ -789,7 +789,7 @@ class ConversionStateTest {
         val redirectUriString = "https://maps.google.com/redirect"
         val redirectUri = Uri.parse(redirectUriString, uriQuote)
         val mockInput = object : ShortUriInput {
-            override val uriPattern = Regex(".")
+            override val pattern = Regex(".")
             override val documentation =
                 InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
             override val shortUriPattern = Regex(".")
@@ -922,7 +922,7 @@ class ConversionStateTest {
             val points = persistentListOf<WGS84Point>()
             val htmlUriString = "$inputUriString/html"
             val mockInput = object : Input {
-                override val uriPattern = Regex(".")
+                override val pattern = Regex(".")
                 override val documentation =
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
 
@@ -1106,7 +1106,7 @@ class ConversionStateTest {
             val points = persistentListOf<WGS84Point>()
             val webUriString = "$inputUriString/web"
             val mockInput = object : Input {
-                override val uriPattern = Regex(".")
+                override val pattern = Regex(".")
                 override val documentation =
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
 
@@ -1488,7 +1488,7 @@ class ConversionStateTest {
         val htmlUriString = "$inputUriString/html"
         val html = "<html></html>"
         val mockInput = object : HtmlInput {
-            override val uriPattern = Regex(".")
+            override val pattern = Regex(".")
             override val documentation =
                 InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
             override val permissionTitleResId = -1
@@ -1766,7 +1766,7 @@ class ConversionStateTest {
         val htmlUriString = "maps.apple.com/foo"
         val pointsFromHtml = persistentListOf(WGS84Point(1.0, 2.0, name = "fromHtml", source = Source.GENERATED))
         val mockInput = object : HtmlInput {
-            override val uriPattern = Regex(".")
+            override val pattern = Regex(".")
             override val documentation =
                 InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
             override val permissionTitleResId = -1
@@ -1816,7 +1816,7 @@ class ConversionStateTest {
         val htmlUriString = "https://api.apple.com/foo.json"
         val pointsFromHtml = persistentListOf(WGS84Point(1.0, 2.0, name = "fromHtml", source = Source.GENERATED))
         val mockInput = object : HtmlInput {
-            override val uriPattern = Regex(".")
+            override val pattern = Regex(".")
             override val documentation =
                 InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
             override val permissionTitleResId = -1
@@ -1867,7 +1867,7 @@ class ConversionStateTest {
             val redirectUriString = "$inputUriString/redirect"
             val redirectUri = Uri.parse(redirectUriString, uriQuote)
             val mockInput = object : HtmlInput {
-                override val uriPattern = Regex(".")
+                override val pattern = Regex(".")
                 override val documentation =
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
                 override val permissionTitleResId = -1
@@ -1925,7 +1925,7 @@ class ConversionStateTest {
             val redirectUri = Uri.parse("$inputUriString/$redirectUriString", uriQuote)
             val html = "<html></html>"
             val mockInput = object : HtmlInput {
-                override val uriPattern = Regex(".")
+                override val pattern = Regex(".")
                 override val documentation =
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
                 override val permissionTitleResId = -1
@@ -1976,7 +1976,7 @@ class ConversionStateTest {
             val webUriString = "$inputUriString/web"
             val html = "<html></html>"
             val mockInput = object : HtmlInput, WebInput {
-                override val uriPattern = Regex(".")
+                override val pattern = Regex(".")
                 override val documentation =
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
                 override val permissionTitleResId = -1
@@ -2022,7 +2022,7 @@ class ConversionStateTest {
             val webUriString = "$inputUriString/web"
             val html = "<html></html>"
             val mockInput = object : HtmlInput {
-                override val uriPattern = Regex(".")
+                override val pattern = Regex(".")
                 override val documentation =
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
                 override val permissionTitleResId = -1
@@ -2071,7 +2071,7 @@ class ConversionStateTest {
                 WGS84Point(name = "foo bar", source = Source.GENERATED),
             )
             val mockInput = object : HtmlInput {
-                override val uriPattern = Regex(".")
+                override val pattern = Regex(".")
                 override val documentation =
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
                 override val permissionTitleResId = -1
@@ -2122,7 +2122,7 @@ class ConversionStateTest {
             val htmlUriString = "https://api.apple.com/foo.json"
             val pointsFromHtml = persistentListOf(WGS84Point(source = Source.GENERATED))
             val mockInput = object : HtmlInput {
-                override val uriPattern = Regex(".")
+                override val pattern = Regex(".")
                 override val documentation =
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
                 override val permissionTitleResId = -1
@@ -2489,7 +2489,7 @@ class ConversionStateTest {
             val webUriString = "$inputUriString/web"
             val urlString = "$webUriString/current"
             val mockInput = object : WebInput {
-                override val uriPattern = Regex("""^https://maps\.apple\.com/\S*""")
+                override val pattern = Regex("""^https://maps\.apple\.com/\S*""")
                 override val documentation =
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
 
@@ -2528,7 +2528,7 @@ class ConversionStateTest {
             val webUriString = "$inputUriString/web"
             val urlString = "$webUriString/current"
             val mockInput = object : WebInput {
-                override val uriPattern = Regex("""^https://maps\.apple\.com/\S*""")
+                override val pattern = Regex("""^https://maps\.apple\.com/\S*""")
                 override val documentation =
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
 
@@ -2574,7 +2574,7 @@ class ConversionStateTest {
             val webUriString = "$inputUriString/web"
             val urlString = "$webUriString/current"
             val mockInput = object : WebInput {
-                override val uriPattern = Regex("""^https://maps\.apple\.com/\S*""")
+                override val pattern = Regex("""^https://maps\.apple\.com/\S*""")
                 override val documentation =
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
 

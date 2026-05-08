@@ -121,8 +121,8 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsWebInput
-import page.ooooo.geoshare.lib.inputs.NewInput
-import page.ooooo.geoshare.lib.inputs.NewWebInput
+import page.ooooo.geoshare.lib.inputs.Input
+import page.ooooo.geoshare.lib.inputs.WebInput
 import page.ooooo.geoshare.lib.network.ConnectTimeoutNetworkException
 import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.outputs.Action
@@ -382,7 +382,7 @@ fun MainScreen(
 @Composable
 private fun MainScreen(
     currentState: State,
-    allInputs: List<NewInput>,
+    allInputs: List<Input>,
     appDetails: AppDetails,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
@@ -724,10 +724,10 @@ private fun MainMainPane(
         is ConversionState.HasError -> {
             ResultError(
                 currentState.message,
-                currentState.rawData,
+                currentState.source,
                 onNavigateToInputsScreen = onNavigateToInputsScreen,
                 onRetry = {
-                    onUpdateInput(currentState.rawData)
+                    onUpdateInput(currentState.source)
                     onStart()
                 },
             )
@@ -762,7 +762,7 @@ private fun MainMainPane(
 
 @Composable
 private fun MainBottomPane(currentState: State) {
-    if (currentState is GrantedPermission && currentState.input is NewWebInput) {
+    if (currentState is GrantedPermission && currentState.input is WebInput) {
         BoxWithConstraints(
             Modifier
                 .fillMaxSize()
@@ -780,7 +780,7 @@ private fun MainBottomPane(currentState: State) {
                     .checkeredBackground(squarePx)
             )
             ConversionWebView(
-                unsafeUrl = currentState.data,
+                unsafeUrl = currentState.match,
                 onUrlChange = { currentState.onWebUrlChange(it) },
                 extendWebSettings = { currentState.input.extendWebSettings(it) },
                 shouldInterceptRequest = { currentState.input.shouldInterceptRequest(it) },
@@ -791,7 +791,7 @@ private fun MainBottomPane(currentState: State) {
 
 @Composable
 private fun MainSupportingPane(
-    allInputs: List<NewInput>,
+    allInputs: List<Input>,
     appDetails: AppDetails,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
@@ -905,14 +905,14 @@ private fun MainBottomBar(
     when (currentState) {
         is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null -> {}
         is ConversionState.HasError -> MainSkipButton(
-            currentState.rawData,
+            currentState.source,
             containerColor,
             contentColor,
             modifier,
         )
 
         is ConversionState.HasResult -> MainSkipButton(
-            currentState.rawData,
+            currentState.source,
             containerColor,
             contentColor,
             modifier,
@@ -1119,7 +1119,7 @@ private fun SucceededPreview() {
         )
         MainScreen(
             currentState = ActionFinished(
-                rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.example),
@@ -1198,7 +1198,7 @@ private fun DarkSucceededPreview() {
         )
         MainScreen(
             currentState = ActionFinished(
-                rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.example),
@@ -1277,7 +1277,7 @@ private fun SmallSucceededPreview() {
         )
         MainScreen(
             currentState = ActionFinished(
-                rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.example),
@@ -1356,7 +1356,7 @@ private fun TabletSucceededPreview() {
         )
         MainScreen(
             currentState = ActionFinished(
-                rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.example),
@@ -1435,7 +1435,7 @@ private fun DarkTabletSucceededPreview() {
         )
         MainScreen(
             currentState = ActionFinished(
-                rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.example),
@@ -1514,7 +1514,7 @@ private fun AutomationPreview() {
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
-                rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
                     .toAction(WGS84Point(source = Source.GENERATED)),
@@ -1592,7 +1592,7 @@ private fun DarkAutomationPreview() {
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
-                rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
                     .toAction(WGS84Point(source = Source.GENERATED)),
@@ -1670,7 +1670,7 @@ private fun TabletAutomationPreview() {
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
-                rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
                     .toAction(WGS84Point(source = Source.GENERATED)),
@@ -1747,8 +1747,8 @@ private fun WebViewPreview() {
                 userPreferencesRepository = FakeUserPreferencesRepository(),
                 billing = BillingImpl(LocalContext.current),
             ),
-            rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            data = "https://www.example.com/",
+            source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            match = "https://www.example.com/",
             input = GoogleMapsWebInput,
             loadingIndicatorTitleResId = GoogleMapsWebInput.loadingIndicatorTitleResId,
         )
@@ -1819,8 +1819,8 @@ private fun DarkWebViewPreview() {
                 userPreferencesRepository = FakeUserPreferencesRepository(),
                 billing = BillingImpl(LocalContext.current),
             ),
-            rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            data = "https://www.example.com/",
+            source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            match = "https://www.example.com/",
             input = GoogleMapsWebInput,
             loadingIndicatorTitleResId = GoogleMapsWebInput.loadingIndicatorTitleResId,
         )
@@ -1891,8 +1891,8 @@ private fun TabletWebViewPreview() {
                 userPreferencesRepository = FakeUserPreferencesRepository(),
                 billing = BillingImpl(LocalContext.current),
             ),
-            rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            data = "https://www.example.com/",
+            source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            match = "https://www.example.com/",
             input = GoogleMapsWebInput,
             loadingIndicatorTitleResId = GoogleMapsWebInput.loadingIndicatorTitleResId,
         )
@@ -1954,7 +1954,7 @@ private fun ErrorPreview() {
         MainScreen(
             currentState = ConversionFailed(
                 message = stringResource(R.string.conversion_failed_parse_url_error),
-                rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
             allInputs = emptyList(),
             appDetails = emptyMap(),
@@ -2012,7 +2012,7 @@ private fun DarkErrorPreview() {
         MainScreen(
             currentState = ConversionFailed(
                 message = stringResource(R.string.conversion_failed_parse_url_error),
-                rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
             allInputs = emptyList(),
             appDetails = emptyMap(),
@@ -2070,7 +2070,7 @@ private fun TabletErrorPreview() {
         MainScreen(
             currentState = ConversionFailed(
                 message = stringResource(R.string.conversion_failed_parse_url_error),
-                rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
             allInputs = emptyList(),
             appDetails = emptyMap(),
@@ -2206,8 +2206,8 @@ private fun LoadingIndicatorPreview() {
                 userPreferencesRepository = FakeUserPreferencesRepository(),
                 billing = BillingImpl(LocalContext.current),
             ),
-            rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            data = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             input = GoogleMapsHtmlInput,
             loadingIndicatorTitleResId = GoogleMapsHtmlInput.loadingIndicatorTitleResId,
             lastAttempt = NetworkTools.Attempt(
@@ -2282,8 +2282,8 @@ private fun DarkLoadingIndicatorPreview() {
                 userPreferencesRepository = FakeUserPreferencesRepository(),
                 billing = BillingImpl(LocalContext.current),
             ),
-            rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            data = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             input = GoogleMapsHtmlInput,
             loadingIndicatorTitleResId = GoogleMapsHtmlInput.loadingIndicatorTitleResId,
             lastAttempt = NetworkTools.Attempt(
@@ -2358,8 +2358,8 @@ private fun TabletLoadingIndicatorPreview() {
                 userPreferencesRepository = FakeUserPreferencesRepository(),
                 billing = BillingImpl(LocalContext.current),
             ),
-            rawData = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            data = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             input = GoogleMapsHtmlInput,
             loadingIndicatorTitleResId = GoogleMapsHtmlInput.loadingIndicatorTitleResId,
             lastAttempt = NetworkTools.Attempt(

@@ -2,7 +2,10 @@ package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.geo.Points
 
 object GoogleMapsShortLinkInput : ShortLinkHeadInput {
     override val pattern = Regex("""(?:https?://)?(?:(?:maps\.)?(?:app\.)?goo\.gl|g\.co)/[/A-Za-z0-9_-]+""")
@@ -23,14 +26,14 @@ object GoogleMapsShortLinkInput : ShortLinkHeadInput {
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
-    override suspend fun parse(unshortenedUri: Uri) = buildParseResult {
-        unshortenedUri.run {
+    override suspend fun parse(data: Uri, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
+        data.run {
             nextInput = GoogleMapsUriInput
 
             // Google Maps Go
             // https://maps.app.goo.gl/?link={url}
             queryParams["link"]?.takeIf { it.isNotEmpty() }?.let {
-                nextData = it
+                nextMatch = it
             }
         }
     }

@@ -3,7 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toScale
@@ -11,10 +11,12 @@ import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-object CoordinatesInput : Input, Input.HasRandomUri {
+// TODO Rename to CoordinateInput
+object CoordinatesInput : TextInput, Input.HasRandomUri {
     private const val CHARS = @Suppress("SpellCheckingInspection") """[\p{Zs},°'′"″NSWE]"""
     private const val SPACE = """\p{Zs}*"""
     private const val LAT_SIG = """(-?)"""
@@ -26,7 +28,7 @@ object CoordinatesInput : Input, Input.HasRandomUri {
     private const val LON_MIN = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
     private const val LON_SEC = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
 
-    override val uriPattern = Regex("""([\d.\-\p{Zs},°'′"″NSWE]*\d[\d.\-\p{Zs},°'′"″NSWE]*)""")
+    override val pattern = Regex("""([\d.\-\p{Zs},°'′"″NSWE]*\d[\d.\-\p{Zs},°'′"″NSWE]*)""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.COORDINATES,
         nameResId = R.string.converter_coordinates_name,
@@ -39,11 +41,12 @@ object CoordinatesInput : Input, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {
-        uri.run {
-            // Decimal
-            // e.g. `N 41.40338, E 2.17403`
-            Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""").matchEntire(path)?.let { m ->
+    override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
+        // Decimal
+        // e.g. `N 41.40338, E 2.17403`
+        Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""")
+            .matchEntire(data)
+            ?.let { m ->
                 points = persistentListOf(
                     WGS84Point(
                         degToDec(
@@ -59,14 +62,14 @@ object CoordinatesInput : Input, Input.HasRandomUri {
                         source = Source.TEXT,
                     )
                 )
-                return@run
+                return@buildParseResult
             }
 
-            // Degrees minutes seconds
-            // e.g. `41°24'12.2"N 2°10'26.5"E`
-            Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""").matchEntire(
-                path
-            )?.let { m ->
+        // Degrees minutes seconds
+        // e.g. `41°24'12.2"N 2°10'26.5"E`
+        Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""")
+            .matchEntire(data)
+            ?.let { m ->
                 points = persistentListOf(
                     WGS84Point(
                         degToDec(
@@ -86,14 +89,16 @@ object CoordinatesInput : Input, Input.HasRandomUri {
                         source = Source.TEXT,
                     )
                 )
-                return@run
+                return@buildParseResult
+
+
             }
 
-            // Degrees minutes
-            // e.g. `41 24.2028, 2 10.4418`
-            Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""").matchEntire(
-                path
-            )?.let { m ->
+        // Degrees minutes
+        // e.g. `41 24.2028, 2 10.4418`
+        Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""")
+            .matchEntire(data)
+            ?.let { m ->
                 points = persistentListOf(
                     WGS84Point(
                         degToDec(
@@ -111,9 +116,8 @@ object CoordinatesInput : Input, Input.HasRandomUri {
                         source = Source.TEXT,
                     )
                 )
-                return@run
+                return@buildParseResult
             }
-        }
     }
 
     private fun degToDec(

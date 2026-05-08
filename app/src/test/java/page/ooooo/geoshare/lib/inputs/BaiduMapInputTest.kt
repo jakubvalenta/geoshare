@@ -10,7 +10,7 @@ import page.ooooo.geoshare.lib.geo.BD09MCPoint
 import page.ooooo.geoshare.lib.geo.Source
 
 class BaiduMapInputTest : InputTest {
-    override val input = BaiduMapInput
+    override val input = BaiduMapShortLinkInput
 
     @Test
     fun uriPattern_fullUrl() {

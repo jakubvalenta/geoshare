@@ -1,14 +1,10 @@
 package page.ooooo.geoshare.lib.inputs
 
-import androidx.annotation.StringRes
-import io.ktor.utils.io.ByteReadChannel
-import io.ktor.utils.io.readLine
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.extensions.decodeBasicHtmlEntities
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
@@ -20,8 +16,13 @@ import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-object UrbiInput : HtmlInput, Input.HasRandomUri {
-    override val uriPattern =
+/**
+ * 2GIS / Urbi input.
+ *
+ * We call it Urbi, because 2GIS starts with a number, so it couldn't be used as a class name.
+ */
+object UrbiUriInput : UriInput, Input.HasRandomUri {
+    override val pattern =
         Regex("""((?:https?://)?(?:www\.)?(?:(?:go|maps)\.)?(?:2gis|urbi|urbi-[a-z]{2})(?:\.[a-z]{2,3})?\.[a-z]{2,3}/$URI_REST)""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.URBI,
@@ -53,8 +54,8 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {
-        uri.run {
+    override suspend fun parse(data: Uri, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
+        data.run {
             // Marker
             // https://maps.urbi.ae/dubai/geo/{lon}%2C{lat}?m={lon},{lat}/{z}
             Regex("""$LON,$LAT/$Z""").matchEntire(queryParams["m"])?.toLonLatZPoint(Source.URI)?.let {
@@ -83,39 +84,9 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
                 return@run
             }
 
-            htmlUriString = toString()
+            nextInput = UrbiHtmlInput
         }
     }
-
-    override suspend fun parseHtml(
-        htmlUrlString: String,
-        channel: ByteReadChannel,
-        pointsFromUri: Points,
-        uriQuote: UriQuote,
-        log: ILog,
-    ) = buildParseHtmlResult {
-        val pattern = Regex("""property="twitter:image" content="([^"]+)""")
-
-        // Notice that unlike in other Inputs, we don't copy any point names from pointsFromUri here
-
-        while (true) {
-            val line = channel.readLine() ?: break
-            pattern.find(line)?.groupOrNull()?.let { attr ->
-                val uri = Uri.parse(attr.decodeBasicHtmlEntities(), uriQuote)
-                val res = parseUri(uri)
-                if (res.points.isNotEmpty()) {
-                    points = res.points
-                    return@buildParseHtmlResult
-                }
-            }
-        }
-    }
-
-    @StringRes
-    override val permissionTitleResId = R.string.converter_urbi_permission_title
-
-    @StringRes
-    override val loadingIndicatorTitleResId = R.string.converter_urbi_loading_indicator_title
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "https://maps.urbi.ae/dubai/geo/{lon}%2C{lat}?m={lon}%2C{lat}%2F{z}")

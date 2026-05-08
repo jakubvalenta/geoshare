@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class MagicEarthInputTest : InputTest {
-    override val input = MagicEarthInput
+    override val input = MagicEarthUriInput
 
     @Test
     fun uriPattern_fullUrl() {

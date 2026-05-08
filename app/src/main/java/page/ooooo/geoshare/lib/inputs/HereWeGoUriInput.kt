@@ -2,6 +2,7 @@ package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
@@ -11,15 +12,16 @@ import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toLatLonZPoint
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-object HereWeGoInput : Input, Input.HasRandomUri {
+object HereWeGoUriInput : UriInput, Input.HasRandomUri {
     private const val SIMPLIFIED_BASE64 = """[A-Za-z0-9+/]+=*"""
 
-    override val uriPattern = Regex("""((?:https?://)?(?:share|wego)\.here\.com/$URI_REST)""")
+    override val pattern = Regex("""((?:https?://)?(?:share|wego)\.here\.com/$URI_REST)""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.HERE_WEGO,
         nameResId = R.string.converter_here_wego_name,
@@ -32,9 +34,9 @@ object HereWeGoInput : Input, Input.HasRandomUri {
     )
 
     @OptIn(ExperimentalEncodingApi::class)
-    override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {
-        uri.run {
-            val parts = uri.pathParts.drop(1)
+    override suspend fun parse(data: Uri, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
+        data.run {
+            val parts = data.pathParts.drop(1)
             val firstPart = parts.firstOrNull() ?: return@run
             if (firstPart == "") {
                 Regex("""$LAT,$LON,$Z""").matchEntire(queryParams["map"])?.toLatLonZPoint(Source.MAP_CENTER)?.let {

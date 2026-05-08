@@ -1,8 +1,5 @@
 package page.ooooo.geoshare.lib.inputs
 
-import androidx.annotation.StringRes
-import io.ktor.utils.io.ByteReadChannel
-import io.ktor.utils.io.readLine
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
 import page.ooooo.geoshare.R
@@ -24,10 +21,10 @@ import page.ooooo.geoshare.lib.geo.decodeWazeGeoHash
 /**
  * See https://developers.google.com/waze/deeplinks/
  */
-object WazeInput : HtmlInput, Input.HasRandomUri {
+object WazeUriInput : UriInput, Input.HasRandomUri {
     private const val HASH = @Suppress("SpellCheckingInspection") """[0-9bcdefghjkmnpqrstuvwxyz]+"""
 
-    override val uriPattern = Regex("""((?:https?://)?(?:(?:www|ul)\.)?waze\.com/$URI_REST)""")
+    override val pattern = Regex("""((?:https?://)?(?:(?:www|ul)\.)?waze\.com/$URI_REST)""")
 
     override val documentation = InputDocumentation(
         id = InputDocumentationId.WAZE,
@@ -41,8 +38,8 @@ object WazeInput : HtmlInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {
-        uri.run {
+    override suspend fun parse(data: Uri, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
+        data.run {
             // Short link
             // https://waze.com/ul/h{hash}
             (Regex("""/ul/h($HASH)""").matchEntire(path)
@@ -86,56 +83,32 @@ object WazeInput : HtmlInput, Input.HasRandomUri {
                 // https://www.waze.com/ul?venue_id=2884104.28644432.6709020
                 // with this one:
                 // https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020
-                htmlUriString = Uri(
+                nextMatch = Uri(
                     scheme = "https",
                     host = "www.waze.com",
                     path = "/live-map/directions",
                     queryParams = persistentMapOf("to" to "place.w.$venueId"),
-                    uriQuote = uri.uriQuote,
+                    uriQuote = uriQuote,
                 ).toString()
+                nextInput = WazeHtmlInput
             } ?: queryParams["place"]?.takeIf { it.isNotEmpty() }?.let { placeId ->
                 // To skip some redirects when downloading HTML, replace this URL:
                 // https://www.waze.com/live-map/directions?place=w.2884104.28644432.6709020
                 // with this one:
                 // https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020
-                htmlUriString = Uri(
+                nextMatch = Uri(
                     scheme = "https",
                     host = "www.waze.com",
                     path = "/live-map/directions",
                     queryParams = persistentMapOf("to" to "place.$placeId"),
-                    uriQuote = uri.uriQuote,
+                    uriQuote = uriQuote,
                 ).toString()
+                nextInput = WazeHtmlInput
             } ?: queryParams["to"]?.takeIf { it.startsWith("place.") }?.let {
-                htmlUriString = toString()
+                nextInput = WazeHtmlInput
             }
         }
     }
-
-    override suspend fun parseHtml(
-        htmlUrlString: String,
-        channel: ByteReadChannel,
-        pointsFromUri: Points,
-        uriQuote: UriQuote,
-        log: ILog,
-    ) = buildParseHtmlResult {
-        val pattern = Regex(""""latLng":\{"lat":$LAT,"lng":$LON\}""")
-
-        val name = prevPoints?.lastOrNull()?.name
-
-        while (true) {
-            val line = channel.readLine() ?: break
-            pattern.find(line)?.toLatLonPoint(Source.JAVASCRIPT)?.let {
-                points = persistentListOf(WGS84Point(it).copy(name = name))
-                return@buildParseHtmlResult
-            }
-        }
-    }
-
-    @StringRes
-    override val permissionTitleResId = R.string.converter_waze_permission_title
-
-    @StringRes
-    override val loadingIndicatorTitleResId = R.string.converter_waze_loading_indicator_title
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "https://waze.com/ul?ll={lat}%2C{lon}&z={z}")

@@ -40,7 +40,7 @@ import page.ooooo.geoshare.lib.conversion.LocationPermissionReceived
 import page.ooooo.geoshare.lib.conversion.LocationRationaleConfirmed
 import page.ooooo.geoshare.lib.conversion.LocationRationaleShown
 import page.ooooo.geoshare.lib.conversion.LocationReceived
-import page.ooooo.geoshare.lib.conversion.ReceivedData
+import page.ooooo.geoshare.lib.conversion.ReceivedSourceData
 import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.LocationAction
@@ -81,7 +81,7 @@ class ConversionViewModel @Inject constructor(
     // Methods
 
     fun start() {
-        stateContext.currentState = ReceivedData(stateContext, inputUriString)
+        stateContext.currentState = ReceivedSourceData(stateContext, inputUriString)
         transition()
     }
 
@@ -132,7 +132,7 @@ class ConversionViewModel @Inject constructor(
         (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
             transition {
                 ActionReady(
-                    currentState.rawData,
+                    currentState.source,
                     currentState.points,
                     action,
                     isAutomation = false
@@ -145,7 +145,7 @@ class ConversionViewModel @Inject constructor(
         (stateContext.currentState as? BasicActionReady)?.let { currentState ->
             transition {
                 ActionRan(
-                    currentState.rawData,
+                    currentState.source,
                     currentState.points,
                     currentState.action,
                     currentState.isAutomation,
@@ -161,7 +161,7 @@ class ConversionViewModel @Inject constructor(
         (stateContext.currentState as? FileUriRequested)?.let { currentState ->
             transition {
                 FileActionReady(
-                    currentState.rawData,
+                    currentState.source,
                     currentState.points,
                     currentState.action,
                     currentState.isAutomation,
@@ -175,7 +175,7 @@ class ConversionViewModel @Inject constructor(
         (stateContext.currentState as? FileUriRequested)?.let { currentState ->
             transition {
                 ActionFinished(
-                    currentState.rawData,
+                    currentState.source,
                     currentState.points,
                     currentState.action,
                     currentState.isAutomation
@@ -188,7 +188,7 @@ class ConversionViewModel @Inject constructor(
         (stateContext.currentState as? FileActionReady)?.let { currentState ->
             transition {
                 ActionRan(
-                    currentState.rawData,
+                    currentState.source,
                     currentState.points,
                     currentState.action,
                     currentState.isAutomation,
@@ -204,7 +204,7 @@ class ConversionViewModel @Inject constructor(
         (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
             transition {
                 LocationRationaleShown(
-                    currentState.rawData,
+                    currentState.source,
                     currentState.points,
                     action,
                     isAutomation
@@ -218,7 +218,7 @@ class ConversionViewModel @Inject constructor(
             transition {
                 LocationPermissionReceived(
                     stateContext,
-                    currentState.rawData,
+                    currentState.source,
                     currentState.points,
                     action,
                     isAutomation,
@@ -232,7 +232,7 @@ class ConversionViewModel @Inject constructor(
             transition {
                 LocationPermissionReceived(
                     stateContext,
-                    currentState.rawData,
+                    currentState.source,
                     currentState.points,
                     currentState.action,
                     currentState.isAutomation,
@@ -245,7 +245,7 @@ class ConversionViewModel @Inject constructor(
         (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
             transition {
                 LocationReceived(
-                    currentState.rawData, currentState.points, action, isAutomation, location
+                    currentState.source, currentState.points, action, isAutomation, location
                 )
             }
         }
@@ -255,7 +255,7 @@ class ConversionViewModel @Inject constructor(
         (stateContext.currentState as? LocationPermissionReceived)?.let { currentState ->
             transition {
                 ActionFinished(
-                    currentState.rawData,
+                    currentState.source,
                     currentState.points,
                     currentState.action,
                     currentState.isAutomation
@@ -268,7 +268,7 @@ class ConversionViewModel @Inject constructor(
         (stateContext.currentState as? LocationActionReady)?.let { currentState ->
             transition {
                 ActionRan(
-                    currentState.rawData,
+                    currentState.source,
                     currentState.points,
                     currentState.action,
                     currentState.isAutomation,

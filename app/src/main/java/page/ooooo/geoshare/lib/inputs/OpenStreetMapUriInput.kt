@@ -1,10 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
-import androidx.annotation.StringRes
-import io.ktor.utils.io.ByteReadChannel
-import io.ktor.utils.io.readLine
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
@@ -21,11 +17,11 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.decodeOpenStreetMapQuadTileHash
 
-object OpenStreetMapInput : HtmlInput, Input.HasRandomUri {
+object OpenStreetMapUriInput : UriInput, Input.HasRandomUri {
     private const val ELEMENT_PATH = """/(node|relation|way)/(\d+)(?:[/?#].*|$)"""
     private const val HASH = """[A-Za-z0-9_~]+-+"""
 
-    override val uriPattern = Regex("""((?:https?://)?(?:www\.)?(?:openstreetmap|osm)\.org/$URI_REST)""")
+    override val pattern = Regex("""((?:https?://)?(?:www\.)?(?:openstreetmap|osm)\.org/$URI_REST)""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.OPEN_STREET_MAP,
         nameResId = R.string.converter_open_street_map_name,
@@ -40,8 +36,8 @@ object OpenStreetMapInput : HtmlInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {
-        uri.run {
+    override suspend fun parse(data: Uri, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
+        data.run {
             // Short link
             // https://osm.org/go/{hash}
             Regex("""/go/($HASH)""").matchEntire(path)?.groupOrNull()
@@ -83,48 +79,14 @@ object OpenStreetMapInput : HtmlInput, Input.HasRandomUri {
             Regex(ELEMENT_PATH).matchEntire(path)?.let { m ->
                 m.groupOrNull(1)?.let { type ->
                     m.groupOrNull(2)?.let { id ->
-                        htmlUriString =
+                        nextMatch =
                             "https://www.openstreetmap.org/api/0.6/$type/$id${if (type != "node") "/full" else ""}.json"
+                        nextInput = OpenStreetMapApiInput
                     }
                 }
             }
         }
     }
-
-    override suspend fun parseHtml(
-        htmlUrlString: String,
-        channel: ByteReadChannel,
-        pointsFromUri: Points,
-        uriQuote: UriQuote,
-        log: ILog,
-    ) = buildParseHtmlResult {
-        val pattern = Regex(""""lat":$LAT,"lon":$LON""")
-
-        val mutablePoints = mutableListOf<WGS84Point>()
-        val name = prevPoints?.lastOrNull()?.name
-
-        while (true) {
-            val line = channel.readLine() ?: break
-            mutablePoints.addAll(
-                pattern.findAll(line)
-                    .mapNotNull { m -> m.toLatLonPoint(Source.API)?.let { WGS84Point(it) } }
-            )
-        }
-
-        if (name != null) {
-            mutablePoints.removeLastOrNull()?.let { lastPoint ->
-                mutablePoints.add(lastPoint.copy(name = name))
-            }
-        }
-
-        points = mutablePoints.toImmutableList()
-    }
-
-    @StringRes
-    override val permissionTitleResId = R.string.converter_open_street_map_permission_title
-
-    @StringRes
-    override val loadingIndicatorTitleResId = R.string.converter_open_street_map_loading_indicator_title
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "https://www.openstreetmap.org/#map={z}/{lat}/{lon}")

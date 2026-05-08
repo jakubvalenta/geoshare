@@ -19,13 +19,12 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.Input
-import page.ooooo.geoshare.lib.inputs.NewInput
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun MainFormLinks(
-    allInputs: List<NewInput>,
+    allInputs: List<Input>,
     modifier: Modifier = Modifier,
     onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,

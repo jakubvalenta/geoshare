@@ -10,7 +10,7 @@ import page.ooooo.geoshare.lib.geo.GCJ02GreaterChinaAndTaiwanPoint
 import page.ooooo.geoshare.lib.geo.Source
 
 class AmapInputTest : InputTest {
-    override val input = AmapInput
+    override val input = AmapUriInput
 
     @Test
     fun uriPattern_fullUrl() {
