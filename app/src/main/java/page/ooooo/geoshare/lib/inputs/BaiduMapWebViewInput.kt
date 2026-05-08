@@ -7,9 +7,8 @@ import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.network.NetworkTools
-import java.net.URL
 
-object BaiduMapWebInput : WebInput {
+object BaiduMapWebViewInput : WebViewInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_baidu_map_permission_title
 

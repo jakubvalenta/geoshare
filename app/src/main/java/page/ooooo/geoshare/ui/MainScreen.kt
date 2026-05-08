@@ -103,8 +103,8 @@ import page.ooooo.geoshare.lib.conversion.ConversionStateContext
 import page.ooooo.geoshare.lib.conversion.ConversionSucceeded
 import page.ooooo.geoshare.lib.conversion.FileActionReady
 import page.ooooo.geoshare.lib.conversion.FileUriRequested
-import page.ooooo.geoshare.lib.conversion.GrantedPermissionSync
-import page.ooooo.geoshare.lib.conversion.GrantedPermissionWeb
+import page.ooooo.geoshare.lib.conversion.GrantedPermissionBasicInput
+import page.ooooo.geoshare.lib.conversion.GrantedPermissionWebViewInput
 import page.ooooo.geoshare.lib.conversion.Initial
 import page.ooooo.geoshare.lib.conversion.LoadingIndicator
 import page.ooooo.geoshare.lib.conversion.LocationActionReady
@@ -121,7 +121,7 @@ import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInput
-import page.ooooo.geoshare.lib.inputs.GoogleMapsWebInput
+import page.ooooo.geoshare.lib.inputs.GoogleMapsWebViewInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.network.ConnectTimeoutNetworkException
 import page.ooooo.geoshare.lib.network.NetworkTools
@@ -762,7 +762,7 @@ private fun MainMainPane(
 
 @Composable
 private fun MainBottomPane(currentState: State) {
-    if (currentState is GrantedPermissionWeb) {
+    if (currentState is GrantedPermissionWebViewInput) {
         BoxWithConstraints(
             Modifier
                 .fillMaxSize()
@@ -1739,7 +1739,7 @@ private fun WebViewPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        val currentState = GrantedPermissionWeb(
+        val currentState = GrantedPermissionWebViewInput(
             stateContext = ConversionStateContext(
                 linkRepository = FakeLinkRepository(),
                 outputRepository = outputRepository,
@@ -1749,7 +1749,7 @@ private fun WebViewPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://www.example.com/",
-            input = GoogleMapsWebInput,
+            input = GoogleMapsWebViewInput,
         )
         MainScreen(
             currentState = currentState,
@@ -1810,7 +1810,7 @@ private fun DarkWebViewPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        val currentState = GrantedPermissionWeb(
+        val currentState = GrantedPermissionWebViewInput(
             stateContext = ConversionStateContext(
                 linkRepository = FakeLinkRepository(),
                 outputRepository = outputRepository,
@@ -1820,7 +1820,7 @@ private fun DarkWebViewPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://www.example.com/",
-            input = GoogleMapsWebInput,
+            input = GoogleMapsWebViewInput,
         )
         MainScreen(
             currentState = currentState,
@@ -1881,7 +1881,7 @@ private fun TabletWebViewPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        val currentState = GrantedPermissionWeb(
+        val currentState = GrantedPermissionWebViewInput(
             stateContext = ConversionStateContext(
                 linkRepository = FakeLinkRepository(),
                 outputRepository = outputRepository,
@@ -1891,7 +1891,7 @@ private fun TabletWebViewPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://www.example.com/",
-            input = GoogleMapsWebInput,
+            input = GoogleMapsWebViewInput,
         )
         MainScreen(
             currentState = currentState,
@@ -2195,7 +2195,7 @@ private fun LoadingIndicatorPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        val currentState = GrantedPermissionSync(
+        val currentState = GrantedPermissionBasicInput(
             stateContext = ConversionStateContext(
                 linkRepository = FakeLinkRepository(),
                 outputRepository = outputRepository,
@@ -2271,7 +2271,7 @@ private fun DarkLoadingIndicatorPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        val currentState = GrantedPermissionSync(
+        val currentState = GrantedPermissionBasicInput(
             stateContext = ConversionStateContext(
                 linkRepository = FakeLinkRepository(),
                 outputRepository = outputRepository,
@@ -2347,7 +2347,7 @@ private fun TabletLoadingIndicatorPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        val currentState = GrantedPermissionSync(
+        val currentState = GrantedPermissionBasicInput(
             stateContext = ConversionStateContext(
                 linkRepository = FakeLinkRepository(),
                 outputRepository = outputRepository,

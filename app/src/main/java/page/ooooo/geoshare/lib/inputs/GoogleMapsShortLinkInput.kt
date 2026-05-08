@@ -7,7 +7,7 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Points
 
-object GoogleMapsShortLinkInput : ShortLinkHeadInput {
+object GoogleMapsShortLinkInput : HeadLocationHeaderInput {
     override val pattern = Regex("""(?:https?://)?(?:(?:maps\.)?(?:app\.)?goo\.gl|g\.co)/[/A-Za-z0-9_-]+""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.GOOGLE_MAPS,

@@ -10,7 +10,7 @@ import page.ooooo.geoshare.lib.extensions.decodeBasicHtmlEntities
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.geo.Points
 
-object UrbiHtmlInput : HtmlInput {
+object UrbiHtmlInput : BodyAsChannelInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_urbi_permission_title
 

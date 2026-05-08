@@ -8,12 +8,11 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import java.net.URL
 
 /**
  * @see DebugInput
  */
-object DebugWebInput : WebInput {
+object DebugWebViewInput : WebViewInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_debug_permission_title
 

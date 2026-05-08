@@ -26,10 +26,10 @@ import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
-import page.ooooo.geoshare.lib.inputs.WebInput
+import page.ooooo.geoshare.lib.inputs.WebViewInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.ParseResult
-import page.ooooo.geoshare.lib.inputs.SyncInput
+import page.ooooo.geoshare.lib.inputs.BasicInput
 import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.network.RecoverableNetworkException
 import page.ooooo.geoshare.lib.network.UnrecoverableNetworkException
@@ -178,7 +178,7 @@ data class GrantedPermission<T>(
 ) : ConversionState {
     override suspend fun transition(): State =
         when (input) {
-            is SyncInput -> GrantedPermissionSync(
+            is BasicInput -> GrantedPermissionBasicInput(
                 stateContext,
                 source,
                 match,
@@ -190,7 +190,7 @@ data class GrantedPermission<T>(
                 maxAttempts,
             )
 
-            is WebInput -> GrantedPermissionWeb(
+            is WebViewInput -> GrantedPermissionWebViewInput(
                 stateContext,
                 source,
                 match,
@@ -201,11 +201,11 @@ data class GrantedPermission<T>(
         }
 }
 
-data class GrantedPermissionSync<T>(
+data class GrantedPermissionBasicInput<T>(
     val stateContext: ConversionStateContext,
     val source: String,
     val match: String,
-    val input: SyncInput<T>,
+    val input: BasicInput<T>,
     val loadingIndicatorTitleResId: Int? = null,
     val permission: Permission? = null,
     val prevPoints: Points? = null,
@@ -273,20 +273,17 @@ data class GrantedPermissionSync<T>(
 }
 
 /**
- * TODO Documentation
+ * When this state is the current state, the UI should load [match] as a page URL in a WebView and call [setData] with
+ * the URL that the page redirects to once it's fully loaded.
  *
- * When GrantedPermission is the current state, the UI should load [match] as a URL in a WebView and call
- * [setData] once the page loaded in the WebView changes its URL. A page usually changes its URL by calling JavaScript
- * function `history.pushState()`.
- *
- * While transitioning, this state waits for [setData] to be called. If it's not called within [timeout], it returns
- * failure.
+ * The [transition] function of this state will wait for [setData] to be called. If it's not called within [timeout], it
+ * returns failure.
  */
-data class GrantedPermissionWeb(
+data class GrantedPermissionWebViewInput(
     val stateContext: ConversionStateContext,
     val source: String,
     val match: String,
-    val input: WebInput,
+    val input: WebViewInput,
     val permission: Permission? = null,
     val prevPoints: Points? = null,
     val timeout: Duration = 60.seconds,
@@ -335,6 +332,44 @@ data class DeniedPermission<T>(
             stateContext.resources.getString(R.string.conversion_failed_connection_permission_denied),
             source,
         )
+}
+
+data class ParsedData(
+    val stateContext: ConversionStateContext,
+    val source: String,
+    val match: String,
+    val input: Input<*>,
+    val result: ParseResult,
+    val permission: Permission? = null,
+    val prevPoints: Points? = null,
+) : ConversionState {
+    override suspend fun transition(): State =
+        result.run {
+            if (points.lastOrNull()?.hasCoordinates() == true) {
+                stateContext.log.i(ConversionState.TAG, "Parse: Converted $match to $points")
+                ConversionSucceeded(stateContext, source, points)
+            } else if (nextInput != null) {
+                stateContext.log.i(ConversionState.TAG, "Parse: Going to next input $nextInput") // TODO toString()
+                FoundInput(stateContext, source, nextMatch ?: match, nextInput, permission, points)
+            } else if (points.lastOrNull()?.hasName() == true) {
+                stateContext.log.i(ConversionState.TAG, "Parse: Converted $match to $points")
+                ConversionSucceeded(stateContext, source, points)
+            } else {
+                stateContext.log.i(ConversionState.TAG, "Parse: Failed to parse $match")
+                ConversionFailed(
+                    stateContext.resources.getString(R.string.conversion_failed_parse_url_error),
+                    source,
+                )
+                // TODO Specific errors
+                // ConversionFailed(
+                //     stateContext.resources.getString(
+                //         R.string.conversion_failed_parse_html_error_with_reason,
+                //         stateContext.resources.getString(R.string.conversion_failed_reason_no_points),
+                //     ),
+                //     source,
+                // )
+            }
+        }
 }
 
 data class ConversionSucceeded(
@@ -413,44 +448,6 @@ data class ConversionSucceeded(
         }
         return null
     }
-}
-
-data class ParsedData(
-    val stateContext: ConversionStateContext,
-    val source: String,
-    val match: String,
-    val input: Input<*>,
-    val result: ParseResult,
-    val permission: Permission? = null,
-    val prevPoints: Points? = null,
-) : ConversionState {
-    override suspend fun transition(): State =
-        result.run {
-            if (points.lastOrNull()?.hasCoordinates() == true) {
-                stateContext.log.i(ConversionState.TAG, "Parse: Converted $match to $points")
-                ConversionSucceeded(stateContext, source, points)
-            } else if (nextInput != null) {
-                stateContext.log.i(ConversionState.TAG, "Parse: Going to next input $nextInput") // TODO toString()
-                FoundInput(stateContext, source, nextMatch ?: match, nextInput, permission, points)
-            } else if (points.lastOrNull()?.hasName() == true) {
-                stateContext.log.i(ConversionState.TAG, "Parse: Converted $match to $points")
-                ConversionSucceeded(stateContext, source, points)
-            } else {
-                stateContext.log.i(ConversionState.TAG, "Parse: Failed to parse $match")
-                ConversionFailed(
-                    stateContext.resources.getString(R.string.conversion_failed_parse_url_error),
-                    source,
-                )
-                // TODO Specific errors
-                // ConversionFailed(
-                //     stateContext.resources.getString(
-                //         R.string.conversion_failed_parse_html_error_with_reason,
-                //         stateContext.resources.getString(R.string.conversion_failed_reason_no_points),
-                //     ),
-                //     source,
-                // )
-            }
-        }
 }
 
 data class ConversionFailed(

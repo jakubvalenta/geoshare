@@ -10,7 +10,7 @@ import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-object OpenStreetMapApiInput : ApiInput {
+object OpenStreetMapApiInput : BodyAsTextInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_open_street_map_permission_title
 

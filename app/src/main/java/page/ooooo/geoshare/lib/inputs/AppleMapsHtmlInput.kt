@@ -12,7 +12,7 @@ import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-object AppleMapsHtmlInput : HtmlInput {
+object AppleMapsHtmlInput : BodyAsChannelInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_apple_maps_permission_title
 

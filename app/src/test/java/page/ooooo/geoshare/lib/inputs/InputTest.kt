@@ -20,7 +20,7 @@ interface InputTest {
         input.parseUri(Uri.parse(uriString, uriQuote = FakeUriQuote), uriQuote = FakeUriQuote)
 
     suspend fun parseHtml(html: String, htmlUrlString: String = "https://example.com/"): ParseHtmlResult =
-        (input as HtmlInput).parseHtml(
+        (input as BodyAsChannelInput).parseHtml(
             htmlUrlString = htmlUrlString,
             channel = html.byteInputStream().toByteReadChannel(),
             pointsFromUri = persistentListOf(),

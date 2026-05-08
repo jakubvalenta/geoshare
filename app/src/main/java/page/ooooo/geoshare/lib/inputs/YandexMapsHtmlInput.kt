@@ -14,7 +14,7 @@ import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-object YandexMapsHtmlInput : HtmlInput {
+object YandexMapsHtmlInput : BodyAsChannelInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_yandex_maps_permission_title
 

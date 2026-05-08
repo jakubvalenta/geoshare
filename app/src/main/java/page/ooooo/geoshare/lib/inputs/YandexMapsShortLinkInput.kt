@@ -7,7 +7,7 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Points
 
-object YandexMapsShortLinkInput : ShortLinkHeadInput {
+object YandexMapsShortLinkInput : HeadLocationHeaderInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_yandex_maps_permission_title
 

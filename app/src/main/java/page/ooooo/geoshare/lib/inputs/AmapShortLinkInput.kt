@@ -7,7 +7,7 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Points
 
-object AmapShortLinkInput : ShortLinkHeadInput {
+object AmapShortLinkInput : HeadLocationHeaderInput {
     override val pattern = Regex("""(?:https?://)?surl\.amap\.com/\S+""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.AMAP,

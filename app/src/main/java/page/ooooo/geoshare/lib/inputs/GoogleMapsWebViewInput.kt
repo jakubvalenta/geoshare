@@ -5,9 +5,8 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Points
-import java.net.URL
 
-object GoogleMapsWebInput : WebInput {
+object GoogleMapsWebViewInput : WebViewInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_google_maps_permission_title
 

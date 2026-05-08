@@ -97,7 +97,14 @@ open class NetworkTools(
     }
 
     /**
-     * TODO Documentation
+     * Makes a HEAD request to [url] and returns the response body as text.
+     *
+     * To enable retrying, pass [maxAttempts] and [lastAttempt]. [maxAttempts] sets the maximum number of requests to
+     * make including the first request. [lastAttempt] tracks how many attempts have already been made. We use this
+     * custom retrying instead of the [io.ktor.client.plugins.HttpRequestRetry] plugin, so that the caller can notify
+     * the user while requests are being retried.
+     *
+     * The network request is executed on [dispatcher].
      */
     @Throws(NetworkException::class)
     open suspend fun httpGetBodyAsText(

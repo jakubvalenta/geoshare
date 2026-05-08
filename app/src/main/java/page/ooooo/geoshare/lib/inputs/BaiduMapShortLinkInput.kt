@@ -7,7 +7,7 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Points
 
-object BaiduMapShortLinkInput : ShortLinkHeadInput {
+object BaiduMapShortLinkInput : HeadLocationHeaderInput {
     override val documentation = InputDocumentation(
         id = InputDocumentationId.BAIDU_MAP,
         nameResId = R.string.converter_baidu_map_name,

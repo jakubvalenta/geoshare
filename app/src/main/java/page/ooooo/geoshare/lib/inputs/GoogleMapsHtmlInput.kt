@@ -15,7 +15,7 @@ import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 
-object GoogleMapsHtmlInput : HtmlInput {
+object GoogleMapsHtmlInput : BodyAsChannelInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_google_maps_permission_title
 
@@ -95,10 +95,10 @@ object GoogleMapsHtmlInput : HtmlInput {
                     mutableNaivePoints.add(defaultNaivePoint)
                 } else if (redirectUriString != null) {
                     nextMatch = redirectUriString
-                    nextInput = GoogleMapsWebInput
+                    nextInput = GoogleMapsWebViewInput
                 } else {
                     // Go to web parsing
-                    nextInput = GoogleMapsWebInput
+                    nextInput = GoogleMapsWebViewInput
                 }
             }
 

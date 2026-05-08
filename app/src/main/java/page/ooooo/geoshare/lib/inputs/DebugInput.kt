@@ -20,6 +20,6 @@ object DebugInput : UriInput {
     )
 
     override suspend fun parse(data: Uri, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
-        nextInput = DebugWebInput
+        nextInput = DebugWebViewInput
     }
 }
