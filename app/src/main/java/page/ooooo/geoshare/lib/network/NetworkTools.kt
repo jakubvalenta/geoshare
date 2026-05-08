@@ -205,9 +205,11 @@ open class NetworkTools(
             }
         }.use { client ->
             try {
-                client.prepareRequest(url) {
-                    this.method = method
-                }.execute(block)
+                client
+                    .prepareRequest(url) {
+                        this.method = method
+                    }
+                    .execute(block)
             } catch (tr: UnresolvedAddressException) {
                 log.w(null, "Unresolved address for $url", tr)
                 throw UnresolvedAddressNetworkException(tr)
@@ -236,9 +238,9 @@ open class NetworkTools(
         }
     }
 
-    fun HttpStatusCode.isRedirect(): Boolean = value in (300 until 400)
+    private fun HttpStatusCode.isRedirect(): Boolean = value in (300 until 400)
 
-    fun HttpStatusCode.isServerError(): Boolean = value in (500 until 600)
+    private fun HttpStatusCode.isServerError(): Boolean = value in (500 until 600)
 
     companion object {
         const val DESKTOP_USER_AGENT =
