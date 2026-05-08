@@ -216,11 +216,12 @@ data class GrantedPermissionSync<T>(
     @OptIn(FlowPreview::class)
     override suspend fun transition(): State = withContext(dispatcher) {
         try {
-            val data = input.getData(
+            val result = input.getData(
                 match, stateContext.networkTools, lastAttempt, maxAttempts, stateContext.uriQuote, stateContext.log
-            )
-            val result = input.parse(data, prevPoints, stateContext.uriQuote, stateContext.log)
-            Parsed(stateContext, source, match, input, result, permission, prevPoints)
+            ) { data ->
+                input.parse(data, prevPoints, stateContext.uriQuote, stateContext.log)
+            }
+            ParsedData(stateContext, source, match, input, result, permission, prevPoints)
         } catch (_: CancellationException) {
             ConversionFailed(
                 stateContext.resources.getString(R.string.conversion_failed_cancelled),
@@ -305,7 +306,7 @@ data class GrantedPermissionWeb(
                 .timeout(timeout)
                 .first()
             val result = input.parse(data, prevPoints, stateContext.uriQuote, stateContext.log)
-            Parsed(stateContext, source, match, input, result, permission, prevPoints)
+            ParsedData(stateContext, source, match, input, result, permission, prevPoints)
         } catch (_: TimeoutCancellationException) {
             stateContext.log.e(ConversionState.TAG, "Parse: Timed out")
             ConversionFailed(
@@ -414,7 +415,7 @@ data class ConversionSucceeded(
     }
 }
 
-data class Parsed(
+data class ParsedData(
     val stateContext: ConversionStateContext,
     val source: String,
     val match: String,

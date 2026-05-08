@@ -12,7 +12,6 @@ import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.network.NetworkTools
-import java.net.URL
 
 sealed interface Input<T> {
     val documentation: InputDocumentation? get() = null
@@ -44,9 +43,11 @@ interface SyncInput<T> : Input<T> {
         maxAttempts: Int,
         uriQuote: UriQuote = DefaultUriQuote,
         log: ILog = DefaultLog,
-    ): T
+        block: suspend (T) -> ParseResult,
+    ): ParseResult
 }
 
+// TODO Rename to WebView input
 interface WebInput : Input<String>, Input.HasPermission {
     fun extendWebSettings(settings: WebSettings) {}
     fun shouldInterceptRequest(requestUrlString: String): Boolean = false
@@ -64,7 +65,8 @@ interface TextInput : SyncInput<String> {
         maxAttempts: Int,
         uriQuote: UriQuote,
         log: ILog,
-    ) = match
+        block: suspend (String) -> ParseResult,
+    ) = block(match)
 }
 
 interface UriInput : SyncInput<Uri> {
@@ -79,7 +81,8 @@ interface UriInput : SyncInput<Uri> {
         maxAttempts: Int,
         uriQuote: UriQuote,
         log: ILog,
-    ) = Uri.parse(match, uriQuote)
+        block: suspend (Uri) -> ParseResult,
+    ) = block(Uri.parse(match, uriQuote))
 }
 
 interface ShortLinkGetInput : UriInput, Input.HasPermission {
@@ -90,14 +93,15 @@ interface ShortLinkGetInput : UriInput, Input.HasPermission {
         maxAttempts: Int,
         uriQuote: UriQuote,
         log: ILog,
-    ): Uri {
+        block: suspend (Uri) -> ParseResult,
+    ): ParseResult {
         val uri = Uri.parse(match, uriQuote)
         val unshortenedUrlString = networkTools.httpGetRedirectedUrlString(
             uri.toUrl(), lastAttempt = lastAttempt, maxAttempts = maxAttempts
         )
         val unshortenedUri = Uri.parse(unshortenedUrlString, uriQuote).toAbsoluteUri(uri)
         log.i(TAG, "Resolved short URI $match to $unshortenedUri")
-        return unshortenedUri
+        return block(unshortenedUri)
     }
 
     private companion object {
@@ -113,14 +117,15 @@ interface ShortLinkHeadInput : UriInput, Input.HasPermission {
         maxAttempts: Int,
         uriQuote: UriQuote,
         log: ILog,
-    ): Uri {
+        block: suspend (Uri) -> ParseResult,
+    ): ParseResult {
         val uri = Uri.parse(match, uriQuote)
         val unshortenedUrlString = networkTools.httpHeadLocationHeader(
             uri.toUrl(), lastAttempt = lastAttempt, maxAttempts = maxAttempts
         )
         val unshortenedUri = Uri.parse(unshortenedUrlString, uriQuote).toAbsoluteUri(uri)
         log.i(TAG, " Resolved short URI $match to $unshortenedUri")
-        return unshortenedUri
+        return block(unshortenedUri)
     }
 
     private companion object {
@@ -136,15 +141,13 @@ interface HtmlInput : SyncInput<ByteReadChannel>, Input.HasPermission {
         maxAttempts: Int,
         uriQuote: UriQuote,
         log: ILog,
-    ): ByteReadChannel {
+        block: suspend (ByteReadChannel) -> ParseResult,
+    ): ParseResult {
         val uri = Uri.parse(match, uriQuote)
         log.i(TAG, "Downloading $uri")
-        // TODO dispatcher param
-        networkTools.httpGetBodyAsByteReadChannel(
-            uri.toUrl(), lastAttempt = lastAttempt, maxAttempts = maxAttempts, dispatcher = Dispatchers.Default
-        ) { channel ->
-            TODO()
-        }
+        return networkTools.httpGetBodyAsByteReadChannel(
+            uri.toUrl(), lastAttempt = lastAttempt, maxAttempts = maxAttempts, dispatcher = Dispatchers.Default, block,
+        )
     }
 
     private companion object {
@@ -160,10 +163,12 @@ interface ApiInput : SyncInput<String>, Input.HasPermission {
         maxAttempts: Int,
         uriQuote: UriQuote,
         log: ILog,
-    ): String {
+        block: suspend (String) -> ParseResult,
+    ): ParseResult {
         val uri = Uri.parse(match, uriQuote)
-        return networkTools.httpGetBodyAsText(
+        val text = networkTools.httpGetBodyAsText(
             uri.toUrl(), lastAttempt = lastAttempt, maxAttempts = maxAttempts
         )
+        return block(text)
     }
 }
