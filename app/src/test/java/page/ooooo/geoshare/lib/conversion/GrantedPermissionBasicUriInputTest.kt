@@ -33,9 +33,14 @@ class GrantedPermissionBasicUriInputTest {
     private val resources: Resources = mock {
         on { getString(R.string.converter_google_maps_loading_indicator_title) } doReturn "Connecting to Google..."
         on { getString(R.string.conversion_failed_cancelled) } doReturn "Cancelled"
+        on { getString(R.string.conversion_failed_reason_invalid_url) } doReturn "invalid URL"
+        on { getString(R.string.conversion_failed_reason_missing_header) } doReturn "missing HTTP header"
         on {
             getString(R.string.conversion_failed_unshorten_error_with_reason, "invalid URL")
         } doReturn "Failed to resolve short link due to: invalid URL"
+        on {
+            getString(R.string.conversion_failed_unshorten_error_with_reason, "missing HTTP header")
+        } doReturn "Failed to resolve short link due to: missing HTTP header"
         on {
             getString(R.string.conversion_failed_unshorten_error_with_reason, "response error 404")
         } doReturn "Failed to resolve short link due to: response error 404"
@@ -70,10 +75,10 @@ class GrantedPermissionBasicUriInputTest {
         val lastAttempt = null
         val permission = Permission.ALWAYS
         val stateContext: ConversionStateContext = mock {
-            on { networkTools } doReturn networkTools
-            on { log } doReturn log
-            on { resources } doReturn resources
-            on { uriQuote } doReturn uriQuote
+            on { this@on.networkTools } doReturn networkTools
+            on { this@on.log } doReturn log
+            on { this@on.resources } doReturn resources
+            on { this@on.uriQuote } doReturn uriQuote
         }
         val state = GrantedPermissionBasicInput(
             stateContext,
@@ -126,10 +131,10 @@ class GrantedPermissionBasicUriInputTest {
         val lastAttempt = null
         val permission = Permission.ALWAYS
         val stateContext: ConversionStateContext = mock {
-            on { networkTools } doReturn networkTools
-            on { log } doReturn log
-            on { resources } doReturn resources
-            on { uriQuote } doReturn uriQuote
+            on { this@on.networkTools } doReturn networkTools
+            on { this@on.log } doReturn log
+            on { this@on.resources } doReturn resources
+            on { this@on.uriQuote } doReturn uriQuote
         }
         val state = GrantedPermissionBasicInput(
             stateContext,
@@ -174,10 +179,10 @@ class GrantedPermissionBasicUriInputTest {
         val lastAttempt = null
         val permission = Permission.ALWAYS
         val stateContext: ConversionStateContext = mock {
-            on { networkTools } doReturn networkTools
-            on { log } doReturn log
-            on { resources } doReturn resources
-            on { uriQuote } doReturn uriQuote
+            on { this@on.networkTools } doReturn networkTools
+            on { this@on.log } doReturn log
+            on { this@on.resources } doReturn resources
+            on { this@on.uriQuote } doReturn uriQuote
         }
         val state = GrantedPermissionBasicInput(
             stateContext,
@@ -194,7 +199,7 @@ class GrantedPermissionBasicUriInputTest {
             ConversionFailed(
                 resources.getString(
                     R.string.conversion_failed_unshorten_error_with_reason,
-                    resources.getString(R.string.conversion_failed_missing_url),
+                    resources.getString(R.string.conversion_failed_reason_invalid_url),
                 ),
                 source,
             ),
@@ -225,7 +230,7 @@ class GrantedPermissionBasicUriInputTest {
         val source = "https://maps.google.com/foo"
         val input = GoogleMapsHtmlInput
         val stateContext: ConversionStateContext = mock {
-            on { resources } doReturn resources
+            on { this@on.resources } doReturn resources
         }
         val state = GrantedPermissionBasicInput(
             stateContext,
@@ -248,7 +253,7 @@ class GrantedPermissionBasicUriInputTest {
         val source = "https://maps.google.com/foo"
         val input = GoogleMapsHtmlInput
         val stateContext: ConversionStateContext = mock {
-            on { resources } doReturn resources
+            on { this@on.resources } doReturn resources
         }
         val state = GrantedPermissionBasicInput(
             stateContext,

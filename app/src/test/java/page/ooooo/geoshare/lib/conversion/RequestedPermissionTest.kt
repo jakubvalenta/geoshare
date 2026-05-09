@@ -40,7 +40,7 @@ class RequestedPermissionTest {
             on { setValue(eq(ConnectionPermissionPreference), any()) } doReturn Unit
         }
         val stateContext: ConversionStateContext = mock {
-            on { userPreferencesRepository } doReturn userPreferencesRepository
+            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = RequestedPermission(
             stateContext,
@@ -56,7 +56,7 @@ class RequestedPermissionTest {
                 source,
                 match = source,
                 input,
-                input.permissionTitleResId,
+                input.loadingIndicatorTitleResId,
                 permission = Permission.ALWAYS,
             ),
             state.grant(false),
@@ -75,7 +75,7 @@ class RequestedPermissionTest {
             on { setValue(eq(ConnectionPermissionPreference), any()) } doReturn Unit
         }
         val stateContext: ConversionStateContext = mock {
-            on { userPreferencesRepository } doReturn userPreferencesRepository
+            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = RequestedPermission(
             stateContext,
@@ -91,7 +91,7 @@ class RequestedPermissionTest {
                 source,
                 match = source,
                 input,
-                input.permissionTitleResId,
+                input.loadingIndicatorTitleResId,
                 permission = Permission.ALWAYS,
             ),
             state.grant(true),
@@ -110,7 +110,7 @@ class RequestedPermissionTest {
             on { setValue(eq(ConnectionPermissionPreference), any()) } doReturn Unit
         }
         val stateContext: ConversionStateContext = mock {
-            on { userPreferencesRepository } doReturn userPreferencesRepository
+            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = RequestedPermission(
             stateContext,
@@ -138,7 +138,7 @@ class RequestedPermissionTest {
             on { setValue(eq(ConnectionPermissionPreference), any()) } doReturn Unit
         }
         val stateContext: ConversionStateContext = mock {
-            on { userPreferencesRepository } doReturn userPreferencesRepository
+            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = RequestedPermission(
             stateContext,

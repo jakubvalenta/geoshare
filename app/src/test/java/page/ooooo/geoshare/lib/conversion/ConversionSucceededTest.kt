@@ -16,7 +16,10 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import page.ooooo.geoshare.data.LinkRepository
+import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.FakeGoogleMapsDisplayLink
+import page.ooooo.geoshare.data.di.FakeLinkRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
@@ -28,6 +31,7 @@ import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareLinkUriAutomation
+import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.Billing
@@ -46,6 +50,9 @@ import kotlin.time.Duration.Companion.seconds
 @OptIn(ExperimentalCoroutinesApi::class)
 class ConversionSucceededTest {
     private val coordinateConverter: CoordinateConverter = mock()
+    private val linkRepository: LinkRepository = FakeLinkRepository()
+    private val log = FakeLog
+    private val outputRepository = OutputRepository(coordinateConverter)
 
     @Test
     fun transition_whenPointsAreEmpty_returnsNull() = runTest {
@@ -56,7 +63,10 @@ class ConversionSucceededTest {
             on { getValue(AutomationPreference) } doReturn automation
         }
         val stateContext: ConversionStateContext = mock {
-            on { userPreferencesRepository } doReturn userPreferencesRepository
+            on { this@on.linkRepository } doReturn linkRepository
+            on { this@on.log } doReturn log
+            on { this@on.outputRepository } doReturn outputRepository
+            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(stateContext, source, points)
         assertNull(state.transition())
@@ -71,7 +81,10 @@ class ConversionSucceededTest {
             on { getValue(AutomationPreference) } doReturn automation
         }
         val stateContext: ConversionStateContext = mock {
-            on { userPreferencesRepository } doReturn userPreferencesRepository
+            on { this@on.linkRepository } doReturn linkRepository
+            on { this@on.log } doReturn log
+            on { this@on.outputRepository } doReturn outputRepository
+            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(stateContext, source, points)
         assertNull(state.transition())
@@ -92,8 +105,11 @@ class ConversionSucceededTest {
             on { setValue(eq(CachedPurchasePreference), any()) } doReturn Unit
         }
         val stateContext: ConversionStateContext = mock {
-            on { billing } doReturn billing
-            on { userPreferencesRepository } doReturn userPreferencesRepository
+            on { this@on.billing } doReturn billing
+            on { this@on.linkRepository } doReturn linkRepository
+            on { this@on.log } doReturn log
+            on { this@on.outputRepository } doReturn outputRepository
+            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(stateContext, source, points)
         assertNull(state.transition())
@@ -120,8 +136,11 @@ class ConversionSucceededTest {
             on { setValue(eq(CachedPurchasePreference), any()) } doReturn Unit
         }
         val stateContext: ConversionStateContext = mock {
-            on { billing } doReturn billing
-            on { userPreferencesRepository } doReturn userPreferencesRepository
+            on { this@on.billing } doReturn billing
+            on { this@on.linkRepository } doReturn linkRepository
+            on { this@on.log } doReturn log
+            on { this@on.outputRepository } doReturn outputRepository
+            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(stateContext, source, points)
         assertNull(state.transition())
@@ -149,8 +168,11 @@ class ConversionSucceededTest {
             on { setValue(eq(CachedPurchasePreference), any()) } doReturn Unit
         }
         val stateContext: ConversionStateContext = mock {
-            on { billing } doReturn billing
-            on { userPreferencesRepository } doReturn userPreferencesRepository
+            on { this@on.billing } doReturn billing
+            on { this@on.linkRepository } doReturn linkRepository
+            on { this@on.log } doReturn log
+            on { this@on.outputRepository } doReturn outputRepository
+            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(stateContext, source, points)
         assertEquals(
@@ -185,8 +207,11 @@ class ConversionSucceededTest {
             on { setValue(eq(CachedPurchasePreference), any()) } doReturn Unit
         }
         val stateContext: ConversionStateContext = mock {
-            on { billing } doReturn billing
-            on { userPreferencesRepository } doReturn userPreferencesRepository
+            on { this@on.billing } doReturn billing
+            on { this@on.linkRepository } doReturn linkRepository
+            on { this@on.log } doReturn log
+            on { this@on.outputRepository } doReturn outputRepository
+            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(stateContext, source, points)
         assertNull(state.transition())
@@ -218,8 +243,11 @@ class ConversionSucceededTest {
             on { getValue(AutomationPreference) } doReturn automation
         }
         val stateContext: ConversionStateContext = mock {
-            on { billing } doReturn billing
-            on { userPreferencesRepository } doReturn userPreferencesRepository
+            on { this@on.billing } doReturn billing
+            on { this@on.linkRepository } doReturn linkRepository
+            on { this@on.log } doReturn log
+            on { this@on.outputRepository } doReturn outputRepository
+            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(stateContext, source, points)
         assertEquals(
@@ -248,8 +276,11 @@ class ConversionSucceededTest {
             on { getValue(AutomationPreference) } doReturn automation
         }
         val stateContext: ConversionStateContext = mock {
-            on { billing } doReturn billing
-            on { userPreferencesRepository } doReturn userPreferencesRepository
+            on { this@on.billing } doReturn billing
+            on { this@on.linkRepository } doReturn linkRepository
+            on { this@on.log } doReturn log
+            on { this@on.outputRepository } doReturn outputRepository
+            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(stateContext, source, points, billingStatusTimeout = 3.seconds)
         var res: State? = null
@@ -289,8 +320,11 @@ class ConversionSucceededTest {
             on { getValue(AutomationPreference) } doReturn automation
         }
         val stateContext: ConversionStateContext = mock {
-            on { billing } doReturn billing
-            on { userPreferencesRepository } doReturn userPreferencesRepository
+            on { this@on.billing } doReturn billing
+            on { this@on.linkRepository } doReturn linkRepository
+            on { this@on.log } doReturn log
+            on { this@on.outputRepository } doReturn outputRepository
+            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(stateContext, source, points, billingStatusTimeout = 3.seconds)
         var res: State? = null
@@ -327,8 +361,11 @@ class ConversionSucceededTest {
             on { getValue(AutomationPreference) } doReturn automation
         }
         val stateContext: ConversionStateContext = mock {
-            on { billing } doReturn billing
-            on { userPreferencesRepository } doReturn userPreferencesRepository
+            on { this@on.billing } doReturn billing
+            on { this@on.linkRepository } doReturn linkRepository
+            on { this@on.log } doReturn log
+            on { this@on.outputRepository } doReturn outputRepository
+            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(stateContext, source, points, billingStatusTimeout = 3.seconds)
         var res: State? = null
@@ -372,8 +409,11 @@ class ConversionSucceededTest {
             on { getValue(AutomationPreference) } doReturn automation
         }
         val stateContext: ConversionStateContext = mock {
-            on { billing } doReturn billing
-            on { userPreferencesRepository } doReturn userPreferencesRepository
+            on { this@on.billing } doReturn billing
+            on { this@on.linkRepository } doReturn linkRepository
+            on { this@on.log } doReturn log
+            on { this@on.outputRepository } doReturn outputRepository
+            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(stateContext, source, points)
         assertEquals(
@@ -406,8 +446,11 @@ class ConversionSucceededTest {
             on { getValue(AutomationDelayPreference) } doReturn delay
         }
         val stateContext: ConversionStateContext = mock {
-            on { billing } doReturn billing
-            on { userPreferencesRepository } doReturn userPreferencesRepository
+            on { this@on.billing } doReturn billing
+            on { this@on.linkRepository } doReturn linkRepository
+            on { this@on.log } doReturn log
+            on { this@on.outputRepository } doReturn outputRepository
+            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(stateContext, source, points)
         assertEquals(
@@ -440,8 +483,11 @@ class ConversionSucceededTest {
             on { getValue(AutomationDelayPreference) } doReturn delay
         }
         val stateContext: ConversionStateContext = mock {
-            on { billing } doReturn billing
-            on { userPreferencesRepository } doReturn userPreferencesRepository
+            on { this@on.billing } doReturn billing
+            on { this@on.linkRepository } doReturn linkRepository
+            on { this@on.log } doReturn log
+            on { this@on.outputRepository } doReturn outputRepository
+            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(stateContext, source, points)
         assertEquals(
@@ -473,8 +519,11 @@ class ConversionSucceededTest {
             on { getValue(AutomationDelayPreference) } doReturn delay
         }
         val stateContext: ConversionStateContext = mock {
-            on { billing } doReturn billing
-            on { userPreferencesRepository } doReturn userPreferencesRepository
+            on { this@on.billing } doReturn billing
+            on { this@on.linkRepository } doReturn linkRepository
+            on { this@on.log } doReturn log
+            on { this@on.outputRepository } doReturn outputRepository
+            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(stateContext, source, points)
         assertNull(state.transition())
@@ -504,8 +553,11 @@ class ConversionSucceededTest {
             on { getValue(AutomationDelayPreference) } doReturn delay
         }
         val stateContext: ConversionStateContext = mock {
-            on { billing } doReturn billing
-            on { userPreferencesRepository } doReturn userPreferencesRepository
+            on { this@on.billing } doReturn billing
+            on { this@on.linkRepository } doReturn linkRepository
+            on { this@on.log } doReturn log
+            on { this@on.outputRepository } doReturn outputRepository
+            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(stateContext, source, points)
         assertEquals(
@@ -538,8 +590,11 @@ class ConversionSucceededTest {
             on { getValue(AutomationDelayPreference) } doReturn delay
         }
         val stateContext: ConversionStateContext = mock {
-            on { billing } doReturn billing
-            on { userPreferencesRepository } doReturn userPreferencesRepository
+            on { this@on.billing } doReturn billing
+            on { this@on.linkRepository } doReturn linkRepository
+            on { this@on.log } doReturn log
+            on { this@on.outputRepository } doReturn outputRepository
+            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(stateContext, source, points)
         assertEquals(

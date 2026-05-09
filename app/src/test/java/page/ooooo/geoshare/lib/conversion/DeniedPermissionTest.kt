@@ -14,7 +14,7 @@ class DeniedPermissionTest {
         on { getString(R.string.conversion_failed_connection_permission_denied) } doReturn "This link is not supported without connecting to the map service"
     }
     private val stateContext: ConversionStateContext = mock {
-        on { resources } doReturn resources
+        on { this@on.resources } doReturn resources
     }
 
     @Test

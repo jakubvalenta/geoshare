@@ -56,9 +56,9 @@ class GrantedPermissionWebViewUriInputTest {
         val permission = Permission.ALWAYS
         val timeout = 7.seconds
         val stateContext: ConversionStateContext = mock {
-            on { log } doReturn log
-            on { resources } doReturn resources
-            on { uriQuote } doReturn uriQuote
+            on { this@on.log } doReturn log
+            on { this@on.resources } doReturn resources
+            on { this@on.uriQuote } doReturn uriQuote
         }
         val state = GrantedPermissionWebViewInput(
             stateContext,
@@ -103,9 +103,9 @@ class GrantedPermissionWebViewUriInputTest {
         val permission = Permission.ALWAYS
         val timeout = 7.seconds
         val stateContext: ConversionStateContext = mock {
-            on { log } doReturn log
-            on { resources } doReturn resources
-            on { uriQuote } doReturn uriQuote
+            on { this@on.log } doReturn log
+            on { this@on.resources } doReturn resources
+            on { this@on.uriQuote } doReturn uriQuote
         }
         val state = GrantedPermissionWebViewInput(
             stateContext,
@@ -132,11 +132,11 @@ class GrantedPermissionWebViewUriInputTest {
     }
 
     @Test
-    fun transition_whenInputGetDataThrowsCancellationException_returnsConversionFailed() = runTest {
+    fun transition_whenInputParseThrowsCancellationException_returnsConversionFailed() = runTest {
         val source = "https://maps.google.com/foo"
         val input = object : WebViewInput {
             override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
-                ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
+                throw CancellationException()
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
@@ -145,9 +145,9 @@ class GrantedPermissionWebViewUriInputTest {
         val permission = Permission.ALWAYS
         val timeout = 7.seconds
         val stateContext: ConversionStateContext = mock {
-            on { log } doReturn log
-            on { resources } doReturn resources
-            on { uriQuote } doReturn uriQuote
+            on { this@on.log } doReturn log
+            on { this@on.resources } doReturn resources
+            on { this@on.uriQuote } doReturn uriQuote
         }
         val state = GrantedPermissionWebViewInput(
             stateContext,

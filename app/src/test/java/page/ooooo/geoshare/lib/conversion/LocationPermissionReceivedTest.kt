@@ -21,7 +21,7 @@ class LocationPermissionReceivedTest {
         on { getString(R.string.conversion_succeeded_location_loading_indicator_title) } doReturn "Finding your location..."
     }
     private val stateContext: ConversionStateContext = mock {
-        on { resources } doReturn resources
+        on { this@on.resources } doReturn resources
     }
 
     @Test
