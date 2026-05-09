@@ -5,7 +5,7 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-class CoordinatesInputBehaviorTest : InputBehaviorTest {
+class CoordinateInputBehaviorTest : InputBehaviorTest {
     @Test
     fun coordinates() = uiAutomator {
         // Launch app and close intro

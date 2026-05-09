@@ -15,8 +15,7 @@ import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-// TODO Rename to CoordinateInput
-object CoordinatesInput : TextInput, Input.HasRandomUri {
+object CoordinateInput : TextInput, Input.HasRandomUri {
     private const val CHARS = @Suppress("SpellCheckingInspection") """[\p{Zs},°'′"″NSWE]"""
     private const val SPACE = """\p{Zs}*"""
     private const val LAT_SIG = """(-?)"""

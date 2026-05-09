@@ -7,7 +7,7 @@ import page.ooooo.geoshare.lib.inputs.AppleMapsUriInput
 import page.ooooo.geoshare.lib.inputs.BaiduMapShortLinkInput
 import page.ooooo.geoshare.lib.inputs.BaiduMapUriInput
 import page.ooooo.geoshare.lib.inputs.CartesIGNUriInput
-import page.ooooo.geoshare.lib.inputs.CoordinatesInput
+import page.ooooo.geoshare.lib.inputs.CoordinateInput
 import page.ooooo.geoshare.lib.inputs.DebugInput
 import page.ooooo.geoshare.lib.inputs.GeoUriInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsShortLinkInput
@@ -58,7 +58,7 @@ class InputRepository @Inject constructor() {
         WazeUriInput,
         YandexMapsShortLinkInput,
         YandexMapsUriInput,
-        CoordinatesInput,
+        CoordinateInput,
     ).run {
         if (BuildConfig.DEBUG) {
             this + DebugInput
