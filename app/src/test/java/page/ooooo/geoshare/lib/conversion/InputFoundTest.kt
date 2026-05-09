@@ -14,10 +14,11 @@ import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInput
+import page.ooooo.geoshare.lib.inputs.GoogleMapsUriInput
 
 class InputFoundTest {
     @Test
-    fun transition_whenPermissionIsAlways_returnsPermissionGranted() = runTest {
+    fun transition_whenPermissionIsAlways_returnsPermissionGrantedAndSetsPermissionParam() = runTest {
         val source = "https://maps.app.goo.gl/foo"
         val input = GoogleMapsHtmlInput
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
@@ -84,30 +85,31 @@ class InputFoundTest {
     }
 
     @Test
-    fun transition_whenPermissionIsNullAndPreferencePermissionIsAlways_returnsPermissionGranted() = runTest {
-        val source = "https://maps.app.goo.gl/foo"
-        val input = GoogleMapsHtmlInput
-        val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(eq(ConnectionPermissionPreference)) } doReturn Permission.ALWAYS
+    fun transition_whenPermissionIsNullAndPreferencePermissionIsAlways_returnsPermissionGrantedAndSetsPermissionParam() =
+        runTest {
+            val source = "https://maps.app.goo.gl/foo"
+            val input = GoogleMapsHtmlInput
+            val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+            val userPreferencesRepository: FakeUserPreferencesRepository = mock {
+                on { getValue(eq(ConnectionPermissionPreference)) } doReturn Permission.ALWAYS
+            }
+            val stateContext: ConversionStateContext = mock {
+                on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
+            }
+            val state = InputFound(stateContext, source, match = source, input, permission = null, prevPoints)
+            assertEquals(
+                PermissionGranted(
+                    stateContext,
+                    source,
+                    match = source,
+                    input,
+                    input.loadingIndicatorTitleResId,
+                    Permission.ALWAYS,
+                    prevPoints,
+                ),
+                state.transition(),
+            )
         }
-        val stateContext: ConversionStateContext = mock {
-            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
-        }
-        val state = InputFound(stateContext, source, match = source, input, permission = null, prevPoints)
-        assertEquals(
-            PermissionGranted(
-                stateContext,
-                source,
-                match = source,
-                input,
-                input.loadingIndicatorTitleResId,
-                Permission.ALWAYS,
-                prevPoints,
-            ),
-            state.transition(),
-        )
-    }
 
     @Test
     fun transition_whenPermissionIsNullAndPreferencePermissionIsAsk_returnsPermissionRequested() = runTest {
@@ -146,6 +148,18 @@ class InputFoundTest {
         val state = InputFound(stateContext, source, match = source, input, permission = null)
         assertEquals(
             PermissionDenied(stateContext, source, input),
+            state.transition(),
+        )
+    }
+
+    @Test
+    fun transition_whenInputDoesNotHavePermission_returnsPermissionGrantedAndPassesPermissionParam() = runTest {
+        val source = "https://maps.app.goo.gl/foo"
+        val input = GoogleMapsUriInput
+        val stateContext: ConversionStateContext = mock()
+        val state = InputFound(stateContext, source, match = source, input, permission = Permission.NEVER)
+        assertEquals(
+            PermissionGranted(stateContext, source, match = source, input, permission = Permission.NEVER),
             state.transition(),
         )
     }

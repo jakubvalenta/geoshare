@@ -114,9 +114,7 @@ data class InputFound<T>(
 ) : ConversionState {
     override suspend fun transition() =
         if (input is Input.HasPermission) {
-            when (permission ?: stateContext.userPreferencesRepository.getValue(
-                ConnectionPermissionPreference
-            )) {
+            when (permission ?: stateContext.userPreferencesRepository.getValue(ConnectionPermissionPreference)) {
                 Permission.ALWAYS -> PermissionGranted(
                     stateContext,
                     source,
@@ -139,7 +137,6 @@ data class InputFound<T>(
                 Permission.NEVER -> PermissionDenied(stateContext, source, input)
             }
         } else {
-            // TODO Test permission passing
             PermissionGranted(stateContext, source, match, input, permission = permission)
         }
 }
