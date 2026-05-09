@@ -89,4 +89,6 @@ object YandexMapsUriInput : UriInput, Input.HasRandomUri {
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "https://yandex.com/maps?ll={lon}%2C{lat}&z={z}")
+
+    override fun toString() = "YandexMapUriInput"
 }

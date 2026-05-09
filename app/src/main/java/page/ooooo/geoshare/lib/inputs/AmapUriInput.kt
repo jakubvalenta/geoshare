@@ -51,4 +51,6 @@ object AmapUriInput : UriInput, Input.HasRandomUri {
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "https://wb.amap.com/?q={lat}%2C{lon}")
+
+    override fun toString() = "AmapUriInput"
 }

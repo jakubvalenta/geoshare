@@ -477,6 +477,16 @@ class UriTest {
     }
 
     @Test
+    fun toString_encodesSlashInPath() {
+        val uriString =
+            @Suppress("SpellCheckingInspection") "https://www.google.com/maps/place/Steak+no+Don/@34.59539,133.7567242,17z/data=!4m6!3m5!1s0x3551565394d96b57%3A0x1c9bdbc5990908bf!8m2!3d34.5945482!4d133.7583428!16s%2Fg%2F1thfc7pn?entry=tts&g_ep=EgoyMDI1MTEyMy4xIPu8ASoASAFQAw%3D%3D&skid=91023dbe-8ef3-4df9-a0ae-8be48dadb8ab"
+        assertEquals(
+            uriString,
+            Uri.parse(uriString, uriQuote).toString()
+        )
+    }
+
+    @Test
     fun toString_doesNotEncodeCommaInQuery() {
         val uriString = "geo:52.3675734,4.9041389?q=52.3675734%2C4.9041389"
         assertEquals(

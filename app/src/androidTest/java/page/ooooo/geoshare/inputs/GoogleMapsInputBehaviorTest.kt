@@ -109,7 +109,7 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
     }
 
     @Test
-    fun googleMapsHtml() = uiAutomator { // FIXME
+    fun googleMapsHtml() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("maps.google.com")
         }

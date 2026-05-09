@@ -33,4 +33,6 @@ object AmapShortLinkInput : HeadLocationHeaderInput {
         nextInput = AmapUriInput
         nextMatch = data.toString()
     }
+
+    override fun toString() = "AmapShortLinkInput"
 }

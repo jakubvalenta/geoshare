@@ -39,7 +39,7 @@ object MapyComUriInput : UriInput, Input.HasRandomUri {
         data.run {
             // Coordinates -- use this part of the text, because it's more precise than the URL
             // e.g. `Vega de Tera 41.9966006N, 6.1223825W https://mapy.com/s/deduduzeha`
-            Regex(COORDS).matchEntire(path)?.let { m ->
+            Regex(COORDS).matchEntire(pathParts.firstOrNull())?.let { m ->
                 m.groupValues[0].let { entireMatch ->
                     m.doubleGroupOrNull(1)?.let { lat ->
                         m.doubleGroupOrNull(2)?.let { lon ->
@@ -67,4 +67,6 @@ object MapyComUriInput : UriInput, Input.HasRandomUri {
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "https://mapy.com/en/zakladni?x={lon}&y={lat}&z={z}")
+
+    override fun toString() = "MapsComUriInput"
 }

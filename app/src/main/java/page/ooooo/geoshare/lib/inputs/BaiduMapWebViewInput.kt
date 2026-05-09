@@ -45,4 +45,6 @@ object BaiduMapWebViewInput : WebViewInput {
             // Tracking
             || requestUrlString.contains(@Suppress("SpellCheckingInspection") "/alog.min.js")
             || requestUrlString.contains(@Suppress("SpellCheckingInspection") "map.baidu.com/newmap_test/static/common/images/transparent.gif")
+
+    override fun toString() = "BaiduMapWebViewInput"
 }

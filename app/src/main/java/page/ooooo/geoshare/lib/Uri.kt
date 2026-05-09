@@ -122,8 +122,8 @@ data class Uri(
             }.joinToString("&")
         }
 
-        fun formatPath(path: String, allow: String = "!&+,/=@", uriQuote: UriQuote): String =
-            uriQuote.encode(path, allow = allow)
+        fun formatPathPart(pathPart: String, allow: String = "!&+,=@", uriQuote: UriQuote): String =
+            uriQuote.encode(pathPart, allow = allow)
     }
 
     constructor(
@@ -142,38 +142,32 @@ data class Uri(
         uriQuote = uriQuote,
     )
 
-    val path: String get() = pathParts.joinToString("/")
-
-    fun copy(
-        scheme: String? = null,
-        host: String? = null,
-        path: String? = null,
-        queryParams: ImmutableMap<String, String>? = null,
-        fragment: String? = null,
-        uriQuote: UriQuote? = null,
-    ) = Uri(
-        scheme = scheme ?: this.scheme,
-        host = host ?: this.host,
-        path = path ?: this.path,
-        queryParams = queryParams ?: this.queryParams,
-        fragment = fragment ?: this.fragment,
-        uriQuote = uriQuote ?: this.uriQuote,
-    )
-
     fun toAbsoluteUri(baseUri: Uri): Uri = if (host.isEmpty()) {
-        if (path.startsWith("//")) {
+        if (pathParts.firstOrNull() == "" && pathParts.getOrNull(1) == "") { // Starts with "//"
             // Protocol-relative URL
             this.copy(scheme = baseUri.scheme)
-        } else if (path.startsWith("/")) {
+        } else if (pathParts.firstOrNull() == "") { // Starts with "/"
             // Absolute URL
             this.copy(scheme = baseUri.scheme, host = baseUri.host)
         } else {
             // Relative URL with only one part
-            this.copy(scheme = baseUri.scheme, host = baseUri.host, path = "${baseUri.path}/$path")
+            this.copy(
+                scheme = baseUri.scheme,
+                host = baseUri.host,
+                pathParts = persistentListOf(*baseUri.pathParts.toTypedArray(), *pathParts.toTypedArray()),
+            )
         }
     } else if (scheme.isEmpty()) {
         // Relative URL with multiple parts
-        this.copy(scheme = baseUri.scheme, host = baseUri.host, path = "${baseUri.path}/$host$path")
+        this.copy(
+            scheme = baseUri.scheme,
+            host = baseUri.host,
+            pathParts = persistentListOf(
+                *baseUri.pathParts.toTypedArray(),
+                host,
+                *pathParts.dropWhile { it.isEmpty() }.toTypedArray(),
+            ),
+        )
     } else {
         this
     }
@@ -181,11 +175,15 @@ data class Uri(
     fun toUrl(): URL? = try {
         URL(
             if (host.isEmpty()) {
-                path.trimStart('/').let { path ->
-                    if (path.isEmpty()) {
+                pathParts.dropWhile { it.isEmpty() }.let { pathParts ->
+                    if (pathParts.isEmpty()) {
                         throw MalformedURLException("Missing host or path")
                     }
-                    this.copy(scheme = scheme.ifEmpty { "https" }, host = path, path = "")
+                    this.copy(
+                        scheme = scheme.ifEmpty { "https" },
+                        host = pathParts.firstOrNull() ?: "",
+                        pathParts = persistentListOf("", *pathParts.drop(1).toTypedArray()),
+                    )
                 }
             } else {
                 this.copy(scheme = scheme.ifEmpty { "https" })
@@ -205,7 +203,7 @@ data class Uri(
         if (host.isNotEmpty()) {
             append(host)
         }
-        append(formatPath(path, uriQuote = uriQuote))
+        append(pathParts.joinToString("/") { formatPathPart(it, uriQuote = uriQuote) })
         if (queryParams.isNotEmpty()) {
             append("?${formatQueryParams(queryParams, uriQuote = uriQuote)}")
         }

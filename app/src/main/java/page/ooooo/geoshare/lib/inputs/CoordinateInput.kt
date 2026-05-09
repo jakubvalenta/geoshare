@@ -140,4 +140,6 @@ object CoordinateInput : TextInput, Input.HasRandomUri {
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "N {lat}, E {lon}")
+
+    override fun toString() = "CoordinateInput"
 }

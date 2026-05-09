@@ -363,8 +363,9 @@ data class DataParsed(
                 stateContext.log.i(ConversionState.TAG, "Parse: Converted $match to $points")
                 ConversionSucceeded(stateContext, source, points)
             } else if (nextInput != null) {
-                stateContext.log.i(ConversionState.TAG, "Parse: Going to next input $nextInput") // TODO toString()
-                InputFound(stateContext, source, nextMatch ?: match, nextInput, permission, points)
+                val nextMatch = nextMatch ?: match
+                stateContext.log.i(ConversionState.TAG, "Parse: Going to next input $nextInput and match $nextMatch")
+                InputFound(stateContext, source, nextMatch, nextInput, permission, points)
             } else if (points.lastOrNull()?.hasName() == true) {
                 stateContext.log.i(ConversionState.TAG, "Parse: Converted $match to $points")
                 ConversionSucceeded(stateContext, source, points)

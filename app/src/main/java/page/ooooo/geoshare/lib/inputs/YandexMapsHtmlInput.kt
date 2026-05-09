@@ -53,4 +53,6 @@ object YandexMapsHtmlInput : BodyAsChannelInput {
                 points = persistentListOf(WGS84Point(name = name, source = Source.HTML))
             }
         }
+
+    override fun toString() = "YandexMapsHtmlInput"
 }

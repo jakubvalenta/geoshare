@@ -63,7 +63,7 @@ object GeoUriInput : UriInput, Input.HasRandomUri {
 
             // Coordinates
             // geo:{lat},{lon}
-            LAT_LON_PATTERN.matchEntire(path)?.toLatLonPoint(Source.URI)?.let {
+            LAT_LON_PATTERN.matchEntire(pathParts.firstOrNull())?.toLatLonPoint(Source.URI)?.let {
                 points = persistentListOf(WGS84Point(it).copy(z = z, name = name))
                 return@run
             }
@@ -76,4 +76,6 @@ object GeoUriInput : UriInput, Input.HasRandomUri {
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "geo:{lat},{lon}?z={z}&q={lat},{lon}({name})")
+
+    override fun toString() = "GeoUriInput"
 }

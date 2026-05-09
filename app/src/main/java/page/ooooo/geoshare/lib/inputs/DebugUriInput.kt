@@ -11,7 +11,7 @@ import page.ooooo.geoshare.lib.geo.Points
  *
  * This input iss useful for WebView testing, because it doesn't make a request to a commercial website.
  */
-object DebugInput : UriInput {
+object DebugUriInput : UriInput {
     override val pattern = Regex("""((?:https?://)?(?:www\.)?example\.com(?:/\S+|$))""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.DEBUG,
@@ -28,4 +28,6 @@ object DebugInput : UriInput {
     ) = buildParseResult {
         nextInput = DebugWebViewInput
     }
+
+    override fun toString() = "DebugInput"
 }

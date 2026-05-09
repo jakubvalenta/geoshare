@@ -116,4 +116,6 @@ object GoogleMapsHtmlInput : BodyAsChannelInput {
         }
 
     private const val TAG = "GoogleMapsHtmlInput"
+
+    override fun toString() = TAG
 }

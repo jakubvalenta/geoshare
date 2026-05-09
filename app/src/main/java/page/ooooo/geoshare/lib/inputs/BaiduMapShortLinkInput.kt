@@ -33,4 +33,6 @@ object BaiduMapShortLinkInput : HeadLocationHeaderInput {
         nextInput = BaiduMapUriInput
         nextMatch = data.toString()
     }
+
+    override fun toString() = "BaiduMapShortLinkInput"
 }

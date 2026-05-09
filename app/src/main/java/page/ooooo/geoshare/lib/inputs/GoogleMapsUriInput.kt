@@ -199,4 +199,6 @@ object GoogleMapsUriInput : UriInput, Input.HasRandomUri {
                 "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint={lat}%2C{lon}",
             ).random(),
         )
+
+    override fun toString() = "GoogleMapsUriInput"
 }

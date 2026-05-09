@@ -64,7 +64,7 @@ object AppleMapsUriInput : UriInput, Input.HasRandomUri {
 
             // Short link
             // https://maps.apple/p/{hash}
-            if (host == "maps.apple" && path.startsWith("/p/") ||
+            if (host == "maps.apple" && pathParts.firstOrNull() == "" && pathParts.getOrNull(1) == "p" ||
                 // Place
                 // https://maps.apple.com/place?auid={id}...
                 !queryParams[@Suppress("SpellCheckingInspection") "auid"].isNullOrEmpty() ||
@@ -89,4 +89,6 @@ object AppleMapsUriInput : UriInput, Input.HasRandomUri {
                 "https://maps.apple.com/?daddr={lat}%2C{lon}",
             ).random(),
         )
+
+    override fun toString() = "AppleMapsUriInput"
 }

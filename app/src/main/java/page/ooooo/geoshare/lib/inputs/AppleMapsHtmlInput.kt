@@ -48,4 +48,6 @@ object AppleMapsHtmlInput : BodyAsChannelInput {
                 }
             }
         }
+
+    override fun toString() = "AppleMapsHtmlInput"
 }

@@ -43,4 +43,6 @@ object OpenStreetMapApiInput : BodyAsTextInput {
 
         points = mutablePoints.toImmutableList()
     }
+
+    override fun toString() = "OpenStreetMapApiInput"
 }

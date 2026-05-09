@@ -67,4 +67,6 @@ object OsmAndUriInput : UriInput, Input.HasRandomUri {
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "https://osmand.net/map?pin={lat}%2C{lon}")
+
+    override fun toString() = "OsmAndUriInput"
 }

@@ -79,4 +79,6 @@ object HereWeGoUriInput : UriInput, Input.HasRandomUri {
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "https://wego.here.com/?map={lat}%2C{lon},{z}")
+
+    override fun toString() = "HereWegoUriInput"
 }

@@ -10,7 +10,7 @@ import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 /**
- * @see DebugInput
+ * @see DebugUriInput
  */
 object DebugWebViewInput : WebViewInput {
     @StringRes

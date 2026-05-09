@@ -26,4 +26,6 @@ object YandexMapsShortLinkInput : HeadLocationHeaderInput {
         nextInput = YandexMapsUriInput
         nextMatch = data.toString()
     }
+
+    override fun toString() = "YandexMapsShortLinkInput"
 }

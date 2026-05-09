@@ -59,4 +59,6 @@ object MagicEarthUriInput : UriInput, Input.HasRandomUri {
             point,
             "https://magicearth.com/?show_on_map&lat={lat}&lon={lon}&name={name}&z={z}",
         )
+
+    override fun toString() = "MagicEarthUriInput"
 }

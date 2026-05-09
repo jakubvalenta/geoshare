@@ -48,7 +48,11 @@ object WazeUriInput : UriInput, Input.HasRandomUri {
         data.run {
             // Short link
             // https://waze.com/ul/h{hash}
-            (Regex("""/ul/h($HASH)""").matchEntire(path)
+            (if (pathParts.firstOrNull() == "" && pathParts.getOrNull(1) == "ul") {
+                Regex("""h($HASH)""").matchEntire(pathParts.getOrNull(2))
+            } else {
+                null
+            }
             // https://www.waze.com/live-map?h={hash}
                 ?: Regex("($HASH)").matchEntire(queryParams["h"])
                 )?.groupOrNull()
@@ -118,4 +122,6 @@ object WazeUriInput : UriInput, Input.HasRandomUri {
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "https://waze.com/ul?ll={lat}%2C{lon}&z={z}")
+
+    override fun toString() = "WazeUriInput"
 }

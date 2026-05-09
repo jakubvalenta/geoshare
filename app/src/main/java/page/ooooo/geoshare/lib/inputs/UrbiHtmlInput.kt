@@ -37,4 +37,6 @@ object UrbiHtmlInput : BodyAsChannelInput {
                 }
             }
         }
+
+    override fun toString() = "UrbiHtmlInput"
 }

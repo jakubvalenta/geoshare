@@ -58,4 +58,6 @@ object MapsMeUriInput : UriInput {
             }
         }
     }
+
+    override fun toString() = "MapsMeUriInput"
 }

@@ -103,4 +103,6 @@ object BaiduMapUriInput : UriInput {
             }
         }
     }
+
+    override fun toString() = "BaiduMapUriInput"
 }

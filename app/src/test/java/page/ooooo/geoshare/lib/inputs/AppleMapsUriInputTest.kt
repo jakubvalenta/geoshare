@@ -301,10 +301,7 @@ class AppleMapsUriInputTest : InputTest {
     @Test
     fun parse_shortLink() = runTest {
         assertEquals(
-            ParseResult(
-                persistentListOf(),
-                nextInput = AppleMapsHtmlInput,
-            ),
+            ParseResult(nextInput = AppleMapsHtmlInput),
             input.parse("https://maps.apple/p/7E-Brjrk_THN14"),
         )
     }

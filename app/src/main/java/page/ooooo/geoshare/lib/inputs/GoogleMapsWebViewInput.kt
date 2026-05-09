@@ -47,4 +47,6 @@ object GoogleMapsWebViewInput : WebViewInput {
             || requestUrlString.contains("google.com/gen_204")
             || requestUrlString.contains("google.com/log")
             || requestUrlString.contains(@Suppress("SpellCheckingInspection") "googlesyndication.com/")
+
+    override fun toString() = "GoogleMapsWebViewInput"
 }

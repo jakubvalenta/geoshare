@@ -46,4 +46,6 @@ object GoogleMapsShortLinkInput : HeadLocationHeaderInput {
             nextMatch = data.toString()
         }
     }
+
+    override fun toString() = "GoogleMapsShortLinkInput"
 }

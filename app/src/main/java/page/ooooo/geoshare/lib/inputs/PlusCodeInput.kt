@@ -70,4 +70,6 @@ object PlusCodeInput : TextInput, Input.HasRandomUri {
 
     override fun genRandomUri(point: Point): String? =
         PlusCodeFormatter.formatPlusCode(point)
+
+    override fun toString() = "PlusCodeInput"
 }

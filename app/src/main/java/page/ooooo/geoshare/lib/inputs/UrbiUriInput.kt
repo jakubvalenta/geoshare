@@ -73,7 +73,7 @@ object UrbiUriInput : UriInput, Input.HasRandomUri {
 
             // Point
             // https://maps.urbi.ae/dubai/geo/{lon}%2C{lat}
-            Regex(""".*/$LON,$LAT/?$""").matchEntire(path)?.toLonLatPoint(Source.URI)?.let {
+            pathParts.firstNotNullOfOrNull { LON_LAT_PATTERN.matchEntire(it)?.toLonLatPoint(Source.URI) }?.let {
                 points = persistentListOf(WGS84Point(it).copy(z = z))
                 return@run
             }
@@ -96,4 +96,6 @@ object UrbiUriInput : UriInput, Input.HasRandomUri {
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "https://maps.urbi.ae/dubai/geo/{lon}%2C{lat}?m={lon}%2C{lat}%2F{z}")
+
+    override fun toString() = "UrbiUriInput"
 }

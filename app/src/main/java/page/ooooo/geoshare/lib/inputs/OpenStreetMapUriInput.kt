@@ -18,7 +18,6 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.decodeOpenStreetMapQuadTileHash
 
 object OpenStreetMapUriInput : UriInput, Input.HasRandomUri {
-    private const val ELEMENT_PATH = """/(node|relation|way)/(\d+)(?:[/?#].*|$)"""
     private const val HASH = """[A-Za-z0-9_~]+-+"""
 
     override val pattern = Regex("""((?:https?://)?(?:www\.)?(?:openstreetmap|osm)\.org/$URI_REST)""")
@@ -46,12 +45,14 @@ object OpenStreetMapUriInput : UriInput, Input.HasRandomUri {
         data.run {
             // Short link
             // https://osm.org/go/{hash}
-            Regex("""/go/($HASH)""").matchEntire(path)?.groupOrNull()
-                ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }
-                ?.let {
-                    points = persistentListOf(WGS84Point(it))
-                    return@run
-                }
+            if (pathParts.firstOrNull() == "" && pathParts.getOrNull(1) == "go") {
+                Regex(HASH).matchEntire(pathParts.getOrNull(2))?.value
+                    ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }
+                    ?.let {
+                        points = persistentListOf(WGS84Point(it))
+                        return@run
+                    }
+            }
 
             // Map center
             // https://www.openstreetmap.org/#map={z}/{lat}/{lon}
@@ -82,9 +83,9 @@ object OpenStreetMapUriInput : UriInput, Input.HasRandomUri {
             // https://www.openstreetmap.org/node/{id}
             // https://www.openstreetmap.org/relation/{id}
             // https://www.openstreetmap.org/way/{id}
-            Regex(ELEMENT_PATH).matchEntire(path)?.let { m ->
-                m.groupOrNull(1)?.let { type ->
-                    m.groupOrNull(2)?.let { id ->
+            if (pathParts.firstOrNull() == "") {
+                pathParts.getOrNull(1).takeIf { it in setOf("node", "relation", "way") }?.let { type ->
+                    pathParts.getOrNull(2)?.let { id ->
                         nextMatch =
                             "https://www.openstreetmap.org/api/0.6/$type/$id${if (type != "node") "/full" else ""}.json"
                         nextInput = OpenStreetMapApiInput
@@ -96,4 +97,6 @@ object OpenStreetMapUriInput : UriInput, Input.HasRandomUri {
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "https://www.openstreetmap.org/#map={z}/{lat}/{lon}")
+
+    override fun toString() = "OpenStreetMapUriInput"
 }
