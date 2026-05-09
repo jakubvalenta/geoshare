@@ -14,7 +14,7 @@ interface TextInput : BasicInput<String> {
 
     override fun match(source: String) = pattern.find(source)?.groupOrNull()
 
-    override suspend fun getData(
+    override suspend fun withData(
         match: String,
         networkTools: NetworkTools,
         lastAttempt: NetworkTools.Attempt?,
@@ -33,7 +33,7 @@ interface UriInput : BasicInput<Uri> {
 
     override fun match(source: String) = pattern.find(source)?.groupOrNull()
 
-    override suspend fun getData(
+    override suspend fun withData(
         match: String,
         networkTools: NetworkTools,
         lastAttempt: NetworkTools.Attempt?,
@@ -45,7 +45,7 @@ interface UriInput : BasicInput<Uri> {
 }
 
 interface GetRedirectUrlInput : UriInput, Input.HasPermission {
-    override suspend fun getData(
+    override suspend fun withData(
         match: String,
         networkTools: NetworkTools,
         lastAttempt: NetworkTools.Attempt?,
@@ -70,7 +70,7 @@ interface GetRedirectUrlInput : UriInput, Input.HasPermission {
 }
 
 interface HeadLocationHeaderInput : UriInput, Input.HasPermission {
-    override suspend fun getData(
+    override suspend fun withData(
         match: String,
         networkTools: NetworkTools,
         lastAttempt: NetworkTools.Attempt?,
@@ -95,7 +95,7 @@ interface HeadLocationHeaderInput : UriInput, Input.HasPermission {
 }
 
 interface BodyAsChannelInput : BasicInput<ByteReadChannel>, Input.HasPermission {
-    override suspend fun getData(
+    override suspend fun withData(
         match: String,
         networkTools: NetworkTools,
         lastAttempt: NetworkTools.Attempt?,
@@ -118,7 +118,7 @@ interface BodyAsChannelInput : BasicInput<ByteReadChannel>, Input.HasPermission 
 }
 
 interface BodyAsTextInput : BasicInput<String>, Input.HasPermission {
-    override suspend fun getData(
+    override suspend fun withData(
         match: String,
         networkTools: NetworkTools,
         lastAttempt: NetworkTools.Attempt?,

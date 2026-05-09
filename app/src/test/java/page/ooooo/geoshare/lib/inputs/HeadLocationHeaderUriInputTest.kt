@@ -38,7 +38,7 @@ class HeadLocationHeaderUriInputTest {
         val match = "https://[invalid:ipv6]/"
         val lastAttempt = null
         val networkTools = NetworkTools()
-        input.getData(
+        input.withData(
             match,
             networkTools,
             lastAttempt,
@@ -62,7 +62,7 @@ class HeadLocationHeaderUriInputTest {
         }
         assertEquals(
             ParseResult(nextMatch = "${match}-data"),
-            input.getData(
+            input.withData(
                 match,
                 networkTools,
                 lastAttempt,
@@ -87,7 +87,7 @@ class HeadLocationHeaderUriInputTest {
         }
         assertEquals(
             ParseResult(nextMatch = "https://${match}-data"),
-            input.getData(
+            input.withData(
                 match,
                 networkTools,
                 lastAttempt,
@@ -112,7 +112,7 @@ class HeadLocationHeaderUriInputTest {
         }
         assertEquals(
             ParseResult(nextMatch = "$match/bar"),
-            input.getData(
+            input.withData(
                 match,
                 networkTools,
                 lastAttempt,
@@ -135,7 +135,7 @@ class HeadLocationHeaderUriInputTest {
                 dispatcher: CoroutineDispatcher,
             ) = throw ResponseNetworkException(HttpStatusCode.NotFound, Exception())
         }
-        input.getData(
+        input.withData(
             match,
             networkTools,
             lastAttempt,

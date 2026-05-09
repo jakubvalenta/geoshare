@@ -224,7 +224,7 @@ data class GrantedPermissionBasicInput<T>(
         withContext(dispatcher) {
             // Run parsing on another thread, because maybe it's computationally expensive
             try {
-                val result = input.getData(
+                val result = input.withData(
                     match,
                     stateContext.networkTools,
                     lastAttempt,

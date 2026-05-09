@@ -36,7 +36,7 @@ class BodyAsTextInputTest {
         val match = "https://[invalid:ipv6]/"
         val lastAttempt = null
         val networkTools = NetworkTools()
-        input.getData(
+        input.withData(
             match,
             networkTools,
             lastAttempt,
@@ -60,7 +60,7 @@ class BodyAsTextInputTest {
         }
         assertEquals(
             ParseResult(nextMatch = "${match}-data"),
-            input.getData(
+            input.withData(
                 match,
                 networkTools,
                 lastAttempt,
@@ -85,7 +85,7 @@ class BodyAsTextInputTest {
         }
         assertEquals(
             ParseResult(nextMatch = "https://${match}-data"),
-            input.getData(
+            input.withData(
                 match,
                 networkTools,
                 lastAttempt,
@@ -108,7 +108,7 @@ class BodyAsTextInputTest {
                 dispatcher: CoroutineDispatcher,
             ) = throw ResponseNetworkException(HttpStatusCode.NotFound, Exception())
         }
-        input.getData(
+        input.withData(
             match,
             networkTools,
             lastAttempt,

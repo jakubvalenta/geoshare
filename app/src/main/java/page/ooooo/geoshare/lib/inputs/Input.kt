@@ -10,6 +10,7 @@ import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.network.NetworkTools
 
 sealed interface Input<T> {
+    @Suppress("SameReturnValue")
     val documentation: InputDocumentation? get() = null
 
     fun match(source: String): String? = null
@@ -33,7 +34,7 @@ sealed interface Input<T> {
 }
 
 interface BasicInput<T> : Input<T> {
-    suspend fun getData(
+    suspend fun withData(
         match: String,
         networkTools: NetworkTools,
         lastAttempt: NetworkTools.Attempt?,

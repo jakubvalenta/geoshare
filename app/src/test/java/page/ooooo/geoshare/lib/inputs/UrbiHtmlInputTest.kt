@@ -1,11 +1,8 @@
 package page.ooooo.geoshare.lib.inputs
 
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class UrbiHtmlInputTest : InputTest {
     private val input = UrbiHtmlInput

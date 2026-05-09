@@ -1,4 +1,17 @@
 package page.ooooo.geoshare.lib.inputs
 
-class GoogleMapsWebViewInputTest {
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Test
+
+class GoogleMapsWebViewInputTest : InputTest {
+    private val input = GoogleMapsWebViewInput
+
+    @Test
+    fun parse_returnsNextInput() = runTest {
+        assertEquals(
+            ParseResult(nextInput = GoogleMapsUriInput),
+            input.parse("foo"),
+        )
+    }
 }

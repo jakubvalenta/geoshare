@@ -59,10 +59,10 @@ class GrantedPermissionBasicInputTest {
     private val uriQuote = FakeUriQuote
 
     @Test
-    fun transition_whenInputGetDataDoesNotThrowException_returnsParsedData() = runTest {
+    fun transition_whenInputWithDataDoesNotThrowException_returnsParsedData() = runTest {
         val source = "https://maps.google.com/foo"
         val input = object : BasicInput<String>, Input.HasPermission {
-            override suspend fun getData(
+            override suspend fun withData(
                 match: String,
                 networkTools: NetworkTools,
                 lastAttempt: NetworkTools.Attempt?,
@@ -113,10 +113,10 @@ class GrantedPermissionBasicInputTest {
     }
 
     @Test
-    fun transition_whenInputGetDataThrowsCancellationException_returnsConversionFailed() = runTest {
+    fun transition_whenInputWithDataThrowsCancellationException_returnsConversionFailed() = runTest {
         val source = "https://maps.google.com/foo"
         val input = object : BasicInput<String>, Input.HasPermission {
-            override suspend fun getData(
+            override suspend fun withData(
                 match: String,
                 networkTools: NetworkTools,
                 lastAttempt: NetworkTools.Attempt?,
@@ -159,10 +159,10 @@ class GrantedPermissionBasicInputTest {
     }
 
     @Test
-    fun transition_whenInputGetDataThrowsMalformedURLException_returnsConversionFailed() = runTest {
+    fun transition_whenInputWithDataThrowsMalformedURLException_returnsConversionFailed() = runTest {
         val source = "https://maps.google.com/foo"
         val input = object : BasicInput<String>, Input.HasPermission {
-            override suspend fun getData(
+            override suspend fun withData(
                 match: String,
                 networkTools: NetworkTools,
                 lastAttempt: NetworkTools.Attempt?,
@@ -211,12 +211,12 @@ class GrantedPermissionBasicInputTest {
     }
 
     @Test
-    fun transition_whenInputGetDataThrowsRecoverableNetworkExceptionAndLastAttemptIsNull_returnsGrantedPermission() =
+    fun transition_whenInputWithDataThrowsRecoverableNetworkExceptionAndLastAttemptIsNull_returnsGrantedPermission() =
         runTest {
             val source = "https://maps.google.com/foo"
             val cause = SocketTimeoutNetworkException(SocketTimeoutException())
             val input = object : BasicInput<String>, Input.HasPermission {
-                override suspend fun getData(
+                override suspend fun withData(
                     match: String,
                     networkTools: NetworkTools,
                     lastAttempt: NetworkTools.Attempt?,
@@ -269,12 +269,12 @@ class GrantedPermissionBasicInputTest {
         }
 
     @Test
-    fun transition_whenInputGetDataThrowsARecoverableNetworkExceptionAndLastAttemptIsNotNull_returnsGrantedPermission() =
+    fun transition_whenInputWithDataThrowsARecoverableNetworkExceptionAndLastAttemptIsNotNull_returnsGrantedPermission() =
         runTest {
             val source = "https://maps.google.com/foo"
             val cause = SocketTimeoutNetworkException(SocketTimeoutException())
             val input = object : BasicInput<String>, Input.HasPermission {
-                override suspend fun getData(
+                override suspend fun withData(
                     match: String,
                     networkTools: NetworkTools,
                     lastAttempt: NetworkTools.Attempt?,
@@ -327,12 +327,12 @@ class GrantedPermissionBasicInputTest {
         }
 
     @Test
-    fun transition_whenInputGetDataThrowsUnrecoverableNetworkExceptionAndLastAttemptIsNotNull_returnsConversionFailed() =
+    fun transition_whenInputWithDataThrowsUnrecoverableNetworkExceptionAndLastAttemptIsNotNull_returnsConversionFailed() =
         runTest {
             val source = "https://maps.google.com/foo"
             val cause = ResponseNetworkException(HttpStatusCode.NotFound, Exception())
             val input = object : BasicInput<String>, Input.HasPermission {
-                override suspend fun getData(
+                override suspend fun withData(
                     match: String,
                     networkTools: NetworkTools,
                     lastAttempt: NetworkTools.Attempt?,

@@ -38,7 +38,7 @@ class GetRedirectUrlInputTest {
         val match = "https://[invalid:ipv6]/"
         val lastAttempt = null
         val networkTools = NetworkTools()
-        input.getData(
+        input.withData(
             match,
             networkTools,
             lastAttempt,
@@ -62,7 +62,7 @@ class GetRedirectUrlInputTest {
         }
         assertEquals(
             ParseResult(nextMatch = "${match}-data"),
-            input.getData(
+            input.withData(
                 match,
                 networkTools,
                 lastAttempt,
@@ -87,7 +87,7 @@ class GetRedirectUrlInputTest {
         }
         assertEquals(
             ParseResult(nextMatch = "https://${match}-data"),
-            input.getData(
+            input.withData(
                 match,
                 networkTools,
                 lastAttempt,
@@ -98,6 +98,7 @@ class GetRedirectUrlInputTest {
         )
     }
 
+    @Test
     fun whenHttpGetRedirectedUrlStringReturnsRelativeUrl_returnsTheResultOfHttpGetRedirectedUrlStringAsAbsoluteUrl() =
         runTest {
             val match = "https://maps.google.com/foo"
@@ -112,7 +113,7 @@ class GetRedirectUrlInputTest {
             }
             assertEquals(
                 ParseResult(nextMatch = "${match}/bar"),
-                input.getData(
+                input.withData(
                     match,
                     networkTools,
                     lastAttempt,
@@ -135,7 +136,7 @@ class GetRedirectUrlInputTest {
                 dispatcher: CoroutineDispatcher,
             ) = throw ResponseNetworkException(HttpStatusCode.NotFound, Exception())
         }
-        input.getData(
+        input.withData(
             match,
             networkTools,
             lastAttempt,
