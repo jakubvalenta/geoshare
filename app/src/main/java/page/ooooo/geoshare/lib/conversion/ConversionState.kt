@@ -41,6 +41,7 @@ import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
 import java.net.MalformedURLException
+import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -219,47 +220,58 @@ data class GrantedPermissionBasicInput<T>(
     val dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : ConversionState, ConversionState.HasLargeLoadingIndicator {
     @OptIn(FlowPreview::class)
-    override suspend fun transition(): State = withContext(dispatcher) {
-        try {
-            val result = input.getData(
-                match, stateContext.networkTools, lastAttempt, maxAttempts, stateContext.uriQuote, stateContext.log
-            ) { data ->
-                input.parse(data, prevPoints, stateContext.uriQuote, stateContext.log)
+    override suspend fun transition(): State = try {
+        withContext(dispatcher) {
+            // Run parsing on another thread, because maybe it's computationally expensive
+            try {
+                val result = input.getData(
+                    match,
+                    stateContext.networkTools,
+                    lastAttempt,
+                    maxAttempts,
+                    stateContext.uriQuote,
+                    stateContext.log
+                ) { data ->
+                    input.parse(data, prevPoints, stateContext.uriQuote, stateContext.log)
+                }
+                ParsedData(stateContext, source, match, input, result, permission, prevPoints)
+            } catch (_: MalformedURLException) {
+                ConversionFailed(
+                    stateContext.resources.getString(
+                        R.string.conversion_failed_unshorten_error_with_reason,
+                        stateContext.resources.getString(R.string.conversion_failed_reason_invalid_url),
+                    ),
+                    source,
+                )
+            } catch (tr: RecoverableNetworkException) {
+                GrantedPermission(
+                    stateContext,
+                    source,
+                    match,
+                    input,
+                    loadingIndicatorTitleResId,
+                    permission,
+                    prevPoints,
+                    lastAttempt = NetworkTools.Attempt(lastAttempt?.number?.plus(1) ?: 2, tr),
+                    maxAttempts = maxAttempts,
+                )
+            } catch (tr: UnrecoverableNetworkException) {
+                // TODO Don't mention short link in the error message
+                ConversionFailed(
+                    stateContext.resources.getString(
+                        R.string.conversion_failed_unshorten_error_with_reason,
+                        tr.getMessage(stateContext.resources),
+                    ),
+                    source,
+                )
             }
-            ParsedData(stateContext, source, match, input, result, permission, prevPoints)
-        } catch (_: CancellationException) {
-            ConversionFailed(
-                stateContext.resources.getString(R.string.conversion_failed_cancelled),
-                source
-            )
-        } catch (_: MalformedURLException) {
-            ConversionFailed(
-                stateContext.resources.getString(
-                    R.string.conversion_failed_unshorten_error_with_reason,
-                    stateContext.resources.getString(R.string.conversion_failed_reason_invalid_url),
-                ),
-                source,
-            )
-        } catch (tr: RecoverableNetworkException) {
-            GrantedPermission(
-                stateContext,
-                source,
-                match,
-                input,
-                loadingIndicatorTitleResId,
-                permission,
-                prevPoints,
-                NetworkTools.Attempt(lastAttempt?.number?.plus(1) ?: 1, tr),
-            )
-        } catch (tr: UnrecoverableNetworkException) {
-            ConversionFailed(
-                stateContext.resources.getString(
-                    R.string.conversion_failed_unshorten_error_with_reason,
-                    tr.getMessage(stateContext.resources),
-                ),
-                source,
-            )
         }
+    } catch (_: CancellationException) {
+        // Cancellation must be caught outside withContext, because withContext somehow rethrows errors
+        ConversionFailed(
+            stateContext.resources.getString(R.string.conversion_failed_cancelled),
+            source
+        )
     }
 
     override fun getLoadingIndicator() = loadingIndicatorTitleResId?.let { loadingIndicatorTitleResId ->
@@ -293,7 +305,7 @@ data class GrantedPermissionWebViewInput(
     val permission: Permission? = null,
     val prevPoints: Points? = null,
     val timeout: Duration = 60.seconds,
-    val dispatcher: CoroutineDispatcher = Dispatchers.Default,
+    val dispatcher: CoroutineContext = Dispatchers.Default,
 ) : ConversionState {
     private val dataFlow = MutableStateFlow<String?>(null)
 
@@ -302,29 +314,33 @@ data class GrantedPermissionWebViewInput(
     }
 
     @OptIn(FlowPreview::class)
-    override suspend fun transition(): State = withContext(dispatcher) {
-        try {
-            val data = dataFlow
-                .filterNotNull()
-                .timeout(timeout)
-                .first()
-            val result = input.parse(data, prevPoints, stateContext.uriQuote, stateContext.log)
-            ParsedData(stateContext, source, match, input, result, permission, prevPoints)
-        } catch (_: TimeoutCancellationException) {
-            stateContext.log.e(ConversionState.TAG, "Parse: Timed out")
-            ConversionFailed(
-                stateContext.resources.getString(
-                    R.string.conversion_failed_parse_html_error_with_reason,
-                    stateContext.resources.getString(R.string.conversion_failed_reason_timeout),
-                ),
-                source,
-            )
-        } catch (_: CancellationException) {
-            ConversionFailed(
-                stateContext.resources.getString(R.string.conversion_failed_cancelled),
-                source
-            )
+    override suspend fun transition(): State = try {
+        withContext(dispatcher) {
+            // Run parsing on another thread, because maybe it's computationally expensive
+            try {
+                val data = dataFlow
+                    .filterNotNull()
+                    .timeout(timeout)
+                    .first()
+                val result = input.parse(data, prevPoints, stateContext.uriQuote, stateContext.log)
+                ParsedData(stateContext, source, match, input, result, permission, prevPoints)
+            } catch (_: TimeoutCancellationException) {
+                stateContext.log.e(ConversionState.TAG, "Parse: Timed out")
+                ConversionFailed(
+                    stateContext.resources.getString(
+                        R.string.conversion_failed_parse_html_error_with_reason,
+                        stateContext.resources.getString(R.string.conversion_failed_reason_timeout),
+                    ),
+                    source,
+                )
+            }
         }
+    } catch (_: CancellationException) {
+        // Cancellation must be caught outside withContext, because withContext somehow rethrows errors
+        ConversionFailed(
+            stateContext.resources.getString(R.string.conversion_failed_cancelled),
+            source,
+        )
     }
 }
 

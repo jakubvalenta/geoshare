@@ -6,6 +6,7 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -27,7 +28,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class GrantedPermissionWebViewUriInputTest {
+class GrantedPermissionWebViewInputTest {
     private val log = FakeLog
     private val resources: Resources = mock {
         on { getString(R.string.converter_google_maps_loading_indicator_title) } doReturn "Connecting to Google..."
@@ -68,6 +69,7 @@ class GrantedPermissionWebViewUriInputTest {
             permission,
             prevPoints,
             timeout,
+            dispatcher = testScheduler,
         )
         var res: State? = null
         launch {
@@ -115,6 +117,7 @@ class GrantedPermissionWebViewUriInputTest {
             permission,
             prevPoints,
             timeout,
+            dispatcher = testScheduler,
         )
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
@@ -157,8 +160,49 @@ class GrantedPermissionWebViewUriInputTest {
             permission,
             prevPoints,
             timeout,
+            dispatcher = testScheduler,
         )
-        var res: State? = Initial()
+        var res: State? = null
+        launch {
+            res = state.transition()
+        }
+        state.setData("${source}-data")
+        advanceUntilIdle()
+        assertEquals(
+            ConversionFailed(resources.getString(R.string.conversion_failed_cancelled), source),
+            res,
+        )
+    }
+
+    @Test
+    fun transition_whenItIsCancelled_returnsConversionFailed() = runTest {
+        val source = "https://maps.google.com/foo"
+        val input = object : WebViewInput {
+            override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
+                ParseResult()
+
+            override val permissionTitleResId = R.string.converter_google_maps_permission_title
+            override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
+        }
+        val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+        val permission = Permission.ALWAYS
+        val timeout = 7.seconds
+        val stateContext: ConversionStateContext = mock {
+            on { this@on.log } doReturn log
+            on { this@on.resources } doReturn resources
+            on { this@on.uriQuote } doReturn uriQuote
+        }
+        val state = GrantedPermissionWebViewInput(
+            stateContext,
+            source,
+            match = source,
+            input,
+            permission,
+            prevPoints,
+            timeout,
+            dispatcher = StandardTestDispatcher(testScheduler),
+        )
+        var res: State? = null
         val job = launch {
             res = state.transition()
         }

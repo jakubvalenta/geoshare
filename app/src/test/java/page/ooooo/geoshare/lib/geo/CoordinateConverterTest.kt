@@ -1,6 +1,6 @@
 package page.ooooo.geoshare.lib.geo
 
-import org.junit.Assert
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import page.ooooo.geoshare.lib.extensions.toScale
 import kotlin.math.roundToLong
@@ -284,7 +284,7 @@ class CoordinateConverterTest : GeoTest {
     )
 
     private fun <T : Point> assertPointsEqual(expectedPoint: T, actualPoint: T, name: String) =
-        Assert.assertTrue(
+        assertTrue(
             "Expected $name $expectedPoint to equal $actualPoint",
             when (expectedPoint) {
                 is BD09MCPoint ->

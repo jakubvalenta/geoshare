@@ -67,8 +67,8 @@ open class NetworkTools(
             lastAttempt = lastAttempt,
             maxAttempts = maxAttempts,
         ) { response ->
-            response.headers[HttpHeaders.Location] ?: throw MissingHeaderNetworkException()
-        }
+            response.headers[HttpHeaders.Location]
+        } ?: throw MissingHeaderNetworkException()
     }
 
     /**

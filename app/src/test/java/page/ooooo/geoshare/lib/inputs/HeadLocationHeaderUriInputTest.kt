@@ -27,9 +27,7 @@ class HeadLocationHeaderUriInputTest {
             prevPoints: Points?,
             uriQuote: UriQuote,
             log: ILog,
-        ): ParseResult {
-            throw NotImplementedError()
-        }
+        ) = throw NotImplementedError()
     }
     private val log = FakeLog
     private val maxAttempts = 3

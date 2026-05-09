@@ -20,7 +20,9 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.io.EOFException
 import kotlinx.io.buffered
 import kotlinx.io.readString
-import org.junit.Assert
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
@@ -40,7 +42,7 @@ class NetworkToolsTest {
             val responseHeaders = headersOf(HttpHeaders.Location, "https://example.com/redirect")
             val mockEngine = MockEngine { respond("", HttpStatusCode.MovedPermanently, responseHeaders) }
             val mockNetworkTools = spy(NetworkTools(mockEngine, log = FakeLog))
-            Assert.assertEquals(
+            assertEquals(
                 "https://example.com/redirect",
                 mockNetworkTools.httpHeadLocationHeader(
                     url,
@@ -59,17 +61,21 @@ class NetworkToolsTest {
         }
 
     @Test
-    fun httpHeadLocationHeader_requestReturns301WithoutLocationHeader_callsConnectAndReturnsNull() =
+    fun httpHeadLocationHeader_requestReturns301WithoutLocationHeader_throwsMissingHeaderNetworkException() =
         runTest {
             val url = URL("https://example.com/")
             val mockEngine = MockEngine { respond("", HttpStatusCode.MovedPermanently) }
             val mockNetworkTools = spy(NetworkTools(mockEngine, log = FakeLog))
-            Assert.assertNull(
+            val threw = try {
                 mockNetworkTools.httpHeadLocationHeader(
                     url,
                     dispatcher = StandardTestDispatcher(testScheduler)
                 )
-            )
+                false
+            } catch (_: MissingHeaderNetworkException) {
+                true
+            }
+            assertTrue(threw)
             verify(mockNetworkTools).connect(
                 engine = eq(mockEngine),
                 url = eq(url),
@@ -93,7 +99,7 @@ class NetworkToolsTest {
             ) { source ->
                 source.asSource().buffered().readString()
             }
-            Assert.assertEquals("test content", text)
+            assertEquals("test content", text)
             verify(mockNetworkTools).connect(
                 engine = eq(mockEngine),
                 url = eq(url),
@@ -110,7 +116,7 @@ class NetworkToolsTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("") }
         val mockNetworkTools = spy(NetworkTools(mockEngine, log = FakeLog))
-        Assert.assertEquals(
+        assertEquals(
             "https://example.com/",
             mockNetworkTools.httpGetRedirectedUrlString(
                 url,
@@ -133,7 +139,7 @@ class NetworkToolsTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
-        Assert.assertEquals(
+        assertEquals(
             "test content",
             mockNetworkTools.connect(
                 mockEngine,
@@ -141,7 +147,7 @@ class NetworkToolsTest {
             ) { response -> response.body<String>() }
         )
         val lastRequest = mockEngine.requestHistory.last()
-        Assert.assertEquals(HttpMethod.Get, lastRequest.method)
+        assertEquals(HttpMethod.Get, lastRequest.method)
     }
 
     @Test
@@ -149,7 +155,7 @@ class NetworkToolsTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
-        Assert.assertEquals(
+        assertEquals(
             "test content",
             mockNetworkTools.connect(
                 mockEngine,
@@ -158,7 +164,7 @@ class NetworkToolsTest {
             ) { response -> response.body<String>() }
         )
         val lastRequest = mockEngine.requestHistory.last()
-        Assert.assertEquals(HttpMethod.Get, lastRequest.method)
+        assertEquals(HttpMethod.Get, lastRequest.method)
     }
 
     @Test
@@ -166,7 +172,7 @@ class NetworkToolsTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
-        Assert.assertEquals(
+        assertEquals(
             "test content",
             mockNetworkTools.connect(
                 mockEngine,
@@ -175,7 +181,7 @@ class NetworkToolsTest {
             ) { response -> response.body<String>() }
         )
         val lastRequest = mockEngine.requestHistory.last()
-        Assert.assertEquals(HttpMethod.Head, lastRequest.method)
+        assertEquals(HttpMethod.Head, lastRequest.method)
     }
 
     @Test
@@ -183,14 +189,14 @@ class NetworkToolsTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
-        Assert.assertEquals(
+        assertEquals(
             "test content",
             mockNetworkTools.connect(mockEngine, url) { response -> response.body<String>() }
         )
         val lastRequest = mockEngine.requestHistory.last()
         val clientConfig =
             lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
-        Assert.assertTrue(clientConfig.followRedirects)
+        assertTrue(clientConfig.followRedirects)
     }
 
     @Test
@@ -198,7 +204,7 @@ class NetworkToolsTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
-        Assert.assertEquals(
+        assertEquals(
             "test content",
             mockNetworkTools.connect(
                 mockEngine,
@@ -209,7 +215,7 @@ class NetworkToolsTest {
         val lastRequest = mockEngine.requestHistory.last()
         val clientConfig =
             lastRequest.attributes[io.ktor.util.AttributeKey<HttpClientConfig<*>>("client-config")]
-        Assert.assertTrue(clientConfig.followRedirects)
+        assertTrue(clientConfig.followRedirects)
     }
 
     @Test
@@ -217,7 +223,7 @@ class NetworkToolsTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
-        Assert.assertEquals(
+        assertEquals(
             "test content",
             mockNetworkTools.connect(
                 mockEngine,
@@ -228,7 +234,7 @@ class NetworkToolsTest {
         val lastRequest = mockEngine.requestHistory.last()
         val clientConfig =
             lastRequest.attributes[io.ktor.util.AttributeKey<HttpClientConfig<*>>("client-config")]
-        Assert.assertFalse(clientConfig.followRedirects)
+        assertFalse(clientConfig.followRedirects)
     }
 
     @Test
@@ -237,12 +243,12 @@ class NetworkToolsTest {
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
         val workDuration = testScheduler.timeSource.measureTime {
-            Assert.assertEquals(
+            assertEquals(
                 "test content",
                 mockNetworkTools.connect(mockEngine, url) { response -> response.body<String>() }
             )
         }
-        Assert.assertEquals(0.seconds, workDuration)
+        assertEquals(0.seconds, workDuration)
     }
 
     @Test
@@ -251,7 +257,7 @@ class NetworkToolsTest {
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
         val workDuration = testScheduler.timeSource.measureTime {
-            Assert.assertEquals(
+            assertEquals(
                 "test content",
                 mockNetworkTools.connect(
                     mockEngine,
@@ -264,7 +270,7 @@ class NetworkToolsTest {
                 ) { response -> response.body<String>() },
             )
         }
-        Assert.assertEquals(0.seconds, workDuration)
+        assertEquals(0.seconds, workDuration)
     }
 
     @Test
@@ -273,7 +279,7 @@ class NetworkToolsTest {
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
         val workDuration = testScheduler.timeSource.measureTime {
-            Assert.assertEquals(
+            assertEquals(
                 "test content",
                 mockNetworkTools.connect(
                     mockEngine,
@@ -286,7 +292,7 @@ class NetworkToolsTest {
                 ) { response -> response.body<String>() }
             )
         }
-        Assert.assertEquals(1.seconds, workDuration)
+        assertEquals(1.seconds, workDuration)
     }
 
     @Test
@@ -295,7 +301,7 @@ class NetworkToolsTest {
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
         val workDuration = testScheduler.timeSource.measureTime {
-            Assert.assertEquals(
+            assertEquals(
                 "test content",
                 mockNetworkTools.connect(
                     mockEngine,
@@ -308,7 +314,7 @@ class NetworkToolsTest {
                 ) { response -> response.body<String>() }
             )
         }
-        Assert.assertEquals(2.seconds, workDuration)
+        assertEquals(2.seconds, workDuration)
     }
 
     @Test
@@ -317,7 +323,7 @@ class NetworkToolsTest {
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
         val workDuration = testScheduler.timeSource.measureTime {
-            Assert.assertEquals(
+            assertEquals(
                 "test content",
                 mockNetworkTools.connect(
                     mockEngine,
@@ -330,7 +336,7 @@ class NetworkToolsTest {
                 ) { response -> response.body<String>() },
             )
         }
-        Assert.assertEquals(4.seconds, workDuration)
+        assertEquals(4.seconds, workDuration)
     }
 
     @Test
@@ -339,7 +345,7 @@ class NetworkToolsTest {
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
         val workDuration = testScheduler.timeSource.measureTime {
-            Assert.assertEquals(
+            assertEquals(
                 "test content",
                 mockNetworkTools.connect(
                     mockEngine,
@@ -352,7 +358,7 @@ class NetworkToolsTest {
                 ) { response -> response.body<String>() },
             )
         }
-        Assert.assertEquals(256.seconds, workDuration)
+        assertEquals(256.seconds, workDuration)
     }
 
     @Test
@@ -364,7 +370,7 @@ class NetworkToolsTest {
             val workDuration = testScheduler.timeSource.measureTime {
                 var threw: Exception? = null
                 try {
-                    Assert.assertEquals(
+                    assertEquals(
                         "test content",
                         mockNetworkTools.connect(
                             mockEngine,
@@ -379,12 +385,12 @@ class NetworkToolsTest {
                 } catch (tr: Exception) {
                     threw = tr
                 }
-                Assert.assertTrue(threw is UnrecoverableNetworkException)
-                Assert.assertTrue(threw is MaxAttemptsReachedNetworkException)
-                Assert.assertTrue(threw?.cause is SocketTimeoutNetworkException)
-                Assert.assertTrue(threw?.cause?.cause is io.ktor.client.network.sockets.SocketTimeoutException)
+                assertTrue(threw is UnrecoverableNetworkException)
+                assertTrue(threw is MaxAttemptsReachedNetworkException)
+                assertTrue(threw?.cause is SocketTimeoutNetworkException)
+                assertTrue(threw?.cause?.cause is io.ktor.client.network.sockets.SocketTimeoutException)
             }
-            Assert.assertEquals(0.seconds, workDuration)
+            assertEquals(0.seconds, workDuration)
         }
 
     @Test
@@ -403,7 +409,7 @@ class NetworkToolsTest {
                     )
                 }
                 val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
-                Assert.assertEquals(
+                assertEquals(
                     "https://example.com/redirect",
                     mockNetworkTools.connect(
                         mockEngine,
@@ -429,7 +435,7 @@ class NetworkToolsTest {
                     )
                 }
                 val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
-                Assert.assertEquals(
+                assertEquals(
                     "https://example.com/redirect",
                     mockNetworkTools.connect(
                         mockEngine,
@@ -459,15 +465,15 @@ class NetworkToolsTest {
                 } catch (tr: Exception) {
                     threw = tr
                 }
-                Assert.assertTrue(threw is UnrecoverableNetworkException)
-                Assert.assertTrue(threw is ResponseNetworkException)
-                Assert.assertTrue(threw?.cause is ResponseException)
-                Assert.assertFalse(threw?.cause is ServerResponseException)
+                assertTrue(threw is UnrecoverableNetworkException)
+                assertTrue(threw is ResponseNetworkException)
+                assertTrue(threw?.cause is ResponseException)
+                assertFalse(threw?.cause is ServerResponseException)
                 val lastRequest = mockEngine.requestHistory.last()
                 val clientConfig =
                     lastRequest.attributes[io.ktor.util.AttributeKey<HttpClientConfig<*>>("client-config")]
-                Assert.assertEquals(lastRequest.method, HttpMethod.Get)
-                Assert.assertTrue(clientConfig.followRedirects)
+                assertEquals(lastRequest.method, HttpMethod.Get)
+                assertTrue(clientConfig.followRedirects)
             }
         }
 
@@ -490,7 +496,7 @@ class NetworkToolsTest {
                     )
                 }
                 val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
-                Assert.assertEquals(
+                assertEquals(
                     "https://example.com/redirect",
                     mockNetworkTools.connect(
                         mockEngine,
@@ -517,15 +523,15 @@ class NetworkToolsTest {
             } catch (tr: Exception) {
                 threw = tr
             }
-            Assert.assertTrue(threw is UnrecoverableNetworkException)
-            Assert.assertTrue(threw is ResponseNetworkException)
-            Assert.assertTrue(threw?.cause is ResponseException)
-            Assert.assertFalse(threw?.cause is ServerResponseException)
+            assertTrue(threw is UnrecoverableNetworkException)
+            assertTrue(threw is ResponseNetworkException)
+            assertTrue(threw?.cause is ResponseException)
+            assertFalse(threw?.cause is ServerResponseException)
             val lastRequest = mockEngine.requestHistory.last()
             val clientConfig =
                 lastRequest.attributes[io.ktor.util.AttributeKey<HttpClientConfig<*>>("client-config")]
-            Assert.assertEquals(lastRequest.method, HttpMethod.Get)
-            Assert.assertTrue(clientConfig.followRedirects)
+            assertEquals(lastRequest.method, HttpMethod.Get)
+            assertTrue(clientConfig.followRedirects)
         }
     }
 
@@ -545,14 +551,14 @@ class NetworkToolsTest {
             } catch (tr: Exception) {
                 threw = tr
             }
-            Assert.assertTrue(threw is RecoverableNetworkException)
-            Assert.assertTrue(threw is ServerResponseNetworkException)
-            Assert.assertTrue(threw?.cause is ServerResponseException)
+            assertTrue(threw is RecoverableNetworkException)
+            assertTrue(threw is ServerResponseNetworkException)
+            assertTrue(threw?.cause is ServerResponseException)
             val lastRequest = mockEngine.requestHistory.last()
             val clientConfig =
                 lastRequest.attributes[io.ktor.util.AttributeKey<HttpClientConfig<*>>("client-config")]
-            Assert.assertEquals(lastRequest.method, HttpMethod.Get)
-            Assert.assertTrue(clientConfig.followRedirects)
+            assertEquals(lastRequest.method, HttpMethod.Get)
+            assertTrue(clientConfig.followRedirects)
         }
     }
 
@@ -568,9 +574,9 @@ class NetworkToolsTest {
         } catch (tr: Exception) {
             threw = tr
         }
-        Assert.assertTrue(threw is RecoverableNetworkException)
-        Assert.assertTrue(threw is UnresolvedAddressNetworkException)
-        Assert.assertTrue(threw?.cause is UnresolvedAddressException)
+        assertTrue(threw is RecoverableNetworkException)
+        assertTrue(threw is UnresolvedAddressNetworkException)
+        assertTrue(threw?.cause is UnresolvedAddressException)
     }
 
     @Test
@@ -585,9 +591,9 @@ class NetworkToolsTest {
         } catch (tr: Exception) {
             threw = tr
         }
-        Assert.assertTrue(threw is RecoverableNetworkException)
-        Assert.assertTrue(threw is RequestTimeoutNetworkException)
-        Assert.assertTrue(threw?.cause is HttpRequestTimeoutException)
+        assertTrue(threw is RecoverableNetworkException)
+        assertTrue(threw is RequestTimeoutNetworkException)
+        assertTrue(threw?.cause is HttpRequestTimeoutException)
     }
 
     @Test
@@ -601,9 +607,9 @@ class NetworkToolsTest {
         } catch (tr: Exception) {
             threw = tr
         }
-        Assert.assertTrue(threw is RecoverableNetworkException)
-        Assert.assertTrue(threw is SocketTimeoutNetworkException)
-        Assert.assertTrue(threw?.cause is SocketTimeoutException)
+        assertTrue(threw is RecoverableNetworkException)
+        assertTrue(threw is SocketTimeoutNetworkException)
+        assertTrue(threw?.cause is SocketTimeoutException)
     }
 
     @Test
@@ -617,9 +623,9 @@ class NetworkToolsTest {
         } catch (tr: Exception) {
             threw = tr
         }
-        Assert.assertTrue(threw is RecoverableNetworkException)
-        Assert.assertTrue(threw is ConnectTimeoutNetworkException)
-        Assert.assertTrue(threw?.cause is ConnectTimeoutException)
+        assertTrue(threw is RecoverableNetworkException)
+        assertTrue(threw is ConnectTimeoutNetworkException)
+        assertTrue(threw?.cause is ConnectTimeoutException)
     }
 
     @Test
@@ -633,9 +639,9 @@ class NetworkToolsTest {
         } catch (tr: Exception) {
             threw = tr
         }
-        Assert.assertTrue(threw is RecoverableNetworkException)
-        Assert.assertTrue(threw is ConnectionClosedNetworkException)
-        Assert.assertTrue(threw?.cause is EOFException)
+        assertTrue(threw is RecoverableNetworkException)
+        assertTrue(threw is ConnectionClosedNetworkException)
+        assertTrue(threw?.cause is EOFException)
     }
 
     @Test
@@ -651,8 +657,8 @@ class NetworkToolsTest {
         } catch (tr: Exception) {
             threw = tr
         }
-        Assert.assertTrue(threw is UnrecoverableNetworkException)
-        Assert.assertTrue(threw is UnknownNetworkException)
-        Assert.assertTrue(threw?.cause is MyException)
+        assertTrue(threw is UnrecoverableNetworkException)
+        assertTrue(threw is UnknownNetworkException)
+        assertTrue(threw?.cause is MyException)
     }
 }

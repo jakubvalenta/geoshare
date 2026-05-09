@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.conversion
 
 import android.content.res.Resources
+import io.ktor.http.HttpStatusCode
 import io.ktor.utils.io.CancellationException
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
@@ -23,10 +24,13 @@ import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.network.ConnectionClosedNetworkException
 import page.ooooo.geoshare.lib.network.NetworkTools
+import page.ooooo.geoshare.lib.network.ResponseNetworkException
+import page.ooooo.geoshare.lib.network.SocketTimeoutNetworkException
 import java.io.EOFException
 import java.net.MalformedURLException
+import java.net.SocketTimeoutException
 
-class GrantedPermissionBasicUriInputTest {
+class GrantedPermissionBasicInputTest {
     private val log = FakeLog
     private val maxAttempts = 3
     private val networkTools: NetworkTools = mock()
@@ -48,6 +52,9 @@ class GrantedPermissionBasicUriInputTest {
             getString(R.string.conversion_loading_indicator_description, 2, 10, "connection closed")
         } doReturn "Attempt 2 out of 10 due to connection closed."
         on { getString(R.string.network_exception_eof) } doReturn "connection closed"
+        on {
+            getString(R.string.network_exception_response_error, HttpStatusCode.NotFound.value)
+        } doReturn "response error 404"
     }
     private val uriQuote = FakeUriQuote
 
@@ -117,9 +124,7 @@ class GrantedPermissionBasicUriInputTest {
                 uriQuote: UriQuote,
                 log: ILog,
                 block: suspend (String) -> ParseResult,
-            ): ParseResult {
-                throw CancellationException()
-            }
+            ) = throw CancellationException()
 
             override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
                 ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
@@ -165,9 +170,7 @@ class GrantedPermissionBasicUriInputTest {
                 uriQuote: UriQuote,
                 log: ILog,
                 block: suspend (String) -> ParseResult,
-            ): ParseResult {
-                throw MalformedURLException()
-            }
+            ) = throw MalformedURLException()
 
             override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
                 ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
@@ -210,19 +213,174 @@ class GrantedPermissionBasicUriInputTest {
     @Test
     fun transition_whenInputGetDataThrowsRecoverableNetworkExceptionAndLastAttemptIsNull_returnsGrantedPermission() =
         runTest {
-            TODO()
+            val source = "https://maps.google.com/foo"
+            val cause = SocketTimeoutNetworkException(SocketTimeoutException())
+            val input = object : BasicInput<String>, Input.HasPermission {
+                override suspend fun getData(
+                    match: String,
+                    networkTools: NetworkTools,
+                    lastAttempt: NetworkTools.Attempt?,
+                    maxAttempts: Int,
+                    uriQuote: UriQuote,
+                    log: ILog,
+                    block: suspend (String) -> ParseResult,
+                ) = throw cause
+
+                override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
+                    ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
+
+                override val permissionTitleResId = R.string.converter_google_maps_permission_title
+                override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
+            }
+            val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+            val lastAttempt = null
+            val permission = Permission.ALWAYS
+            val stateContext: ConversionStateContext = mock {
+                on { this@on.networkTools } doReturn networkTools
+                on { this@on.log } doReturn log
+                on { this@on.resources } doReturn resources
+                on { this@on.uriQuote } doReturn uriQuote
+            }
+            val state = GrantedPermissionBasicInput(
+                stateContext,
+                source,
+                match = source,
+                input,
+                input.loadingIndicatorTitleResId,
+                permission,
+                prevPoints,
+                lastAttempt,
+                maxAttempts,
+            )
+            assertEquals(
+                GrantedPermission(
+                    stateContext,
+                    source,
+                    match = source,
+                    input,
+                    input.loadingIndicatorTitleResId,
+                    permission,
+                    prevPoints,
+                    lastAttempt = NetworkTools.Attempt(2, cause),
+                    maxAttempts,
+                ),
+                state.transition(),
+            )
         }
 
     @Test
-    fun transition_whenInputGetDataThrowsRecoverableNetworkExceptionAndLastAttemptIsNotNull_returnsGrantedPermission() =
+    fun transition_whenInputGetDataThrowsARecoverableNetworkExceptionAndLastAttemptIsNotNull_returnsGrantedPermission() =
         runTest {
-            TODO()
+            val source = "https://maps.google.com/foo"
+            val cause = SocketTimeoutNetworkException(SocketTimeoutException())
+            val input = object : BasicInput<String>, Input.HasPermission {
+                override suspend fun getData(
+                    match: String,
+                    networkTools: NetworkTools,
+                    lastAttempt: NetworkTools.Attempt?,
+                    maxAttempts: Int,
+                    uriQuote: UriQuote,
+                    log: ILog,
+                    block: suspend (String) -> ParseResult,
+                ) = throw cause
+
+                override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
+                    ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
+
+                override val permissionTitleResId = R.string.converter_google_maps_permission_title
+                override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
+            }
+            val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+            val lastAttempt = NetworkTools.Attempt(2, ConnectionClosedNetworkException(EOFException()))
+            val permission = Permission.ALWAYS
+            val stateContext: ConversionStateContext = mock {
+                on { this@on.networkTools } doReturn networkTools
+                on { this@on.log } doReturn log
+                on { this@on.resources } doReturn resources
+                on { this@on.uriQuote } doReturn uriQuote
+            }
+            val state = GrantedPermissionBasicInput(
+                stateContext,
+                source,
+                match = source,
+                input,
+                input.loadingIndicatorTitleResId,
+                permission,
+                prevPoints,
+                lastAttempt,
+                maxAttempts,
+            )
+            assertEquals(
+                GrantedPermission(
+                    stateContext,
+                    source,
+                    match = source,
+                    input,
+                    input.loadingIndicatorTitleResId,
+                    permission,
+                    prevPoints,
+                    lastAttempt = NetworkTools.Attempt(3, cause),
+                    maxAttempts,
+                ),
+                state.transition(),
+            )
         }
 
     @Test
     fun transition_whenInputGetDataThrowsUnrecoverableNetworkExceptionAndLastAttemptIsNotNull_returnsConversionFailed() =
         runTest {
-            TODO()
+            val source = "https://maps.google.com/foo"
+            val cause = ResponseNetworkException(HttpStatusCode.NotFound, Exception())
+            val input = object : BasicInput<String>, Input.HasPermission {
+                override suspend fun getData(
+                    match: String,
+                    networkTools: NetworkTools,
+                    lastAttempt: NetworkTools.Attempt?,
+                    maxAttempts: Int,
+                    uriQuote: UriQuote,
+                    log: ILog,
+                    block: suspend (String) -> ParseResult,
+                ) = throw cause
+
+                override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
+                    ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
+
+                override val permissionTitleResId = R.string.converter_google_maps_permission_title
+                override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
+            }
+            val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+            val lastAttempt = NetworkTools.Attempt(2, ConnectionClosedNetworkException(EOFException()))
+            val permission = Permission.ALWAYS
+            val stateContext: ConversionStateContext = mock {
+                on { this@on.networkTools } doReturn networkTools
+                on { this@on.log } doReturn log
+                on { this@on.resources } doReturn resources
+                on { this@on.uriQuote } doReturn uriQuote
+            }
+            val state = GrantedPermissionBasicInput(
+                stateContext,
+                source,
+                match = source,
+                input,
+                input.loadingIndicatorTitleResId,
+                permission,
+                prevPoints,
+                lastAttempt,
+                maxAttempts,
+            )
+            assertEquals(
+                ConversionFailed(
+                    stateContext.resources.getString(
+                        R.string.conversion_failed_unshorten_error_with_reason,
+                        resources.getString(
+                            R.string.network_exception_response_error,
+                            HttpStatusCode.NotFound.value,
+                        ),
+                    ),
+                    source,
+                ),
+                state.transition(),
+            )
         }
 
     @Test
@@ -252,6 +410,7 @@ class GrantedPermissionBasicUriInputTest {
     fun getLoadingIndicator_whenLastAttemptNumberIsTwo_returnsLargeLoadingIndicatorWithDescription() = runTest {
         val source = "https://maps.google.com/foo"
         val input = GoogleMapsHtmlInput
+        val lastAttempt = NetworkTools.Attempt(2, ConnectionClosedNetworkException(EOFException()))
         val stateContext: ConversionStateContext = mock {
             on { this@on.resources } doReturn resources
         }
@@ -261,17 +420,17 @@ class GrantedPermissionBasicUriInputTest {
             match = source,
             input,
             input.loadingIndicatorTitleResId,
-            lastAttempt = NetworkTools.Attempt(
-                2,
-                ConnectionClosedNetworkException(EOFException()),
-            ),
+            lastAttempt = lastAttempt,
         )
         assertEquals(
             LoadingIndicator.Large(
                 title = resources.getString(R.string.converter_google_maps_loading_indicator_title),
                 description = resources.getString(
-                    R.string.conversion_loading_indicator_description, 2, 10, R.string.network_exception_eof,
-                )
+                    R.string.conversion_loading_indicator_description,
+                    2,
+                    10,
+                    resources.getString(R.string.network_exception_eof),
+                ),
             ),
             state.getLoadingIndicator(),
         )
