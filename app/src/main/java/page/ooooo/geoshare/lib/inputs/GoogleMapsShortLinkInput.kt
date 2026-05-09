@@ -34,7 +34,10 @@ object GoogleMapsShortLinkInput : HeadLocationHeaderInput {
             // https://maps.app.goo.gl/?link={url}
             queryParams["link"]?.takeIf { it.isNotEmpty() }?.let {
                 nextMatch = it
+                return@buildParseResult
             }
+
+            nextMatch = data.toString()
         }
     }
 }

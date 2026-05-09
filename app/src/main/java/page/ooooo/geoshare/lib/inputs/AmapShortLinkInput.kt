@@ -25,5 +25,6 @@ object AmapShortLinkInput : HeadLocationHeaderInput {
 
     override suspend fun parse(data: Uri, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
         nextInput = AmapUriInput
+        nextMatch = data.toString()
     }
 }

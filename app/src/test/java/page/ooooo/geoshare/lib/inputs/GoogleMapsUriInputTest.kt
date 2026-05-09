@@ -8,7 +8,7 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 
-class GoogleMapsUriUriInputTest : InputTest {
+class GoogleMapsUriInputTest : InputTest {
     private val input = GoogleMapsUriInput
 
     @Test

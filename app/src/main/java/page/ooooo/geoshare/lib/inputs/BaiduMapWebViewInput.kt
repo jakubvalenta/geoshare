@@ -17,6 +17,7 @@ object BaiduMapWebViewInput : WebViewInput {
 
     override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
         nextInput = BaiduMapUriInput
+        nextMatch = data
     }
 
     override fun extendWebSettings(settings: WebSettings) {

@@ -47,20 +47,6 @@ import java.util.concurrent.TimeoutException
 import kotlin.math.pow
 import kotlin.math.roundToLong
 
-class DialogScope(val dialog: UiObject2) {
-    fun confirm() {
-        dialog.onElement { viewIdResourceName == "geoShareConfirmationDialogConfirmButton" }.click()
-    }
-
-    fun dismiss() {
-        dialog.onElement { viewIdResourceName == "geoShareConfirmationDialogDismissButton" }.click()
-    }
-
-    fun toggleDoNotAsk() {
-        dialog.onElement { viewIdResourceName == "geoShareConfirmationDialogDoNotAskSwitch" }.click()
-    }
-}
-
 class MockLocationScope(val locationManager: LocationManager, val mockProviderName: String) {
     fun setLocation(lat: Double, lon: Double) {
         val location = Location(mockProviderName).apply {
@@ -117,13 +103,16 @@ interface BehaviorTest {
         waitForStableInActiveWindow(stableTimeoutMs = 1_000L, stableIntervalMs = 100L, requireStableScreenshot = false)
     }
 
-    fun onDialog(
-        resourceName: String,
-        timeoutMs: Long = 10_000L,
-        block: DialogScope.() -> Unit,
-    ) = uiAutomator {
-        val dialog = onElement(timeoutMs) { viewIdResourceName == resourceName }
-        DialogScope(dialog).block()
+    fun UiObject2.confirmDialog() {
+        onElement { viewIdResourceName == "geoShareConfirmationDialogConfirmButton" }.click()
+    }
+
+    fun UiObject2.dismissDialog() {
+        onElement { viewIdResourceName == "geoShareConfirmationDialogDismissButton" }.click()
+    }
+
+    fun UiObject2.toggleDoNotAsk() {
+        onElement { viewIdResourceName == "geoShareConfirmationDialogDoNotAskSwitch" }.click()
     }
 
     private fun isLocationGrantButton(element: AccessibilityNodeInfo): Boolean =

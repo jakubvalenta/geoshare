@@ -651,8 +651,7 @@ private fun MainScreen(
                 onDismissRequest = onDeny,
                 modifier = Modifier
                     .semantics { testTagsAsResourceId = true }
-                    .testTag("geoShareUnshortenPermissionDialog"),
-                // TODO Some behavior tests use "geoShareParseHtmlPermissionDialog"
+                    .testTag("geoShareConnectionPermissionDialog"),
             ) {
                 Text(
                     AnnotatedString.fromHtml(
@@ -762,6 +761,7 @@ private fun MainMainPane(
 
 @Composable
 private fun MainBottomPane(currentState: State) {
+    // TODO Show loading indicator with WebView too
     if (currentState is GrantedPermissionWebViewInput) {
         BoxWithConstraints(
             Modifier

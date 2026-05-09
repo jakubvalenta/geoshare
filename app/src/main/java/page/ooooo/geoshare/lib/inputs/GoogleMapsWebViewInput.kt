@@ -15,6 +15,7 @@ object GoogleMapsWebViewInput : WebViewInput {
 
     override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
         nextInput = GoogleMapsUriInput
+        nextMatch = data
     }
 
     override fun shouldInterceptRequest(requestUrlString: String) =

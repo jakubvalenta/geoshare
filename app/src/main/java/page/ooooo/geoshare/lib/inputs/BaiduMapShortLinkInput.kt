@@ -25,5 +25,6 @@ object BaiduMapShortLinkInput : HeadLocationHeaderInput {
 
     override suspend fun parse(data: Uri, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
         nextInput = BaiduMapUriInput
+        nextMatch = data.toString()
     }
 }

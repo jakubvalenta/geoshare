@@ -143,7 +143,7 @@ private fun ParseHtmlPermissionPreview() {
                 onDismissRequest = {},
                 modifier = Modifier
                     .semantics { testTagsAsResourceId = true }
-                    .testTag("geoShareParseHtmlPermissionDialog"),
+                    .testTag("geoShareConnectionPermissionDialog"),
             ) {
                 val appName = stringResource(R.string.app_name)
                 val uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
@@ -175,7 +175,7 @@ private fun DarkParseHtmlPermissionPreview() {
                 onDismissRequest = {},
                 modifier = Modifier
                     .semantics { testTagsAsResourceId = true }
-                    .testTag("geoShareParseHtmlPermissionDialog"),
+                    .testTag("geoShareConnectionPermissionDialog"),
             ) {
                 val appName = stringResource(R.string.app_name)
                 val uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"

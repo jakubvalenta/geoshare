@@ -141,7 +141,8 @@ data class FoundInput<T>(
                 Permission.NEVER -> DeniedPermission(stateContext, source, input)
             }
         } else {
-            GrantedPermission(stateContext, source, match, input)
+            // TODO Test permission passing
+            GrantedPermission(stateContext, source, match, input, permission = permission)
         }
 }
 

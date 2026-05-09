@@ -10,7 +10,7 @@ import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-class GoogleMapsUriInputBehaviorTest : InputBehaviorTest {
+class GoogleMapsInputBehaviorTest : InputBehaviorTest {
     @Test
     fun googleMaps() = uiAutomator {
         // Coordinates in data
@@ -109,7 +109,7 @@ class GoogleMapsUriInputBehaviorTest : InputBehaviorTest {
     }
 
     @Test
-    fun googleMapsHtml() = uiAutomator {
+    fun googleMapsHtml() = uiAutomator { // FIXME
         runBlocking {
             assumeDomainResolvable("maps.google.com")
         }

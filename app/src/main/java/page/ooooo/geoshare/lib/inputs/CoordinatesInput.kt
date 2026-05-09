@@ -90,8 +90,6 @@ object CoordinatesInput : TextInput, Input.HasRandomUri {
                     )
                 )
                 return@buildParseResult
-
-
             }
 
         // Degrees minutes

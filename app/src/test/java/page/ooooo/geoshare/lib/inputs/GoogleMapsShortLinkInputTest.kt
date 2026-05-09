@@ -91,7 +91,18 @@ class GoogleMapsShortLinkInputTest : InputTest {
     }
 
     @Test
-    fun parse_googleMapsGo() = runTest {
+    fun parse_returnsNextInput() = runTest {
+        assertEquals(
+            ParseResult(
+                nextInput = GoogleMapsUriInput,
+                nextMatch = "https://www.google.com/maps/search/39.920439,+116.331538"
+            ),
+            input.parse("https://www.google.com/maps/search/39.920439,+116.331538"),
+        )
+    }
+
+    @Test
+    fun parse_googleMapsGo_returnsNextInput() = runTest {
         assertEquals(
             ParseResult(
                 nextInput = GoogleMapsUriInput,

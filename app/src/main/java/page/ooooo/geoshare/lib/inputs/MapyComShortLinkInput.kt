@@ -18,5 +18,6 @@ object MapyComShortLinkInput : GetRedirectUrlInput {
 
     override suspend fun parse(data: Uri, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
         nextInput = MapyComUriInput
+        nextMatch = data.toString()
     }
 }

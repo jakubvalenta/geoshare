@@ -10,7 +10,7 @@ class GoogleMapsWebViewInputTest : InputTest {
     @Test
     fun parse_returnsNextInput() = runTest {
         assertEquals(
-            ParseResult(nextInput = GoogleMapsUriInput),
+            ParseResult(nextInput = GoogleMapsUriInput, nextMatch = "foo"),
             input.parse("foo"),
         )
     }

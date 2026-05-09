@@ -18,5 +18,6 @@ object YandexMapsShortLinkInput : HeadLocationHeaderInput {
 
     override suspend fun parse(data: Uri, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
         nextInput = YandexMapsUriInput
+        nextMatch = data.toString()
     }
 }
