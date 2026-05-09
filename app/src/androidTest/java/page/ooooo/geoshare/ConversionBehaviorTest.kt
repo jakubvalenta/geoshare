@@ -449,7 +449,7 @@ class ConversionBehaviorTest : BehaviorTest {
 
     @Test
     fun whenShortUriWithCoordinatesInHtmlIsSharedAndPermissionIsGranted_doesNotAskForPermission() = uiAutomator {
-        // FIXME Conversion fails
+        // TODO This test fails on emulator but not on physical phone for some reason
         runBlocking {
             assumeDomainResolvable("maps.google.com")
         }
