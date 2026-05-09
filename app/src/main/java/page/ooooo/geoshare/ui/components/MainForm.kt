@@ -36,13 +36,13 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun MainForm(
-    inputUriString: String,
+    source: String,
     billingAppNameResId: Int,
     billingStatus: BillingStatus,
     errorMessageResId: Int?,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
     onSubmit: () -> Unit,
-    onUpdateInput: (newInputUriString: String) -> Unit,
+    onUpdateInput: (newSource: String) -> Unit,
 ) {
     val clipboard = LocalClipboard.current
     val coroutineScope = rememberCoroutineScope()
@@ -69,13 +69,13 @@ fun MainForm(
         verticalArrangement = Arrangement.spacedBy(spacing.mediumAdaptive),
     ) {
         OutlinedTextField(
-            value = inputUriString,
+            value = source,
             onValueChange = {
                 onUpdateInput(it)
                 onSetErrorMessageResId(null)
             },
             modifier = Modifier
-                .testTag("geoShareMainInputUriStringTextField")
+                .testTag("geoShareMainSourceTextField")
                 .onPreviewKeyEvent { keyEvent ->
                     if (keyEvent.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {
                         onSubmit()
@@ -89,7 +89,7 @@ fun MainForm(
                 Text(stringResource(R.string.main_input_uri_label))
             },
             trailingIcon = {
-                if (inputUriString.isNotEmpty()) {
+                if (source.isNotEmpty()) {
                     IconButton({
                         onUpdateInput("")
                         onSetErrorMessageResId(null)
@@ -131,7 +131,7 @@ fun MainForm(
             stringResource(R.string.main_create_geo_uri),
             Modifier.testTag("geoShareMainSubmitButton"),
         ) {
-            if (inputUriString.isEmpty()) {
+            if (source.isEmpty()) {
                 // To show the user immediate feedback on this screen, do a simple validation before
                 // starting the conversion. Else the user would see an error message only on the conversion
                 // screen.
@@ -152,7 +152,7 @@ private fun DefaultPreview() {
         Surface {
             Column {
                 MainForm(
-                    inputUriString = "",
+                    source = "",
                     billingAppNameResId = R.string.app_name_pro,
                     billingStatus = BillingStatus.NotPurchased(),
                     errorMessageResId = null,
@@ -172,7 +172,7 @@ private fun DarkPreview() {
         Surface {
             Column {
                 MainForm(
-                    inputUriString = "",
+                    source = "",
                     billingAppNameResId = R.string.app_name_pro,
                     billingStatus = BillingStatus.NotPurchased(),
                     errorMessageResId = null,
@@ -192,7 +192,7 @@ private fun FilledPreview() {
         Surface {
             Column {
                 MainForm(
-                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     billingAppNameResId = R.string.app_name_pro,
                     billingStatus = BillingStatus.Purchased(
                         product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
@@ -217,7 +217,7 @@ private fun DarkFilledPreview() {
         Surface {
             Column {
                 MainForm(
-                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     billingAppNameResId = R.string.app_name_pro,
                     billingStatus = BillingStatus.Purchased(
                         product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
@@ -242,7 +242,7 @@ private fun ErrorPreview() {
         Surface {
             Column {
                 MainForm(
-                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     billingAppNameResId = R.string.app_name_pro,
                     billingStatus = BillingStatus.NotPurchased(),
                     errorMessageResId = R.string.conversion_failed_missing_url,
@@ -262,7 +262,7 @@ private fun DarkErrorPreview() {
         Surface {
             Column {
                 MainForm(
-                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     billingAppNameResId = R.string.app_name_pro,
                     billingStatus = BillingStatus.NotPurchased(),
                     errorMessageResId = R.string.conversion_failed_missing_url,

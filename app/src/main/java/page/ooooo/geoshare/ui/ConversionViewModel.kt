@@ -74,14 +74,14 @@ class ConversionViewModel @Inject constructor(
         _currentState.value = newState
     }
 
-    var inputUriString by savedStateHandle.saveable("inputUriString") { mutableStateOf("") }
+    var source by savedStateHandle.saveable("source") { mutableStateOf("") }
 
     private var transitionJob: Job? = null
 
     // Methods
 
     fun start() {
-        stateContext.currentState = SourceReceived(stateContext, inputUriString)
+        stateContext.currentState = SourceReceived(stateContext, source)
         transition()
     }
 
@@ -98,7 +98,7 @@ class ConversionViewModel @Inject constructor(
                 stateContext.log.e(TAG, tr.stackTraceToString())
                 stateContext.currentState = ConversionFailed(
                     stateContext.resources.getString(R.string.conversion_failed_parse_url_error),
-                    inputUriString,
+                    source,
                 )
             }
         }
@@ -281,7 +281,7 @@ class ConversionViewModel @Inject constructor(
     // Lifecycle
 
     fun onCreateOrNewIntent(intent: Intent) {
-        inputUriString = AndroidTools.getIntentUriString(intent) ?: ""
+        source = AndroidTools.getIntentUriString(intent) ?: ""
         start()
     }
 

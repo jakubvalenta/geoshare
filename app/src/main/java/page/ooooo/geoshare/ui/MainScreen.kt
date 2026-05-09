@@ -312,7 +312,7 @@ fun MainScreen(
         changelogShown = changelogShown,
         coordinateConverter = outputViewModel.coordinateConverter,
         coordinateFormat = userPreferencesValues.coordinateFormat,
-        inputUriString = conversionViewModel.inputUriString,
+        source = conversionViewModel.source,
         largeLoadingIndicator = largeLoadingIndicator,
         linkMessage = linkMessage,
         outputsForApps = outputsForApps,
@@ -374,7 +374,7 @@ fun MainScreen(
             conversionViewModel.startAction(action)
         },
         onStart = { conversionViewModel.start() },
-    ) { conversionViewModel.inputUriString = it }
+    ) { conversionViewModel.source = it }
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -390,7 +390,7 @@ private fun MainScreen(
     changelogShown: Boolean,
     coordinateConverter: CoordinateConverter,
     coordinateFormat: CoordinateFormat,
-    inputUriString: String,
+    source: String,
     largeLoadingIndicator: LoadingIndicator.Large?,
     linkMessage: Message?,
     outputsForApps: Map<String, List<Output>>,
@@ -502,7 +502,7 @@ private fun MainScreen(
                         coordinateConverter = coordinateConverter,
                         coordinateFormat = coordinateFormat,
                         errorMessageResId = errorMessageResId,
-                        inputUriString = inputUriString,
+                        source = source,
                         largeLoadingIndicator = largeLoadingIndicator,
                         onCancel = onCancel,
                         onNavigateToInputsScreen = onNavigateToInputsScreen,
@@ -702,7 +702,7 @@ private fun MainMainPane(
     coordinateConverter: CoordinateConverter,
     coordinateFormat: CoordinateFormat,
     errorMessageResId: Int?,
-    inputUriString: String,
+    source: String,
     largeLoadingIndicator: LoadingIndicator.Large?,
     onCancel: () -> Unit,
     onNavigateToInputsScreen: () -> Unit,
@@ -747,7 +747,7 @@ private fun MainMainPane(
 
         is Initial -> {
             MainForm(
-                inputUriString = inputUriString,
+                source = source,
                 billingAppNameResId = billingAppNameResId,
                 billingStatus = billingStatus,
                 errorMessageResId = errorMessageResId,
@@ -809,7 +809,7 @@ private fun MainSupportingPane(
     onExecute: (action: Action<*>) -> Unit,
     onHideApp: (packageName: String) -> Unit,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
-    onUpdateInput: (newInputUriString: String) -> Unit,
+    onUpdateInput: (newSource: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when (currentState) {
@@ -922,7 +922,7 @@ private fun MainBottomBar(
 
 @Composable
 private fun MainSkipButton(
-    inputUriString: String,
+    source: String,
     containerColor: Color,
     contentColor: Color,
     modifier: Modifier = Modifier,
@@ -940,7 +940,7 @@ private fun MainSkipButton(
         TextButton(
             {
                 coroutineScope.launch {
-                    AndroidTools.copyToClipboard(clipboard, inputUriString)
+                    AndroidTools.copyToClipboard(clipboard, source)
                 }
             },
             Modifier
@@ -974,7 +974,7 @@ private fun DefaultPreview() {
             changelogShown = false,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            inputUriString = "",
+            source = "",
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -1024,7 +1024,7 @@ private fun DarkPreview() {
             changelogShown = false,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            inputUriString = "",
+            source = "",
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -1074,7 +1074,7 @@ private fun TabletPreview() {
             changelogShown = false,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            inputUriString = "",
+            source = "",
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -1140,7 +1140,7 @@ private fun SucceededPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            inputUriString = "",
+            source = "",
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
@@ -1219,7 +1219,7 @@ private fun DarkSucceededPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            inputUriString = "",
+            source = "",
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
@@ -1298,7 +1298,7 @@ private fun SmallSucceededPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            inputUriString = "",
+            source = "",
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
@@ -1377,7 +1377,7 @@ private fun TabletSucceededPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            inputUriString = "",
+            source = "",
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
@@ -1456,7 +1456,7 @@ private fun DarkTabletSucceededPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            inputUriString = "",
+            source = "",
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
@@ -1534,7 +1534,7 @@ private fun AutomationPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            inputUriString = "",
+            source = "",
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
@@ -1612,7 +1612,7 @@ private fun DarkAutomationPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            inputUriString = "",
+            source = "",
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
@@ -1690,7 +1690,7 @@ private fun TabletAutomationPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            inputUriString = "",
+            source = "",
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
@@ -1766,7 +1766,7 @@ private fun WebViewPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            inputUriString = "",
+            source = "",
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -1837,7 +1837,7 @@ private fun DarkWebViewPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            inputUriString = "",
+            source = "",
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -1908,7 +1908,7 @@ private fun TabletWebViewPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            inputUriString = "",
+            source = "",
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -1966,7 +1966,7 @@ private fun ErrorPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            inputUriString = "",
+            source = "",
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -2024,7 +2024,7 @@ private fun DarkErrorPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            inputUriString = "",
+            source = "",
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -2082,7 +2082,7 @@ private fun TabletErrorPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            inputUriString = "",
+            source = "",
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -2151,7 +2151,7 @@ private fun EmptyPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            inputUriString = "",
+            source = "",
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -2227,7 +2227,7 @@ private fun LoadingIndicatorPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            inputUriString = "",
+            source = "",
             largeLoadingIndicator = currentState.getLoadingIndicator(),
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -2303,7 +2303,7 @@ private fun DarkLoadingIndicatorPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            inputUriString = "",
+            source = "",
             largeLoadingIndicator = currentState.getLoadingIndicator(),
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -2379,7 +2379,7 @@ private fun TabletLoadingIndicatorPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            inputUriString = "",
+            source = "",
             largeLoadingIndicator = currentState.getLoadingIndicator(),
             linkMessage = null,
             outputsForApps = emptyMap(),

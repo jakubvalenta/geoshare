@@ -40,7 +40,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @Composable
 fun ResultError(
     message: String,
-    inputUriString: String,
+    source: String,
     initialRetryLoadingIndicatorVisible: Boolean = false,
     onNavigateToInputsScreen: () -> Unit,
     onRetry: () -> Unit,
@@ -68,18 +68,18 @@ fun ResultError(
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 }
-                if (inputUriString.isNotEmpty()) {
+                if (source.isNotEmpty()) {
                     SelectionContainer(Modifier.padding(bottom = spacing.smallAdaptive)) {
-                        if (inputUriString.startsWith("https://")) {
+                        if (source.startsWith("https://")) {
                             Text(
-                                inputUriString,
-                                modifier = Modifier.clickable { uriHandler.openUri(inputUriString) },
+                                source,
+                                modifier = Modifier.clickable { uriHandler.openUri(source) },
                                 textDecoration = TextDecoration.Underline,
                                 style = MaterialTheme.typography.bodySmall,
                             )
                         } else {
                             Text(
-                                inputUriString,
+                                source,
                                 fontStyle = FontStyle.Italic,
                                 style = MaterialTheme.typography.bodySmall,
                             )

@@ -19,12 +19,12 @@ class PermissionDeniedTest {
 
     @Test
     fun transition_returnsConversionFailed() = runTest {
-        val inputUriString = "https://maps.app.goo.gl/foo"
-        val state = PermissionDenied(stateContext, inputUriString, GoogleMapsUriInput)
+        val source = "https://maps.app.goo.gl/foo"
+        val state = PermissionDenied(stateContext, source, GoogleMapsUriInput)
         assertEquals(
             ConversionFailed(
                 resources.getString(R.string.conversion_failed_connection_permission_denied),
-                inputUriString
+                source
             ),
             state.transition(),
         )

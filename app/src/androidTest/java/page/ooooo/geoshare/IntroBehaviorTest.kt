@@ -28,13 +28,13 @@ class IntroBehaviorTest : BehaviorTest {
         }
 
         // Main screen is visible
-        onElement { viewIdResourceName == "geoShareMainInputUriStringTextField" }
+        onElement { viewIdResourceName == "geoShareMainSourceTextField" }
 
         // Relaunch app
         closeApplication()
         launchApplication()
 
         // Main screen is visible again
-        onElement { viewIdResourceName == "geoShareMainInputUriStringTextField" }
+        onElement { viewIdResourceName == "geoShareMainSourceTextField" }
     }
 }

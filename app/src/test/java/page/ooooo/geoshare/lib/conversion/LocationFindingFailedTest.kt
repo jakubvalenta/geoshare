@@ -21,13 +21,13 @@ class LocationFindingFailedTest {
 
     @Test
     fun locationFindingFailed_executionIsNotCancelled_waitsAndReturnsActionFinished() = runTest {
-        val inputUriString = "https://maps.google.com/foo"
+        val source = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter).toAction(points.last())
-        val state = LocationFindingFailed(inputUriString, points, action, isAutomation = false)
+        val state = LocationFindingFailed(source, points, action, isAutomation = false)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
-                ActionFinished(inputUriString, points, action, isAutomation = false),
+                ActionFinished(source, points, action, isAutomation = false),
                 state.transition(),
             )
         }
@@ -36,10 +36,10 @@ class LocationFindingFailedTest {
 
     @Test
     fun locationFindingFailed_executionIsCancelled_returnsActionFinished() = runTest {
-        val inputUriString = "https://maps.google.com/foo"
+        val source = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter).toAction(points.last())
-        val state = LocationFindingFailed(inputUriString, points, action, isAutomation = false)
+        val state = LocationFindingFailed(source, points, action, isAutomation = false)
         var res: State? = null
         val job = launch {
             res = state.transition()
@@ -53,7 +53,7 @@ class LocationFindingFailedTest {
         }
         assertEquals(
             res,
-            ActionFinished(inputUriString, points, action, isAutomation = false),
+            ActionFinished(source, points, action, isAutomation = false),
         )
     }
 }
