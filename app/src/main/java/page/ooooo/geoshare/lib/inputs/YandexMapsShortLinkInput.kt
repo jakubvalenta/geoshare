@@ -16,7 +16,13 @@ object YandexMapsShortLinkInput : HeadLocationHeaderInput {
 
     override val pattern = Regex("""((?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/maps/-/\S+)""")
 
-    override suspend fun parse(data: Uri, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
+    override suspend fun parse(
+        data: Uri,
+        match: String,
+        prevPoints: Points?,
+        uriQuote: UriQuote,
+        log: ILog,
+    ) = buildParseResult {
         nextInput = YandexMapsUriInput
         nextMatch = data.toString()
     }

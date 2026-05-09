@@ -17,7 +17,13 @@ object UrbiHtmlInput : BodyAsChannelInput {
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_urbi_loading_indicator_title
 
-    override suspend fun parse(data: ByteReadChannel, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
+    override suspend fun parse(
+        data: ByteReadChannel,
+        match: String,
+        prevPoints: Points?,
+        uriQuote: UriQuote,
+        log: ILog,
+    ) =
         buildParseResult {
             val pattern = Regex("""property="twitter:image" content="([^"]+)""")
 

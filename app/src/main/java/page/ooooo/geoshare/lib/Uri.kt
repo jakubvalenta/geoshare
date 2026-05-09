@@ -19,7 +19,12 @@ data class Uri(
 ) {
     companion object {
         fun parse(uriString: String, uriQuote: UriQuote = DefaultUriQuote): Uri {
-            val schemeSepIndex = uriString.indexOf(':').takeIf { it > -1 }
+            val schemeSepIndex = if (!uriString.startsWith('/')) {
+                uriString.indexOf(':').takeIf { it > -1 }
+            } else {
+                // TODO Test URIs that contain colon in path
+                null
+            }
             val hostSepIndex =
                 schemeSepIndex?.takeIf { uriString.length > it + 2 && uriString[it + 1] == '/' && uriString[it + 2] == '/' }
                     ?.let { it + 2 }

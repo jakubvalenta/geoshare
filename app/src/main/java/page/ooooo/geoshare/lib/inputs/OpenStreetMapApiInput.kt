@@ -17,7 +17,13 @@ object OpenStreetMapApiInput : BodyAsTextInput {
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_open_street_map_loading_indicator_title
 
-    override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
+    override suspend fun parse(
+        data: String,
+        match: String,
+        prevPoints: Points?,
+        uriQuote: UriQuote,
+        log: ILog,
+    ) = buildParseResult {
         // Use a simple regex instead of JSON parsing, because it works fine
         val pattern = Regex(""""lat":$LAT,"lon":$LON""")
 

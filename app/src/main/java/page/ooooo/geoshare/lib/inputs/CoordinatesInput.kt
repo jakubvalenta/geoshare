@@ -41,7 +41,13 @@ object CoordinatesInput : TextInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
+    override suspend fun parse(
+        data: String,
+        match: String,
+        prevPoints: Points?,
+        uriQuote: UriQuote,
+        log: ILog,
+    ) = buildParseResult {
         // Decimal
         // e.g. `N 41.40338, E 2.17403`
         Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""")

@@ -13,7 +13,13 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 object WazeHtmlInput : BodyAsChannelInput {
-    override suspend fun parse(data: ByteReadChannel, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
+    override suspend fun parse(
+        data: ByteReadChannel,
+        match: String,
+        prevPoints: Points?,
+        uriQuote: UriQuote,
+        log: ILog,
+    ) =
         buildParseResult {
             val pattern = Regex(""""latLng":\{"lat":$LAT,"lng":$LON\}""")
 

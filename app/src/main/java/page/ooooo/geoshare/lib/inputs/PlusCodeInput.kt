@@ -50,22 +50,23 @@ object PlusCodeInput : TextInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
-        // URL-decode code string if it was extracted from a URL
-        val codeString = data.replace("%2B", "+")
+    override suspend fun parse(data: String, match: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
+        buildParseResult {
+            // URL-decode code string if it was extracted from a URL
+            val codeString = data.replace("%2B", "+")
 
-        // Global code
-        // e.g. `796RWF8Q+WF`
-        decodePlusCode(codeString)?.let {
-            points = persistentListOf(
-                GCJ02MainlandChinaPoint(it).copy(lat = it.lat?.toScale(6), lon = it.lon?.toScale(6))
-            )
-            return@buildParseResult
+            // Global code
+            // e.g. `796RWF8Q+WF`
+            decodePlusCode(codeString)?.let {
+                points = persistentListOf(
+                    GCJ02MainlandChinaPoint(it).copy(lat = it.lat?.toScale(6), lon = it.lon?.toScale(6))
+                )
+                return@buildParseResult
+            }
+
+            // Local code (not implemented yet)
+            // e.g. `28WR+CW` or `28WR+CW Comstock Park, Michigan`
         }
-
-        // Local code (not implemented yet)
-        // e.g. `28WR+CW` or `28WR+CW Comstock Park, Michigan`
-    }
 
     override fun genRandomUri(point: Point): String? =
         PlusCodeFormatter.formatPlusCode(point)

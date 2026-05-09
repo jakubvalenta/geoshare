@@ -10,8 +10,8 @@ class GoogleMapsWebViewInputTest : InputTest {
     @Test
     fun parse_returnsNextInput() = runTest {
         assertEquals(
-            ParseResult(nextInput = GoogleMapsUriInput, nextMatch = "foo"),
-            input.parse("foo"),
+            ParseResult(nextInput = GoogleMapsUriInput, nextMatch = "https://maps.google.com/redirected"),
+            input.parse("https://maps.google.com/redirected", "https://maps.google.com/original"),
         )
     }
 }

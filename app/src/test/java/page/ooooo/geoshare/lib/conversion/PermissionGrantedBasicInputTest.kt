@@ -72,7 +72,13 @@ class PermissionGrantedBasicInputTest {
                 block: suspend (String) -> ParseResult,
             ) = block("${match}-data")
 
-            override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
+            override suspend fun parse(
+                data: String,
+                match: String,
+                prevPoints: Points?,
+                uriQuote: UriQuote,
+                log: ILog,
+            ) =
                 ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -126,7 +132,13 @@ class PermissionGrantedBasicInputTest {
                 block: suspend (String) -> ParseResult,
             ) = throw CancellationException()
 
-            override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
+            override suspend fun parse(
+                data: String,
+                match: String,
+                prevPoints: Points?,
+                uriQuote: UriQuote,
+                log: ILog,
+            ) =
                 ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -172,7 +184,13 @@ class PermissionGrantedBasicInputTest {
                 block: suspend (String) -> ParseResult,
             ) = throw MalformedURLException()
 
-            override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
+            override suspend fun parse(
+                data: String,
+                match: String,
+                prevPoints: Points?,
+                uriQuote: UriQuote,
+                log: ILog,
+            ) =
                 ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -226,7 +244,13 @@ class PermissionGrantedBasicInputTest {
                     block: suspend (String) -> ParseResult,
                 ) = throw cause
 
-                override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
+                override suspend fun parse(
+                    data: String,
+                    match: String,
+                    prevPoints: Points?,
+                    uriQuote: UriQuote,
+                    log: ILog,
+                ) =
                     ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
 
                 override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -284,7 +308,13 @@ class PermissionGrantedBasicInputTest {
                     block: suspend (String) -> ParseResult,
                 ) = throw cause
 
-                override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
+                override suspend fun parse(
+                    data: String,
+                    match: String,
+                    prevPoints: Points?,
+                    uriQuote: UriQuote,
+                    log: ILog,
+                ) =
                     ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
 
                 override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -342,7 +372,13 @@ class PermissionGrantedBasicInputTest {
                     block: suspend (String) -> ParseResult,
                 ) = throw cause
 
-                override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
+                override suspend fun parse(
+                    data: String,
+                    match: String,
+                    prevPoints: Points?,
+                    uriQuote: UriQuote,
+                    log: ILog,
+                ) =
                     ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
 
                 override val permissionTitleResId = R.string.converter_google_maps_permission_title

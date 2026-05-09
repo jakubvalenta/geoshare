@@ -34,7 +34,13 @@ object HereWeGoUriInput : UriInput, Input.HasRandomUri {
     )
 
     @OptIn(ExperimentalEncodingApi::class)
-    override suspend fun parse(data: Uri, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
+    override suspend fun parse(
+        data: Uri,
+        match: String,
+        prevPoints: Points?,
+        uriQuote: UriQuote,
+        log: ILog,
+    ) = buildParseResult {
         data.run {
             val parts = data.pathParts.drop(1)
             val firstPart = parts.firstOrNull() ?: return@run

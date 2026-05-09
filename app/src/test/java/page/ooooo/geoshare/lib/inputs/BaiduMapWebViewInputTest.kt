@@ -10,8 +10,8 @@ class BaiduMapWebViewInputTest : InputTest {
     @Test
     fun parse_returnsNextInput() = runTest {
         assertEquals(
-            ParseResult(nextInput = BaiduMapUriInput, nextMatch = "foo"),
-            input.parse("foo"),
+            ParseResult(nextInput = BaiduMapUriInput, nextMatch = "https://map.baidu.com/redirected"),
+            input.parse("https://map.baidu.com/redirected", "https://map.baidu.com/original"),
         )
     }
 }

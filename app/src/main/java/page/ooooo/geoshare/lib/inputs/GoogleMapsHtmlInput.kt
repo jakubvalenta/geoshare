@@ -6,7 +6,9 @@ import io.ktor.utils.io.readLine
 import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.extensions.decodeBasicHtmlEntities
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
@@ -22,7 +24,13 @@ object GoogleMapsHtmlInput : BodyAsChannelInput {
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
-    override suspend fun parse(data: ByteReadChannel, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
+    override suspend fun parse(
+        data: ByteReadChannel,
+        match: String,
+        prevPoints: Points?,
+        uriQuote: UriQuote,
+        log: ILog,
+    ) =
         buildParseResult {
             val directionsPreviewPattern = Regex("""%213d$LAT%214d$LON""")
             val pointPattern = Regex("""\[(?:null,null,|null,\[)$LAT,$LON]""")
@@ -43,7 +51,7 @@ object GoogleMapsHtmlInput : BodyAsChannelInput {
             while (true) {
                 val line = data.readLine() ?: break
                 if (!genericMetaTagFound && genericMetaTagPattern.find(line) != null) {
-                    log.d("GoogleMapsInput", "HTML Pattern: Generic meta tag matched line $line")
+                    log.d(TAG, "Generic meta tag matched line $line")
                     genericMetaTagFound = true
                 }
                 if (
@@ -53,7 +61,7 @@ object GoogleMapsHtmlInput : BodyAsChannelInput {
                         }
                     )
                 ) {
-                    log.d("GoogleMapsInput", "HTML Pattern: Directions preview pattern matched line $line")
+                    log.d(TAG, "Directions preview pattern matched line $line")
                     // Stop parsing, so that we don't add points that we've just parsed again from SCRIPT tags
                     break
                 }
@@ -64,11 +72,11 @@ object GoogleMapsHtmlInput : BodyAsChannelInput {
                         }
                     )
                 ) {
-                    log.d("GoogleMapsInput", "HTML Pattern: Point pattern matched line $line")
+                    log.d(TAG, "Point pattern matched line $line")
                 }
                 if (defaultNaivePoint == null) {
                     defaultPointLinkPattern.find(line)?.toLatLonPoint(Source.JAVASCRIPT)?.let {
-                        log.d("GoogleMapsInput", "HTML Pattern: Default point pattern 1 matched line $line")
+                        log.d(TAG, "Default point pattern 1 matched line $line")
                         defaultNaivePoint = it.copy(name = name)
                     }
                 }
@@ -78,14 +86,14 @@ object GoogleMapsHtmlInput : BodyAsChannelInput {
                     // coordinates. It contains coordinates of the IP address that the HTTP request came from. So let's
                     // ignore these coordinates.
                     defaultPointAppInitStatePattern.find(line)?.toLonLatPoint(Source.JAVASCRIPT)?.let {
-                        log.d("GoogleMapsInput", "HTML Pattern: Default point pattern 2 matched line $line")
+                        log.d(TAG, "Default point pattern 2 matched line $line")
                         defaultNaivePoint = it.copy(name = name)
                     }
                 }
                 if (redirectUriString == null) {
-                    uriPattern.find(line)?.groupOrNull()?.let {
-                        log.d("GoogleMapsInput", "HTML Pattern: URI pattern matched line $line")
-                        redirectUriString = it
+                    uriPattern.find(line)?.groupOrNull()?.let { attr ->
+                        log.d(TAG, "URI pattern matched line $line")
+                        redirectUriString = attr.decodeBasicHtmlEntities()
                     }
                 }
             }
@@ -94,7 +102,9 @@ object GoogleMapsHtmlInput : BodyAsChannelInput {
                 if (defaultNaivePoint != null) {
                     mutableNaivePoints.add(defaultNaivePoint)
                 } else if (redirectUriString != null) {
-                    nextMatch = redirectUriString // TODO Make it an absolute URL
+                    val baseUri = Uri.parse(match, uriQuote)
+                    val redirectUri = Uri.parse(redirectUriString, uriQuote).toAbsoluteUri(baseUri)
+                    nextMatch = redirectUri.toString()
                     nextInput = GoogleMapsUriInput
                 } else {
                     // Go to web parsing
@@ -104,4 +114,6 @@ object GoogleMapsHtmlInput : BodyAsChannelInput {
 
             points = mutableNaivePoints.map { GCJ02MainlandChinaPoint(it) }.toImmutableList()
         }
+
+    private const val TAG = "GoogleMapsHtmlInput"
 }

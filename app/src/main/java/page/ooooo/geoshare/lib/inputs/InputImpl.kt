@@ -25,9 +25,6 @@ interface TextInput : BasicInput<String> {
     ) = block(match)
 }
 
-// TODO Test valid URI "https://maps.google.com/foo"
-// TODO Test invalid URI "https://[invalid:ipv6]/"
-// TODO Test invalid URI "https://[invalid:ipv6]/"
 interface UriInput : BasicInput<Uri> {
     val pattern: Regex
 

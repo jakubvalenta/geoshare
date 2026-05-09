@@ -47,7 +47,13 @@ class PermissionGrantedWebViewInputTest {
     fun transition_whenSetDataIsCalled_returnsDataParsed() = runTest {
         val source = "https://maps.google.com/foo"
         val input = object : WebViewInput {
-            override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
+            override suspend fun parse(
+                data: String,
+                match: String,
+                prevPoints: Points?,
+                uriQuote: UriQuote,
+                log: ILog,
+            ) =
                 ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -95,7 +101,13 @@ class PermissionGrantedWebViewInputTest {
     fun transition_whenSetDataIsNotCalledWithinTimeout_returnsConversionFailed() = runTest {
         val source = "https://maps.google.com/foo"
         val input = object : WebViewInput {
-            override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
+            override suspend fun parse(
+                data: String,
+                match: String,
+                prevPoints: Points?,
+                uriQuote: UriQuote,
+                log: ILog,
+            ) =
                 ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -138,7 +150,13 @@ class PermissionGrantedWebViewInputTest {
     fun transition_whenInputParseThrowsCancellationException_returnsConversionFailed() = runTest {
         val source = "https://maps.google.com/foo"
         val input = object : WebViewInput {
-            override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
+            override suspend fun parse(
+                data: String,
+                match: String,
+                prevPoints: Points?,
+                uriQuote: UriQuote,
+                log: ILog,
+            ) =
                 throw CancellationException()
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -178,7 +196,13 @@ class PermissionGrantedWebViewInputTest {
     fun transition_whenItIsCancelled_returnsConversionFailed() = runTest {
         val source = "https://maps.google.com/foo"
         val input = object : WebViewInput {
-            override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
+            override suspend fun parse(
+                data: String,
+                match: String,
+                prevPoints: Points?,
+                uriQuote: UriQuote,
+                log: ILog,
+            ) =
                 ParseResult()
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title

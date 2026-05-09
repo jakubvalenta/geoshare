@@ -26,7 +26,13 @@ object AppleMapsUriInput : UriInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parse(data: Uri, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
+    override suspend fun parse(
+        data: Uri,
+        match: String,
+        prevPoints: Points?,
+        uriQuote: UriQuote,
+        log: ILog,
+    ) = buildParseResult {
         data.run {
             val z = Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()
 

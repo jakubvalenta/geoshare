@@ -19,7 +19,13 @@ object AppleMapsHtmlInput : BodyAsChannelInput {
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_apple_maps_loading_indicator_title
 
-    override suspend fun parse(data: ByteReadChannel, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
+    override suspend fun parse(
+        data: ByteReadChannel,
+        match: String,
+        prevPoints: Points?,
+        uriQuote: UriQuote,
+        log: ILog,
+    ) =
         buildParseResult {
             val latPattern = Regex("""<meta property="place:location:latitude" content="$LAT"""")
             val lonPattern = Regex("""<meta property="place:location:longitude" content="$LON"""")

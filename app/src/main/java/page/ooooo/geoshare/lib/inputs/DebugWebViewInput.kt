@@ -19,7 +19,13 @@ object DebugWebViewInput : WebViewInput {
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_debug_loading_indicator_title
 
-    override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
+    override suspend fun parse(
+        data: String,
+        match: String,
+        prevPoints: Points?,
+        uriQuote: UriQuote,
+        log: ILog,
+    ) = buildParseResult {
         points = persistentListOf(WGS84Point(NaivePoint.genRandomPoint()))
     }
 }

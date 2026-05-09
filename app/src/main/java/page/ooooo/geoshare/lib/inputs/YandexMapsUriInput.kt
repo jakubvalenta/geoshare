@@ -44,47 +44,48 @@ object YandexMapsUriInput : UriInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parse(data: Uri, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
-        data.run {
-            val z = listOf(@Suppress("SpellCheckingInspection") "whatshere[zoom]", "z")
-                .firstNotNullOfOrNull { key -> Z_PATTERN.matchEntire(queryParams[key])?.doubleGroupOrNull() }
+    override suspend fun parse(data: Uri, match: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
+        buildParseResult {
+            data.run {
+                val z = listOf(@Suppress("SpellCheckingInspection") "whatshere[zoom]", "z")
+                    .firstNotNullOfOrNull { key -> Z_PATTERN.matchEntire(queryParams[key])?.doubleGroupOrNull() }
 
-            // Coordinates
-            // https://yandex.com/maps?ll={lon},{lat}
-            // https://yandex.com/maps?whatshere%5Bpoint%5D={lon}%2C{lat}
-            listOf(@Suppress("SpellCheckingInspection") "whatshere[point]", "ll")
-                .firstNotNullOfOrNull { key ->
-                    LON_LAT_PATTERN.matchEntire(queryParams[key])?.toLonLatPoint(Source.URI)
-                }?.let {
-                    points = persistentListOf(WGS84Point(it).copy(z = z))
-                    return@buildParseResult
-                }
-
-            pathParts.forEachIndexed { i, part ->
-                when (part) {
-                    "geo" -> {
-                        // POI
-                        // https://yandex.com/maps/.../.../geo/{name}/{id}/
-                        points = persistentListOf(
-                            WGS84Point(
-                                name = pathParts.getOrNull(i + 1)?.replace('_', ' '),
-                                source = Source.URI,
-                            ),
-                        )
-                        nextInput = YandexMapsHtmlInput
+                // Coordinates
+                // https://yandex.com/maps?ll={lon},{lat}
+                // https://yandex.com/maps?whatshere%5Bpoint%5D={lon}%2C{lat}
+                listOf(@Suppress("SpellCheckingInspection") "whatshere[point]", "ll")
+                    .firstNotNullOfOrNull { key ->
+                        LON_LAT_PATTERN.matchEntire(queryParams[key])?.toLonLatPoint(Source.URI)
+                    }?.let {
+                        points = persistentListOf(WGS84Point(it).copy(z = z))
                         return@buildParseResult
                     }
 
-                    "org" -> {
-                        // Old POI -- these links seem to return 404 now; we still keep the code in case they start working again
-                        // https://yandex.com/maps/org/{id}?...
-                        nextInput = YandexMapsHtmlInput
-                        return@buildParseResult
+                pathParts.forEachIndexed { i, part ->
+                    when (part) {
+                        "geo" -> {
+                            // POI
+                            // https://yandex.com/maps/.../.../geo/{name}/{id}/
+                            points = persistentListOf(
+                                WGS84Point(
+                                    name = pathParts.getOrNull(i + 1)?.replace('_', ' '),
+                                    source = Source.URI,
+                                ),
+                            )
+                            nextInput = YandexMapsHtmlInput
+                            return@buildParseResult
+                        }
+
+                        "org" -> {
+                            // Old POI -- these links seem to return 404 now; we still keep the code in case they start working again
+                            // https://yandex.com/maps/org/{id}?...
+                            nextInput = YandexMapsHtmlInput
+                            return@buildParseResult
+                        }
                     }
                 }
             }
         }
-    }
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "https://yandex.com/maps?ll={lon}%2C{lat}&z={z}")

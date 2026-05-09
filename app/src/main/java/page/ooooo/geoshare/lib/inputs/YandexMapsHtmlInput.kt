@@ -21,7 +21,13 @@ object YandexMapsHtmlInput : BodyAsChannelInput {
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_yandex_maps_loading_indicator_title
 
-    override suspend fun parse(data: ByteReadChannel, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
+    override suspend fun parse(
+        data: ByteReadChannel,
+        match: String,
+        prevPoints: Points?,
+        uriQuote: UriQuote,
+        log: ILog,
+    ) =
         buildParseResult {
             val pointPattern = Regex("""pt=$LON%2C$LAT""")
             val namePattern = Regex("""itemProp="name"[^>]*>([^<]+)""")

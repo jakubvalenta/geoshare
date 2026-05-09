@@ -22,6 +22,7 @@ class BodyAsTextInputTest {
 
         override suspend fun parse(
             data: String,
+            match: String,
             prevPoints: Points?,
             uriQuote: UriQuote,
             log: ILog,

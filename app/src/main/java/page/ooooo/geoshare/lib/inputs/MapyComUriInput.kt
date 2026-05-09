@@ -29,7 +29,13 @@ object MapyComUriInput : UriInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parse(data: Uri, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
+    override suspend fun parse(
+        data: Uri,
+        match: String,
+        prevPoints: Points?,
+        uriQuote: UriQuote,
+        log: ILog,
+    ) = buildParseResult {
         data.run {
             // Coordinates -- use this part of the text, because it's more precise than the URL
             // e.g. `Vega de Tera 41.9966006N, 6.1223825W https://mapy.com/s/deduduzeha`

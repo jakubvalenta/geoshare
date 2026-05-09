@@ -26,7 +26,13 @@ object MapsMeUriInput : UriInput {
         ),
     )
 
-    override suspend fun parse(data: Uri, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
+    override suspend fun parse(
+        data: Uri,
+        match: String,
+        prevPoints: Points?,
+        uriQuote: UriQuote,
+        log: ILog,
+    ) = buildParseResult {
         data.run {
             val name = (if (scheme == "ge0") pathParts.getOrNull(1) else pathParts.getOrNull(2))
                 ?.let { Q_PATH_PATTERN.matchEntire(it) }

@@ -225,7 +225,7 @@ data class PermissionGrantedBasicInput<T>(
                     stateContext.uriQuote,
                     stateContext.log
                 ) { data ->
-                    input.parse(data, prevPoints, stateContext.uriQuote, stateContext.log)
+                    input.parse(data, match, prevPoints, stateContext.uriQuote, stateContext.log)
                 }
                 DataParsed(stateContext, source, match, input, result, permission, prevPoints)
             } catch (_: MalformedURLException) {
@@ -273,7 +273,7 @@ data class PermissionGrantedBasicInput<T>(
             description = lastAttempt?.let {
                 stateContext.resources.getString(
                     R.string.conversion_loading_indicator_description,
-                    it.number, // TODO Should this be it.number + 1?
+                    it.number, // FIXME Should this be it.number + 1?
                     maxAttempts,
                     it.cause.getMessage(stateContext.resources),
                 )
@@ -314,7 +314,7 @@ data class PermissionGrantedWebViewInput(
                     .filterNotNull()
                     .timeout(timeout)
                     .first()
-                val result = input.parse(data, prevPoints, stateContext.uriQuote, stateContext.log)
+                val result = input.parse(data, match, prevPoints, stateContext.uriQuote, stateContext.log)
                 DataParsed(stateContext, source, match, input, result, permission, prevPoints)
             } catch (_: TimeoutCancellationException) {
                 stateContext.log.e(ConversionState.TAG, "Parse: Timed out")
