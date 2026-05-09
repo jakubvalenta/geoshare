@@ -40,7 +40,7 @@ import page.ooooo.geoshare.lib.conversion.LocationPermissionReceived
 import page.ooooo.geoshare.lib.conversion.LocationRationaleConfirmed
 import page.ooooo.geoshare.lib.conversion.LocationRationaleShown
 import page.ooooo.geoshare.lib.conversion.LocationReceived
-import page.ooooo.geoshare.lib.conversion.ReceivedSourceData
+import page.ooooo.geoshare.lib.conversion.SourceReceived
 import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.LocationAction
@@ -81,7 +81,7 @@ class ConversionViewModel @Inject constructor(
     // Methods
 
     fun start() {
-        stateContext.currentState = ReceivedSourceData(stateContext, inputUriString)
+        stateContext.currentState = SourceReceived(stateContext, inputUriString)
         transition()
     }
 

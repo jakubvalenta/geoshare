@@ -30,7 +30,7 @@ import java.io.EOFException
 import java.net.MalformedURLException
 import java.net.SocketTimeoutException
 
-class GrantedPermissionBasicInputTest {
+class PermissionGrantedBasicInputTest {
     private val log = FakeLog
     private val maxAttempts = 3
     private val networkTools: NetworkTools = mock()
@@ -59,7 +59,7 @@ class GrantedPermissionBasicInputTest {
     private val uriQuote = FakeUriQuote
 
     @Test
-    fun transition_whenInputWithDataDoesNotThrowException_returnsParsedData() = runTest {
+    fun transition_whenInputWithDataDoesNotThrowException_returnsDataParsed() = runTest {
         val source = "https://maps.google.com/foo"
         val input = object : BasicInput<String>, Input.HasPermission {
             override suspend fun withData(
@@ -87,7 +87,7 @@ class GrantedPermissionBasicInputTest {
             on { this@on.resources } doReturn resources
             on { this@on.uriQuote } doReturn uriQuote
         }
-        val state = GrantedPermissionBasicInput(
+        val state = PermissionGrantedBasicInput(
             stateContext,
             source,
             match = source,
@@ -99,7 +99,7 @@ class GrantedPermissionBasicInputTest {
             maxAttempts,
         )
         assertEquals(
-            ParsedData(
+            DataParsed(
                 stateContext,
                 source,
                 match = source,
@@ -141,7 +141,7 @@ class GrantedPermissionBasicInputTest {
             on { this@on.resources } doReturn resources
             on { this@on.uriQuote } doReturn uriQuote
         }
-        val state = GrantedPermissionBasicInput(
+        val state = PermissionGrantedBasicInput(
             stateContext,
             source,
             match = source,
@@ -187,7 +187,7 @@ class GrantedPermissionBasicInputTest {
             on { this@on.resources } doReturn resources
             on { this@on.uriQuote } doReturn uriQuote
         }
-        val state = GrantedPermissionBasicInput(
+        val state = PermissionGrantedBasicInput(
             stateContext,
             source,
             match = source,
@@ -211,7 +211,7 @@ class GrantedPermissionBasicInputTest {
     }
 
     @Test
-    fun transition_whenInputWithDataThrowsRecoverableNetworkExceptionAndLastAttemptIsNull_returnsGrantedPermission() =
+    fun transition_whenInputWithDataThrowsRecoverableNetworkExceptionAndLastAttemptIsNull_returnsPermissionGranted() =
         runTest {
             val source = "https://maps.google.com/foo"
             val cause = SocketTimeoutNetworkException(SocketTimeoutException())
@@ -241,7 +241,7 @@ class GrantedPermissionBasicInputTest {
                 on { this@on.resources } doReturn resources
                 on { this@on.uriQuote } doReturn uriQuote
             }
-            val state = GrantedPermissionBasicInput(
+            val state = PermissionGrantedBasicInput(
                 stateContext,
                 source,
                 match = source,
@@ -253,7 +253,7 @@ class GrantedPermissionBasicInputTest {
                 maxAttempts,
             )
             assertEquals(
-                GrantedPermission(
+                PermissionGranted(
                     stateContext,
                     source,
                     match = source,
@@ -269,7 +269,7 @@ class GrantedPermissionBasicInputTest {
         }
 
     @Test
-    fun transition_whenInputWithDataThrowsARecoverableNetworkExceptionAndLastAttemptIsNotNull_returnsGrantedPermission() =
+    fun transition_whenInputWithDataThrowsARecoverableNetworkExceptionAndLastAttemptIsNotNull_returnsPermissionGranted() =
         runTest {
             val source = "https://maps.google.com/foo"
             val cause = SocketTimeoutNetworkException(SocketTimeoutException())
@@ -299,7 +299,7 @@ class GrantedPermissionBasicInputTest {
                 on { this@on.resources } doReturn resources
                 on { this@on.uriQuote } doReturn uriQuote
             }
-            val state = GrantedPermissionBasicInput(
+            val state = PermissionGrantedBasicInput(
                 stateContext,
                 source,
                 match = source,
@@ -311,7 +311,7 @@ class GrantedPermissionBasicInputTest {
                 maxAttempts,
             )
             assertEquals(
-                GrantedPermission(
+                PermissionGranted(
                     stateContext,
                     source,
                     match = source,
@@ -357,7 +357,7 @@ class GrantedPermissionBasicInputTest {
                 on { this@on.resources } doReturn resources
                 on { this@on.uriQuote } doReturn uriQuote
             }
-            val state = GrantedPermissionBasicInput(
+            val state = PermissionGrantedBasicInput(
                 stateContext,
                 source,
                 match = source,
@@ -390,7 +390,7 @@ class GrantedPermissionBasicInputTest {
         val stateContext: ConversionStateContext = mock {
             on { this@on.resources } doReturn resources
         }
-        val state = GrantedPermissionBasicInput(
+        val state = PermissionGrantedBasicInput(
             stateContext,
             source,
             match = source,
@@ -414,7 +414,7 @@ class GrantedPermissionBasicInputTest {
         val stateContext: ConversionStateContext = mock {
             on { this@on.resources } doReturn resources
         }
-        val state = GrantedPermissionBasicInput(
+        val state = PermissionGrantedBasicInput(
             stateContext,
             source,
             match = source,

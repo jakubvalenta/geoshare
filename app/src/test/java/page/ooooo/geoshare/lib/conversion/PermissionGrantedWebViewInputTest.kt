@@ -28,7 +28,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class GrantedPermissionWebViewInputTest {
+class PermissionGrantedWebViewInputTest {
     private val log = FakeLog
     private val resources: Resources = mock {
         on { getString(R.string.converter_google_maps_loading_indicator_title) } doReturn "Connecting to Google..."
@@ -44,7 +44,7 @@ class GrantedPermissionWebViewInputTest {
     private val uriQuote = FakeUriQuote
 
     @Test
-    fun transition_whenSetDataIsCalled_returnsParsedData() = runTest {
+    fun transition_whenSetDataIsCalled_returnsDataParsed() = runTest {
         val source = "https://maps.google.com/foo"
         val input = object : WebViewInput {
             override suspend fun parse(data: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
@@ -61,7 +61,7 @@ class GrantedPermissionWebViewInputTest {
             on { this@on.resources } doReturn resources
             on { this@on.uriQuote } doReturn uriQuote
         }
-        val state = GrantedPermissionWebViewInput(
+        val state = PermissionGrantedWebViewInput(
             stateContext,
             source,
             match = source,
@@ -78,7 +78,7 @@ class GrantedPermissionWebViewInputTest {
         state.setData("${source}-data")
         advanceUntilIdle()
         assertEquals(
-            ParsedData(
+            DataParsed(
                 stateContext,
                 source,
                 match = source,
@@ -109,7 +109,7 @@ class GrantedPermissionWebViewInputTest {
             on { this@on.resources } doReturn resources
             on { this@on.uriQuote } doReturn uriQuote
         }
-        val state = GrantedPermissionWebViewInput(
+        val state = PermissionGrantedWebViewInput(
             stateContext,
             source,
             match = source,
@@ -152,7 +152,7 @@ class GrantedPermissionWebViewInputTest {
             on { this@on.resources } doReturn resources
             on { this@on.uriQuote } doReturn uriQuote
         }
-        val state = GrantedPermissionWebViewInput(
+        val state = PermissionGrantedWebViewInput(
             stateContext,
             source,
             match = source,
@@ -192,7 +192,7 @@ class GrantedPermissionWebViewInputTest {
             on { this@on.resources } doReturn resources
             on { this@on.uriQuote } doReturn uriQuote
         }
-        val state = GrantedPermissionWebViewInput(
+        val state = PermissionGrantedWebViewInput(
             stateContext,
             source,
             match = source,

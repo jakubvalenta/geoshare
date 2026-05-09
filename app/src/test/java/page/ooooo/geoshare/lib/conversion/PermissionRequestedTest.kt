@@ -15,13 +15,13 @@ import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInput
 
-class RequestedPermissionTest {
+class PermissionRequestedTest {
     @Test
     fun transition_returnsNull() = runTest {
         val source = "https://maps.app.goo.gl/foo"
         val input = GoogleMapsHtmlInput
         val stateContext: ConversionStateContext = mock()
-        val state = RequestedPermission(
+        val state = PermissionRequested(
             stateContext,
             source,
             match = source,
@@ -33,7 +33,7 @@ class RequestedPermissionTest {
     }
 
     @Test
-    fun grant_whenDoNotAskIsFalse_doesNotSavePreferenceAndReturnsGrantedPermission() = runTest {
+    fun grant_whenDoNotAskIsFalse_doesNotSavePreferenceAndReturnsPermissionGranted() = runTest {
         val source = "https://maps.app.goo.gl/foo"
         val input = GoogleMapsHtmlInput
         val userPreferencesRepository: FakeUserPreferencesRepository = mock {
@@ -42,7 +42,7 @@ class RequestedPermissionTest {
         val stateContext: ConversionStateContext = mock {
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = RequestedPermission(
+        val state = PermissionRequested(
             stateContext,
             source,
             match = source,
@@ -51,7 +51,7 @@ class RequestedPermissionTest {
             input.loadingIndicatorTitleResId,
         )
         assertEquals(
-            GrantedPermission(
+            PermissionGranted(
                 stateContext,
                 source,
                 match = source,
@@ -68,7 +68,7 @@ class RequestedPermissionTest {
     }
 
     @Test
-    fun grant_whenDoNotAskIsTrue_savesPreferenceAndReturnsGrantedPermission() = runTest {
+    fun grant_whenDoNotAskIsTrue_savesPreferenceAndReturnsPermissionGranted() = runTest {
         val source = "https://maps.app.goo.gl/foo"
         val input = GoogleMapsHtmlInput
         val userPreferencesRepository: FakeUserPreferencesRepository = mock {
@@ -77,7 +77,7 @@ class RequestedPermissionTest {
         val stateContext: ConversionStateContext = mock {
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = RequestedPermission(
+        val state = PermissionRequested(
             stateContext,
             source,
             match = source,
@@ -86,7 +86,7 @@ class RequestedPermissionTest {
             input.loadingIndicatorTitleResId,
         )
         assertEquals(
-            GrantedPermission(
+            PermissionGranted(
                 stateContext,
                 source,
                 match = source,
@@ -103,7 +103,7 @@ class RequestedPermissionTest {
     }
 
     @Test
-    fun deny_whenDoNotAskIsFalse_doesNotSavePreferenceAndReturnsDeniedPermission() = runTest {
+    fun deny_whenDoNotAskIsFalse_doesNotSavePreferenceAndReturnsPermissionDenied() = runTest {
         val source = "https://maps.app.goo.gl/foo"
         val input = GoogleMapsHtmlInput
         val userPreferencesRepository: FakeUserPreferencesRepository = mock {
@@ -112,7 +112,7 @@ class RequestedPermissionTest {
         val stateContext: ConversionStateContext = mock {
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = RequestedPermission(
+        val state = PermissionRequested(
             stateContext,
             source,
             match = source,
@@ -121,7 +121,7 @@ class RequestedPermissionTest {
             input.loadingIndicatorTitleResId,
         )
         assertEquals(
-            DeniedPermission(stateContext, source, input),
+            PermissionDenied(stateContext, source, input),
             state.deny(false),
         )
         verify(userPreferencesRepository, never()).setValue(
@@ -131,7 +131,7 @@ class RequestedPermissionTest {
     }
 
     @Test
-    fun deny_whenDoNotIsAskIsTrue_savesPreferenceAndDeniedPermission() = runTest {
+    fun deny_whenDoNotIsAskIsTrue_savesPreferenceAndPermissionDenied() = runTest {
         val source = "https://maps.app.goo.gl/foo"
         val input = GoogleMapsHtmlInput
         val userPreferencesRepository: FakeUserPreferencesRepository = mock {
@@ -140,7 +140,7 @@ class RequestedPermissionTest {
         val stateContext: ConversionStateContext = mock {
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = RequestedPermission(
+        val state = PermissionRequested(
             stateContext,
             source,
             match = source,
@@ -149,7 +149,7 @@ class RequestedPermissionTest {
             input.loadingIndicatorTitleResId,
         )
         assertEquals(
-            DeniedPermission(stateContext, source, input),
+            PermissionDenied(stateContext, source, input),
             state.deny(true),
         )
         verify(userPreferencesRepository).setValue(

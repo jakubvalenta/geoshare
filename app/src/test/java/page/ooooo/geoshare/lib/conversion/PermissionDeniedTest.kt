@@ -9,7 +9,7 @@ import org.mockito.kotlin.mock
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.inputs.GoogleMapsUriInput
 
-class DeniedPermissionTest {
+class PermissionDeniedTest {
     private val resources: Resources = mock {
         on { getString(R.string.conversion_failed_connection_permission_denied) } doReturn "This link is not supported without connecting to the map service"
     }
@@ -20,7 +20,7 @@ class DeniedPermissionTest {
     @Test
     fun transition_returnsConversionFailed() = runTest {
         val inputUriString = "https://maps.app.goo.gl/foo"
-        val state = DeniedPermission(stateContext, inputUriString, GoogleMapsUriInput)
+        val state = PermissionDenied(stateContext, inputUriString, GoogleMapsUriInput)
         assertEquals(
             ConversionFailed(
                 resources.getString(R.string.conversion_failed_connection_permission_denied),

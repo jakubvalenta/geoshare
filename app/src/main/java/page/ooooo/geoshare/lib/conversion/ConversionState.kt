@@ -80,8 +80,7 @@ interface ConversionState : State {
 
 class Initial : ConversionState
 
-// TODO Rename to SourceReceived
-data class ReceivedSourceData(
+data class SourceReceived(
     val stateContext: ConversionStateContext,
     val source: String,
 ) : ConversionState {
@@ -95,7 +94,7 @@ data class ReceivedSourceData(
         for (input in stateContext.inputs) {
             val match = input.match(source)
             if (match != null) {
-                return FoundInput(stateContext, source, match, input)
+                return InputFound(stateContext, source, match, input)
             }
         }
         return ConversionFailed(
@@ -105,8 +104,7 @@ data class ReceivedSourceData(
     }
 }
 
-// TODO Rename to InputFound
-data class FoundInput<T>(
+data class InputFound<T>(
     val stateContext: ConversionStateContext,
     val source: String,
     val match: String,
@@ -119,7 +117,7 @@ data class FoundInput<T>(
             when (permission ?: stateContext.userPreferencesRepository.getValue(
                 ConnectionPermissionPreference
             )) {
-                Permission.ALWAYS -> GrantedPermission(
+                Permission.ALWAYS -> PermissionGranted(
                     stateContext,
                     source,
                     match,
@@ -129,7 +127,7 @@ data class FoundInput<T>(
                     prevPoints = prevPoints,
                 )
 
-                Permission.ASK -> RequestedPermission(
+                Permission.ASK -> PermissionRequested(
                     stateContext,
                     source,
                     match,
@@ -138,16 +136,15 @@ data class FoundInput<T>(
                     loadingIndicatorTitleResId = input.loadingIndicatorTitleResId,
                 )
 
-                Permission.NEVER -> DeniedPermission(stateContext, source, input)
+                Permission.NEVER -> PermissionDenied(stateContext, source, input)
             }
         } else {
             // TODO Test permission passing
-            GrantedPermission(stateContext, source, match, input, permission = permission)
+            PermissionGranted(stateContext, source, match, input, permission = permission)
         }
 }
 
-// TODO Rename to PermissionRequested
-data class RequestedPermission<T>(
+data class PermissionRequested<T>(
     val stateContext: ConversionStateContext,
     val source: String,
     val match: String,
@@ -159,19 +156,18 @@ data class RequestedPermission<T>(
         if (doNotAsk) {
             stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.ALWAYS)
         }
-        return GrantedPermission(stateContext, source, match, input, loadingIndicatorTitleResId, Permission.ALWAYS)
+        return PermissionGranted(stateContext, source, match, input, loadingIndicatorTitleResId, Permission.ALWAYS)
     }
 
     override suspend fun deny(doNotAsk: Boolean): State {
         if (doNotAsk) {
             stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.NEVER)
         }
-        return DeniedPermission(stateContext, source, input)
+        return PermissionDenied(stateContext, source, input)
     }
 }
 
-// TODO Rename to PermissionGranted
-data class GrantedPermission<T>(
+data class PermissionGranted<T>(
     val stateContext: ConversionStateContext,
     val source: String,
     val match: String,
@@ -184,7 +180,7 @@ data class GrantedPermission<T>(
 ) : ConversionState {
     override suspend fun transition(): State =
         when (input) {
-            is BasicInput -> GrantedPermissionBasicInput(
+            is BasicInput -> PermissionGrantedBasicInput(
                 stateContext,
                 source,
                 match,
@@ -196,7 +192,7 @@ data class GrantedPermission<T>(
                 maxAttempts,
             )
 
-            is WebViewInput -> GrantedPermissionWebViewInput(
+            is WebViewInput -> PermissionGrantedWebViewInput(
                 stateContext,
                 source,
                 match,
@@ -207,8 +203,7 @@ data class GrantedPermission<T>(
         }
 }
 
-// TODO Rename to PermissionGrantedBasicInput
-data class GrantedPermissionBasicInput<T>(
+data class PermissionGrantedBasicInput<T>(
     val stateContext: ConversionStateContext,
     val source: String,
     val match: String,
@@ -235,7 +230,7 @@ data class GrantedPermissionBasicInput<T>(
                 ) { data ->
                     input.parse(data, prevPoints, stateContext.uriQuote, stateContext.log)
                 }
-                ParsedData(stateContext, source, match, input, result, permission, prevPoints)
+                DataParsed(stateContext, source, match, input, result, permission, prevPoints)
             } catch (_: MalformedURLException) {
                 ConversionFailed(
                     stateContext.resources.getString(
@@ -245,7 +240,7 @@ data class GrantedPermissionBasicInput<T>(
                     source,
                 )
             } catch (tr: RecoverableNetworkException) {
-                GrantedPermission(
+                PermissionGranted(
                     stateContext,
                     source,
                     match,
@@ -297,8 +292,7 @@ data class GrantedPermissionBasicInput<T>(
  * The [transition] function of this state will wait for [setData] to be called. If it's not called within [timeout], it
  * returns failure.
  */
-// TODO Rename to PermissionGrantedWebViewInput
-data class GrantedPermissionWebViewInput(
+data class PermissionGrantedWebViewInput(
     val stateContext: ConversionStateContext,
     val source: String,
     val match: String,
@@ -324,7 +318,7 @@ data class GrantedPermissionWebViewInput(
                     .timeout(timeout)
                     .first()
                 val result = input.parse(data, prevPoints, stateContext.uriQuote, stateContext.log)
-                ParsedData(stateContext, source, match, input, result, permission, prevPoints)
+                DataParsed(stateContext, source, match, input, result, permission, prevPoints)
             } catch (_: TimeoutCancellationException) {
                 stateContext.log.e(ConversionState.TAG, "Parse: Timed out")
                 ConversionFailed(
@@ -345,8 +339,7 @@ data class GrantedPermissionWebViewInput(
     }
 }
 
-// TODO Rename to PermissionDenied
-data class DeniedPermission<T>(
+data class PermissionDenied<T>(
     val stateContext: ConversionStateContext,
     val source: String,
     val input: Input<T>,
@@ -358,8 +351,7 @@ data class DeniedPermission<T>(
         )
 }
 
-// TODO Rename to DataParsed
-data class ParsedData(
+data class DataParsed(
     val stateContext: ConversionStateContext,
     val source: String,
     val match: String,
@@ -375,7 +367,7 @@ data class ParsedData(
                 ConversionSucceeded(stateContext, source, points)
             } else if (nextInput != null) {
                 stateContext.log.i(ConversionState.TAG, "Parse: Going to next input $nextInput") // TODO toString()
-                FoundInput(stateContext, source, nextMatch ?: match, nextInput, permission, points)
+                InputFound(stateContext, source, nextMatch ?: match, nextInput, permission, points)
             } else if (points.lastOrNull()?.hasName() == true) {
                 stateContext.log.i(ConversionState.TAG, "Parse: Converted $match to $points")
                 ConversionSucceeded(stateContext, source, points)

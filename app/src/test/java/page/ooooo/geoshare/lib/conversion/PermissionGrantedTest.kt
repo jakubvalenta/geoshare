@@ -14,9 +14,9 @@ import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.network.SocketTimeoutNetworkException
 import java.net.SocketTimeoutException
 
-class GrantedPermissionTest {
+class PermissionGrantedTest {
     @Test
-    fun transition_whenInputIsBasicInput_returnsGrantedPermissionBasicInput() = runTest {
+    fun transition_whenInputIsBasicInput_returnsPermissionGrantedBasicInput() = runTest {
         val source = "https://maps.app.goo.gl/foo"
         val input = GoogleMapsHtmlInput
         val permission = Permission.ALWAYS
@@ -25,7 +25,7 @@ class GrantedPermissionTest {
         val lastAttempt = NetworkTools.Attempt(1, cause)
         val maxAttempts = 3
         val stateContext: ConversionStateContext = mock()
-        val state = GrantedPermission(
+        val state = PermissionGranted(
             stateContext,
             source,
             match = source,
@@ -37,7 +37,7 @@ class GrantedPermissionTest {
             maxAttempts,
         )
         assertEquals(
-            GrantedPermissionBasicInput(
+            PermissionGrantedBasicInput(
                 stateContext,
                 source,
                 match = source,
@@ -53,7 +53,7 @@ class GrantedPermissionTest {
     }
 
     @Test
-    fun transition_whenInputIsWebViewInput_returnsGrantedPermissionWebViewInput() = runTest {
+    fun transition_whenInputIsWebViewInput_returnsPermissionGrantedWebViewInput() = runTest {
         val source = "https://maps.app.goo.gl/foo"
         val input = GoogleMapsWebViewInput
         val permission = Permission.ALWAYS
@@ -62,7 +62,7 @@ class GrantedPermissionTest {
         val lastAttempt = NetworkTools.Attempt(1, cause)
         val maxAttempts = 3
         val stateContext: ConversionStateContext = mock()
-        val state = GrantedPermission(
+        val state = PermissionGranted(
             stateContext,
             source,
             match = source,
@@ -74,7 +74,7 @@ class GrantedPermissionTest {
             maxAttempts,
         )
         assertEquals(
-            GrantedPermissionWebViewInput(
+            PermissionGrantedWebViewInput(
                 stateContext,
                 source,
                 match = source,

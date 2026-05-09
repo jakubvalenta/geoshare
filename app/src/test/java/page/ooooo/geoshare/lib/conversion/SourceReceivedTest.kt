@@ -10,7 +10,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.inputs.GeoUriInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsUriInput
 
-class ReceivedSourceDataTest {
+class SourceReceivedTest {
     private val resources: Resources = mock {
         on { getString(R.string.conversion_failed_missing_url) } doReturn "Missing URL"
         on { getString(R.string.conversion_failed_unsupported_service) } doReturn "Unsupported map service"
@@ -23,7 +23,7 @@ class ReceivedSourceDataTest {
     @Test
     fun transition_whenSourceIsEmpty_returnsConversionFailed() = runTest {
         val source = ""
-        val state = ReceivedSourceData(stateContext, "")
+        val state = SourceReceived(stateContext, "")
         assertEquals(
             ConversionFailed(resources.getString(R.string.conversion_failed_missing_url), source),
             state.transition(),
@@ -31,32 +31,32 @@ class ReceivedSourceDataTest {
     }
 
     @Test
-    fun transition_whenSourceIsGeoUri_returnsFoundInput() = runTest {
+    fun transition_whenSourceIsGeoUri_returnsInputFound() = runTest {
         val source = "geo:1,2?q="
-        val state = ReceivedSourceData(stateContext, source)
+        val state = SourceReceived(stateContext, source)
         assertEquals(
-            FoundInput(stateContext, source, match = source, GeoUriInput, permission = null),
+            InputFound(stateContext, source, match = source, GeoUriInput, permission = null),
             state.transition(),
         )
     }
 
     @Test
-    fun transition_whenSourceHasUriInTheMiddle_returnsFoundInput() = runTest {
+    fun transition_whenSourceHasUriInTheMiddle_returnsInputFound() = runTest {
         val source = "FOO\nhttps://maps.google.com/foo\nBAR"
         val match = "https://maps.google.com/foo"
-        val state = ReceivedSourceData(stateContext, source)
+        val state = SourceReceived(stateContext, source)
         assertEquals(
-            FoundInput(stateContext, source, match, GoogleMapsUriInput, permission = null),
+            InputFound(stateContext, source, match, GoogleMapsUriInput, permission = null),
             state.transition(),
         )
     }
 
     @Test
-    fun transition_whenSourceMatchesAnInput_returnsFoundInput() = runTest {
+    fun transition_whenSourceMatchesAnInput_returnsInputFound() = runTest {
         val source = "https://maps.google.com/foo"
-        val state = ReceivedSourceData(stateContext, source)
+        val state = SourceReceived(stateContext, source)
         assertEquals(
-            FoundInput(stateContext, source, match = source, GoogleMapsUriInput, permission = null),
+            InputFound(stateContext, source, match = source, GoogleMapsUriInput, permission = null),
             state.transition(),
         )
     }
@@ -64,7 +64,7 @@ class ReceivedSourceDataTest {
     @Test
     fun transition_whenSourceDoesNotMatchAnyInput_returnsConversionFailed() = runTest {
         val source = "https://maps.example.com/foo"
-        val state = ReceivedSourceData(stateContext, source)
+        val state = SourceReceived(stateContext, source)
         assertEquals(
             ConversionFailed(resources.getString(R.string.conversion_failed_unsupported_service), source),
             state.transition(),
