@@ -94,8 +94,8 @@ object GoogleMapsHtmlInput : BodyAsChannelInput {
                 if (defaultNaivePoint != null) {
                     mutableNaivePoints.add(defaultNaivePoint)
                 } else if (redirectUriString != null) {
-                    nextMatch = redirectUriString
-                    nextInput = GoogleMapsWebViewInput
+                    nextMatch = redirectUriString // TODO Make it an absolute URL
+                    nextInput = GoogleMapsUriInput
                 } else {
                     // Go to web parsing
                     nextInput = GoogleMapsWebViewInput

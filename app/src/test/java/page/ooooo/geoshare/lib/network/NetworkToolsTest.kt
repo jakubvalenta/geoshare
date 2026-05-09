@@ -38,13 +38,7 @@ class NetworkToolsTest {
         runTest {
             val url = URL("https://example.com/")
             val responseHeaders = headersOf(HttpHeaders.Location, "https://example.com/redirect")
-            val mockEngine = MockEngine.Companion {
-                respond(
-                    "",
-                    HttpStatusCode.Companion.MovedPermanently,
-                    responseHeaders
-                )
-            }
+            val mockEngine = MockEngine { respond("", HttpStatusCode.MovedPermanently, responseHeaders) }
             val mockNetworkTools = spy(NetworkTools(mockEngine, log = FakeLog))
             Assert.assertEquals(
                 "https://example.com/redirect",
@@ -56,7 +50,7 @@ class NetworkToolsTest {
             verify(mockNetworkTools).connect(
                 engine = eq(mockEngine),
                 url = eq(url),
-                method = eq(HttpMethod.Companion.Head),
+                method = eq(HttpMethod.Head),
                 followRedirects = eq(false),
                 lastAttempt = eq(null),
                 maxAttempts = eq(1),
@@ -68,8 +62,7 @@ class NetworkToolsTest {
     fun httpHeadLocationHeader_requestReturns301WithoutLocationHeader_callsConnectAndReturnsNull() =
         runTest {
             val url = URL("https://example.com/")
-            val mockEngine =
-                MockEngine.Companion { respond("", HttpStatusCode.Companion.MovedPermanently) }
+            val mockEngine = MockEngine { respond("", HttpStatusCode.MovedPermanently) }
             val mockNetworkTools = spy(NetworkTools(mockEngine, log = FakeLog))
             Assert.assertNull(
                 mockNetworkTools.httpHeadLocationHeader(
@@ -80,7 +73,7 @@ class NetworkToolsTest {
             verify(mockNetworkTools).connect(
                 engine = eq(mockEngine),
                 url = eq(url),
-                method = eq(HttpMethod.Companion.Head),
+                method = eq(HttpMethod.Head),
                 followRedirects = eq(false),
                 lastAttempt = eq(null),
                 maxAttempts = eq(1),
@@ -92,7 +85,7 @@ class NetworkToolsTest {
     fun httpGetBodyAsByteReadChannel_requestReturns200_callsConnectAndReturnsResponseBody() =
         runTest {
             val url = URL("https://example.com/")
-            val mockEngine = MockEngine.Companion { respond("test content") }
+            val mockEngine = MockEngine { respond("test content") }
             val mockNetworkTools = spy(NetworkTools(mockEngine, log = FakeLog))
             val text = mockNetworkTools.httpGetBodyAsByteReadChannel(
                 url,
@@ -104,7 +97,7 @@ class NetworkToolsTest {
             verify(mockNetworkTools).connect(
                 engine = eq(mockEngine),
                 url = eq(url),
-                method = eq(HttpMethod.Companion.Get),
+                method = eq(HttpMethod.Get),
                 followRedirects = eq(true),
                 lastAttempt = eq(null),
                 maxAttempts = eq(1),
@@ -115,7 +108,7 @@ class NetworkToolsTest {
     @Test
     fun httpGetRedirectUrlString_requestReturns200_callsConnectAndReturnsRequestUrl() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine.Companion { respond("") }
+        val mockEngine = MockEngine { respond("") }
         val mockNetworkTools = spy(NetworkTools(mockEngine, log = FakeLog))
         Assert.assertEquals(
             "https://example.com/",
@@ -127,7 +120,7 @@ class NetworkToolsTest {
         verify(mockNetworkTools).connect(
             engine = eq(mockEngine),
             url = eq(url),
-            method = eq(HttpMethod.Companion.Get),
+            method = eq(HttpMethod.Get),
             followRedirects = eq(true),
             lastAttempt = eq(null),
             maxAttempts = eq(1),
@@ -138,7 +131,7 @@ class NetworkToolsTest {
     @Test
     fun connect_methodIsDefault_makesRequestWithMethodGet() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine.Companion { respond("test content") }
+        val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
         Assert.assertEquals(
             "test content",
@@ -148,47 +141,47 @@ class NetworkToolsTest {
             ) { response -> response.body<String>() }
         )
         val lastRequest = mockEngine.requestHistory.last()
-        Assert.assertEquals(HttpMethod.Companion.Get, lastRequest.method)
+        Assert.assertEquals(HttpMethod.Get, lastRequest.method)
     }
 
     @Test
     fun connect_methodIsGet_makesRequestWithMethodGet() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine.Companion { respond("test content") }
+        val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
         Assert.assertEquals(
             "test content",
             mockNetworkTools.connect(
                 mockEngine,
                 url,
-                method = HttpMethod.Companion.Get,
+                method = HttpMethod.Get,
             ) { response -> response.body<String>() }
         )
         val lastRequest = mockEngine.requestHistory.last()
-        Assert.assertEquals(HttpMethod.Companion.Get, lastRequest.method)
+        Assert.assertEquals(HttpMethod.Get, lastRequest.method)
     }
 
     @Test
     fun connect_methodIsHead_makesRequestWithMethodHead() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine.Companion { respond("test content") }
+        val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
         Assert.assertEquals(
             "test content",
             mockNetworkTools.connect(
                 mockEngine,
                 url,
-                method = HttpMethod.Companion.Head,
+                method = HttpMethod.Head,
             ) { response -> response.body<String>() }
         )
         val lastRequest = mockEngine.requestHistory.last()
-        Assert.assertEquals(HttpMethod.Companion.Head, lastRequest.method)
+        Assert.assertEquals(HttpMethod.Head, lastRequest.method)
     }
 
     @Test
     fun connect_followRedirectsIsDefault_makesRequestWithFollowRedirectsTrue() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine.Companion { respond("test content") }
+        val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
         Assert.assertEquals(
             "test content",
@@ -203,7 +196,7 @@ class NetworkToolsTest {
     @Test
     fun connect_followRedirectsIsTrue_makesRequestWithFollowRedirectsTrue() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine.Companion { respond("test content") }
+        val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
         Assert.assertEquals(
             "test content",
@@ -222,7 +215,7 @@ class NetworkToolsTest {
     @Test
     fun connect_followRedirectsIsFalse_makesRequestWithFollowRedirectsFalse() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine.Companion { respond("test content") }
+        val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
         Assert.assertEquals(
             "test content",
@@ -241,7 +234,7 @@ class NetworkToolsTest {
     @Test
     fun connect_lastAttemptIsNull_doesNotWait() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine.Companion { respond("test content") }
+        val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
         val workDuration = testScheduler.timeSource.measureTime {
             Assert.assertEquals(
@@ -255,7 +248,7 @@ class NetworkToolsTest {
     @Test
     fun connect_lastAttemptNumberIsOne_doesNotWait() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine.Companion { respond("test content") }
+        val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
         val workDuration = testScheduler.timeSource.measureTime {
             Assert.assertEquals(
@@ -277,7 +270,7 @@ class NetworkToolsTest {
     @Test
     fun connect_lastAttemptNumberIsTwo_waits() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine.Companion { respond("test content") }
+        val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
         val workDuration = testScheduler.timeSource.measureTime {
             Assert.assertEquals(
@@ -299,7 +292,7 @@ class NetworkToolsTest {
     @Test
     fun connect_lastAttemptNumberIsThree_waits() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine.Companion { respond("test content") }
+        val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
         val workDuration = testScheduler.timeSource.measureTime {
             Assert.assertEquals(
@@ -321,7 +314,7 @@ class NetworkToolsTest {
     @Test
     fun connect_lastAttemptNumberIsFour_waits() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine.Companion { respond("test content") }
+        val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
         val workDuration = testScheduler.timeSource.measureTime {
             Assert.assertEquals(
@@ -343,7 +336,7 @@ class NetworkToolsTest {
     @Test
     fun connect_lastAttemptNumberIsMaxAttempts_waits() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine.Companion { respond("test content") }
+        val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
         val workDuration = testScheduler.timeSource.measureTime {
             Assert.assertEquals(
@@ -366,7 +359,7 @@ class NetworkToolsTest {
     fun connect_lastAttemptNumberIsGreaterThanMaxAttempts_doesNotWaitAndThrowsUnrecoverableException() =
         runTest {
             val url = URL("https://example.com/")
-            val mockEngine = MockEngine.Companion { respond("") }
+            val mockEngine = MockEngine { respond("") }
             val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
             val workDuration = testScheduler.timeSource.measureTime {
                 var threw: Exception? = null
@@ -398,8 +391,8 @@ class NetworkToolsTest {
     fun connect_requestReturns2xx_andFollowRedirectsIsDefault_returnsResponseIncludingLocationHeader() =
         runTest {
             val url = URL("https://example.com/")
-            for (status in listOf(HttpStatusCode.Companion.OK, HttpStatusCode.Companion.Created)) {
-                val mockEngine = MockEngine.Companion {
+            for (status in listOf(HttpStatusCode.OK, HttpStatusCode.Created)) {
+                val mockEngine = MockEngine {
                     respond(
                         content = "test content",
                         status = status,
@@ -424,8 +417,8 @@ class NetworkToolsTest {
     fun connect_requestReturns2xx_andFollowRedirectsIsFalse_returnsResponseIncludingLocationHeader() =
         runTest {
             val url = URL("https://example.com/")
-            for (status in listOf(HttpStatusCode.Companion.OK, HttpStatusCode.Companion.Created)) {
-                val mockEngine = MockEngine.Companion {
+            for (status in listOf(HttpStatusCode.OK, HttpStatusCode.Created)) {
+                val mockEngine = MockEngine {
                     respond(
                         content = "test content",
                         status = status,
@@ -452,10 +445,10 @@ class NetworkToolsTest {
         runTest {
             val url = URL("https://example.com/")
             for (status in listOf(
-                HttpStatusCode.Companion.MovedPermanently,
-                HttpStatusCode.Companion.Found
+                HttpStatusCode.MovedPermanently,
+                HttpStatusCode.Found
             )) {
-                val mockEngine = MockEngine.Companion { respond("test content", status) }
+                val mockEngine = MockEngine { respond("test content", status) }
                 val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
                 var threw: Exception? = null
                 try {
@@ -473,7 +466,7 @@ class NetworkToolsTest {
                 val lastRequest = mockEngine.requestHistory.last()
                 val clientConfig =
                     lastRequest.attributes[io.ktor.util.AttributeKey<HttpClientConfig<*>>("client-config")]
-                Assert.assertEquals(lastRequest.method, HttpMethod.Companion.Get)
+                Assert.assertEquals(lastRequest.method, HttpMethod.Get)
                 Assert.assertTrue(clientConfig.followRedirects)
             }
         }
@@ -483,10 +476,10 @@ class NetworkToolsTest {
         runTest {
             val url = URL("https://example.com/")
             for (status in listOf(
-                HttpStatusCode.Companion.MovedPermanently,
-                HttpStatusCode.Companion.Found
+                HttpStatusCode.MovedPermanently,
+                HttpStatusCode.Found
             )) {
-                val mockEngine = MockEngine.Companion {
+                val mockEngine = MockEngine {
                     respond(
                         content = "test content",
                         status = status,
@@ -512,11 +505,11 @@ class NetworkToolsTest {
     fun connect_requestReturns4xx_throwsUnrecoverableException() = runTest {
         val url = URL("https://example.com/")
         for (status in listOf(
-            HttpStatusCode.Companion.BadRequest,
-            HttpStatusCode.Companion.NotFound,
-            HttpStatusCode.Companion.TooManyRequests
+            HttpStatusCode.BadRequest,
+            HttpStatusCode.NotFound,
+            HttpStatusCode.TooManyRequests
         )) {
-            val mockEngine = MockEngine.Companion { respond("test content", status) }
+            val mockEngine = MockEngine { respond("test content", status) }
             val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
             var threw: Exception? = null
             try {
@@ -531,7 +524,7 @@ class NetworkToolsTest {
             val lastRequest = mockEngine.requestHistory.last()
             val clientConfig =
                 lastRequest.attributes[io.ktor.util.AttributeKey<HttpClientConfig<*>>("client-config")]
-            Assert.assertEquals(lastRequest.method, HttpMethod.Companion.Get)
+            Assert.assertEquals(lastRequest.method, HttpMethod.Get)
             Assert.assertTrue(clientConfig.followRedirects)
         }
     }
@@ -541,10 +534,10 @@ class NetworkToolsTest {
         val url = URL("https://example.com/")
 
         for (status in listOf(
-            HttpStatusCode.Companion.InternalServerError,
-            HttpStatusCode.Companion.BadGateway
+            HttpStatusCode.InternalServerError,
+            HttpStatusCode.BadGateway
         )) {
-            val mockEngine = MockEngine.Companion { respond("test content", status) }
+            val mockEngine = MockEngine { respond("test content", status) }
             val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
             var threw: Exception? = null
             try {
@@ -558,7 +551,7 @@ class NetworkToolsTest {
             val lastRequest = mockEngine.requestHistory.last()
             val clientConfig =
                 lastRequest.attributes[io.ktor.util.AttributeKey<HttpClientConfig<*>>("client-config")]
-            Assert.assertEquals(lastRequest.method, HttpMethod.Companion.Get)
+            Assert.assertEquals(lastRequest.method, HttpMethod.Get)
             Assert.assertTrue(clientConfig.followRedirects)
         }
     }
@@ -567,7 +560,7 @@ class NetworkToolsTest {
     fun connect_requestThrowsUnresolvedAddressException_throwsRecoverableException() = runTest {
         val url = URL("https://example.com/")
         val mockEngine =
-            MockEngine.Companion { throw io.ktor.util.network.UnresolvedAddressException() }
+            MockEngine { throw io.ktor.util.network.UnresolvedAddressException() }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
         var threw: Exception? = null
         try {
@@ -584,7 +577,7 @@ class NetworkToolsTest {
     fun connect_requestThrowsHttpRequestTimeoutException_throwsRecoverableException() = runTest {
         val url = URL("https://example.com/")
         val mockEngine =
-            MockEngine.Companion { request -> throw HttpRequestTimeoutException(request) }
+            MockEngine { request -> throw HttpRequestTimeoutException(request) }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
         var threw: Exception? = null
         try {
@@ -600,7 +593,7 @@ class NetworkToolsTest {
     @Test
     fun connect_requestThrowsSocketTimeoutException_throwsRecoverableException() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine.Companion { throw SocketTimeoutException() }
+        val mockEngine = MockEngine { throw SocketTimeoutException() }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
         var threw: Exception? = null
         try {
@@ -616,7 +609,7 @@ class NetworkToolsTest {
     @Test
     fun connect_requestThrowsConnectTimeoutException_throwsRecoverableException() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine.Companion { throw ConnectTimeoutException("Connect timeout") }
+        val mockEngine = MockEngine { throw ConnectTimeoutException("Connect timeout") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
         var threw: Exception? = null
         try {
@@ -632,7 +625,7 @@ class NetworkToolsTest {
     @Test
     fun connect_requestThrowsEOFException_throwsRecoverableException() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine.Companion { throw kotlinx.io.EOFException() }
+        val mockEngine = MockEngine { throw kotlinx.io.EOFException() }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
         var threw: Exception? = null
         try {
@@ -650,7 +643,7 @@ class NetworkToolsTest {
         class MyException(message: String) : Exception(message)
 
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine.Companion { throw MyException("Unknown exception") }
+        val mockEngine = MockEngine { throw MyException("Unknown exception") }
         val mockNetworkTools = NetworkTools(mockEngine, log = FakeLog)
         var threw: Exception? = null
         try {

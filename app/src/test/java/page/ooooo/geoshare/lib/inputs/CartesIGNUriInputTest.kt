@@ -8,68 +8,67 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-class CartesIGNInputTest : InputTest {
-    override val input = CartesIGNUriInput
+class CartesIGNUriInputTest : InputTest {
+    private val input = CartesIGNUriInput
 
     @Test
-    fun uriPattern_fullUrl() {
+    fun match_fullUrl() {
         assertEquals(
             "https://cartes-ign.ign.fr?lng=-11.123456&lat=50.123456&z=3.14",
-            getUri("https://cartes-ign.ign.fr?lng=-11.123456&lat=50.123456&z=3.14")
+            input.match("https://cartes-ign.ign.fr?lng=-11.123456&lat=50.123456&z=3.14")
         )
         assertEquals(
             "cartes-ign.ign.fr?lng=-11.123456&lat=50.123456&z=3.14",
-            getUri("cartes-ign.ign.fr?lng=-11.123456&lat=50.123456&z=3.14")
+            input.match("cartes-ign.ign.fr?lng=-11.123456&lat=50.123456&z=3.14")
         )
     }
 
     @Test
-    fun uriPattern_unknownHost() {
-        assertNull(getUri("https://www.example.com/?lng=-11.123456&lat=50.123456&z=3.14"))
+    fun match_unknownHost() {
+        assertNull(input.match("https://www.example.com/?lng=-11.123456&lat=50.123456&z=3.14"))
     }
 
     @Test
-    fun uriPattern_unknownScheme() {
+    fun match_unknownScheme() {
         assertEquals(
             "cartes-ign.ign.fr?lng=-11.123456&lat=50.123456&z=3.14",
-            getUri("ftp://cartes-ign.ign.fr?lng=-11.123456&lat=50.123456&z=3.14"),
+            input.match("ftp://cartes-ign.ign.fr?lng=-11.123456&lat=50.123456&z=3.14"),
         )
     }
 
     @Test
-    fun uriPattern_spaces() {
+    fun match_spaces() {
         assertEquals(
             "https://cartes-ign.ign.fr?q=foobar",
-            getUri("https://cartes-ign.ign.fr?q=foobar ")
+            input.match("https://cartes-ign.ign.fr?q=foobar ")
         )
         assertEquals(
             "https://cartes-ign.ign.fr?q=foo bar",
-            getUri("https://cartes-ign.ign.fr?q=foo bar ")
+            input.match("https://cartes-ign.ign.fr?q=foo bar ")
         )
         assertEquals(
             "https://cartes-ign.ign.fr?q=foo",
-            getUri("https://cartes-ign.ign.fr?q=foo  bar")
+            input.match("https://cartes-ign.ign.fr?q=foo  bar")
         )
         assertEquals(
             "https://cartes-ign.ign.fr?q=foo",
-            getUri("https://cartes-ign.ign.fr?q=foo\tbar")
+            input.match("https://cartes-ign.ign.fr?q=foo\tbar")
         )
     }
 
     @Test
-    fun parseUri_unknownPathOrParams() = runTest {
-        assertEquals(ParseUriResult(), parseUri("https://cartes-ign.ign.fr/"))
-        assertEquals(ParseUriResult(), parseUri("https://cartes-ign.ign.fr/?spam=1"))
+    fun parse_unknownPathOrParams() = runTest {
+        assertEquals(ParseResult(), input.parse("https://cartes-ign.ign.fr/"))
+        assertEquals(ParseResult(), input.parse("https://cartes-ign.ign.fr/?spam=1"))
     }
 
     @Test
-    fun parseUri_coordinates() = runTest {
+    fun parse_coordinates() = runTest {
         assertEquals(
-            ParseUriResult(
+            ParseResult(
                 persistentListOf(WGS84Point(50.123456, -11.123456, z = 3.14, source = Source.URI))
             ),
-            parseUri("https://cartes-ign.ign.fr?lng=-11.123456&lat=50.123456&z=3.14"),
+            input.parse("https://cartes-ign.ign.fr?lng=-11.123456&lat=50.123456&z=3.14"),
         )
     }
-
 }

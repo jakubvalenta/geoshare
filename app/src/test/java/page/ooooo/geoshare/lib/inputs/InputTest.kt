@@ -1,30 +1,15 @@
 package page.ooooo.geoshare.lib.inputs
 
 import io.ktor.utils.io.jvm.javaio.toByteReadChannel
-import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.groupOrNull
 
 interface InputTest {
-    val input: Input
+    suspend fun UriInput.parse(uriString: String) =
+        this.parse(Uri.parse(uriString, uriQuote = FakeUriQuote), uriQuote = FakeUriQuote)
 
-    fun getUri(uriString: String): String? =
-        input.uriPattern.find(uriString)?.groupOrNull()
-
-    fun getShortUri(uriString: String): String? =
-        (input as ShortUriInput).shortUriPattern.find(uriString)?.value
-
-    suspend fun parseUri(uriString: String): ParseUriResult =
-        input.parseUri(Uri.parse(uriString, uriQuote = FakeUriQuote), uriQuote = FakeUriQuote)
-
-    suspend fun parseHtml(html: String, htmlUrlString: String = "https://example.com/"): ParseHtmlResult =
-        (input as BodyAsChannelInput).parseHtml(
-            htmlUrlString = htmlUrlString,
-            channel = html.byteInputStream().toByteReadChannel(),
-            pointsFromUri = persistentListOf(),
-            uriQuote = FakeUriQuote,
-            log = FakeLog,
-        )
+    suspend fun BodyAsChannelInput.parse(html: String, match: String = "https://example.com/") =
+        // TODO Use match
+        this.parse(html.byteInputStream().toByteReadChannel(), uriQuote = FakeUriQuote, log = FakeLog)
 }

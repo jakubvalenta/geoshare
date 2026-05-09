@@ -9,94 +9,78 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
 import page.ooooo.geoshare.lib.geo.Source
 
-class BaiduMapInputTest : InputTest {
-    override val input = BaiduMapShortLinkInput
+class BaiduMapUriInputTest : InputTest {
+    private val input = BaiduMapUriInput
 
     @Test
-    fun uriPattern_fullUrl() {
+    fun match_fullUrl() {
         assertEquals(
             "https://map.baidu.com/@13520653,3317203,13z",
-            getUri("https://map.baidu.com/@13520653,3317203,13z")
+            input.match("https://map.baidu.com/@13520653,3317203,13z")
         )
         assertEquals(
             @Suppress("SpellCheckingInspection") "https://map.baidu.com/poi/%E9%BB%84%E5%B2%A9%E5%AE%A2%E8%BF%90%E4%B8%AD%E5%BF%83/@13502918.375,3315902.2199999997,16z?uid=fef3b5922f87e66c63180999&info_merge=1&isBizPoi=false&ugc_type=3&ugc_ver=1&device_ratio=2&compat=1&routetype=drive&en_uid=fef3b5922f87e66c63180999&pcevaname=pc4.1&querytype=detailConInfo&da_src=shareurl",
-            getUri(
+            input.match(
                 @Suppress("SpellCheckingInspection") "https://map.baidu.com/poi/%E9%BB%84%E5%B2%A9%E5%AE%A2%E8%BF%90%E4%B8%AD%E5%BF%83/@13502918.375,3315902.2199999997,16z?uid=fef3b5922f87e66c63180999&info_merge=1&isBizPoi=false&ugc_type=3&ugc_ver=1&device_ratio=2&compat=1&routetype=drive&en_uid=fef3b5922f87e66c63180999&pcevaname=pc4.1&querytype=detailConInfo&da_src=shareurl"
             ),
         )
         assertEquals(
             @Suppress("SpellCheckingInspection") """https://map.baidu.com/dir/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E6%A2%85%E8%8A%B1%E6%9D%91%E8%A1%97%E9%81%93%E6%B3%B0%E5%85%B4%E7%9B%B4%E8%A1%9735%E5%8F%B7/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7/@12614173.165,2630534.5250000004,16z?querytype=nav&c=257&sn=1$$$$12613508.26,2629184.09$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF$$0$$$$&en=1$$$$12614727.164999995,2631131.0213408465$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E6%A2%85%E8%8A%B1%E6%9D%91%E8%A1%97%E9%81%93%E6%B3%B0%E5%85%B4%E7%9B%B4%E8%A1%9735%E5%8F%B7$$0$$$$$$1$$%20to:1$$$$12611885.88,2631139.59$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7$$0$$$$&sc=257&ec=257+to:257&pn=0&rn=5&mrs=0&version=4&route_traffic=1&sy=0&da_src=shareurl""",
-            getUri(
+            input.match(
                 @Suppress("SpellCheckingInspection") """https://map.baidu.com/dir/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E6%A2%85%E8%8A%B1%E6%9D%91%E8%A1%97%E9%81%93%E6%B3%B0%E5%85%B4%E7%9B%B4%E8%A1%9735%E5%8F%B7/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7/@12614173.165,2630534.5250000004,16z?querytype=nav&c=257&sn=1$$$$12613508.26,2629184.09$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF$$0$$$$&en=1$$$$12614727.164999995,2631131.0213408465$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E6%A2%85%E8%8A%B1%E6%9D%91%E8%A1%97%E9%81%93%E6%B3%B0%E5%85%B4%E7%9B%B4%E8%A1%9735%E5%8F%B7$$0$$$$$$1$$%20to:1$$$$12611885.88,2631139.59$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7$$0$$$$&sc=257&ec=257+to:257&pn=0&rn=5&mrs=0&version=4&route_traffic=1&sy=0&da_src=shareurl"""
             ),
         )
         assertEquals(
             "https://map.baidu.com/?shareurl=1&poiShareUid=fef3b5922f87e66c63180999",
-            getUri("https://map.baidu.com/?shareurl=1&poiShareUid=fef3b5922f87e66c63180999")
+            input.match("https://map.baidu.com/?shareurl=1&poiShareUid=fef3b5922f87e66c63180999")
         )
     }
 
     @Test
-    fun uriPattern_shortUrl() {
-        assertEquals("https://j.map.baidu.com/0f/tbWk", getUri("https://j.map.baidu.com/0f/tbWk"))
+    fun match_unknownHost() {
+        assertNull(input.match("https://www.example.com/@13520653,3317203,13z"))
     }
 
     @Test
-    fun uriPattern_unknownHost() {
-        assertNull(getUri("https://www.example.com/@13520653,3317203,13z"))
-    }
-
-    @Test
-    fun uriPattern_unknownScheme() {
+    fun match_unknownScheme() {
         assertEquals(
             "map.baidu.com/@13520653,3317203,13z",
-            getUri("ftp://map.baidu.com/@13520653,3317203,13z"),
+            input.match("ftp://map.baidu.com/@13520653,3317203,13z"),
         )
     }
 
     @Test
-    fun uriPattern_matchesShortLinkInText() {
-        assertEquals(
-            "https://j.map.baidu.com/64/lqEk",
-            getUri(
-                uriString = "这里是地图上的点：江苏省苏州市吴中区金庭镇移影桥\n" +
-                    "查看详情>>https://j.map.baidu.com/64/lqEk  #百度地图#"
-            ),
-        )
-    }
-
-    @Test
-    fun uriPattern_spaces() {
+    fun match_spaces() {
         assertEquals(
             "https://map.baidu.com/?q=foobar",
-            getUri("https://map.baidu.com/?q=foobar ")
+            input.match("https://map.baidu.com/?q=foobar ")
         )
         assertEquals(
             "https://map.baidu.com/?q=foo bar",
-            getUri("https://map.baidu.com/?q=foo bar ")
+            input.match("https://map.baidu.com/?q=foo bar ")
         )
         assertEquals(
             "https://map.baidu.com/?q=foo",
-            getUri("https://map.baidu.com/?q=foo  bar")
+            input.match("https://map.baidu.com/?q=foo  bar")
         )
         assertEquals(
             "https://map.baidu.com/?q=foo",
-            getUri("https://map.baidu.com/?q=foo\tbar")
+            input.match("https://map.baidu.com/?q=foo\tbar")
         )
     }
 
     @Test
-    fun parseUri_center() = runTest {
+    fun parse_center() = runTest {
         assertEquals(
-            ParseUriResult(persistentListOf(BD09MCPoint(3317203.0, 13520653.0, 13.0, source = Source.MAP_CENTER))),
-            parseUri("https://map.baidu.com/@13520653,3317203,13z"),
+            ParseResult(persistentListOf(BD09MCPoint(3317203.0, 13520653.0, 13.0, source = Source.MAP_CENTER))),
+            input.parse("https://map.baidu.com/@13520653,3317203,13z"),
         )
     }
 
     @Test
-    fun parseUri_coordinates() = runTest {
+    fun parse_coordinates() = runTest {
         assertEquals(
-            ParseUriResult(
+            ParseResult(
                 persistentListOf(
                     BD09MCPoint(
                         3619117.0, 13392211.0,
@@ -106,14 +90,14 @@ class BaiduMapInputTest : InputTest {
                     )
                 )
             ),
-            parseUri(@Suppress("SpellCheckingInspection") "https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13392211,3619117,17z?querytype=share&poiShareId=p8cdf0522067cf66173901fc9e4&da_src=shareurl"),
+            input.parse(@Suppress("SpellCheckingInspection") "https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13392211,3619117,17z?querytype=share&poiShareId=p8cdf0522067cf66173901fc9e4&da_src=shareurl"),
         )
     }
 
     @Test
-    fun parseUri_poi() = runTest {
+    fun parse_poi() = runTest {
         assertEquals(
-            ParseUriResult(
+            ParseResult(
                 persistentListOf(
                     BD09MCPoint(
                         3315902.2199999997, 13502918.375,
@@ -123,68 +107,68 @@ class BaiduMapInputTest : InputTest {
                     )
                 )
             ),
-            parseUri(@Suppress("SpellCheckingInspection") "https://map.baidu.com/poi/%E9%BB%84%E5%B2%A9%E5%AE%A2%E8%BF%90%E4%B8%AD%E5%BF%83/@13502918.375,3315902.2199999997,16z?uid=fef3b5922f87e66c63180999&info_merge=1&isBizPoi=false&ugc_type=3&ugc_ver=1&device_ratio=2&compat=1&routetype=drive&en_uid=fef3b5922f87e66c63180999&pcevaname=pc4.1&querytype=detailConInfo&da_src=shareurl"),
+            input.parse(@Suppress("SpellCheckingInspection") "https://map.baidu.com/poi/%E9%BB%84%E5%B2%A9%E5%AE%A2%E8%BF%90%E4%B8%AD%E5%BF%83/@13502918.375,3315902.2199999997,16z?uid=fef3b5922f87e66c63180999&info_merge=1&isBizPoi=false&ugc_type=3&ugc_ver=1&device_ratio=2&compat=1&routetype=drive&en_uid=fef3b5922f87e66c63180999&pcevaname=pc4.1&querytype=detailConInfo&da_src=shareurl"),
         )
     }
 
     @Test
-    fun parseUri_sharedCoordinates() = runTest {
+    fun parse_sharedCoordinates() = runTest {
         assertEquals(
-            ParseUriResult(
+            ParseResult(
                 persistentListOf(),
-                webUriString = "https://map.baidu.com/?poiShareId=p8cdf0522067cf66173901fc9e4",
+                nextInput = BaiduMapWebViewInput,
             ),
-            parseUri("https://map.baidu.com/?poiShareId=p8cdf0522067cf66173901fc9e4"),
+            input.parse("https://map.baidu.com/?poiShareId=p8cdf0522067cf66173901fc9e4"),
         )
     }
 
     @Test
-    fun parseUri_sharedPOIParamS_returnsSupportsWebParsing() = runTest {
+    fun parse_sharedPOIParamS_returnsSupportsWebParsing() = runTest {
         assertEquals(
-            ParseUriResult(
+            ParseResult(
                 persistentListOf(),
-                webUriString = "https://map.baidu.com/?newmap=1&s=inf%26uid%3D2c2bd9487c142391100daa62&sharecallbackflag=poiDetailPage",
+                nextInput = BaiduMapWebViewInput,
             ),
-            parseUri("https://map.baidu.com/?newmap=1&s=inf%26uid%3D2c2bd9487c142391100daa62&sharecallbackflag=poiDetailPage"),
+            input.parse("https://map.baidu.com/?newmap=1&s=inf%26uid%3D2c2bd9487c142391100daa62&sharecallbackflag=poiDetailPage"),
         )
     }
 
     @Test
-    fun parseUri_sharedPOIParamUid_returnsSupportsWebParsing() = runTest {
+    fun parse_sharedPOIParamUid_returnsSupportsWebParsing() = runTest {
         assertEquals(
-            ParseUriResult(
+            ParseResult(
                 persistentListOf(),
-                webUriString = "https://map.baidu.com/?shareurl=1&poiShareUid=fef3b5922f87e66c63180999",
+                nextInput = BaiduMapWebViewInput,
             ),
-            parseUri("https://map.baidu.com/?shareurl=1&poiShareUid=fef3b5922f87e66c63180999"),
+            input.parse("https://map.baidu.com/?shareurl=1&poiShareUid=fef3b5922f87e66c63180999"),
         )
     }
 
     @Test
-    fun parseUri_mobilePlaceDetailWithoutCoords_returnsSupportsWebParsing() = runTest {
+    fun parse_mobilePlaceDetailWithoutCoords_returnsSupportsWebParsing() = runTest {
         assertEquals(
-            ParseUriResult(
+            ParseResult(
                 persistentListOf(),
-                webUriString = "https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=p8cdf0522067cf66173901fc9e4/act=read_share&vt=map&da_from=weixin&openna=1"
+                nextInput = BaiduMapWebViewInput,
             ),
-            parseUri("https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=p8cdf0522067cf66173901fc9e4/act=read_share&vt=map&da_from=weixin&openna=1")
+            input.parse("https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=p8cdf0522067cf66173901fc9e4/act=read_share&vt=map&da_from=weixin&openna=1")
         )
     }
 
     @Test
-    fun parseUri_mobilePlaceDetailWithCoords_returnsSucceeded() = runTest {
+    fun parse_mobilePlaceDetailWithCoords_returnsSucceeded() = runTest {
         assertEquals(
-            ParseUriResult(
+            ParseResult(
                 persistentListOf(BD09MCPoint(3619117.0, 13392211.0, source = Source.URI))
             ),
-            parseUri("https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=p8cdf0522067cf66173901fc9e4/act=read_share&vt=map&da_from=weixin&openna=1&sharegeo=13392211%2C3619117")
+            input.parse("https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=p8cdf0522067cf66173901fc9e4/act=read_share&vt=map&da_from=weixin&openna=1&sharegeo=13392211%2C3619117")
         )
     }
 
     @Test
-    fun parseUri_directionsOnePointNoParams() = runTest {
+    fun parse_directionsOnePointNoParams() = runTest {
         assertEquals(
-            ParseUriResult(
+            ParseResult(
                 persistentListOf(
                     BD09MCPoint(
                         name = "广东省广州市越秀区大塘街道中山三路东昌大街2号",
@@ -192,16 +176,16 @@ class BaiduMapInputTest : InputTest {
                     )
                 ),
             ),
-            parseUri(
+            input.parse(
                 "https://map.baidu.com/dir/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7/@12614173.165,2630534.5250000004,16z"
             ),
         )
     }
 
     @Test
-    fun parseUri_directionsTwoPoints() = runTest {
+    fun parse_directionsTwoPoints() = runTest {
         assertEquals(
-            ParseUriResult(
+            ParseResult(
                 persistentListOf(
                     BD09MCPoint(
                         2629182.88, 12613508.26,
@@ -215,31 +199,31 @@ class BaiduMapInputTest : InputTest {
                     ),
                 ),
             ),
-            parseUri(
+            input.parse(
                 @Suppress("SpellCheckingInspection") "https://map.baidu.com/dir/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7/@12614173.165,2630534.5250000004,16z?querytype=nav&navtp=2&c=257&drag=1&sc=257&ec=257&sy=0&sn=1$$$$12613508.26,2629182.88$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF$$$$$$12613508.26,2629182.88$$&en=1$$$$12611885.88,2631139.59$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7$$$$$$12611885.88,2631139.59$$&version=4&mrs=1&route_traffic=1&da_src=shareurl"
             ),
         )
     }
 
     @Test
-    fun parseUri_directionsTwoPointsNoParams() = runTest {
+    fun parse_directionsTwoPointsNoParams() = runTest {
         assertEquals(
-            ParseUriResult(
+            ParseResult(
                 persistentListOf(
                     BD09MCPoint(name = "广东省广州市越秀区白云街道烟雨路", source = Source.URI),
                     BD09MCPoint(name = "广东省广州市越秀区大塘街道中山三路东昌大街2号", source = Source.URI),
                 ),
             ),
-            parseUri(
+            input.parse(
                 "https://map.baidu.com/dir/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7/@12614173.165,2630534.5250000004,16z"
             ),
         )
     }
 
     @Test
-    fun parseUri_directionsThreePoints() = runTest {
+    fun parse_directionsThreePoints() = runTest {
         assertEquals(
-            ParseUriResult(
+            ParseResult(
                 persistentListOf(
                     BD09MCPoint(
                         2629184.09, 12613508.26,
@@ -258,32 +242,32 @@ class BaiduMapInputTest : InputTest {
                     ),
                 )
             ),
-            parseUri(
+            input.parse(
                 @Suppress("SpellCheckingInspection") "https://map.baidu.com/dir/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E6%A2%85%E8%8A%B1%E6%9D%91%E8%A1%97%E9%81%93%E6%B3%B0%E5%85%B4%E7%9B%B4%E8%A1%9735%E5%8F%B7/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7/@12614173.165,2630534.5250000004,16z?querytype=nav&c=257&sn=1$$$$12613508.26,2629184.09$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF$$0$$$$&en=1$$$$12614727.164999995,2631131.0213408465$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E6%A2%85%E8%8A%B1%E6%9D%91%E8%A1%97%E9%81%93%E6%B3%B0%E5%85%B4%E7%9B%B4%E8%A1%9735%E5%8F%B7$$0$$$$$$1$$%20to:1$$$$12611885.88,2631139.59$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7$$0$$$$&sc=257&ec=257+to:257&pn=0&rn=5&mrs=0&version=4&route_traffic=1&sy=0&da_src=shareurl"
             ),
         )
     }
 
     @Test
-    fun parseUri_directionsThreePointsNoParams() = runTest {
+    fun parse_directionsThreePointsNoParams() = runTest {
         assertEquals(
-            ParseUriResult(
+            ParseResult(
                 persistentListOf(
                     BD09MCPoint(name = "广东省广州市越秀区白云街道烟雨路", source = Source.URI),
                     BD09MCPoint(name = "广东省广州市越秀区梅花村街道泰兴直街35号", source = Source.URI),
                     BD09MCPoint(name = "广东省广州市越秀区大塘街道中山三路东昌大街2号", source = Source.URI),
                 )
             ),
-            parseUri(
+            input.parse(
                 "https://map.baidu.com/dir/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E6%A2%85%E8%8A%B1%E6%9D%91%E8%A1%97%E9%81%93%E6%B3%B0%E5%85%B4%E7%9B%B4%E8%A1%9735%E5%8F%B7/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7/@12614173.165,2630534.5250000004,16z"
             ),
         )
     }
 
     @Test
-    fun parseUri_directionsFourPoints() = runTest {
+    fun parse_directionsFourPoints() = runTest {
         assertEquals(
-            ParseUriResult(
+            ParseResult(
                 persistentListOf(
                     BD09MCPoint(
                         2629182.88, 12613508.26,
@@ -307,16 +291,16 @@ class BaiduMapInputTest : InputTest {
                     ),
                 )
             ),
-            parseUri(
+            input.parse(
                 @Suppress("SpellCheckingInspection") "https://map.baidu.com/dir/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E6%A2%85%E8%8A%B1%E6%9D%91%E8%A1%97%E9%81%93%E6%B3%B0%E5%85%B4%E7%9B%B4%E8%A1%9735%E5%8F%B7/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E9%BB%84%E8%8A%B1%E5%B2%97%E8%A1%97%E9%81%93%E6%B0%B8%E7%A6%8F%E8%B7%AF36%E5%8F%B7DE%E5%BA%A7/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7/@12612741.165,2631232.5250000004,16z?querytype=nav&c=257&sn=1$$$$12613508.26,2629182.88$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF$$0$$$$&en=1$$$$12614727.164999995,2631131.0213408465$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E6%A2%85%E8%8A%B1%E6%9D%91%E8%A1%97%E9%81%93%E6%B3%B0%E5%85%B4%E7%9B%B4%E8%A1%9735%E5%8F%B7$$0$$$$$$1$$%20to:1$$$$12613424.449999997,2633524.681382545$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E9%BB%84%E8%8A%B1%E5%B2%97%E8%A1%97%E9%81%93%E6%B0%B8%E7%A6%8F%E8%B7%AF36%E5%8F%B7DE%E5%BA%A7$$0$$$$$$1$$%20to:1$$$$12611885.88,2631139.59$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7$$0$$$$&sc=257&ec=257+to:257+to:257&pn=0&rn=5&mrs=0&version=4&route_traffic=1&sy=0&da_src=shareurl"
             ),
         )
     }
 
     @Test
-    fun parseUri_directionsFourPointsNoParams() = runTest {
+    fun parse_directionsFourPointsNoParams() = runTest {
         assertEquals(
-            ParseUriResult(
+            ParseResult(
                 persistentListOf(
                     BD09MCPoint(name = "广东省广州市越秀区白云街道烟雨路", source = Source.URI),
                     BD09MCPoint(name = "广东省广州市越秀区梅花村街道泰兴直街35号", source = Source.URI),
@@ -324,18 +308,18 @@ class BaiduMapInputTest : InputTest {
                     BD09MCPoint(name = "广东省广州市越秀区大塘街道中山三路东昌大街2号", source = Source.URI),
                 )
             ),
-            parseUri(
+            input.parse(
                 "https://map.baidu.com/dir/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E6%A2%85%E8%8A%B1%E6%9D%91%E8%A1%97%E9%81%93%E6%B3%B0%E5%85%B4%E7%9B%B4%E8%A1%9735%E5%8F%B7/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E9%BB%84%E8%8A%B1%E5%B2%97%E8%A1%97%E9%81%93%E6%B0%B8%E7%A6%8F%E8%B7%AF36%E5%8F%B7DE%E5%BA%A7/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7/@12612741.165,2631232.5250000004,16z"
             ),
         )
     }
 
     @Test
-    fun parseUri_search() = runTest {
+    fun parse_search() = runTest {
         // TODO Add support for Baidu Map search URLs
         assumeTrue(false)
         assertEquals(
-            ParseUriResult(
+            ParseResult(
                 persistentListOf(
                     BD09MCPoint(
                         4047017.0, 14571495.0,
@@ -345,7 +329,7 @@ class BaiduMapInputTest : InputTest {
                     ),
                 )
             ),
-            parseUri(
+            input.parse(
                 @Suppress("SpellCheckingInspection") "https://map.baidu.com/search/%E5%8C%BB%E9%99%A2/@14571400,4047000,16z?querytype=nb&ar=(14570495%2C4046017%3B14572495%2C4048017)&wd=%E5%8C%BB%E9%99%A2&c=26046&bdtp=0&nb_x=14571495&nb_y=4047017&userSign=0&b=(14566383%2C4044357%3B14576607%2C4049677)&l=16&pn=0&gr_radius=1000&r=1000&from=webmap&device_ratio=1&da_src=shareurl"
             ),
         )

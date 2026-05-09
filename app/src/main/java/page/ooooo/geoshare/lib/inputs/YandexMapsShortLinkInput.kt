@@ -14,7 +14,7 @@ object YandexMapsShortLinkInput : HeadLocationHeaderInput {
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_yandex_maps_loading_indicator_title
 
-    override val pattern = Regex("""(?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/maps/-/\S+""")
+    override val pattern = Regex("""((?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/maps/-/\S+)""")
 
     override suspend fun parse(data: Uri, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
         nextInput = YandexMapsUriInput

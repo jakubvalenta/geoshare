@@ -8,7 +8,7 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Points
 
 object MapyComShortLinkInput : GetRedirectUrlInput {
-    override val pattern = Regex("""(?:https?://)?(?:www\.)?mapy\.[a-z]{2,3}/s/\S+""")
+    override val pattern = Regex("""((?:https?://)?(?:www\.)?mapy\.[a-z]{2,3}/s/\S+)""")
 
     @StringRes
     override val permissionTitleResId = R.string.converter_mapy_com_permission_title

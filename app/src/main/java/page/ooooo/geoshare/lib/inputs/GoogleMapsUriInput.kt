@@ -39,9 +39,9 @@ object GoogleMapsUriInput : UriInput, Input.HasRandomUri {
     )
 
     override suspend fun parse(data: Uri, prevPoints: Points?, uriQuote: UriQuote, log: ILog) = buildParseResult {
-        data.run {
-            val mutableNaivePoints = mutableListOf<NaivePoint>()
+        val mutableNaivePoints = mutableListOf<NaivePoint>()
 
+        data.run {
             val z = Z_PATTERN.matchEntire(queryParams["zoom"])?.doubleGroupOrNull()
 
             // API directions
@@ -179,9 +179,9 @@ object GoogleMapsUriInput : UriInput, Input.HasRandomUri {
                 // Go to HTML parsing if needed
                 nextInput = GoogleMapsHtmlInput
             }
-
-            points = mutableNaivePoints.map { GCJ02MainlandChinaPoint(it) }.toImmutableList()
         }
+
+        points = mutableNaivePoints.map { GCJ02MainlandChinaPoint(it) }.toImmutableList()
     }
 
     override fun genRandomUri(point: Point) =

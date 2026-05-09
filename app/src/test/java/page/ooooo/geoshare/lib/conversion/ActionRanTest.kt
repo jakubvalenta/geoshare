@@ -1,45 +1,47 @@
 package page.ooooo.geoshare.lib.conversion
 
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.outputs.NoopAction
 
 class ActionRanTest {
     @Test
-    fun actionRan_successIsTrue_returnsActionSucceeded() = runTest {
-        val inputUriString = "https://maps.google.com/foo"
+    fun transition_whenSuccessIsTrue_returnsActionSucceeded() = runTest {
+        val source = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val action = NoopAction
-        val state = ActionRan(inputUriString, points, action, isAutomation = true, success = true)
+        val state = ActionRan(source, points, action, isAutomation = true, success = true)
         assertEquals(
-            ActionSucceeded(inputUriString, points, action, isAutomation = true),
+            ActionSucceeded(source, points, action, isAutomation = true),
             state.transition(),
         )
     }
 
     @Test
-    fun actionRan_successIsFalse_returnsActionFailed() = runTest {
-        val inputUriString = "https://maps.google.com/foo"
+    fun transition_whenSuccessIsFalse_returnsActionFailed() = runTest {
+        val source = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val action = NoopAction
-        val state = ActionRan(inputUriString, points, action, isAutomation = true, success = false)
+        val state = ActionRan(source, points, action, isAutomation = true, success = false)
         assertEquals(
-            ActionFailed(inputUriString, points, action, isAutomation = true),
+            ActionFailed(source, points, action, isAutomation = true),
             state.transition(),
         )
     }
 
     @Test
-    fun actionRan_successIsNull_returnsActionFinished() = runTest {
-        val inputUriString = "https://maps.google.com/foo"
+    fun transition_whenSuccessIsNull_returnsActionFinished() = runTest {
+        val source = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val action = NoopAction
-        val state = ActionRan(inputUriString, points, action, isAutomation = true, success = null)
+        val state = ActionRan(source, points, action, isAutomation = true, success = null)
         assertEquals(
-            ActionFinished(inputUriString, points, action, isAutomation = true),
+            ActionFinished(source, points, action, isAutomation = true),
             state.transition(),
         )
     }
-
 }

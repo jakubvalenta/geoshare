@@ -658,7 +658,7 @@ private fun MainScreen(
                     AnnotatedString.fromHtml(
                         stringResource(
                             R.string.conversion_permission_common_text,
-                            currentState.data.truncateMiddle(),
+                            currentState.match.truncateMiddle(),
                             appName,
                         )
                     ),

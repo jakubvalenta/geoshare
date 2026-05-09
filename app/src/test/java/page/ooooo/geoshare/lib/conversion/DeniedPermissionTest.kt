@@ -1,77 +1,32 @@
 package page.ooooo.geoshare.lib.conversion
 
+import android.content.res.Resources
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.inputs.GoogleMapsUriInput
 
 class DeniedPermissionTest {
+    private val resources: Resources = mock {
+        on { getString(R.string.conversion_failed_connection_permission_denied) } doReturn "This link is not supported without connecting to the map service"
+    }
+    private val stateContext: ConversionStateContext = mock {
+        on { resources } doReturn resources
+    }
+
     @Test
-    fun deniedConnectionPermission_returnsConversionFailed() = runTest {
+    fun transition_returnsConversionFailed() = runTest {
         val inputUriString = "https://maps.app.goo.gl/foo"
-        val stateContext = mockStateContext()
-        val state = DeniedConnectionPermission(stateContext, inputUriString, GoogleMapsUriInput)
+        val state = DeniedPermission(stateContext, inputUriString, GoogleMapsUriInput)
         assertEquals(
             ConversionFailed(
-                mockResources.getString(R.string.conversion_failed_connection_permission_denied),
+                resources.getString(R.string.conversion_failed_connection_permission_denied),
                 inputUriString
             ),
             state.transition(),
         )
     }
-
-    @Test
-    fun deniedParseHtmlPermission_lastPointHasCoords_returnsConversionSucceeded() = runTest {
-        val inputUriString = "https://maps.apple.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val stateContext = mockStateContext()
-        val state = DeniedParseHtmlPermission(stateContext, inputUriString, points)
-        assertEquals(
-            ConversionSucceeded(stateContext, inputUriString, points),
-            state.transition(),
-        )
-    }
-
-    @Test
-    fun deniedParseHtmlPermission_lastPointHasName_returnsConversionSucceeded() = runTest {
-        val inputUriString = "https://maps.apple.com/foo"
-        val points = persistentListOf(WGS84Point(name = "bar", source = Source.GENERATED))
-        val stateContext = mockStateContext()
-        val state = DeniedParseHtmlPermission(stateContext, inputUriString, points)
-        assertEquals(
-            ConversionSucceeded(stateContext, inputUriString, points),
-            state.transition(),
-        )
-    }
-
-    @Test
-    fun deniedParseHtmlPermission_lastPointIsEmpty_returnsConversionFailed() = runTest {
-        val inputUriString = "https://maps.apple.com/foo"
-        val points = persistentListOf(WGS84Point(source = Source.GENERATED))
-        val stateContext = mockStateContext()
-        val state = DeniedParseHtmlPermission(stateContext, inputUriString, points)
-        assertEquals(
-            ConversionFailed(
-                mockResources.getString(R.string.conversion_failed_connection_permission_denied),
-                inputUriString,
-            ),
-            state.transition(),
-        )
-    }
-
-    @Test
-    fun deniedParseHtmlPermission_pointsAreEmpty_returnsConversionFailed() = runTest {
-        val inputUriString = "https://maps.apple.com/foo"
-        val points = persistentListOf<WGS84Point>()
-        val stateContext = mockStateContext()
-        val state = DeniedParseHtmlPermission(stateContext, inputUriString, points)
-        assertEquals(
-            ConversionFailed(
-                mockResources.getString(R.string.conversion_failed_connection_permission_denied),
-                inputUriString,
-            ),
-            state.transition(),
-        )
-    }
-
 }

@@ -7,6 +7,7 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.network.NetworkTools
+import java.net.MalformedURLException
 
 interface TextInput : BasicInput<String> {
     val pattern: Regex
@@ -51,8 +52,9 @@ interface GetRedirectUrlInput : UriInput, Input.HasPermission {
         block: suspend (Uri) -> ParseResult,
     ): ParseResult {
         val uri = Uri.parse(match, uriQuote)
+        val url = uri.toUrl() ?: throw MalformedURLException()
         val unshortenedUrlString = networkTools.httpGetRedirectedUrlString(
-            uri.toUrl(), lastAttempt = lastAttempt, maxAttempts = maxAttempts
+            url, lastAttempt = lastAttempt, maxAttempts = maxAttempts
         )
         val unshortenedUri = Uri.parse(unshortenedUrlString, uriQuote).toAbsoluteUri(uri)
         log.i(TAG, "Resolved short URI $match to $unshortenedUri")
@@ -75,8 +77,9 @@ interface HeadLocationHeaderInput : UriInput, Input.HasPermission {
         block: suspend (Uri) -> ParseResult,
     ): ParseResult {
         val uri = Uri.parse(match, uriQuote)
+        val url = uri.toUrl() ?: throw MalformedURLException()
         val unshortenedUrlString = networkTools.httpHeadLocationHeader(
-            uri.toUrl(), lastAttempt = lastAttempt, maxAttempts = maxAttempts
+            url, lastAttempt = lastAttempt, maxAttempts = maxAttempts
         )
         val unshortenedUri = Uri.parse(unshortenedUrlString, uriQuote).toAbsoluteUri(uri)
         log.i(TAG, "Resolved short URI $match to $unshortenedUri")
@@ -99,9 +102,10 @@ interface BodyAsChannelInput : BasicInput<ByteReadChannel>, Input.HasPermission 
         block: suspend (ByteReadChannel) -> ParseResult,
     ): ParseResult {
         val uri = Uri.parse(match, uriQuote)
+        val url = uri.toUrl() ?: throw MalformedURLException()
         log.i(TAG, "Downloading $uri")
         return networkTools.httpGetBodyAsByteReadChannel(
-            uri.toUrl(), lastAttempt = lastAttempt, maxAttempts = maxAttempts, dispatcher = Dispatchers.Default, block,
+            url, lastAttempt = lastAttempt, maxAttempts = maxAttempts, dispatcher = Dispatchers.Default, block,
         )
     }
 
@@ -121,9 +125,15 @@ interface BodyAsTextInput : BasicInput<String>, Input.HasPermission {
         block: suspend (String) -> ParseResult,
     ): ParseResult {
         val uri = Uri.parse(match, uriQuote)
+        val url = uri.toUrl() ?: throw MalformedURLException()
+        log.i(TAG, "Downloading $uri")
         val text = networkTools.httpGetBodyAsText(
-            uri.toUrl(), lastAttempt = lastAttempt, maxAttempts = maxAttempts
+            url, lastAttempt = lastAttempt, maxAttempts = maxAttempts
         )
         return block(text)
+    }
+
+    private companion object {
+        private const val TAG = "BodyAsTextInput"
     }
 }

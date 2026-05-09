@@ -15,8 +15,7 @@ object BaiduMapShortLinkInput : HeadLocationHeaderInput {
             InputDocumentationItem.Url(35, "https://j.map.baidu.com"),
         ),
     )
-    override val pattern =
-        Regex("""(?:https?://)?j\.map\.baidu\.com/\S+""") // TODO Use URI_REST in all short link patterns
+    override val pattern = Regex("""((?:https?://)?j\.map\.baidu\.com/\S+)""")
 
     @StringRes
     override val permissionTitleResId = R.string.converter_baidu_map_permission_title

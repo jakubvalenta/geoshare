@@ -21,9 +21,9 @@ import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.inputs.GeoUriInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsUriInput
 import page.ooooo.geoshare.lib.inputs.Input
-import page.ooooo.geoshare.lib.network.MockNetworkTools
 import page.ooooo.geoshare.lib.network.NetworkTools
 
+// TODO Remove ConversionStateTest
 class ConversionStateTest {
 
     private val mockResources: Resources = mock {
@@ -77,7 +77,7 @@ class ConversionStateTest {
 
     private fun mockStateContext(
         inputs: List<Input<*>> = listOf(GeoUriInput, GoogleMapsUriInput),
-        networkTools: NetworkTools = MockNetworkTools(),
+        networkTools: NetworkTools = NetworkTools(),
         linkRepository: LinkRepository = this@ConversionStateTest.linkRepository,
         userPreferencesRepository: UserPreferencesRepository = this@ConversionStateTest.userPreferencesRepository,
         billing: Billing = mock {},

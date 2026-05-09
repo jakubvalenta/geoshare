@@ -79,6 +79,7 @@ interface ConversionState : State {
 
 class Initial : ConversionState
 
+// TODO Rename to SourceReceived
 data class ReceivedSourceData(
     val stateContext: ConversionStateContext,
     val source: String,
@@ -103,6 +104,7 @@ data class ReceivedSourceData(
     }
 }
 
+// TODO Rename to InputFound
 data class FoundInput<T>(
     val stateContext: ConversionStateContext,
     val source: String,
@@ -142,10 +144,11 @@ data class FoundInput<T>(
         }
 }
 
+// TODO Rename to PermissionRequested
 data class RequestedPermission<T>(
     val stateContext: ConversionStateContext,
     val source: String,
-    val data: String,
+    val match: String,
     val input: Input<T>,
     override val permissionTitleResId: Int,
     val loadingIndicatorTitleResId: Int,
@@ -154,7 +157,7 @@ data class RequestedPermission<T>(
         if (doNotAsk) {
             stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.ALWAYS)
         }
-        return GrantedPermission(stateContext, source, data, input, loadingIndicatorTitleResId, Permission.ALWAYS)
+        return GrantedPermission(stateContext, source, match, input, loadingIndicatorTitleResId, Permission.ALWAYS)
     }
 
     override suspend fun deny(doNotAsk: Boolean): State {
@@ -165,6 +168,7 @@ data class RequestedPermission<T>(
     }
 }
 
+// TODO Rename to PermissionGranted
 data class GrantedPermission<T>(
     val stateContext: ConversionStateContext,
     val source: String,
@@ -201,6 +205,7 @@ data class GrantedPermission<T>(
         }
 }
 
+// TODO Rename to PermissionGrantedBasicInput
 data class GrantedPermissionBasicInput<T>(
     val stateContext: ConversionStateContext,
     val source: String,
@@ -263,7 +268,7 @@ data class GrantedPermissionBasicInput<T>(
             description = lastAttempt?.let {
                 stateContext.resources.getString(
                     R.string.conversion_loading_indicator_description,
-                    it.number,
+                    it.number, // TODO Should this be it.number + 1?
                     maxAttempts,
                     it.cause.getMessage(stateContext.resources),
                 )
@@ -279,6 +284,7 @@ data class GrantedPermissionBasicInput<T>(
  * The [transition] function of this state will wait for [setData] to be called. If it's not called within [timeout], it
  * returns failure.
  */
+// TODO Rename to PermissionGrantedWebViewInput
 data class GrantedPermissionWebViewInput(
     val stateContext: ConversionStateContext,
     val source: String,
@@ -322,6 +328,7 @@ data class GrantedPermissionWebViewInput(
     }
 }
 
+// TODO Rename to PermissionDenied
 data class DeniedPermission<T>(
     val stateContext: ConversionStateContext,
     val source: String,
@@ -334,6 +341,7 @@ data class DeniedPermission<T>(
         )
 }
 
+// TODO Rename to DataParsed
 data class ParsedData(
     val stateContext: ConversionStateContext,
     val source: String,
@@ -360,14 +368,8 @@ data class ParsedData(
                     stateContext.resources.getString(R.string.conversion_failed_parse_url_error),
                     source,
                 )
-                // TODO Specific errors
-                // ConversionFailed(
-                //     stateContext.resources.getString(
-                //         R.string.conversion_failed_parse_html_error_with_reason,
-                //         stateContext.resources.getString(R.string.conversion_failed_reason_no_points),
-                //     ),
-                //     source,
-                // )
+                // TODO Use specific error R.string.conversion_failed_parse_html_error_with_reason with R.string.conversion_failed_reason_no_points
+                // TODO Use specific error R.string.conversion_failed_connection_permission_denied
             }
         }
 }

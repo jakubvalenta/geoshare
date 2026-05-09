@@ -8,45 +8,48 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-class GeoUriInputTest : InputTest {
-    override val input: Input = GeoUriInput
+class GeoUriUriInputTest : InputTest {
+    private val input = GeoUriInput
 
     @Test
-    fun uriPattern_geoUri() {
-        assertEquals("geo:50.123456,-11.123456?q=foo%20bar&z=3.4", getUri("geo:50.123456,-11.123456?q=foo%20bar&z=3.4"))
+    fun match_geoUri() {
+        assertEquals(
+            "geo:50.123456,-11.123456?q=foo%20bar&z=3.4",
+            input.match("geo:50.123456,-11.123456?q=foo%20bar&z=3.4")
+        )
     }
 
     @Test
-    fun uriPattern_geoUriWithSpaceInQ() = runTest {
-        assertEquals("geo:0,0?q=45.4786785, 9.2473799", getUri("geo:0,0?q=45.4786785, 9.2473799"))
+    fun match_geoUriWithSpaceInQ() = runTest {
+        assertEquals("geo:0,0?q=45.4786785, 9.2473799", input.match("geo:0,0?q=45.4786785, 9.2473799"))
     }
 
     @Test
-    fun uriPattern_noPath() {
-        assertEquals("geo:?q=foo", getUri("geo:?q=foo"))
+    fun match_noPath() {
+        assertEquals("geo:?q=foo", input.match("geo:?q=foo"))
     }
 
     @Test
-    fun uriPattern_noScheme() {
-        assertNull(getUri("50.123456,-11.123456?q=foo%20bar&z=3.4"))
+    fun match_noScheme() {
+        assertNull(input.match("50.123456,-11.123456?q=foo%20bar&z=3.4"))
     }
 
     @Test
-    fun uriPattern_nonGeoScheme() {
-        assertNull(getUri("ftp:50.123456,-11.123456?q=foo%20bar&z=3.4"))
+    fun match_nonGeoScheme() {
+        assertNull(input.match("ftp:50.123456,-11.123456?q=foo%20bar&z=3.4"))
     }
 
     @Test
-    fun uriPattern_unknownPath() {
-        assertEquals("geo:example?q=foo%20bar&z=3.4", getUri("geo:example?q=foo%20bar&z=3.4"))
+    fun match_unknownPath() {
+        assertEquals("geo:example?q=foo%20bar&z=3.4", input.match("geo:example?q=foo%20bar&z=3.4"))
     }
 
     @Test
-    fun uriPattern_replacement() {
+    fun match_replacement() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
             "geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)",
-            getUri(
+            input.match(
                 @Suppress("SpellCheckingInspection")
                 "geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)\n" +
                     "https://omaps.app/Umse5f0H8a/Nova_Iorque"
@@ -55,35 +58,35 @@ class GeoUriInputTest : InputTest {
     }
 
     @Test
-    fun uriPattern_spaces() {
+    fun match_spaces() {
         assertEquals(
             "geo:1,2?q=foobar",
-            getUri("geo:1,2?q=foobar ")
+            input.match("geo:1,2?q=foobar ")
         )
         assertEquals(
             "geo:1,2?q=foo bar",
-            getUri("geo:1,2?q=foo bar ")
+            input.match("geo:1,2?q=foo bar ")
         )
         assertEquals(
             "geo:1,2?q=foo",
-            getUri("geo:1,2?q=foo  bar")
+            input.match("geo:1,2?q=foo  bar")
         )
         assertEquals(
             "geo:1,2?q=foo",
-            getUri("geo:1,2?q=foo\tbar")
+            input.match("geo:1,2?q=foo\tbar")
         )
     }
 
     @Test
-    fun parseUri_unknownPathOrParams() = runTest {
-        assertEquals(ParseUriResult(), parseUri("geo:"))
-        assertEquals(ParseUriResult(), parseUri("geo:?spam=1"))
+    fun parse_unknownPathOrParams() = runTest {
+        assertEquals(ParseResult(), input.parse("geo:"))
+        assertEquals(ParseResult(), input.parse("geo:?spam=1"))
     }
 
     @Test
-    fun parseUri_coordsAndQAndZ() = runTest {
+    fun parse_coordsAndQAndZ() = runTest {
         assertEquals(
-            ParseUriResult(
+            ParseResult(
                 persistentListOf(
                     WGS84Point(
                         50.123456, -11.123456,
@@ -93,31 +96,31 @@ class GeoUriInputTest : InputTest {
                     )
                 )
             ),
-            parseUri("geo:50.123456,-11.123456?q=foo%20bar&z=3.4"),
+            input.parse("geo:50.123456,-11.123456?q=foo%20bar&z=3.4"),
         )
     }
 
     @Test
-    fun parseUri_coordsAndQCoords() = runTest {
+    fun parse_coordsAndQCoords() = runTest {
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(50.123456, -11.123456, source = Source.URI))),
-            parseUri("geo:50.123456,-11.123456?q=50.123456,-11.123456"),
+            ParseResult(persistentListOf(WGS84Point(50.123456, -11.123456, source = Source.URI))),
+            input.parse("geo:50.123456,-11.123456?q=50.123456,-11.123456"),
         )
     }
 
     @Test
-    fun parseUri_coordsAndQCoordsDiffer_qCoordsTakePrecedence() = runTest {
+    fun parse_coordsAndQCoordsDiffer_qCoordsTakePrecedence() = runTest {
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(40.7127400, -74.0059965, source = Source.URI))),
-            parseUri("geo:50.123456,-11.123456?q=40.7127400,-74.0059965"),
+            ParseResult(persistentListOf(WGS84Point(40.7127400, -74.0059965, source = Source.URI))),
+            input.parse("geo:50.123456,-11.123456?q=40.7127400,-74.0059965"),
         )
     }
 
     @Test
-    fun parseUri_coordsAndName() = runTest {
+    fun parse_coordsAndName() = runTest {
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            ParseUriResult(
+            ParseResult(
                 persistentListOf(
                     WGS84Point(
                         40.7127400, -74.0059965,
@@ -128,15 +131,15 @@ class GeoUriInputTest : InputTest {
                 )
             ),
             @Suppress("SpellCheckingInspection")
-            parseUri("geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)"),
+            input.parse("geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)"),
         )
     }
 
     @Test
-    fun parseUri_coordsAndNameInSeparateQueryParam() = runTest {
+    fun parse_coordsAndNameInSeparateQueryParam() = runTest {
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            ParseUriResult(
+            ParseResult(
                 persistentListOf(
                     WGS84Point(
                         40.7127400, -74.0059965,
@@ -146,26 +149,11 @@ class GeoUriInputTest : InputTest {
                 )
             ),
             @Suppress("SpellCheckingInspection")
-            parseUri("geo:40.7127400,-74.0059965?q=40.7127400,-74.0059965&(Nova%20Iorque)"),
+            input.parse("geo:40.7127400,-74.0059965?q=40.7127400,-74.0059965&(Nova%20Iorque)"),
         )
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            ParseUriResult(
-                persistentListOf(
-                    WGS84Point(
-                        40.7127400, -74.0059965,
-                        z = 9.0,
-                        name = "Nova Iorque",
-                        source = Source.URI,
-                    )
-                )
-            ),
-            @Suppress("SpellCheckingInspection")
-            parseUri("geo:40.7127400,-74.0059965?q=40.7127400,-74.0059965&z=9.0&(Nova%20Iorque)"),
-        )
-        assertEquals(
-            @Suppress("SpellCheckingInspection")
-            ParseUriResult(
+            ParseResult(
                 persistentListOf(
                     WGS84Point(
                         40.7127400, -74.0059965,
@@ -176,23 +164,38 @@ class GeoUriInputTest : InputTest {
                 )
             ),
             @Suppress("SpellCheckingInspection")
-            parseUri("geo:40.7127400,-74.0059965?q=40.7127400,-74.0059965&(Nova%20Iorque)&z=9.0"),
+            input.parse("geo:40.7127400,-74.0059965?q=40.7127400,-74.0059965&z=9.0&(Nova%20Iorque)"),
+        )
+        assertEquals(
+            @Suppress("SpellCheckingInspection")
+            ParseResult(
+                persistentListOf(
+                    WGS84Point(
+                        40.7127400, -74.0059965,
+                        z = 9.0,
+                        name = "Nova Iorque",
+                        source = Source.URI,
+                    )
+                )
+            ),
+            @Suppress("SpellCheckingInspection")
+            input.parse("geo:40.7127400,-74.0059965?q=40.7127400,-74.0059965&(Nova%20Iorque)&z=9.0"),
         )
     }
 
     @Test
-    fun parseUri_qOnly() = runTest {
+    fun parse_qOnly() = runTest {
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(name = "foo bar", source = Source.URI))),
-            parseUri("geo:?q=foo%20bar"),
+            ParseResult(persistentListOf(WGS84Point(name = "foo bar", source = Source.URI))),
+            input.parse("geo:?q=foo%20bar"),
         )
     }
 
     @Test
-    fun parseUri_coordsInQWithSpace() = runTest {
+    fun parse_coordsInQWithSpace() = runTest {
         assertEquals(
-            ParseUriResult(persistentListOf(WGS84Point(45.4786785, 9.2473799, source = Source.URI))),
-            parseUri("geo:0,0?q=45.4786785,%209.2473799"),
+            ParseResult(persistentListOf(WGS84Point(45.4786785, 9.2473799, source = Source.URI))),
+            input.parse("geo:0,0?q=45.4786785,%209.2473799"),
         )
     }
 }

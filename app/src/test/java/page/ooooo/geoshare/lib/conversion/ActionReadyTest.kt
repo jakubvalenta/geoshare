@@ -1,69 +1,54 @@
 package page.ooooo.geoshare.lib.conversion
 
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.kotlin.mock
+import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.outputs.CopyCoordsDecOutput
+import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
+import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
 
 class ActionReadyTest {
+    private val coordinateConverter: CoordinateConverter = mock()
+
     @Test
-    fun actionReady_actionIsCopyAutomation_returnsBasicActionReady() = runTest {
-        val inputUriString = "https://maps.google.com/foo"
+    fun transition_whenActionIsCopyCoordsDec_returnsBasicActionReady() = runTest {
+        val source = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
-        val state = ActionReady(inputUriString, points, action, isAutomation = false)
+        val state = ActionReady(source, points, action, isAutomation = true)
         assertEquals(
-            BasicActionReady(inputUriString, points, action, isAutomation = false),
+            BasicActionReady(source, points, action, isAutomation = true),
             state.transition(),
         )
     }
 
     @Test
-    fun actionReady_actionIsCopyAction_returnsBasicActionReady() = runTest {
-        val inputUriString = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
-        val state = ActionReady(inputUriString, points, action, isAutomation = true)
-        assertEquals(
-            BasicActionReady(inputUriString, points, action, isAutomation = true),
-            state.transition(),
-        )
-    }
-
-    @Test
-    fun actionReady_actionIsSaveGpxPoints_returnsFileUriRequested() = runTest {
-        val inputUriString = "https://maps.google.com/foo"
+    fun transition_whenActionIsSavePointsGpx_returnsFileUriRequested() = runTest {
+        val source = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val action = SavePointsGpxOutput(coordinateConverter).toAction(points)
-        val state = ActionReady(inputUriString, points, action, isAutomation = true)
+        val state = ActionReady(source, points, action, isAutomation = true)
         assertEquals(
-            FileUriRequested(inputUriString, points, action, isAutomation = true),
+            FileUriRequested(source, points, action, isAutomation = true),
             state.transition(),
         )
     }
 
     @Test
-    fun actionReady_actionIsShareGpxRouteAutomation_returnsLocationRationaleRequested() = runTest {
-        val inputUriString = "https://maps.google.com/foo"
+    fun transition_whenActionIsOpenRouteOnePointGpx_returnsLocationRationaleRequested() = runTest {
+        val source = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val action = OpenRouteOnePointGpxOutput(PackageNames.GOOGLE_MAPS, coordinateConverter).toAction(points.last())
-        val state = ActionReady(inputUriString, points, action, isAutomation = true)
+        val state = ActionReady(source, points, action, isAutomation = true)
         assertEquals(
-            LocationRationaleRequested(inputUriString, points, action, isAutomation = true),
+            LocationRationaleRequested(source, points, action, isAutomation = true),
             state.transition(),
         )
     }
-
-    @Test
-    fun actionReady_actionIsShareGpxRouteAction_returnsLocationRationaleRequested() = runTest {
-        val inputUriString = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = OpenRouteOnePointGpxOutput(PackageNames.GOOGLE_MAPS, coordinateConverter).toAction(points.last())
-        val state = ActionReady(inputUriString, points, action, isAutomation = false)
-        assertEquals(
-            LocationRationaleRequested(inputUriString, points, action, isAutomation = false),
-            state.transition(),
-        )
-    }
-
 }

@@ -16,6 +16,7 @@ sealed interface Input<T> {
 
     suspend fun parse(
         data: T,
+        // TODO Add match: String,
         prevPoints: Points? = null,
         uriQuote: UriQuote = DefaultUriQuote,
         log: ILog = DefaultLog,

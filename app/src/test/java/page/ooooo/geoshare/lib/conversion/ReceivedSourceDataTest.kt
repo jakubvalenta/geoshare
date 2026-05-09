@@ -1,112 +1,112 @@
 package page.ooooo.geoshare.lib.conversion
 
+import android.content.res.Resources
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.inputs.GeoUriInput
+import page.ooooo.geoshare.lib.inputs.GoogleMapsUriInput
 
 class ReceivedSourceDataTest {
+    private val resources: Resources = mock {
+        on { getString(R.string.conversion_failed_missing_url) } doReturn "Missing URL"
+        on { getString(R.string.conversion_failed_unsupported_service) } doReturn "Unsupported map service"
+    }
+    private val stateContext: ConversionStateContext = mock {
+        on { resources } doReturn resources
+    }
+
     @Test
-    fun receivedUriString_inputUriStringIsEmpty_returnsConversionFailed() = runTest {
-        val inputUriString = ""
-        val stateContext = mockStateContext()
+    fun transition_whenSourceIsEmpty_returnsConversionFailed() = runTest {
+        val source = ""
         val state = ReceivedSourceData(stateContext, "")
         assertEquals(
-            ConversionFailed(mockResources.getString(R.string.conversion_failed_missing_url), inputUriString),
+            ConversionFailed(resources.getString(R.string.conversion_failed_missing_url), source),
             state.transition(),
         )
     }
 
     @Test
-    fun receivedUriString_inputUriStringIsGeoUri_returnsReceivedUriWithPermissionNull() = runTest {
-        val inputUriString = "geo:1,2?q="
-        val uri = Uri.parse(inputUriString, uriQuote)
-        val stateContext = mockStateContext()
-        val state = ReceivedSourceData(stateContext, inputUriString)
+    fun transition_whenSourceIsGeoUri_returnsReceivedUriWithPermissionNull() = runTest {
+        val source = "geo:1,2?q="
+        val state = ReceivedSourceData(stateContext, source)
         assertEquals(
-            FoundInput(stateContext, inputUriString, GeoUriInput, uri, null),
+            FoundInput(stateContext, source, match = source, GeoUriInput, permission = null),
             state.transition(),
         )
     }
 
     @Test
-    fun receivedUriString_inputUriStringHasUriInTheMiddle_returnsReceivedUriWithPermissionNull() = runTest {
-        val inputUriString = "FOO\nhttps://maps.google.com/foo\nBAR"
-        val matchedInputUriString = "https://maps.google.com/foo"
-        val uri = Uri.parse(matchedInputUriString, uriQuote)
-        val stateContext = mockStateContext()
-        val state = ReceivedSourceData(stateContext, inputUriString)
+    fun transition_whenSourceHasUriInTheMiddle_returnsReceivedUriWithPermissionNull() = runTest {
+        val source = "FOO\nhttps://maps.google.com/foo\nBAR"
+        val match = "https://maps.google.com/foo"
+        val state = ReceivedSourceData(stateContext, source)
         assertEquals(
-            FoundInput(stateContext, inputUriString, GoogleMapsUriInput, uri, null),
+            FoundInput(stateContext, source, match, GoogleMapsUriInput, permission = null),
             state.transition(),
         )
     }
 
     @Test
-    fun receivedUriString_inputUriStringIsValidUrl_returnsReceivedUriWithPermissionNull() = runTest {
-        val inputUriString = "https://maps.google.com/foo"
-        val uri = Uri.parse(inputUriString, uriQuote)
-        val stateContext = mockStateContext()
-        val state = ReceivedSourceData(stateContext, inputUriString)
+    fun transition_whenSourceIsValidUrl_returnsReceivedUriWithPermissionNull() = runTest {
+        val source = "https://maps.google.com/foo"
+        val state = ReceivedSourceData(stateContext, source)
         assertEquals(
-            FoundInput(stateContext, inputUriString, GoogleMapsUriInput, uri, null),
+            FoundInput(stateContext, source, match = source, GoogleMapsUriInput, permission = null),
             state.transition(),
         )
     }
 
     @Test
-    fun receivedUriString_inputUriStringIsNotValidUrl_returnsConversionFailed() = runTest {
-        val inputUriString = "https://[invalid:ipv6]/"
-        val stateContext = mockStateContext()
-        val state = ReceivedSourceData(stateContext, inputUriString)
+    fun transition_whenSourceIsNotValidUrl_returnsConversionFailed() = runTest {
+        val source = "https://[invalid:ipv6]/"
+        val state = ReceivedSourceData(stateContext, source)
         assertEquals(
-            ConversionFailed(mockResources.getString(R.string.conversion_failed_unsupported_service), inputUriString),
+            ConversionFailed(resources.getString(R.string.conversion_failed_unsupported_service), source),
             state.transition(),
         )
     }
 
     @Test
-    fun receivedUriString_inputUriStringDoesNotHaveScheme_returnsConversionFailed() = runTest {
-        val inputUriString = "maps.google.com/"
-        val stateContext = mockStateContext()
-        val state = ReceivedSourceData(stateContext, inputUriString)
+    fun transition_whenSourceDoesNotHaveScheme_returnsConversionFailed() = runTest {
+        val source = "maps.google.com/"
+        val state = ReceivedSourceData(stateContext, source)
         assertEquals(
-            ConversionFailed(mockResources.getString(R.string.conversion_failed_unsupported_service), inputUriString),
+            ConversionFailed(resources.getString(R.string.conversion_failed_unsupported_service), source),
             state.transition(),
         )
     }
 
     @Test
-    fun receivedUriString_inputUriStringHasRelativeScheme_returnsConversionFailed() = runTest {
-        val inputUriString = "//maps.google.com/"
-        val stateContext = mockStateContext()
-        val state = ReceivedSourceData(stateContext, inputUriString)
+    fun transition_whenSourceHasRelativeScheme_returnsConversionFailed() = runTest {
+        val source = "//maps.google.com/"
+        val state = ReceivedSourceData(stateContext, source)
         assertEquals(
-            ConversionFailed(mockResources.getString(R.string.conversion_failed_unsupported_service), inputUriString),
+            ConversionFailed(resources.getString(R.string.conversion_failed_unsupported_service), source),
             state.transition(),
         )
     }
 
     @Test
-    fun receivedUriString_inputUriStringDoesNotHaveHttpsScheme_returnsConversionFailed() = runTest {
-        val inputUriString = "ftp://maps.google.com/"
-        val stateContext = mockStateContext()
-        val state = ReceivedSourceData(stateContext, inputUriString)
+    fun transition_whenSourceDoesNotHaveHttpsScheme_returnsConversionFailed() = runTest {
+        val source = "ftp://maps.google.com/"
+        val state = ReceivedSourceData(stateContext, source)
         assertEquals(
-            ConversionFailed(mockResources.getString(R.string.conversion_failed_unsupported_service), inputUriString),
+            ConversionFailed(resources.getString(R.string.conversion_failed_unsupported_service), source),
             state.transition(),
         )
     }
 
     @Test
-    fun receivedUriString_inputUriStringDoesNotMatchAnyInput_returnsConversionFailed() = runTest {
-        val inputUriString = "https://maps.example.com/foo"
-        val stateContext = mockStateContext()
-        val state = ReceivedSourceData(stateContext, inputUriString)
+    fun transition_whenSourceDoesNotMatchAnyInput_returnsConversionFailed() = runTest {
+        val source = "https://maps.example.com/foo"
+        val state = ReceivedSourceData(stateContext, source)
         assertEquals(
-            ConversionFailed(mockResources.getString(R.string.conversion_failed_unsupported_service), inputUriString),
+            ConversionFailed(resources.getString(R.string.conversion_failed_unsupported_service), source),
             state.transition(),
         )
     }
-
 }
