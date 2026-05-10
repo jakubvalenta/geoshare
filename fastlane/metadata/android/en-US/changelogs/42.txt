@@ -1,4 +1,5 @@
 - Added the option to send a point via selected messaging apps.
 - Added the option to save a point to a contact.
 - Fixed pin display when opening Cartes IGN.
+- Fixed splash screen in dark mode.
 - Improved network error messages.
