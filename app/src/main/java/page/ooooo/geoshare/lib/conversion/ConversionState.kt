@@ -313,7 +313,8 @@ data class PermissionDenied<T>(
 ) : ConversionState {
     override suspend fun transition(): State =
         if (prevResult != null) {
-            DataParsed(stateContext, source, match, input, result = prevResult, permission = permission)
+            // Fall back to previous result
+            DataParsed(stateContext, source, match, input, result = ParseResult(), permission, prevResult)
         } else {
             ConversionFailed(
                 stateContext.resources.getString(R.string.conversion_failed_connection_permission_denied),
@@ -337,7 +338,6 @@ data class DataParsed<T>(
                 stateContext.log.i(TAG, "Converted $match to $points")
                 ConversionSucceeded(stateContext, source, points)
             } else if (nextInput != null) {
-                // FIXME Loop
                 val nextMatch = nextMatch ?: match
                 stateContext.log.i(TAG, "Going to next input $nextInput and match $nextMatch")
                 InputFound(stateContext, source, nextMatch, nextInput, permission, prevResult = this)

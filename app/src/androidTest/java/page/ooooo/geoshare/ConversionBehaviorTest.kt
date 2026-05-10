@@ -394,7 +394,6 @@ class ConversionBehaviorTest : BehaviorTest {
             onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.dismissDialog()
 
             // Shows location search
-            // FIXME Add fallback to Uri parsing again
             assertConversionSucceeded(
                 GCJ02Point(
                     name = @Suppress("SpellCheckingInspection") "Hermannstr. 30, Berlin",
@@ -426,7 +425,6 @@ class ConversionBehaviorTest : BehaviorTest {
             }
 
             // Shows location search
-            // FIXME Add fallback to Uri parsing again
             assertConversionSucceeded(
                 GCJ02Point(
                     name = @Suppress("SpellCheckingInspection") "Hermannstr. 40, Berlin",

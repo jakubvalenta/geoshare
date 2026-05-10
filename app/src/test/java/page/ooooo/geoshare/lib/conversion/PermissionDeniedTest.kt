@@ -45,7 +45,13 @@ class PermissionDeniedTest {
         )
         assertEquals(
             DataParsed(
-                stateContext, source, match = source, GoogleMapsUriInput, prevResult, Permission.NEVER
+                stateContext,
+                source,
+                match = source,
+                GoogleMapsUriInput,
+                result = ParseResult(),
+                Permission.NEVER,
+                prevResult,
             ),
             state.transition(),
         )
