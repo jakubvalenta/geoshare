@@ -10,6 +10,7 @@ import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.network.FakeNetworkTools
 import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.network.SocketTimeoutNetworkException
 import java.net.SocketTimeoutException
@@ -29,7 +30,7 @@ class UriInputTest {
     private val log = FakeLog
     private val lastAttempt = NetworkTools.Attempt(1, SocketTimeoutNetworkException(SocketTimeoutException()))
     private val maxAttempts = 3
-    private val networkTools = NetworkTools()
+    private val networkTools = FakeNetworkTools()
     private val uriQuote = FakeUriQuote
 
     @Test

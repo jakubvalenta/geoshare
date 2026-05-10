@@ -36,12 +36,43 @@ import java.net.URL
 import kotlin.math.pow
 import kotlin.math.roundToLong
 
-open class NetworkTools(
-    private val engine: HttpClientEngine = CIO.create(),
-    private val log: Log = DefaultLog,
-) {
+interface NetworkTools {
     data class Attempt(val number: Int, val cause: RecoverableNetworkException)
 
+    suspend fun httpHeadLocationHeader(
+        url: URL,
+        lastAttempt: Attempt? = null,
+        maxAttempts: Int = 1,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    ): String
+
+    suspend fun <T> httpGetBodyAsByteReadChannel(
+        url: URL,
+        lastAttempt: Attempt? = null,
+        maxAttempts: Int = 1,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        block: suspend (channel: ByteReadChannel) -> T,
+    ): T
+
+    suspend fun httpGetBodyAsText(
+        url: URL,
+        lastAttempt: Attempt? = null,
+        maxAttempts: Int = 1,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    ): String
+
+    suspend fun httpGetRedirectedUrlString(
+        url: URL,
+        lastAttempt: Attempt? = null,
+        maxAttempts: Int = 1,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    ): String
+}
+
+class DefaultNetworkTools(
+    private val engine: HttpClientEngine = CIO.create(),
+    private val log: Log = DefaultLog,
+) : NetworkTools {
     /**
      * Makes a HEAD request to [url] and returns the value of the response Location header.
      *
@@ -53,11 +84,11 @@ open class NetworkTools(
      * The network request is executed on [dispatcher].
      */
     @Throws(NetworkException::class)
-    open suspend fun httpHeadLocationHeader(
+    override suspend fun httpHeadLocationHeader(
         url: URL,
-        lastAttempt: Attempt? = null,
-        maxAttempts: Int = 1,
-        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        lastAttempt: NetworkTools.Attempt?,
+        maxAttempts: Int,
+        dispatcher: CoroutineDispatcher,
     ): String = withContext(dispatcher) {
         connect(
             engine,
@@ -83,11 +114,11 @@ open class NetworkTools(
      * is closed.
      */
     @Throws(NetworkException::class)
-    open suspend fun <T> httpGetBodyAsByteReadChannel(
+    override suspend fun <T> httpGetBodyAsByteReadChannel(
         url: URL,
-        lastAttempt: Attempt? = null,
-        maxAttempts: Int = 1,
-        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        lastAttempt: NetworkTools.Attempt?,
+        maxAttempts: Int,
+        dispatcher: CoroutineDispatcher,
         block: suspend (channel: ByteReadChannel) -> T,
     ): T = withContext(dispatcher) {
         connect(engine, url, lastAttempt = lastAttempt, maxAttempts = maxAttempts) { response ->
@@ -107,11 +138,11 @@ open class NetworkTools(
      * The network request is executed on [dispatcher].
      */
     @Throws(NetworkException::class)
-    open suspend fun httpGetBodyAsText(
+    override suspend fun httpGetBodyAsText(
         url: URL,
-        lastAttempt: Attempt? = null,
-        maxAttempts: Int = 1,
-        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        lastAttempt: NetworkTools.Attempt?,
+        maxAttempts: Int,
+        dispatcher: CoroutineDispatcher,
     ): String = withContext(dispatcher) {
         connect(engine, url, lastAttempt = lastAttempt, maxAttempts = maxAttempts) { response ->
             response.bodyAsText()
@@ -129,11 +160,11 @@ open class NetworkTools(
      * The network request is executed on [dispatcher].
      */
     @Throws(NetworkException::class)
-    open suspend fun httpGetRedirectedUrlString(
+    override suspend fun httpGetRedirectedUrlString(
         url: URL,
-        lastAttempt: Attempt? = null,
-        maxAttempts: Int = 1,
-        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        lastAttempt: NetworkTools.Attempt?,
+        maxAttempts: Int,
+        dispatcher: CoroutineDispatcher,
     ): String = withContext(dispatcher) {
         connect(engine, url, lastAttempt = lastAttempt, maxAttempts = maxAttempts) { response ->
             response.request.url.toString()
@@ -153,12 +184,12 @@ open class NetworkTools(
      * the user while requests are being retried.
      */
     @Throws(NetworkException::class)
-    open suspend fun <T> connect(
+    suspend fun <T> connect(
         engine: HttpClientEngine,
         url: URL,
         method: HttpMethod = HttpMethod.Get,
         followRedirects: Boolean = true,
-        lastAttempt: Attempt? = null,
+        lastAttempt: NetworkTools.Attempt? = null,
         maxAttempts: Int = 1,
         block: suspend (response: HttpResponse) -> T,
     ): T {
@@ -260,4 +291,35 @@ open class NetworkTools(
 
         private const val TAG = "NetworkTools"
     }
+}
+
+open class FakeNetworkTools : NetworkTools {
+    override suspend fun httpHeadLocationHeader(
+        url: URL,
+        lastAttempt: NetworkTools.Attempt?,
+        maxAttempts: Int,
+        dispatcher: CoroutineDispatcher,
+    ): String = throw NotImplementedError()
+
+    override suspend fun <T> httpGetBodyAsByteReadChannel(
+        url: URL,
+        lastAttempt: NetworkTools.Attempt?,
+        maxAttempts: Int,
+        dispatcher: CoroutineDispatcher,
+        block: suspend (channel: ByteReadChannel) -> T,
+    ): T = throw NotImplementedError()
+
+    override suspend fun httpGetBodyAsText(
+        url: URL,
+        lastAttempt: NetworkTools.Attempt?,
+        maxAttempts: Int,
+        dispatcher: CoroutineDispatcher,
+    ): String = throw NotImplementedError()
+
+    override suspend fun httpGetRedirectedUrlString(
+        url: URL,
+        lastAttempt: NetworkTools.Attempt?,
+        maxAttempts: Int,
+        dispatcher: CoroutineDispatcher,
+    ): String = throw NotImplementedError()
 }

@@ -13,6 +13,7 @@ import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.network.FakeNetworkTools
 import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.network.ResponseNetworkException
 import java.net.MalformedURLException
@@ -39,7 +40,7 @@ class BodyAsChannelInputTest {
     fun whenMatchIsInvalidURL_throwsMalformedURLException() = runTest {
         val match = "https://[invalid:ipv6]/"
         val lastAttempt = null
-        val networkTools = NetworkTools()
+        val networkTools = FakeNetworkTools()
         input.withData(
             match,
             networkTools,
@@ -54,10 +55,10 @@ class BodyAsChannelInputTest {
     fun whenMatchHasScheme_returnsTheResultOfHttpGetBodyAsByteReadChannel() = runTest {
         val match = "https://maps.google.com/foo"
         val lastAttempt = null
-        val networkTools = object : NetworkTools(log = log) {
+        val networkTools = object : FakeNetworkTools() {
             override suspend fun <T> httpGetBodyAsByteReadChannel(
                 url: URL,
-                lastAttempt: Attempt?,
+                lastAttempt: NetworkTools.Attempt?,
                 maxAttempts: Int,
                 dispatcher: CoroutineDispatcher,
                 block: suspend (channel: ByteReadChannel) -> T,
@@ -80,10 +81,10 @@ class BodyAsChannelInputTest {
     fun whenMatchHasNoScheme_returnsTheResultOfHttpGetBodyAsByteReadChannelCalledWithHttpsScheme() = runTest {
         val match = "maps.google.com/foo"
         val lastAttempt = null
-        val networkTools = object : NetworkTools(log = log) {
+        val networkTools = object : FakeNetworkTools() {
             override suspend fun <T> httpGetBodyAsByteReadChannel(
                 url: URL,
-                lastAttempt: Attempt?,
+                lastAttempt: NetworkTools.Attempt?,
                 maxAttempts: Int,
                 dispatcher: CoroutineDispatcher,
                 block: suspend (channel: ByteReadChannel) -> T,
@@ -106,10 +107,10 @@ class BodyAsChannelInputTest {
     fun whenHttpGetBodyAsByteReadChannelThrowsAnException_throwsTheSameException() = runTest {
         val match = "https://maps.google.com/foo"
         val lastAttempt = null
-        val networkTools = object : NetworkTools(log = log) {
+        val networkTools = object : FakeNetworkTools() {
             override suspend fun <T> httpGetBodyAsByteReadChannel(
                 url: URL,
-                lastAttempt: Attempt?,
+                lastAttempt: NetworkTools.Attempt?,
                 maxAttempts: Int,
                 dispatcher: CoroutineDispatcher,
                 block: suspend (channel: ByteReadChannel) -> T,

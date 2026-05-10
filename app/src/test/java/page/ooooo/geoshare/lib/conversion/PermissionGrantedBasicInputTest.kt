@@ -23,6 +23,7 @@ import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.network.ConnectionClosedNetworkException
+import page.ooooo.geoshare.lib.network.FakeNetworkTools
 import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.network.ResponseNetworkException
 import page.ooooo.geoshare.lib.network.SocketTimeoutNetworkException
@@ -33,7 +34,7 @@ import java.net.SocketTimeoutException
 class PermissionGrantedBasicInputTest {
     private val log = FakeLog
     private val maxAttempts = 3
-    private val networkTools: NetworkTools = mock()
+    private val networkTools = FakeNetworkTools()
     private val resources: Resources = mock {
         on { getString(R.string.converter_google_maps_loading_indicator_title) } doReturn "Connecting to Google..."
         on { getString(R.string.conversion_failed_cancelled) } doReturn "Cancelled"

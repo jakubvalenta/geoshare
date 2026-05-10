@@ -10,11 +10,12 @@ import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.inputs.Input
+import page.ooooo.geoshare.lib.network.DefaultNetworkTools
 import page.ooooo.geoshare.lib.network.NetworkTools
 
 class ConversionStateContext(
     val inputs: List<Input<*>> = emptyList(),
-    val networkTools: NetworkTools = NetworkTools(),
+    val networkTools: NetworkTools = DefaultNetworkTools(),
     val linkRepository: LinkRepository,
     val outputRepository: OutputRepository,
     val resources: Resources,

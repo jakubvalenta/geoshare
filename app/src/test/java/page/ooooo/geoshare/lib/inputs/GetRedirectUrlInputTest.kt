@@ -11,6 +11,7 @@ import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.network.FakeNetworkTools
 import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.network.ResponseNetworkException
 import java.net.MalformedURLException
@@ -38,7 +39,7 @@ class GetRedirectUrlInputTest {
     fun whenMatchIsInvalidURL_throwsMalformedURLException() = runTest {
         val match = "https://[invalid:ipv6]/"
         val lastAttempt = null
-        val networkTools = NetworkTools()
+        val networkTools = FakeNetworkTools()
         input.withData(
             match,
             networkTools,
@@ -53,10 +54,10 @@ class GetRedirectUrlInputTest {
     fun whenMatchHasScheme_returnsTheResultOfHttpGetRedirectedUrlString() = runTest {
         val match = "https://maps.google.com/foo"
         val lastAttempt = null
-        val networkTools = object : NetworkTools(log = log) {
+        val networkTools = object : FakeNetworkTools() {
             override suspend fun httpGetRedirectedUrlString(
                 url: URL,
-                lastAttempt: Attempt?,
+                lastAttempt: NetworkTools.Attempt?,
                 maxAttempts: Int,
                 dispatcher: CoroutineDispatcher,
             ) = "${url}-data"
@@ -78,10 +79,10 @@ class GetRedirectUrlInputTest {
     fun whenMatchHasNoScheme_returnsTheResultOfHttpGetRedirectedUrlStringCalledWithHttpsScheme() = runTest {
         val match = "maps.google.com/foo"
         val lastAttempt = null
-        val networkTools = object : NetworkTools(log = log) {
+        val networkTools = object : FakeNetworkTools() {
             override suspend fun httpGetRedirectedUrlString(
                 url: URL,
-                lastAttempt: Attempt?,
+                lastAttempt: NetworkTools.Attempt?,
                 maxAttempts: Int,
                 dispatcher: CoroutineDispatcher,
             ) = "${url}-data"
@@ -104,10 +105,10 @@ class GetRedirectUrlInputTest {
         runTest {
             val match = "https://maps.google.com/foo"
             val lastAttempt = null
-            val networkTools = object : NetworkTools(log = log) {
+            val networkTools = object : FakeNetworkTools() {
                 override suspend fun httpGetRedirectedUrlString(
                     url: URL,
-                    lastAttempt: Attempt?,
+                    lastAttempt: NetworkTools.Attempt?,
                     maxAttempts: Int,
                     dispatcher: CoroutineDispatcher,
                 ) = "bar"
@@ -129,10 +130,10 @@ class GetRedirectUrlInputTest {
     fun whenHttpGetRedirectedUrlStringThrowsAnException_throwsTheSameException() = runTest {
         val match = "https://maps.google.com/foo"
         val lastAttempt = null
-        val networkTools = object : NetworkTools(log = log) {
+        val networkTools = object : FakeNetworkTools() {
             override suspend fun httpGetRedirectedUrlString(
                 url: URL,
-                lastAttempt: Attempt?,
+                lastAttempt: NetworkTools.Attempt?,
                 maxAttempts: Int,
                 dispatcher: CoroutineDispatcher,
             ) = throw ResponseNetworkException(HttpStatusCode.NotFound, Exception())
