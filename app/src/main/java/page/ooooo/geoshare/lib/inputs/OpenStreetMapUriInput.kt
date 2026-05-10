@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
@@ -21,8 +20,7 @@ object OpenStreetMapUriInput : UriInput, Input.HasRandomUri {
 
     override val pattern = Regex("""((?:https?://)?(?:www\.)?(?:openstreetmap|osm)\.org/$URI_REST)""")
     override val documentation = InputDocumentation(
-        id = InputDocumentationId.OPEN_STREET_MAP,
-        nameResId = R.string.converter_open_street_map_name,
+        group = InputDocumentationGroup.OPEN_STREET_MAP,
         items = listOf(
             InputDocumentationItem.Url(20, "https://www.openstreetmap.org/"),
             InputDocumentationItem.Url(31, "https://www.openstreetmap.org/directions"),

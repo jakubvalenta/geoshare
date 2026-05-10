@@ -24,8 +24,7 @@ object GeoUriInput : UriInput, Input.HasRandomUri {
 
     override val pattern = Regex("""(geo:$LAT_NUM,$LON_NUM\?q=$LAT_NUM,\s*$LON_NUM|geo:$URI_REST)""")
     override val documentation = InputDocumentation(
-        id = InputDocumentationId.GEO_URI,
-        nameResId = R.string.converter_geo_name,
+        group = InputDocumentationGroup.GEO_URI,
         items = listOf(
             InputDocumentationItem.Text(3) {
                 stringResource(R.string.example, GeoUriFormatter.formatGeoUriString(WGS84Point(NaivePoint.example)))

@@ -29,8 +29,7 @@ object CoordinateInput : TextInput, Input.HasRandomUri {
 
     override val pattern = Regex("""([\d.\-\p{Zs},°'′"″NSWE]*\d[\d.\-\p{Zs},°'′"″NSWE]*)""")
     override val documentation = InputDocumentation(
-        id = InputDocumentationId.COORDINATES,
-        nameResId = R.string.converter_coordinates_name,
+        group = InputDocumentationGroup.COORDINATES,
         items = listOf(
             InputDocumentationItem.Text(20) {
                 stringResource(

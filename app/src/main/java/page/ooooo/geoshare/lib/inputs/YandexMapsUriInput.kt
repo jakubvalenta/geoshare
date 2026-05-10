@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
@@ -17,8 +16,7 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 object YandexMapsUriInput : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/$URI_REST)""")
     override val documentation = InputDocumentation(
-        id = InputDocumentationId.YANDEX_MAPS,
-        nameResId = R.string.converter_yandex_maps_name,
+        group = InputDocumentationGroup.YANDEX_MAPS,
         items = listOf(
             InputDocumentationItem.Url(20, "https://ya.ru/maps"),
             InputDocumentationItem.Url(22, "https://yandex.az/maps"),

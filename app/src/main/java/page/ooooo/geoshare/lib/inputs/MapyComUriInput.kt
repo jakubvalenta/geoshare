@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
@@ -19,8 +18,7 @@ object MapyComUriInput : UriInput, Input.HasRandomUri {
     override val pattern =
         Regex("""($COORDS|(?:https?://)?(?:(?:hapticke|www)\.)?mapy\.[a-z]{2,3}[/?]$URI_REST)""")
     override val documentation = InputDocumentation(
-        id = InputDocumentationId.MAPY_COM,
-        nameResId = R.string.converter_mapy_com_name,
+        group = InputDocumentationGroup.MAPY_COM,
         items = listOf(
             InputDocumentationItem.Url(23, "https://mapy.com"),
             InputDocumentationItem.Url(23, "https://mapy.cz"),

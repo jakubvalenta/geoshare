@@ -37,8 +37,7 @@ object PlusCodeInput : TextInput, Input.HasRandomUri {
     )
 
     override val documentation = InputDocumentation(
-        id = InputDocumentationId.PLUS_CODE,
-        nameResId = R.string.converter_plus_code_name,
+        group = InputDocumentationGroup.PLUS_CODE,
         items = listOf(
             InputDocumentationItem.Url(39, "https://plus.codes"),
             InputDocumentationItem.Text(39) {

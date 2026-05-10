@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
@@ -16,8 +15,7 @@ import page.ooooo.geoshare.lib.geo.Source
 object AmapUriInput : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:https?://)?wb\.amap\.com/$URI_REST)""")
     override val documentation = InputDocumentation(
-        id = InputDocumentationId.AMAP,
-        nameResId = R.string.converter_amap_name,
+        group = InputDocumentationGroup.AMAP,
         items = listOf(
             InputDocumentationItem.Url(27, "https://wb.amap.com/"),
         ),

@@ -2,7 +2,6 @@ package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
@@ -25,8 +24,7 @@ object BaiduMapUriInput : UriInput {
     override val pattern = Regex("""((?:https?://)?(?:j\.)?map\.baidu\.com/$URI_REST)""")
 
     override val documentation = InputDocumentation(
-        id = InputDocumentationId.BAIDU_MAP, // TODO Group documentations by id
-        nameResId = R.string.converter_baidu_map_name,
+        group = InputDocumentationGroup.BAIDU_MAP,
         items = listOf(
             InputDocumentationItem.Url(33, "https://map.baidu.com"),
         ),

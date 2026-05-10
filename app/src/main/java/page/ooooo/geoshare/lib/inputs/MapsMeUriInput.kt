@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
@@ -17,8 +16,7 @@ object MapsMeUriInput : UriInput {
 
     override val pattern = Regex("""((?:(?:https?://)?(?:comaps\.at|ge0\.me|omaps\.app)|ge0:/)/$URI_REST)""")
     override val documentation = InputDocumentation(
-        id = InputDocumentationId.MAPS_ME,
-        nameResId = R.string.converter_ge0_name,
+        group = InputDocumentationGroup.MAPS_ME,
         items = listOf(
             InputDocumentationItem.Url(25, "http://ge0.me/"),
             InputDocumentationItem.Url(25, "https://omaps.app/"),

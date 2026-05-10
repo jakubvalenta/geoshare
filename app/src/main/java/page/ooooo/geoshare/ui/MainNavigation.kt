@@ -11,7 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
-import page.ooooo.geoshare.lib.inputs.InputDocumentationId
+import page.ooooo.geoshare.lib.inputs.InputDocumentationGroup
 
 @Serializable
 object AboutRoute
@@ -20,7 +20,7 @@ object AboutRoute
 object FaqRoute
 
 @Serializable
-data class InputsRoute(val id: InputDocumentationId? = null)
+data class InputsRoute(val group: InputDocumentationGroup? = null)
 
 @Serializable
 object IntroRoute
@@ -100,7 +100,7 @@ fun MainNavigation(
         composable<InputsRoute> { backStackEntry ->
             val route: InputsRoute = backStackEntry.toRoute()
             InputsScreen(
-                initialDocumentationId = route.id,
+                initialDocumentationGroup = route.group,
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
             )
         }

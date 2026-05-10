@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.lib.inputs
 
-import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
@@ -14,8 +13,7 @@ import page.ooooo.geoshare.lib.geo.Points
 object DebugUriInput : UriInput {
     override val pattern = Regex("""((?:https?://)?(?:www\.)?example\.com(?:/\S+|$))""")
     override val documentation = InputDocumentation(
-        id = InputDocumentationId.DEBUG,
-        nameResId = R.string.converter_debug_name,
+        group = InputDocumentationGroup.DEBUG,
         items = emptyList(),
     )
 

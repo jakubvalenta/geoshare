@@ -2,7 +2,6 @@ package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
-import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
@@ -27,8 +26,7 @@ object WazeUriInput : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:https?://)?(?:(?:www|ul)\.)?waze\.com/$URI_REST)""")
 
     override val documentation = InputDocumentation(
-        id = InputDocumentationId.WAZE,
-        nameResId = R.string.converter_waze_name,
+        group = InputDocumentationGroup.WAZE,
         items = listOf(
             InputDocumentationItem.Url(21, "https://waze.com/live-map"),
             InputDocumentationItem.Url(21, "https://waze.com/ul"),

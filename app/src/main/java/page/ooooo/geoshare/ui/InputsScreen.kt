@@ -44,7 +44,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.InputRepository
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.inputs.InputDocumentation
-import page.ooooo.geoshare.lib.inputs.InputDocumentationId
+import page.ooooo.geoshare.lib.inputs.InputDocumentationGroup
 import page.ooooo.geoshare.lib.inputs.InputDocumentationItem
 import page.ooooo.geoshare.ui.components.InputsSettingsButton
 import page.ooooo.geoshare.ui.components.NavigableBasicListDetailScaffold
@@ -57,7 +57,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun InputsScreen(
-    initialDocumentationId: InputDocumentationId?,
+    initialDocumentationGroup: InputDocumentationGroup?,
     onBack: () -> Unit = {},
     viewModel: InputViewModel = hiltViewModel(),
 ) {
@@ -65,7 +65,7 @@ fun InputsScreen(
     val recentDocumentations by viewModel.recentDocumentations.collectAsStateWithLifecycle()
 
     InputsScreen(
-        initialDocumentationId = initialDocumentationId,
+        initialDocumentationGroup = initialDocumentationGroup,
         allDocumentations = allDocumentations,
         recentDocumentations = recentDocumentations,
         onBack = {
@@ -78,7 +78,7 @@ fun InputsScreen(
 @OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun InputsScreen(
-    initialDocumentationId: InputDocumentationId?,
+    initialDocumentationGroup: InputDocumentationGroup?,
     allDocumentations: List<InputDocumentation>,
     recentDocumentations: List<InputDocumentation>,
     onBack: () -> Unit,
@@ -86,15 +86,15 @@ private fun InputsScreen(
     val coroutineScope = rememberCoroutineScope()
     val navigator = rememberListDetailPaneScaffoldNavigator(
         initialDestinationHistory = listOf(
-            if (initialDocumentationId == null) {
+            if (initialDocumentationGroup == null) {
                 ThreePaneScaffoldDestinationItem(ListDetailPaneScaffoldRole.List)
             } else {
-                ThreePaneScaffoldDestinationItem(ListDetailPaneScaffoldRole.Detail, initialDocumentationId)
+                ThreePaneScaffoldDestinationItem(ListDetailPaneScaffoldRole.Detail, initialDocumentationGroup)
             },
         ),
     )
     val currentDocumentation = remember(navigator.currentDestination, allDocumentations) {
-        navigator.currentDestination?.contentKey?.let { id -> allDocumentations.find { it.id == id } }
+        navigator.currentDestination?.contentKey?.let { id -> allDocumentations.find { it.group == id } }
     }
 
     BackHandler {
@@ -105,7 +105,7 @@ private fun InputsScreen(
         navigator = navigator,
         listPane = { wide, containerColor ->
             InputsListPane(
-                currentDocumentationId = navigator.currentDestination?.contentKey,
+                currentDocumentationGroup = navigator.currentDestination?.contentKey,
                 allDocumentations = allDocumentations,
                 recentDocumentations = recentDocumentations,
                 containerColor = containerColor,
@@ -149,13 +149,13 @@ private fun InputsScreen(
 
 @Composable
 private fun InputsListPane(
-    currentDocumentationId: InputDocumentationId?,
+    currentDocumentationGroup: InputDocumentationGroup?,
     allDocumentations: List<InputDocumentation>,
     recentDocumentations: List<InputDocumentation>,
     containerColor: Color,
     wide: Boolean,
     onBack: () -> Unit,
-    onNavigateToDocumentation: (id: InputDocumentationId) -> Unit,
+    onNavigateToDocumentation: (id: InputDocumentationGroup) -> Unit,
 ) {
     val context = LocalContext.current
     val spacing = LocalSpacing.current
@@ -193,10 +193,10 @@ private fun InputsListPane(
             item {
                 SegmentedList(
                     values = recentDocumentations,
-                    itemHeadline = { stringResource(it.nameResId) },
-                    itemIsSelected = { it.id == currentDocumentationId },
-                    itemOnClick = { onNavigateToDocumentation(it.id) },
-                    itemTestTag = { "geoShareInputsDocumentationRecent_${it.id}" },
+                    itemHeadline = { stringResource(it.group.nameResId) },
+                    itemIsSelected = { it.group == currentDocumentationGroup },
+                    itemOnClick = { onNavigateToDocumentation(it.group) },
+                    itemTestTag = { "geoShareInputsDocumentationRecent_${it.group}" },
                     sort = true,
                 )
             }
@@ -211,10 +211,10 @@ private fun InputsListPane(
         item {
             SegmentedList(
                 values = allDocumentations,
-                itemHeadline = { stringResource(it.nameResId) },
-                itemIsSelected = { it.id == currentDocumentationId },
-                itemOnClick = { onNavigateToDocumentation(it.id) },
-                itemTestTag = { "geoShareInputsDocumentationAll_${it.id}" },
+                itemHeadline = { stringResource(it.group.nameResId) },
+                itemIsSelected = { it.group == currentDocumentationGroup },
+                itemOnClick = { onNavigateToDocumentation(it.group) },
+                itemTestTag = { "geoShareInputsDocumentationAll_${it.group}" },
                 sort = true,
             )
         }
@@ -261,7 +261,7 @@ private fun InputsDetailPane(
 
     ScrollablePane(
         title = {
-            Text(stringResource(currentDocumentation.nameResId))
+            Text(stringResource(currentDocumentation.group.nameResId))
         },
         onBack = onBack.takeUnless { wide },
         modifier = Modifier.padding(horizontal = spacing.windowPadding),
@@ -350,10 +350,16 @@ private fun DefaultPreview() {
         Surface {
             Column {
                 val inputRepository = InputRepository()
+                val allDocumentations = inputRepository.all
+                    .mapNotNull { input -> input.documentation }
+                    .groupBy { documentation -> documentation.group }
+                    .map { (group, documentations) ->
+                        InputDocumentation(group, documentations.flatMap { it.items })
+                    }
                 InputsScreen(
-                    initialDocumentationId = null,
-                    allDocumentations = inputRepository.all.mapNotNull { it.documentation },
-                    recentDocumentations = inputRepository.all.mapNotNull { it.documentation }.filter { documentation ->
+                    initialDocumentationGroup = null,
+                    allDocumentations = allDocumentations,
+                    recentDocumentations = allDocumentations.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -370,10 +376,16 @@ private fun DarkPreview() {
         Surface {
             Column {
                 val inputRepository = InputRepository()
+                val allDocumentations = inputRepository.all
+                    .mapNotNull { input -> input.documentation }
+                    .groupBy { documentation -> documentation.group }
+                    .map { (group, documentations) ->
+                        InputDocumentation(group, documentations.flatMap { it.items })
+                    }
                 InputsScreen(
-                    initialDocumentationId = null,
-                    allDocumentations = inputRepository.all.mapNotNull { it.documentation },
-                    recentDocumentations = inputRepository.all.mapNotNull { it.documentation }.filter { documentation ->
+                    initialDocumentationGroup = null,
+                    allDocumentations = allDocumentations,
+                    recentDocumentations = allDocumentations.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -390,10 +402,16 @@ private fun TabletPreview() {
         Surface {
             Column {
                 val inputRepository = InputRepository()
+                val allDocumentations = inputRepository.all
+                    .mapNotNull { input -> input.documentation }
+                    .groupBy { documentation -> documentation.group }
+                    .map { (group, documentations) ->
+                        InputDocumentation(group, documentations.flatMap { it.items })
+                    }
                 InputsScreen(
-                    initialDocumentationId = null,
-                    allDocumentations = inputRepository.all.mapNotNull { it.documentation },
-                    recentDocumentations = inputRepository.all.mapNotNull { it.documentation }.filter { documentation ->
+                    initialDocumentationGroup = null,
+                    allDocumentations = allDocumentations,
+                    recentDocumentations = allDocumentations.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -410,9 +428,15 @@ private fun NoRecentPreview() {
         Surface {
             Column {
                 val inputRepository = InputRepository()
+                val allDocumentations = inputRepository.all
+                    .mapNotNull { input -> input.documentation }
+                    .groupBy { documentation -> documentation.group }
+                    .map { (group, documentations) ->
+                        InputDocumentation(group, documentations.flatMap { it.items })
+                    }
                 InputsScreen(
-                    initialDocumentationId = null,
-                    allDocumentations = inputRepository.all.mapNotNull { it.documentation },
+                    initialDocumentationGroup = null,
+                    allDocumentations = allDocumentations,
                     recentDocumentations = emptyList(),
                     onBack = {},
                 )
@@ -428,9 +452,15 @@ private fun DarkNoRecentPreview() {
         Surface {
             Column {
                 val inputRepository = InputRepository()
+                val allDocumentations = inputRepository.all
+                    .mapNotNull { input -> input.documentation }
+                    .groupBy { documentation -> documentation.group }
+                    .map { (group, documentations) ->
+                        InputDocumentation(group, documentations.flatMap { it.items })
+                    }
                 InputsScreen(
-                    initialDocumentationId = null,
-                    allDocumentations = inputRepository.all.mapNotNull { it.documentation },
+                    initialDocumentationGroup = null,
+                    allDocumentations = allDocumentations,
                     recentDocumentations = emptyList(),
                     onBack = {},
                 )
@@ -446,9 +476,15 @@ private fun TabletNoRecentPreview() {
         Surface {
             Column {
                 val inputRepository = InputRepository()
+                val allDocumentations = inputRepository.all
+                    .mapNotNull { input -> input.documentation }
+                    .groupBy { documentation -> documentation.group }
+                    .map { (group, documentations) ->
+                        InputDocumentation(group, documentations.flatMap { it.items })
+                    }
                 InputsScreen(
-                    initialDocumentationId = null,
-                    allDocumentations = inputRepository.all.mapNotNull { it.documentation },
+                    initialDocumentationGroup = null,
+                    allDocumentations = allDocumentations,
                     recentDocumentations = emptyList(),
                     onBack = {},
                 )
@@ -464,10 +500,16 @@ private fun OpenStreetMapPreview() {
         Surface {
             Column {
                 val inputRepository = InputRepository()
+                val allDocumentations = inputRepository.all
+                    .mapNotNull { input -> input.documentation }
+                    .groupBy { documentation -> documentation.group }
+                    .map { (group, documentations) ->
+                        InputDocumentation(group, documentations.flatMap { it.items })
+                    }
                 InputsScreen(
-                    initialDocumentationId = InputDocumentationId.OPEN_STREET_MAP,
-                    allDocumentations = inputRepository.all.mapNotNull { it.documentation },
-                    recentDocumentations = inputRepository.all.mapNotNull { it.documentation }.filter { documentation ->
+                    initialDocumentationGroup = InputDocumentationGroup.OPEN_STREET_MAP,
+                    allDocumentations = allDocumentations,
+                    recentDocumentations = allDocumentations.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -484,10 +526,16 @@ private fun DarkOpenStreetMapPreview() {
         Surface {
             Column {
                 val inputRepository = InputRepository()
+                val allDocumentations = inputRepository.all
+                    .mapNotNull { input -> input.documentation }
+                    .groupBy { documentation -> documentation.group }
+                    .map { (group, documentations) ->
+                        InputDocumentation(group, documentations.flatMap { it.items })
+                    }
                 InputsScreen(
-                    initialDocumentationId = InputDocumentationId.OPEN_STREET_MAP,
-                    allDocumentations = inputRepository.all.mapNotNull { it.documentation },
-                    recentDocumentations = inputRepository.all.mapNotNull { it.documentation }.filter { documentation ->
+                    initialDocumentationGroup = InputDocumentationGroup.OPEN_STREET_MAP,
+                    allDocumentations = allDocumentations,
+                    recentDocumentations = allDocumentations.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -504,10 +552,16 @@ private fun TabletOpenStreetMapPreview() {
         Surface {
             Column {
                 val inputRepository = InputRepository()
+                val allDocumentations = inputRepository.all
+                    .mapNotNull { input -> input.documentation }
+                    .groupBy { documentation -> documentation.group }
+                    .map { (group, documentations) ->
+                        InputDocumentation(group, documentations.flatMap { it.items })
+                    }
                 InputsScreen(
-                    initialDocumentationId = InputDocumentationId.OPEN_STREET_MAP,
-                    allDocumentations = inputRepository.all.mapNotNull { it.documentation },
-                    recentDocumentations = inputRepository.all.mapNotNull { it.documentation }.filter { documentation ->
+                    initialDocumentationGroup = InputDocumentationGroup.OPEN_STREET_MAP,
+                    allDocumentations = allDocumentations,
+                    recentDocumentations = allDocumentations.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -524,10 +578,16 @@ private fun GeoUriPreview() {
         Surface {
             Column {
                 val inputRepository = InputRepository()
+                val allDocumentations = inputRepository.all
+                    .mapNotNull { input -> input.documentation }
+                    .groupBy { documentation -> documentation.group }
+                    .map { (group, documentations) ->
+                        InputDocumentation(group, documentations.flatMap { it.items })
+                    }
                 InputsScreen(
-                    initialDocumentationId = InputDocumentationId.GEO_URI,
-                    allDocumentations = inputRepository.all.mapNotNull { it.documentation },
-                    recentDocumentations = inputRepository.all.mapNotNull { it.documentation }.filter { documentation ->
+                    initialDocumentationGroup = InputDocumentationGroup.GEO_URI,
+                    allDocumentations = allDocumentations,
+                    recentDocumentations = allDocumentations.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -544,10 +604,16 @@ private fun DarkGeoUriPreview() {
         Surface {
             Column {
                 val inputRepository = InputRepository()
+                val allDocumentations = inputRepository.all
+                    .mapNotNull { input -> input.documentation }
+                    .groupBy { documentation -> documentation.group }
+                    .map { (group, documentations) ->
+                        InputDocumentation(group, documentations.flatMap { it.items })
+                    }
                 InputsScreen(
-                    initialDocumentationId = InputDocumentationId.GEO_URI,
-                    allDocumentations = inputRepository.all.mapNotNull { it.documentation },
-                    recentDocumentations = inputRepository.all.mapNotNull { it.documentation }.filter { documentation ->
+                    initialDocumentationGroup = InputDocumentationGroup.GEO_URI,
+                    allDocumentations = allDocumentations,
+                    recentDocumentations = allDocumentations.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -564,10 +630,16 @@ private fun TabletGeoUriPreview() {
         Surface {
             Column {
                 val inputRepository = InputRepository()
+                val allDocumentations = inputRepository.all
+                    .mapNotNull { input -> input.documentation }
+                    .groupBy { documentation -> documentation.group }
+                    .map { (group, documentations) ->
+                        InputDocumentation(group, documentations.flatMap { it.items })
+                    }
                 InputsScreen(
-                    initialDocumentationId = InputDocumentationId.GEO_URI,
-                    allDocumentations = inputRepository.all.mapNotNull { it.documentation },
-                    recentDocumentations = inputRepository.all.mapNotNull { it.documentation }.filter { documentation ->
+                    initialDocumentationGroup = InputDocumentationGroup.GEO_URI,
+                    allDocumentations = allDocumentations,
+                    recentDocumentations = allDocumentations.filter { documentation ->
                         documentation.items.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},

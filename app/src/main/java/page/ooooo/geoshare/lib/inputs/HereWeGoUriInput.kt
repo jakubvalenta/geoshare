@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
@@ -23,8 +22,7 @@ object HereWeGoUriInput : UriInput, Input.HasRandomUri {
 
     override val pattern = Regex("""((?:https?://)?(?:share|wego)\.here\.com/$URI_REST)""")
     override val documentation = InputDocumentation(
-        id = InputDocumentationId.HERE_WEGO,
-        nameResId = R.string.converter_here_wego_name,
+        group = InputDocumentationGroup.HERE_WEGO,
         items = listOf(
             InputDocumentationItem.Url(20, "https://share.here.com/l/"),
             InputDocumentationItem.Url(20, "https://share.here.com/p/"),

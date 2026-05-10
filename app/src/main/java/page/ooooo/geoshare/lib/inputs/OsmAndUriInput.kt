@@ -2,7 +2,6 @@ package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
@@ -19,8 +18,7 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 object OsmAndUriInput : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:https?://)?(?:www\.)?osmand\.net/$URI_REST)""")
     override val documentation = InputDocumentation(
-        id = InputDocumentationId.OSM_AND,
-        nameResId = R.string.converter_osm_and_name,
+        group = InputDocumentationGroup.OSM_AND,
         items = listOf(
             InputDocumentationItem.Url(20, "https://osmand.net/map"),
         ),

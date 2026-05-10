@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
@@ -25,8 +24,7 @@ object UrbiUriInput : UriInput, Input.HasRandomUri {
     override val pattern =
         Regex("""((?:https?://)?(?:www\.)?(?:(?:go|maps)\.)?(?:2gis|urbi|urbi-[a-z]{2})(?:\.[a-z]{2,3})?\.[a-z]{2,3}/$URI_REST)""")
     override val documentation = InputDocumentation(
-        id = InputDocumentationId.URBI,
-        nameResId = R.string.converter_urbi_name,
+        group = InputDocumentationGroup.URBI,
         items = listOf(
             InputDocumentationItem.Url(27, "https://2gis.ae/"),
             InputDocumentationItem.Url(27, "https://2gis.am/"),

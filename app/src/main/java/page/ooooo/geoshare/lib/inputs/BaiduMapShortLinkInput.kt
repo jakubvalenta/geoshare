@@ -9,8 +9,7 @@ import page.ooooo.geoshare.lib.geo.Points
 
 object BaiduMapShortLinkInput : HeadLocationHeaderInput {
     override val documentation = InputDocumentation(
-        id = InputDocumentationId.BAIDU_MAP,
-        nameResId = R.string.converter_baidu_map_name,
+        group = InputDocumentationGroup.BAIDU_MAP,
         items = listOf(
             InputDocumentationItem.Url(35, "https://j.map.baidu.com"),
         ),

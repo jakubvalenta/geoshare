@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.toImmutableList
-import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
@@ -29,8 +28,7 @@ object GoogleMapsUriInput : UriInput, Input.HasRandomUri {
     override val pattern =
         Regex("""((?:https?://)?(?:(?:www|maps)\.)?google(?:\.[a-z]{2,3})?\.[a-z]{2,3}[/?#]$URI_REST)""")
     override val documentation = InputDocumentation(
-        id = InputDocumentationId.GOOGLE_MAPS,
-        nameResId = R.string.converter_google_maps_name,
+        group = InputDocumentationGroup.GOOGLE_MAPS,
         items = listOf(
             InputDocumentationItem.Url(5, "https://maps.google.com"),
             InputDocumentationItem.Url(5, "https://google.com/maps"),

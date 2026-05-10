@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
@@ -16,8 +15,7 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 object CartesIGNUriInput : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:https?://)?cartes-ign\.ign\.fr$URI_REST)""")
     override val documentation = InputDocumentation(
-        id = InputDocumentationId.CARTES_IGN,
-        nameResId = R.string.converter_cartes_ign_name,
+        group = InputDocumentationGroup.CARTES_IGN,
         items = listOf(
             InputDocumentationItem.Url(39, "https://cartes-ign.ign.fr"),
         ),

@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
@@ -20,8 +19,7 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 object MagicEarthUriInput : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:(?:https?://)?magicearth.com|magicearth:/)/\?$URI_REST)""")
     override val documentation = InputDocumentation(
-        id = InputDocumentationId.MAGIC_EARTH,
-        nameResId = R.string.converter_magic_earth_name,
+        group = InputDocumentationGroup.MAGIC_EARTH,
         items = listOf(
             InputDocumentationItem.Url(20, "https://magicearth.com/"),
         ),
