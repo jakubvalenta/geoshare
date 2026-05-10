@@ -164,12 +164,12 @@ open class NetworkTools(
     ): T {
         if (lastAttempt != null && lastAttempt.number > 1) {
             if (lastAttempt.number > maxAttempts) {
-                log.w(null, "Maximum number of $maxAttempts attempts reached for $url")
+                log.w(TAG, "Maximum number of $maxAttempts attempts reached for $url")
                 throw MaxAttemptsReachedNetworkException(lastAttempt.cause)
             }
             val delayMillis = (EXPONENTIAL_DELAY_BASE.pow(lastAttempt.number - 2) * EXPONENTIAL_DELAY_BASE_DELAY)
                 .roundToLong()
-            log.i(null, "Waiting ${delayMillis}ms before attempt ${lastAttempt.number} of $maxAttempts for $url")
+            log.i(TAG, "Waiting ${delayMillis}ms before attempt ${lastAttempt.number} of $maxAttempts for $url")
             delay(delayMillis)
         }
         return HttpClient(engine) {
@@ -218,28 +218,28 @@ open class NetworkTools(
                     }
                     .execute(block)
             } catch (tr: UnresolvedAddressException) {
-                log.w(null, "Unresolved address for $url", tr)
+                log.w(TAG, "Unresolved address for $url", tr)
                 throw UnresolvedAddressNetworkException(tr)
             } catch (tr: HttpRequestTimeoutException) {
-                log.w(null, "Request timeout for $url", tr)
+                log.w(TAG, "Request timeout for $url", tr)
                 throw RequestTimeoutNetworkException(tr)
             } catch (tr: SocketTimeoutException) {
-                log.w(null, "Socket timeout for $url", tr)
+                log.w(TAG, "Socket timeout for $url", tr)
                 throw SocketTimeoutNetworkException(tr)
             } catch (tr: ConnectTimeoutException) {
-                log.w(null, "Connect timeout for $url", tr)
+                log.w(TAG, "Connect timeout for $url", tr)
                 throw ConnectTimeoutNetworkException(tr)
             } catch (tr: EOFException) {
-                log.w(null, "EOF exception for $url", tr)
+                log.w(TAG, "EOF exception for $url", tr)
                 throw ConnectionClosedNetworkException(tr)
             } catch (tr: ServerResponseException) {
-                log.w(null, "Server error ${tr.response.status} for $url", tr)
+                log.w(TAG, "Server error ${tr.response.status} for $url", tr)
                 throw ServerResponseNetworkException(tr.response.status, tr)
             } catch (tr: ResponseException) {
-                log.w(null, "Unexpected response code ${tr.response.status} for $url", tr)
+                log.w(TAG, "Unexpected response code ${tr.response.status} for $url", tr)
                 throw ResponseNetworkException(tr.response.status, tr)
             } catch (tr: Exception) {
-                log.e(null, "Unknown network exception for $url", tr)
+                log.e(TAG, "Unknown network exception for $url", tr)
                 throw UnknownNetworkException(tr)
             }
         }
@@ -257,5 +257,7 @@ open class NetworkTools(
         const val REQUEST_TIMEOUT = 256_000L
         const val CONNECT_TIMEOUT = 128_000L
         const val SOCKET_TIMEOUT = 128_000L
+
+        private const val TAG = "NetworkTools"
     }
 }
