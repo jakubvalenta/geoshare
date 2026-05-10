@@ -1,7 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
@@ -26,7 +26,7 @@ object CartesIGNUriInput : UriInput, Input.HasRandomUri {
         match: String,
         prevPoints: Points?,
         uriQuote: UriQuote,
-        log: ILog,
+        log: Log,
     ) = buildParseResult {
         data.run {
             // Coordinates

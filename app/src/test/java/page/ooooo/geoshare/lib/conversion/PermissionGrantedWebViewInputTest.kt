@@ -16,7 +16,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
-import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
@@ -49,7 +49,7 @@ class PermissionGrantedWebViewInputTest {
                 match: String,
                 prevPoints: Points?,
                 uriQuote: UriQuote,
-                log: ILog,
+                log: Log,
             ) = ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -95,7 +95,7 @@ class PermissionGrantedWebViewInputTest {
                 match: String,
                 prevPoints: Points?,
                 uriQuote: UriQuote,
-                log: ILog,
+                log: Log,
             ) = ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -133,7 +133,7 @@ class PermissionGrantedWebViewInputTest {
                 match: String,
                 prevPoints: Points?,
                 uriQuote: UriQuote,
-                log: ILog,
+                log: Log,
             ) = throw CancellationException()
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -171,7 +171,7 @@ class PermissionGrantedWebViewInputTest {
                 match: String,
                 prevPoints: Points?,
                 uriQuote: UriQuote,
-                log: ILog,
+                log: Log,
             ) = ParseResult()
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title

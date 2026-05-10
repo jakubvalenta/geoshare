@@ -3,7 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import androidx.annotation.StringRes
 import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.geo.Points
@@ -22,7 +22,7 @@ object OpenStreetMapApiInput : BodyAsTextInput {
         match: String,
         prevPoints: Points?,
         uriQuote: UriQuote,
-        log: ILog,
+        log: Log,
     ) = buildParseResult {
         // Use a simple regex instead of JSON parsing, because it works fine
         val pattern = Regex(""""lat":$LAT,"lon":$LON""")

@@ -1,7 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
@@ -29,7 +29,7 @@ object MapsMeUriInput : UriInput {
         match: String,
         prevPoints: Points?,
         uriQuote: UriQuote,
-        log: ILog,
+        log: Log,
     ) = buildParseResult {
         data.run {
             val name = (if (scheme == "ge0") pathParts.getOrNull(1) else pathParts.getOrNull(2))

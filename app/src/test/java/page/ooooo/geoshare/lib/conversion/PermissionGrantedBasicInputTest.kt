@@ -13,7 +13,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
-import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
@@ -59,7 +59,7 @@ class PermissionGrantedBasicInputTest {
                 lastAttempt: NetworkTools.Attempt?,
                 maxAttempts: Int,
                 uriQuote: UriQuote,
-                log: ILog,
+                log: Log,
                 block: suspend (String) -> ParseResult,
             ) = block("${match}-data")
 
@@ -68,7 +68,7 @@ class PermissionGrantedBasicInputTest {
                 match: String,
                 prevPoints: Points?,
                 uriQuote: UriQuote,
-                log: ILog,
+                log: Log,
             ) =
                 ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
 
@@ -111,7 +111,7 @@ class PermissionGrantedBasicInputTest {
                 lastAttempt: NetworkTools.Attempt?,
                 maxAttempts: Int,
                 uriQuote: UriQuote,
-                log: ILog,
+                log: Log,
                 block: suspend (String) -> ParseResult,
             ) = throw CancellationException()
 
@@ -120,7 +120,7 @@ class PermissionGrantedBasicInputTest {
                 match: String,
                 prevPoints: Points?,
                 uriQuote: UriQuote,
-                log: ILog,
+                log: Log,
             ) =
                 ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
 
@@ -155,7 +155,7 @@ class PermissionGrantedBasicInputTest {
                 lastAttempt: NetworkTools.Attempt?,
                 maxAttempts: Int,
                 uriQuote: UriQuote,
-                log: ILog,
+                log: Log,
                 block: suspend (String) -> ParseResult,
             ) = throw MalformedURLException()
 
@@ -164,7 +164,7 @@ class PermissionGrantedBasicInputTest {
                 match: String,
                 prevPoints: Points?,
                 uriQuote: UriQuote,
-                log: ILog,
+                log: Log,
             ) =
                 ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
 
@@ -204,7 +204,7 @@ class PermissionGrantedBasicInputTest {
                     lastAttempt: NetworkTools.Attempt?,
                     maxAttempts: Int,
                     uriQuote: UriQuote,
-                    log: ILog,
+                    log: Log,
                     block: suspend (String) -> ParseResult,
                 ) = throw cause
 
@@ -213,7 +213,7 @@ class PermissionGrantedBasicInputTest {
                     match: String,
                     prevPoints: Points?,
                     uriQuote: UriQuote,
-                    log: ILog,
+                    log: Log,
                 ) =
                     ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
 
@@ -259,7 +259,7 @@ class PermissionGrantedBasicInputTest {
                     lastAttempt: NetworkTools.Attempt?,
                     maxAttempts: Int,
                     uriQuote: UriQuote,
-                    log: ILog,
+                    log: Log,
                     block: suspend (String) -> ParseResult,
                 ) = throw cause
 
@@ -268,7 +268,7 @@ class PermissionGrantedBasicInputTest {
                     match: String,
                     prevPoints: Points?,
                     uriQuote: UriQuote,
-                    log: ILog,
+                    log: Log,
                 ) =
                     ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
 
@@ -314,7 +314,7 @@ class PermissionGrantedBasicInputTest {
                     lastAttempt: NetworkTools.Attempt?,
                     maxAttempts: Int,
                     uriQuote: UriQuote,
-                    log: ILog,
+                    log: Log,
                     block: suspend (String) -> ParseResult,
                 ) = throw cause
 
@@ -323,7 +323,7 @@ class PermissionGrantedBasicInputTest {
                     match: String,
                     prevPoints: Points?,
                     uriQuote: UriQuote,
-                    log: ILog,
+                    log: Log,
                 ) =
                     ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
 

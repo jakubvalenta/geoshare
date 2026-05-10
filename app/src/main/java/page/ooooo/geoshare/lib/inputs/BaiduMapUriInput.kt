@@ -2,7 +2,7 @@ package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.find
@@ -36,7 +36,7 @@ object BaiduMapUriInput : UriInput {
         match: String,
         prevPoints: Points?,
         uriQuote: UriQuote,
-        log: ILog,
+        log: Log,
     ) = buildParseResult {
         data.run {
             val parts = data.pathParts.drop(1)

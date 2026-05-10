@@ -6,7 +6,7 @@ import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.DefaultUriQuote
-import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.inputs.Input
@@ -19,7 +19,7 @@ class ConversionStateContext(
     val outputRepository: OutputRepository,
     val resources: Resources,
     val userPreferencesRepository: UserPreferencesRepository,
-    val log: ILog = DefaultLog,
+    val log: Log = DefaultLog,
     val billing: Billing,
     val uriQuote: UriQuote = DefaultUriQuote,
     val onStateChange: (State) -> Unit = {},

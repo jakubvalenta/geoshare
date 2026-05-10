@@ -2,7 +2,7 @@ package page.ooooo.geoshare.lib.inputs
 
 import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.Dispatchers
-import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
@@ -20,7 +20,7 @@ interface TextInput : BasicInput<String> {
         lastAttempt: NetworkTools.Attempt?,
         maxAttempts: Int,
         uriQuote: UriQuote,
-        log: ILog,
+        log: Log,
         block: suspend (String) -> ParseResult,
     ) = block(match)
 }
@@ -36,7 +36,7 @@ interface UriInput : BasicInput<Uri> {
         lastAttempt: NetworkTools.Attempt?,
         maxAttempts: Int,
         uriQuote: UriQuote,
-        log: ILog,
+        log: Log,
         block: suspend (Uri) -> ParseResult,
     ) = block(Uri.parse(match, uriQuote))
 }
@@ -48,7 +48,7 @@ interface GetRedirectUrlInput : UriInput, Input.HasPermission {
         lastAttempt: NetworkTools.Attempt?,
         maxAttempts: Int,
         uriQuote: UriQuote,
-        log: ILog,
+        log: Log,
         block: suspend (Uri) -> ParseResult,
     ): ParseResult {
         val uri = Uri.parse(match, uriQuote)
@@ -73,7 +73,7 @@ interface HeadLocationHeaderInput : UriInput, Input.HasPermission {
         lastAttempt: NetworkTools.Attempt?,
         maxAttempts: Int,
         uriQuote: UriQuote,
-        log: ILog,
+        log: Log,
         block: suspend (Uri) -> ParseResult,
     ): ParseResult {
         val uri = Uri.parse(match, uriQuote)
@@ -98,7 +98,7 @@ interface BodyAsChannelInput : BasicInput<ByteReadChannel>, Input.HasPermission 
         lastAttempt: NetworkTools.Attempt?,
         maxAttempts: Int,
         uriQuote: UriQuote,
-        log: ILog,
+        log: Log,
         block: suspend (ByteReadChannel) -> ParseResult,
     ): ParseResult {
         val uri = Uri.parse(match, uriQuote)
@@ -121,7 +121,7 @@ interface BodyAsTextInput : BasicInput<String>, Input.HasPermission {
         lastAttempt: NetworkTools.Attempt?,
         maxAttempts: Int,
         uriQuote: UriQuote,
-        log: ILog,
+        log: Log,
         block: suspend (String) -> ParseResult,
     ): ParseResult {
         val uri = Uri.parse(match, uriQuote)

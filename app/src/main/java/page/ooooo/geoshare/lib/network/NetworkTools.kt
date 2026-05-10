@@ -31,14 +31,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.io.EOFException
 import page.ooooo.geoshare.lib.DefaultLog
-import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.Log
 import java.net.URL
 import kotlin.math.pow
 import kotlin.math.roundToLong
 
 open class NetworkTools(
     private val engine: HttpClientEngine = CIO.create(),
-    private val log: ILog = DefaultLog,
+    private val log: Log = DefaultLog,
 ) {
     data class Attempt(val number: Int, val cause: RecoverableNetworkException)
 

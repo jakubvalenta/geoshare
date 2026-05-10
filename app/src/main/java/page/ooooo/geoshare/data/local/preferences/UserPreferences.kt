@@ -9,7 +9,7 @@ import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.lib.DefaultLog
-import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.DataTypes
@@ -19,32 +19,32 @@ import kotlin.time.DurationUnit
 
 interface UserPreference<T> {
     fun getValue(values: UserPreferencesValues): T
-    fun getValue(preferences: Preferences, log: ILog = DefaultLog): T
-    fun setValue(preferences: MutablePreferences, value: T, log: ILog = DefaultLog)
+    fun getValue(preferences: Preferences, log: Log = DefaultLog): T
+    fun setValue(preferences: MutablePreferences, value: T, log: Log = DefaultLog)
 }
 
 interface TextPreference<T> : UserPreference<T> {
     val key: Preferences.Key<String>
     val default: T
 
-    fun serialize(value: T, log: ILog = DefaultLog): String
+    fun serialize(value: T, log: Log = DefaultLog): String
 
-    fun deserialize(value: String?, log: ILog = DefaultLog): T
+    fun deserialize(value: String?, log: Log = DefaultLog): T
 
     fun isValid(value: String?): Boolean = true
 
-    override fun getValue(preferences: Preferences, log: ILog): T =
+    override fun getValue(preferences: Preferences, log: Log): T =
         deserialize(preferences[key], log)
 
-    override fun setValue(preferences: MutablePreferences, value: T, log: ILog) =
+    override fun setValue(preferences: MutablePreferences, value: T, log: Log) =
         preferences.set(key, serialize(value, log))
 }
 
 interface NullableIntPreference : TextPreference<Int?> {
-    override fun serialize(value: Int?, log: ILog) =
+    override fun serialize(value: Int?, log: Log) =
         value.toString()
 
-    override fun deserialize(value: String?, log: ILog) =
+    override fun deserialize(value: String?, log: Log) =
         value?.toIntOrNull() ?: default
 }
 
@@ -52,10 +52,10 @@ interface DurationPreference : TextPreference<Duration> {
     val minSec: Int
     val maxSec: Int
 
-    override fun serialize(value: Duration, log: ILog) =
+    override fun serialize(value: Duration, log: Log) =
         value.toInt(DurationUnit.SECONDS).toString()
 
-    override fun deserialize(value: String?, log: ILog) =
+    override fun deserialize(value: String?, log: Log) =
         value?.toIntOrNull()?.coerceIn(minSec, maxSec)?.seconds ?: default
 
     override fun isValid(value: String?) =
@@ -73,7 +73,7 @@ object ConnectionPermissionPreference : OptionsPreference<Permission> {
 
     override fun getValue(values: UserPreferencesValues) = values.connectionPermission
 
-    override fun getValue(preferences: Preferences, log: ILog) = preferences[key]?.let {
+    override fun getValue(preferences: Preferences, log: Log) = preferences[key]?.let {
         try {
             Permission.valueOf(it)
         } catch (_: IllegalArgumentException) {
@@ -81,7 +81,7 @@ object ConnectionPermissionPreference : OptionsPreference<Permission> {
         }
     } ?: default
 
-    override fun setValue(preferences: MutablePreferences, value: Permission, log: ILog) {
+    override fun setValue(preferences: MutablePreferences, value: Permission, log: Log) {
         preferences[key] = value.name
     }
 
@@ -101,7 +101,7 @@ object CoordinateFormatPreference : OptionsPreference<CoordinateFormat> {
 
     override fun getValue(values: UserPreferencesValues) = values.coordinateFormat
 
-    override fun getValue(preferences: Preferences, log: ILog) = preferences[key]?.let {
+    override fun getValue(preferences: Preferences, log: Log) = preferences[key]?.let {
         try {
             CoordinateFormat.valueOf(it)
         } catch (_: IllegalArgumentException) {
@@ -109,7 +109,7 @@ object CoordinateFormatPreference : OptionsPreference<CoordinateFormat> {
         }
     } ?: default
 
-    override fun setValue(preferences: MutablePreferences, value: CoordinateFormat, log: ILog) {
+    override fun setValue(preferences: MutablePreferences, value: CoordinateFormat, log: Log) {
         preferences[key] = value.name
     }
 
@@ -140,7 +140,7 @@ object AutomationPreference : OptionsPreference<Automation> {
 
     override fun getValue(values: UserPreferencesValues) = values.automation
 
-    override fun getValue(preferences: Preferences, log: ILog) =
+    override fun getValue(preferences: Preferences, log: Log) =
         getValueOrNull(preferences, log)
             ?: @Suppress("DEPRECATION") getOldValueOrNull(preferences, log)
             // Silently ignore serialization errors, because they should never happen, because we test all automations
@@ -150,7 +150,7 @@ object AutomationPreference : OptionsPreference<Automation> {
     /**
      * Get [Automation] from [preferences] by deserializing a JSON stored in a single string key.
      */
-    private fun getValueOrNull(preferences: Preferences, log: ILog): Automation? {
+    private fun getValueOrNull(preferences: Preferences, log: Log): Automation? {
         val serializedString = preferences[key] ?: return NoopAutomation
         return try {
             json.decodeFromString<Automation>(serializedString)
@@ -167,7 +167,7 @@ object AutomationPreference : OptionsPreference<Automation> {
      * of old app versions don't lose their automation preference after upgrading the app.
      */
     @Deprecated("Replaced with getValueOrNull")
-    private fun getOldValueOrNull(preferences: Preferences, log: ILog): Automation? {
+    private fun getOldValueOrNull(preferences: Preferences, log: Log): Automation? {
         val type = preferences[key] ?: return NoopAutomation
         val oldPackageNameKey = stringPreferencesKey("automation_package_name")
         val packageName = preferences[oldPackageNameKey]
@@ -187,7 +187,7 @@ object AutomationPreference : OptionsPreference<Automation> {
     @Serializable
     private data class OldData(val type: String?, val packageName: String?)
 
-    override fun setValue(preferences: MutablePreferences, value: Automation, log: ILog) {
+    override fun setValue(preferences: MutablePreferences, value: Automation, log: Log) {
         val serializedString = try {
             json.encodeToString(value)
         } catch (tr: SerializationException) {
@@ -284,7 +284,7 @@ object CachedPurchasePreference : TextPreference<CachedPurchase?> {
     override val default = null
     val loading = default
 
-    override fun serialize(value: CachedPurchase?, log: ILog) =
+    override fun serialize(value: CachedPurchase?, log: Log) =
         try {
             Json.encodeToString(value)
         } catch (tr: SerializationException) {
@@ -293,7 +293,7 @@ object CachedPurchasePreference : TextPreference<CachedPurchase?> {
             ""
         }
 
-    override fun deserialize(value: String?, log: ILog) =
+    override fun deserialize(value: String?, log: Log) =
         if (value != null) {
             try {
                 Json.decodeFromString<CachedPurchase?>(value)
@@ -317,7 +317,7 @@ interface SetPreference : TextPreference<Set<String>?> {
     override val key: Preferences.Key<String>
     override val default: Set<String>?
 
-    override fun serialize(value: Set<String>?, log: ILog) =
+    override fun serialize(value: Set<String>?, log: Log) =
         try {
             Json.encodeToString(value)
         } catch (tr: SerializationException) {
@@ -326,7 +326,7 @@ interface SetPreference : TextPreference<Set<String>?> {
             ""
         }
 
-    override fun deserialize(value: String?, log: ILog) =
+    override fun deserialize(value: String?, log: Log) =
         if (value != null) {
             try {
                 Json.decodeFromString<Set<String>?>(value)

@@ -5,7 +5,7 @@ import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readLine
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
@@ -26,7 +26,7 @@ object YandexMapsHtmlInput : BodyAsChannelInput {
         match: String,
         prevPoints: Points?,
         uriQuote: UriQuote,
-        log: ILog,
+        log: Log,
     ) =
         buildParseResult {
             val pointPattern = Regex("""pt=$LON%2C$LAT""")

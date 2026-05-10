@@ -2,7 +2,7 @@ package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Points
@@ -27,7 +27,7 @@ object BaiduMapShortLinkInput : HeadLocationHeaderInput {
         match: String,
         prevPoints: Points?,
         uriQuote: UriQuote,
-        log: ILog,
+        log: Log,
     ) = buildParseResult {
         nextInput = BaiduMapUriInput
         nextMatch = data.toString()

@@ -5,7 +5,7 @@ import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readLine
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.geo.Points
@@ -24,7 +24,7 @@ object AppleMapsHtmlInput : BodyAsChannelInput {
         match: String,
         prevPoints: Points?,
         uriQuote: UriQuote,
-        log: ILog,
+        log: Log,
     ) =
         buildParseResult {
             val latPattern = Regex("""<meta property="place:location:latitude" content="$LAT"""")

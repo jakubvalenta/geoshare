@@ -6,7 +6,7 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
-import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Points
@@ -23,7 +23,7 @@ class UriInputTest {
             match: String,
             prevPoints: Points?,
             uriQuote: UriQuote,
-            log: ILog,
+            log: Log,
         ) = throw NotImplementedError()
     }
     private val log = FakeLog

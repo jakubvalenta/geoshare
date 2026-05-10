@@ -3,7 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import androidx.annotation.StringRes
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.NaivePoint
@@ -24,7 +24,7 @@ object DebugWebViewInput : WebViewInput {
         match: String,
         prevPoints: Points?,
         uriQuote: UriQuote,
-        log: ILog,
+        log: Log,
     ) = buildParseResult {
         points = persistentListOf(WGS84Point(NaivePoint.genRandomPoint()))
     }

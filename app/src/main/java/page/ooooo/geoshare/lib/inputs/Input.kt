@@ -3,7 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import android.webkit.WebSettings
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.DefaultUriQuote
-import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
@@ -20,7 +20,7 @@ sealed interface Input<T> {
         match: String,
         prevPoints: Points? = null,
         uriQuote: UriQuote = DefaultUriQuote,
-        log: ILog = DefaultLog,
+        log: Log = DefaultLog,
     ): ParseResult
 
     interface HasPermission {
@@ -40,7 +40,7 @@ interface BasicInput<T> : Input<T> {
         lastAttempt: NetworkTools.Attempt?,
         maxAttempts: Int,
         uriQuote: UriQuote = DefaultUriQuote,
-        log: ILog = DefaultLog,
+        log: Log = DefaultLog,
         block: suspend (T) -> ParseResult,
     ): ParseResult
 }

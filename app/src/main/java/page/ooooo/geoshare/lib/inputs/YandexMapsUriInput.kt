@@ -1,7 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
@@ -42,7 +42,7 @@ object YandexMapsUriInput : UriInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parse(data: Uri, match: String, prevPoints: Points?, uriQuote: UriQuote, log: ILog) =
+    override suspend fun parse(data: Uri, match: String, prevPoints: Points?, uriQuote: UriQuote, log: Log) =
         buildParseResult {
             data.run {
                 val z = listOf(@Suppress("SpellCheckingInspection") "whatshere[zoom]", "z")

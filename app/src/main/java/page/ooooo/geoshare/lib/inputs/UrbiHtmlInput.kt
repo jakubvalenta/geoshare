@@ -4,7 +4,7 @@ import androidx.annotation.StringRes
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readLine
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.decodeBasicHtmlEntities
 import page.ooooo.geoshare.lib.extensions.groupOrNull
@@ -22,7 +22,7 @@ object UrbiHtmlInput : BodyAsChannelInput {
         match: String,
         prevPoints: Points?,
         uriQuote: UriQuote,
-        log: ILog,
+        log: Log,
     ) =
         buildParseResult {
             val pattern = Regex("""property="twitter:image" content="([^"]+)""")
