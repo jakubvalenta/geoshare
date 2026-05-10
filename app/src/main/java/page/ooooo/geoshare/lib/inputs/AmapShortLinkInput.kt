@@ -5,7 +5,6 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.geo.Points
 
 object AmapShortLinkInput : HeadLocationHeaderInput {
     override val pattern = Regex("""((?:https?://)?surl\.amap\.com/\S+)""")
@@ -25,7 +24,7 @@ object AmapShortLinkInput : HeadLocationHeaderInput {
     override suspend fun parse(
         data: Uri,
         match: String,
-        prevPoints: Points?,
+        prevResult: ParseResult?,
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {

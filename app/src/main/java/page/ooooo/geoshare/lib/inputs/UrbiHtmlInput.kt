@@ -8,7 +8,6 @@ import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.decodeBasicHtmlEntities
 import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.geo.Points
 
 object UrbiHtmlInput : BodyAsChannelInput {
     @StringRes
@@ -20,7 +19,7 @@ object UrbiHtmlInput : BodyAsChannelInput {
     override suspend fun parse(
         data: ByteReadChannel,
         match: String,
-        prevPoints: Points?,
+        prevResult: ParseResult?,
         uriQuote: UriQuote,
         log: Log,
     ) =

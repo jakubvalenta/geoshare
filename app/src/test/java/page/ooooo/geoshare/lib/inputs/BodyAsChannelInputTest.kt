@@ -12,7 +12,6 @@ import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.network.FakeNetworkTools
 import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.network.ResponseNetworkException
@@ -27,7 +26,7 @@ class BodyAsChannelInputTest {
         override suspend fun parse(
             data: ByteReadChannel,
             match: String,
-            prevPoints: Points?,
+            prevResult: ParseResult?,
             uriQuote: UriQuote,
             log: Log,
         ) = throw NotImplementedError()

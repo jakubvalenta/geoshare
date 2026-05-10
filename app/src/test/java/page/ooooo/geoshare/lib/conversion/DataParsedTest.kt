@@ -32,7 +32,7 @@ class DataParsedTest {
         val source = "https://maps.apple.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val result = ParseResult(points)
-        val state = DataParsed(stateContext, source, match = source, GoogleMapsUriInput, result)
+        val state = DataParsed(stateContext, source, match = source, GoogleMapsUriInput, result, permission = null)
         assertEquals(
             ConversionSucceeded(stateContext, source, points),
             state.transition(),
@@ -47,12 +47,9 @@ class DataParsedTest {
         val nextMatch = "https://maps.apple.com/foo"
         val result = ParseResult(points, nextInput, nextMatch)
         val permission = Permission.ALWAYS
-        val prevPoints = persistentListOf(WGS84Point(name = "Previous point", source = Source.GENERATED))
-        val state = DataParsed(
-            stateContext, source, match = source, GoogleMapsUriInput, result, permission, prevPoints
-        )
+        val state = DataParsed(stateContext, source, match = source, GoogleMapsUriInput, result, permission)
         assertEquals(
-            InputFound(stateContext, source, nextMatch, nextInput, permission, points),
+            InputFound(stateContext, source, nextMatch, nextInput, permission, prevResult = result),
             state.transition(),
         )
     }
@@ -64,12 +61,9 @@ class DataParsedTest {
         val nextInput = GoogleMapsHtmlInput
         val result = ParseResult(points, nextInput)
         val permission = Permission.ALWAYS
-        val prevPoints = persistentListOf(WGS84Point(name = "Previous point", source = Source.GENERATED))
-        val state = DataParsed(
-            stateContext, source, match = source, GoogleMapsUriInput, result, permission, prevPoints
-        )
+        val state = DataParsed(stateContext, source, match = source, GoogleMapsUriInput, result, permission)
         assertEquals(
-            InputFound(stateContext, source, match = source, nextInput, permission, points),
+            InputFound(stateContext, source, match = source, nextInput, permission, prevResult = result),
             state.transition(),
         )
     }
@@ -79,7 +73,7 @@ class DataParsedTest {
         val source = "https://maps.apple.com/foo"
         val points = persistentListOf(WGS84Point(name = "bar", source = Source.GENERATED))
         val result = ParseResult(points)
-        val state = DataParsed(stateContext, source, match = source, GoogleMapsUriInput, result)
+        val state = DataParsed(stateContext, source, match = source, GoogleMapsUriInput, result, permission = null)
         assertEquals(
             ConversionSucceeded(stateContext, source, points),
             state.transition(),
@@ -91,7 +85,7 @@ class DataParsedTest {
         val source = "https://maps.apple.com/foo"
         val points = persistentListOf(WGS84Point(source = Source.GENERATED))
         val result = ParseResult(points)
-        val state = DataParsed(stateContext, source, match = source, GoogleMapsUriInput, result)
+        val state = DataParsed(stateContext, source, match = source, GoogleMapsUriInput, result, permission = null)
         assertEquals(
             ConversionFailed(
                 resources.getString(R.string.conversion_failed_reason_no_points),
@@ -106,12 +100,28 @@ class DataParsedTest {
         val source = "https://maps.apple.com/foo"
         val points = persistentListOf<WGS84Point>()
         val result = ParseResult(points)
-        val state = DataParsed(stateContext, source, match = source, GoogleMapsUriInput, result)
+        val state = DataParsed(stateContext, source, match = source, GoogleMapsUriInput, result, permission = null)
         assertEquals(
             ConversionFailed(
                 resources.getString(R.string.conversion_failed_reason_no_points),
                 source,
             ),
+            state.transition(),
+        )
+    }
+
+    @Test
+    fun transition_whenPointsAreEmptyButThereIsPrevResult_returnsConversionSucceeded() = runTest {
+        val source = "https://maps.apple.com/foo"
+        val points = persistentListOf<WGS84Point>()
+        val result = ParseResult(points)
+        val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+        val prevResult = ParseResult(prevPoints)
+        val state = DataParsed(
+            stateContext, source, match = source, GoogleMapsUriInput, result, permission = null, prevResult
+        )
+        assertEquals(
+            ConversionSucceeded(stateContext, source, prevPoints),
             state.transition(),
         )
     }

@@ -8,7 +8,6 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
-import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
@@ -22,14 +21,14 @@ object WazeHtmlInput : BodyAsChannelInput {
     override suspend fun parse(
         data: ByteReadChannel,
         match: String,
-        prevPoints: Points?,
+        prevResult: ParseResult?,
         uriQuote: UriQuote,
         log: Log,
     ) =
         buildParseResult {
             val pattern = Regex(""""latLng":\{"lat":$LAT,"lng":$LON\}""")
 
-            val name = prevPoints?.lastOrNull()?.name
+            val name = prevResult?.points?.lastOrNull()?.name
 
             while (true) {
                 val line = data.readLine() ?: break

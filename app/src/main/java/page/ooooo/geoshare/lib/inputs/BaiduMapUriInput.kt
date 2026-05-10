@@ -12,7 +12,6 @@ import page.ooooo.geoshare.lib.extensions.toLonLatNamePoint
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
-import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 
 object BaiduMapUriInput : UriInput {
@@ -34,7 +33,7 @@ object BaiduMapUriInput : UriInput {
     override suspend fun parse(
         data: Uri,
         match: String,
-        prevPoints: Points?,
+        prevResult: ParseResult?,
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {

@@ -9,7 +9,6 @@ import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
-import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
@@ -42,7 +41,7 @@ object YandexMapsUriInput : UriInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parse(data: Uri, match: String, prevPoints: Points?, uriQuote: UriQuote, log: Log) =
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?, uriQuote: UriQuote, log: Log) =
         buildParseResult {
             data.run {
                 val z = listOf(@Suppress("SpellCheckingInspection") "whatshere[zoom]", "z")

@@ -14,7 +14,6 @@ import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.NaivePoint
-import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 
 object GoogleMapsHtmlInput : BodyAsChannelInput {
@@ -27,7 +26,7 @@ object GoogleMapsHtmlInput : BodyAsChannelInput {
     override suspend fun parse(
         data: ByteReadChannel,
         match: String,
-        prevPoints: Points?,
+        prevResult: ParseResult?,
         uriQuote: UriQuote,
         log: Log,
     ) =
@@ -46,7 +45,7 @@ object GoogleMapsHtmlInput : BodyAsChannelInput {
             var defaultNaivePoint: NaivePoint? = null
             var genericMetaTagFound = false
             var redirectUriString: String? = null
-            val name = prevPoints?.lastOrNull()?.name
+            val name = prevResult?.points?.lastOrNull()?.name
 
             while (true) {
                 val line = data.readLine() ?: break

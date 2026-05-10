@@ -8,7 +8,6 @@ import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
-import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
@@ -24,7 +23,7 @@ object CartesIGNUriInput : UriInput, Input.HasRandomUri {
     override suspend fun parse(
         data: Uri,
         match: String,
-        prevPoints: Points?,
+        prevResult: ParseResult?,
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {

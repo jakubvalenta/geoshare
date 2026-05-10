@@ -4,7 +4,6 @@ import androidx.annotation.StringRes
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.geo.Points
 
 object GoogleMapsWebViewInput : WebViewInput {
     @StringRes
@@ -16,7 +15,7 @@ object GoogleMapsWebViewInput : WebViewInput {
     override suspend fun parse(
         data: String,
         match: String,
-        prevPoints: Points?,
+        prevResult: ParseResult?,
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {

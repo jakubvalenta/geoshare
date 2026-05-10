@@ -18,7 +18,6 @@ import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.GoogleMapsWebViewInput
@@ -47,15 +46,16 @@ class PermissionGrantedWebViewInputTest {
             override suspend fun parse(
                 data: String,
                 match: String,
-                prevPoints: Points?,
+                prevResult: ParseResult?,
                 uriQuote: UriQuote,
                 log: Log,
-            ) = ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
+            ) = ParseResult(prevResult?.points ?: persistentListOf(), nextMatch = data)
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
         }
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+        val prevResult = ParseResult(prevPoints)
         val permission = Permission.ALWAYS
         val timeout = 7.seconds
         val stateContext: ConversionStateContext = mock {
@@ -64,7 +64,7 @@ class PermissionGrantedWebViewInputTest {
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedWebViewInput(
-            stateContext, source, match = source, input, permission, prevPoints, timeout, dispatcher = testScheduler
+            stateContext, source, match = source, input, permission, prevResult, timeout, dispatcher = testScheduler
         )
         var res: State? = null
         launch {
@@ -80,7 +80,7 @@ class PermissionGrantedWebViewInputTest {
                 input,
                 ParseResult(prevPoints, nextMatch = "${source}-data"),
                 permission,
-                prevPoints,
+                prevResult,
             ),
             res,
         )
@@ -93,15 +93,16 @@ class PermissionGrantedWebViewInputTest {
             override suspend fun parse(
                 data: String,
                 match: String,
-                prevPoints: Points?,
+                prevResult: ParseResult?,
                 uriQuote: UriQuote,
                 log: Log,
-            ) = ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
+            ) = ParseResult(prevResult?.points ?: persistentListOf(), nextMatch = data)
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
         }
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+        val prevResult = ParseResult(prevPoints)
         val permission = Permission.ALWAYS
         val timeout = 7.seconds
         val stateContext: ConversionStateContext = mock {
@@ -110,7 +111,7 @@ class PermissionGrantedWebViewInputTest {
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedWebViewInput(
-            stateContext, source, match = source, input, permission, prevPoints, timeout, dispatcher = testScheduler
+            stateContext, source, match = source, input, permission, prevResult, timeout, dispatcher = testScheduler
         )
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
@@ -131,7 +132,7 @@ class PermissionGrantedWebViewInputTest {
             override suspend fun parse(
                 data: String,
                 match: String,
-                prevPoints: Points?,
+                prevResult: ParseResult?,
                 uriQuote: UriQuote,
                 log: Log,
             ) = throw CancellationException()
@@ -140,6 +141,7 @@ class PermissionGrantedWebViewInputTest {
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
         }
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+        val prevResult = ParseResult(prevPoints)
         val permission = Permission.ALWAYS
         val timeout = 7.seconds
         val stateContext: ConversionStateContext = mock {
@@ -148,7 +150,7 @@ class PermissionGrantedWebViewInputTest {
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedWebViewInput(
-            stateContext, source, match = source, input, permission, prevPoints, timeout, dispatcher = testScheduler
+            stateContext, source, match = source, input, permission, prevResult, timeout, dispatcher = testScheduler
         )
         var res: State? = null
         launch {
@@ -169,7 +171,7 @@ class PermissionGrantedWebViewInputTest {
             override suspend fun parse(
                 data: String,
                 match: String,
-                prevPoints: Points?,
+                prevResult: ParseResult?,
                 uriQuote: UriQuote,
                 log: Log,
             ) = ParseResult()
@@ -178,6 +180,7 @@ class PermissionGrantedWebViewInputTest {
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
         }
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+        val prevResult = ParseResult(prevPoints)
         val permission = Permission.ALWAYS
         val timeout = 7.seconds
         val stateContext: ConversionStateContext = mock {
@@ -186,7 +189,7 @@ class PermissionGrantedWebViewInputTest {
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedWebViewInput(
-            stateContext, source, match = source, input, permission, prevPoints, timeout, dispatcher = testScheduler
+            stateContext, source, match = source, input, permission, prevResult, timeout, dispatcher = testScheduler
         )
         var res: State? = null
         val job = launch {
@@ -212,7 +215,7 @@ class PermissionGrantedWebViewInputTest {
         val stateContext: ConversionStateContext = mock {
             on { this@on.resources } doReturn resources
         }
-        val state = PermissionGrantedWebViewInput(stateContext, source, match = source, input)
+        val state = PermissionGrantedWebViewInput(stateContext, source, match = source, input, Permission.ALWAYS)
         assertEquals(
             LoadingIndicator.Large(
                 title = resources.getString(R.string.converter_google_maps_loading_indicator_title),

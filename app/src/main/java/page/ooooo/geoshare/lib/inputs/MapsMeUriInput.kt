@@ -6,7 +6,6 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toScale
-import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.decodeGe0Hash
@@ -27,7 +26,7 @@ object MapsMeUriInput : UriInput {
     override suspend fun parse(
         data: Uri,
         match: String,
-        prevPoints: Points?,
+        prevResult: ParseResult?,
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {

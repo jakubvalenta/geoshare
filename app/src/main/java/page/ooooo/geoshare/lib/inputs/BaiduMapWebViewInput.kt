@@ -5,7 +5,6 @@ import androidx.annotation.StringRes
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.network.DefaultNetworkTools
 
 object BaiduMapWebViewInput : WebViewInput {
@@ -18,7 +17,7 @@ object BaiduMapWebViewInput : WebViewInput {
     override suspend fun parse(
         data: String,
         match: String,
-        prevPoints: Points?,
+        prevResult: ParseResult?,
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {

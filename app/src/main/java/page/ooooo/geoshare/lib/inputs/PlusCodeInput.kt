@@ -10,7 +10,6 @@ import page.ooooo.geoshare.lib.formatters.PlusCodeFormatter
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
-import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.decodePlusCode
 
@@ -49,7 +48,7 @@ object PlusCodeInput : TextInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parse(data: String, match: String, prevPoints: Points?, uriQuote: UriQuote, log: Log) =
+    override suspend fun parse(data: String, match: String, prevResult: ParseResult?, uriQuote: UriQuote, log: Log) =
         buildParseResult {
             // URL-decode code string if it was extracted from a URL
             val codeString = data.replace("%2B", "+")

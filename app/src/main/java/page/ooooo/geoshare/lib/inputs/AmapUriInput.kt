@@ -9,7 +9,6 @@ import page.ooooo.geoshare.lib.extensions.toLatLonNamePoint
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.GCJ02GreaterChinaAndTaiwanPoint
 import page.ooooo.geoshare.lib.geo.Point
-import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 
 object AmapUriInput : UriInput, Input.HasRandomUri {
@@ -24,7 +23,7 @@ object AmapUriInput : UriInput, Input.HasRandomUri {
     override suspend fun parse(
         data: Uri,
         match: String,
-        prevPoints: Points?,
+        prevResult: ParseResult?,
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {

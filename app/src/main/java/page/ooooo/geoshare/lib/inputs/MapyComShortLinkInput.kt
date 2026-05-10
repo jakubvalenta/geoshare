@@ -5,7 +5,6 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.geo.Points
 
 object MapyComShortLinkInput : GetRedirectUrlInput {
     override val pattern = Regex("""((?:https?://)?(?:www\.)?mapy\.[a-z]{2,3}/s/\S+)""")
@@ -19,7 +18,7 @@ object MapyComShortLinkInput : GetRedirectUrlInput {
     override suspend fun parse(
         data: Uri,
         match: String,
-        prevPoints: Points?,
+        prevResult: ParseResult?,
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {

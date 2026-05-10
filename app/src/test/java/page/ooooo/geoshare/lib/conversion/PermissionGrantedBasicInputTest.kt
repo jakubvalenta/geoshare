@@ -15,7 +15,6 @@ import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.BasicInput
@@ -67,16 +66,16 @@ class PermissionGrantedBasicInputTest {
             override suspend fun parse(
                 data: String,
                 match: String,
-                prevPoints: Points?,
+                prevResult: ParseResult?,
                 uriQuote: UriQuote,
                 log: Log,
-            ) =
-                ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
+            ) = ParseResult(prevResult?.points ?: persistentListOf(), nextMatch = data)
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
         }
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+        val prevResult = ParseResult(prevPoints)
         val lastAttempt = null
         val permission = Permission.ALWAYS
         val stateContext: ConversionStateContext = mock {
@@ -86,7 +85,7 @@ class PermissionGrantedBasicInputTest {
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedBasicInput(
-            stateContext, source, match = source, input, permission, prevPoints, lastAttempt, maxAttempts
+            stateContext, source, match = source, input, permission, prevResult, lastAttempt, maxAttempts
         )
         assertEquals(
             DataParsed(
@@ -96,7 +95,7 @@ class PermissionGrantedBasicInputTest {
                 input,
                 ParseResult(prevPoints, nextMatch = "${source}-data"),
                 permission,
-                prevPoints,
+                prevResult,
             ),
             state.transition(),
         )
@@ -119,16 +118,16 @@ class PermissionGrantedBasicInputTest {
             override suspend fun parse(
                 data: String,
                 match: String,
-                prevPoints: Points?,
+                prevResult: ParseResult?,
                 uriQuote: UriQuote,
                 log: Log,
-            ) =
-                ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
+            ) = ParseResult(prevResult?.points ?: persistentListOf(), nextMatch = data)
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
         }
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+        val prevResult = ParseResult(prevPoints)
         val lastAttempt = null
         val permission = Permission.ALWAYS
         val stateContext: ConversionStateContext = mock {
@@ -138,7 +137,7 @@ class PermissionGrantedBasicInputTest {
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedBasicInput(
-            stateContext, source, match = source, input, permission, prevPoints, lastAttempt, maxAttempts
+            stateContext, source, match = source, input, permission, prevResult, lastAttempt, maxAttempts
         )
         assertEquals(
             ConversionFailed(resources.getString(R.string.conversion_failed_cancelled), source),
@@ -163,16 +162,16 @@ class PermissionGrantedBasicInputTest {
             override suspend fun parse(
                 data: String,
                 match: String,
-                prevPoints: Points?,
+                prevResult: ParseResult?,
                 uriQuote: UriQuote,
                 log: Log,
-            ) =
-                ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
+            ) = ParseResult(prevResult?.points ?: persistentListOf(), nextMatch = data)
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
         }
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+        val prevResult = ParseResult(prevPoints)
         val lastAttempt = null
         val permission = Permission.ALWAYS
         val stateContext: ConversionStateContext = mock {
@@ -182,7 +181,7 @@ class PermissionGrantedBasicInputTest {
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedBasicInput(
-            stateContext, source, match = source, input, permission, prevPoints, lastAttempt, maxAttempts
+            stateContext, source, match = source, input, permission, prevResult, lastAttempt, maxAttempts
         )
         assertEquals(
             ConversionFailed(
@@ -212,16 +211,16 @@ class PermissionGrantedBasicInputTest {
                 override suspend fun parse(
                     data: String,
                     match: String,
-                    prevPoints: Points?,
+                    prevResult: ParseResult?,
                     uriQuote: UriQuote,
                     log: Log,
-                ) =
-                    ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
+                ) = ParseResult(prevResult?.points ?: persistentListOf(), nextMatch = data)
 
                 override val permissionTitleResId = R.string.converter_google_maps_permission_title
                 override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
             }
             val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+            val prevResult = ParseResult(prevPoints)
             val lastAttempt = null
             val permission = Permission.ALWAYS
             val stateContext: ConversionStateContext = mock {
@@ -231,7 +230,7 @@ class PermissionGrantedBasicInputTest {
                 on { this@on.uriQuote } doReturn uriQuote
             }
             val state = PermissionGrantedBasicInput(
-                stateContext, source, match = source, input, permission, prevPoints, lastAttempt, maxAttempts
+                stateContext, source, match = source, input, permission, prevResult, lastAttempt, maxAttempts
             )
             assertEquals(
                 PermissionGranted(
@@ -240,7 +239,7 @@ class PermissionGrantedBasicInputTest {
                     match = source,
                     input,
                     permission,
-                    prevPoints,
+                    prevResult,
                     lastAttempt = NetworkTools.Attempt(2, cause),
                     maxAttempts,
                 ),
@@ -267,16 +266,16 @@ class PermissionGrantedBasicInputTest {
                 override suspend fun parse(
                     data: String,
                     match: String,
-                    prevPoints: Points?,
+                    prevResult: ParseResult?,
                     uriQuote: UriQuote,
                     log: Log,
-                ) =
-                    ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
+                ) = ParseResult(prevResult?.points ?: persistentListOf(), nextMatch = data)
 
                 override val permissionTitleResId = R.string.converter_google_maps_permission_title
                 override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
             }
             val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+            val prevResult = ParseResult(prevPoints)
             val lastAttempt = NetworkTools.Attempt(2, ConnectionClosedNetworkException(EOFException()))
             val permission = Permission.ALWAYS
             val stateContext: ConversionStateContext = mock {
@@ -286,7 +285,7 @@ class PermissionGrantedBasicInputTest {
                 on { this@on.uriQuote } doReturn uriQuote
             }
             val state = PermissionGrantedBasicInput(
-                stateContext, source, match = source, input, permission, prevPoints, lastAttempt, maxAttempts
+                stateContext, source, match = source, input, permission, prevResult, lastAttempt, maxAttempts
             )
             assertEquals(
                 PermissionGranted(
@@ -295,7 +294,7 @@ class PermissionGrantedBasicInputTest {
                     match = source,
                     input,
                     permission,
-                    prevPoints,
+                    prevResult,
                     lastAttempt = NetworkTools.Attempt(3, cause),
                     maxAttempts,
                 ),
@@ -322,16 +321,16 @@ class PermissionGrantedBasicInputTest {
                 override suspend fun parse(
                     data: String,
                     match: String,
-                    prevPoints: Points?,
+                    prevResult: ParseResult?,
                     uriQuote: UriQuote,
                     log: Log,
-                ) =
-                    ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
+                ) = ParseResult(prevResult?.points ?: persistentListOf(), nextMatch = data)
 
                 override val permissionTitleResId = R.string.converter_google_maps_permission_title
                 override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
             }
             val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+            val prevResult = ParseResult(prevPoints)
             val lastAttempt = NetworkTools.Attempt(2, ConnectionClosedNetworkException(EOFException()))
             val permission = Permission.ALWAYS
             val stateContext: ConversionStateContext = mock {
@@ -341,7 +340,7 @@ class PermissionGrantedBasicInputTest {
                 on { this@on.uriQuote } doReturn uriQuote
             }
             val state = PermissionGrantedBasicInput(
-                stateContext, source, match = source, input, permission, prevPoints, lastAttempt, maxAttempts
+                stateContext, source, match = source, input, permission, prevResult, lastAttempt, maxAttempts
             )
             assertEquals(
                 ConversionFailed(
@@ -360,7 +359,7 @@ class PermissionGrantedBasicInputTest {
             on { this@on.resources } doReturn resources
         }
         val state = PermissionGrantedBasicInput(
-            stateContext, source, match = source, input, lastAttempt = null
+            stateContext, source, match = source, input, Permission.ALWAYS, lastAttempt = null
         )
         assertEquals(
             LoadingIndicator.Large(
@@ -379,7 +378,7 @@ class PermissionGrantedBasicInputTest {
             on { this@on.resources } doReturn resources
         }
         val state = PermissionGrantedBasicInput(
-            stateContext, source, match = source, input, lastAttempt = lastAttempt
+            stateContext, source, match = source, input, Permission.ALWAYS, lastAttempt = lastAttempt
         )
         assertEquals(
             LoadingIndicator.Large(

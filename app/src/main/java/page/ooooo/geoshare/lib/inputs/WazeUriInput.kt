@@ -12,7 +12,6 @@ import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
-import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.decodeWazeGeoHash
@@ -39,7 +38,7 @@ object WazeUriInput : UriInput, Input.HasRandomUri {
     override suspend fun parse(
         data: Uri,
         match: String,
-        prevPoints: Points?,
+        prevResult: ParseResult?,
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {

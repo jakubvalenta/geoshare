@@ -6,7 +6,6 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
-import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
@@ -20,7 +19,7 @@ object OpenStreetMapApiInput : BodyAsTextInput {
     override suspend fun parse(
         data: String,
         match: String,
-        prevPoints: Points?,
+        prevResult: ParseResult?,
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {
@@ -28,7 +27,7 @@ object OpenStreetMapApiInput : BodyAsTextInput {
         val pattern = Regex(""""lat":$LAT,"lon":$LON""")
 
         val mutablePoints = mutableListOf<WGS84Point>()
-        val name = prevPoints?.lastOrNull()?.name
+        val name = prevResult?.points?.lastOrNull()?.name
 
         mutablePoints.addAll(
             pattern.findAll(data)

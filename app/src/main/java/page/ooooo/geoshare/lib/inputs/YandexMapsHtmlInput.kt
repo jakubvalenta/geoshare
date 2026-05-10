@@ -10,7 +10,6 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.geo.NaivePoint
-import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
@@ -24,7 +23,7 @@ object YandexMapsHtmlInput : BodyAsChannelInput {
     override suspend fun parse(
         data: ByteReadChannel,
         match: String,
-        prevPoints: Points?,
+        prevResult: ParseResult?,
         uriQuote: UriQuote,
         log: Log,
     ) =
@@ -33,7 +32,7 @@ object YandexMapsHtmlInput : BodyAsChannelInput {
             val namePattern = Regex("""itemProp="name"[^>]*>([^<]+)""")
 
             var naivePoint: NaivePoint? = null
-            var name = prevPoints?.lastOrNull()?.name
+            var name = prevResult?.points?.lastOrNull()?.name
 
             while (true) {
                 val line = data.readLine() ?: break

@@ -5,7 +5,6 @@ import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
@@ -22,7 +21,7 @@ object DebugWebViewInput : WebViewInput {
     override suspend fun parse(
         data: String,
         match: String,
-        prevPoints: Points?,
+        prevResult: ParseResult?,
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {

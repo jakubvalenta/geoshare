@@ -6,7 +6,6 @@ import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Point
-import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.network.NetworkTools
 
 sealed interface Input<T> {
@@ -18,7 +17,7 @@ sealed interface Input<T> {
     suspend fun parse(
         data: T,
         match: String,
-        prevPoints: Points? = null,
+        prevResult: ParseResult? = null,
         uriQuote: UriQuote = DefaultUriQuote,
         log: Log = DefaultLog,
     ): ParseResult

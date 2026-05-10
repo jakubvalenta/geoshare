@@ -3,7 +3,6 @@ package page.ooooo.geoshare.lib.inputs
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.geo.Points
 
 /**
  * Loads example.com in a WebView.
@@ -20,7 +19,7 @@ object DebugUriInput : UriInput {
     override suspend fun parse(
         data: Uri,
         match: String,
-        prevPoints: Points?,
+        prevResult: ParseResult?,
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {

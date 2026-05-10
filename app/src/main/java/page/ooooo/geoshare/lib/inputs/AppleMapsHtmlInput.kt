@@ -8,7 +8,6 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
-import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
@@ -22,7 +21,7 @@ object AppleMapsHtmlInput : BodyAsChannelInput {
     override suspend fun parse(
         data: ByteReadChannel,
         match: String,
-        prevPoints: Points?,
+        prevResult: ParseResult?,
         uriQuote: UriQuote,
         log: Log,
     ) =
@@ -32,7 +31,7 @@ object AppleMapsHtmlInput : BodyAsChannelInput {
 
             var lat: Double? = null
             var lon: Double? = null
-            val name = prevPoints?.lastOrNull()?.name
+            val name = prevResult?.points?.lastOrNull()?.name
 
             while (true) {
                 val line = data.readLine() ?: break

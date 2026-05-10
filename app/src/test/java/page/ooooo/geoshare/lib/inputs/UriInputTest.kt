@@ -9,7 +9,6 @@ import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.network.FakeNetworkTools
 import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.network.SocketTimeoutNetworkException
@@ -22,7 +21,7 @@ class UriInputTest {
         override suspend fun parse(
             data: Uri,
             match: String,
-            prevPoints: Points?,
+            prevResult: ParseResult?,
             uriQuote: UriQuote,
             log: Log,
         ) = throw NotImplementedError()
