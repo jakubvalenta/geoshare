@@ -43,7 +43,6 @@
     <string name="user_preferences_connection_option_ask">Запитувати перед з’єднанням</string>
     <string name="no">Ні</string>
     <string name="conversion_failed_missing_url">Помилкова адреса</string>
-    <string name="conversion_failed_parse_url_error">Не вдалося обробити посилання на мапу</string>
     <string name="conversion_succeeded_apps_not_found">Жодного картографічного застосунку не встановлено</string>
     <string name="copying_finished">Скопійовано в буфер обміну</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">У браузері</string>
@@ -232,12 +231,10 @@
     <string name="user_preferences_coordinate_format_option_dec">Градуси з десятковою крапкою</string>
     <string name="user_preferences_coordinate_format_option_deg_min_sec">Градуси, хвилини, секунди</string>
     <string name="user_preferences_coordinate_format_title">Формат координат</string>
-    <string name="conversion_failed_unshorten_error_with_reason">Не вдалося розпізнати коротке посилання через: %1$s</string>
     <string name="conversion_failed_reason_invalid_url">неправильна URL-адреса</string>
     <string name="conversion_failed_reason_missing_header">відсутній заголовок HTTP</string>
     <string name="conversion_failed_reason_no_points">не знайдено жодних результатів</string>
     <string name="conversion_failed_reason_timeout">час очікування вичерпано</string>
-    <string name="conversion_failed_parse_html_error_with_reason">Не вдалося обробити вебсторінку через: %1$s</string>
     <string name="licenses">Ліцензії</string>
     <string name="links_delete">Видалити</string>
     <string name="links_delete_text">Вебмапа «%1$s» буде остаточно видалена.</string>

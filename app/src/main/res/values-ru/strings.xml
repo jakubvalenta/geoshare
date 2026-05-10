@@ -50,7 +50,6 @@
     <string name="user_preferences_connection_option_ask">Спросить перед подключением</string>
     <string name="copying_finished">Скопировано в буфер обмена</string>
     <string name="conversion_failed_unsupported_service">Неподдерживаемый картографический сервис</string>
-    <string name="conversion_failed_parse_url_error">Не удалось обработать ссылку на карту</string>
     <string name="intro_how_to_share_google_maps_content_description">Снимок экрана Google Карт с диалогом «Поделится ссылкой»</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
     <string name="conversion_succeeded_apps_not_found">Никакое приложение для карты не установлено</string>
@@ -267,12 +266,10 @@
     <string name="user_preferences_connection_option_never">Запретить</string>
     <string name="billing_status_expired">Срок действия вашей подписки скоро истечёт</string>
     <string name="billing_status_pending">Ваш платёж ожидает подтверждения</string>
-    <string name="conversion_failed_unshorten_error_with_reason">Не удалось открыть короткую ссылку: %1$s</string>
     <string name="conversion_failed_reason_invalid_url">неправильный URL</string>
     <string name="conversion_failed_reason_missing_header">отсутствует HTTP-заголовок</string>
     <string name="conversion_failed_reason_no_points">точки не найдены</string>
     <string name="conversion_failed_reason_timeout">истекло время ожидания</string>
-    <string name="conversion_failed_parse_html_error_with_reason">Не удалось обработать web-страницу: %1$s</string>
     <string name="network_exception_too_many_requests">слишком много запросов</string>
     <string name="licenses">Лицензии</string>
     <string name="conversion_succeeded_check_experimental">Местоположение может быть неточным из-за экспериментального метода извлечения.</string>

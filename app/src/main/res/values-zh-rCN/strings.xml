@@ -32,7 +32,6 @@
     <string name="user_preferences_connection_option_ask">连接前询问</string>
     <string name="no">否</string>
     <string name="conversion_failed_missing_url">缺少 URL</string>
-    <string name="conversion_failed_parse_url_error">无法处理地图链接</string>
     <string name="conversion_succeeded_apps_not_found">未安装地图应用</string>
     <string name="copying_finished">已复制到剪贴板</string>
     <string name="conversion_failed_connection_permission_denied">如果不连接到地图服务，则不支持此链接</string>
@@ -246,12 +245,10 @@
     <string name="user_preferences_connection_option_never">永不允许</string>
     <string name="billing_status_expired">您的订阅即将到期</string>
     <string name="billing_status_pending">您的付款正在处理中</string>
-    <string name="conversion_failed_unshorten_error_with_reason">无法解析短链接，原因：%1$s</string>
     <string name="conversion_failed_reason_invalid_url">URL 无效</string>
     <string name="conversion_failed_reason_missing_header">缺少 HTTP 标头</string>
     <string name="conversion_failed_reason_no_points">未找到点</string>
     <string name="conversion_failed_reason_timeout">超时</string>
-    <string name="conversion_failed_parse_html_error_with_reason">无法处理网页，原因：%1$s</string>
     <string name="network_exception_too_many_requests">请求过多</string>
     <string name="licenses">许可</string>
     <string name="conversion_succeeded_check_experimental">由于采用了实验性的提取方法，位置可能不准确。</string>
