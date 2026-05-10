@@ -3,36 +3,22 @@ package page.ooooo.geoshare.lib.inputs
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.lib.geo.Points
 
-data class ParseUriResult(
+data class ParseResult(
     val points: Points = persistentListOf(),
-    val htmlUriString: String? = null,
-    val webUriString: String? = null,
+    val nextStep: NextStep? = null,
 )
 
-class ParseUriResultScope {
-    var points: Points = persistentListOf()
-    var htmlUriString: String? = null
-    var webUriString: String? = null
-
-    internal fun build() = ParseUriResult(points, htmlUriString, webUriString)
-}
-
-data class ParseHtmlResult(
-    val points: Points = persistentListOf(),
-    val redirectUriString: String? = null,
-    val webUriString: String? = null,
+data class NextStep(
+    val input: Input<*>,
+    val match: String,
 )
 
-class ParseHtmlResultScope {
+class ParseResultScope {
     var points: Points = persistentListOf()
-    var redirectUriString: String? = null
-    var webUriString: String? = null
+    var nextStep: NextStep? = null
 
-    internal fun build() = ParseHtmlResult(points, redirectUriString, webUriString)
+    internal fun build() = ParseResult(points, nextStep)
 }
 
-suspend fun buildParseUriResult(block: suspend ParseUriResultScope.() -> Unit): ParseUriResult =
-    ParseUriResultScope().apply { this.block() }.build()
-
-suspend fun buildParseHtmlResult(block: suspend ParseHtmlResultScope.() -> Unit): ParseHtmlResult =
-    ParseHtmlResultScope().apply { this.block() }.build()
+suspend fun buildParseResult(block: suspend ParseResultScope.() -> Unit): ParseResult =
+    ParseResultScope().apply { this.block() }.build()

@@ -103,13 +103,9 @@ class LinksBehaviorTest : BehaviorTest {
 
         // Delete link
         onElement { viewIdResourceName == "geoShareLinksDetailDelete" }.click()
-        onDialog("geoShareLinkDeleteDialog") {
-            dismiss()
-        }
+        onElement { viewIdResourceName == "geoShareLinkDeleteDialog" }.dismissDialog()
         onElement { viewIdResourceName == "geoShareLinksDetailDelete" }.click()
-        onDialog("geoShareLinkDeleteDialog") {
-            confirm()
-        }
+        onElement { viewIdResourceName == "geoShareLinkDeleteDialog" }.confirmDialog()
 
         // Does not show link
         assertNull(onElementOrNull(BehaviorTest.ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareLinksListItem_a5092c63-cf5c-4225-9059-e888ae12e215" })
@@ -126,13 +122,9 @@ class LinksBehaviorTest : BehaviorTest {
             // Scroll again, because only now can the lazy column pane scroll all the way to the bottom
             .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinksRestoreInitialButton" }
             .click()
-        onDialog("geoShareLinksRestoreInitialDialog") {
-            dismiss()
-        }
+        onElement { viewIdResourceName == "geoShareLinksRestoreInitialDialog" }.dismissDialog()
         onElement { viewIdResourceName == "geoShareLinksRestoreInitialButton" }.click()
-        onDialog("geoShareLinksRestoreInitialDialog") {
-            confirm()
-        }
+        onElement { viewIdResourceName == "geoShareLinksRestoreInitialDialog" }.confirmDialog()
 
         // Shows link
         onElement { viewIdResourceName == "geoShareLinksListPane" }

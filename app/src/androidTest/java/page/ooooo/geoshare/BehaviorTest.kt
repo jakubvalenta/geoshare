@@ -33,11 +33,10 @@ import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.network.NetworkTools.Companion.CONNECT_TIMEOUT
-import page.ooooo.geoshare.lib.network.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE
-import page.ooooo.geoshare.lib.network.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE_DELAY
-import page.ooooo.geoshare.lib.network.NetworkTools.Companion.MAX_RETRIES
-import page.ooooo.geoshare.lib.network.NetworkTools.Companion.REQUEST_TIMEOUT
+import page.ooooo.geoshare.lib.network.DefaultNetworkTools.Companion.CONNECT_TIMEOUT
+import page.ooooo.geoshare.lib.network.DefaultNetworkTools.Companion.EXPONENTIAL_DELAY_BASE
+import page.ooooo.geoshare.lib.network.DefaultNetworkTools.Companion.EXPONENTIAL_DELAY_BASE_DELAY
+import page.ooooo.geoshare.lib.network.DefaultNetworkTools.Companion.REQUEST_TIMEOUT
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 import java.net.InetAddress
 import java.net.SocketException
@@ -47,20 +46,6 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import kotlin.math.pow
 import kotlin.math.roundToLong
-
-class DialogScope(val dialog: UiObject2) {
-    fun confirm() {
-        dialog.onElement { viewIdResourceName == "geoShareConfirmationDialogConfirmButton" }.click()
-    }
-
-    fun dismiss() {
-        dialog.onElement { viewIdResourceName == "geoShareConfirmationDialogDismissButton" }.click()
-    }
-
-    fun toggleDoNotAsk() {
-        dialog.onElement { viewIdResourceName == "geoShareConfirmationDialogDoNotAskSwitch" }.click()
-    }
-}
 
 class MockLocationScope(val locationManager: LocationManager, val mockProviderName: String) {
     fun setLocation(lat: Double, lon: Double) {
@@ -77,14 +62,6 @@ class MockLocationScope(val locationManager: LocationManager, val mockProviderNa
 }
 
 interface BehaviorTest {
-
-    companion object {
-        const val ELEMENT_DOES_NOT_EXIST_TIMEOUT = 500L
-        val NETWORK_TIMEOUT = (1..MAX_RETRIES).fold(CONNECT_TIMEOUT + REQUEST_TIMEOUT) { acc, curr ->
-            acc + (EXPONENTIAL_DELAY_BASE.pow(curr - 1) * EXPONENTIAL_DELAY_BASE_DELAY).roundToLong() + CONNECT_TIMEOUT + REQUEST_TIMEOUT
-        }
-    }
-
     @Before
     fun goToLauncher() = uiAutomator {
         // Start from the home screen
@@ -117,13 +94,16 @@ interface BehaviorTest {
         waitForStableInActiveWindow(stableTimeoutMs = 1_000L, stableIntervalMs = 100L, requireStableScreenshot = false)
     }
 
-    fun onDialog(
-        resourceName: String,
-        timeoutMs: Long = 10_000L,
-        block: DialogScope.() -> Unit,
-    ) = uiAutomator {
-        val dialog = onElement(timeoutMs) { viewIdResourceName == resourceName }
-        DialogScope(dialog).block()
+    fun UiObject2.confirmDialog() {
+        onElement { viewIdResourceName == "geoShareConfirmationDialogConfirmButton" }.click()
+    }
+
+    fun UiObject2.dismissDialog() {
+        onElement { viewIdResourceName == "geoShareConfirmationDialogDismissButton" }.click()
+    }
+
+    fun UiObject2.toggleDoNotAsk() {
+        onElement { viewIdResourceName == "geoShareConfirmationDialogDoNotAskSwitch" }.click()
     }
 
     private fun isLocationGrantButton(element: AccessibilityNodeInfo): Boolean =
@@ -500,6 +480,14 @@ interface BehaviorTest {
             MockLocationScope(locationManager, mockProviderName).block()
         } finally {
             locationManager.removeTestProvider(mockProviderName)
+        }
+    }
+
+    companion object {
+        const val ELEMENT_DOES_NOT_EXIST_TIMEOUT = 500L
+        const val MAX_ATTEMPTS = 10
+        val NETWORK_TIMEOUT = (1..MAX_ATTEMPTS).fold(CONNECT_TIMEOUT + REQUEST_TIMEOUT) { acc, curr ->
+            acc + (EXPONENTIAL_DELAY_BASE.pow(curr - 1) * EXPONENTIAL_DELAY_BASE_DELAY).roundToLong() + CONNECT_TIMEOUT + REQUEST_TIMEOUT
         }
     }
 }

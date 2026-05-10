@@ -17,7 +17,7 @@ object GeoUriFormatter {
             buildString {
                 append("geo:")
                 append(
-                    Uri.formatPath(
+                    Uri.formatPathPart(
                         latStr?.let { latStr ->
                             lonStr?.let { lonStr ->
                                 "$latStr,$lonStr"

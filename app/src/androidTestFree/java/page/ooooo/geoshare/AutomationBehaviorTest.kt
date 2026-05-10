@@ -147,9 +147,7 @@ class AutomationBehaviorTest : BehaviorTest {
             onElement { viewIdResourceName == "geoShareResultSuccessAutomationCounter" }
 
             // Confirm location rationale
-            onDialog("geoShareLocationRationaleDialog", timeoutMs = 20_000L) {
-                confirm()
-            }
+            onElement(20_000L) { viewIdResourceName == "geoShareLocationRationaleDialog" }.confirmDialog()
 
             // Grant location permission
             waitForStableInActiveWindow() // Wait, otherwise tapping the location permission grant button does nothing

@@ -38,7 +38,6 @@
     <string name="user_preferences_connection_option_ask">Demandez avant de vous connecter</string>
     <string name="no">Non</string>
     <string name="conversion_failed_missing_url">URL manquante</string>
-    <string name="conversion_failed_parse_url_error">Échec du traitement du lien de la carte</string>
     <string name="conversion_succeeded_apps_not_found">Aucune application cartographique n’est installée</string>
     <string name="copying_finished">Copié dans le presse-papiers</string>
     <string name="conversion_failed_connection_permission_denied">Ce lien n’est pas pris en charge sans connexion au service de cartographie</string>
@@ -258,12 +257,10 @@
     <string name="user_preferences_section_output">Résultat</string>
     <string name="user_preferences_connection_option_always">Autoriser</string>
     <string name="user_preferences_connection_option_never">Ne jamais autoriser</string>
-    <string name="conversion_failed_unshorten_error_with_reason">Impossible de résoudre le lien raccourci en raison de : %1$s</string>
     <string name="conversion_failed_reason_invalid_url">URL invalide</string>
     <string name="conversion_failed_reason_missing_header">En-tête HTTP manquant</string>
     <string name="conversion_failed_reason_no_points">Aucun point trouvé</string>
     <string name="conversion_failed_reason_timeout">temps mort</string>
-    <string name="conversion_failed_parse_html_error_with_reason">Échec du traitement de la page Web pour la raison suivante : %1$s</string>
     <string name="network_exception_too_many_requests">Trop de demandes</string>
     <string name="licenses">Licences</string>
     <string name="conversion_succeeded_check_experimental">La localisation peut être inexacte en raison d’une méthode d’extraction expérimentale.</string>

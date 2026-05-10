@@ -70,7 +70,7 @@ class ConversionBehaviorTest : BehaviorTest {
     }
 
     @Test
-    fun whenShortUriIsSharedAndPermissionIsGrantedWithoutDoNotAsk_showsPointAndShowsDialogAgain() = uiAutomator {
+    fun whenShortLinkIsSharedAndPermissionIsGrantedWithoutDoNotAsk_showsPointAndShowsDialogAgain() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("maps.google.com")
         }
@@ -79,9 +79,7 @@ class ConversionBehaviorTest : BehaviorTest {
         shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
 
         // Grant unshorten permission
-        onDialog("geoShareUnshortenPermissionDialog", timeoutMs = 20_000L) {
-            confirm()
-        }
+        onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
 
         // Shows precise location
         assertConversionSucceeded(
@@ -94,14 +92,14 @@ class ConversionBehaviorTest : BehaviorTest {
 
         // Share another Google Maps short link with the app
         shareUri("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA")
-        quickWaitForStableInActiveWindow()
+        waitForStableInActiveWindow()
 
         // Unshorten permission dialog is visible again
-        onElement { viewIdResourceName == "geoShareUnshortenPermissionDialog" }
+        onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }
     }
 
     @Test
-    fun whenShortUriIsSharedAndPermissionIsGrantedWithDoNotAsk_showsPointAndDoesNotShowDialogAgain() = uiAutomator {
+    fun whenShortLinkIsSharedAndPermissionIsGrantedWithDoNotAsk_showsPointAndDoesNotShowDialogAgain() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("maps.google.com")
         }
@@ -110,9 +108,9 @@ class ConversionBehaviorTest : BehaviorTest {
         shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
 
         // Grant unshorten permission and check "Don't ask me again"
-        onDialog("geoShareUnshortenPermissionDialog", timeoutMs = 20_000L) {
+        onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
             toggleDoNotAsk()
-            confirm()
+            confirmDialog()
         }
 
         // Shows precise location
@@ -139,7 +137,7 @@ class ConversionBehaviorTest : BehaviorTest {
     }
 
     @Test
-    fun whenShortUriIsSharedAndPermissionIsDeniedWithoutDoNotAsk_closesDialogAndShowsDialogAgain() = uiAutomator {
+    fun whenShortLinkIsSharedAndPermissionIsDeniedWithoutDoNotAsk_closesDialogAndShowsDialogAgain() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("maps.google.com")
         }
@@ -148,9 +146,7 @@ class ConversionBehaviorTest : BehaviorTest {
         shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
 
         // Deny unshorten permission
-        onDialog("geoShareUnshortenPermissionDialog", timeoutMs = 20_000L) {
-            dismiss()
-        }
+        onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.dismissDialog()
 
         // Error is visible
         onElement { viewIdResourceName == "geoShareConversionError" }
@@ -162,11 +158,11 @@ class ConversionBehaviorTest : BehaviorTest {
         shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
 
         // Unshorten permission dialog is visible again
-        onElement { viewIdResourceName == "geoShareUnshortenPermissionDialog" }
+        onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }
     }
 
     @Test
-    fun whenShortUriIsSharedAndPermissionIsDeniedWithDoNotAsk_closesDialogAndDoesNotShowDialogAgain() = uiAutomator {
+    fun whenShortLinkIsSharedAndPermissionIsDeniedWithDoNotAsk_closesDialogAndDoesNotShowDialogAgain() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("maps.google.com")
         }
@@ -175,9 +171,9 @@ class ConversionBehaviorTest : BehaviorTest {
         shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
 
         // Deny unshorten permission
-        onDialog("geoShareUnshortenPermissionDialog", timeoutMs = 20_000L) {
+        onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
             toggleDoNotAsk()
-            dismiss()
+            dismissDialog()
         }
 
         // Error is visible
@@ -194,7 +190,7 @@ class ConversionBehaviorTest : BehaviorTest {
     }
 
     @Test
-    fun whenNonexistentShortUriIsSharedAndPermissionIsDenied_closesDialogAndDoesNothing() = uiAutomator {
+    fun whenNonexistentShortLinkIsSharedAndPermissionIsDenied_closesDialogAndDoesNothing() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("maps.google.com")
         }
@@ -203,9 +199,7 @@ class ConversionBehaviorTest : BehaviorTest {
         shareUri("https://maps.app.goo.gl/spam")
 
         // Grant unshorten permission
-        onDialog("geoShareUnshortenPermissionDialog", timeoutMs = 20_000L) {
-            confirm()
-        }
+        onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
 
         // Error is visible
         onElement { viewIdResourceName == "geoShareConversionError" }
@@ -222,9 +216,7 @@ class ConversionBehaviorTest : BehaviorTest {
             shareUri("https://maps.apple.com/place?place-id=I7BA098CC17989C16&_provider=9902")
 
             // Grant parse HTML permission
-            onDialog("geoShareParseHtmlPermissionDialog", timeoutMs = 20_000L) {
-                confirm()
-            }
+            onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
 
             // Shows precise location
             assertConversionSucceeded(WGS84Point(52.4697882, 13.4257989, source = Source.HTML))
@@ -234,7 +226,7 @@ class ConversionBehaviorTest : BehaviorTest {
             quickWaitForStableInActiveWindow()
 
             // Parse HTML permission dialog is visible again
-            onElement { viewIdResourceName == "geoShareParseHtmlPermissionDialog" }
+            onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }
         }
 
     @Test
@@ -248,9 +240,9 @@ class ConversionBehaviorTest : BehaviorTest {
             shareUri("https://maps.apple.com/place?place-id=I1CBDEBCF5A275CB2&_provider=9902")
 
             // Grant parse HTML permission and check "Don't ask me again"
-            onDialog("geoShareParseHtmlPermissionDialog", timeoutMs = 20_000L) {
+            onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
                 toggleDoNotAsk()
-                confirm()
+                confirmDialog()
             }
 
             // Shows precise location
@@ -275,9 +267,7 @@ class ConversionBehaviorTest : BehaviorTest {
             shareUri("https://maps.apple.com/place?place-id=I8D204FAB527CE0EB&_provider=9902")
 
             // Deny parse HTML permission
-            onDialog("geoShareParseHtmlPermissionDialog", timeoutMs = 20_000L) {
-                dismiss()
-            }
+            onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.dismissDialog()
 
             // Error is visible
             onElement { viewIdResourceName == "geoShareConversionError" }
@@ -289,7 +279,7 @@ class ConversionBehaviorTest : BehaviorTest {
             shareUri("https://maps.apple.com/place?place-id=IE08A4F5FAA2F0502&_provider=9902")
 
             // Parse HTML permission dialog is visible again
-            onElement { viewIdResourceName == "geoShareParseHtmlPermissionDialog" }
+            onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }
         }
 
     @Test
@@ -303,9 +293,9 @@ class ConversionBehaviorTest : BehaviorTest {
             shareUri("https://maps.apple.com/place?place-id=I5ECF0E5A2703FCD1&_provider=9902")
 
             // Deny parse HTML permission
-            onDialog("geoShareParseHtmlPermissionDialog", timeoutMs = 20_000L) {
+            onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
                 toggleDoNotAsk()
-                dismiss()
+                dismissDialog()
             }
 
             // Error is visible
@@ -332,9 +322,7 @@ class ConversionBehaviorTest : BehaviorTest {
             shareUri("https://www.google.com/maps/place/Hermannstr.+10,+Berlin/")
 
             // Grant parse HTML permission
-            onDialog("geoShareParseHtmlPermissionDialog", timeoutMs = 20_000L) {
-                confirm()
-            }
+            onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
 
             // Shows precise location
             assertConversionSucceeded(
@@ -350,7 +338,7 @@ class ConversionBehaviorTest : BehaviorTest {
             quickWaitForStableInActiveWindow()
 
             // Parse HTML permission dialog is visible again
-            onElement { viewIdResourceName == "geoShareParseHtmlPermissionDialog" }
+            onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }
         }
 
     @Test
@@ -364,9 +352,9 @@ class ConversionBehaviorTest : BehaviorTest {
             shareUri("https://www.google.com/maps/place/Hermannstr.+20,+Berlin/")
 
             // Grant parse HTML permission and check "Don't ask me again"
-            onDialog("geoShareParseHtmlPermissionDialog", timeoutMs = 20_000L) {
+            onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
                 toggleDoNotAsk()
-                confirm()
+                confirmDialog()
             }
 
             // Shows precise location
@@ -403,9 +391,7 @@ class ConversionBehaviorTest : BehaviorTest {
             shareUri("https://www.google.com/maps/place/Hermannstr.+30,+Berlin/")
 
             // Deny parse HTML permission
-            onDialog("geoShareParseHtmlPermissionDialog", timeoutMs = 20_000L) {
-                dismiss()
-            }
+            onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.dismissDialog()
 
             // Shows location search
             assertConversionSucceeded(
@@ -419,7 +405,7 @@ class ConversionBehaviorTest : BehaviorTest {
             shareUri("https://www.google.com/maps/place/Hermannstr.+31,+Berlin/")
 
             // Parse HTML permission dialog is visible again
-            onElement { viewIdResourceName == "geoShareParseHtmlPermissionDialog" }
+            onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }
         }
 
     @Test
@@ -433,9 +419,9 @@ class ConversionBehaviorTest : BehaviorTest {
             shareUri("https://www.google.com/maps/place/Hermannstr.+40,+Berlin/")
 
             // Deny parse HTML permission
-            onDialog("geoShareParseHtmlPermissionDialog", timeoutMs = 20_000L) {
+            onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
                 toggleDoNotAsk()
-                dismiss()
+                dismissDialog()
             }
 
             // Shows location search
@@ -460,18 +446,16 @@ class ConversionBehaviorTest : BehaviorTest {
         }
 
     @Test
-    fun whenShortUriWithCoordinatesInHtmlIsSharedAndPermissionIsGranted_doesNotAskForPermission() = uiAutomator {
+    fun whenShortLinkWithCoordinatesInHtmlIsSharedAndPermissionIsGranted_doesNotAskForPermission() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("maps.google.com")
         }
 
         // Share a Google Maps short link with the app
-        shareUri("https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8")
+        shareUri("https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8") // Sometimes fails in emulator
 
         // Grant unshorten permission
-        onDialog("geoShareUnshortenPermissionDialog", timeoutMs = 20_000L) {
-            confirm()
-        }
+        onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
 
         // Shows precise location
         assertConversionSucceeded(
@@ -523,17 +507,13 @@ class ConversionBehaviorTest : BehaviorTest {
             onElement { viewIdResourceName == "geoShareApp_${PackageNames.TOMTOM}" }.click()
 
             // Dismiss the location rationale dialog
-            onDialog("geoShareLocationRationaleDialog", timeoutMs = 20_000L) {
-                dismiss()
-            }
+            onElement(20_000L) { viewIdResourceName == "geoShareLocationRationaleDialog" }.dismissDialog()
 
             // Tap the TomTom icon again
             onElement { viewIdResourceName == "geoShareApp_${PackageNames.TOMTOM}" }.click()
 
             // Confirm location rationale
-            onDialog("geoShareLocationRationaleDialog", timeoutMs = 20_000L) {
-                confirm()
-            }
+            onElement(20_000L) { viewIdResourceName == "geoShareLocationRationaleDialog" }.confirmDialog()
 
             // Deny location permission
             denyLocationPermission()
@@ -542,9 +522,7 @@ class ConversionBehaviorTest : BehaviorTest {
             onElement { viewIdResourceName == "geoShareApp_${PackageNames.TOMTOM}" }.click()
 
             // Confirm location rationale
-            onDialog("geoShareLocationRationaleDialog", timeoutMs = 20_000L) {
-                confirm()
-            }
+            onElement(20_000L) { viewIdResourceName == "geoShareLocationRationaleDialog" }.confirmDialog()
 
             // Grant location permission
             waitForStableInActiveWindow() // Wait, otherwise tapping the location permission grant button does nothing

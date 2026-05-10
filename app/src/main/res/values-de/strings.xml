@@ -72,7 +72,6 @@
     <string name="user_preferences_connection_option_ask">Vor dem Verbinden fragen</string>
     <string name="no">Nein</string>
     <string name="conversion_failed_missing_url">Fehlende URL</string>
-    <string name="conversion_failed_parse_url_error">Kartenlink konnte nicht verarbeitet werden</string>
     <string name="conversion_succeeded_apps_not_found">Es ist keine Karten-App installiert</string>
     <string name="copying_finished">In die Zwischenablage kopiert</string>
     <string name="conversion_failed_connection_permission_denied">Dieser Link wird ohne Verbindung zum Kartendienst nicht unterstützt</string>

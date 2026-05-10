@@ -37,7 +37,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.DefaultLog
-import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Message
 import kotlin.time.Duration.Companion.hours
 
@@ -51,7 +51,7 @@ class BillingImpl(
     private val productDetailsParamsBuilder: () -> ProductDetailsParamsBuilder = { DefaultProductDetailsParamsBuilder() },
     private val billingFlowParamsBuilder: () -> BillingFlowParamsBuilder = { DefaultBillingFlowParamsBuilder() },
     private val resources: Resources = context.resources,
-    private val log: ILog = DefaultLog,
+    private val log: Log = DefaultLog,
 ) :
     Billing,
     AcknowledgePurchaseResponseListener,

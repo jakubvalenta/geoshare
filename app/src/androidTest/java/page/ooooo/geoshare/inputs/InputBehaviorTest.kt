@@ -61,7 +61,7 @@ interface InputBehaviorTest : BehaviorTest {
         goToMainForm()
 
         // Set main input
-        val mainInput = onElement { viewIdResourceName == "geoShareMainInputUriStringTextField" }
+        val mainInput = onElement { viewIdResourceName == "geoShareMainSourceTextField" }
         mainInput.setText(unsafeText)
         quickWaitForStableInActiveWindow() // Wait for the submit button to get its final position, after setting text
 

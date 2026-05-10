@@ -143,8 +143,13 @@ fun decodeWazeGeoHash(hash: String) = decodeGeoHash(
  * See https://github.com/google/open-location-code
  */
 fun decodePlusCode(codeString: String): NaivePoint? =
-    OpenLocationCode(codeString)
-        .run {
+    try {
+        OpenLocationCode(codeString)
+    } catch (_: IllegalArgumentException) {
+        // Invalid code
+        null
+    }
+        ?.run {
             if (isFull) {
                 // The code is full
                 this

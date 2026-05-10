@@ -15,6 +15,7 @@ import io.ktor.client.plugins.cookies.ConstantCookiesStorage
 import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.request.prepareRequest
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.request
 import io.ktor.http.Cookie
 import io.ktor.http.HttpHeaders
@@ -30,17 +31,48 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.io.EOFException
 import page.ooooo.geoshare.lib.DefaultLog
-import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.Log
 import java.net.URL
 import kotlin.math.pow
 import kotlin.math.roundToLong
 
-open class NetworkTools(
-    private val engine: HttpClientEngine = CIO.create(),
-    private val log: ILog = DefaultLog,
-) {
+interface NetworkTools {
     data class Attempt(val number: Int, val cause: RecoverableNetworkException)
 
+    suspend fun httpHeadLocationHeader(
+        url: URL,
+        lastAttempt: Attempt? = null,
+        maxAttempts: Int = 1,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    ): String
+
+    suspend fun <T> httpGetBodyAsByteReadChannel(
+        url: URL,
+        lastAttempt: Attempt? = null,
+        maxAttempts: Int = 1,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        block: suspend (channel: ByteReadChannel) -> T,
+    ): T
+
+    suspend fun httpGetBodyAsText(
+        url: URL,
+        lastAttempt: Attempt? = null,
+        maxAttempts: Int = 1,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    ): String
+
+    suspend fun httpGetRedirectedUrlString(
+        url: URL,
+        lastAttempt: Attempt? = null,
+        maxAttempts: Int = 1,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    ): String
+}
+
+class DefaultNetworkTools(
+    private val engine: HttpClientEngine = CIO.create(),
+    private val log: Log = DefaultLog,
+) : NetworkTools {
     /**
      * Makes a HEAD request to [url] and returns the value of the response Location header.
      *
@@ -52,12 +84,12 @@ open class NetworkTools(
      * The network request is executed on [dispatcher].
      */
     @Throws(NetworkException::class)
-    open suspend fun httpHeadLocationHeader(
+    override suspend fun httpHeadLocationHeader(
         url: URL,
-        lastAttempt: Attempt? = null,
-        maxAttempts: Int = 1,
-        dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    ): String? = withContext(dispatcher) {
+        lastAttempt: NetworkTools.Attempt?,
+        maxAttempts: Int,
+        dispatcher: CoroutineDispatcher,
+    ): String = withContext(dispatcher) {
         connect(
             engine,
             url,
@@ -67,7 +99,7 @@ open class NetworkTools(
             maxAttempts = maxAttempts,
         ) { response ->
             response.headers[HttpHeaders.Location]
-        }
+        } ?: throw MissingHeaderNetworkException()
     }
 
     /**
@@ -82,16 +114,38 @@ open class NetworkTools(
      * is closed.
      */
     @Throws(NetworkException::class)
-    open suspend fun <T> httpGetBodyAsByteReadChannel(
+    override suspend fun <T> httpGetBodyAsByteReadChannel(
         url: URL,
-        lastAttempt: Attempt? = null,
-        maxAttempts: Int = 1,
-        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        lastAttempt: NetworkTools.Attempt?,
+        maxAttempts: Int,
+        dispatcher: CoroutineDispatcher,
         block: suspend (channel: ByteReadChannel) -> T,
     ): T = withContext(dispatcher) {
         connect(engine, url, lastAttempt = lastAttempt, maxAttempts = maxAttempts) { response ->
             val channel: ByteReadChannel = response.body()
             block(channel)
+        }
+    }
+
+    /**
+     * Makes a HEAD request to [url] and returns the response body as text.
+     *
+     * To enable retrying, pass [maxAttempts] and [lastAttempt]. [maxAttempts] sets the maximum number of requests to
+     * make including the first request. [lastAttempt] tracks how many attempts have already been made. We use this
+     * custom retrying instead of the [io.ktor.client.plugins.HttpRequestRetry] plugin, so that the caller can notify
+     * the user while requests are being retried.
+     *
+     * The network request is executed on [dispatcher].
+     */
+    @Throws(NetworkException::class)
+    override suspend fun httpGetBodyAsText(
+        url: URL,
+        lastAttempt: NetworkTools.Attempt?,
+        maxAttempts: Int,
+        dispatcher: CoroutineDispatcher,
+    ): String = withContext(dispatcher) {
+        connect(engine, url, lastAttempt = lastAttempt, maxAttempts = maxAttempts) { response ->
+            response.bodyAsText()
         }
     }
 
@@ -106,11 +160,11 @@ open class NetworkTools(
      * The network request is executed on [dispatcher].
      */
     @Throws(NetworkException::class)
-    open suspend fun httpGetRedirectedUrlString(
+    override suspend fun httpGetRedirectedUrlString(
         url: URL,
-        lastAttempt: Attempt? = null,
-        maxAttempts: Int = 1,
-        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        lastAttempt: NetworkTools.Attempt?,
+        maxAttempts: Int,
+        dispatcher: CoroutineDispatcher,
     ): String = withContext(dispatcher) {
         connect(engine, url, lastAttempt = lastAttempt, maxAttempts = maxAttempts) { response ->
             response.request.url.toString()
@@ -130,23 +184,23 @@ open class NetworkTools(
      * the user while requests are being retried.
      */
     @Throws(NetworkException::class)
-    open suspend fun <T> connect(
+    suspend fun <T> connect(
         engine: HttpClientEngine,
         url: URL,
         method: HttpMethod = HttpMethod.Get,
         followRedirects: Boolean = true,
-        lastAttempt: Attempt? = null,
+        lastAttempt: NetworkTools.Attempt? = null,
         maxAttempts: Int = 1,
         block: suspend (response: HttpResponse) -> T,
     ): T {
         if (lastAttempt != null && lastAttempt.number > 1) {
             if (lastAttempt.number > maxAttempts) {
-                log.w(null, "Maximum number of $maxAttempts attempts reached for $url")
+                log.w(TAG, "Maximum number of $maxAttempts attempts reached for $url")
                 throw MaxAttemptsReachedNetworkException(lastAttempt.cause)
             }
             val delayMillis = (EXPONENTIAL_DELAY_BASE.pow(lastAttempt.number - 2) * EXPONENTIAL_DELAY_BASE_DELAY)
                 .roundToLong()
-            log.i(null, "Waiting ${delayMillis}ms before attempt ${lastAttempt.number} of $maxAttempts for $url")
+            log.i(TAG, "Waiting ${delayMillis}ms before attempt ${lastAttempt.number} of $maxAttempts for $url")
             delay(delayMillis)
         }
         return HttpClient(engine) {
@@ -189,40 +243,42 @@ open class NetworkTools(
             }
         }.use { client ->
             try {
-                client.prepareRequest(url) {
-                    this.method = method
-                }.execute(block)
+                client
+                    .prepareRequest(url) {
+                        this.method = method
+                    }
+                    .execute(block)
             } catch (tr: UnresolvedAddressException) {
-                log.w(null, "Unresolved address for $url", tr)
+                log.w(TAG, "Unresolved address for $url", tr)
                 throw UnresolvedAddressNetworkException(tr)
             } catch (tr: HttpRequestTimeoutException) {
-                log.w(null, "Request timeout for $url", tr)
+                log.w(TAG, "Request timeout for $url", tr)
                 throw RequestTimeoutNetworkException(tr)
             } catch (tr: SocketTimeoutException) {
-                log.w(null, "Socket timeout for $url", tr)
+                log.w(TAG, "Socket timeout for $url", tr)
                 throw SocketTimeoutNetworkException(tr)
             } catch (tr: ConnectTimeoutException) {
-                log.w(null, "Connect timeout for $url", tr)
+                log.w(TAG, "Connect timeout for $url", tr)
                 throw ConnectTimeoutNetworkException(tr)
             } catch (tr: EOFException) {
-                log.w(null, "EOF exception for $url", tr)
+                log.w(TAG, "EOF exception for $url", tr)
                 throw ConnectionClosedNetworkException(tr)
             } catch (tr: ServerResponseException) {
-                log.w(null, "Server error ${tr.response.status} for $url", tr)
+                log.w(TAG, "Server error ${tr.response.status} for $url", tr)
                 throw ServerResponseNetworkException(tr.response.status, tr)
             } catch (tr: ResponseException) {
-                log.w(null, "Unexpected response code ${tr.response.status} for $url", tr)
+                log.w(TAG, "Unexpected response code ${tr.response.status} for $url", tr)
                 throw ResponseNetworkException(tr.response.status, tr)
             } catch (tr: Exception) {
-                log.e(null, "Unknown network exception for $url", tr)
+                log.e(TAG, "Unknown network exception for $url", tr)
                 throw UnknownNetworkException(tr)
             }
         }
     }
 
-    fun HttpStatusCode.isRedirect(): Boolean = value in (300 until 400)
+    private fun HttpStatusCode.isRedirect(): Boolean = value in (300 until 400)
 
-    fun HttpStatusCode.isServerError(): Boolean = value in (500 until 600)
+    private fun HttpStatusCode.isServerError(): Boolean = value in (500 until 600)
 
     companion object {
         const val DESKTOP_USER_AGENT =
@@ -232,5 +288,38 @@ open class NetworkTools(
         const val REQUEST_TIMEOUT = 256_000L
         const val CONNECT_TIMEOUT = 128_000L
         const val SOCKET_TIMEOUT = 128_000L
+
+        private const val TAG = "NetworkTools"
     }
+}
+
+open class FakeNetworkTools : NetworkTools {
+    override suspend fun httpHeadLocationHeader(
+        url: URL,
+        lastAttempt: NetworkTools.Attempt?,
+        maxAttempts: Int,
+        dispatcher: CoroutineDispatcher,
+    ): String = throw NotImplementedError()
+
+    override suspend fun <T> httpGetBodyAsByteReadChannel(
+        url: URL,
+        lastAttempt: NetworkTools.Attempt?,
+        maxAttempts: Int,
+        dispatcher: CoroutineDispatcher,
+        block: suspend (channel: ByteReadChannel) -> T,
+    ): T = throw NotImplementedError()
+
+    override suspend fun httpGetBodyAsText(
+        url: URL,
+        lastAttempt: NetworkTools.Attempt?,
+        maxAttempts: Int,
+        dispatcher: CoroutineDispatcher,
+    ): String = throw NotImplementedError()
+
+    override suspend fun httpGetRedirectedUrlString(
+        url: URL,
+        lastAttempt: NetworkTools.Attempt?,
+        maxAttempts: Int,
+        dispatcher: CoroutineDispatcher,
+    ): String = throw NotImplementedError()
 }

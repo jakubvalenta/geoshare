@@ -42,7 +42,6 @@
     <string name="permission_do_not_ask">Не ме питай отново</string>
     <string name="faq_title">ЧЗВ</string>
     <string name="conversion_failed_connection_permission_denied">Тази връзка не се поддържа без свързване с картографската услуга</string>
-    <string name="conversion_failed_parse_url_error">Неуспешно обработване на връзка към карта</string>
     <string name="user_preferences_title">Предпочитания</string>
     <string name="about_text"><![CDATA[<p>%1$s е безплатно приложение с отворен код, разпространявано под <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> или по-нов лиценз.</p><br><p>Можете да намерите кода на <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, където можете също да <a href="https://github.com/jakubvalenta/geoshare/issues">докладвате за проблеми</a>.</p><br><p>Вашите отзиви са добре дошли. Можете да се свържете с мен на <a href="mailto:%2$s">%2$s</a>.</p>]]></string>
     <string name="user_preferences_connection_description">За да поддържа кратки връзки и връзки, които не съдържат географски координати в URL адреса, %1$s може да се свърже с картографската услуга (Google Maps, Apple Maps и др.).</string>
@@ -251,12 +250,10 @@
     <string name="user_preferences_apps_title">Приложения</string>
     <string name="user_preferences_section_input">Вход</string>
     <string name="user_preferences_section_output">Изход</string>
-    <string name="conversion_failed_unshorten_error_with_reason">Неуспешно разрешаване на кратката връзка поради: %1$s</string>
     <string name="conversion_failed_reason_invalid_url">невалиден URL адрес</string>
     <string name="conversion_failed_reason_missing_header">липсва HTTP заглавка</string>
     <string name="conversion_failed_reason_no_points">не са намерени точки</string>
     <string name="conversion_failed_reason_timeout">изтичане на времето</string>
-    <string name="conversion_failed_parse_html_error_with_reason">Неуспешна обработка на уеб страницата поради: %1$s</string>
     <string name="network_exception_too_many_requests">твърде много заявки</string>
     <string name="licenses">Лицензи</string>
     <string name="conversion_succeeded_check_experimental">Местоположението може да е неточно поради експериментален метод на извличане.</string>

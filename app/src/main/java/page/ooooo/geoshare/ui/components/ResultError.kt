@@ -40,7 +40,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @Composable
 fun ResultError(
     message: String,
-    inputUriString: String,
+    source: String,
     initialRetryLoadingIndicatorVisible: Boolean = false,
     onNavigateToInputsScreen: () -> Unit,
     onRetry: () -> Unit,
@@ -68,18 +68,18 @@ fun ResultError(
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 }
-                if (inputUriString.isNotEmpty()) {
+                if (source.isNotEmpty()) {
                     SelectionContainer(Modifier.padding(bottom = spacing.smallAdaptive)) {
-                        if (inputUriString.startsWith("https://")) {
+                        if (source.startsWith("https://")) {
                             Text(
-                                inputUriString,
-                                modifier = Modifier.clickable { uriHandler.openUri(inputUriString) },
+                                source,
+                                modifier = Modifier.clickable { uriHandler.openUri(source) },
                                 textDecoration = TextDecoration.Underline,
                                 style = MaterialTheme.typography.bodySmall,
                             )
                         } else {
                             Text(
-                                inputUriString,
+                                source,
                                 fontStyle = FontStyle.Italic,
                                 style = MaterialTheme.typography.bodySmall,
                             )
@@ -141,8 +141,8 @@ private fun DefaultPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultError(
-                stringResource(R.string.conversion_failed_parse_url_error),
-                "https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398",
+                message = stringResource(R.string.conversion_failed_reason_no_points),
+                source = "https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398",
                 initialRetryLoadingIndicatorVisible = false,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
@@ -160,8 +160,8 @@ private fun DarkPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultError(
-                stringResource(R.string.conversion_failed_parse_url_error),
-                "https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398",
+                message = stringResource(R.string.conversion_failed_reason_no_points),
+                source = "https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398",
                 initialRetryLoadingIndicatorVisible = false,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
@@ -179,8 +179,8 @@ private fun CoordinatesPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultError(
-                stringResource(R.string.conversion_failed_parse_url_error),
-                "41°24′12.2″N 2°10′26.5″E",
+                message = stringResource(R.string.conversion_failed_reason_no_points),
+                source = "41°24′12.2″N 2°10′26.5″E",
                 initialRetryLoadingIndicatorVisible = false,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
@@ -198,8 +198,8 @@ private fun DarkCoordinatesPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultError(
-                stringResource(R.string.conversion_failed_parse_url_error),
-                "41°24′12.2″N 2°10′26.5″E",
+                message = stringResource(R.string.conversion_failed_reason_no_points),
+                source = "41°24′12.2″N 2°10′26.5″E",
                 initialRetryLoadingIndicatorVisible = false,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
@@ -217,8 +217,8 @@ private fun EmptyPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultError(
-                stringResource(R.string.conversion_failed_parse_url_error),
-                "",
+                message = stringResource(R.string.conversion_failed_reason_no_points),
+                source = "",
                 initialRetryLoadingIndicatorVisible = false,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
@@ -236,8 +236,8 @@ private fun DarkEmptyPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultError(
-                stringResource(R.string.conversion_failed_parse_url_error),
-                "",
+                message = stringResource(R.string.conversion_failed_reason_no_points),
+                source = "",
                 initialRetryLoadingIndicatorVisible = false,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
@@ -255,8 +255,8 @@ private fun LoadingIndicatorPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultError(
-                stringResource(R.string.conversion_failed_parse_url_error),
-                "",
+                message = stringResource(R.string.conversion_failed_reason_no_points),
+                source = "",
                 initialRetryLoadingIndicatorVisible = true,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
@@ -274,8 +274,8 @@ private fun DarkLoadingIndicatorPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultError(
-                stringResource(R.string.conversion_failed_parse_url_error),
-                "",
+                message = stringResource(R.string.conversion_failed_reason_no_points),
+                source = "",
                 initialRetryLoadingIndicatorVisible = true,
                 onNavigateToInputsScreen = {},
                 onRetry = {},

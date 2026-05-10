@@ -18,20 +18,20 @@ class MapsMeInputBehaviorTest : InputBehaviorTest {
             "ge0://ApYSV0YTAl/América_do_Norte",
         )
 
-        // Maps.me short URI
+        // Maps.me short link
         testUri(
             WGS84Point(-18.9249432, 46.4416404, z = 4.0, name = "Madagascar", source = Source.HASH),
             "http://ge0.me/AbCMCNp0LO/Madagascar",
         )
 
-        // Organic Maps short URI
+        // Organic Maps short link
         testUri(
             @Suppress("SpellCheckingInspection")
             WGS84Point(40.7127405, -74.005997, z = 9.0, name = "Nova Iorque", source = Source.HASH),
             "https://omaps.app/Umse5f0H8a/Nova_Iorque",
         )
 
-        // CoMaps short URI
+        // CoMaps short link
         testUri(
             WGS84Point(52.4877386, 13.3815233, z = 14.0, name = "Kreuzberg", source = Source.HASH),
             "https://comaps.at/o4MnIOApKp/Kreuzberg",
@@ -45,7 +45,7 @@ class MapsMeInputBehaviorTest : InputBehaviorTest {
                 "(51.000001, -108.999988)",
         )
 
-        // Text, which will get parsed by GeoUriInput, because it contains a geo: URI that precedes the short URI
+        // Text, which will get parsed by GeoUriInput, because it contains a geo: URI that precedes the short link
         testTextUri(
             @Suppress("SpellCheckingInspection")
             WGS84Point(40.7127400, -74.0059965, z = 9.0, name = "Nova Iorque", source = Source.URI),

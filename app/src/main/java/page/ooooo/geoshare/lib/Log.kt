@@ -1,8 +1,6 @@
 package page.ooooo.geoshare.lib
 
-import android.util.Log
-
-interface ILog {
+interface Log {
     fun d(tag: String?, msg: String): Int
     fun d(tag: String?, msg: String, tr: Throwable): Int
     fun e(tag: String?, msg: String): Int
@@ -13,18 +11,18 @@ interface ILog {
     fun w(tag: String?, msg: String, tr: Throwable): Int
 }
 
-object DefaultLog : ILog {
-    override fun d(tag: String?, msg: String) = Log.d(tag, msg)
-    override fun d(tag: String?, msg: String, tr: Throwable) = Log.d(tag, msg, tr)
-    override fun e(tag: String?, msg: String) = Log.e(tag, msg)
-    override fun e(tag: String?, msg: String, tr: Throwable) = Log.e(tag, msg, tr)
-    override fun i(tag: String?, msg: String) = Log.i(tag, msg)
-    override fun i(tag: String?, msg: String, tr: Throwable) = Log.i(tag, msg, tr)
-    override fun w(tag: String?, msg: String) = Log.w(tag, msg)
-    override fun w(tag: String?, msg: String, tr: Throwable) = Log.w(tag, msg, tr)
+object DefaultLog : Log {
+    override fun d(tag: String?, msg: String) = android.util.Log.d(tag, msg)
+    override fun d(tag: String?, msg: String, tr: Throwable) = android.util.Log.d(tag, msg, tr)
+    override fun e(tag: String?, msg: String) = android.util.Log.e(tag, msg)
+    override fun e(tag: String?, msg: String, tr: Throwable) = android.util.Log.e(tag, msg, tr)
+    override fun i(tag: String?, msg: String) = android.util.Log.i(tag, msg)
+    override fun i(tag: String?, msg: String, tr: Throwable) = android.util.Log.i(tag, msg, tr)
+    override fun w(tag: String?, msg: String) = android.util.Log.w(tag, msg)
+    override fun w(tag: String?, msg: String, tr: Throwable) = android.util.Log.w(tag, msg, tr)
 }
 
-object FakeLog : ILog {
+object FakeLog : Log {
     override fun d(tag: String?, msg: String) = log(msg)
     override fun d(tag: String?, msg: String, tr: Throwable) = log(msg, tr)
     override fun e(tag: String?, msg: String) = log(msg)

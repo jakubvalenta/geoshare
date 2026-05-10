@@ -34,7 +34,6 @@
     <string name="user_preferences_connection_option_ask">Preguntar antes de conectar</string>
     <string name="no">No</string>
     <string name="conversion_failed_missing_url">URL ausente</string>
-    <string name="conversion_failed_parse_url_error">Error al procesar el enlace de mapa</string>
     <string name="conversion_succeeded_apps_not_found">No hay ninguna aplicación de mapas instalada</string>
     <string name="copying_finished">Se copiaron al portapapeles</string>
     <string name="conversion_failed_connection_permission_denied">Este enlace no es compatible sin conectarse al servicio de mapas</string>

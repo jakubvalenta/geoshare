@@ -95,7 +95,6 @@
     <string name="no">Hayır</string>
     <string name="user_preferences_connection_title">Harita hizmeti bağlantısı</string>
     <string name="conversion_failed_missing_url">Eksik URL</string>
-    <string name="conversion_failed_parse_url_error">Harita bağlantısı işlenemedi</string>
     <string name="conversion_succeeded_apps_not_found">Hiçbir harita uygulaması yüklü değil</string>
     <string name="copying_finished">Panoya kopyalandı</string>
     <string name="conversion_failed_connection_permission_denied">Harita servisine bağlanmadan bu bağlantı desteklenmiyor</string>
@@ -220,12 +219,10 @@
     <string name="user_preferences_coordinate_format_description">Uygulama genelinde tüm coğrafi koordinatların görüntüleneceği formatı seçin.</string>
     <string name="user_preferences_coordinate_format_option_dec">Ondalık dereceler</string>
     <string name="user_preferences_coordinate_format_option_deg_min_sec">Derece, dakika, saniye</string>
-    <string name="conversion_failed_unshorten_error_with_reason">Şu nedenden dolayı kısa bağlantı çözümlenemedi: %1$s</string>
     <string name="conversion_failed_reason_invalid_url">geçersiz URL</string>
     <string name="conversion_failed_reason_missing_header">eksik HTTP başlığı</string>
     <string name="conversion_failed_reason_no_points">hiçbir nokta bulunamadı</string>
     <string name="conversion_failed_reason_timeout">zaman aşımı</string>
-    <string name="conversion_failed_parse_html_error_with_reason">Şu nedenden dolayı web sayfası işlenemedi: %1$s</string>
     <string name="inputs_list_text">Aşağıdaki harita servislerine ait bağlantıları %1$s ile paylaşabilir veya uygulamaya yapıştırabilirsiniz.</string>
     <string name="links_delete">Sil</string>
     <string name="links_delete_text">“%1$s” web haritası kalıcı olarak silinecektir.</string>

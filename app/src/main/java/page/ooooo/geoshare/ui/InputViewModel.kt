@@ -14,6 +14,7 @@ import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePreference
 import page.ooooo.geoshare.data.InputRepository
+import page.ooooo.geoshare.lib.inputs.InputDocumentation
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,7 +26,14 @@ class InputViewModel @Inject constructor(
     val allInputs = inputRepository.all
 
     private val allDocumentationsFlow = flow {
-        emit(inputRepository.all.map { input -> input.documentation })
+        emit(
+            inputRepository.all
+                .mapNotNull { input -> input.documentation }
+                .groupBy { documentation -> documentation.group }
+                .map { (group, documentations) ->
+                    InputDocumentation(group, documentations.flatMap { it.items })
+                }
+        )
     }
 
     val allDocumentations = allDocumentationsFlow
@@ -56,7 +64,7 @@ class InputViewModel @Inject constructor(
 
     fun setChangelogShown() {
         val newestInputAddedInVersionCode = inputRepository.all.maxOfOrNull { input ->
-            input.documentation.items.maxOfOrNull { it.addedInVersionCode } ?: BuildConfig.VERSION_CODE
+            input.documentation?.items?.maxOfOrNull { it.addedInVersionCode } ?: BuildConfig.VERSION_CODE
         } ?: BuildConfig.VERSION_CODE
         viewModelScope.launch {
             userPreferencesRepository.setValue(

@@ -44,7 +44,6 @@
     <string name="user_preferences_connection_option_ask">Zeptat se před spojením</string>
     <string name="no">Ne</string>
     <string name="conversion_failed_missing_url">Chybí URL</string>
-    <string name="conversion_failed_parse_url_error">Nepodařilo se zpracovat odkaz na mapu</string>
     <string name="conversion_succeeded_apps_not_found">Není nainstalovaná žádná mapová aplikace</string>
     <string name="copying_finished">Zkopírováno do schránky</string>
     <string name="conversion_failed_connection_permission_denied">Tento odkaz není podporován bez spojení s mapovou službou</string>
@@ -269,12 +268,10 @@
     <string name="conversion_succeeded_check_srs">Poloha může být nepřesná kvůli převodu systému souřadnic.</string>
     <string name="converter_cartes_ign_name">Cartes IGN</string>
     <string name="converter_plus_code_name">Plus Codes</string>
-    <string name="conversion_failed_unshorten_error_with_reason">Nepodařilo se zpracovat krátký odkaz kvůli: %1$s</string>
     <string name="conversion_failed_reason_invalid_url">neplatné URL</string>
     <string name="conversion_failed_reason_missing_header">chybějící HTTP hlavička</string>
     <string name="conversion_failed_reason_no_points">žádné body nenalezeny</string>
     <string name="conversion_failed_reason_timeout">časový limit vypršel</string>
-    <string name="conversion_failed_parse_html_error_with_reason">Nepodařilo se zpracovat webovou stránku kvůli: %1$s</string>
     <string name="licenses">Licence</string>
     <string name="network_exception_too_many_requests">příliš mnoho požadavků</string>
     <string name="srs_description_mainland_china">Kontinentální Čína</string>

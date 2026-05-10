@@ -1,52 +1,50 @@
 package page.ooooo.geoshare.lib.inputs
 
 import android.webkit.WebSettings
-import io.ktor.utils.io.ByteReadChannel
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.DefaultUriQuote
-import page.ooooo.geoshare.lib.ILog
-import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Point
-import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.network.NetworkTools
 
-interface Input {
-    val uriPattern: Regex
-    val documentation: InputDocumentation
+sealed interface Input<T> {
+    @Suppress("SameReturnValue")
+    val documentation: InputDocumentation? get() = null
 
-    suspend fun parseUri(uri: Uri, uriQuote: UriQuote = DefaultUriQuote): ParseUriResult
+    fun match(source: String): String? = null
+
+    suspend fun parse(
+        data: T,
+        match: String,
+        prevResult: ParseResult? = null,
+        uriQuote: UriQuote = DefaultUriQuote,
+        log: Log = DefaultLog,
+    ): ParseResult
+
+    interface HasPermission {
+        val permissionTitleResId: Int
+        val loadingIndicatorTitleResId: Int
+    }
 
     interface HasRandomUri {
         fun genRandomUri(point: Point): String?
     }
 }
 
-interface ShortUriInput : Input {
-    enum class Method { GET, HEAD }
-
-    val shortUriPattern: Regex
-    val shortUriMethod: Method
-    val permissionTitleResId: Int
-    val loadingIndicatorTitleResId: Int
-}
-
-interface HtmlInput : Input {
-    val permissionTitleResId: Int
-    val loadingIndicatorTitleResId: Int
-
-    suspend fun parseHtml(
-        htmlUrlString: String,
-        channel: ByteReadChannel,
-        pointsFromUri: Points,
+interface BasicInput<T> : Input<T> {
+    suspend fun withData(
+        match: String,
+        networkTools: NetworkTools,
+        lastAttempt: NetworkTools.Attempt?,
+        maxAttempts: Int,
         uriQuote: UriQuote = DefaultUriQuote,
-        log: ILog = DefaultLog,
-    ): ParseHtmlResult
+        log: Log = DefaultLog,
+        block: suspend (T) -> ParseResult,
+    ): ParseResult
 }
 
-interface WebInput : Input {
-    val permissionTitleResId: Int
-    val loadingIndicatorTitleResId: Int
-
+interface WebViewInput : Input<String>, Input.HasPermission {
     fun extendWebSettings(settings: WebSettings) {}
     fun shouldInterceptRequest(requestUrlString: String): Boolean = false
 }

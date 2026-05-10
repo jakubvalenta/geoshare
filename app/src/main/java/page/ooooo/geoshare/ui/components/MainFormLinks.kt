@@ -24,12 +24,12 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun MainFormLinks(
-    allInputs: List<Input>,
+    allInputs: List<Input<*>>,
     modifier: Modifier = Modifier,
     onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
-    onUpdateInput: (newInputUriString: String) -> Unit,
+    onUpdateInput: (newSource: String) -> Unit,
 ) {
     val resources = LocalResources.current
     val spacing = LocalSpacing.current
@@ -63,8 +63,8 @@ fun MainFormLinks(
             allInputs
                 .shuffled()
                 .firstNotNullOfOrNull { (it as? Input.HasRandomUri)?.genRandomUri(randomPoint) }
-                ?.let { newInputUriString ->
-                    onUpdateInput(newInputUriString)
+                ?.let { newSource ->
+                    onUpdateInput(newSource)
                     onSetErrorMessageResId(null)
                 }
         }) {

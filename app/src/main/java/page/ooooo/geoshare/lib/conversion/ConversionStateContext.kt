@@ -4,19 +4,23 @@ import android.content.res.Resources
 import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.DefaultLog
+import page.ooooo.geoshare.lib.DefaultUriQuote
+import page.ooooo.geoshare.lib.Log
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.inputs.Input
+import page.ooooo.geoshare.lib.network.DefaultNetworkTools
 import page.ooooo.geoshare.lib.network.NetworkTools
 
 class ConversionStateContext(
-    val inputs: List<Input> = emptyList(),
-    val networkTools: NetworkTools = NetworkTools(),
+    val inputs: List<Input<*>> = emptyList(),
+    val networkTools: NetworkTools = DefaultNetworkTools(),
     val linkRepository: LinkRepository,
     val outputRepository: OutputRepository,
     val resources: Resources,
     val userPreferencesRepository: UserPreferencesRepository,
-    val log: ILog = DefaultLog,
+    val log: Log = DefaultLog,
     val billing: Billing,
     val uriQuote: UriQuote = DefaultUriQuote,
     val onStateChange: (State) -> Unit = {},

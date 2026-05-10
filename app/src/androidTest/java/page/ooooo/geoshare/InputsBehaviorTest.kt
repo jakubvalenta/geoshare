@@ -6,7 +6,7 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import page.ooooo.geoshare.BehaviorTest.Companion.ELEMENT_DOES_NOT_EXIST_TIMEOUT
-import page.ooooo.geoshare.lib.inputs.InputDocumentationId
+import page.ooooo.geoshare.lib.inputs.InputDocumentationGroup
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
 @RunWith(AndroidJUnit4::class)
@@ -32,14 +32,14 @@ class InputsBehaviorTest : BehaviorTest {
         }
 
         // Main screen is visible
-        onElement { viewIdResourceName == "geoShareMainInputUriStringTextField" }
+        onElement { viewIdResourceName == "geoShareMainSourceTextField" }
 
         // Relaunch app
         closeApplication()
         launchApplication()
 
         // Main screen is visible again
-        onElement { viewIdResourceName == "geoShareMainInputUriStringTextField" }
+        onElement { viewIdResourceName == "geoShareMainSourceTextField" }
     }
 
     @Test
@@ -55,11 +55,11 @@ class InputsBehaviorTest : BehaviorTest {
         goToInputsList()
 
         // Does not show recently added documentations
-        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareInputsDocumentationRecent_${InputDocumentationId.MAPY_COM}" })
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareInputsDocumentationRecent_${InputDocumentationGroup.MAPY_COM}" })
 
         // Shows all documentations
-        onElement { viewIdResourceName == "geoShareInputsDocumentationAll_${InputDocumentationId.AMAP}" }
-        onElement { viewIdResourceName == "geoShareInputsDocumentationAll_${InputDocumentationId.APPLE_MAPS}" }
+        onElement { viewIdResourceName == "geoShareInputsDocumentationAll_${InputDocumentationGroup.AMAP}" }
+        onElement { viewIdResourceName == "geoShareInputsDocumentationAll_${InputDocumentationGroup.APPLE_MAPS}" }
 
         // Go to main screen
         pressBack()
@@ -78,7 +78,7 @@ class InputsBehaviorTest : BehaviorTest {
         goToInputsList()
 
         // Shows documentations added since version 19
-        onElement { viewIdResourceName == "geoShareInputsDocumentationRecent_${InputDocumentationId.HERE_WEGO}" }
-        onElement { viewIdResourceName == "geoShareInputsDocumentationRecent_${InputDocumentationId.MAGIC_EARTH}" }
+        onElement { viewIdResourceName == "geoShareInputsDocumentationRecent_${InputDocumentationGroup.HERE_WEGO}" }
+        onElement { viewIdResourceName == "geoShareInputsDocumentationRecent_${InputDocumentationGroup.MAGIC_EARTH}" }
     }
 }

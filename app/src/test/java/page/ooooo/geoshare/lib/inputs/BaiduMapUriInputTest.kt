@@ -1,0 +1,345 @@
+package page.ooooo.geoshare.lib.inputs
+
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assume.assumeTrue
+import org.junit.Test
+import page.ooooo.geoshare.lib.geo.BD09MCPoint
+import page.ooooo.geoshare.lib.geo.Source
+
+class BaiduMapUriInputTest : InputTest {
+    private val input = BaiduMapUriInput
+
+    @Test
+    fun match_fullUrl() {
+        assertEquals(
+            "https://map.baidu.com/@13520653,3317203,13z",
+            input.match("https://map.baidu.com/@13520653,3317203,13z")
+        )
+        assertEquals(
+            @Suppress("SpellCheckingInspection") "https://map.baidu.com/poi/%E9%BB%84%E5%B2%A9%E5%AE%A2%E8%BF%90%E4%B8%AD%E5%BF%83/@13502918.375,3315902.2199999997,16z?uid=fef3b5922f87e66c63180999&info_merge=1&isBizPoi=false&ugc_type=3&ugc_ver=1&device_ratio=2&compat=1&routetype=drive&en_uid=fef3b5922f87e66c63180999&pcevaname=pc4.1&querytype=detailConInfo&da_src=shareurl",
+            input.match(
+                @Suppress("SpellCheckingInspection") "https://map.baidu.com/poi/%E9%BB%84%E5%B2%A9%E5%AE%A2%E8%BF%90%E4%B8%AD%E5%BF%83/@13502918.375,3315902.2199999997,16z?uid=fef3b5922f87e66c63180999&info_merge=1&isBizPoi=false&ugc_type=3&ugc_ver=1&device_ratio=2&compat=1&routetype=drive&en_uid=fef3b5922f87e66c63180999&pcevaname=pc4.1&querytype=detailConInfo&da_src=shareurl"
+            ),
+        )
+        assertEquals(
+            @Suppress("SpellCheckingInspection") """https://map.baidu.com/dir/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E6%A2%85%E8%8A%B1%E6%9D%91%E8%A1%97%E9%81%93%E6%B3%B0%E5%85%B4%E7%9B%B4%E8%A1%9735%E5%8F%B7/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7/@12614173.165,2630534.5250000004,16z?querytype=nav&c=257&sn=1$$$$12613508.26,2629184.09$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF$$0$$$$&en=1$$$$12614727.164999995,2631131.0213408465$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E6%A2%85%E8%8A%B1%E6%9D%91%E8%A1%97%E9%81%93%E6%B3%B0%E5%85%B4%E7%9B%B4%E8%A1%9735%E5%8F%B7$$0$$$$$$1$$%20to:1$$$$12611885.88,2631139.59$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7$$0$$$$&sc=257&ec=257+to:257&pn=0&rn=5&mrs=0&version=4&route_traffic=1&sy=0&da_src=shareurl""",
+            input.match(
+                @Suppress("SpellCheckingInspection") """https://map.baidu.com/dir/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E6%A2%85%E8%8A%B1%E6%9D%91%E8%A1%97%E9%81%93%E6%B3%B0%E5%85%B4%E7%9B%B4%E8%A1%9735%E5%8F%B7/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7/@12614173.165,2630534.5250000004,16z?querytype=nav&c=257&sn=1$$$$12613508.26,2629184.09$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF$$0$$$$&en=1$$$$12614727.164999995,2631131.0213408465$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E6%A2%85%E8%8A%B1%E6%9D%91%E8%A1%97%E9%81%93%E6%B3%B0%E5%85%B4%E7%9B%B4%E8%A1%9735%E5%8F%B7$$0$$$$$$1$$%20to:1$$$$12611885.88,2631139.59$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7$$0$$$$&sc=257&ec=257+to:257&pn=0&rn=5&mrs=0&version=4&route_traffic=1&sy=0&da_src=shareurl"""
+            ),
+        )
+        assertEquals(
+            "https://map.baidu.com/?shareurl=1&poiShareUid=fef3b5922f87e66c63180999",
+            input.match("https://map.baidu.com/?shareurl=1&poiShareUid=fef3b5922f87e66c63180999")
+        )
+    }
+
+    @Test
+    fun match_unknownHost() {
+        assertNull(input.match("https://www.example.com/@13520653,3317203,13z"))
+    }
+
+    @Test
+    fun match_unknownScheme() {
+        assertEquals(
+            "map.baidu.com/@13520653,3317203,13z",
+            input.match("ftp://map.baidu.com/@13520653,3317203,13z"),
+        )
+    }
+
+    @Test
+    fun match_spaces() {
+        assertEquals(
+            "https://map.baidu.com/?q=foobar",
+            input.match("https://map.baidu.com/?q=foobar ")
+        )
+        assertEquals(
+            "https://map.baidu.com/?q=foo bar",
+            input.match("https://map.baidu.com/?q=foo bar ")
+        )
+        assertEquals(
+            "https://map.baidu.com/?q=foo",
+            input.match("https://map.baidu.com/?q=foo  bar")
+        )
+        assertEquals(
+            "https://map.baidu.com/?q=foo",
+            input.match("https://map.baidu.com/?q=foo\tbar")
+        )
+    }
+
+    @Test
+    fun parse_center() = runTest {
+        assertEquals(
+            ParseResult(persistentListOf(BD09MCPoint(3317203.0, 13520653.0, 13.0, source = Source.MAP_CENTER))),
+            input.parse("https://map.baidu.com/@13520653,3317203,13z"),
+        )
+    }
+
+    @Test
+    fun parse_coordinates() = runTest {
+        assertEquals(
+            ParseResult(
+                persistentListOf(
+                    BD09MCPoint(
+                        3619117.0, 13392211.0,
+                        17.0,
+                        name = "地图上的点",
+                        source = Source.MAP_CENTER,
+                    )
+                )
+            ),
+            input.parse(@Suppress("SpellCheckingInspection") "https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13392211,3619117,17z?querytype=share&poiShareId=p8cdf0522067cf66173901fc9e4&da_src=shareurl"),
+        )
+    }
+
+    @Test
+    fun parse_poi() = runTest {
+        assertEquals(
+            ParseResult(
+                persistentListOf(
+                    BD09MCPoint(
+                        3315902.2199999997, 13502918.375,
+                        16.0,
+                        name = "黄岩客运中心",
+                        source = Source.MAP_CENTER,
+                    )
+                )
+            ),
+            input.parse(@Suppress("SpellCheckingInspection") "https://map.baidu.com/poi/%E9%BB%84%E5%B2%A9%E5%AE%A2%E8%BF%90%E4%B8%AD%E5%BF%83/@13502918.375,3315902.2199999997,16z?uid=fef3b5922f87e66c63180999&info_merge=1&isBizPoi=false&ugc_type=3&ugc_ver=1&device_ratio=2&compat=1&routetype=drive&en_uid=fef3b5922f87e66c63180999&pcevaname=pc4.1&querytype=detailConInfo&da_src=shareurl"),
+        )
+    }
+
+    @Test
+    fun parse_sharedCoordinates() = runTest {
+        assertEquals(
+            ParseResult(
+                nextStep = NextStep(
+                    BaiduMapWebViewInput,
+                    "https://map.baidu.com/?poiShareId=p8cdf0522067cf66173901fc9e4"
+                )
+            ),
+            input.parse("https://map.baidu.com/?poiShareId=p8cdf0522067cf66173901fc9e4"),
+        )
+    }
+
+    @Test
+    fun parse_sharedPOIParamS_returnsSupportsWebParsing() = runTest {
+        assertEquals(
+            ParseResult(
+                nextStep = NextStep(
+                    BaiduMapWebViewInput,
+                    "https://map.baidu.com/?newmap=1&s=inf%26uid%3D2c2bd9487c142391100daa62&sharecallbackflag=poiDetailPage"
+                )
+            ),
+            input.parse("https://map.baidu.com/?newmap=1&s=inf%26uid%3D2c2bd9487c142391100daa62&sharecallbackflag=poiDetailPage"),
+        )
+    }
+
+    @Test
+    fun parse_sharedPOIParamUid_returnsSupportsWebParsing() = runTest {
+        assertEquals(
+            ParseResult(
+                nextStep = NextStep(
+                    BaiduMapWebViewInput,
+                    "https://map.baidu.com/?shareurl=1&poiShareUid=fef3b5922f87e66c63180999"
+                )
+            ),
+            input.parse("https://map.baidu.com/?shareurl=1&poiShareUid=fef3b5922f87e66c63180999"),
+        )
+    }
+
+    @Test
+    fun parse_mobilePlaceDetailWithoutCoords_returnsSupportsWebParsing() = runTest {
+        assertEquals(
+            ParseResult(
+                nextStep = NextStep(
+                    BaiduMapWebViewInput,
+                    "https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=p8cdf0522067cf66173901fc9e4/act=read_share&vt=map&da_from=weixin&openna=1"
+                )
+            ),
+            input.parse("https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=p8cdf0522067cf66173901fc9e4/act=read_share&vt=map&da_from=weixin&openna=1")
+        )
+    }
+
+    @Test
+    fun parse_mobilePlaceDetailWithCoords_returnsSucceeded() = runTest {
+        assertEquals(
+            ParseResult(
+                persistentListOf(BD09MCPoint(3619117.0, 13392211.0, source = Source.URI))
+            ),
+            input.parse("https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=p8cdf0522067cf66173901fc9e4/act=read_share&vt=map&da_from=weixin&openna=1&sharegeo=13392211%2C3619117")
+        )
+    }
+
+    @Test
+    fun parse_directionsOnePointNoParams() = runTest {
+        assertEquals(
+            ParseResult(
+                persistentListOf(
+                    BD09MCPoint(
+                        name = "广东省广州市越秀区大塘街道中山三路东昌大街2号",
+                        source = Source.URI,
+                    )
+                ),
+            ),
+            input.parse(
+                "https://map.baidu.com/dir/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7/@12614173.165,2630534.5250000004,16z"
+            ),
+        )
+    }
+
+    @Test
+    fun parse_directionsTwoPoints() = runTest {
+        assertEquals(
+            ParseResult(
+                persistentListOf(
+                    BD09MCPoint(
+                        2629182.88, 12613508.26,
+                        name = "广东省广州市越秀区白云街道烟雨路",
+                        source = Source.URI,
+                    ),
+                    BD09MCPoint(
+                        2631139.59, 12611885.88,
+                        name = "广东省广州市越秀区大塘街道中山三路东昌大街2号",
+                        source = Source.URI,
+                    ),
+                ),
+            ),
+            input.parse(
+                @Suppress("SpellCheckingInspection") "https://map.baidu.com/dir/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7/@12614173.165,2630534.5250000004,16z?querytype=nav&navtp=2&c=257&drag=1&sc=257&ec=257&sy=0&sn=1$$$$12613508.26,2629182.88$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF$$$$$$12613508.26,2629182.88$$&en=1$$$$12611885.88,2631139.59$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7$$$$$$12611885.88,2631139.59$$&version=4&mrs=1&route_traffic=1&da_src=shareurl"
+            ),
+        )
+    }
+
+    @Test
+    fun parse_directionsTwoPointsNoParams() = runTest {
+        assertEquals(
+            ParseResult(
+                persistentListOf(
+                    BD09MCPoint(name = "广东省广州市越秀区白云街道烟雨路", source = Source.URI),
+                    BD09MCPoint(name = "广东省广州市越秀区大塘街道中山三路东昌大街2号", source = Source.URI),
+                ),
+            ),
+            input.parse(
+                "https://map.baidu.com/dir/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7/@12614173.165,2630534.5250000004,16z"
+            ),
+        )
+    }
+
+    @Test
+    fun parse_directionsThreePoints() = runTest {
+        assertEquals(
+            ParseResult(
+                persistentListOf(
+                    BD09MCPoint(
+                        2629184.09, 12613508.26,
+                        name = "广东省广州市越秀区白云街道烟雨路",
+                        source = Source.URI,
+                    ),
+                    BD09MCPoint(
+                        2631131.0213408465, 12614727.164999995,
+                        name = "广东省广州市越秀区梅花村街道泰兴直街35号",
+                        source = Source.URI,
+                    ),
+                    BD09MCPoint(
+                        2631139.59, 12611885.88,
+                        name = "广东省广州市越秀区大塘街道中山三路东昌大街2号",
+                        source = Source.URI,
+                    ),
+                )
+            ),
+            input.parse(
+                @Suppress("SpellCheckingInspection") "https://map.baidu.com/dir/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E6%A2%85%E8%8A%B1%E6%9D%91%E8%A1%97%E9%81%93%E6%B3%B0%E5%85%B4%E7%9B%B4%E8%A1%9735%E5%8F%B7/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7/@12614173.165,2630534.5250000004,16z?querytype=nav&c=257&sn=1$$$$12613508.26,2629184.09$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF$$0$$$$&en=1$$$$12614727.164999995,2631131.0213408465$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E6%A2%85%E8%8A%B1%E6%9D%91%E8%A1%97%E9%81%93%E6%B3%B0%E5%85%B4%E7%9B%B4%E8%A1%9735%E5%8F%B7$$0$$$$$$1$$%20to:1$$$$12611885.88,2631139.59$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7$$0$$$$&sc=257&ec=257+to:257&pn=0&rn=5&mrs=0&version=4&route_traffic=1&sy=0&da_src=shareurl"
+            ),
+        )
+    }
+
+    @Test
+    fun parse_directionsThreePointsNoParams() = runTest {
+        assertEquals(
+            ParseResult(
+                persistentListOf(
+                    BD09MCPoint(name = "广东省广州市越秀区白云街道烟雨路", source = Source.URI),
+                    BD09MCPoint(name = "广东省广州市越秀区梅花村街道泰兴直街35号", source = Source.URI),
+                    BD09MCPoint(name = "广东省广州市越秀区大塘街道中山三路东昌大街2号", source = Source.URI),
+                )
+            ),
+            input.parse(
+                "https://map.baidu.com/dir/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E6%A2%85%E8%8A%B1%E6%9D%91%E8%A1%97%E9%81%93%E6%B3%B0%E5%85%B4%E7%9B%B4%E8%A1%9735%E5%8F%B7/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7/@12614173.165,2630534.5250000004,16z"
+            ),
+        )
+    }
+
+    @Test
+    fun parse_directionsFourPoints() = runTest {
+        assertEquals(
+            ParseResult(
+                persistentListOf(
+                    BD09MCPoint(
+                        2629182.88, 12613508.26,
+                        name = "广东省广州市越秀区白云街道烟雨路",
+                        source = Source.URI,
+                    ),
+                    BD09MCPoint(
+                        2631131.0213408465, 12614727.164999995,
+                        name = "广东省广州市越秀区梅花村街道泰兴直街35号",
+                        source = Source.URI,
+                    ),
+                    BD09MCPoint(
+                        2633524.681382545, 12613424.449999997,
+                        name = "广东省广州市越秀区黄花岗街道永福路36号DE座",
+                        source = Source.URI,
+                    ),
+                    BD09MCPoint(
+                        2631139.59, 12611885.88,
+                        name = "广东省广州市越秀区大塘街道中山三路东昌大街2号",
+                        source = Source.URI,
+                    ),
+                )
+            ),
+            input.parse(
+                @Suppress("SpellCheckingInspection") "https://map.baidu.com/dir/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E6%A2%85%E8%8A%B1%E6%9D%91%E8%A1%97%E9%81%93%E6%B3%B0%E5%85%B4%E7%9B%B4%E8%A1%9735%E5%8F%B7/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E9%BB%84%E8%8A%B1%E5%B2%97%E8%A1%97%E9%81%93%E6%B0%B8%E7%A6%8F%E8%B7%AF36%E5%8F%B7DE%E5%BA%A7/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7/@12612741.165,2631232.5250000004,16z?querytype=nav&c=257&sn=1$$$$12613508.26,2629182.88$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF$$0$$$$&en=1$$$$12614727.164999995,2631131.0213408465$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E6%A2%85%E8%8A%B1%E6%9D%91%E8%A1%97%E9%81%93%E6%B3%B0%E5%85%B4%E7%9B%B4%E8%A1%9735%E5%8F%B7$$0$$$$$$1$$%20to:1$$$$12613424.449999997,2633524.681382545$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E9%BB%84%E8%8A%B1%E5%B2%97%E8%A1%97%E9%81%93%E6%B0%B8%E7%A6%8F%E8%B7%AF36%E5%8F%B7DE%E5%BA%A7$$0$$$$$$1$$%20to:1$$$$12611885.88,2631139.59$$%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7$$0$$$$&sc=257&ec=257+to:257+to:257&pn=0&rn=5&mrs=0&version=4&route_traffic=1&sy=0&da_src=shareurl"
+            ),
+        )
+    }
+
+    @Test
+    fun parse_directionsFourPointsNoParams() = runTest {
+        assertEquals(
+            ParseResult(
+                persistentListOf(
+                    BD09MCPoint(name = "广东省广州市越秀区白云街道烟雨路", source = Source.URI),
+                    BD09MCPoint(name = "广东省广州市越秀区梅花村街道泰兴直街35号", source = Source.URI),
+                    BD09MCPoint(name = "广东省广州市越秀区黄花岗街道永福路36号DE座", source = Source.URI),
+                    BD09MCPoint(name = "广东省广州市越秀区大塘街道中山三路东昌大街2号", source = Source.URI),
+                )
+            ),
+            input.parse(
+                "https://map.baidu.com/dir/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E7%99%BD%E4%BA%91%E8%A1%97%E9%81%93%E7%83%9F%E9%9B%A8%E8%B7%AF/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E6%A2%85%E8%8A%B1%E6%9D%91%E8%A1%97%E9%81%93%E6%B3%B0%E5%85%B4%E7%9B%B4%E8%A1%9735%E5%8F%B7/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E9%BB%84%E8%8A%B1%E5%B2%97%E8%A1%97%E9%81%93%E6%B0%B8%E7%A6%8F%E8%B7%AF36%E5%8F%B7DE%E5%BA%A7/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7/@12612741.165,2631232.5250000004,16z"
+            ),
+        )
+    }
+
+    @Test
+    fun parse_search() = runTest {
+        // TODO Add support for Baidu Map search URLs
+        assumeTrue(false)
+        assertEquals(
+            ParseResult(
+                persistentListOf(
+                    BD09MCPoint(
+                        4047017.0, 14571495.0,
+                        z = 16.0,
+                        name = "%E5%8C%BB%E9%99%A2",
+                        source = Source.MAP_CENTER,
+                    ),
+                )
+            ),
+            input.parse(
+                @Suppress("SpellCheckingInspection") "https://map.baidu.com/search/%E5%8C%BB%E9%99%A2/@14571400,4047000,16z?querytype=nb&ar=(14570495%2C4046017%3B14572495%2C4048017)&wd=%E5%8C%BB%E9%99%A2&c=26046&bdtp=0&nb_x=14571495&nb_y=4047017&userSign=0&b=(14566383%2C4044357%3B14576607%2C4049677)&l=16&pn=0&gr_radius=1000&r=1000&from=webmap&device_ratio=1&da_src=shareurl"
+            ),
+        )
+    }
+}

@@ -38,7 +38,6 @@
     <string name="user_preferences_connection_option_ask">Perguntar antes de conectar</string>
     <string name="no">Não</string>
     <string name="conversion_failed_missing_url">URL faltando</string>
-    <string name="conversion_failed_parse_url_error">Falha ao processar o link de mapa</string>
     <string name="conversion_succeeded_apps_not_found">Nenhum app de mapa está instalado</string>
     <string name="copying_finished">Copiado para a área de transferência</string>
     <string name="conversion_failed_connection_permission_denied">O link não é suportado sem conectar ao mapa</string>
@@ -258,12 +257,10 @@
     <string name="user_preferences_apps_title">Apps</string>
     <string name="user_preferences_section_input">Entrada</string>
     <string name="user_preferences_section_output">Saída</string>
-    <string name="conversion_failed_unshorten_error_with_reason">Falha ao converter link curto devido a: %1$s</string>
     <string name="conversion_failed_reason_invalid_url">URL inválido</string>
     <string name="conversion_failed_reason_missing_header">cabelhaço HTTP ausente</string>
     <string name="conversion_failed_reason_no_points">nenhum ponto encontrado</string>
     <string name="conversion_failed_reason_timeout">tempo esgotado</string>
-    <string name="conversion_failed_parse_html_error_with_reason">Falha ao processar página da web devido a: %1$s</string>
     <string name="network_exception_too_many_requests">solicitações demais</string>
     <string name="licenses">Licenças</string>
     <string name="conversion_succeeded_check_experimental">A localização pode ser imprecisa devido a um método de extração experimental.</string>

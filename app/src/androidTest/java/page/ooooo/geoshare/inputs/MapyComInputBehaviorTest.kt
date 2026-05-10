@@ -32,7 +32,7 @@ class MapyComInputBehaviorTest : InputBehaviorTest {
             assumeDomainResolvable("mapy.com")
         }
 
-        // Short URI
+        // Short link
         testUri(
             WGS84Point(50.0831498, 14.4549515, z = 17.0, source = Source.URI),
             "https://mapy.com/s/jakuhelasu",

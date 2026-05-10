@@ -33,10 +33,8 @@ class ConnectionClosedNetworkException(cause: Throwable) : RecoverableNetworkExc
 }
 
 class ServerResponseNetworkException(val code: HttpStatusCode, cause: Throwable) : RecoverableNetworkException(cause) {
-    override fun getMessage(resources: Resources) = resources.getString(
-        R.string.network_exception_server_response_error,
-        code.value,
-    )
+    override fun getMessage(resources: Resources) =
+        resources.getString(R.string.network_exception_server_response_error, code.value)
 }
 
 class ResponseNetworkException(val code: HttpStatusCode, cause: Throwable) : UnrecoverableNetworkException(cause) {
@@ -49,6 +47,11 @@ class ResponseNetworkException(val code: HttpStatusCode, cause: Throwable) : Unr
 
 class UnknownNetworkException(cause: Throwable) : UnrecoverableNetworkException(cause) {
     override fun getMessage(resources: Resources) = resources.getString(R.string.network_exception_unknown)
+}
+
+class MissingHeaderNetworkException : UnrecoverableNetworkException(Throwable()) {
+    override fun getMessage(resources: Resources) =
+        resources.getString(R.string.conversion_failed_reason_missing_header)
 }
 
 class MaxAttemptsReachedNetworkException(override val cause: RecoverableNetworkException) :

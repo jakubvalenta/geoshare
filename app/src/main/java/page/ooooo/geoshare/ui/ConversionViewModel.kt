@@ -40,7 +40,7 @@ import page.ooooo.geoshare.lib.conversion.LocationPermissionReceived
 import page.ooooo.geoshare.lib.conversion.LocationRationaleConfirmed
 import page.ooooo.geoshare.lib.conversion.LocationRationaleShown
 import page.ooooo.geoshare.lib.conversion.LocationReceived
-import page.ooooo.geoshare.lib.conversion.ReceivedUriString
+import page.ooooo.geoshare.lib.conversion.SourceReceived
 import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.LocationAction
@@ -74,14 +74,14 @@ class ConversionViewModel @Inject constructor(
         _currentState.value = newState
     }
 
-    var inputUriString by savedStateHandle.saveable("inputUriString") { mutableStateOf("") }
+    var source by savedStateHandle.saveable("source") { mutableStateOf("") }
 
     private var transitionJob: Job? = null
 
     // Methods
 
     fun start() {
-        stateContext.currentState = ReceivedUriString(stateContext, inputUriString)
+        stateContext.currentState = SourceReceived(stateContext, source)
         transition()
     }
 
@@ -97,8 +97,8 @@ class ConversionViewModel @Inject constructor(
                 stateContext.log.e(TAG, "Exception while transitioning state", tr)
                 stateContext.log.e(TAG, tr.stackTraceToString())
                 stateContext.currentState = ConversionFailed(
-                    stateContext.resources.getString(R.string.conversion_failed_parse_url_error),
-                    inputUriString,
+                    stateContext.resources.getString(R.string.conversion_failed_reason_exception),
+                    source,
                 )
             }
         }
@@ -132,7 +132,7 @@ class ConversionViewModel @Inject constructor(
         (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
             transition {
                 ActionReady(
-                    currentState.inputUriString,
+                    currentState.source,
                     currentState.points,
                     action,
                     isAutomation = false
@@ -145,7 +145,7 @@ class ConversionViewModel @Inject constructor(
         (stateContext.currentState as? BasicActionReady)?.let { currentState ->
             transition {
                 ActionRan(
-                    currentState.inputUriString,
+                    currentState.source,
                     currentState.points,
                     currentState.action,
                     currentState.isAutomation,
@@ -161,7 +161,7 @@ class ConversionViewModel @Inject constructor(
         (stateContext.currentState as? FileUriRequested)?.let { currentState ->
             transition {
                 FileActionReady(
-                    currentState.inputUriString,
+                    currentState.source,
                     currentState.points,
                     currentState.action,
                     currentState.isAutomation,
@@ -175,7 +175,7 @@ class ConversionViewModel @Inject constructor(
         (stateContext.currentState as? FileUriRequested)?.let { currentState ->
             transition {
                 ActionFinished(
-                    currentState.inputUriString,
+                    currentState.source,
                     currentState.points,
                     currentState.action,
                     currentState.isAutomation
@@ -188,7 +188,7 @@ class ConversionViewModel @Inject constructor(
         (stateContext.currentState as? FileActionReady)?.let { currentState ->
             transition {
                 ActionRan(
-                    currentState.inputUriString,
+                    currentState.source,
                     currentState.points,
                     currentState.action,
                     currentState.isAutomation,
@@ -204,7 +204,7 @@ class ConversionViewModel @Inject constructor(
         (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
             transition {
                 LocationRationaleShown(
-                    currentState.inputUriString,
+                    currentState.source,
                     currentState.points,
                     action,
                     isAutomation
@@ -218,7 +218,7 @@ class ConversionViewModel @Inject constructor(
             transition {
                 LocationPermissionReceived(
                     stateContext,
-                    currentState.inputUriString,
+                    currentState.source,
                     currentState.points,
                     action,
                     isAutomation,
@@ -232,7 +232,7 @@ class ConversionViewModel @Inject constructor(
             transition {
                 LocationPermissionReceived(
                     stateContext,
-                    currentState.inputUriString,
+                    currentState.source,
                     currentState.points,
                     currentState.action,
                     currentState.isAutomation,
@@ -245,7 +245,7 @@ class ConversionViewModel @Inject constructor(
         (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
             transition {
                 LocationReceived(
-                    currentState.inputUriString, currentState.points, action, isAutomation, location
+                    currentState.source, currentState.points, action, isAutomation, location
                 )
             }
         }
@@ -255,7 +255,7 @@ class ConversionViewModel @Inject constructor(
         (stateContext.currentState as? LocationPermissionReceived)?.let { currentState ->
             transition {
                 ActionFinished(
-                    currentState.inputUriString,
+                    currentState.source,
                     currentState.points,
                     currentState.action,
                     currentState.isAutomation
@@ -268,7 +268,7 @@ class ConversionViewModel @Inject constructor(
         (stateContext.currentState as? LocationActionReady)?.let { currentState ->
             transition {
                 ActionRan(
-                    currentState.inputUriString,
+                    currentState.source,
                     currentState.points,
                     currentState.action,
                     currentState.isAutomation,
@@ -281,7 +281,7 @@ class ConversionViewModel @Inject constructor(
     // Lifecycle
 
     fun onCreateOrNewIntent(intent: Intent) {
-        inputUriString = AndroidTools.getIntentUriString(intent) ?: ""
+        source = AndroidTools.getIntentUriString(intent) ?: ""
         start()
     }
 
