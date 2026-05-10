@@ -40,15 +40,6 @@ class PermissionGrantedBasicInputTest {
         on { getString(R.string.conversion_failed_reason_invalid_url) } doReturn "invalid URL"
         on { getString(R.string.conversion_failed_reason_missing_header) } doReturn "missing HTTP header"
         on {
-            getString(R.string.conversion_failed_unshorten_error_with_reason, "invalid URL")
-        } doReturn "Failed to resolve short link due to: invalid URL"
-        on {
-            getString(R.string.conversion_failed_unshorten_error_with_reason, "missing HTTP header")
-        } doReturn "Failed to resolve short link due to: missing HTTP header"
-        on {
-            getString(R.string.conversion_failed_unshorten_error_with_reason, "response error 404")
-        } doReturn "Failed to resolve short link due to: response error 404"
-        on {
             getString(R.string.conversion_loading_indicator_description, 2, 10, "connection closed")
         } doReturn "Attempt 2 out of 10 due to connection closed."
         on { getString(R.string.network_exception_eof) } doReturn "connection closed"
@@ -94,15 +85,7 @@ class PermissionGrantedBasicInputTest {
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedBasicInput(
-            stateContext,
-            source,
-            match = source,
-            input,
-            input.loadingIndicatorTitleResId,
-            permission,
-            prevPoints,
-            lastAttempt,
-            maxAttempts,
+            stateContext, source, match = source, input, permission, prevPoints, lastAttempt, maxAttempts
         )
         assertEquals(
             DataParsed(
@@ -154,15 +137,7 @@ class PermissionGrantedBasicInputTest {
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedBasicInput(
-            stateContext,
-            source,
-            match = source,
-            input,
-            input.loadingIndicatorTitleResId,
-            permission,
-            prevPoints,
-            lastAttempt,
-            maxAttempts,
+            stateContext, source, match = source, input, permission, prevPoints, lastAttempt, maxAttempts
         )
         assertEquals(
             ConversionFailed(resources.getString(R.string.conversion_failed_cancelled), source),
@@ -206,22 +181,11 @@ class PermissionGrantedBasicInputTest {
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedBasicInput(
-            stateContext,
-            source,
-            match = source,
-            input,
-            input.loadingIndicatorTitleResId,
-            permission,
-            prevPoints,
-            lastAttempt,
-            maxAttempts,
+            stateContext, source, match = source, input, permission, prevPoints, lastAttempt, maxAttempts
         )
         assertEquals(
             ConversionFailed(
-                resources.getString(
-                    R.string.conversion_failed_unshorten_error_with_reason,
-                    resources.getString(R.string.conversion_failed_reason_invalid_url),
-                ),
+                resources.getString(R.string.conversion_failed_reason_invalid_url),
                 source,
             ),
             state.transition(),
@@ -266,15 +230,7 @@ class PermissionGrantedBasicInputTest {
                 on { this@on.uriQuote } doReturn uriQuote
             }
             val state = PermissionGrantedBasicInput(
-                stateContext,
-                source,
-                match = source,
-                input,
-                input.loadingIndicatorTitleResId,
-                permission,
-                prevPoints,
-                lastAttempt,
-                maxAttempts,
+                stateContext, source, match = source, input, permission, prevPoints, lastAttempt, maxAttempts
             )
             assertEquals(
                 PermissionGranted(
@@ -282,7 +238,6 @@ class PermissionGrantedBasicInputTest {
                     source,
                     match = source,
                     input,
-                    input.loadingIndicatorTitleResId,
                     permission,
                     prevPoints,
                     lastAttempt = NetworkTools.Attempt(2, cause),
@@ -330,15 +285,7 @@ class PermissionGrantedBasicInputTest {
                 on { this@on.uriQuote } doReturn uriQuote
             }
             val state = PermissionGrantedBasicInput(
-                stateContext,
-                source,
-                match = source,
-                input,
-                input.loadingIndicatorTitleResId,
-                permission,
-                prevPoints,
-                lastAttempt,
-                maxAttempts,
+                stateContext, source, match = source, input, permission, prevPoints, lastAttempt, maxAttempts
             )
             assertEquals(
                 PermissionGranted(
@@ -346,7 +293,6 @@ class PermissionGrantedBasicInputTest {
                     source,
                     match = source,
                     input,
-                    input.loadingIndicatorTitleResId,
                     permission,
                     prevPoints,
                     lastAttempt = NetworkTools.Attempt(3, cause),
@@ -394,25 +340,11 @@ class PermissionGrantedBasicInputTest {
                 on { this@on.uriQuote } doReturn uriQuote
             }
             val state = PermissionGrantedBasicInput(
-                stateContext,
-                source,
-                match = source,
-                input,
-                input.loadingIndicatorTitleResId,
-                permission,
-                prevPoints,
-                lastAttempt,
-                maxAttempts,
+                stateContext, source, match = source, input, permission, prevPoints, lastAttempt, maxAttempts
             )
             assertEquals(
                 ConversionFailed(
-                    stateContext.resources.getString(
-                        R.string.conversion_failed_unshorten_error_with_reason,
-                        resources.getString(
-                            R.string.network_exception_response_error,
-                            HttpStatusCode.NotFound.value,
-                        ),
-                    ),
+                    resources.getString(R.string.network_exception_response_error, HttpStatusCode.NotFound.value),
                     source,
                 ),
                 state.transition(),
@@ -427,12 +359,7 @@ class PermissionGrantedBasicInputTest {
             on { this@on.resources } doReturn resources
         }
         val state = PermissionGrantedBasicInput(
-            stateContext,
-            source,
-            match = source,
-            input,
-            input.loadingIndicatorTitleResId,
-            lastAttempt = null,
+            stateContext, source, match = source, input, lastAttempt = null
         )
         assertEquals(
             LoadingIndicator.Large(
@@ -451,12 +378,7 @@ class PermissionGrantedBasicInputTest {
             on { this@on.resources } doReturn resources
         }
         val state = PermissionGrantedBasicInput(
-            stateContext,
-            source,
-            match = source,
-            input,
-            input.loadingIndicatorTitleResId,
-            lastAttempt = lastAttempt,
+            stateContext, source, match = source, input, lastAttempt = lastAttempt
         )
         assertEquals(
             LoadingIndicator.Large(

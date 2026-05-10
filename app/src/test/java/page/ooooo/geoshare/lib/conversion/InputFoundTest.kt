@@ -30,15 +30,7 @@ class InputFoundTest {
         }
         val state = InputFound(stateContext, source, match = source, input, Permission.ALWAYS, prevPoints)
         assertEquals(
-            PermissionGranted(
-                stateContext,
-                source,
-                match = source,
-                input,
-                input.loadingIndicatorTitleResId,
-                Permission.ALWAYS,
-                prevPoints,
-            ),
+            PermissionGranted(stateContext, source, match = source, input, Permission.ALWAYS, prevPoints),
             state.transition(),
         )
     }
@@ -55,14 +47,7 @@ class InputFoundTest {
         }
         val state = InputFound(stateContext, source, match = source, input, Permission.ASK)
         assertEquals(
-            PermissionRequested(
-                stateContext,
-                source,
-                match = source,
-                input,
-                input.permissionTitleResId,
-                input.loadingIndicatorTitleResId,
-            ),
+            PermissionRequested(stateContext, source, match = source, input, input.permissionTitleResId),
             state.transition(),
         )
     }
@@ -98,15 +83,7 @@ class InputFoundTest {
             }
             val state = InputFound(stateContext, source, match = source, input, permission = null, prevPoints)
             assertEquals(
-                PermissionGranted(
-                    stateContext,
-                    source,
-                    match = source,
-                    input,
-                    input.loadingIndicatorTitleResId,
-                    Permission.ALWAYS,
-                    prevPoints,
-                ),
+                PermissionGranted(stateContext, source, match = source, input, Permission.ALWAYS, prevPoints),
                 state.transition(),
             )
         }
@@ -123,14 +100,7 @@ class InputFoundTest {
         }
         val state = InputFound(stateContext, source, match = source, input, permission = null)
         assertEquals(
-            PermissionRequested(
-                stateContext,
-                source,
-                match = source,
-                input,
-                input.permissionTitleResId,
-                input.loadingIndicatorTitleResId,
-            ),
+            PermissionRequested(stateContext, source, match = source, input, input.permissionTitleResId),
             state.transition(),
         )
     }
@@ -157,9 +127,9 @@ class InputFoundTest {
         val source = "https://maps.app.goo.gl/foo"
         val input = GoogleMapsUriInput
         val stateContext: ConversionStateContext = mock()
-        val state = InputFound(stateContext, source, match = source, input, permission = Permission.NEVER)
+        val state = InputFound(stateContext, source, match = source, input, Permission.NEVER)
         assertEquals(
-            PermissionGranted(stateContext, source, match = source, input, permission = Permission.NEVER),
+            PermissionGranted(stateContext, source, match = source, input, Permission.NEVER),
             state.transition(),
         )
     }

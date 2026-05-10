@@ -761,7 +761,6 @@ private fun MainMainPane(
 
 @Composable
 private fun MainBottomPane(currentState: State) {
-    // TODO Show loading indicator with WebView too
     if (currentState is PermissionGrantedWebViewInput) {
         BoxWithConstraints(
             Modifier
@@ -1950,7 +1949,7 @@ private fun ErrorPreview() {
         val coordinateConverter = CoordinateConverter(geometries)
         MainScreen(
             currentState = ConversionFailed(
-                message = stringResource(R.string.conversion_failed_parse_url_error),
+                message = stringResource(R.string.conversion_failed_reason_no_points),
                 source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
             allInputs = emptyList(),
@@ -2008,7 +2007,7 @@ private fun DarkErrorPreview() {
         val coordinateConverter = CoordinateConverter(geometries)
         MainScreen(
             currentState = ConversionFailed(
-                message = stringResource(R.string.conversion_failed_parse_url_error),
+                message = stringResource(R.string.conversion_failed_reason_no_points),
                 source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
             allInputs = emptyList(),
@@ -2066,7 +2065,7 @@ private fun TabletErrorPreview() {
         val coordinateConverter = CoordinateConverter(geometries)
         MainScreen(
             currentState = ConversionFailed(
-                message = stringResource(R.string.conversion_failed_parse_url_error),
+                message = stringResource(R.string.conversion_failed_reason_no_points),
                 source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
             allInputs = emptyList(),
@@ -2206,7 +2205,6 @@ private fun LoadingIndicatorPreview() {
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             input = GoogleMapsHtmlInput,
-            loadingIndicatorTitleResId = GoogleMapsHtmlInput.loadingIndicatorTitleResId,
             lastAttempt = NetworkTools.Attempt(
                 2,
                 ConnectTimeoutNetworkException(Exception()),
@@ -2282,7 +2280,6 @@ private fun DarkLoadingIndicatorPreview() {
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             input = GoogleMapsHtmlInput,
-            loadingIndicatorTitleResId = GoogleMapsHtmlInput.loadingIndicatorTitleResId,
             lastAttempt = NetworkTools.Attempt(
                 2,
                 ConnectTimeoutNetworkException(Exception()),
@@ -2358,7 +2355,6 @@ private fun TabletLoadingIndicatorPreview() {
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             input = GoogleMapsHtmlInput,
-            loadingIndicatorTitleResId = GoogleMapsHtmlInput.loadingIndicatorTitleResId,
             lastAttempt = NetworkTools.Attempt(
                 2,
                 ConnectTimeoutNetworkException(Exception()),

@@ -26,27 +26,11 @@ class PermissionGrantedTest {
         val maxAttempts = 3
         val stateContext: ConversionStateContext = mock()
         val state = PermissionGranted(
-            stateContext,
-            source,
-            match = source,
-            input,
-            input.loadingIndicatorTitleResId,
-            permission,
-            prevPoints,
-            lastAttempt,
-            maxAttempts,
+            stateContext, source, match = source, input, permission, prevPoints, lastAttempt, maxAttempts
         )
         assertEquals(
             PermissionGrantedBasicInput(
-                stateContext,
-                source,
-                match = source,
-                input,
-                input.loadingIndicatorTitleResId,
-                permission,
-                prevPoints,
-                lastAttempt,
-                maxAttempts,
+                stateContext, source, match = source, input, permission, prevPoints, lastAttempt, maxAttempts
             ),
             state.transition(),
         )
@@ -63,24 +47,11 @@ class PermissionGrantedTest {
         val maxAttempts = 3
         val stateContext: ConversionStateContext = mock()
         val state = PermissionGranted(
-            stateContext,
-            source,
-            match = source,
-            input,
-            input.loadingIndicatorTitleResId,
-            permission,
-            prevPoints,
-            lastAttempt,
-            maxAttempts,
+            stateContext, source, match = source, input, permission, prevPoints, lastAttempt, maxAttempts
         )
         assertEquals(
             PermissionGrantedWebViewInput(
-                stateContext,
-                source,
-                match = source,
-                input,
-                permission,
-                prevPoints,
+                stateContext, source, match = source, input, permission, prevPoints
             ),
             state.transition(),
         )

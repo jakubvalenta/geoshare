@@ -97,7 +97,7 @@ class ConversionViewModel @Inject constructor(
                 stateContext.log.e(TAG, "Exception while transitioning state", tr)
                 stateContext.log.e(TAG, tr.stackTraceToString())
                 stateContext.currentState = ConversionFailed(
-                    stateContext.resources.getString(R.string.conversion_failed_parse_url_error),
+                    stateContext.resources.getString(R.string.conversion_failed_reason_exception),
                     source,
                 )
             }

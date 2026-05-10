@@ -20,7 +20,7 @@ class DataParsedTest {
     private val log = FakeLog
     private val resources: Resources = mock {
         on { getString(R.string.conversion_failed_connection_permission_denied) } doReturn "This link is not supported without connecting to the map service"
-        on { getString(R.string.conversion_failed_parse_url_error) } doReturn "Failed to process map link"
+        on { getString(R.string.conversion_failed_reason_no_points) } doReturn "no points found"
     }
     private val stateContext: ConversionStateContext = mock {
         on { this@on.log } doReturn log
@@ -94,7 +94,7 @@ class DataParsedTest {
         val state = DataParsed(stateContext, source, match = source, GoogleMapsUriInput, result)
         assertEquals(
             ConversionFailed(
-                resources.getString(R.string.conversion_failed_parse_url_error),
+                resources.getString(R.string.conversion_failed_reason_no_points),
                 source,
             ),
             state.transition(),
@@ -102,14 +102,14 @@ class DataParsedTest {
     }
 
     @Test
-    fun transition_wHenPointsAreEmpty_returnsConversionFailed() = runTest {
+    fun transition_whenPointsAreEmpty_returnsConversionFailed() = runTest {
         val source = "https://maps.apple.com/foo"
         val points = persistentListOf<WGS84Point>()
         val result = ParseResult(points)
         val state = DataParsed(stateContext, source, match = source, GoogleMapsUriInput, result)
         assertEquals(
             ConversionFailed(
-                resources.getString(R.string.conversion_failed_parse_url_error),
+                resources.getString(R.string.conversion_failed_reason_no_points),
                 source,
             ),
             state.transition(),

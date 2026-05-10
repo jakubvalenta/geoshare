@@ -10,7 +10,7 @@ sealed interface Point {
     val lon: Double?
     val z: Double?
     val name: String?
-    val source: Source // TODO Rename to origin
+    val source: Source
 
     val latStr: String?
         get() = lat?.toScale(7)?.toTrimmedString()

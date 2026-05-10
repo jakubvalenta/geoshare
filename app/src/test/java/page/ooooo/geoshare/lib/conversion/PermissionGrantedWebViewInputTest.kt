@@ -6,7 +6,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -22,6 +21,7 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.inputs.GoogleMapsWebViewInput
 import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.inputs.WebViewInput
 import kotlin.time.Duration.Companion.seconds
@@ -33,9 +33,6 @@ class PermissionGrantedWebViewInputTest {
     private val resources: Resources = mock {
         on { getString(R.string.converter_google_maps_loading_indicator_title) } doReturn "Connecting to Google..."
         on { getString(R.string.conversion_failed_cancelled) } doReturn "Cancelled"
-        on {
-            getString(R.string.conversion_failed_parse_html_error_with_reason, "timeout")
-        } doReturn "Failed to process web page due to: timeout"
         on { getString(R.string.conversion_failed_reason_timeout) } doReturn "timeout"
         on {
             getString(R.string.conversion_loading_indicator_description, 2, 10, "connection closed")
@@ -53,8 +50,7 @@ class PermissionGrantedWebViewInputTest {
                 prevPoints: Points?,
                 uriQuote: UriQuote,
                 log: ILog,
-            ) =
-                ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
+            ) = ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
@@ -68,14 +64,7 @@ class PermissionGrantedWebViewInputTest {
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedWebViewInput(
-            stateContext,
-            source,
-            match = source,
-            input,
-            permission,
-            prevPoints,
-            timeout,
-            dispatcher = testScheduler,
+            stateContext, source, match = source, input, permission, prevPoints, timeout, dispatcher = testScheduler
         )
         var res: State? = null
         launch {
@@ -107,8 +96,7 @@ class PermissionGrantedWebViewInputTest {
                 prevPoints: Points?,
                 uriQuote: UriQuote,
                 log: ILog,
-            ) =
-                ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
+            ) = ParseResult(prevPoints ?: persistentListOf(), nextMatch = data)
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
@@ -122,22 +110,12 @@ class PermissionGrantedWebViewInputTest {
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedWebViewInput(
-            stateContext,
-            source,
-            match = source,
-            input,
-            permission,
-            prevPoints,
-            timeout,
-            dispatcher = testScheduler,
+            stateContext, source, match = source, input, permission, prevPoints, timeout, dispatcher = testScheduler
         )
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
                 ConversionFailed(
-                    resources.getString(
-                        R.string.conversion_failed_parse_html_error_with_reason,
-                        resources.getString(R.string.conversion_failed_reason_timeout),
-                    ),
+                    resources.getString(R.string.conversion_failed_reason_timeout),
                     source,
                 ),
                 state.transition(),
@@ -156,8 +134,7 @@ class PermissionGrantedWebViewInputTest {
                 prevPoints: Points?,
                 uriQuote: UriQuote,
                 log: ILog,
-            ) =
-                throw CancellationException()
+            ) = throw CancellationException()
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
@@ -171,14 +148,7 @@ class PermissionGrantedWebViewInputTest {
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedWebViewInput(
-            stateContext,
-            source,
-            match = source,
-            input,
-            permission,
-            prevPoints,
-            timeout,
-            dispatcher = testScheduler,
+            stateContext, source, match = source, input, permission, prevPoints, timeout, dispatcher = testScheduler
         )
         var res: State? = null
         launch {
@@ -202,8 +172,7 @@ class PermissionGrantedWebViewInputTest {
                 prevPoints: Points?,
                 uriQuote: UriQuote,
                 log: ILog,
-            ) =
-                ParseResult()
+            ) = ParseResult()
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
@@ -217,14 +186,7 @@ class PermissionGrantedWebViewInputTest {
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedWebViewInput(
-            stateContext,
-            source,
-            match = source,
-            input,
-            permission,
-            prevPoints,
-            timeout,
-            dispatcher = StandardTestDispatcher(testScheduler),
+            stateContext, source, match = source, input, permission, prevPoints, timeout, dispatcher = testScheduler
         )
         var res: State? = null
         val job = launch {
@@ -240,6 +202,22 @@ class PermissionGrantedWebViewInputTest {
         assertEquals(
             ConversionFailed(resources.getString(R.string.conversion_failed_cancelled), source),
             res,
+        )
+    }
+
+    @Test
+    fun getLoadingIndicator_whenLastAttemptIsNull_returnsLargeLoadingIndicatorWithoutDescription() = runTest {
+        val source = "https://maps.google.com/foo"
+        val input = GoogleMapsWebViewInput
+        val stateContext: ConversionStateContext = mock {
+            on { this@on.resources } doReturn resources
+        }
+        val state = PermissionGrantedWebViewInput(stateContext, source, match = source, input)
+        assertEquals(
+            LoadingIndicator.Large(
+                title = resources.getString(R.string.converter_google_maps_loading_indicator_title),
+            ),
+            state.getLoadingIndicator(),
         )
     }
 }

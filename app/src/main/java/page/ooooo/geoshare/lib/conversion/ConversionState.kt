@@ -72,10 +72,6 @@ interface ConversionState : State {
     interface HasLargeLoadingIndicator {
         fun getLoadingIndicator(): LoadingIndicator.Large?
     }
-
-    companion object {
-        const val TAG = "ConversionState"
-    }
 }
 
 class Initial : ConversionState
@@ -116,28 +112,17 @@ data class InputFound<T>(
         if (input is Input.HasPermission) {
             when (permission ?: stateContext.userPreferencesRepository.getValue(ConnectionPermissionPreference)) {
                 Permission.ALWAYS -> PermissionGranted(
-                    stateContext,
-                    source,
-                    match,
-                    input,
-                    loadingIndicatorTitleResId = input.loadingIndicatorTitleResId,
-                    permission = Permission.ALWAYS,
-                    prevPoints = prevPoints,
+                    stateContext, source, match, input, Permission.ALWAYS, prevPoints
                 )
 
                 Permission.ASK -> PermissionRequested(
-                    stateContext,
-                    source,
-                    match,
-                    input,
-                    permissionTitleResId = input.permissionTitleResId,
-                    loadingIndicatorTitleResId = input.loadingIndicatorTitleResId,
+                    stateContext, source, match, input, input.permissionTitleResId
                 )
 
                 Permission.NEVER -> PermissionDenied(stateContext, source, input)
             }
         } else {
-            PermissionGranted(stateContext, source, match, input, permission = permission)
+            PermissionGranted(stateContext, source, match, input, permission)
         }
 }
 
@@ -147,13 +132,12 @@ data class PermissionRequested<T>(
     val match: String,
     val input: Input<T>,
     override val permissionTitleResId: Int,
-    val loadingIndicatorTitleResId: Int,
 ) : ConversionState, ConversionState.HasPermission {
     override suspend fun grant(doNotAsk: Boolean): State {
         if (doNotAsk) {
             stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.ALWAYS)
         }
-        return PermissionGranted(stateContext, source, match, input, loadingIndicatorTitleResId, Permission.ALWAYS)
+        return PermissionGranted(stateContext, source, match, input, Permission.ALWAYS)
     }
 
     override suspend fun deny(doNotAsk: Boolean): State {
@@ -169,7 +153,6 @@ data class PermissionGranted<T>(
     val source: String,
     val match: String,
     val input: Input<T>,
-    val loadingIndicatorTitleResId: Int? = null,
     val permission: Permission? = null,
     val prevPoints: Points? = null,
     val lastAttempt: NetworkTools.Attempt? = null,
@@ -178,24 +161,11 @@ data class PermissionGranted<T>(
     override suspend fun transition(): State =
         when (input) {
             is BasicInput -> PermissionGrantedBasicInput(
-                stateContext,
-                source,
-                match,
-                input,
-                loadingIndicatorTitleResId,
-                permission,
-                prevPoints,
-                lastAttempt,
-                maxAttempts,
+                stateContext, source, match, input, permission, prevPoints, lastAttempt, maxAttempts
             )
 
             is WebViewInput -> PermissionGrantedWebViewInput(
-                stateContext,
-                source,
-                match,
-                input,
-                permission,
-                prevPoints,
+                stateContext, source, match, input, permission, prevPoints
             )
         }
 }
@@ -205,7 +175,6 @@ data class PermissionGrantedBasicInput<T>(
     val source: String,
     val match: String,
     val input: BasicInput<T>,
-    val loadingIndicatorTitleResId: Int? = null,
     val permission: Permission? = null,
     val prevPoints: Points? = null,
     val lastAttempt: NetworkTools.Attempt? = null,
@@ -230,10 +199,7 @@ data class PermissionGrantedBasicInput<T>(
                 DataParsed(stateContext, source, match, input, result, permission, prevPoints)
             } catch (_: MalformedURLException) {
                 ConversionFailed(
-                    stateContext.resources.getString(
-                        R.string.conversion_failed_unshorten_error_with_reason,
-                        stateContext.resources.getString(R.string.conversion_failed_reason_invalid_url),
-                    ),
+                    stateContext.resources.getString(R.string.conversion_failed_reason_invalid_url),
                     source,
                 )
             } catch (tr: RecoverableNetworkException) {
@@ -242,19 +208,14 @@ data class PermissionGrantedBasicInput<T>(
                     source,
                     match,
                     input,
-                    loadingIndicatorTitleResId,
                     permission,
                     prevPoints,
                     lastAttempt = NetworkTools.Attempt(lastAttempt?.number?.plus(1) ?: 2, tr),
                     maxAttempts = maxAttempts,
                 )
             } catch (tr: UnrecoverableNetworkException) {
-                // TODO Don't mention short link in the error message
                 ConversionFailed(
-                    stateContext.resources.getString(
-                        R.string.conversion_failed_unshorten_error_with_reason,
-                        tr.getMessage(stateContext.resources),
-                    ),
+                    tr.getMessage(stateContext.resources),
                     source,
                 )
             }
@@ -267,19 +228,20 @@ data class PermissionGrantedBasicInput<T>(
         )
     }
 
-    override fun getLoadingIndicator() = loadingIndicatorTitleResId?.let { loadingIndicatorTitleResId ->
-        LoadingIndicator.Large(
-            title = stateContext.resources.getString(loadingIndicatorTitleResId),
-            description = lastAttempt?.let {
-                stateContext.resources.getString(
-                    R.string.conversion_loading_indicator_description,
-                    it.number, // FIXME Should this be it.number + 1?
-                    maxAttempts,
-                    it.cause.getMessage(stateContext.resources),
-                )
-            },
-        )
-    }
+    override fun getLoadingIndicator() =
+        (input as? Input.HasPermission)?.loadingIndicatorTitleResId?.let { loadingIndicatorTitleResId ->
+            LoadingIndicator.Large(
+                title = stateContext.resources.getString(loadingIndicatorTitleResId),
+                description = lastAttempt?.let {
+                    stateContext.resources.getString(
+                        R.string.conversion_loading_indicator_description,
+                        it.number,
+                        maxAttempts,
+                        it.cause.getMessage(stateContext.resources),
+                    )
+                },
+            )
+        }
 }
 
 /**
@@ -298,7 +260,7 @@ data class PermissionGrantedWebViewInput(
     val prevPoints: Points? = null,
     val timeout: Duration = 60.seconds,
     val dispatcher: CoroutineContext = Dispatchers.Default,
-) : ConversionState {
+) : ConversionState, ConversionState.HasLargeLoadingIndicator {
     private val dataFlow = MutableStateFlow<String?>(null)
 
     fun setData(data: String) {
@@ -317,12 +279,9 @@ data class PermissionGrantedWebViewInput(
                 val result = input.parse(data, match, prevPoints, stateContext.uriQuote, stateContext.log)
                 DataParsed(stateContext, source, match, input, result, permission, prevPoints)
             } catch (_: TimeoutCancellationException) {
-                stateContext.log.e(ConversionState.TAG, "Parse: Timed out")
+                stateContext.log.e(TAG, "Timed out")
                 ConversionFailed(
-                    stateContext.resources.getString(
-                        R.string.conversion_failed_parse_html_error_with_reason,
-                        stateContext.resources.getString(R.string.conversion_failed_reason_timeout),
-                    ),
+                    stateContext.resources.getString(R.string.conversion_failed_reason_timeout),
                     source,
                 )
             }
@@ -333,6 +292,13 @@ data class PermissionGrantedWebViewInput(
             stateContext.resources.getString(R.string.conversion_failed_cancelled),
             source,
         )
+    }
+
+    override fun getLoadingIndicator() =
+        LoadingIndicator.Large(stateContext.resources.getString(input.loadingIndicatorTitleResId))
+
+    private companion object {
+        private const val TAG = "PermissionGrantedWebViewInput"
     }
 }
 
@@ -360,25 +326,27 @@ data class DataParsed(
     override suspend fun transition(): State =
         result.run {
             if (points.lastOrNull()?.hasCoordinates() == true) {
-                stateContext.log.i(ConversionState.TAG, "Parse: Converted $match to $points")
+                stateContext.log.i(TAG, "Converted $match to $points")
                 ConversionSucceeded(stateContext, source, points)
             } else if (nextInput != null) {
                 val nextMatch = nextMatch ?: match
-                stateContext.log.i(ConversionState.TAG, "Parse: Going to next input $nextInput and match $nextMatch")
+                stateContext.log.i(TAG, "Going to next input $nextInput and match $nextMatch")
                 InputFound(stateContext, source, nextMatch, nextInput, permission, points)
             } else if (points.lastOrNull()?.hasName() == true) {
-                stateContext.log.i(ConversionState.TAG, "Parse: Converted $match to $points")
+                stateContext.log.i(TAG, "Converted $match to $points")
                 ConversionSucceeded(stateContext, source, points)
             } else {
-                stateContext.log.i(ConversionState.TAG, "Parse: Failed to parse $match")
+                stateContext.log.i(TAG, "Failed to parse $match")
                 ConversionFailed(
-                    stateContext.resources.getString(R.string.conversion_failed_parse_url_error),
+                    stateContext.resources.getString(R.string.conversion_failed_reason_no_points),
                     source,
                 )
-                // TODO Use specific error R.string.conversion_failed_parse_html_error_with_reason with R.string.conversion_failed_reason_no_points
-                // TODO Use specific error R.string.conversion_failed_connection_permission_denied
             }
         }
+
+    private companion object {
+        private const val TAG = "ConversionSucceeded"
+    }
 }
 
 data class ConversionSucceeded(
@@ -418,14 +386,12 @@ data class ConversionSucceeded(
                 .first()
         } catch (_: TimeoutCancellationException) {
             // If billing status didn't appear, try to read it from cache
-            stateContext.log.w(
-                ConversionState.TAG, "Automation: Billing status didn't appear within $billingStatusTimeout"
-            )
+            stateContext.log.w(TAG, "Automation: Billing status didn't appear within $billingStatusTimeout")
             stateContext.userPreferencesRepository.getValue(CachedPurchasePreference)
                 ?.let { cachedPurchase ->
                     stateContext.billing.products.firstOrNull { product -> cachedPurchase.productId == product.id }
                         ?.let { product ->
-                            stateContext.log.w(ConversionState.TAG, "Automation: Found cached billing status")
+                            stateContext.log.w(TAG, "Automation: Found cached billing status")
                             BillingStatus.Purchased(
                                 product,
                                 expired = false,
@@ -435,7 +401,7 @@ data class ConversionSucceeded(
                         }
                 }
                 ?: run {
-                    stateContext.log.w(ConversionState.TAG, "Automation: Didn't find cached billing status")
+                    stateContext.log.w(TAG, "Automation: Didn't find cached billing status")
                     BillingStatus.Loading()
                 }
         }
@@ -456,6 +422,10 @@ data class ConversionSucceeded(
             return ActionReady(source, points, action, isAutomation = true)
         }
         return null
+    }
+
+    private companion object {
+        private const val TAG = "ConversionSucceeded"
     }
 }
 

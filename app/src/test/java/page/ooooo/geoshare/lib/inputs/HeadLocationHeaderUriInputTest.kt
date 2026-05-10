@@ -145,6 +145,4 @@ class HeadLocationHeaderUriInputTest {
             log,
         ) { ParseResult() }
     }
-
-    // TODO Test GoogleMapsShortLinkInput.parse() when data is null
 }

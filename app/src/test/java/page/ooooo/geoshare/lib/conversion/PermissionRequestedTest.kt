@@ -22,12 +22,7 @@ class PermissionRequestedTest {
         val input = GoogleMapsHtmlInput
         val stateContext: ConversionStateContext = mock()
         val state = PermissionRequested(
-            stateContext,
-            source,
-            match = source,
-            input,
-            input.permissionTitleResId,
-            input.loadingIndicatorTitleResId,
+            stateContext, source, match = source, input, input.permissionTitleResId
         )
         assertNull(state.transition())
     }
@@ -43,22 +38,10 @@ class PermissionRequestedTest {
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = PermissionRequested(
-            stateContext,
-            source,
-            match = source,
-            input,
-            input.permissionTitleResId,
-            input.loadingIndicatorTitleResId,
+            stateContext, source, match = source, input, input.permissionTitleResId
         )
         assertEquals(
-            PermissionGranted(
-                stateContext,
-                source,
-                match = source,
-                input,
-                input.loadingIndicatorTitleResId,
-                permission = Permission.ALWAYS,
-            ),
+            PermissionGranted(stateContext, source, match = source, input, Permission.ALWAYS),
             state.grant(false),
         )
         verify(userPreferencesRepository, never()).setValue(
@@ -77,23 +60,9 @@ class PermissionRequestedTest {
         val stateContext: ConversionStateContext = mock {
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = PermissionRequested(
-            stateContext,
-            source,
-            match = source,
-            input,
-            input.permissionTitleResId,
-            input.loadingIndicatorTitleResId,
-        )
+        val state = PermissionRequested(stateContext, source, match = source, input, input.permissionTitleResId)
         assertEquals(
-            PermissionGranted(
-                stateContext,
-                source,
-                match = source,
-                input,
-                input.loadingIndicatorTitleResId,
-                permission = Permission.ALWAYS,
-            ),
+            PermissionGranted(stateContext, source, match = source, input, Permission.ALWAYS),
             state.grant(true),
         )
         verify(userPreferencesRepository).setValue(
@@ -112,14 +81,7 @@ class PermissionRequestedTest {
         val stateContext: ConversionStateContext = mock {
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = PermissionRequested(
-            stateContext,
-            source,
-            match = source,
-            input,
-            input.permissionTitleResId,
-            input.loadingIndicatorTitleResId,
-        )
+        val state = PermissionRequested(stateContext, source, match = source, input, input.permissionTitleResId)
         assertEquals(
             PermissionDenied(stateContext, source, input),
             state.deny(false),
@@ -140,14 +102,7 @@ class PermissionRequestedTest {
         val stateContext: ConversionStateContext = mock {
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = PermissionRequested(
-            stateContext,
-            source,
-            match = source,
-            input,
-            input.permissionTitleResId,
-            input.loadingIndicatorTitleResId,
-        )
+        val state = PermissionRequested(stateContext, source, match = source, input, input.permissionTitleResId)
         assertEquals(
             PermissionDenied(stateContext, source, input),
             state.deny(true),
