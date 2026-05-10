@@ -9,7 +9,7 @@ interface InputTest {
     suspend fun TextInput.parse(text: String, match: String = "https://example.com/") =
         this.parse(text, match, uriQuote = FakeUriQuote, log = FakeLog)
 
-    suspend fun UriInput.parse(uriString: String, match: String = "https://example.com/") =
+    suspend fun UriInput.parse(uriString: String, match: String = uriString) =
         this.parse(Uri.parse(uriString, uriQuote = FakeUriQuote), match, uriQuote = FakeUriQuote)
 
     suspend fun BodyAsChannelInput.parse(html: String, match: String = "https://example.com/") =

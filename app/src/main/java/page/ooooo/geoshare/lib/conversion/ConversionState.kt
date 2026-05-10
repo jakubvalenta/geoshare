@@ -335,20 +335,23 @@ data class DataParsed<T>(
     override suspend fun transition(): State =
         result.run {
             if (points.lastOrNull()?.hasCoordinates() == true) {
-                stateContext.log.i(TAG, "Converted $match to $points")
+                stateContext.log.i(TAG, "Extracted point with coordinates $points from $match")
                 ConversionSucceeded(stateContext, source, points)
-            } else if (nextInput != null) {
-                val nextMatch = nextMatch ?: match
-                stateContext.log.i(TAG, "Going to next input $nextInput and match $nextMatch")
-                InputFound(stateContext, source, nextMatch, nextInput, permission, prevResult = this)
+            } else if (nextStep != null) {
+                stateContext.log.i(
+                    TAG, "Failed to extract point with coordinates from $match, going to input $nextStep"
+                )
+                InputFound(stateContext, source, nextStep.match, nextStep.input, permission, prevResult = this)
             } else if (points.lastOrNull()?.hasName() == true) {
-                stateContext.log.i(TAG, "Converted $match to $points")
+                stateContext.log.i(TAG, "Extracted point with name $points from $match")
                 ConversionSucceeded(stateContext, source, points)
-            } else if (prevResult != null) {
-                stateContext.log.i(TAG, "Fall back to previous result $prevResult.points")
+            } else if (prevResult?.points?.lastOrNull()?.run { hasCoordinates() || hasName() } == true) { // TODO Test
+                stateContext.log.i(
+                    TAG, "Failed to extract point from $match, using previous result ${prevResult.points}"
+                )
                 ConversionSucceeded(stateContext, source, prevResult.points)
             } else {
-                stateContext.log.i(TAG, "Failed to parse $match")
+                stateContext.log.i(TAG, "Failed to extract point from $match")
                 ConversionFailed(
                     stateContext.resources.getString(R.string.conversion_failed_reason_no_points),
                     source,

@@ -69,7 +69,7 @@ object AppleMapsUriInput : UriInput, Input.HasRandomUri {
                 // https://maps.apple.com/place?place-id={id}...
                 !queryParams["place-id"].isNullOrEmpty()
             ) {
-                nextInput = AppleMapsHtmlInput
+                nextStep = NextStep(AppleMapsHtmlInput, match)
             }
 
             if (name != null) {

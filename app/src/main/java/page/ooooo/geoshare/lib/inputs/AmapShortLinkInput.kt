@@ -28,8 +28,7 @@ object AmapShortLinkInput : HeadLocationHeaderInput {
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {
-        nextInput = AmapUriInput
-        nextMatch = data.toString()
+        nextStep = NextStep(AmapUriInput, data.toString())
     }
 
     override fun toString() = "AmapShortLinkInput"

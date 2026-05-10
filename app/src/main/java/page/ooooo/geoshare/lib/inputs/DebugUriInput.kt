@@ -23,8 +23,8 @@ object DebugUriInput : UriInput {
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {
-        nextInput = DebugWebViewInput
+        nextStep = NextStep(DebugWebViewInput, match)
     }
 
-    override fun toString() = "DebugInput"
+    override fun toString() = "DebugUriInput"
 }

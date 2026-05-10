@@ -62,7 +62,7 @@ class GetRedirectUrlInputTest {
             ) = "${url}-data"
         }
         assertEquals(
-            ParseResult(nextMatch = "${match}-data"),
+            ParseResult(nextStep = NextStep(DebugUriInput, "${match}-data")),
             input.withData(
                 match,
                 networkTools,
@@ -70,7 +70,11 @@ class GetRedirectUrlInputTest {
                 maxAttempts,
                 uriQuote,
                 log,
-            ) { data -> ParseResult(nextMatch = data.toString()) }
+            ) { data ->
+                ParseResult(
+                    nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
+                )
+            }
         )
     }
 
@@ -87,7 +91,7 @@ class GetRedirectUrlInputTest {
             ) = "${url}-data"
         }
         assertEquals(
-            ParseResult(nextMatch = "https://${match}-data"),
+            ParseResult(nextStep = NextStep(DebugUriInput, "https://${match}-data")),
             input.withData(
                 match,
                 networkTools,
@@ -95,7 +99,11 @@ class GetRedirectUrlInputTest {
                 maxAttempts,
                 uriQuote,
                 log,
-            ) { data -> ParseResult(nextMatch = data.toString()) }
+            ) { data ->
+                ParseResult(
+                    nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
+                )
+            }
         )
     }
 
@@ -113,7 +121,7 @@ class GetRedirectUrlInputTest {
                 ) = "bar"
             }
             assertEquals(
-                ParseResult(nextMatch = "${match}/bar"),
+                ParseResult(nextStep = NextStep(DebugUriInput, "${match}/bar")),
                 input.withData(
                     match,
                     networkTools,
@@ -121,7 +129,11 @@ class GetRedirectUrlInputTest {
                     maxAttempts,
                     uriQuote,
                     log,
-                ) { data -> ParseResult(nextMatch = data.toString()) }
+                ) { data ->
+                    ParseResult(
+                        nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
+                    )
+                }
             )
         }
 

@@ -127,20 +127,38 @@ class YandexMapsUriInputTest : InputTest {
                         source = Source.URI,
                     )
                 ),
-                nextInput = YandexMapsHtmlInput,
+                nextStep = NextStep(
+                    YandexMapsHtmlInput,
+                    "https://yandex.ru/maps/213/moscow/geo/keramicheskiy_proyezd/8062907/"
+                )
             ),
             input.parse("https://yandex.ru/maps/213/moscow/geo/keramicheskiy_proyezd/8062907/"),
         )
         assertEquals(
-            ParseResult(nextInput = YandexMapsHtmlInput),
+            ParseResult(
+                nextStep = NextStep(
+                    YandexMapsHtmlInput,
+                    "https://yandex.com/maps/org/94933420809"
+                )
+            ),
             input.parse("https://yandex.com/maps/org/94933420809"),
         )
         assertEquals(
-            ParseResult(nextInput = YandexMapsHtmlInput),
+            ParseResult(
+                nextStep = NextStep(
+                    YandexMapsHtmlInput,
+                    "https://yandex.com/maps/org/94933420809/"
+                )
+            ),
             input.parse("https://yandex.com/maps/org/94933420809/"),
         )
         assertEquals(
-            ParseResult(nextInput = YandexMapsHtmlInput),
+            ParseResult(
+                nextStep = NextStep(
+                    YandexMapsHtmlInput,
+                    "https://yandex.com/maps/org/94933420809?spam"
+                )
+            ),
             input.parse("https://yandex.com/maps/org/94933420809?spam"),
         )
     }

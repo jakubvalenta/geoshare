@@ -69,14 +69,14 @@ object YandexMapsUriInput : UriInput, Input.HasRandomUri {
                                     source = Source.URI,
                                 ),
                             )
-                            nextInput = YandexMapsHtmlInput
+                            nextStep = NextStep(YandexMapsHtmlInput, match)
                             return@buildParseResult
                         }
 
                         "org" -> {
                             // Old POI -- these links seem to return 404 now; we still keep the code in case they start working again
                             // https://yandex.com/maps/org/{id}?...
-                            nextInput = YandexMapsHtmlInput
+                            nextStep = NextStep(YandexMapsHtmlInput, match)
                             return@buildParseResult
                         }
                     }

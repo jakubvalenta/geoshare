@@ -90,29 +90,33 @@ object WazeUriInput : UriInput, Input.HasRandomUri {
                 // https://www.waze.com/ul?venue_id=2884104.28644432.6709020
                 // with this one:
                 // https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020
-                nextMatch = Uri(
-                    scheme = "https",
-                    host = "www.waze.com",
-                    path = "/live-map/directions",
-                    queryParams = persistentMapOf("to" to "place.w.$venueId"),
-                    uriQuote = uriQuote,
-                ).toString()
-                nextInput = WazeHtmlInput
+                nextStep = NextStep(
+                    WazeHtmlInput,
+                    Uri(
+                        scheme = "https",
+                        host = "www.waze.com",
+                        path = "/live-map/directions",
+                        queryParams = persistentMapOf("to" to "place.w.$venueId"),
+                        uriQuote = uriQuote,
+                    ).toString(),
+                )
             } ?: queryParams["place"]?.takeIf { it.isNotEmpty() }?.let { placeId ->
                 // To skip some redirects when downloading HTML, replace this URL:
                 // https://www.waze.com/live-map/directions?place=w.2884104.28644432.6709020
                 // with this one:
                 // https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020
-                nextMatch = Uri(
-                    scheme = "https",
-                    host = "www.waze.com",
-                    path = "/live-map/directions",
-                    queryParams = persistentMapOf("to" to "place.$placeId"),
-                    uriQuote = uriQuote,
-                ).toString()
-                nextInput = WazeHtmlInput
+                nextStep = NextStep(
+                    WazeHtmlInput,
+                    Uri(
+                        scheme = "https",
+                        host = "www.waze.com",
+                        path = "/live-map/directions",
+                        queryParams = persistentMapOf("to" to "place.$placeId"),
+                        uriQuote = uriQuote,
+                    ).toString(),
+                )
             } ?: queryParams["to"]?.takeIf { it.startsWith("place.") }?.let {
-                nextInput = WazeHtmlInput
+                nextStep = NextStep(WazeHtmlInput, match)
             }
         }
     }

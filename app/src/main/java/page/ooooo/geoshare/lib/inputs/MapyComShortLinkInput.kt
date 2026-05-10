@@ -22,8 +22,7 @@ object MapyComShortLinkInput : GetRedirectUrlInput {
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {
-        nextInput = MapyComUriInput
-        nextMatch = data.toString()
+        nextStep = NextStep(MapyComUriInput, data.toString())
     }
 
     override fun toString() = "MapyComShortLinkInput"

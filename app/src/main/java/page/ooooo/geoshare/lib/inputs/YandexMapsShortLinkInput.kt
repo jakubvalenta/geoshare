@@ -22,8 +22,7 @@ object YandexMapsShortLinkInput : HeadLocationHeaderInput {
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {
-        nextInput = YandexMapsUriInput
-        nextMatch = data.toString()
+        nextStep = NextStep(YandexMapsUriInput, data.toString())
     }
 
     override fun toString() = "YandexMapsShortLinkInput"

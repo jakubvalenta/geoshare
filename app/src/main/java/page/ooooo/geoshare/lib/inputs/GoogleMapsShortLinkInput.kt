@@ -32,16 +32,14 @@ object GoogleMapsShortLinkInput : HeadLocationHeaderInput {
         log: Log,
     ) = buildParseResult {
         data.run {
-            nextInput = GoogleMapsUriInput
-
             // Google Maps Go
             // https://maps.app.goo.gl/?link={url}
             queryParams["link"]?.takeIf { it.isNotEmpty() }?.let {
-                nextMatch = it
+                nextStep = NextStep(GoogleMapsUriInput, it)
                 return@buildParseResult
             }
 
-            nextMatch = data.toString()
+            nextStep = NextStep(GoogleMapsUriInput, data.toString())
         }
     }
 

@@ -28,8 +28,7 @@ object BaiduMapShortLinkInput : HeadLocationHeaderInput {
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {
-        nextInput = BaiduMapUriInput
-        nextMatch = data.toString()
+        nextStep = NextStep(BaiduMapUriInput, data.toString())
     }
 
     override fun toString() = "BaiduMapShortLinkInput"

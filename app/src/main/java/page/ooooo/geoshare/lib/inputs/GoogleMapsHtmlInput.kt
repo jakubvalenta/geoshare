@@ -103,11 +103,10 @@ object GoogleMapsHtmlInput : BodyAsChannelInput {
                 } else if (redirectUriString != null) {
                     val baseUri = Uri.parse(match, uriQuote)
                     val redirectUri = Uri.parse(redirectUriString, uriQuote).toAbsoluteUri(baseUri)
-                    nextMatch = redirectUri.toString()
-                    nextInput = GoogleMapsUriInput
+                    nextStep = NextStep(GoogleMapsUriInput, redirectUri.toString())
                 } else {
                     // Go to web parsing
-                    nextInput = GoogleMapsWebViewInput
+                    nextStep = NextStep(GoogleMapsWebViewInput, match)
                 }
             }
 

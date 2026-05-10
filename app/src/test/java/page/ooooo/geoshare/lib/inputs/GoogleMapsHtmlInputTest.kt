@@ -48,9 +48,14 @@ class GoogleMapsHtmlInputTest : InputTest {
     }
 
     @Test
-    fun parse_whenHtmlContainsGenericMetaTagAndAppInitState_returnsNextInput() = runTest {
+    fun parse_whenHtmlContainsGenericMetaTagAndAppInitState_returnsNextStep() = runTest {
         assertEquals(
-            ParseResult(nextInput = GoogleMapsWebViewInput),
+            ParseResult(
+                nextStep = NextStep(
+                    GoogleMapsWebViewInput,
+                    "https://www.google.com/maps/place/Berlin,+Germany/"
+                )
+            ),
             input.parse(
                 @Suppress("SpellCheckingInspection")
                 """<head><meta content="Google Maps" itemprop="name">
@@ -171,27 +176,39 @@ class GoogleMapsHtmlInputTest : InputTest {
     }
 
     @Test
-    fun parse_htmlDoesNotMatch_returnsNextInput() = runTest {
+    fun parse_htmlDoesNotMatch_returnsNextStep() = runTest {
         assertEquals(
-            ParseResult(nextInput = GoogleMapsWebViewInput),
+            ParseResult(
+                nextStep = NextStep(
+                    GoogleMapsWebViewInput,
+                    "https://www.google.com/maps/place/Berlin,+Germany/"
+                )
+            ),
             input.parse("spam", "https://www.google.com/maps/place/Berlin,+Germany/")
         )
     }
 
     @Test
-    fun parse_googleSearchHtmlDoesNotContainUrl_returnsNextInput() = runTest {
+    fun parse_googleSearchHtmlDoesNotContainUrl_returnsNextStep() = runTest {
         assertEquals(
-            ParseResult(nextInput = GoogleMapsWebViewInput),
+            ParseResult(
+                nextStep = NextStep(
+                    GoogleMapsWebViewInput,
+                    "https://www.google.com/maps/place/Berlin,+Germany/"
+                )
+            ),
             input.parse("<html></html>", "https://www.google.com/maps/place/Berlin,+Germany/"),
         )
     }
 
     @Test
-    fun parse_googleSearchHtmlContainsRelativeUrl_returnsNextInputWithAbsoluteUrl() = runTest {
+    fun parse_googleSearchHtmlContainsRelativeUrl_returnsNextStepWithAbsoluteUrl() = runTest {
         assertEquals(
             ParseResult(
-                nextInput = GoogleMapsUriInput,
-                nextMatch = "https://www.google.com/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705%3A0xa9ea51361ed84bda?sa=X&ved=2ahUKEwiY7vv80aeKAxU41QIHHSgBOlsQ4kB6BAgHEAA&hl=de&gl=de",
+                nextStep = NextStep(
+                    GoogleMapsUriInput,
+                    "https://www.google.com/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705%3A0xa9ea51361ed84bda?sa=X&ved=2ahUKEwiY7vv80aeKAxU41QIHHSgBOlsQ4kB6BAgHEAA&hl=de&gl=de"
+                )
             ),
             input.parse(
                 @Suppress("SpellCheckingInspection")
@@ -210,22 +227,20 @@ class GoogleMapsHtmlInputTest : InputTest {
     }
 
     @Test
-    fun parse_googleSearchHtmlContainsAbsoluteUrl_returnsNextInput() = runTest {
+    fun parse_googleSearchHtmlContainsAbsoluteUrl_returnsNextStep() = runTest {
         assertEquals(
             ParseResult(
-                nextInput = GoogleMapsUriInput,
-                nextMatch = "https://www.example.com/foo",
+                nextStep = NextStep(GoogleMapsUriInput, "https://www.example.com/foo")
             ),
             input.parse("""<html><a href="" data-url="https://www.example.com/foo"></a></html>"""),
         )
     }
 
     @Test
-    fun parse_googleSearchHtmlContainsInvalidUrl_returnsNextInput() = runTest {
+    fun parse_googleSearchHtmlContainsInvalidUrl_returnsNextStep() = runTest {
         assertEquals(
             ParseResult(
-                nextInput = GoogleMapsUriInput,
-                nextMatch = "https://example.com//spam",
+                nextStep = NextStep(GoogleMapsUriInput, "https://example.com//spam")
             ),
             input.parse("""<html><a href="" data-url="spam"></a></html>"""),
         )

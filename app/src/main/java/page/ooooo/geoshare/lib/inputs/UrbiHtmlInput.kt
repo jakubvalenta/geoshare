@@ -31,8 +31,8 @@ object UrbiHtmlInput : BodyAsChannelInput {
             while (true) {
                 val line = data.readLine() ?: break
                 pattern.find(line)?.groupOrNull()?.let { attr ->
-                    nextMatch = attr.decodeBasicHtmlEntities()
-                    nextInput = UrbiUriInput
+                    nextStep = NextStep(UrbiUriInput, attr.decodeBasicHtmlEntities())
+                    return@buildParseResult
                 }
             }
         }

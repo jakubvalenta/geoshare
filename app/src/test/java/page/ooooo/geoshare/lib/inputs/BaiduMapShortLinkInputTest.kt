@@ -24,11 +24,13 @@ class BaiduMapShortLinkInputTest : InputTest {
     }
 
     @Test
-    fun parse_returnsNextInput() = runTest {
+    fun parse_returnsNextStep() = runTest {
         assertEquals(
             ParseResult(
-                nextInput = BaiduMapUriInput,
-                nextMatch = "https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13392211,3619117,17z"
+                nextStep = NextStep(
+                    BaiduMapUriInput,
+                    "https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13392211,3619117,17z"
+                )
             ),
             input.parse("https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13392211,3619117,17z"),
         )

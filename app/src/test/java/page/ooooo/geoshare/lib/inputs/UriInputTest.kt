@@ -42,7 +42,7 @@ class UriInputTest {
     fun withData_whenDataIsValidUrl_returnsUri() = runTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
-            ParseResult(nextMatch = match),
+            ParseResult(nextStep = NextStep(DebugUriInput, match)),
             input.withData(
                 match = match,
                 networkTools = networkTools,
@@ -50,7 +50,11 @@ class UriInputTest {
                 maxAttempts = maxAttempts,
                 uriQuote = uriQuote,
                 log = log,
-            ) { data -> ParseResult(nextMatch = data.toString()) },
+            ) { data ->
+                ParseResult(
+                    nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
+                )
+            }
         )
     }
 
@@ -58,7 +62,7 @@ class UriInputTest {
     fun withData_whenDataIsInvalidUrl_returnsUri() = runTest {
         val match = "https://[invalid:ipv6]/"
         assertEquals(
-            ParseResult(nextMatch = match),
+            ParseResult(nextStep = NextStep(DebugUriInput, match)),
             input.withData(
                 match = match,
                 networkTools = networkTools,
@@ -66,7 +70,11 @@ class UriInputTest {
                 maxAttempts = maxAttempts,
                 uriQuote = uriQuote,
                 log = log,
-            ) { data -> ParseResult(nextMatch = data.toString()) },
+            ) { data ->
+                ParseResult(
+                    nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
+                )
+            }
         )
     }
 }

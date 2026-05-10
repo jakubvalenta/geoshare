@@ -18,8 +18,10 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.BasicInput
+import page.ooooo.geoshare.lib.inputs.DebugUriInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInput
 import page.ooooo.geoshare.lib.inputs.Input
+import page.ooooo.geoshare.lib.inputs.NextStep
 import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.network.ConnectionClosedNetworkException
 import page.ooooo.geoshare.lib.network.FakeNetworkTools
@@ -69,7 +71,10 @@ class PermissionGrantedBasicInputTest {
                 prevResult: ParseResult?,
                 uriQuote: UriQuote,
                 log: Log,
-            ) = ParseResult(prevResult?.points ?: persistentListOf(), nextMatch = data)
+            ) = ParseResult(
+                prevResult?.points ?: persistentListOf(),
+                nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
+            )
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
@@ -93,7 +98,7 @@ class PermissionGrantedBasicInputTest {
                 source,
                 match = source,
                 input,
-                ParseResult(prevPoints, nextMatch = "${source}-data"),
+                ParseResult(prevPoints, nextStep = NextStep(DebugUriInput, "${source}-data")),
                 permission,
                 prevResult,
             ),
@@ -121,7 +126,10 @@ class PermissionGrantedBasicInputTest {
                 prevResult: ParseResult?,
                 uriQuote: UriQuote,
                 log: Log,
-            ) = ParseResult(prevResult?.points ?: persistentListOf(), nextMatch = data)
+            ) = ParseResult(
+                prevResult?.points ?: persistentListOf(),
+                nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
+            )
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
@@ -165,7 +173,10 @@ class PermissionGrantedBasicInputTest {
                 prevResult: ParseResult?,
                 uriQuote: UriQuote,
                 log: Log,
-            ) = ParseResult(prevResult?.points ?: persistentListOf(), nextMatch = data)
+            ) = ParseResult(
+                prevResult?.points ?: persistentListOf(),
+                nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
+            )
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
@@ -214,7 +225,10 @@ class PermissionGrantedBasicInputTest {
                     prevResult: ParseResult?,
                     uriQuote: UriQuote,
                     log: Log,
-                ) = ParseResult(prevResult?.points ?: persistentListOf(), nextMatch = data)
+                ) = ParseResult(
+                    prevResult?.points ?: persistentListOf(),
+                    nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
+                )
 
                 override val permissionTitleResId = R.string.converter_google_maps_permission_title
                 override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
@@ -269,7 +283,10 @@ class PermissionGrantedBasicInputTest {
                     prevResult: ParseResult?,
                     uriQuote: UriQuote,
                     log: Log,
-                ) = ParseResult(prevResult?.points ?: persistentListOf(), nextMatch = data)
+                ) = ParseResult(
+                    prevResult?.points ?: persistentListOf(),
+                    nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
+                )
 
                 override val permissionTitleResId = R.string.converter_google_maps_permission_title
                 override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
@@ -324,7 +341,10 @@ class PermissionGrantedBasicInputTest {
                     prevResult: ParseResult?,
                     uriQuote: UriQuote,
                     log: Log,
-                ) = ParseResult(prevResult?.points ?: persistentListOf(), nextMatch = data)
+                ) = ParseResult(
+                    prevResult?.points ?: persistentListOf(),
+                    nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
+                )
 
                 override val permissionTitleResId = R.string.converter_google_maps_permission_title
                 override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title

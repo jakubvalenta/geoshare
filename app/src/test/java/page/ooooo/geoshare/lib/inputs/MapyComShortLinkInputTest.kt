@@ -28,11 +28,13 @@ class MapyComShortLinkInputTest : InputTest {
     }
 
     @Test
-    fun parse_returnsNextInput() = runTest {
+    fun parse_returnsNextStep() = runTest {
         assertEquals(
             ParseResult(
-                nextInput = MapyComUriInput,
-                nextMatch = "https://mapy.com/en/turisticka?source=base&id=1723771&x=14.4549515&y=50.0831498&z=17"
+                nextStep = NextStep(
+                    MapyComUriInput,
+                    "https://mapy.com/en/turisticka?source=base&id=1723771&x=14.4549515&y=50.0831498&z=17"
+                )
             ),
             input.parse("https://mapy.com/en/turisticka?source=base&id=1723771&x=14.4549515&y=50.0831498&z=17"),
         )

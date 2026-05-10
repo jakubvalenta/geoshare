@@ -61,7 +61,7 @@ object GoogleMapsUriInput : UriInput, Input.HasRandomUri {
                     mutableNaivePoints.addAll(naivePoints.map { it.copy(z = z) })
                     if (naivePoints.any { !it.hasCoordinates() }) {
                         // Go to HTML parsing unless all points have coordinates
-                        nextInput = GoogleMapsHtmlInput
+                        nextStep = NextStep(GoogleMapsHtmlInput, match)
                     }
                     return@run
                 }
@@ -105,7 +105,7 @@ object GoogleMapsUriInput : UriInput, Input.HasRandomUri {
                 Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull()?.let { name ->
                     mutableNaivePoints.add(NaivePoint(z = z, name = name, source = Source.URI))
                     // Go to HTML parsing
-                    nextInput = GoogleMapsHtmlInput
+                    nextStep = NextStep(GoogleMapsHtmlInput, match)
                     return@run
                 }
             }
@@ -180,7 +180,7 @@ object GoogleMapsUriInput : UriInput, Input.HasRandomUri {
 
             if (mutableNaivePoints.lastOrNull()?.hasCoordinates() != true && firstPart in partsThatSupportHtmlParsing) {
                 // Go to HTML parsing if needed
-                nextInput = GoogleMapsHtmlInput
+                nextStep = NextStep(GoogleMapsHtmlInput, match)
             }
         }
 

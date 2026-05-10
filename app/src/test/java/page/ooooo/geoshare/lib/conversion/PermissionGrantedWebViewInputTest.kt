@@ -20,7 +20,9 @@ import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.inputs.DebugUriInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsWebViewInput
+import page.ooooo.geoshare.lib.inputs.NextStep
 import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.inputs.WebViewInput
 import kotlin.time.Duration.Companion.seconds
@@ -49,7 +51,10 @@ class PermissionGrantedWebViewInputTest {
                 prevResult: ParseResult?,
                 uriQuote: UriQuote,
                 log: Log,
-            ) = ParseResult(prevResult?.points ?: persistentListOf(), nextMatch = data)
+            ) = ParseResult(
+                prevResult?.points ?: persistentListOf(),
+                nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
+            )
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
@@ -78,7 +83,7 @@ class PermissionGrantedWebViewInputTest {
                 source,
                 match = source,
                 input,
-                ParseResult(prevPoints, nextMatch = "${source}-data"),
+                ParseResult(prevPoints, nextStep = NextStep(DebugUriInput, "${source}-data")),
                 permission,
                 prevResult,
             ),
@@ -96,7 +101,10 @@ class PermissionGrantedWebViewInputTest {
                 prevResult: ParseResult?,
                 uriQuote: UriQuote,
                 log: Log,
-            ) = ParseResult(prevResult?.points ?: persistentListOf(), nextMatch = data)
+            ) = ParseResult(
+                prevResult?.points ?: persistentListOf(),
+                nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
+            )
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title

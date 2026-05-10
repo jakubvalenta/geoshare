@@ -270,7 +270,10 @@ class AppleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 persistentListOf(),
-                nextInput = AppleMapsHtmlInput,
+                nextStep = NextStep(
+                    AppleMapsHtmlInput,
+                    "https://maps.apple.com/place?auid=17017496253231963769&lsp=7618"
+                )
             ),
             input.parse("https://maps.apple.com/place?auid=17017496253231963769&lsp=7618"),
         )
@@ -281,7 +284,10 @@ class AppleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 persistentListOf(),
-                nextInput = AppleMapsHtmlInput,
+                nextStep = NextStep(
+                    AppleMapsHtmlInput,
+                    "https://maps.apple.com/place?place-id=I3B04EDEB21D5F86&_provider=9902"
+                )
             ),
             input.parse("https://maps.apple.com/place?place-id=I3B04EDEB21D5F86&_provider=9902"),
         )
@@ -292,7 +298,10 @@ class AppleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 persistentListOf(WGS84Point(name = "Central Park", source = Source.URI)),
-                nextInput = AppleMapsHtmlInput,
+                nextStep = NextStep(
+                    AppleMapsHtmlInput,
+                    "https://maps.apple.com/place?place-id=I3B04EDEB21D5F86&_provider=9902&q=Central+Park"
+                )
             ),
             input.parse("https://maps.apple.com/place?place-id=I3B04EDEB21D5F86&_provider=9902&q=Central+Park"),
         )
@@ -301,7 +310,12 @@ class AppleMapsUriInputTest : InputTest {
     @Test
     fun parse_shortLink() = runTest {
         assertEquals(
-            ParseResult(nextInput = AppleMapsHtmlInput),
+            ParseResult(
+                nextStep = NextStep(
+                    AppleMapsHtmlInput,
+                    "https://maps.apple/p/7E-Brjrk_THN14"
+                )
+            ),
             input.parse("https://maps.apple/p/7E-Brjrk_THN14"),
         )
     }

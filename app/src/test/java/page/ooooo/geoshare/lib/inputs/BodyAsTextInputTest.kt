@@ -60,7 +60,7 @@ class BodyAsTextInputTest {
             ) = "${url}-data"
         }
         assertEquals(
-            ParseResult(nextMatch = "${match}-data"),
+            ParseResult(nextStep = NextStep(DebugUriInput, "${match}-data")),
             input.withData(
                 match,
                 networkTools,
@@ -68,7 +68,9 @@ class BodyAsTextInputTest {
                 maxAttempts,
                 uriQuote,
                 log,
-            ) { data -> ParseResult(nextMatch = data) }
+            ) { data ->
+                ParseResult(nextStep = NextStep(DebugUriInput, data)) // Store data in nextStep, so we can test it
+            }
         )
     }
 
@@ -85,7 +87,7 @@ class BodyAsTextInputTest {
             ) = "${url}-data"
         }
         assertEquals(
-            ParseResult(nextMatch = "https://${match}-data"),
+            ParseResult(nextStep = NextStep(DebugUriInput, "https://${match}-data")),
             input.withData(
                 match,
                 networkTools,
@@ -93,7 +95,9 @@ class BodyAsTextInputTest {
                 maxAttempts,
                 uriQuote,
                 log,
-            ) { data -> ParseResult(nextMatch = data) }
+            ) { data ->
+                ParseResult(nextStep = NextStep(DebugUriInput, data)) // Store data in nextStep, so we can test it
+            }
         )
     }
 

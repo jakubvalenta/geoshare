@@ -33,10 +33,10 @@ import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.network.NetworkTools.Companion.CONNECT_TIMEOUT
-import page.ooooo.geoshare.lib.network.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE
-import page.ooooo.geoshare.lib.network.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE_DELAY
-import page.ooooo.geoshare.lib.network.NetworkTools.Companion.REQUEST_TIMEOUT
+import page.ooooo.geoshare.lib.network.DefaultNetworkTools.Companion.CONNECT_TIMEOUT
+import page.ooooo.geoshare.lib.network.DefaultNetworkTools.Companion.EXPONENTIAL_DELAY_BASE
+import page.ooooo.geoshare.lib.network.DefaultNetworkTools.Companion.EXPONENTIAL_DELAY_BASE_DELAY
+import page.ooooo.geoshare.lib.network.DefaultNetworkTools.Companion.REQUEST_TIMEOUT
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 import java.net.InetAddress
 import java.net.SocketException
@@ -62,15 +62,6 @@ class MockLocationScope(val locationManager: LocationManager, val mockProviderNa
 }
 
 interface BehaviorTest {
-
-    companion object {
-        const val ELEMENT_DOES_NOT_EXIST_TIMEOUT = 500L
-        const val MAX_ATTEMPTS = 10
-        val NETWORK_TIMEOUT = (1..MAX_ATTEMPTS).fold(CONNECT_TIMEOUT + REQUEST_TIMEOUT) { acc, curr ->
-            acc + (EXPONENTIAL_DELAY_BASE.pow(curr - 1) * EXPONENTIAL_DELAY_BASE_DELAY).roundToLong() + CONNECT_TIMEOUT + REQUEST_TIMEOUT
-        }
-    }
-
     @Before
     fun goToLauncher() = uiAutomator {
         // Start from the home screen
@@ -489,6 +480,14 @@ interface BehaviorTest {
             MockLocationScope(locationManager, mockProviderName).block()
         } finally {
             locationManager.removeTestProvider(mockProviderName)
+        }
+    }
+
+    companion object {
+        const val ELEMENT_DOES_NOT_EXIST_TIMEOUT = 500L
+        const val MAX_ATTEMPTS = 10
+        val NETWORK_TIMEOUT = (1..MAX_ATTEMPTS).fold(CONNECT_TIMEOUT + REQUEST_TIMEOUT) { acc, curr ->
+            acc + (EXPONENTIAL_DELAY_BASE.pow(curr - 1) * EXPONENTIAL_DELAY_BASE_DELAY).roundToLong() + CONNECT_TIMEOUT + REQUEST_TIMEOUT
         }
     }
 }

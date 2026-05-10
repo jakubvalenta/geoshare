@@ -87,7 +87,7 @@ object UrbiUriInput : UriInput, Input.HasRandomUri {
                 return@run
             }
 
-            nextInput = UrbiHtmlInput
+            nextStep = NextStep(UrbiHtmlInput, match)
         }
     }
 

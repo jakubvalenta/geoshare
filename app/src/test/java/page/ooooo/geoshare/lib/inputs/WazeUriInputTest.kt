@@ -144,21 +144,38 @@ class WazeUriInputTest : InputTest {
     fun parse_directionsPlace() = runTest {
         assertEquals(
             ParseResult(
-                nextInput = WazeHtmlInput,
-                nextMatch = "https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020",
+                nextStep = NextStep(
+                    WazeHtmlInput,
+                    "https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020"
+                )
             ),
             input.parse("https://www.waze.com/live-map/directions?place=w.2884104.28644432.6709020"),
         )
         assertEquals(
-            ParseResult(nextInput = WazeHtmlInput),
+            ParseResult(
+                nextStep = NextStep(
+                    WazeHtmlInput,
+                    "https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020"
+                )
+            ),
             input.parse("https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020"),
         )
         assertEquals(
-            ParseResult(nextInput = WazeHtmlInput),
+            ParseResult(
+                nextStep = NextStep(
+                    WazeHtmlInput,
+                    "https://www.waze.com/live-map/directions/cn-tower-front-st-w-301-toronto?to=place.w.2884104.28644432.6709020"
+                )
+            ),
             input.parse("https://www.waze.com/live-map/directions/cn-tower-front-st-w-301-toronto?to=place.w.2884104.28644432.6709020"),
         )
         assertEquals(
-            ParseResult(nextInput = WazeHtmlInput),
+            ParseResult(
+                nextStep = NextStep(
+                    WazeHtmlInput,
+                    "https://www.waze.com/live-map/directions/potsdam-bb-de?to=place.ChIJt9Y6hM31qEcRm-yqC5j4ZcU&from=place.ChIJAVkDPzdOqEcRcDteW0YgIQQ"
+                )
+            ),
             input.parse("https://www.waze.com/live-map/directions/potsdam-bb-de?to=place.ChIJt9Y6hM31qEcRm-yqC5j4ZcU&from=place.ChIJAVkDPzdOqEcRcDteW0YgIQQ"),
         )
     }
@@ -167,15 +184,19 @@ class WazeUriInputTest : InputTest {
     fun parse_place() = runTest {
         assertEquals(
             ParseResult(
-                nextInput = WazeHtmlInput,
-                nextMatch = "https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020",
+                nextStep = NextStep(
+                    WazeHtmlInput,
+                    "https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020"
+                )
             ),
             input.parse("https://ul.waze.com/ul?venue_id=2884104.28644432.6709020&overview=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location"),
         )
         assertEquals(
             ParseResult(
-                nextInput = WazeHtmlInput,
-                nextMatch = "https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020",
+                nextStep = NextStep(
+                    WazeHtmlInput,
+                    "https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020"
+                )
             ),
             input.parse("https://www.waze.com/ul?venue_id=2884104.28644432.6709020"),
         )

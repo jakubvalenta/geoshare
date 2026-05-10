@@ -8,9 +8,9 @@ class BaiduMapWebViewInputTest : InputTest {
     private val input = BaiduMapWebViewInput
 
     @Test
-    fun parse_returnsNextInput() = runTest {
+    fun parse_returnsNextStep() = runTest {
         assertEquals(
-            ParseResult(nextInput = BaiduMapUriInput, nextMatch = "https://map.baidu.com/redirected"),
+            ParseResult(nextStep = NextStep(BaiduMapUriInput, "https://map.baidu.com/redirected")),
             input.parse("https://map.baidu.com/redirected", "https://map.baidu.com/original"),
         )
     }

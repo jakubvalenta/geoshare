@@ -64,7 +64,7 @@ class BodyAsChannelInputTest {
             ) = block("${url}-data".byteInputStream().toByteReadChannel())
         }
         assertEquals(
-            ParseResult(nextMatch = "${match}-data"),
+            ParseResult(nextStep = NextStep(DebugUriInput, "${match}-data")),
             input.withData(
                 match,
                 networkTools,
@@ -72,7 +72,11 @@ class BodyAsChannelInputTest {
                 maxAttempts,
                 uriQuote,
                 log,
-            ) { data -> ParseResult(nextMatch = data.readLine()) }
+            ) { data ->
+                ParseResult(
+                    nextStep = NextStep(DebugUriInput, data.readLine()!!) // Store data in nextStep, so we can test it
+                )
+            }
         )
     }
 
@@ -90,7 +94,7 @@ class BodyAsChannelInputTest {
             ) = block("${url}-data".byteInputStream().toByteReadChannel())
         }
         assertEquals(
-            ParseResult(nextMatch = "https://${match}-data"),
+            ParseResult(nextStep = NextStep(DebugUriInput, "https://${match}-data")),
             input.withData(
                 match,
                 networkTools,
@@ -98,7 +102,11 @@ class BodyAsChannelInputTest {
                 maxAttempts,
                 uriQuote,
                 log,
-            ) { data -> ParseResult(nextMatch = data.readLine()) }
+            ) { data ->
+                ParseResult(
+                    nextStep = NextStep(DebugUriInput, data.readLine()!!) // Store data in nextStep, so we can test it
+                )
+            }
         )
     }
 

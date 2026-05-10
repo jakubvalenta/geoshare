@@ -5,16 +5,19 @@ import page.ooooo.geoshare.lib.geo.Points
 
 data class ParseResult(
     val points: Points = persistentListOf(),
-    val nextInput: Input<*>? = null,
-    val nextMatch: String? = null,
+    val nextStep: NextStep? = null,
+)
+
+data class NextStep(
+    val input: Input<*>,
+    val match: String,
 )
 
 class ParseResultScope {
     var points: Points = persistentListOf()
-    var nextInput: Input<*>? = null
-    var nextMatch: String? = null
+    var nextStep: NextStep? = null
 
-    internal fun build() = ParseResult(points, nextInput, nextMatch)
+    internal fun build() = ParseResult(points, nextStep)
 }
 
 suspend fun buildParseResult(block: suspend ParseResultScope.() -> Unit): ParseResult =
