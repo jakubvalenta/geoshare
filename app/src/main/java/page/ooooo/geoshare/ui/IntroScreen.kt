@@ -195,7 +195,7 @@ private fun IntroScreen(
                                 styledArgsString(
                                     R.string.intro_open_by_default_app_note_1,
                                     SpanStyle(fontWeight = FontWeight.Bold),
-                                    "maps.app.goog.gl", "maps.google.com", "www.google.com",
+                                    "maps.app.goo.gl", "maps.google.com", "www.google.com",
                                 )
                             )
                             ParagraphText(

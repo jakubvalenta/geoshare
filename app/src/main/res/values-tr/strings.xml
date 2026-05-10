@@ -165,8 +165,8 @@
     <string name="network_exception_connect_timeout">bağlantı zaman aşımı</string>
     <string name="network_exception_eof">bağlantı kapatılması</string>
     <string name="network_exception_request_timeout">istek zaman aşımı</string>
-    <string name="network_exception_response_error">yanıt hatası</string>
-    <string name="network_exception_server_response_error">sunucu yanıtı hatası</string>
+    <string name="network_exception_response_error">yanıt hatası %1$d</string>
+    <string name="network_exception_server_response_error">sunucu yanıtı hatası %1$d</string>
     <string name="network_exception_socket_timeout">soket zaman aşımı</string>
     <string name="network_exception_unknown">bilinmeyen hata</string>
     <string name="network_exception_unresolved_address">çözümlenmemiş adres</string>

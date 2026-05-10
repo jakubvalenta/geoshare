@@ -125,8 +125,8 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.inputs.Input
+import page.ooooo.geoshare.lib.network.ConnectTimeoutNetworkException
 import page.ooooo.geoshare.lib.network.NetworkTools
-import page.ooooo.geoshare.lib.network.RecoverableNetworkException
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.ActionContext
 import page.ooooo.geoshare.lib.outputs.LocationAction
@@ -2265,9 +2265,9 @@ private fun LoadingIndicatorPreview() {
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsInput,
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
-                retry = NetworkTools.Retry(
+                lastAttempt = NetworkTools.Attempt(
                     2,
-                    RecoverableNetworkException(R.string.network_exception_connect_timeout, Exception()),
+                    ConnectTimeoutNetworkException(Exception()),
                 )
             ),
             allInputs = emptyList(),
@@ -2339,9 +2339,9 @@ private fun DarkLoadingIndicatorPreview() {
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsInput,
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
-                retry = NetworkTools.Retry(
+                lastAttempt = NetworkTools.Attempt(
                     2,
-                    RecoverableNetworkException(R.string.network_exception_connect_timeout, Exception()),
+                    ConnectTimeoutNetworkException(Exception()),
                 )
             ),
             allInputs = emptyList(),
@@ -2413,9 +2413,9 @@ private fun TabletLoadingIndicatorPreview() {
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsInput,
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
-                retry = NetworkTools.Retry(
+                lastAttempt = NetworkTools.Attempt(
                     2,
-                    RecoverableNetworkException(R.string.network_exception_connect_timeout, Exception()),
+                    ConnectTimeoutNetworkException(Exception()),
                 )
             ),
             allInputs = emptyList(),
