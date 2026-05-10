@@ -28,7 +28,7 @@ class YandexMapsInputBehaviorTest : InputBehaviorTest {
             assumeDomainResolvable("yandex.com")
         }
 
-        // Short URI
+        // Short link
         testUri(
             WGS84Point(50.111192, 8.668963, z = 14.19, source = Source.URI),
             "https://yandex.com/maps/-/CLAvMI18",

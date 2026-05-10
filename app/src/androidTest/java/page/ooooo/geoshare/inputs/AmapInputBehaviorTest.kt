@@ -67,7 +67,7 @@ class AmapInputBehaviorTest : InputBehaviorTest {
             assumeDomainResolvable(@Suppress("SpellCheckingInspection") "surl.amap.com")
         }
 
-        // Short URI
+        // Short link
         testUri(
             GCJ02Point(
                 31.222811749011463, 121.46840706467624,

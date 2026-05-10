@@ -28,7 +28,7 @@ class OpenStreetMapInputBehaviorTest : InputBehaviorTest {
             "https://www.openstreetmap.org/directions?to=51.0528,13.7364",
         )
 
-        // Short URI
+        // Short link
         testUri(
             WGS84Point(-16.23152732849121, -49.08348083496094, z = 11.0, source = Source.HASH),
             "https://osm.org/go/NuJWxJh-",

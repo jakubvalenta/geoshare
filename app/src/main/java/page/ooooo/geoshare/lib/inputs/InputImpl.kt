@@ -57,7 +57,7 @@ interface GetRedirectUrlInput : UriInput, Input.HasPermission {
             url, lastAttempt = lastAttempt, maxAttempts = maxAttempts
         )
         val unshortenedUri = Uri.parse(unshortenedUrlString, uriQuote).toAbsoluteUri(uri)
-        log.i(TAG, "Resolved short URI $match to $unshortenedUri")
+        log.i(TAG, "Resolved short link $match to $unshortenedUri")
         return block(unshortenedUri)
     }
 
@@ -82,7 +82,7 @@ interface HeadLocationHeaderInput : UriInput, Input.HasPermission {
             url, lastAttempt = lastAttempt, maxAttempts = maxAttempts
         )
         val unshortenedUri = Uri.parse(unshortenedUrlString, uriQuote).toAbsoluteUri(uri)
-        log.i(TAG, "Resolved short URI $match to $unshortenedUri")
+        log.i(TAG, "Resolved short link $match to $unshortenedUri")
         return block(unshortenedUri)
     }
 

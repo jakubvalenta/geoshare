@@ -70,7 +70,7 @@ class ConversionBehaviorTest : BehaviorTest {
     }
 
     @Test
-    fun whenShortUriIsSharedAndPermissionIsGrantedWithoutDoNotAsk_showsPointAndShowsDialogAgain() = uiAutomator {
+    fun whenShortLinkIsSharedAndPermissionIsGrantedWithoutDoNotAsk_showsPointAndShowsDialogAgain() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("maps.google.com")
         }
@@ -99,7 +99,7 @@ class ConversionBehaviorTest : BehaviorTest {
     }
 
     @Test
-    fun whenShortUriIsSharedAndPermissionIsGrantedWithDoNotAsk_showsPointAndDoesNotShowDialogAgain() = uiAutomator {
+    fun whenShortLinkIsSharedAndPermissionIsGrantedWithDoNotAsk_showsPointAndDoesNotShowDialogAgain() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("maps.google.com")
         }
@@ -137,7 +137,7 @@ class ConversionBehaviorTest : BehaviorTest {
     }
 
     @Test
-    fun whenShortUriIsSharedAndPermissionIsDeniedWithoutDoNotAsk_closesDialogAndShowsDialogAgain() = uiAutomator {
+    fun whenShortLinkIsSharedAndPermissionIsDeniedWithoutDoNotAsk_closesDialogAndShowsDialogAgain() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("maps.google.com")
         }
@@ -162,7 +162,7 @@ class ConversionBehaviorTest : BehaviorTest {
     }
 
     @Test
-    fun whenShortUriIsSharedAndPermissionIsDeniedWithDoNotAsk_closesDialogAndDoesNotShowDialogAgain() = uiAutomator {
+    fun whenShortLinkIsSharedAndPermissionIsDeniedWithDoNotAsk_closesDialogAndDoesNotShowDialogAgain() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("maps.google.com")
         }
@@ -190,7 +190,7 @@ class ConversionBehaviorTest : BehaviorTest {
     }
 
     @Test
-    fun whenNonexistentShortUriIsSharedAndPermissionIsDenied_closesDialogAndDoesNothing() = uiAutomator {
+    fun whenNonexistentShortLinkIsSharedAndPermissionIsDenied_closesDialogAndDoesNothing() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("maps.google.com")
         }
@@ -448,14 +448,13 @@ class ConversionBehaviorTest : BehaviorTest {
         }
 
     @Test
-    fun whenShortUriWithCoordinatesInHtmlIsSharedAndPermissionIsGranted_doesNotAskForPermission() = uiAutomator {
-        // TODO This test fails on emulator but not on physical phone for some reason
+    fun whenShortLinkWithCoordinatesInHtmlIsSharedAndPermissionIsGranted_doesNotAskForPermission() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("maps.google.com")
         }
 
         // Share a Google Maps short link with the app
-        shareUri("https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8")
+        shareUri("https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8") // Sometimes fails in emulator
 
         // Grant unshorten permission
         onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()

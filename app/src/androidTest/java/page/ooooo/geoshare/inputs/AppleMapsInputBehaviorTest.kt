@@ -66,7 +66,7 @@ class AppleMapsInputBehaviorTest : InputBehaviorTest {
             "https://maps.apple.com/place?auid=17017496253231963769&lsp=7618",
         )
 
-        // Short URI
+        // Short link
         testUri(
             WGS84Point(52.4737758, 13.4373898, source = Source.HTML),
             "https://maps.apple/p/7E-Brjrk_THN14",

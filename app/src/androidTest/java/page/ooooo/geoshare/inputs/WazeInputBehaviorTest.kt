@@ -29,7 +29,7 @@ class WazeInputBehaviorTest : InputBehaviorTest {
             "https://waze.com/ul?q=66%20Acacia%20Avenue",
         )
 
-        // Short URI
+        // Short link
         testUri(
             WGS84Point(19.402564, -99.165666, z = 16.0, source = Source.HASH),
             "https://waze.com/ul/h9g3qrkju0",

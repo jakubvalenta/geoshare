@@ -129,16 +129,26 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
             "https://www.google.com/maps/search/?api=1&query=Louisenstra%C3%9Fe%2060,%2001099%20Dresden",
         )
 
-        // Short URI within western Japan
+        // Short link within western Japan
         testUri(
             WGS84Point(34.5945482, 133.7583428, z = 17.0, name = "Steak no Don", source = Source.URI),
             "https://maps.app.goo.gl/mBtbC6qXLK2baGTV9",
         )
 
-        // Short URI within mainland China
+        // Short link within mainland China
         testUri(
             GCJ02Point(39.920439, 116.331538, source = Source.URI),
             "https://maps.app.goo.gl/FP3EV7tTUKYbmcVp7",
+        )
+
+        // Short link with coordinates in HTML
+        testUri(
+            GCJ02Point(
+                51.1982447, 6.4389493,
+                name = @Suppress("SpellCheckingInspection") "Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
+                source = Source.URI,
+            ),
+            "https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8", // Sometimes fails in emulator
         )
 
         // Place

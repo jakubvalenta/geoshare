@@ -22,7 +22,7 @@ class UrbiInputBehaviorTest : InputBehaviorTest {
             assumeDomainResolvable("go.2gis.com")
         }
 
-        // Short URI
+        // Short link
         testUri(
             WGS84Point(
                 41.285765, 69.234083,
