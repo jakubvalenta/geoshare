@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <style name="MainTheme" parent="BaseMainTheme">
-        <!-- Fix text color on Xiaomi phones. https://stackoverflow.com/a/62732689 -->
-        <item name="android:forceDarkAllowed">false</item>
-    </style>
-</resources>
