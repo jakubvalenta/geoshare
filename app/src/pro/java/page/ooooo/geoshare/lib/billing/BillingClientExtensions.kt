@@ -2,9 +2,9 @@ package page.ooooo.geoshare.lib.billing
 
 import com.android.billingclient.api.ProductDetails
 import page.ooooo.geoshare.lib.DefaultLog
-import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.Log
 
-fun ProductDetails.getOffers(log: ILog = DefaultLog): List<Offer> {
+fun ProductDetails.getOffers(log: Log = DefaultLog): List<Offer> {
     oneTimePurchaseOfferDetailsList?.takeIf { it.isNotEmpty() }?.let { oneTimeOfferDetailsList ->
         return oneTimeOfferDetailsList.mapNotNull { oneTimeOfferDetails ->
             val offerToken = oneTimeOfferDetails.offerToken  // Copy to variable to support mocking
