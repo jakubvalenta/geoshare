@@ -240,7 +240,7 @@
     <string name="user_preferences_changelog_shown_for_version_code_title" translatable="false">For which version of the app was changelog last shown?</string>
     <string name="user_preferences_number_error_range" tools:ignore="PluralsCandidate">Value must be between %1$d and %2$d</string>
     <string name="conversion_failed_missing_url">Missing URL</string>
-    <string name="conversion_failed_reason_exception">unexpected error</string>
+    <string name="conversion_failed_reason_exception">unknown exception</string>
     <string name="conversion_failed_reason_invalid_url">invalid URL</string>
     <string name="conversion_failed_reason_missing_header">missing HTTP header</string>
     <string name="conversion_failed_reason_no_points">no points found</string>
