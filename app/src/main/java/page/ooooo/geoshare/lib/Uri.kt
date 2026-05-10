@@ -19,11 +19,8 @@ data class Uri(
 ) {
     companion object {
         fun parse(uriString: String, uriQuote: UriQuote = DefaultUriQuote): Uri {
-            val schemeSepIndex = if (!uriString.startsWith('/')) {
-                uriString.indexOf(':').takeIf { it > -1 }
-            } else {
-                // TODO Test URIs that contain colon in path
-                null
+            val schemeSepIndex = uriString.indexOf(':').takeIf {
+                it > -1 && uriString.indexOf('/').let { slashIndex -> slashIndex == -1 || slashIndex > it }
             }
             val hostSepIndex =
                 schemeSepIndex?.takeIf { uriString.length > it + 2 && uriString[it + 1] == '/' && uriString[it + 2] == '/' }
@@ -211,4 +208,28 @@ data class Uri(
             append("#$fragment")
         }
     }.toString()
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Uri
+
+        if (scheme != other.scheme) return false
+        if (host != other.host) return false
+        if (pathParts != other.pathParts) return false
+        if (queryParams != other.queryParams) return false
+        if (fragment != other.fragment) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = scheme.hashCode()
+        result = 31 * result + host.hashCode()
+        result = 31 * result + pathParts.hashCode()
+        result = 31 * result + queryParams.hashCode()
+        result = 31 * result + fragment.hashCode()
+        return result
+    }
 }

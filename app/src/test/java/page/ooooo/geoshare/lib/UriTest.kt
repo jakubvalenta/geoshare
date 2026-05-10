@@ -4,6 +4,7 @@ import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableMap
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assume.assumeTrue
 import org.junit.Test
 
 class UriTest {
@@ -38,6 +39,25 @@ class UriTest {
                 uriQuote = uriQuote,
             ),
             Uri.parse(":foo", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_pathWithColon() {
+        assertEquals(
+            Uri(
+                path = "/foo/bar%3Abaz",
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("/foo/bar:baz", uriQuote)
+        )
+        assertEquals(
+            Uri(
+                host = "foo",
+                path = "/bar:baz",
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("foo/bar:baz", uriQuote)
         )
     }
 
