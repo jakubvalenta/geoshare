@@ -258,4 +258,10 @@
     <string name="srs_description_greater_china_and_taiwan">中国全境（含港澳台）</string>
     <string name="converter_cartes_ign_name">Cartes IGN</string>
     <string name="converter_plus_code_name">Plus Codes</string>
+    <string name="output_save_to_contact">保存到联系人</string>
+    <string name="output_save_to_contact_automation_failed">无法自动将点保存到联系人</string>
+    <string name="output_save_to_contact_failed">无法将点保存到联系人</string>
+    <string name="output_send">发送点</string>
+    <string name="output_send_via">通过 %1$s 发送点</string>
+    <string name="conversion_failed_reason_exception">未知异常</string>
 </resources>
