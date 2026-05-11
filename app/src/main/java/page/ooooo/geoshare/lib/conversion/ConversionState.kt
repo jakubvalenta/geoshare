@@ -75,7 +75,9 @@ interface ConversionState : State {
     }
 }
 
-class Initial : ConversionState
+class Initial : ConversionState {
+    override fun toString() = "Initial"
+}
 
 data class SourceReceived(
     val stateContext: ConversionStateContext,
@@ -99,6 +101,8 @@ data class SourceReceived(
             source,
         )
     }
+
+    override fun toString() = "SourceReceived"
 }
 
 data class InputFound<T>(
@@ -109,8 +113,9 @@ data class InputFound<T>(
     val permission: Permission? = null,
     val prevResult: ParseResult? = null,
 ) : ConversionState {
-    override suspend fun transition() =
-        if (input is Input.HasPermission) {
+    override suspend fun transition(): State {
+        stateContext.log.i(TAG, "Using input $input with match $match")
+        return if (input is Input.HasPermission) {
             when (permission ?: stateContext.userPreferencesRepository.getValue(ConnectionPermissionPreference)) {
                 Permission.ALWAYS -> PermissionGranted(
                     stateContext, source, match, input, Permission.ALWAYS, prevResult
@@ -133,6 +138,13 @@ data class InputFound<T>(
         } else {
             PermissionGranted(stateContext, source, match, input, permission, prevResult)
         }
+    }
+
+    private companion object {
+        private const val TAG = "InputFound"
+    }
+
+    override fun toString() = TAG
 }
 
 data class PermissionRequested<T>(
@@ -158,6 +170,8 @@ data class PermissionRequested<T>(
             stateContext, source, match, input, result = ParseResult(), permission = Permission.NEVER, prevResult
         )
     }
+
+    override fun toString() = "PermissionRequested"
 }
 
 data class PermissionGranted<T>(
@@ -180,6 +194,8 @@ data class PermissionGranted<T>(
                 stateContext, source, match, input, permission, prevResult,
             )
         }
+
+    override fun toString() = "PermissionGranted"
 }
 
 data class PermissionGrantedBasicInput<T>(
@@ -254,6 +270,8 @@ data class PermissionGrantedBasicInput<T>(
                 },
             )
         }
+
+    override fun toString() = "PermissionGrantedBasicInput"
 }
 
 /**
@@ -312,6 +330,8 @@ data class PermissionGrantedWebViewInput(
     private companion object {
         private const val TAG = "PermissionGrantedWebViewInput"
     }
+
+    override fun toString() = TAG
 }
 
 data class DataParsed<T>(
@@ -332,7 +352,7 @@ data class DataParsed<T>(
                 ConversionSucceeded(stateContext, source, points)
             } else if (nextStep != null) {
                 stateContext.log.i(
-                    TAG, "Failed to extract point with coordinates from $match, going to input $nextStep"
+                    TAG, "Failed to extract point with coordinates from $match, going to next step"
                 )
                 InputFound(stateContext, source, nextStep.match, nextStep.input, permission, prevResult = this)
             } else if (points.lastOrNull()?.hasName() == true) {
@@ -367,6 +387,8 @@ data class DataParsed<T>(
     private companion object {
         private const val TAG = "DataParsed"
     }
+
+    override fun toString() = TAG
 }
 
 data class ConversionSucceeded(
@@ -406,12 +428,12 @@ data class ConversionSucceeded(
                 .first()
         } catch (_: TimeoutCancellationException) {
             // If billing status didn't appear, try to read it from cache
-            stateContext.log.w(TAG, "Automation: Billing status didn't appear within $billingStatusTimeout")
+            stateContext.log.w(TAG, "Billing status didn't appear within $billingStatusTimeout")
             stateContext.userPreferencesRepository.getValue(CachedPurchasePreference)
                 ?.let { cachedPurchase ->
                     stateContext.billing.products.firstOrNull { product -> cachedPurchase.productId == product.id }
                         ?.let { product ->
-                            stateContext.log.w(TAG, "Automation: Found cached billing status")
+                            stateContext.log.w(TAG, "Found cached billing status")
                             BillingStatus.Purchased(
                                 product,
                                 expired = false,
@@ -421,7 +443,7 @@ data class ConversionSucceeded(
                         }
                 }
                 ?: run {
-                    stateContext.log.w(TAG, "Automation: Didn't find cached billing status")
+                    stateContext.log.w(TAG, "Didn't find cached billing status")
                     BillingStatus.Loading()
                 }
         }
@@ -447,12 +469,16 @@ data class ConversionSucceeded(
     private companion object {
         private const val TAG = "ConversionSucceeded"
     }
+
+    override fun toString() = TAG
 }
 
 data class ConversionFailed(
     override val message: String,
     override val source: String,
-) : ConversionState, ConversionState.HasError
+) : ConversionState, ConversionState.HasError {
+    override fun toString() = "ConversionFailed"
+}
 
 data class ActionWaiting(
     val stateContext: ConversionStateContext,
@@ -471,6 +497,8 @@ data class ActionWaiting(
     } catch (_: CancellationException) {
         ActionFinished(source, points, ActionResult.Failed)
     }
+
+    override fun toString() = "ActionWaiting"
 }
 
 data class ActionReady(
@@ -484,6 +512,8 @@ data class ActionReady(
         is FileAction -> FileUriRequested(source, points, action, isAutomation)
         is LocationAction -> LocationRationaleRequested(source, points, action, isAutomation)
     }
+
+    override fun toString() = "ActionReady"
 }
 
 data class BasicActionReady(
@@ -491,7 +521,9 @@ data class BasicActionReady(
     override val points: Points,
     val action: BasicAction<*>,
     val isAutomation: Boolean,
-) : ConversionState, ConversionState.HasResult
+) : ConversionState, ConversionState.HasResult {
+    override fun toString() = "BasicActionReady"
+}
 
 data class FileActionReady(
     override val source: String,
@@ -499,7 +531,9 @@ data class FileActionReady(
     val action: FileAction<*>,
     val isAutomation: Boolean,
     val uri: Uri,
-) : ConversionState, ConversionState.HasResult
+) : ConversionState, ConversionState.HasResult {
+    override fun toString() = "FileActionReady"
+}
 
 data class LocationActionReady(
     override val source: String,
@@ -507,7 +541,9 @@ data class LocationActionReady(
     val action: LocationAction<*>,
     val isAutomation: Boolean,
     val location: Point,
-) : ConversionState, ConversionState.HasResult
+) : ConversionState, ConversionState.HasResult {
+    override fun toString() = "LocationActionReady"
+}
 
 data class ActionRan(
     override val source: String,
@@ -551,6 +587,8 @@ data class ActionRan(
             }
         }
     }
+
+    override fun toString() = "ActionRan"
 }
 
 data class ActionSucceeded(
@@ -567,6 +605,8 @@ data class ActionSucceeded(
         }
         return ActionFinished(source, points, actionResult)
     }
+
+    override fun toString() = "ActionSucceeded"
 }
 
 data class ActionAutomationSucceeded(
@@ -583,6 +623,8 @@ data class ActionAutomationSucceeded(
         }
         return ActionFinished(source, points, actionResult)
     }
+
+    override fun toString() = "ActionAutomationSucceeded"
 }
 
 data class ActionFailed(
@@ -599,6 +641,8 @@ data class ActionFailed(
         }
         return ActionFinished(source, points, actionResult)
     }
+
+    override fun toString() = "ActionFailed"
 }
 
 data class ActionAutomationFailed(
@@ -615,27 +659,35 @@ data class ActionAutomationFailed(
         }
         return ActionFinished(source, points, actionResult)
     }
+
+    override fun toString() = "ActionAutomationFailed"
 }
 
 data class ActionFinished(
     override val source: String,
     override val points: Points,
     val actionResult: ActionResult, // = ActionResult.Succeeded,
-) : ConversionState, ConversionState.HasResult
+) : ConversionState, ConversionState.HasResult {
+    override fun toString() = "ActionFinished"
+}
 
 data class FileUriRequested(
     override val source: String,
     override val points: Points,
     val action: FileAction<*>,
     val isAutomation: Boolean,
-) : ConversionState, ConversionState.HasResult
+) : ConversionState, ConversionState.HasResult {
+    override fun toString() = "FileUriRequested"
+}
 
 data class LocationRationaleRequested(
     override val source: String,
     override val points: Points,
     val action: LocationAction<*>,
     val isAutomation: Boolean,
-) : ConversionState, ConversionState.HasResult
+) : ConversionState, ConversionState.HasResult {
+    override fun toString() = "LocationRationaleRequested"
+}
 
 data class LocationRationaleShown(
     override val source: String,
@@ -651,6 +703,8 @@ data class LocationRationaleShown(
 
     override suspend fun deny(doNotAsk: Boolean): State =
         ActionFinished(source, points, ActionResult.Failed)
+
+    override fun toString() = "LocationRationaleShown"
 }
 
 data class LocationRationaleConfirmed(
@@ -658,7 +712,9 @@ data class LocationRationaleConfirmed(
     override val points: Points,
     val action: LocationAction<*>,
     val isAutomation: Boolean,
-) : ConversionState, ConversionState.HasResult
+) : ConversionState, ConversionState.HasResult {
+    override fun toString() = "LocationRationaleConfirmed"
+}
 
 data class LocationPermissionReceived(
     val stateContext: ConversionStateContext,
@@ -670,6 +726,8 @@ data class LocationPermissionReceived(
     override fun getLoadingIndicator() = LoadingIndicator.Small(
         stateContext.resources.getString(R.string.conversion_succeeded_location_loading_indicator_title)
     )
+
+    override fun toString() = "LocationPermissionReceived"
 }
 
 data class LocationReceived(
@@ -684,6 +742,8 @@ data class LocationReceived(
     } else {
         LocationActionReady(source, points, action, isAutomation, location)
     }
+
+    override fun toString() = "LocationReceived"
 }
 
 data class LocationFindingFailed(
@@ -699,4 +759,6 @@ data class LocationFindingFailed(
         }
         return ActionFinished(source, points, actionResult)
     }
+
+    override fun toString() = "LocationFindingFailed"
 }
