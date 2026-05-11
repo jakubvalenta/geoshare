@@ -271,4 +271,9 @@
     <string name="converter_cartes_ign_name">Cartes IGN</string>
     <string name="converter_plus_code_name">Codes Plus</string>
     <string name="output_save_to_contact">Enregistrer dans un contact</string>
+    <string name="output_save_to_contact_automation_failed">Échec de l\'enregistrement automatique des coordonnées</string>
+    <string name="output_save_to_contact_failed">Échec de l\'enregistrement du point de contact</string>
+    <string name="output_send">Point d\'envoi</string>
+    <string name="output_send_via">Envoyer le point via %1$s</string>
+    <string name="conversion_failed_reason_exception">exception inconnue</string>
 </resources>

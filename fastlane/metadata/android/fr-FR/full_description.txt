@@ -35,6 +35,8 @@ Si vous utilisez Google Maps pour trouver des lieux, mais que vous préférez un
 - Permet de <b>lancer la navigation</b> dans toutes les applications qui prennent cette fonctionnalité en charge, y compris TomTom.
 - Permet d'ouvrir un lieu dans <b>des cartes Web</b>, qu'elles soient préinstallées ou de votre choix.
 - Permet d'enregistrer une position au format <b>GPX</b>.
+- Permet d'envoyer une position via une <b>application de messagerie</b>.
+- Permet d'enregistrer une position dans un <b>contact</b>.
 - Gestion des tentatives de connexion en cas de <b>connexion Internet instable</b>.
 - Permet de <b>coller</b> les liens de carte directement dans l'application, sans avoir à les partager.
 - Interface adaptée aux <b>tablettes</b>.
