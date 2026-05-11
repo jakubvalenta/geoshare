@@ -11,7 +11,6 @@ class MapsMeInputBehaviorTest : InputBehaviorTest {
         // Launch app and close intro
         launchApplication()
         waitForAppToBeVisible()
-        waitForAppToBeVisible()
         closeIntro()
 
         // Custom scheme

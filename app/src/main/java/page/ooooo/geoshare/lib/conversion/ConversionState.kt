@@ -34,6 +34,7 @@ import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.network.RecoverableNetworkException
 import page.ooooo.geoshare.lib.network.UnrecoverableNetworkException
 import page.ooooo.geoshare.lib.outputs.Action
+import page.ooooo.geoshare.lib.outputs.ActionResult
 import page.ooooo.geoshare.lib.outputs.BasicAction
 import page.ooooo.geoshare.lib.outputs.FileAction
 import page.ooooo.geoshare.lib.outputs.LocationAction
@@ -364,7 +365,7 @@ data class DataParsed<T>(
         }
 
     private companion object {
-        private const val TAG = "ConversionSucceeded"
+        private const val TAG = "DataParsed"
     }
 }
 
@@ -436,7 +437,7 @@ data class ConversionSucceeded(
             }
             if (output is Output.HasAutomationDelay) {
                 val delay = stateContext.userPreferencesRepository.getValue(AutomationDelayPreference)
-                return ActionWaiting(stateContext, source, points, action, isAutomation = true, delay = delay)
+                return ActionWaiting(stateContext, source, points, action, output, isAutomation = true, delay = delay)
             }
             return ActionReady(source, points, action, isAutomation = true)
         }
@@ -458,6 +459,7 @@ data class ActionWaiting(
     override val source: String,
     override val points: Points,
     val action: Action<*>,
+    val output: Output.HasAutomationDelay,
     @Suppress("SameParameterValue") val isAutomation: Boolean,
     val delay: Duration,
 ) : ConversionState, ConversionState.HasResult {
@@ -467,7 +469,7 @@ data class ActionWaiting(
         }
         ActionReady(source, points, action, isAutomation)
     } catch (_: CancellationException) {
-        ActionFinished(source, points, action, isAutomation)
+        ActionFinished(source, points, ActionResult.Failed)
     }
 }
 
@@ -511,21 +513,51 @@ data class ActionRan(
     override val source: String,
     override val points: Points,
     val action: Action<*>,
+    val actionResult: ActionResult,
     val isAutomation: Boolean,
-    val success: Boolean?,
 ) : ConversionState, ConversionState.HasResult {
-    override suspend fun transition(): State = when (success) {
-        true -> ActionSucceeded(source, points, action, isAutomation)
-        false -> ActionFailed(source, points, action, isAutomation)
-        else -> ActionFinished(source, points, action, isAutomation)
+    override suspend fun transition(): State = action.output.let { output ->
+        if (!isAutomation) {
+            when (actionResult) {
+                ActionResult.Succeeded, ActionResult.SucceededAndFinish ->
+                    if (output is Output.HasSuccessText) {
+                        ActionSucceeded(source, points, actionResult, output)
+                    } else {
+                        ActionFinished(source, points, actionResult)
+                    }
+
+                ActionResult.Failed ->
+                    if (output is Output.HasErrorText) {
+                        ActionFailed(source, points, actionResult, output)
+                    } else {
+                        ActionFinished(source, points, actionResult)
+                    }
+            }
+        } else {
+            when (actionResult) {
+                ActionResult.Succeeded, ActionResult.SucceededAndFinish ->
+                    if (output is Output.HasAutomationSuccessText) {
+                        ActionAutomationSucceeded(source, points, actionResult, output)
+                    } else {
+                        ActionFinished(source, points, actionResult)
+                    }
+
+                ActionResult.Failed ->
+                    if (output is Output.HasAutomationErrorText) {
+                        ActionAutomationFailed(source, points, actionResult, output)
+                    } else {
+                        ActionFinished(source, points, actionResult)
+                    }
+            }
+        }
     }
 }
 
 data class ActionSucceeded(
     override val source: String,
     override val points: Points,
-    val action: Action<*>,
-    val isAutomation: Boolean,
+    val actionResult: ActionResult,
+    val output: Output.HasSuccessText,
 ) : ConversionState, ConversionState.HasResult {
     override suspend fun transition(): State {
         try {
@@ -533,15 +565,31 @@ data class ActionSucceeded(
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return ActionFinished(source, points, action, isAutomation)
+        return ActionFinished(source, points, actionResult)
+    }
+}
+
+data class ActionAutomationSucceeded(
+    override val source: String,
+    override val points: Points,
+    val actionResult: ActionResult,
+    val output: Output.HasAutomationSuccessText,
+) : ConversionState, ConversionState.HasResult {
+    override suspend fun transition(): State {
+        try {
+            delay(3.seconds)
+        } catch (_: CancellationException) {
+            // Do nothing
+        }
+        return ActionFinished(source, points, actionResult)
     }
 }
 
 data class ActionFailed(
     override val source: String,
     override val points: Points,
-    val action: Action<*>,
-    val isAutomation: Boolean,
+    val actionResult: ActionResult,
+    val output: Output.HasErrorText,
 ) : ConversionState, ConversionState.HasResult {
     override suspend fun transition(): State {
         try {
@@ -549,15 +597,30 @@ data class ActionFailed(
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return ActionFinished(source, points, action, isAutomation)
+        return ActionFinished(source, points, actionResult)
+    }
+}
+
+data class ActionAutomationFailed(
+    override val source: String,
+    override val points: Points,
+    val actionResult: ActionResult,
+    val output: Output.HasAutomationErrorText,
+) : ConversionState, ConversionState.HasResult {
+    override suspend fun transition(): State {
+        try {
+            delay(3.seconds)
+        } catch (_: CancellationException) {
+            // Do nothing
+        }
+        return ActionFinished(source, points, actionResult)
     }
 }
 
 data class ActionFinished(
     override val source: String,
     override val points: Points,
-    val action: Action<*>,
-    val isAutomation: Boolean,
+    val actionResult: ActionResult, // = ActionResult.Succeeded,
 ) : ConversionState, ConversionState.HasResult
 
 data class FileUriRequested(
@@ -587,7 +650,7 @@ data class LocationRationaleShown(
         LocationRationaleConfirmed(source, points, action, isAutomation)
 
     override suspend fun deny(doNotAsk: Boolean): State =
-        ActionFinished(source, points, action, isAutomation)
+        ActionFinished(source, points, ActionResult.Failed)
 }
 
 data class LocationRationaleConfirmed(
@@ -617,17 +680,16 @@ data class LocationReceived(
     val location: Point?,
 ) : ConversionState, ConversionState.HasResult {
     override suspend fun transition(): State = if (location == null) {
-        LocationFindingFailed(source, points, action, isAutomation)
+        LocationFindingFailed(source, points, ActionResult.Failed)
     } else {
-        LocationActionReady(source, points, action, isAutomation = isAutomation, location = location)
+        LocationActionReady(source, points, action, isAutomation, location)
     }
 }
 
 data class LocationFindingFailed(
     override val source: String,
     override val points: Points,
-    val action: LocationAction<*>,
-    val isAutomation: Boolean,
+    val actionResult: ActionResult,
 ) : ConversionState, ConversionState.HasResult {
     override suspend fun transition(): State {
         try {
@@ -635,6 +697,6 @@ data class LocationFindingFailed(
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return ActionFinished(source, points, action, isAutomation)
+        return ActionFinished(source, points, actionResult)
     }
 }

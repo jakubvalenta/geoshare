@@ -60,7 +60,7 @@ sealed interface PointOutput : Output {
      * Example: Copy point coordinates, Open point in an app
      */
     sealed interface WithoutLocation : PointOutput {
-        suspend fun execute(value: Point, actionContext: ActionContext): Boolean
+        suspend fun execute(value: Point, actionContext: ActionContext): ActionResult
 
         override fun toAction(value: Point) = BasicAction.WithPoint(value, this)
     }
@@ -76,7 +76,7 @@ sealed interface PointOutput : Output {
         val mimeType: String
 
         @Suppress("SameReturnValue")
-        suspend fun execute(uri: Uri, value: Point, actionContext: ActionContext): Boolean
+        suspend fun execute(uri: Uri, value: Point, actionContext: ActionContext): ActionResult
 
         override fun toAction(value: Point) = FileAction.WithPoint(value, this)
     }
@@ -87,7 +87,7 @@ sealed interface PointOutput : Output {
      * Example: Share a route from current location to a point
      */
     sealed interface WithLocation : PointOutput {
-        suspend fun execute(location: Point?, value: Point, actionContext: ActionContext): Boolean
+        suspend fun execute(location: Point?, value: Point, actionContext: ActionContext): ActionResult
 
         override fun toAction(value: Point) = LocationAction.WithPoint(value, this)
 
@@ -108,7 +108,7 @@ sealed interface PointsOutput : Output {
      * Example: Open GPX route in an app
      */
     sealed interface WithoutLocation : PointsOutput {
-        suspend fun execute(value: Points, actionContext: ActionContext): Boolean
+        suspend fun execute(value: Points, actionContext: ActionContext): ActionResult
 
         override fun toAction(value: Points) = BasicAction.WithPoints(value, this)
     }
@@ -124,7 +124,7 @@ sealed interface PointsOutput : Output {
         val mimeType: String
 
         @Suppress("SameReturnValue")
-        suspend fun execute(uri: Uri, value: Points, actionContext: ActionContext): Boolean
+        suspend fun execute(uri: Uri, value: Points, actionContext: ActionContext): ActionResult
 
         override fun toAction(value: Points) = FileAction.WithPoints(value, this)
     }
@@ -135,7 +135,7 @@ sealed interface PointsOutput : Output {
      * Example: Share route from current location to last point
      */
     sealed interface WithLocation : PointsOutput {
-        suspend fun execute(location: Point?, value: Points, actionContext: ActionContext): Boolean
+        suspend fun execute(location: Point?, value: Points, actionContext: ActionContext): ActionResult
 
         override fun toAction(value: Points) = LocationAction.WithPoints(value, this)
 

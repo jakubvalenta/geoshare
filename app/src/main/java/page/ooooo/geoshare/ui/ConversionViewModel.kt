@@ -45,6 +45,7 @@ import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.LocationAction
 import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.outputs.ActionResult
 import javax.inject.Inject
 
 @OptIn(SavedStateHandleSaveableApi::class)
@@ -105,14 +106,14 @@ class ConversionViewModel @Inject constructor(
     }
 
     fun grant(doNotAsk: Boolean) {
-        (stateContext.currentState as? ConversionState.HasPermission)?.let { currentState ->
-            transition { currentState.grant(doNotAsk) }
+        (stateContext.currentState as? ConversionState.HasPermission)?.run {
+            transition { grant(doNotAsk) }
         }
     }
 
     fun deny(doNotAsk: Boolean) {
-        (stateContext.currentState as? ConversionState.HasPermission)?.let { currentState ->
-            transition { currentState.deny(doNotAsk) }
+        (stateContext.currentState as? ConversionState.HasPermission)?.run {
+            transition { deny(doNotAsk) }
         }
     }
 
@@ -129,152 +130,72 @@ class ConversionViewModel @Inject constructor(
     // Any action
 
     fun startAction(action: Action<*>) {
-        (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
-            transition {
-                ActionReady(
-                    currentState.source,
-                    currentState.points,
-                    action,
-                    isAutomation = false
-                )
-            }
+        (stateContext.currentState as? ConversionState.HasResult)?.run {
+            transition { ActionReady(source, points, action, isAutomation = false) }
         }
     }
 
-    fun finishBasicAction(success: Boolean?) {
-        (stateContext.currentState as? BasicActionReady)?.let { currentState ->
-            transition {
-                ActionRan(
-                    currentState.source,
-                    currentState.points,
-                    currentState.action,
-                    currentState.isAutomation,
-                    success,
-                )
-            }
+    fun finishBasicAction(actionResult: ActionResult) {
+        (stateContext.currentState as? BasicActionReady)?.run {
+            transition { ActionRan(source, points, action, actionResult, isAutomation) }
         }
     }
 
     // File action
 
     fun receiveFileUri(uri: Uri) {
-        (stateContext.currentState as? FileUriRequested)?.let { currentState ->
-            transition {
-                FileActionReady(
-                    currentState.source,
-                    currentState.points,
-                    currentState.action,
-                    currentState.isAutomation,
-                    uri,
-                )
-            }
+        (stateContext.currentState as? FileUriRequested)?.run {
+            transition { FileActionReady(source, points, action, isAutomation, uri) }
         }
     }
 
     fun cancelFileUriRequest() {
-        (stateContext.currentState as? FileUriRequested)?.let { currentState ->
-            transition {
-                ActionFinished(
-                    currentState.source,
-                    currentState.points,
-                    currentState.action,
-                    currentState.isAutomation
-                )
-            }
+        (stateContext.currentState as? FileUriRequested)?.run {
+            transition { ActionFinished(source, points, ActionResult.Failed) }
         }
     }
 
-    fun finishFileAction(success: Boolean?) {
-        (stateContext.currentState as? FileActionReady)?.let { currentState ->
-            transition {
-                ActionRan(
-                    currentState.source,
-                    currentState.points,
-                    currentState.action,
-                    currentState.isAutomation,
-                    success,
-                )
-            }
+    fun finishFileAction(actionResult: ActionResult) {
+        (stateContext.currentState as? FileActionReady)?.run {
+            transition { ActionRan(source, points, action, actionResult, isAutomation) }
         }
     }
 
     // Location action
 
     fun showLocationRationale(action: LocationAction<*>, isAutomation: Boolean) {
-        (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
-            transition {
-                LocationRationaleShown(
-                    currentState.source,
-                    currentState.points,
-                    action,
-                    isAutomation
-                )
-            }
+        (stateContext.currentState as? ConversionState.HasResult)?.run {
+            transition { LocationRationaleShown(source, points, action, isAutomation) }
         }
     }
 
     fun skipLocationRationale(action: LocationAction<*>, isAutomation: Boolean) {
-        (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
-            transition {
-                LocationPermissionReceived(
-                    stateContext,
-                    currentState.source,
-                    currentState.points,
-                    action,
-                    isAutomation,
-                )
-            }
+        (stateContext.currentState as? ConversionState.HasResult)?.run {
+            transition { LocationPermissionReceived(stateContext, source, points, action, isAutomation) }
         }
     }
 
     fun receiveLocationPermission() {
-        (stateContext.currentState as? LocationRationaleConfirmed)?.let { currentState ->
-            transition {
-                LocationPermissionReceived(
-                    stateContext,
-                    currentState.source,
-                    currentState.points,
-                    currentState.action,
-                    currentState.isAutomation,
-                )
-            }
+        (stateContext.currentState as? LocationRationaleConfirmed)?.run {
+            transition { LocationPermissionReceived(stateContext, source, points, action, isAutomation) }
         }
     }
 
     fun receiveLocation(action: LocationAction<*>, isAutomation: Boolean, location: Point?) {
-        (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
-            transition {
-                LocationReceived(
-                    currentState.source, currentState.points, action, isAutomation, location
-                )
-            }
+        (stateContext.currentState as? ConversionState.HasResult)?.run {
+            transition { LocationReceived(source, points, action, isAutomation, location) }
         }
     }
 
     fun cancelLocationFinding() {
-        (stateContext.currentState as? LocationPermissionReceived)?.let { currentState ->
-            transition {
-                ActionFinished(
-                    currentState.source,
-                    currentState.points,
-                    currentState.action,
-                    currentState.isAutomation
-                )
-            }
+        (stateContext.currentState as? LocationPermissionReceived)?.run {
+            transition { ActionFinished(source, points, ActionResult.Failed) }
         }
     }
 
-    fun finishLocationAction(success: Boolean?) {
-        (stateContext.currentState as? LocationActionReady)?.let { currentState ->
-            transition {
-                ActionRan(
-                    currentState.source,
-                    currentState.points,
-                    currentState.action,
-                    currentState.isAutomation,
-                    success,
-                )
-            }
+    fun finishLocationAction(actionResult: ActionResult) {
+        (stateContext.currentState as? LocationActionReady)?.run {
+            transition { ActionRan(source, points, action, actionResult, isAutomation) }
         }
     }
 

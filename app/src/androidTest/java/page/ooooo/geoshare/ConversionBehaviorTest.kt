@@ -43,6 +43,14 @@ class ConversionBehaviorTest : BehaviorTest {
 
         // Google Maps shows precise location
         waitAndAssertGoogleMapsContainsElement { textAsString() in setOf("Westend", "Berlin-Westend") }
+
+        // Go back to app
+        launchApplication()
+        waitForAppToBeVisible()
+        closeIntro()
+
+        // Shows main screen instead of result screen, because the app finished
+        onElement { viewIdResourceName == "geoShareMainSourceTextField" }
     }
 
     @Test
@@ -441,7 +449,7 @@ class ConversionBehaviorTest : BehaviorTest {
         }
 
         // Share a Google Maps short link with the app
-        shareUri("https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8") // Sometimes fails in emulator
+        shareUri("https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8") // Fails in emulator API 36.1 but not API 35 for some reason
 
         // Grant connection permission
         onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
@@ -475,7 +483,7 @@ class ConversionBehaviorTest : BehaviorTest {
             onElement { viewIdResourceName == "geoShareApp_${messagingAppPackageName}" }.click()
 
             // Opens the messaging app
-            onElement { this.packageName == messagingAppPackageName }
+            onElement { packageName == messagingAppPackageName }
         }
     }
 
@@ -534,7 +542,6 @@ class ConversionBehaviorTest : BehaviorTest {
     fun savesGpxRoute() = uiAutomator {
         // Launch application and close intro
         launchApplication()
-        waitForAppToBeVisible()
         waitForAppToBeVisible()
         closeIntro()
 

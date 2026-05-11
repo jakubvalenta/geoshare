@@ -32,7 +32,6 @@ class UserPreferencesBehaviorTest : BehaviorTest {
         // Launch application and close intro
         launchApplication()
         waitForAppToBeVisible()
-        waitForAppToBeVisible()
         closeIntro()
 
         // Share a URI with the app
@@ -86,7 +85,6 @@ class UserPreferencesBehaviorTest : BehaviorTest {
         // Launch application and close intro
         launchApplication()
         waitForAppToBeVisible()
-        waitForAppToBeVisible()
         closeIntro()
 
         // Share a URI with the app
@@ -133,7 +131,6 @@ class UserPreferencesBehaviorTest : BehaviorTest {
 
         // Launch application and close intro
         launchApplication()
-        waitForAppToBeVisible()
         waitForAppToBeVisible()
         closeIntro()
 

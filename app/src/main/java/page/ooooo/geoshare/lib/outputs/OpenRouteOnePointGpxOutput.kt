@@ -35,13 +35,13 @@ class OpenRouteOnePointGpxOutput @Inject constructor(
         actionContext: ActionContext,
     ) =
         location?.let { location ->
-            // Notice that we use the .xml extension, because that's what TomTom requires.
+            // Don't use a .gpx extension but use .xml instead, because that's what TomTom requires
             writeFile(actionContext.context.filesDir, "routes", "${System.currentTimeMillis()}.xml") {
                 GpxFormatter.writeGpxRoute(coordinateConverter.toWGS84(persistentListOf(location, value)), this)
             }?.let { file ->
                 actionContext.androidTools.openAppFile(actionContext.context, packageName, file)
             }
-        } ?: false
+        }.let { success -> if (success == true) ActionResult.SucceededAndFinish else ActionResult.Failed }
 
     @Composable
     override fun label(appDetails: AppDetails) =

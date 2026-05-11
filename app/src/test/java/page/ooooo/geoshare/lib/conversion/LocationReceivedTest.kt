@@ -9,6 +9,7 @@ import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.outputs.ActionResult
 import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 
 class LocationReceivedTest {
@@ -21,7 +22,7 @@ class LocationReceivedTest {
         val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter).toAction(points.last())
         val state = LocationReceived(source, points, action, isAutomation = false, location = null)
         assertEquals(
-            LocationFindingFailed(source, points, action, isAutomation = false),
+            LocationFindingFailed(source, points, ActionResult.Failed),
             state.transition(),
         )
     }

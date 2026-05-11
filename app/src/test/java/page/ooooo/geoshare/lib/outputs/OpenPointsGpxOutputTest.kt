@@ -4,7 +4,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
@@ -55,11 +54,11 @@ class OpenPointsGpxOutputTest : GeoTest {
             setOf(oldFile.path),
             childDir.listFiles()?.map { it.path }?.toSet(),
         )
-        val success = OpenPointsGpxOutput(PackageNames.TEST, coordinateConverter).execute(
+        val actionResult = OpenPointsGpxOutput(PackageNames.TEST, coordinateConverter).execute(
             value = points,
             actionContext = mockActionContext(parentDir),
         )
-        assertTrue(success)
+        assertEquals(ActionResult.SucceededAndFinish, actionResult)
         val resFiles = childDir.listFiles()
         assertEquals(1, resFiles?.size)
         val resFile = resFiles?.first()

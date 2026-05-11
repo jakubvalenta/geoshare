@@ -427,7 +427,8 @@ class ConversionSucceededTest {
         val source = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val automation = OpenDisplayGeoUriAutomation(PackageNames.GOOGLE_MAPS)
-        val action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter).toAction(points.last())
+        val output = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
+        val action = output.toAction(points.last())
         val delay = 2.seconds
         val billing: Billing = mock {
             on { status } doReturn MutableStateFlow(
@@ -454,7 +455,7 @@ class ConversionSucceededTest {
         }
         val state = ConversionSucceeded(stateContext, source, points)
         assertEquals(
-            ActionWaiting(stateContext, source, points, action, isAutomation = true, delay = delay),
+            ActionWaiting(stateContext, source, points, action, output, isAutomation = true, delay = delay),
             state.transition(),
         )
     }
@@ -464,7 +465,8 @@ class ConversionSucceededTest {
         val source = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val automation = ShareLinkUriAutomation(FakeGoogleMapsDisplayLink.uuid)
-        val action = ShareLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter).toAction(points.last())
+        val output = ShareLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter)
+        val action = output.toAction(points.last())
         val delay = 2.seconds
         val billing: Billing = mock {
             on { status } doReturn MutableStateFlow(
@@ -491,7 +493,7 @@ class ConversionSucceededTest {
         }
         val state = ConversionSucceeded(stateContext, source, points)
         assertEquals(
-            ActionWaiting(stateContext, source, points, action, isAutomation = true, delay = delay),
+            ActionWaiting(stateContext, source, points, action, output, isAutomation = true, delay = delay),
             state.transition(),
         )
     }
@@ -534,7 +536,8 @@ class ConversionSucceededTest {
         val source = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val automation = SavePointsGpxAutomation
-        val action = SavePointsGpxOutput(coordinateConverter).toAction(points)
+        val output = SavePointsGpxOutput(coordinateConverter)
+        val action = output.toAction(points)
         val delay = 2.seconds
         val billing: Billing = mock {
             on { status } doReturn MutableStateFlow(
@@ -561,7 +564,7 @@ class ConversionSucceededTest {
         }
         val state = ConversionSucceeded(stateContext, source, points)
         assertEquals(
-            ActionWaiting(stateContext, source, points, action, isAutomation = true, delay = delay),
+            ActionWaiting(stateContext, source, points, action, output, isAutomation = true, delay = delay),
             state.transition(),
         )
     }
@@ -571,7 +574,8 @@ class ConversionSucceededTest {
         val source = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val automation = OpenDisplayGeoUriAutomation(PackageNames.GOOGLE_MAPS)
-        val action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter).toAction(points.last())
+        val output = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
+        val action = output.toAction(points.last())
         val delay = 2.seconds
         val billing: Billing = mock {
             on { status } doReturn MutableStateFlow(
@@ -598,7 +602,7 @@ class ConversionSucceededTest {
         }
         val state = ConversionSucceeded(stateContext, source, points)
         assertEquals(
-            ActionWaiting(stateContext, source, points, action, isAutomation = true, delay = delay),
+            ActionWaiting(stateContext, source, points, action, output, isAutomation = true, delay = delay),
             state.transition(),
         )
     }

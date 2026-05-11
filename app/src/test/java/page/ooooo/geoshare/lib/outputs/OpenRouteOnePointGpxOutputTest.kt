@@ -3,7 +3,6 @@ package page.ooooo.geoshare.lib.outputs
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
@@ -40,28 +39,28 @@ class OpenRouteOnePointGpxOutputTest : GeoTest {
         )
 
     @Test
-    fun execute_locationIsNull_returnsFalse() = runTest {
+    fun execute_locationIsNull_returnsFailed() = runTest {
         val parentDir = createTempDirectory().toFile()
-        val success = OpenRouteOnePointGpxOutput(PackageNames.TEST, coordinateConverter).execute(
+        val actionResult = OpenRouteOnePointGpxOutput(PackageNames.TEST, coordinateConverter).execute(
             location = null,
             value = WGS84Point(1.0, 2.0, name = "My destination", source = Source.GENERATED),
             actionContext = mockActionContext(parentDir),
         )
-        assertFalse(success)
+        assertEquals(ActionResult.Failed, actionResult)
     }
 
     @Test
-    fun execute_parentDirIsNotWritable_returnsFalse() = runTest {
+    fun execute_parentDirIsNotWritable_returnsFailed() = runTest {
         val parentDir = createTempDirectory(
             null,
             PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("r--------")),
         ).toFile()
-        val success = OpenRouteOnePointGpxOutput(PackageNames.TEST, coordinateConverter).execute(
+        val actionResult = OpenRouteOnePointGpxOutput(PackageNames.TEST, coordinateConverter).execute(
             location = WGS84Point(3.0, 4.0, source = Source.GPS_SENSOR),
             value = WGS84Point(1.0, 2.0, name = "My destination", source = Source.GENERATED),
             actionContext = mockActionContext(parentDir),
         )
-        assertFalse(success)
+        assertEquals(ActionResult.Failed, actionResult)
     }
 
     @Test
@@ -75,12 +74,12 @@ class OpenRouteOnePointGpxOutputTest : GeoTest {
             setOf(oldFile.path),
             childDir.listFiles()?.map { it.path }?.toSet(),
         )
-        val success = OpenRouteOnePointGpxOutput(PackageNames.TEST, coordinateConverter).execute(
+        val actionResult = OpenRouteOnePointGpxOutput(PackageNames.TEST, coordinateConverter).execute(
             location = WGS84Point(3.0, 4.0, source = Source.GPS_SENSOR),
             value = WGS84Point(1.0, 2.0, name = "My destination", source = Source.GENERATED),
             actionContext = mockActionContext(parentDir),
         )
-        assertTrue(success)
+        assertEquals(ActionResult.SucceededAndFinish, actionResult)
         val resFiles = childDir.listFiles()
         assertEquals(1, resFiles?.size)
         val resFile = resFiles?.first()

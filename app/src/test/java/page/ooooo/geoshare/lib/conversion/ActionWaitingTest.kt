@@ -7,22 +7,27 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
+import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import page.ooooo.geoshare.lib.outputs.NoopAction
+import page.ooooo.geoshare.lib.outputs.ActionResult
+import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
 
 class ActionWaitingTest {
+    private val coordinateConverter: CoordinateConverter = mock()
     private val stateContext: ConversionStateContext = mock()
 
     @Test
     fun transition_whenExecutionIsNotCancelled_waitsAndReturnsActionReady() = runTest {
         val source = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = NoopAction
-        val state = ActionWaiting(stateContext, source, points, action, isAutomation = true, 3.seconds)
+        val output = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
+        val action = output.toAction(points.last())
+        val state = ActionWaiting(stateContext, source, points, action, output, isAutomation = true, 3.seconds)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
                 ActionReady(source, points, action, isAutomation = true),
@@ -36,8 +41,9 @@ class ActionWaitingTest {
     fun transition_whenExecutionIsNotCancelledAndDelayIsNotPositive_doesNotWaitAndReturnsActionReady() = runTest {
         val source = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = NoopAction
-        val state = ActionWaiting(stateContext, source, points, action, isAutomation = true, (-1).seconds)
+        val output = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
+        val action = output.toAction(points.last())
+        val state = ActionWaiting(stateContext, source, points, action, output, isAutomation = true, (-1).seconds)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
                 ActionReady(source, points, action, isAutomation = true),
@@ -51,8 +57,9 @@ class ActionWaitingTest {
     fun transition_whenExecutionIsCancelled_returnsActionFinished() = runTest {
         val source = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = NoopAction
-        val state = ActionWaiting(stateContext, source, points, action, isAutomation = true, 3.seconds)
+        val output = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
+        val action = output.toAction(points.last())
+        val state = ActionWaiting(stateContext, source, points, action, output, isAutomation = true, 3.seconds)
         var res: State? = null
         val job = launch {
             res = state.transition()
@@ -66,7 +73,7 @@ class ActionWaitingTest {
         }
         assertEquals(
             res,
-            ActionFinished(source, points, action, isAutomation = true),
+            ActionFinished(source, points, ActionResult.Failed),
         )
     }
 }

@@ -9,6 +9,7 @@ import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.outputs.ActionResult
 import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 
 class LocationRationaleShownTest {
@@ -33,7 +34,7 @@ class LocationRationaleShownTest {
         val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter).toAction(points.last())
         val state = LocationRationaleShown(source, points, action, isAutomation = false)
         assertEquals(
-            ActionFinished(source, points, action, isAutomation = false),
+            ActionFinished(source, points, ActionResult.Failed),
             state.deny(false),
         )
     }

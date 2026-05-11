@@ -46,6 +46,7 @@ fun MainNavigation(
     billingViewModel: BillingViewModel,
     conversionViewModel: ConversionViewModel = hiltViewModel(),
     introEnabled: Boolean = true,
+    onFinish: () -> Unit = {},
     introViewModel: IntroViewModel = hiltViewModel(),
 ) {
     val navController = rememberNavController()
@@ -83,6 +84,7 @@ fun MainNavigation(
         }
         composable<MainRoute> {
             MainScreen(
+                onFinish = onFinish,
                 onNavigateToAboutScreen = { navController.navigate(AboutRoute) },
                 onNavigateToBillingScreen = { navController.navigate(BillingRoute) },
                 onNavigateToFaqScreen = { navController.navigate(FaqRoute) },

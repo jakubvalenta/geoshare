@@ -23,7 +23,6 @@ class DemoBillingBehaviorTest : BehaviorTest {
         // Launch application and close intro
         launchApplication()
         waitForAppToBeVisible()
-        waitForAppToBeVisible()
         closeIntro()
 
         // Shows free headline

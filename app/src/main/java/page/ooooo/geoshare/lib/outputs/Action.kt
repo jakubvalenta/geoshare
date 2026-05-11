@@ -29,7 +29,7 @@ sealed interface Action<T> {
  * Basic action is an [Action] that doesn't require anything other than a [value] ([Point] or [Points]) to be executed.
  */
 sealed interface BasicAction<T> : Action<T> {
-    suspend fun execute(actionContext: ActionContext): Boolean
+    suspend fun execute(actionContext: ActionContext): ActionResult
 
     data class WithPoint(
         override val value: Point,
@@ -63,7 +63,7 @@ sealed interface FileAction<T> : Action<T> {
 
     val mimeType: String
 
-    suspend fun execute(uri: Uri, actionContext: ActionContext): Boolean
+    suspend fun execute(uri: Uri, actionContext: ActionContext): ActionResult
 
     data class WithPoint(
         override val value: Point,
@@ -101,7 +101,7 @@ sealed interface FileAction<T> : Action<T> {
  * be executed.
  */
 sealed interface LocationAction<T> : Action<T> {
-    suspend fun execute(location: Point, actionContext: ActionContext): Boolean
+    suspend fun execute(location: Point, actionContext: ActionContext): ActionResult
 
     data class WithPoint(
         override val value: Point,
