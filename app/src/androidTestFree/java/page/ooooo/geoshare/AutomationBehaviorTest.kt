@@ -125,7 +125,7 @@ class AutomationBehaviorTest : BehaviorTest {
     }
 
     @Test
-    fun opensTomTom() = uiAutomator {
+    fun launchesNavigationInTomTom() = uiAutomator {
         runBlocking {
             assumeAppInstalled(PackageNames.TOMTOM)
             assumeDomainResolvable("tomtom.com")
