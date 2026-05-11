@@ -464,6 +464,10 @@ interface BehaviorTest {
             waitForAppToBeVisible(packageName, 3_000L)
         }
 
+        // If there's a "Some menu items have moved..." popup, close it
+        onElementOrNull(3_000L) { packageName == "com.google.android.contacts" && viewIdResourceName == "android:id/closeButton" }
+            ?.click()
+
         val contactDetailOpen = onElementOrNull(3_000L) {
             packageName == "com.android.contacts" && viewIdResourceName == "com.android.contacts:id/menu_edit" ||
                 packageName == "com.google.android.contacts" && viewIdResourceName == "com.google.android.contacts:id/menu_insert_or_edit"
@@ -471,7 +475,6 @@ interface BehaviorTest {
         if (contactDetailOpen) {
             // If the contacts app is already open on the contact detail screen, do nothing
         } else {
-            // FIXME
             // Scroll to the test contact in the list of contacts, and click it
             onElement { isScrollable }
                 .scrollToElement(Direction.DOWN) { textAsString() == name && isVisibleToUser }

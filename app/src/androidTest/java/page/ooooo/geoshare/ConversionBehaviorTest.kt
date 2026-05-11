@@ -185,7 +185,7 @@ class ConversionBehaviorTest : BehaviorTest {
     }
 
     @Test
-    fun whenNonexistentShortLinkIsSharedAndPermissionIsDenied_closesDialogAndDoesNothing() = uiAutomator { // TODO
+    fun whenNonexistentShortLinkIsSharedAndPermissionIsDenied_closesDialogAndDoesNothing() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("maps.google.com")
         }
