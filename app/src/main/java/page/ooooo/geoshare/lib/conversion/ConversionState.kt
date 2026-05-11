@@ -517,31 +517,38 @@ data class ActionRan(
     val isAutomation: Boolean,
 ) : ConversionState, ConversionState.HasResult {
     override suspend fun transition(): State = action.output.let { output ->
-        when (actionResult) {
-            // TODO Test
-            ActionResult.Succeeded, ActionResult.SucceededAndFinish ->
-                when (output) {
-                    is Output.HasSuccessText if !isAutomation ->
+        if (!isAutomation) {
+            when (actionResult) {
+                ActionResult.Succeeded, ActionResult.SucceededAndFinish ->
+                    if (output is Output.HasSuccessText) {
                         ActionSucceeded(source, points, actionResult, output)
-
-                    is Output.HasAutomationSuccessText if isAutomation ->
-                        ActionAutomationSucceeded(source, points, actionResult, output)
-
-                    else ->
+                    } else {
                         ActionFinished(source, points, actionResult)
-                }
+                    }
 
-            ActionResult.Failed ->
-                when (output) {
-                    is Output.HasErrorText if !isAutomation ->
+                ActionResult.Failed ->
+                    if (output is Output.HasErrorText) {
                         ActionFailed(source, points, actionResult, output)
-
-                    is Output.HasAutomationErrorText if isAutomation ->
-                        ActionAutomationFailed(source, points, actionResult, output)
-
-                    else ->
+                    } else {
                         ActionFinished(source, points, actionResult)
-                }
+                    }
+            }
+        } else {
+            when (actionResult) {
+                ActionResult.Succeeded, ActionResult.SucceededAndFinish ->
+                    if (output is Output.HasAutomationSuccessText) {
+                        ActionAutomationSucceeded(source, points, actionResult, output)
+                    } else {
+                        ActionFinished(source, points, actionResult)
+                    }
+
+                ActionResult.Failed ->
+                    if (output is Output.HasAutomationErrorText) {
+                        ActionAutomationFailed(source, points, actionResult, output)
+                    } else {
+                        ActionFinished(source, points, actionResult)
+                    }
+            }
         }
     }
 }
