@@ -50,7 +50,7 @@ interface InputBehaviorTest : BehaviorTest {
     ) =
         testUri(persistentListOf(expectedPoint), unsafeUriString, accurate, timeoutMs)
 
-    fun UiAutomatorTestScope.testTextUri(expectedPoints: Points, unsafeText: String) {
+    fun UiAutomatorTestScope.testText(expectedPoints: Points, unsafeText: String) {
         // It would be preferable to test sharing of the text with the app, but this shell command doesn't work when
         // there are spaces in the text. So instead, we type the text in the main form of the app.
         // device.executeShellCommand(
@@ -81,6 +81,6 @@ interface InputBehaviorTest : BehaviorTest {
         assertConversionSucceeded(expectedPoints)
     }
 
-    fun UiAutomatorTestScope.testTextUri(expectedPoint: Point, unsafeText: String) =
-        testTextUri(persistentListOf(expectedPoint), unsafeText)
+    fun UiAutomatorTestScope.testText(expectedPoint: Point, unsafeText: String) =
+        testText(persistentListOf(expectedPoint), unsafeText)
 }

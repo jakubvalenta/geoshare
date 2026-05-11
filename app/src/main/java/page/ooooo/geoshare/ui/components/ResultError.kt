@@ -53,11 +53,7 @@ fun ResultError(
         mutableStateOf(initialRetryLoadingIndicatorVisible)
     }
 
-    Column(
-        modifier = Modifier
-            .testTag("geoShareConversionError")
-            .fillMaxWidth(),
-    ) {
+    Column(Modifier.fillMaxWidth()) {
         if (!retryLoadingIndicatorVisible) {
             Column(Modifier.padding(horizontal = spacing.windowPadding)) {
                 Headline(stringResource(R.string.conversion_error_title))

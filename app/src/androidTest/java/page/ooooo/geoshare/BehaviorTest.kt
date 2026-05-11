@@ -68,15 +68,16 @@ interface BehaviorTest {
         pressHome()
     }
 
-    fun UiAutomatorTestScope.launchApplication(
-        packageName: String = BuildConfig.APPLICATION_ID,
-        timeoutMs: Long = 10_000L,
-    ): Boolean {
+    fun UiAutomatorTestScope.launchApplication(packageName: String = BuildConfig.APPLICATION_ID) {
         // Use shell command instead of startActivity() to support Xiaomi.
         device.executeShellCommand("monkey -p $packageName 1")
+    }
 
-        // Wait for the app to appear
-        return waitForAppToBeVisible(packageName, timeoutMs)
+    fun UiAutomatorTestScope.waitForAppToBeVisible(
+        packageName: String = BuildConfig.APPLICATION_ID,
+        timeoutMs: Long = 10_000L,
+    ) {
+        waitForAppToBeVisible(packageName, timeoutMs)
     }
 
     fun closeApplication() {
@@ -106,27 +107,33 @@ interface BehaviorTest {
         onElement { viewIdResourceName == "geoShareConfirmationDialogDoNotAskSwitch" }.click()
     }
 
-    private fun isLocationGrantButton(element: AccessibilityNodeInfo): Boolean =
-        @Suppress("SpellCheckingInspection") when (element.textAsString()?.lowercase()) {
-            "only this time", "uniquement cette fois-ci" -> true
-            else -> false
-        }
+    private fun AccessibilityNodeInfo.isPermissionButtonOnlyThisTime(): Boolean =
+        textAsString()?.lowercase() in setOf(
+            "only this time",
+            @Suppress("SpellCheckingInspection") "uniquement cette fois-ci",
+        )
 
-    fun UiAutomatorTestScope.grantLocationPermission() {
-        onElement { isLocationGrantButton(this) }.click()
+    private fun AccessibilityNodeInfo.isPermissionButtonDoNotAllow(): Boolean =
+        textAsString()?.lowercase() in setOf(
+            "don't allow",
+            "don’t allow", // Notice the different quote character
+            @Suppress("SpellCheckingInspection") "ne pas autoriser"
+        )
+
+    fun UiAutomatorTestScope.grantSystemPermission() {
+        onElement { isPermissionButtonOnlyThisTime() }.click()
     }
 
-    fun UiAutomatorTestScope.grantLocationPermissionIfNecessary() {
-        onElementOrNull(3_000L) { isLocationGrantButton(this) }?.click()
+    fun UiAutomatorTestScope.grantSystemPermissionIfNecessary() {
+        onElementOrNull(3_000L) { isPermissionButtonOnlyThisTime() }?.click()
     }
 
-    fun UiAutomatorTestScope.denyLocationPermission() {
-        onElement {
-            @Suppress("SpellCheckingInspection") when (textAsString()?.lowercase()) {
-                "don't allow", "don’t allow", "ne pas autoriser" -> true
-                else -> false
-            }
-        }.click()
+    fun UiAutomatorTestScope.denySystemPermission() {
+        onElement { isPermissionButtonDoNotAllow() }.click()
+    }
+
+    fun UiAutomatorTestScope.denySystemPermissionIfNecessary() {
+        onElementOrNull(3_000L) { isPermissionButtonDoNotAllow() }?.click()
     }
 
     fun UiAutomatorTestScope.assumeAppInstalled(packageName: String) {
@@ -285,8 +292,7 @@ interface BehaviorTest {
         expectedPoint: Point,
         accurate: Boolean? = null,
         timeoutMs: Long = NETWORK_TIMEOUT,
-    ) =
-        assertConversionSucceeded(persistentListOf(expectedPoint), accurate, timeoutMs)
+    ) = assertConversionSucceeded(persistentListOf(expectedPoint), accurate, timeoutMs)
 
     fun UiAutomatorTestScope.waitAndAssertGoogleMapsContainsElement(block: AccessibilityNodeInfo.() -> Boolean) {
         // Wait for Google Maps
@@ -294,16 +300,16 @@ interface BehaviorTest {
 
         // If there is a Google Maps sign in screen, skip it
         onElementOrNull(3_000L) {
-            packageName == PackageNames.GOOGLE_MAPS && @Suppress("SpellCheckingInspection") when (textAsString()) {
-                "Make it your map", "Profitez d'une carte personnalisée" -> true
-                else -> false
-            }
+            packageName == PackageNames.GOOGLE_MAPS && textAsString() in setOf(
+                "Make it your map",
+                @Suppress("SpellCheckingInspection") "Profitez d'une carte personnalisée"
+            )
         }?.let {
             onElement {
-                packageName == PackageNames.GOOGLE_MAPS && when (textAsString()?.lowercase()) {
-                    "skip", "ignorer" -> true
-                    else -> false
-                }
+                packageName == PackageNames.GOOGLE_MAPS && textAsString()?.lowercase() in setOf(
+                    "skip",
+                    "ignorer",
+                )
             }.click()
         }
 
@@ -311,19 +317,30 @@ interface BehaviorTest {
         onElement(20_000L) { packageName == PackageNames.GOOGLE_MAPS && this.block() }
     }
 
+    fun UiAutomatorTestScope.assertConversionFailed() {
+        onElement {
+            viewIdResourceName == "geoShareConversionErrorMessage" && textAsString()?.lowercase() in setOf(
+                "no points found",
+                @Suppress("SpellCheckingInspection") "aucun point trouvé",
+                "response error 404",
+                @Suppress("SpellCheckingInspection") "erreur de réponse 404",
+            )
+        }
+    }
+
     fun UiAutomatorTestScope.waitAndAssertTomTomContainsElement(block: AccessibilityNodeInfo.() -> Boolean) {
         // Wait for TomTom
         onElement(30_000L) { packageName == PackageNames.TOMTOM }
 
-        // If there is location permission, grant it
-        grantLocationPermissionIfNecessary()
+        // If there is location permission dialog, confirm it
+        grantSystemPermissionIfNecessary()
 
-        // If there is Importing GPX tracks dialog, confirm it
+        // If there is "Importing GPX tracks" dialog, confirm it
         onElementOrNull(5_000L) {
-            @Suppress("SpellCheckingInspection") when (textAsString()) {
-                "Got it", "J'ai compris" -> true
-                else -> false
-            }
+            textAsString() in setOf(
+                "Got it",
+                @Suppress("SpellCheckingInspection") "J'ai compris"
+            )
         }?.click()
 
         // Verify TomTom content
@@ -373,13 +390,12 @@ interface BehaviorTest {
     /**
      * Return the main screen scrollable element that contains app icons. Works on phone as well as tablet.
      */
-    fun UiAutomatorTestScope.onMainScrollablePane(): UiObject2 =
-        onElement {
-            // First try supporting pane, which is displayed only on wide screens
-            viewIdResourceName == "geoShareMainSupportingPane" ||
-                // Then try the main pane, which is displayed on all devices but doesn't contain apps on wide screens
-                viewIdResourceName == "geoShareMainPane"
-        }
+    fun UiAutomatorTestScope.onMainScrollablePane(): UiObject2 = onElement {
+        // First try supporting pane, which is displayed only on wide screens
+        viewIdResourceName == "geoShareMainSupportingPane" ||
+            // Then try the main pane, which is displayed on all devices but doesn't contain apps on wide screens
+            viewIdResourceName == "geoShareMainPane"
+    }
 
     fun UiAutomatorTestScope.chooseFile() {
         if (onElementOrNull(3_000L) { textAsString() == "Recent" } != null) {
@@ -404,8 +420,7 @@ interface BehaviorTest {
     fun UiAutomatorTestScope.insertOrEditContact(name: String = "GeoShare Test Contact") {
         // If using the Android open-source contacts app, click the search button
         onElementOrNull(3_000L) {
-            packageName == "com.android.contacts" &&
-                contentDescription in setOf(
+            packageName == "com.android.contacts" && contentDescription in setOf(
                 "Search contacts",
                 @Suppress("SpellCheckingInspection") "Rechercher dans vos contacts",
             )
@@ -417,8 +432,7 @@ interface BehaviorTest {
         } else {
             // If using the Android open-source contacts app, click the back button
             onElementOrNull(3_000L) {
-                packageName == "com.android.contacts" &&
-                    contentDescription in setOf(
+                packageName == "com.android.contacts" && contentDescription in setOf(
                     "stop searching",
                     @Suppress("SpellCheckingInspection") "arrêter la recherche",
                 )
@@ -441,9 +455,15 @@ interface BehaviorTest {
     }
 
     fun UiAutomatorTestScope.openContact(name: String = "GeoShare Test Contact") {
-        setOf("com.android.contacts", "com.google.android.contacts").first {
-            launchApplication(it, 3_000L)
+        setOf("com.android.contacts", "com.google.android.contacts").first { packageName ->
+            launchApplication(packageName)
+
+            // If there is "Allow contacts to send you notifications" dialog, dismiss it
+            denySystemPermissionIfNecessary()
+
+            waitForAppToBeVisible(packageName, 3_000L)
         }
+
         val contactDetailOpen = onElementOrNull(3_000L) {
             packageName == "com.android.contacts" && viewIdResourceName == "com.android.contacts:id/menu_edit" ||
                 packageName == "com.google.android.contacts" && viewIdResourceName == "com.google.android.contacts:id/menu_insert_or_edit"
@@ -451,6 +471,7 @@ interface BehaviorTest {
         if (contactDetailOpen) {
             // If the contacts app is already open on the contact detail screen, do nothing
         } else {
+            // FIXME
             // Scroll to the test contact in the list of contacts, and click it
             onElement { isScrollable }
                 .scrollToElement(Direction.DOWN) { textAsString() == name && isVisibleToUser }
@@ -460,8 +481,7 @@ interface BehaviorTest {
 
     fun UiAutomatorTestScope.mockLocation(block: MockLocationScope.() -> Unit) {
         device.executeShellCommand(
-            @Suppress("SpellCheckingInspection")
-            "appops set ${BuildConfig.APPLICATION_ID} android:mock_location allow"
+            @Suppress("SpellCheckingInspection") "appops set ${BuildConfig.APPLICATION_ID} android:mock_location allow"
         )
 
         val context: Context = InstrumentationRegistry.getInstrumentation().targetContext

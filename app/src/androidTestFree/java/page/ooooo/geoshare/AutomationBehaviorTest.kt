@@ -35,6 +35,7 @@ class AutomationBehaviorTest : BehaviorTest {
     fun copiesCoordinates() = uiAutomator {
         // Launch application and close intro
         launchApplication()
+        waitForAppToBeVisible()
         closeIntro()
 
         // Configure automation
@@ -59,6 +60,7 @@ class AutomationBehaviorTest : BehaviorTest {
 
         // Launch application and close intro
         launchApplication()
+        waitForAppToBeVisible()
         closeIntro()
 
         // Configure automation
@@ -84,6 +86,7 @@ class AutomationBehaviorTest : BehaviorTest {
 
         // Go back to app
         launchApplication()
+        waitForAppToBeVisible()
 
         // Shows automation preferences button
         onElement { viewIdResourceName == "geoShareResultAutomationButton" }
@@ -151,7 +154,7 @@ class AutomationBehaviorTest : BehaviorTest {
 
             // Grant location permission
             waitForStableInActiveWindow() // Wait, otherwise tapping the location permission grant button does nothing
-            grantLocationPermission()
+            grantSystemPermission()
 
             mockLocation {
                 // Set location
@@ -170,6 +173,7 @@ class AutomationBehaviorTest : BehaviorTest {
     fun savesGpxRoute() = uiAutomator {
         // Launch application and close intro
         launchApplication()
+        waitForAppToBeVisible()
         closeIntro()
 
         // Configure automation
@@ -203,6 +207,7 @@ class AutomationBehaviorTest : BehaviorTest {
     fun savesPointToContact() = uiAutomator {
         // Launch application and close intro
         launchApplication()
+        waitForAppToBeVisible()
         closeIntro()
 
         // Configure automation

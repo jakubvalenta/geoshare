@@ -2,6 +2,7 @@ package page.ooooo.geoshare
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.uiautomator.Direction
+import androidx.test.uiautomator.UiAutomatorTestScope
 import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
@@ -148,11 +149,8 @@ class ConversionBehaviorTest : BehaviorTest {
         // Deny unshorten permission
         onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.dismissDialog()
 
-        // Error is visible
-        onElement { viewIdResourceName == "geoShareConversionError" }
-
-        // Close the window (this is necessary, for some reason)
-        onElement { viewIdResourceName == "geoShareMainBackButton" }.click()
+        // Shows permission denied error
+        assertPermissionDenied()
 
         // Share the Google Maps short link with the app again
         shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
@@ -176,21 +174,18 @@ class ConversionBehaviorTest : BehaviorTest {
             dismissDialog()
         }
 
-        // Error is visible
-        onElement { viewIdResourceName == "geoShareConversionError" }
-
-        // Close the window (this is necessary, for some reason)
-        onElement { viewIdResourceName == "geoShareMainBackButton" }.click()
+        // Shows permission denied error
+        assertPermissionDenied()
 
         // Share the Google Maps short link with the app again
         shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
 
-        // Error is visible again
-        onElement { viewIdResourceName == "geoShareConversionError" }
+        // Shows permission denied error
+        assertPermissionDenied()
     }
 
     @Test
-    fun whenNonexistentShortLinkIsSharedAndPermissionIsDenied_closesDialogAndDoesNothing() = uiAutomator {
+    fun whenNonexistentShortLinkIsSharedAndPermissionIsDenied_closesDialogAndDoesNothing() = uiAutomator { // TODO
         runBlocking {
             assumeDomainResolvable("maps.google.com")
         }
@@ -202,7 +197,7 @@ class ConversionBehaviorTest : BehaviorTest {
         onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
 
         // Error is visible
-        onElement { viewIdResourceName == "geoShareConversionError" }
+        assertConversionFailed()
     }
 
     @Test
@@ -269,11 +264,8 @@ class ConversionBehaviorTest : BehaviorTest {
             // Deny parse HTML permission
             onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.dismissDialog()
 
-            // Error is visible
-            onElement { viewIdResourceName == "geoShareConversionError" }
-
-            // Close the window (this is necessary, for some reason)
-            onElement { viewIdResourceName == "geoShareMainBackButton" }.click()
+            // Shows permission denied error
+            assertPermissionDenied()
 
             // Share the Apple Maps place link with the app again
             shareUri("https://maps.apple.com/place?place-id=IE08A4F5FAA2F0502&_provider=9902")
@@ -298,17 +290,14 @@ class ConversionBehaviorTest : BehaviorTest {
                 dismissDialog()
             }
 
-            // Error is visible
-            onElement { viewIdResourceName == "geoShareConversionError" }
-
-            // Close the window (this is necessary, for some reason)
-            onElement { viewIdResourceName == "geoShareMainBackButton" }.click()
+            // Shows permission denied error
+            assertPermissionDenied()
 
             // Share another Apple Maps place link with the app
             shareUri("https://maps.apple.com/place?place-id=I263680A7B546CF16&_provider=9902")
 
-            // Error is visible
-            onElement { viewIdResourceName == "geoShareConversionError" }
+            // Shows permission denied error
+            assertPermissionDenied()
         }
 
     @Test
@@ -516,7 +505,7 @@ class ConversionBehaviorTest : BehaviorTest {
             onElement(20_000L) { viewIdResourceName == "geoShareLocationRationaleDialog" }.confirmDialog()
 
             // Deny location permission
-            denyLocationPermission()
+            denySystemPermission()
 
             // Tap the TomTom icon again
             onElement { viewIdResourceName == "geoShareApp_${PackageNames.TOMTOM}" }.click()
@@ -526,7 +515,7 @@ class ConversionBehaviorTest : BehaviorTest {
 
             // Grant location permission
             waitForStableInActiveWindow() // Wait, otherwise tapping the location permission grant button does nothing
-            grantLocationPermission()
+            grantSystemPermission()
 
             mockLocation {
                 // Set location
@@ -545,6 +534,8 @@ class ConversionBehaviorTest : BehaviorTest {
     fun savesGpxRoute() = uiAutomator {
         // Launch application and close intro
         launchApplication()
+        waitForAppToBeVisible()
+        waitForAppToBeVisible()
         closeIntro()
 
         // Share a geo: URI with the app
@@ -586,6 +577,7 @@ class ConversionBehaviorTest : BehaviorTest {
     fun savesPointToContact() = uiAutomator {
         // Launch application and close intro
         launchApplication()
+        waitForAppToBeVisible()
         closeIntro()
 
         // Share a geo: URI with the app
@@ -621,5 +613,15 @@ class ConversionBehaviorTest : BehaviorTest {
         // The test contact contains coordinates
         val expectedCoordinates = CoordinateFormatter.formatDecCoords(point)
         onElement { textAsString() == expectedCoordinates }
+    }
+
+    private fun UiAutomatorTestScope.assertPermissionDenied() {
+        onElement {
+            viewIdResourceName == "geoShareConversionErrorMessage" &&
+                textAsString() in setOf(
+                "This link is not supported without connecting to the map service",
+                @Suppress("SpellCheckingInspection") "Ce lien n’est pas pris en charge sans connexion au service de cartographie",
+            )
+        }
     }
 }

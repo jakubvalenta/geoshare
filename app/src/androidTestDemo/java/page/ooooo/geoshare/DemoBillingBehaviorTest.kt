@@ -22,6 +22,8 @@ class DemoBillingBehaviorTest : BehaviorTest {
     fun allowsPurchasingAndRefundingOneTimeProduct() = uiAutomator {
         // Launch application and close intro
         launchApplication()
+        waitForAppToBeVisible()
+        waitForAppToBeVisible()
         closeIntro()
 
         // Shows free headline
@@ -95,6 +97,7 @@ class DemoBillingBehaviorTest : BehaviorTest {
     fun allowsPurchasingAndRefundingSubscription() = uiAutomator {
         // Launch application and close intro
         launchApplication()
+        waitForAppToBeVisible()
         closeIntro()
 
         // Shows free headline
@@ -174,6 +177,7 @@ class DemoBillingBehaviorTest : BehaviorTest {
     fun allowsUsingAutomationAfterPurchase() = uiAutomator {
         // Launch application and close intro
         launchApplication()
+        waitForAppToBeVisible()
         closeIntro()
 
         // Share a Google Maps coordinates link with the app
@@ -222,6 +226,7 @@ class DemoBillingBehaviorTest : BehaviorTest {
     fun allowsUsingCustomLinkAfterPurchase() = uiAutomator {
         // Launch application and close intro
         launchApplication()
+        waitForAppToBeVisible()
         closeIntro()
 
         // Go to link list
