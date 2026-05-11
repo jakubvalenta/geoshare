@@ -19,7 +19,7 @@ import page.ooooo.geoshare.lib.inputs.ParseResult
 
 class InputFoundTest {
     @Test
-    fun transition_whenPermissionIsAlways_returnsPermissionGrantedAndSetsPermissionParam() = runTest {
+    fun transition_whenPermissionIsAlways_returnsPermissionGrantedAndPassesPermissionParam() = runTest {
         val source = "https://maps.app.goo.gl/foo"
         val input = GoogleMapsHtmlInput
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
@@ -57,7 +57,7 @@ class InputFoundTest {
     }
 
     @Test
-    fun transition_whenPermissionIsNever_returnsDeniedUnshortenPermission() = runTest {
+    fun transition_whenPermissionIsNever_returnsDataParsed() = runTest {
         val source = "https://maps.app.goo.gl/foo"
         val input = GoogleMapsHtmlInput
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
@@ -70,7 +70,9 @@ class InputFoundTest {
         }
         val state = InputFound(stateContext, source, match = source, input, Permission.NEVER, prevResult)
         assertEquals(
-            PermissionDenied(stateContext, source, match = source, input, Permission.NEVER, prevResult),
+            DataParsed(
+                stateContext, source, match = source, input, result = ParseResult(), Permission.NEVER, prevResult
+            ),
             state.transition(),
         )
     }
@@ -115,7 +117,7 @@ class InputFoundTest {
     }
 
     @Test
-    fun transition_whenPermissionIsNullAndPreferencePermissionIsNever_returnsDeniedUnshortenPermission() = runTest {
+    fun transition_whenPermissionIsNullAndPreferencePermissionIsNever_returnsDataParsed() = runTest {
         val source = "https://maps.app.goo.gl/foo"
         val input = GoogleMapsHtmlInput
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
@@ -128,7 +130,9 @@ class InputFoundTest {
         }
         val state = InputFound(stateContext, source, match = source, input, permission = null, prevResult)
         assertEquals(
-            PermissionDenied(stateContext, source, match = source, input, Permission.NEVER, prevResult),
+            DataParsed(
+                stateContext, source, match = source, input, result = ParseResult(), Permission.NEVER, prevResult
+            ),
             state.transition(),
         )
     }

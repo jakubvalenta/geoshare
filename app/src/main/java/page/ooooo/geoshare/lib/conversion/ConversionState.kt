@@ -313,19 +313,6 @@ data class PermissionGrantedWebViewInput(
     }
 }
 
-// TODO Remove
-data class PermissionDenied<T>(
-    val stateContext: ConversionStateContext,
-    val source: String,
-    val match: String,
-    val input: Input<T>,
-    val permission: Permission,
-    val prevResult: ParseResult? = null,
-) : ConversionState {
-    override suspend fun transition(): State =
-        throw NotImplementedError()
-}
-
 data class DataParsed<T>(
     val stateContext: ConversionStateContext,
     val source: String,
@@ -352,7 +339,7 @@ data class DataParsed<T>(
                     TAG, "Extracted point with name $points from $match"
                 )
                 ConversionSucceeded(stateContext, source, points)
-            } else if (prevResult?.points?.lastOrNull()?.run { hasCoordinates() || hasName() } == true) { // TODO Test
+            } else if (prevResult?.points?.lastOrNull()?.run { hasCoordinates() || hasName() } == true) {
                 stateContext.log.i(
                     TAG, "Failed to extract point from $match, using previous result ${prevResult.points}"
                 )

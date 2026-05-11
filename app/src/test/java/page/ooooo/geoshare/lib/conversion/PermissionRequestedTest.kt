@@ -83,7 +83,7 @@ class PermissionRequestedTest {
     }
 
     @Test
-    fun deny_whenDoNotAskIsFalse_doesNotSavePreferenceAndReturnsPermissionDenied() = runTest {
+    fun deny_whenDoNotAskIsFalse_doesNotSavePreferenceAndReturnsDataParsed() = runTest {
         val source = "https://maps.app.goo.gl/foo"
         val input = GoogleMapsHtmlInput
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
@@ -97,7 +97,9 @@ class PermissionRequestedTest {
         val state =
             PermissionRequested(stateContext, source, match = source, input, prevResult, input.permissionTitleResId)
         assertEquals(
-            PermissionDenied(stateContext, source, match = source, input, Permission.NEVER, prevResult),
+            DataParsed(
+                stateContext, source, match = source, input, result = ParseResult(), Permission.NEVER, prevResult
+            ),
             state.deny(false),
         )
         verify(userPreferencesRepository, never()).setValue(
@@ -107,7 +109,7 @@ class PermissionRequestedTest {
     }
 
     @Test
-    fun deny_whenDoNotIsAskIsTrue_savesPreferenceAndPermissionDenied() = runTest {
+    fun deny_whenDoNotIsAskIsTrue_savesPreferenceAndReturnsDataParsed() = runTest {
         val source = "https://maps.app.goo.gl/foo"
         val input = GoogleMapsHtmlInput
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
@@ -122,7 +124,9 @@ class PermissionRequestedTest {
             stateContext, source, match = source, input, prevResult, input.permissionTitleResId
         )
         assertEquals(
-            PermissionDenied(stateContext, source, match = source, input, Permission.NEVER, prevResult),
+            DataParsed(
+                stateContext, source, match = source, input, result = ParseResult(), Permission.NEVER, prevResult
+            ),
             state.deny(true),
         )
         verify(userPreferencesRepository).setValue(

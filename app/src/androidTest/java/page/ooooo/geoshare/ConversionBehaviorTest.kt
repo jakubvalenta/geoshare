@@ -79,7 +79,7 @@ class ConversionBehaviorTest : BehaviorTest {
         // Share a Google Maps short link with the app
         shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
 
-        // Grant unshorten permission
+        // Grant connection permission
         onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
 
         // Shows precise location
@@ -95,7 +95,7 @@ class ConversionBehaviorTest : BehaviorTest {
         shareUri("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA")
         waitForStableInActiveWindow()
 
-        // Unshorten permission dialog is visible again
+        // Connection permission dialog is visible again
         onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }
     }
 
@@ -108,7 +108,7 @@ class ConversionBehaviorTest : BehaviorTest {
         // Share a Google Maps short link with the app
         shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
 
-        // Grant unshorten permission and check "Don't ask me again"
+        // Grant connection permission and check "Don't ask me again"
         onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
             toggleDoNotAsk()
             confirmDialog()
@@ -146,7 +146,7 @@ class ConversionBehaviorTest : BehaviorTest {
         // Share a Google Maps short link with the app
         shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
 
-        // Deny unshorten permission
+        // Deny connection permission
         onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.dismissDialog()
 
         // Shows permission denied error
@@ -155,7 +155,7 @@ class ConversionBehaviorTest : BehaviorTest {
         // Share the Google Maps short link with the app again
         shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
 
-        // Unshorten permission dialog is visible again
+        // Connection permission dialog is visible again
         onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }
     }
 
@@ -168,7 +168,7 @@ class ConversionBehaviorTest : BehaviorTest {
         // Share a Google Maps short link with the app
         shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
 
-        // Deny unshorten permission
+        // Deny connection permission
         onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
             toggleDoNotAsk()
             dismissDialog()
@@ -193,7 +193,7 @@ class ConversionBehaviorTest : BehaviorTest {
         // Share a Google Maps short non-existent link with the app
         shareUri("https://maps.app.goo.gl/spam")
 
-        // Grant unshorten permission
+        // Grant connection permission
         onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
 
         // Error is visible
@@ -210,7 +210,7 @@ class ConversionBehaviorTest : BehaviorTest {
             // Share an Apple Maps place link with the app
             shareUri("https://maps.apple.com/place?place-id=I7BA098CC17989C16&_provider=9902")
 
-            // Grant parse HTML permission
+            // Grant connection permission
             onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
 
             // Shows precise location
@@ -220,7 +220,7 @@ class ConversionBehaviorTest : BehaviorTest {
             shareUri("https://maps.apple.com/place?place-id=I849C144AAC7A794F&_provider=9902")
             quickWaitForStableInActiveWindow()
 
-            // Parse HTML permission dialog is visible again
+            // Connection permission dialog is visible again
             onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }
         }
 
@@ -234,7 +234,7 @@ class ConversionBehaviorTest : BehaviorTest {
             // Share an Apple Maps place link with the app
             shareUri("https://maps.apple.com/place?place-id=I1CBDEBCF5A275CB2&_provider=9902")
 
-            // Grant parse HTML permission and check "Don't ask me again"
+            // Grant connection permission and check "Don't ask me again"
             onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
                 toggleDoNotAsk()
                 confirmDialog()
@@ -261,7 +261,7 @@ class ConversionBehaviorTest : BehaviorTest {
             // Share an Apple Maps place link with the app
             shareUri("https://maps.apple.com/place?place-id=I8D204FAB527CE0EB&_provider=9902")
 
-            // Deny parse HTML permission
+            // Deny connection permission
             onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.dismissDialog()
 
             // Shows permission denied error
@@ -270,7 +270,7 @@ class ConversionBehaviorTest : BehaviorTest {
             // Share the Apple Maps place link with the app again
             shareUri("https://maps.apple.com/place?place-id=IE08A4F5FAA2F0502&_provider=9902")
 
-            // Parse HTML permission dialog is visible again
+            // Connection permission dialog is visible again
             onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }
         }
 
@@ -284,7 +284,7 @@ class ConversionBehaviorTest : BehaviorTest {
             // Share an Apple Maps place link with the app
             shareUri("https://maps.apple.com/place?place-id=I5ECF0E5A2703FCD1&_provider=9902")
 
-            // Deny parse HTML permission
+            // Deny connection permission
             onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
                 toggleDoNotAsk()
                 dismissDialog()
@@ -310,7 +310,7 @@ class ConversionBehaviorTest : BehaviorTest {
             // Share a Google Maps place link with the app
             shareUri("https://www.google.com/maps/place/Hermannstr.+10,+Berlin/")
 
-            // Grant parse HTML permission
+            // Grant connection permission
             onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
 
             // Shows precise location
@@ -326,7 +326,7 @@ class ConversionBehaviorTest : BehaviorTest {
             shareUri("https://www.google.com/maps/place/Hermannstr.+11,+Berlin/")
             quickWaitForStableInActiveWindow()
 
-            // Parse HTML permission dialog is visible again
+            // Connection permission dialog is visible again
             onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }
         }
 
@@ -340,7 +340,7 @@ class ConversionBehaviorTest : BehaviorTest {
             // Share a Google Maps place link with the app
             shareUri("https://www.google.com/maps/place/Hermannstr.+20,+Berlin/")
 
-            // Grant parse HTML permission and check "Don't ask me again"
+            // Grant connection permission and check "Don't ask me again"
             onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
                 toggleDoNotAsk()
                 confirmDialog()
@@ -379,7 +379,7 @@ class ConversionBehaviorTest : BehaviorTest {
             // Share a Google Maps place link with the app
             shareUri("https://www.google.com/maps/place/Hermannstr.+30,+Berlin/")
 
-            // Deny parse HTML permission
+            // Deny connection permission
             onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.dismissDialog()
 
             // Shows location search
@@ -393,7 +393,7 @@ class ConversionBehaviorTest : BehaviorTest {
             // Share another Google Maps place link with the app
             shareUri("https://www.google.com/maps/place/Hermannstr.+31,+Berlin/")
 
-            // Parse HTML permission dialog is visible again
+            // Connection permission dialog is visible again
             onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }
         }
 
@@ -407,7 +407,7 @@ class ConversionBehaviorTest : BehaviorTest {
             // Share a Google Maps place link with the app
             shareUri("https://www.google.com/maps/place/Hermannstr.+40,+Berlin/")
 
-            // Deny parse HTML permission
+            // Deny connection permission
             onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
                 toggleDoNotAsk()
                 dismissDialog()
@@ -443,7 +443,7 @@ class ConversionBehaviorTest : BehaviorTest {
         // Share a Google Maps short link with the app
         shareUri("https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8") // Sometimes fails in emulator
 
-        // Grant unshorten permission
+        // Grant connection permission
         onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
 
         // Shows precise location
