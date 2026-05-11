@@ -11,6 +11,8 @@ class AppleMapsInputBehaviorTest : InputBehaviorTest {
     fun appleMaps() = uiAutomator {
         // Launch app and close intro
         launchApplication()
+        waitForAppToBeVisible()
+        waitForAppToBeVisible()
         closeIntro()
 
         // Coordinates
@@ -39,7 +41,7 @@ class AppleMapsInputBehaviorTest : InputBehaviorTest {
         )
 
         // Text
-        testTextUri(
+        testText(
             WGS84Point(52.49115540927951, 13.42595574770533, source = Source.URI),
             "https://maps.apple.com/?ll=52.49115540927951,13.42595574770533",
         )
@@ -53,6 +55,8 @@ class AppleMapsInputBehaviorTest : InputBehaviorTest {
 
         // Launch app and close intro
         launchApplication()
+        waitForAppToBeVisible()
+        waitForAppToBeVisible()
         closeIntro()
         setUserPreferenceConnectionPermissionToAlways()
 

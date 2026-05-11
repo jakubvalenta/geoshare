@@ -16,6 +16,8 @@ class InputsBehaviorTest : BehaviorTest {
     fun whenAppIsOpenTwice_isVisibleOnlyFirstTime() = uiAutomator {
         // Launch app
         launchApplication()
+        waitForAppToBeVisible()
+        waitForAppToBeVisible()
 
         // Go to the second intro page
         onElement { viewIdResourceName == "geoShareIntroPage0HeadingText" }
@@ -24,6 +26,8 @@ class InputsBehaviorTest : BehaviorTest {
         // Relaunch app
         closeApplication()
         launchApplication()
+        waitForAppToBeVisible()
+        waitForAppToBeVisible()
 
         // Intro is still visible; go through all intro pages
         for (page in 0..1) {
@@ -37,6 +41,8 @@ class InputsBehaviorTest : BehaviorTest {
         // Relaunch app
         closeApplication()
         launchApplication()
+        waitForAppToBeVisible()
+        waitForAppToBeVisible()
 
         // Main screen is visible again
         onElement { viewIdResourceName == "geoShareMainSourceTextField" }
@@ -46,6 +52,8 @@ class InputsBehaviorTest : BehaviorTest {
     fun whenOpenWithOldVersionCode_showsRecentInputsAndSavesNewVersionCode() = uiAutomator {
         // Launch application and close intro
         launchApplication()
+        waitForAppToBeVisible()
+        waitForAppToBeVisible()
         closeIntro()
 
         // Does not show main menu badge

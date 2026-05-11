@@ -119,7 +119,15 @@ data class InputFound<T>(
                     stateContext, source, match, input, prevResult, input.permissionTitleResId
                 )
 
-                Permission.NEVER -> PermissionDenied(stateContext, source, match, input, Permission.NEVER, prevResult)
+                Permission.NEVER -> DataParsed(
+                    stateContext,
+                    source,
+                    match,
+                    input,
+                    result = ParseResult(),
+                    permission = Permission.NEVER,
+                    prevResult,
+                )
             }
         } else {
             PermissionGranted(stateContext, source, match, input, permission, prevResult)
@@ -145,7 +153,9 @@ data class PermissionRequested<T>(
         if (doNotAsk) {
             stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.NEVER)
         }
-        return PermissionDenied(stateContext, source, match, input, Permission.NEVER, prevResult)
+        return DataParsed(
+            stateContext, source, match, input, result = ParseResult(), permission = Permission.NEVER, prevResult
+        )
     }
 }
 
@@ -303,26 +313,6 @@ data class PermissionGrantedWebViewInput(
     }
 }
 
-data class PermissionDenied<T>(
-    val stateContext: ConversionStateContext,
-    val source: String,
-    val match: String,
-    val input: Input<T>,
-    val permission: Permission,
-    val prevResult: ParseResult? = null,
-) : ConversionState {
-    override suspend fun transition(): State =
-        if (prevResult != null) {
-            // Fall back to previous result
-            DataParsed(stateContext, source, match, input, result = ParseResult(), permission, prevResult)
-        } else {
-            ConversionFailed(
-                stateContext.resources.getString(R.string.conversion_failed_connection_permission_denied),
-                source,
-            )
-        }
-}
-
 data class DataParsed<T>(
     val stateContext: ConversionStateContext,
     val source: String,
@@ -335,7 +325,9 @@ data class DataParsed<T>(
     override suspend fun transition(): State =
         result.run {
             if (points.lastOrNull()?.hasCoordinates() == true) {
-                stateContext.log.i(TAG, "Extracted point with coordinates $points from $match")
+                stateContext.log.i(
+                    TAG, "Extracted point with coordinates $points from $match"
+                )
                 ConversionSucceeded(stateContext, source, points)
             } else if (nextStep != null) {
                 stateContext.log.i(
@@ -343,15 +335,27 @@ data class DataParsed<T>(
                 )
                 InputFound(stateContext, source, nextStep.match, nextStep.input, permission, prevResult = this)
             } else if (points.lastOrNull()?.hasName() == true) {
-                stateContext.log.i(TAG, "Extracted point with name $points from $match")
+                stateContext.log.i(
+                    TAG, "Extracted point with name $points from $match"
+                )
                 ConversionSucceeded(stateContext, source, points)
-            } else if (prevResult?.points?.lastOrNull()?.run { hasCoordinates() || hasName() } == true) { // TODO Test
+            } else if (prevResult?.points?.lastOrNull()?.run { hasCoordinates() || hasName() } == true) {
                 stateContext.log.i(
                     TAG, "Failed to extract point from $match, using previous result ${prevResult.points}"
                 )
                 ConversionSucceeded(stateContext, source, prevResult.points)
+            } else if (permission == Permission.NEVER) {
+                stateContext.log.i(
+                    TAG, "Failed to extract point from $match, because permission was denied"
+                )
+                ConversionFailed(
+                    stateContext.resources.getString(R.string.conversion_failed_connection_permission_denied),
+                    source,
+                )
             } else {
-                stateContext.log.i(TAG, "Failed to extract point from $match")
+                stateContext.log.i(
+                    TAG, "Failed to extract point from $match"
+                )
                 ConversionFailed(
                     stateContext.resources.getString(R.string.conversion_failed_reason_no_points),
                     source,

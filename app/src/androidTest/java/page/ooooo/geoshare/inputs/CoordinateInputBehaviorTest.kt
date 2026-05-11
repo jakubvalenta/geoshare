@@ -10,10 +10,12 @@ class CoordinateInputBehaviorTest : InputBehaviorTest {
     fun coordinates() = uiAutomator {
         // Launch app and close intro
         launchApplication()
+        waitForAppToBeVisible()
+        waitForAppToBeVisible()
         closeIntro()
 
         // Decimal
-        testTextUri(
+        testText(
             WGS84Point(-68.648556, -152.775879, source = Source.TEXT),
             "N-68.648556,E-152.775879",
         )

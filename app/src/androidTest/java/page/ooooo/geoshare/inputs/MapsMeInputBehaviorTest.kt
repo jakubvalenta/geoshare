@@ -10,6 +10,8 @@ class MapsMeInputBehaviorTest : InputBehaviorTest {
     fun mapsMe() = uiAutomator {
         // Launch app and close intro
         launchApplication()
+        waitForAppToBeVisible()
+        waitForAppToBeVisible()
         closeIntro()
 
         // Custom scheme
@@ -38,7 +40,7 @@ class MapsMeInputBehaviorTest : InputBehaviorTest {
         )
 
         // Text
-        testTextUri(
+        testText(
             WGS84Point(51.0000004, -108.9999868, z = 4.0, name = "América do Norte", source = Source.HASH),
             "América do Norte, Lancer, Saskatchewan, Canadá\n" +
                 "http://ge0.me/ApYSV0YTAl/América_do_Norte\n" +
@@ -46,7 +48,7 @@ class MapsMeInputBehaviorTest : InputBehaviorTest {
         )
 
         // Text, which will get parsed by GeoUriInput, because it contains a geo: URI that precedes the short link
-        testTextUri(
+        testText(
             @Suppress("SpellCheckingInspection")
             WGS84Point(40.7127400, -74.0059965, z = 9.0, name = "Nova Iorque", source = Source.URI),
             @Suppress("SpellCheckingInspection")

@@ -11,6 +11,8 @@ class WazeInputBehaviorTest : InputBehaviorTest {
     fun waze() = uiAutomator {
         // Launch app and close intro
         launchApplication()
+        waitForAppToBeVisible()
+        waitForAppToBeVisible()
         closeIntro()
 
         // Coordinates
@@ -36,7 +38,7 @@ class WazeInputBehaviorTest : InputBehaviorTest {
         )
 
         // Text
-        testTextUri(
+        testText(
             WGS84Point(45.829189, 1.259372, z = 16.0, source = Source.HASH),
             @Suppress("SpellCheckingInspection")
             "Use Waze to drive to 5 - 22 Boulevard Gambetta: https://waze.com/ul/hu00uswvn3",

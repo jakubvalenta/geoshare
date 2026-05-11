@@ -10,6 +10,8 @@ class GeoUriInputBehaviorTest : InputBehaviorTest {
     fun geoUri() = uiAutomator {
         // Launch app and close intro
         launchApplication()
+        waitForAppToBeVisible()
+        waitForAppToBeVisible()
         closeIntro()
 
         // Coordinates, query and zoom
@@ -19,7 +21,7 @@ class GeoUriInputBehaviorTest : InputBehaviorTest {
         )
 
         // Coordinates in query with space; this is not a valid URI, but we support it anyway
-        testTextUri(
+        testText(
             WGS84Point(45.4786785, 9.2473799, source = Source.URI),
             "geo:0,0?q=45.4786785, 9.2473799",
         )

@@ -19,6 +19,7 @@ class LinksBehaviorTest : BehaviorTest {
     fun whenLinkIsInserted_allowsCopyingIt() = uiAutomator {
         // Launch application and close intro
         launchApplication()
+        waitForAppToBeVisible()
         closeIntro()
 
         // Go to link list
@@ -59,6 +60,7 @@ class LinksBehaviorTest : BehaviorTest {
     fun allowsUpdatingAndDeletingAndRestoringLink() = uiAutomator {
         // Launch application and close intro
         launchApplication()
+        waitForAppToBeVisible()
         closeIntro()
 
         // Go to link list
@@ -135,6 +137,7 @@ class LinksBehaviorTest : BehaviorTest {
     fun allowsTogglingLink() = uiAutomator {
         // Launch application and close intro
         launchApplication()
+        waitForAppToBeVisible()
         closeIntro()
 
         // Go to links list

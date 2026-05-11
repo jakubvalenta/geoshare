@@ -116,6 +116,25 @@ class DataParsedTest {
     }
 
     @Test
+    fun transition_whenPointsAreEmptyAndPrevResultIsEmptyAndPermissionIsNever_returnsConversionFailed() = runTest {
+        val source = "https://maps.apple.com/foo"
+        val points = persistentListOf<WGS84Point>()
+        val result = ParseResult(points)
+        val prevPoints = persistentListOf<WGS84Point>()
+        val prevResult = ParseResult(prevPoints)
+        val state = DataParsed(
+            stateContext, source, match = source, GoogleMapsUriInput, result, permission = Permission.NEVER, prevResult
+        )
+        assertEquals(
+            ConversionFailed(
+                resources.getString(R.string.conversion_failed_connection_permission_denied),
+                source,
+            ),
+            state.transition(),
+        )
+    }
+
+    @Test
     fun transition_whenPointsAreEmptyAndPrevResultHasCoordinates_returnsConversionSucceeded() = runTest {
         val source = "https://maps.apple.com/foo"
         val points = persistentListOf<WGS84Point>()
