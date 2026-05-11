@@ -65,15 +65,15 @@
     <string name="conversion_automation_open_app_failed">%1$s otomatik olarak açılamadı</string>
     <string name="conversion_automation_open_app_succeeded">%1$s otomatik olarak açıldı</string>
     <plurals name="conversion_automation_open_app_waiting">
-        <item quantity="one">%1$s %2$ds içinde otomatik olarak açılacak</item>
-        <item quantity="other">%1$s %2$ds içinde otomatik olarak açılacak</item>
+        <item quantity="one">%1$s %2$ds\'de otomatik olarak açılıyor</item>
+        <item quantity="other">%1$s %2$ds\'de otomatik olarak açılıyor</item>
     </plurals>
     <string name="conversion_automation_share_failed">Bağlantı otomatik olarak paylaşılamadı</string>
     <string name="conversion_automation_share_succeeded">Bağlantı otomatik olarak paylaşıldı</string>
     <string name="intro_settings_activity_not_found">Ayarlar açılamadı</string>
     <plurals name="conversion_automation_share_waiting">
-        <item quantity="one">Bağlantı %1$ds’de otomatik olarak paylaşılıyor</item>
-        <item quantity="other">Bağlantı %1$ds’de otomatik olarak paylaşılıyor</item>
+        <item quantity="one">Bağlantı otomatik olarak %1$ds\'de paylaşılıyor</item>
+        <item quantity="other">Bağlantı otomatik olarak %1$ds\'de paylaşılıyor</item>
     </plurals>
     <string name="conversion_error_title">Hata</string>
     <string name="conversion_error_report">Sorun bildir</string>
@@ -250,8 +250,8 @@
     <string name="links_update">Web haritasını düzenle</string>
     <string name="network_exception_too_many_requests">çok fazla istek</string>
     <plurals name="user_preferences_apps_visible_count">
-        <item quantity="one">%2$d uygulamadan %1$d’si görünür</item>
-        <item quantity="other">%2$d uygulamadan %1$d’si görünür</item>
+        <item quantity="one">%2$d uygulamadan %1$d’i görünür</item>
+        <item quantity="other">%2$d uygulamadan %1$d’i görünür</item>
     </plurals>
     <string name="intro_how_to_share_google_maps_screenshot_place">Bırakılan işaretçi</string>
     <string name="about_text"><![CDATA[<p>%1$s, ücretsiz ve açık kaynaklı bir uygulamadır <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> veya daha sonraki lisans altında dağıtılmaktadır.</p><br><p>Kodu <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>’ta bulabilirsiniz, ayrıca <a href="https://github.com/jakubvalenta/geoshare/issues">sorun bildirebilirsiniz</a>.</p><br><p>Görüşleriniz bizim için değerlidir. Bana <a href="mailto:%2$s">%2$s</a>’den ulaşabilirsiniz.</p>]]></string>
@@ -263,4 +263,8 @@
     <string name="srs_description_greater_china_and_taiwan">Büyük Çin ve Tayvan</string>
     <string name="converter_cartes_ign_name">Cartes IGN</string>
     <string name="converter_plus_code_name">Plus Codes</string>
+    <string name="output_save_to_contact">Rehbere kaydet</string>
+    <string name="output_send">Noktayı gönder</string>
+    <string name="output_send_via">Noktayı %1$s ile gönder</string>
+    <string name="conversion_failed_reason_exception">bilinmeyen istisna</string>
 </resources>
