@@ -481,7 +481,7 @@ class ConversionBehaviorTest : BehaviorTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun opensTomTom() = uiAutomator {
+    fun launchesNavigationInTomTom() = uiAutomator {
         runBlocking {
             assumeAppInstalled(PackageNames.TOMTOM)
             assumeDomainResolvable("tomtom.com")
@@ -489,17 +489,17 @@ class ConversionBehaviorTest : BehaviorTest {
             // Share a geo: URI with the app
             shareUri("geo:52.47254,13.4345")
 
-            // Tap the TomTom icon
+            // Launch navigation in TomTom
             onMainScrollablePane()
                 // Scroll by percents, because it's more reliable than scrolling to the app icon
                 .scroll(Direction.DOWN, 2f)
-            onElement { viewIdResourceName == "geoShareApp_${PackageNames.TOMTOM}" }.click()
+            launchNavigationInApp(PackageNames.TOMTOM)
 
             // Dismiss the location rationale dialog
             onElement(20_000L) { viewIdResourceName == "geoShareLocationRationaleDialog" }.dismissDialog()
 
-            // Tap the TomTom icon again
-            onElement { viewIdResourceName == "geoShareApp_${PackageNames.TOMTOM}" }.click()
+            // Launch navigation in TomTom again
+            launchNavigationInApp(PackageNames.TOMTOM)
 
             // Confirm location rationale
             onElement(20_000L) { viewIdResourceName == "geoShareLocationRationaleDialog" }.confirmDialog()
@@ -507,8 +507,8 @@ class ConversionBehaviorTest : BehaviorTest {
             // Deny location permission
             denySystemPermission()
 
-            // Tap the TomTom icon again
-            onElement { viewIdResourceName == "geoShareApp_${PackageNames.TOMTOM}" }.click()
+            // Launch navigation in TomTom again
+            launchNavigationInApp(PackageNames.TOMTOM)
 
             // Confirm location rationale
             onElement(20_000L) { viewIdResourceName == "geoShareLocationRationaleDialog" }.confirmDialog()
@@ -623,5 +623,15 @@ class ConversionBehaviorTest : BehaviorTest {
                 @Suppress("SpellCheckingInspection") "Ce lien n’est pas pris en charge sans connexion au service de cartographie",
             )
         }
+    }
+
+    private fun UiAutomatorTestScope.launchNavigationInApp(packageName: String) {
+        onElement { viewIdResourceName == "geoShareApp_$packageName" }.longClick()
+        onElement {
+            viewIdResourceName == "geoShareAppOutput" && textAsString() in setOf(
+                "Navigate",
+                @Suppress("SpellCheckingInspection") "Naviguer"
+            )
+        }.click()
     }
 }
