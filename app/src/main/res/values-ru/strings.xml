@@ -279,4 +279,10 @@
     <string name="srs_description_greater_china_and_taiwan">Большой Китай и Тайвань</string>
     <string name="converter_cartes_ign_name">Cartes IGN</string>
     <string name="converter_plus_code_name">Plus Codes</string>
+    <string name="output_send_via">Отправить точку через %1$s</string>
+    <string name="output_save_to_contact_failed">Не удалось сохранить точку в контакт</string>
+    <string name="output_save_to_contact">Сохранить точку в контакт</string>
+    <string name="output_save_to_contact_automation_failed">Не удалось автоматически сохранить точку в контакт</string>
+    <string name="output_send">Отправить точку</string>
+    <string name="conversion_failed_reason_exception">неизвестное исключение</string>
 </resources>
