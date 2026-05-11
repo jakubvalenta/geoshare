@@ -71,7 +71,7 @@ class ConversionViewModel @Inject constructor(
         userPreferencesRepository = userPreferencesRepository,
         billing = billing,
     ) { newState ->
-        Log.d(TAG, "Current state is ${newState::class.simpleName}")
+        Log.d(TAG, "Current state is $newState")
         _currentState.value = newState
     }
 
@@ -206,7 +206,7 @@ class ConversionViewModel @Inject constructor(
         start()
     }
 
-    companion object {
-        const val TAG = "ConversionViewModel"
+    private companion object {
+        private const val TAG = "ConversionViewModel"
     }
 }

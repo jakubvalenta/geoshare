@@ -11,6 +11,7 @@ import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.Permission
+import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInput
@@ -18,6 +19,8 @@ import page.ooooo.geoshare.lib.inputs.GoogleMapsUriInput
 import page.ooooo.geoshare.lib.inputs.ParseResult
 
 class InputFoundTest {
+    private val log = FakeLog
+
     @Test
     fun transition_whenPermissionIsAlways_returnsPermissionGrantedAndPassesPermissionParam() = runTest {
         val source = "https://maps.app.goo.gl/foo"
@@ -28,6 +31,7 @@ class InputFoundTest {
             on { getValue(eq(ConnectionPermissionPreference)) } doThrow NotImplementedError()
         }
         val stateContext: ConversionStateContext = mock {
+            on { this@on.log } doReturn log
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = InputFound(stateContext, source, match = source, input, Permission.ALWAYS, prevResult)
@@ -47,6 +51,7 @@ class InputFoundTest {
             on { getValue(eq(ConnectionPermissionPreference)) } doThrow NotImplementedError()
         }
         val stateContext: ConversionStateContext = mock {
+            on { this@on.log } doReturn log
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = InputFound(stateContext, source, match = source, input, Permission.ASK, prevResult)
@@ -66,6 +71,7 @@ class InputFoundTest {
             on { getValue(eq(ConnectionPermissionPreference)) } doThrow NotImplementedError()
         }
         val stateContext: ConversionStateContext = mock {
+            on { this@on.log } doReturn log
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = InputFound(stateContext, source, match = source, input, Permission.NEVER, prevResult)
@@ -88,6 +94,7 @@ class InputFoundTest {
                 on { getValue(eq(ConnectionPermissionPreference)) } doReturn Permission.ALWAYS
             }
             val stateContext: ConversionStateContext = mock {
+                on { this@on.log } doReturn log
                 on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
             }
             val state = InputFound(stateContext, source, match = source, input, permission = null, prevResult)
@@ -107,6 +114,7 @@ class InputFoundTest {
             on { getValue(eq(ConnectionPermissionPreference)) } doReturn Permission.ASK
         }
         val stateContext: ConversionStateContext = mock {
+            on { this@on.log } doReturn log
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = InputFound(stateContext, source, match = source, input, permission = null, prevResult)
@@ -126,6 +134,7 @@ class InputFoundTest {
             on { getValue(eq(ConnectionPermissionPreference)) } doReturn Permission.NEVER
         }
         val stateContext: ConversionStateContext = mock {
+            on { this@on.log } doReturn log
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = InputFound(stateContext, source, match = source, input, permission = null, prevResult)
@@ -143,7 +152,9 @@ class InputFoundTest {
         val input = GoogleMapsUriInput
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val prevResult = ParseResult(prevPoints)
-        val stateContext: ConversionStateContext = mock()
+        val stateContext: ConversionStateContext = mock {
+            on { this@on.log } doReturn log
+        }
         val state = InputFound(stateContext, source, match = source, input, Permission.NEVER, prevResult)
         assertEquals(
             PermissionGranted(stateContext, source, match = source, input, Permission.NEVER, prevResult),
