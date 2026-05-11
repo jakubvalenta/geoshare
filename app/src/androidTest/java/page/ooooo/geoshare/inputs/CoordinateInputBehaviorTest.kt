@@ -11,7 +11,6 @@ class CoordinateInputBehaviorTest : InputBehaviorTest {
         // Launch app and close intro
         launchApplication()
         waitForAppToBeVisible()
-        waitForAppToBeVisible()
         closeIntro()
 
         // Decimal

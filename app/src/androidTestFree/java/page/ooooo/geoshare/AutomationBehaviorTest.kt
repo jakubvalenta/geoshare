@@ -88,8 +88,9 @@ class AutomationBehaviorTest : BehaviorTest {
         launchApplication()
         waitForAppToBeVisible()
 
-        // Shows automation preferences button
-        onElement { viewIdResourceName == "geoShareResultAutomationButton" }
+        // Shows automation screen instead of result screen, because the app finished and the automation screen is the
+        // one we had last opened when we were configuring automation
+        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
     }
 
     @Test

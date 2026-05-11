@@ -12,7 +12,6 @@ class WazeInputBehaviorTest : InputBehaviorTest {
         // Launch app and close intro
         launchApplication()
         waitForAppToBeVisible()
-        waitForAppToBeVisible()
         closeIntro()
 
         // Coordinates

@@ -213,12 +213,6 @@ fun MainScreen(
     LaunchedEffect(currentState) {
         currentState.let { currentState ->
             when (currentState) {
-                // All actions
-
-                is ActionFinished if currentState.actionResult == ActionResult.SucceededAndFinish -> {
-                    onFinish()
-                }
-
                 // Basic action
 
                 is BasicActionReady -> {
@@ -228,6 +222,9 @@ fun MainScreen(
                         resources = resources,
                     )
                     val actionResult = currentState.action.execute(actionContext)
+                    if (actionResult == ActionResult.SucceededAndFinish) {
+                        onFinish()
+                    }
                     conversionViewModel.finishBasicAction(actionResult)
                 }
 
@@ -254,6 +251,9 @@ fun MainScreen(
                         resources = resources,
                     )
                     val actionResult = currentState.action.execute(currentState.uri, actionContext)
+                    if (actionResult == ActionResult.SucceededAndFinish) {
+                        onFinish()
+                    }
                     conversionViewModel.finishFileAction(actionResult)
                 }
 
@@ -293,6 +293,9 @@ fun MainScreen(
                         resources = resources,
                     )
                     val actionResult = currentState.action.execute(currentState.location, actionContext)
+                    if (actionResult == ActionResult.SucceededAndFinish) {
+                        onFinish()
+                    }
                     conversionViewModel.finishLocationAction(actionResult)
                 }
             }

@@ -11,7 +11,6 @@ class GeoUriInputBehaviorTest : InputBehaviorTest {
         // Launch app and close intro
         launchApplication()
         waitForAppToBeVisible()
-        waitForAppToBeVisible()
         closeIntro()
 
         // Coordinates, query and zoom
