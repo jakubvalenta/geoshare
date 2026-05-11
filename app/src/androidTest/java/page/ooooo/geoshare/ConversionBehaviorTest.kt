@@ -625,7 +625,7 @@ class ConversionBehaviorTest : BehaviorTest {
         }
     }
 
-    private fun UiAutomatorTestScope.launchNavigationInApp(packageName: String) {
+    private fun UiAutomatorTestScope.launchNavigationInApp(@Suppress("SameParameterValue") packageName: String) {
         onElement { viewIdResourceName == "geoShareApp_$packageName" }.longClick()
         onElement {
             viewIdResourceName == "geoShareAppOutput" && textAsString() in setOf(
