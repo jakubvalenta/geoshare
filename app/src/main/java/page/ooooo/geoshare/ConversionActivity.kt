@@ -27,7 +27,7 @@ class ConversionActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AppTheme {
-                MainNavigation(billingViewModel, conversionViewModel, introEnabled = false)
+                MainNavigation(billingViewModel, conversionViewModel, introEnabled = false, onFinish = { finish() })
             }
         }
     }

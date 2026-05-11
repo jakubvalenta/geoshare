@@ -30,7 +30,7 @@ class SavePointsGpxOutput @Inject constructor(
     override suspend fun execute(uri: Uri, value: Points, actionContext: ActionContext) = withContext(Dispatchers.IO) {
         AndroidTools.openFileUri(actionContext.context, uri) {
             GpxFormatter.writeGpxPoints(coordinateConverter.toWGS84(value), this)
-        }
+        }.let { success -> if (success) ActionResult.Succeeded else ActionResult.Failed }
     }
 
     @Composable

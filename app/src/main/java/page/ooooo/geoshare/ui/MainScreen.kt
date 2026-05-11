@@ -104,8 +104,6 @@ import page.ooooo.geoshare.lib.conversion.ConversionStateContext
 import page.ooooo.geoshare.lib.conversion.ConversionSucceeded
 import page.ooooo.geoshare.lib.conversion.FileActionReady
 import page.ooooo.geoshare.lib.conversion.FileUriRequested
-import page.ooooo.geoshare.lib.conversion.PermissionGrantedBasicInput
-import page.ooooo.geoshare.lib.conversion.PermissionGrantedWebViewInput
 import page.ooooo.geoshare.lib.conversion.Initial
 import page.ooooo.geoshare.lib.conversion.LoadingIndicator
 import page.ooooo.geoshare.lib.conversion.LocationActionReady
@@ -113,6 +111,8 @@ import page.ooooo.geoshare.lib.conversion.LocationPermissionReceived
 import page.ooooo.geoshare.lib.conversion.LocationRationaleConfirmed
 import page.ooooo.geoshare.lib.conversion.LocationRationaleRequested
 import page.ooooo.geoshare.lib.conversion.LocationRationaleShown
+import page.ooooo.geoshare.lib.conversion.PermissionGrantedBasicInput
+import page.ooooo.geoshare.lib.conversion.PermissionGrantedWebViewInput
 import page.ooooo.geoshare.lib.conversion.PermissionRequested
 import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.lib.extensions.truncateMiddle
@@ -128,8 +128,8 @@ import page.ooooo.geoshare.lib.network.ConnectTimeoutNetworkException
 import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.ActionContext
+import page.ooooo.geoshare.lib.outputs.ActionResult
 import page.ooooo.geoshare.lib.outputs.LocationAction
-import page.ooooo.geoshare.lib.outputs.NoopAction
 import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
@@ -157,6 +157,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun MainScreen(
+    onFinish: () -> Unit,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
@@ -212,6 +213,12 @@ fun MainScreen(
     LaunchedEffect(currentState) {
         currentState.let { currentState ->
             when (currentState) {
+                // All actions
+
+                is ActionFinished if currentState.actionResult == ActionResult.SucceededAndFinish -> {
+                    onFinish()
+                }
+
                 // Basic action
 
                 is BasicActionReady -> {
@@ -220,8 +227,8 @@ fun MainScreen(
                         clipboard = clipboard,
                         resources = resources,
                     )
-                    val success = currentState.action.execute(actionContext)
-                    conversionViewModel.finishBasicAction(success)
+                    val actionResult = currentState.action.execute(actionContext)
+                    conversionViewModel.finishBasicAction(actionResult)
                 }
 
                 // File action
@@ -246,8 +253,8 @@ fun MainScreen(
                         clipboard = clipboard,
                         resources = resources,
                     )
-                    val success = currentState.action.execute(currentState.uri, actionContext)
-                    conversionViewModel.finishFileAction(success)
+                    val actionResult = currentState.action.execute(currentState.uri, actionContext)
+                    conversionViewModel.finishFileAction(actionResult)
                 }
 
                 // Location action
@@ -285,8 +292,8 @@ fun MainScreen(
                         clipboard = clipboard,
                         resources = resources,
                     )
-                    val success = currentState.action.execute(currentState.location, actionContext)
-                    conversionViewModel.finishLocationAction(success)
+                    val actionResult = currentState.action.execute(currentState.location, actionContext)
+                    conversionViewModel.finishLocationAction(actionResult)
                 }
             }
         }
@@ -1124,8 +1131,7 @@ private fun SucceededPreview() {
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.example),
                 ),
-                action = NoopAction,
-                isAutomation = false,
+                actionResult = ActionResult.Succeeded,
             ),
             allInputs = emptyList(),
             appDetails = emptyMap(),
@@ -1203,8 +1209,7 @@ private fun DarkSucceededPreview() {
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.example),
                 ),
-                action = NoopAction,
-                isAutomation = false,
+                actionResult = ActionResult.Succeeded,
             ),
             allInputs = emptyList(),
             appDetails = emptyMap(),
@@ -1282,8 +1287,7 @@ private fun SmallSucceededPreview() {
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.example),
                 ),
-                action = NoopAction,
-                isAutomation = false,
+                actionResult = ActionResult.Succeeded,
             ),
             allInputs = emptyList(),
             appDetails = emptyMap(),
@@ -1361,8 +1365,7 @@ private fun TabletSucceededPreview() {
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.example),
                 ),
-                action = NoopAction,
-                isAutomation = false,
+                actionResult = ActionResult.Succeeded,
             ),
             allInputs = emptyList(),
             appDetails = emptyMap(),
@@ -1440,8 +1443,7 @@ private fun DarkTabletSucceededPreview() {
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.example),
                 ),
-                action = NoopAction,
-                isAutomation = false,
+                actionResult = ActionResult.Succeeded,
             ),
             allInputs = emptyList(),
             appDetails = emptyMap(),
@@ -1505,6 +1507,7 @@ private fun AutomationPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
+        val output = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
         MainScreen(
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(
@@ -1516,8 +1519,8 @@ private fun AutomationPreview() {
                 ),
                 source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
-                action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
-                    .toAction(WGS84Point(source = Source.GENERATED)),
+                action = output.toAction(WGS84Point(source = Source.GENERATED)),
+                output = output,
                 isAutomation = true,
                 delay = 3.seconds,
             ),
@@ -1583,6 +1586,7 @@ private fun DarkAutomationPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
+        val output = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
         MainScreen(
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(
@@ -1594,8 +1598,8 @@ private fun DarkAutomationPreview() {
                 ),
                 source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
-                action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
-                    .toAction(WGS84Point(source = Source.GENERATED)),
+                action = output.toAction(WGS84Point(source = Source.GENERATED)),
+                output = output,
                 isAutomation = true,
                 delay = 3.seconds,
             ),
@@ -1661,6 +1665,7 @@ private fun TabletAutomationPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
+        val output = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
         MainScreen(
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(
@@ -1672,8 +1677,8 @@ private fun TabletAutomationPreview() {
                 ),
                 source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
-                action = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
-                    .toAction(WGS84Point(source = Source.GENERATED)),
+                action = output.toAction(WGS84Point(source = Source.GENERATED)),
+                output = output,
                 isAutomation = true,
                 delay = 3.seconds,
             ),

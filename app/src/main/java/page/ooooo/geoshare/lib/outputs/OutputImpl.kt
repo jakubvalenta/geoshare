@@ -25,7 +25,7 @@ sealed interface CopyPointOutput :
         getText(value, actionContext.uriQuote)?.let { text ->
             actionContext.androidTools.copyToClipboard(actionContext.clipboard, text)
             true
-        } ?: false
+        }.let { success -> if (success == true) ActionResult.Succeeded else ActionResult.Failed }
 
     override fun getDescription(value: Point, uriQuote: UriQuote) =
         getText(value, uriQuote)
@@ -49,10 +49,10 @@ sealed interface OpenPointOutput :
 
     fun getText(value: Point, uriQuote: UriQuote = DefaultUriQuote): String? = null
 
-    override suspend fun execute(value: Point, actionContext: ActionContext): Boolean =
+    override suspend fun execute(value: Point, actionContext: ActionContext) =
         getText(value, actionContext.uriQuote)?.let { uriString ->
             actionContext.androidTools.openApp(actionContext.context, packageName, uriString)
-        } ?: false
+        }.let { success -> if (success == true) ActionResult.SucceededAndFinish else ActionResult.Failed }
 
     override fun getIcon(appDetails: AppDetails) =
         appDetails[packageName]?.let { DrawableIconDescriptor(it.icon) }
@@ -104,7 +104,7 @@ sealed interface OpenPointsOutput :
             writePoints(value, this)
         }?.let { file ->
             actionContext.androidTools.openAppFile(actionContext.context, packageName, file)
-        } ?: false
+        }.let { success -> if (success == true) ActionResult.SucceededAndFinish else ActionResult.Failed }
 
     override fun getIcon(appDetails: AppDetails) =
         appDetails[packageName]?.let { DrawableIconDescriptor(it.icon) }
@@ -184,10 +184,10 @@ sealed interface SharePointOutput :
 
     fun getText(value: Point, uriQuote: UriQuote = DefaultUriQuote): String? = null
 
-    override suspend fun execute(value: Point, actionContext: ActionContext): Boolean =
+    override suspend fun execute(value: Point, actionContext: ActionContext) =
         getText(value, actionContext.uriQuote)?.let { uriString ->
             actionContext.androidTools.openChooser(actionContext.context, uriString)
-        } ?: false
+        }.let { success -> if (success == true) ActionResult.SucceededAndFinish else ActionResult.Failed }
 
     @Composable
     override fun errorText(appDetails: AppDetails) =
@@ -216,13 +216,11 @@ sealed interface SharePointsOutput :
     fun writePoints(value: Points, writer: Appendable)
 
     override suspend fun execute(value: Points, actionContext: ActionContext) =
-        writeFile(
-            actionContext.context.filesDir, "points", "${System.currentTimeMillis()}.gpx"
-        ) {
+        writeFile(actionContext.context.filesDir, "points", "${System.currentTimeMillis()}.gpx") {
             writePoints(value, this)
         }?.let { file ->
             actionContext.androidTools.openChooserFile(actionContext.context, file)
-        } ?: false
+        }.let { success -> if (success == true) ActionResult.SucceededAndFinish else ActionResult.Failed }
 
     override fun getMenuIcon(appDetails: AppDetails) =
         ResourceIconDescriptor(R.drawable.route_24px)

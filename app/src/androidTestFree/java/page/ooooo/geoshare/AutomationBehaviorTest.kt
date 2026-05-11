@@ -120,7 +120,7 @@ class AutomationBehaviorTest : BehaviorTest {
             onElement { viewIdResourceName == "geoShareResultSuccessAutomationCounter" }
 
             // Opens the messaging app
-            onElement { this.packageName == messagingAppPackageName }
+            onElement { packageName == messagingAppPackageName }
         }
     }
 

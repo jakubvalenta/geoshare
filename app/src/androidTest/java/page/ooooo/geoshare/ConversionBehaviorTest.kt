@@ -475,7 +475,7 @@ class ConversionBehaviorTest : BehaviorTest {
             onElement { viewIdResourceName == "geoShareApp_${messagingAppPackageName}" }.click()
 
             // Opens the messaging app
-            onElement { this.packageName == messagingAppPackageName }
+            onElement { packageName == messagingAppPackageName }
         }
     }
 

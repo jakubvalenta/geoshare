@@ -53,6 +53,8 @@ import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.CustomLinkFeature
 import page.ooooo.geoshare.lib.billing.Feature
+import page.ooooo.geoshare.lib.conversion.ActionAutomationFailed
+import page.ooooo.geoshare.lib.conversion.ActionAutomationSucceeded
 import page.ooooo.geoshare.lib.conversion.ActionFailed
 import page.ooooo.geoshare.lib.conversion.ActionFinished
 import page.ooooo.geoshare.lib.conversion.ActionSucceeded
@@ -65,10 +67,10 @@ import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.outputs.ActionResult
 import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
-import page.ooooo.geoshare.lib.outputs.Output
-import page.ooooo.geoshare.lib.outputs.SharePointsGpxOutput
+import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
@@ -91,11 +93,11 @@ fun ResultSuccessMessage(
     AnimatedMessage(
         state = currentState,
         isMessageShown = { state ->
-            state is ActionWaiting && state.action.output is Output.HasAutomationDelay ||
-                state is ActionSucceeded && !state.isAutomation && state.action.output is Output.HasSuccessText ||
-                state is ActionFailed && !state.isAutomation && state.action.output is Output.HasErrorText ||
-                state is ActionSucceeded && state.isAutomation && state.action.output is Output.HasAutomationSuccessText ||
-                state is ActionFailed && state.isAutomation && state.action.output is Output.HasAutomationErrorText ||
+            state is ActionWaiting ||
+                state is ActionSucceeded ||
+                state is ActionAutomationSucceeded ||
+                state is ActionFailed ||
+                state is ActionAutomationFailed ||
                 state is LocationFindingFailed ||
                 state is ConversionState.HasSmallLoadingIndicator
         },
@@ -106,76 +108,61 @@ fun ResultSuccessMessage(
         animationsEnabled = animationsEnabled,
     ) { targetState ->
         when (targetState) {
-            is ActionWaiting if targetState.action.output is Output.HasAutomationDelay ->
-                (targetState.action.output as? Output.HasAutomationDelay)?.let { output ->
-                    ResultMessageRow {
-                        LaunchedEffect(targetState.action) {
-                            counterSec = targetState.delay.toInt(DurationUnit.SECONDS)
-                            while (counterSec > 0) {
-                                delay(1.seconds)
-                                counterSec--
-                            }
-                        }
-                        ResultMessageText(
-                            output.automationWaitingText(counterSec, appDetails),
-                            Modifier.testTag("geoShareResultSuccessAutomationCounter"),
-                        )
-                        FilledIconButton(
-                            onCancel,
-                            colors = IconButtonDefaults.filledIconButtonColors(
-                                containerColor = MaterialTheme.colorScheme.tertiary,
-                                contentColor = MaterialTheme.colorScheme.onTertiary,
-                            ),
-                        ) {
-                            Icon(
-                                Icons.Default.Close,
-                                stringResource(R.string.conversion_loading_indicator_cancel),
-                            )
-                        }
+            is ActionWaiting -> ResultMessageRow {
+                LaunchedEffect(targetState.action) {
+                    counterSec = targetState.delay.toInt(DurationUnit.SECONDS)
+                    while (counterSec > 0) {
+                        delay(1.seconds)
+                        counterSec--
                     }
                 }
+                ResultMessageText(
+                    targetState.output.automationWaitingText(counterSec, appDetails),
+                    Modifier.testTag("geoShareResultSuccessAutomationCounter"),
+                )
+                FilledIconButton(
+                    onCancel,
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.tertiary,
+                        contentColor = MaterialTheme.colorScheme.onTertiary,
+                    ),
+                ) {
+                    Icon(
+                        Icons.Default.Close,
+                        stringResource(R.string.conversion_loading_indicator_cancel),
+                    )
+                }
+            }
 
-            is ActionSucceeded if !targetState.isAutomation && targetState.action.output is Output.HasSuccessText ->
-                (targetState.action.output as? Output.HasSuccessText)?.let { output ->
-                    ResultMessageRow {
-                        ResultMessageText(
-                            output.successText(appDetails),
-                            Modifier.testTag("geoShareResultSuccessMessage"),
-                        )
-                    }
-                }
+            is ActionSucceeded -> ResultMessageRow {
+                ResultMessageText(
+                    targetState.output.successText(appDetails),
+                    Modifier.testTag("geoShareResultSuccessMessage"),
+                )
+            }
 
-            is ActionFailed if !targetState.isAutomation && targetState.action.output is Output.HasErrorText ->
-                (targetState.action.output as? Output.HasErrorText)?.let { output ->
-                    ResultMessageRow {
-                        ResultMessageText(
-                            output.errorText(appDetails),
-                            containerColor = MaterialTheme.colorScheme.errorContainer,
-                            contentColor = MaterialTheme.colorScheme.onErrorContainer,
-                        )
-                    }
-                }
+            is ActionFailed -> ResultMessageRow {
+                ResultMessageText(
+                    targetState.output.errorText(appDetails),
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                )
+            }
 
-            is ActionSucceeded if targetState.isAutomation && targetState.action.output is Output.HasAutomationSuccessText ->
-                (targetState.action.output as? Output.HasAutomationSuccessText)?.let { output ->
-                    ResultMessageRow {
-                        ResultMessageText(
-                            output.automationSuccessText(appDetails),
-                            Modifier.testTag("geoShareResultSuccessMessage"),
-                        )
-                    }
-                }
+            is ActionAutomationSucceeded -> ResultMessageRow {
+                ResultMessageText(
+                    targetState.output.automationSuccessText(appDetails),
+                    Modifier.testTag("geoShareResultSuccessMessage"),
+                )
+            }
 
-            is ActionFailed if targetState.isAutomation && targetState.action.output is Output.HasAutomationErrorText ->
-                (targetState.action.output as? Output.HasAutomationErrorText)?.let { output ->
-                    ResultMessageRow {
-                        ResultMessageText(
-                            output.automationErrorText(appDetails),
-                            containerColor = MaterialTheme.colorScheme.errorContainer,
-                            contentColor = MaterialTheme.colorScheme.onErrorContainer,
-                        )
-                    }
-                }
+            is ActionAutomationFailed -> ResultMessageRow {
+                ResultMessageText(
+                    targetState.output.automationErrorText(appDetails),
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                )
+            }
 
             is LocationFindingFailed -> ResultMessageRow {
                 ResultMessageText(
@@ -287,16 +274,12 @@ private fun ActionFinishedPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionFinished(
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-                        .toAction(WGS84Point(NaivePoint.example)),
-                    isAutomation = true,
+                    actionResult = ActionResult.Succeeded,
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
@@ -325,16 +308,12 @@ private fun DarkActionFinishedPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionFinished(
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-                        .toAction(WGS84Point(NaivePoint.example)),
-                    isAutomation = true,
+                    actionResult = ActionResult.Succeeded,
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
@@ -364,16 +343,12 @@ private fun ActionFinishedFeatureNotAvailablePreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val geometries = Geometries(context)
-                val coordinateConverter = CoordinateConverter(geometries)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessMessage(
                     currentState = ActionFinished(
                         source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         points = persistentListOf(WGS84Point(NaivePoint.example)),
-                        action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-                            .toAction(WGS84Point(NaivePoint.example)),
-                        isAutomation = true,
+                        actionResult = ActionResult.Succeeded,
                     ),
                     appDetails = mapOf(
                         PackageNames.OSMAND_PLUS to AppDetail(
@@ -400,16 +375,12 @@ private fun DarkActionFinishedFeatureNotAvailablePreview() {
         Surface {
             Column {
                 val context = LocalContext.current
-                val geometries = Geometries(context)
-                val coordinateConverter = CoordinateConverter(geometries)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessMessage(
                     currentState = ActionFinished(
                         source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         points = persistentListOf(WGS84Point(NaivePoint.example)),
-                        action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-                            .toAction(WGS84Point(NaivePoint.example)),
-                        isAutomation = true,
+                        actionResult = ActionResult.Succeeded,
                     ),
                     appDetails = mapOf(
                         PackageNames.OSMAND_PLUS to AppDetail(
@@ -441,6 +412,7 @@ private fun ActionWaitingPreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
+            val output = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionWaiting(
@@ -453,8 +425,8 @@ private fun ActionWaitingPreview() {
                     ),
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-                        .toAction(WGS84Point(NaivePoint.example)),
+                    action = output.toAction(WGS84Point(NaivePoint.example)),
+                    output = output,
                     isAutomation = true,
                     delay = 3.seconds,
                 ),
@@ -491,6 +463,7 @@ private fun DarkActionWaitingPreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
+            val output = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionWaiting(
@@ -503,8 +476,8 @@ private fun DarkActionWaitingPreview() {
                     ),
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-                        .toAction(WGS84Point(NaivePoint.example)),
+                    action = output.toAction(WGS84Point(NaivePoint.example)),
+                    output = output,
                     isAutomation = true,
                     delay = 3.seconds,
                 ),
@@ -640,9 +613,8 @@ private fun SucceededPreview() {
                 currentState = ActionSucceeded(
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-                        .toAction(WGS84Point(NaivePoint.example)),
-                    isAutomation = true,
+                    output = SavePointsGpxOutput(coordinateConverter),
+                    actionResult = ActionResult.Succeeded,
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
@@ -678,85 +650,8 @@ private fun DarSucceededPreview() {
                 currentState = ActionSucceeded(
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-                        .toAction(WGS84Point(NaivePoint.example)),
-                    isAutomation = true,
-                ),
-                appDetails = mapOf(
-                    PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
-                    ),
-                ),
-                billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-                billingStatus = BillingStatus.Purchased(
-                    BillingProduct("test", BillingProduct.Type.DONATION),
-                    expired = false,
-                    refundable = true,
-                    token = "test_purchased",
-                ),
-                animationsEnabled = false,
-                onCancel = {},
-                onNavigateToUserPreferencesAutomationScreen = {},
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun SucceededNoMessagePreview() {
-    AppTheme {
-        Surface {
-            val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
-            @SuppressLint("LocalContextGetResourceValueCall")
-            ResultSuccessMessage(
-                currentState = ActionSucceeded(
-                    source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    action = SharePointsGpxOutput(coordinateConverter)
-                        .toAction(persistentListOf(WGS84Point(NaivePoint.example))),
-                    isAutomation = false,
-                ),
-                appDetails = mapOf(
-                    PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
-                    ),
-                ),
-                billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-                billingStatus = BillingStatus.Purchased(
-                    BillingProduct("test", BillingProduct.Type.DONATION),
-                    expired = false,
-                    refundable = true,
-                    token = "test_purchased",
-                ),
-                animationsEnabled = false,
-                onCancel = {},
-                onNavigateToUserPreferencesAutomationScreen = {},
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkSucceededNoMessagePreview() {
-    AppTheme {
-        Surface {
-            val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
-            @SuppressLint("LocalContextGetResourceValueCall")
-            ResultSuccessMessage(
-                currentState = ActionSucceeded(
-                    source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    action = SharePointsGpxOutput(coordinateConverter)
-                        .toAction(persistentListOf(WGS84Point(NaivePoint.example))),
-                    isAutomation = false,
+                    output = SavePointsGpxOutput(coordinateConverter),
+                    actionResult = ActionResult.Succeeded,
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
@@ -792,9 +687,8 @@ private fun FailedPreview() {
                 currentState = ActionFailed(
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-                        .toAction(WGS84Point(NaivePoint.example)),
-                    isAutomation = true,
+                    output = SavePointsGpxOutput(coordinateConverter),
+                    actionResult = ActionResult.Failed,
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
@@ -830,9 +724,8 @@ private fun DarkFailedPreview() {
                 currentState = ActionFailed(
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    action = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-                        .toAction(WGS84Point(NaivePoint.example)),
-                    isAutomation = true,
+                    output = SavePointsGpxOutput(coordinateConverter),
+                    actionResult = ActionResult.Failed,
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
