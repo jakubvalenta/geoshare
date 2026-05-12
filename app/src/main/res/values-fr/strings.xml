@@ -162,14 +162,14 @@
     <string name="donation_button">Faites un don sur Ko-fi</string>
     <string name="donation_description">Cette application vous fait-elle gagner du temps ?</string>
     <string name="conversion_succeeded_description_q_only">Le lien d’origine ne contient pas de coordonnées, seulement un nom de lieu. Lorsque vous ouvrez cet emplacement dans une autre application, celle-ci peut trouver un lieu différent de celui du lien d’origine.</string>
-    <string name="network_exception_connect_timeout">délai d’attente de connexion</string>
-    <string name="network_exception_eof">connexion fermée</string>
-    <string name="network_exception_request_timeout">délai d’attente de la requête</string>
-    <string name="network_exception_response_error">erreur de réponse %1$d</string>
-    <string name="network_exception_server_response_error">erreur de réponse du serveur %1$d</string>
-    <string name="network_exception_socket_timeout">délai d’attente de la prise</string>
-    <string name="network_exception_unknown">erreur inconnue</string>
-    <string name="network_exception_unresolved_address">adresse non résolue</string>
+    <string name="network_exception_connect_timeout">Délai d’attente de connexion</string>
+    <string name="network_exception_eof">Connexion fermée</string>
+    <string name="network_exception_request_timeout">Délai d’attente de la requête</string>
+    <string name="network_exception_response_error">Erreur de réponse %1$d</string>
+    <string name="network_exception_server_response_error">Erreur de réponse du serveur %1$d</string>
+    <string name="network_exception_socket_timeout">Délai d’attente de la prise</string>
+    <string name="network_exception_unknown">Erreur inconnue</string>
+    <string name="network_exception_unresolved_address">Adresse non résolue</string>
     <string name="converter_baidu_map_permission_title">Se connecter à Baidu Map ?</string>
     <string name="faq_how_headline">Comment ça marche</string>
     <string name="faq_how_text_1">%1$s convertit les liens de carte en liens geo: pouvant être ouverts par d’autres applications de cartographie. La création d’un lien geo: nécessite des coordonnées géographiques. %1$s les extrait de l’URL de la carte.</string>
@@ -260,7 +260,7 @@
     <string name="conversion_failed_reason_invalid_url">URL invalide</string>
     <string name="conversion_failed_reason_missing_header">En-tête HTTP manquant</string>
     <string name="conversion_failed_reason_no_points">Aucun point trouvé</string>
-    <string name="conversion_failed_reason_timeout">temps mort</string>
+    <string name="conversion_failed_reason_timeout">Temps mort</string>
     <string name="network_exception_too_many_requests">Trop de demandes</string>
     <string name="licenses">Licences</string>
     <string name="conversion_succeeded_check_experimental">La localisation peut être inexacte en raison d’une méthode d’extraction expérimentale.</string>
@@ -275,5 +275,5 @@
     <string name="output_save_to_contact_failed">Échec de l’enregistrement du point de contact</string>
     <string name="output_send">Point d’envoi</string>
     <string name="output_send_via">Envoyer le point via %1$s</string>
-    <string name="conversion_failed_reason_exception">exception inconnue</string>
+    <string name="conversion_failed_reason_exception">Exception inconnue</string>
 </resources>
