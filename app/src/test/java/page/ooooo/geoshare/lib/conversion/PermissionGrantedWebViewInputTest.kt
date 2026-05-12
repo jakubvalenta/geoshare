@@ -45,6 +45,10 @@ class PermissionGrantedWebViewInputTest {
     fun transition_whenSetDataIsCalled_returnsDataParsed() = runTest {
         val source = "https://maps.google.com/foo"
         val input = object : WebViewInput {
+            override val permissionTitleResId = R.string.converter_google_maps_permission_title
+            override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
+            override val unsafeExtractionJavascript = "undefined"
+
             override suspend fun parse(
                 data: String,
                 match: String,
@@ -55,9 +59,6 @@ class PermissionGrantedWebViewInputTest {
                 prevResult?.points ?: persistentListOf(),
                 nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
             )
-
-            override val permissionTitleResId = R.string.converter_google_maps_permission_title
-            override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
         }
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val prevResult = ParseResult(prevPoints)
@@ -95,6 +96,10 @@ class PermissionGrantedWebViewInputTest {
     fun transition_whenSetDataIsNotCalledWithinTimeout_returnsConversionFailed() = runTest {
         val source = "https://maps.google.com/foo"
         val input = object : WebViewInput {
+            override val permissionTitleResId = R.string.converter_google_maps_permission_title
+            override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
+            override val unsafeExtractionJavascript = "undefined"
+
             override suspend fun parse(
                 data: String,
                 match: String,
@@ -105,9 +110,6 @@ class PermissionGrantedWebViewInputTest {
                 prevResult?.points ?: persistentListOf(),
                 nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
             )
-
-            override val permissionTitleResId = R.string.converter_google_maps_permission_title
-            override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
         }
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val prevResult = ParseResult(prevPoints)
@@ -137,6 +139,10 @@ class PermissionGrantedWebViewInputTest {
     fun transition_whenInputParseThrowsCancellationException_returnsConversionFailed() = runTest {
         val source = "https://maps.google.com/foo"
         val input = object : WebViewInput {
+            override val permissionTitleResId = R.string.converter_google_maps_permission_title
+            override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
+            override val unsafeExtractionJavascript = "undefined"
+
             override suspend fun parse(
                 data: String,
                 match: String,
@@ -144,9 +150,6 @@ class PermissionGrantedWebViewInputTest {
                 uriQuote: UriQuote,
                 log: Log,
             ) = throw CancellationException()
-
-            override val permissionTitleResId = R.string.converter_google_maps_permission_title
-            override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
         }
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val prevResult = ParseResult(prevPoints)
@@ -176,6 +179,10 @@ class PermissionGrantedWebViewInputTest {
     fun transition_whenItIsCancelled_returnsConversionFailed() = runTest {
         val source = "https://maps.google.com/foo"
         val input = object : WebViewInput {
+            override val permissionTitleResId = R.string.converter_google_maps_permission_title
+            override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
+            override val unsafeExtractionJavascript = "undefined"
+
             override suspend fun parse(
                 data: String,
                 match: String,
@@ -183,9 +190,6 @@ class PermissionGrantedWebViewInputTest {
                 uriQuote: UriQuote,
                 log: Log,
             ) = ParseResult()
-
-            override val permissionTitleResId = R.string.converter_google_maps_permission_title
-            override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
         }
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val prevResult = ParseResult(prevPoints)

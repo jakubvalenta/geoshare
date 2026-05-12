@@ -170,6 +170,7 @@ interface BehaviorTest {
         assumeTrue("This test only works when DNS resolves the domain $domain", success)
     }
 
+    @Suppress("unused")
     suspend fun assumeHttpHeadIsSuccess(@Suppress("SameParameterValue") url: String) {
         val status = try {
             withContext(Dispatchers.IO) {

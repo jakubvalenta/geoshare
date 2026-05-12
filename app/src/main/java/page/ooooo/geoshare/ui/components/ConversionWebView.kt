@@ -44,13 +44,14 @@ private const val TAG = "ConversionWebView"
 @Composable
 fun ConversionWebView(
     unsafeUrl: String,
+    unsafeExtractionJavascript: String,
+    onExtractionSettle: (data: String) -> Unit,
     extendWebSettings: (settings: WebSettings) -> Unit,
-    onUrlChange: (urlString: String) -> Unit,
     shouldInterceptRequest: (requestUrlString: String) -> Boolean,
     // Set window size minus a common browser chrome size, so the numbers seem real, in case a web page checks
     sizePx: Size = Size(1080 - 2f, 1920f - 277f),
-    urlChangeCheckInterval: Duration = 1.seconds,
-    urlChangeDebounceTimeout: Duration = 3.seconds,
+    extractionInterval: Duration = 1.seconds,
+    settleTimeout: Duration = 3.seconds,
 ) {
     val context = LocalContext.current
     val density = LocalDensity.current
@@ -58,27 +59,36 @@ fun ConversionWebView(
 
     // As an extra layer of security, allow only specific URLs to be loaded in the WebView. These URLs should be more
     // strict than the patterns in Input (for example only HTTPS should be allowed) and they should not change often.
-    val googleHostPattern = """(?:www|maps)\.google(?:\.[a-z]{2,3})?\.[a-z]{2,3}"""
-    val baiduHostPattern = """map\.baidu\.com"""
-    val allowUrlPattern = Regex("""^https://(?:$googleHostPattern|$baiduHostPattern)[/?#]\S+$""")
+    val allowedUrlPatterns = listOf(
+        // language=RegExp
+        """^https://(?:www|maps)\.google(?:\.[a-z]{2,3})?\.[a-z]{2,3}[/?#]\S+$""",
+        // language=RegExp
+        """^https://map\.baidu\.com[/?#]\S+$""",
+        // language=RegExp
+        """^https://www\.example\.com[/?#]\S+$""",
+    )
     val safeUrl = remember(unsafeUrl) {
-        allowUrlPattern.matchEntire(unsafeUrl)?.value
+        allowedUrlPatterns.firstNotNullOfOrNull { pattern -> Regex(pattern).matchEntire(unsafeUrl)?.value }
     }
 
-    // Call URL change callback if the URL hasn't changed for a while, because:
-    // 1. First URL change is often not the final URL, and we don't want to start parsing an intermediate URL.
-    // 2. Quick URL changes cause ConversionState transition to crash, because each new transition cancels any running
-    //    transition.
-    val currentUrlStringFlow = remember(safeUrl) { MutableStateFlow<String?>(null) }
-    LaunchedEffect(currentUrlStringFlow) {
-        currentUrlStringFlow
+    // Store the extraction result. Then call the extraction settle callback. Call it only after the result hasn't
+    // changed in a while, because:
+    // 1. The first extraction often doesn't lead to the final result. For example when extracting the page URL, the
+    //    first URL is not the final one. It can take the page a few seconds to set the final page URL.
+    // 2. Quick calls to the settle callback would make a ConversionState transition crash, because each new transition
+    //    cancels any running transition.
+    val dataFlow = remember(safeUrl) { MutableStateFlow<String?>(null) }
+    LaunchedEffect(dataFlow) {
+        dataFlow
             .filterNotNull()
-            .onEach { Log.d(TAG, "URL is $it") }
+            .onEach { data ->
+                Log.d(TAG, "Extracted $data")
+            }
             .distinctUntilChanged()
-            .debounce(urlChangeDebounceTimeout)
-            .collect { urlString ->
-                Log.d(TAG, "URL hasn't changed in $urlChangeDebounceTimeout, calling callback")
-                onUrlChange(urlString)
+            .debounce(settleTimeout)
+            .collect { data ->
+                Log.i(TAG, "Extraction settled at $data after $settleTimeout")
+                onExtractionSettle(data)
             }
     }
 
@@ -114,9 +124,9 @@ fun ConversionWebView(
                 settings.allowContentAccess = false
                 settings.allowFileAccess = false
                 settings.javaScriptEnabled = true
+                // Notice that we don't set custom user agent, because it makes Google Maps serve an error page. An
+                // Input can set a user agent in extendWebSettings, if needed.
                 extendWebSettings(settings)
-
-                // Notice that we don't set custom user agent, because it makes Google Maps serve an error page
 
                 webChromeClient = object : WebChromeClient() {
                     override fun onConsoleMessage(cm: ConsoleMessage): Boolean =
@@ -130,8 +140,8 @@ fun ConversionWebView(
                     object {
                         @Suppress("unused")
                         @JavascriptInterface
-                        fun onUrlChange(urlString: String) {
-                            currentUrlStringFlow.value = urlString
+                        fun onExtract(data: String) {
+                            dataFlow.value = data
                         }
                     },
                     "Android",
@@ -142,9 +152,16 @@ fun ConversionWebView(
                         super.onPageFinished(view, url)
 
                         view?.evaluateJavascript(
-                            """window.setInterval(function () {
-                                Android.onUrlChange(window.location.href);
-                            }, ${urlChangeCheckInterval.inWholeMilliseconds});""".trimIndent(),
+                            // language=JavaScript
+                            """
+                                (() => {
+                                    const extract = $unsafeExtractionJavascript;
+                                    window.setInterval(
+                                        () => Android.onExtract(extract()),
+                                        ${extractionInterval.inWholeMilliseconds}
+                                    );
+                                })();
+                            """.trimIndent(),
                             null,
                         )
                     }
@@ -155,10 +172,10 @@ fun ConversionWebView(
                     ): WebResourceResponse? {
                         request?.url?.toString()?.let { requestUrlString ->
                             if (shouldInterceptRequest(requestUrlString)) {
-                                Log.d(TAG, "Blocked request to $requestUrlString")
+                                Log.d(TAG, "Blocked request $requestUrlString")
                                 return WebResourceResponse("text/plain", "utf-8", null)
                             }
-                            Log.d(TAG, "Allowed request to $requestUrlString")
+                            Log.d(TAG, "Allowed request $requestUrlString")
                         }
                         return super.shouldInterceptRequest(view, request)
                     }
