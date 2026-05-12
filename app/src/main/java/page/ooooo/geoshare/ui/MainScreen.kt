@@ -791,7 +791,8 @@ private fun MainBottomPane(currentState: State) {
             )
             ConversionWebView(
                 unsafeUrl = currentState.match,
-                onUrlChange = { currentState.setData(it) },
+                unsafeExtractionJavascript = currentState.input.unsafeExtractionJavascript,
+                onExtractionSettle = { currentState.setData(it) },
                 extendWebSettings = { currentState.input.extendWebSettings(it) },
                 shouldInterceptRequest = { currentState.input.shouldInterceptRequest(it) },
             )

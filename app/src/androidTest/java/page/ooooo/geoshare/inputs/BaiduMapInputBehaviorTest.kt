@@ -98,30 +98,28 @@ class BaiduMapInputBehaviorTest : InputBehaviorTest {
     fun baiduMapHtml() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("map.baidu.com")
-            assumeHttpHeadIsSuccess("https://maponline1.bdimg.com/tile/?qt=vtile&x=13490&y=6210&z=14&styles=pl&udt=20230101&scaler=1&p=1")
+            // TODO Remove the whole assumeHttpHeadIsSuccess function, because the HTTP HEAD check seems to always fail but the test works anyway
+            // assumeHttpHeadIsSuccess("https://maponline1.bdimg.com/tile/?qt=vtile&x=13490&y=6210&z=14&styles=pl&udt=20230101&scaler=1&p=1")
         }
 
         // Shared coordinates
         testUri(
-            BD09MCPoint(3619117.0, 13392243.0, 17.0, name = "地图上的点", source = Source.URI),
-            "https://j.map.baidu.com/64/lqEk", // Resolves to https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13392243,3619117,17z...
-            // On desktop, it resolves to https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13392211,3619117,17z...
+            BD09MCPoint(3619117.0, 13392211.0, 17.0, name = "地图上的点", source = Source.JAVASCRIPT),
+            "https://j.map.baidu.com/64/lqEk", // Resolves to https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13392211,3619117,17z...
             timeoutMs = NETWORK_TIMEOUT * 2,
         )
 
         // Shared POI
         testUri(
-            BD09MCPoint(3316047.58, 13502465.77, 19.0, name = "黄岩客运中心", source = Source.URI),
+            BD09MCPoint(3316047.58, 13502465.77, 19.0, name = "黄岩客运中心", source = Source.JAVASCRIPT),
             "https://j.map.baidu.com/44/lth", // Resolves to https://map.baidu.com/poi/%E9%BB%84%E5%B2%A9%E5%AE%A2%E8%BF%90%E4%B8%AD%E5%BF%83/@13502465.77,3316047.58,19z...
-            // On desktop, it also resolves to https://map.baidu.com/poi/%E9%BB%84%E5%B2%A9%E5%AE%A2%E8%BF%90%E4%B8%AD%E5%BF%83/@13502465.77,3316047.58,19z...
             timeoutMs = NETWORK_TIMEOUT * 2,
         )
 
         // Shared POI that requires CSS
         testUri(
-            BD09MCPoint(3750567.0, 13224572.0, 17.0, name = "地图上的点", source = Source.URI),
-            "https://j.map.baidu.com/a7/GXfM", // Resolves to https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13224572,3750567,17z...
-            // On desktop, it resolves to https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13224540,3750567,17z...
+            BD09MCPoint(3750567.0, 13224540.0, 17.0, name = "地图上的点", source = Source.JAVASCRIPT),
+            "https://j.map.baidu.com/a7/GXfM", // Resolves to https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13224540,3750567,17z...
             timeoutMs = NETWORK_TIMEOUT * 2,
         )
     }

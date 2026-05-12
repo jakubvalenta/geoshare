@@ -12,6 +12,11 @@ object GoogleMapsWebViewInput : WebViewInput {
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
+    // language=JavaScript
+    override val unsafeExtractionJavascript = """
+        () => window.location.href !== 'about:blank' ? window.location.href : undefined;
+    """.trimIndent()
+
     override suspend fun parse(
         data: String,
         match: String,

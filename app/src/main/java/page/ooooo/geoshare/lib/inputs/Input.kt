@@ -45,6 +45,8 @@ interface BasicInput<T> : Input<T> {
 }
 
 interface WebViewInput : Input<String>, Input.HasPermission {
+    val unsafeExtractionJavascript: String
+
     fun extendWebSettings(settings: WebSettings) {}
     fun shouldInterceptRequest(requestUrlString: String): Boolean = false
 }
