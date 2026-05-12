@@ -197,5 +197,18 @@ fun ConversionWebView(
             webView.loadUrl("about:blank")
             webView.clearHistory()
         },
+        onRelease = { webView ->
+            webView.stopLoading()
+
+            // Neutralize callbacks before any teardown
+            webView.webViewClient = WebViewClient()
+            webView.webChromeClient = null
+            webView.removeJavascriptInterface("Android")
+
+            webView.onPause()
+            webView.pauseTimers()
+            webView.removeAllViews()
+            webView.destroy()
+        },
     )
 }
