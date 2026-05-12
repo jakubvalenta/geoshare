@@ -22,20 +22,19 @@ object UrbiHtmlInput : BodyAsChannelInput {
         prevResult: ParseResult?,
         uriQuote: UriQuote,
         log: Log,
-    ) =
-        buildParseResult {
-            val pattern = Regex("""property="twitter:image" content="([^"]+)""")
+    ) = buildParseResult {
+        val pattern = Regex("""property="twitter:image" content="([^"]+)""")
 
-            // Notice that unlike in other Inputs, we don't copy any point names from pointsFromUri here
+        // Notice that unlike in other Inputs, we don't copy any point names from pointsFromUri here
 
-            while (true) {
-                val line = data.readLine() ?: break
-                pattern.find(line)?.groupOrNull()?.let { attr ->
-                    nextStep = NextStep(UrbiUriInput, attr.decodeBasicHtmlEntities())
-                    return@buildParseResult
-                }
+        while (true) {
+            val line = data.readLine() ?: break
+            pattern.find(line)?.groupOrNull()?.let { attr ->
+                nextStep = NextStep(UrbiUriInput, attr.decodeBasicHtmlEntities())
+                return@buildParseResult
             }
         }
+    }
 
     override fun toString() = "UrbiHtmlInput"
 }

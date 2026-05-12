@@ -24,29 +24,28 @@ object AppleMapsHtmlInput : BodyAsChannelInput {
         prevResult: ParseResult?,
         uriQuote: UriQuote,
         log: Log,
-    ) =
-        buildParseResult {
-            val latPattern = Regex("""<meta property="place:location:latitude" content="$LAT"""")
-            val lonPattern = Regex("""<meta property="place:location:longitude" content="$LON"""")
+    ) = buildParseResult {
+        val latPattern = Regex("""<meta property="place:location:latitude" content="$LAT"""")
+        val lonPattern = Regex("""<meta property="place:location:longitude" content="$LON"""")
 
-            var lat: Double? = null
-            var lon: Double? = null
-            val name = prevResult?.points?.lastOrNull()?.name
+        var lat: Double? = null
+        var lon: Double? = null
+        val name = prevResult?.points?.lastOrNull()?.name
 
-            while (true) {
-                val line = data.readLine() ?: break
-                if (lat == null) {
-                    latPattern.find(line)?.doubleGroupOrNull()?.let { lat = it }
-                }
-                if (lon == null) {
-                    lonPattern.find(line)?.doubleGroupOrNull()?.let { lon = it }
-                }
-                if (lat != null && lon != null) {
-                    points = persistentListOf(WGS84Point(lat, lon, name = name, source = Source.HTML))
-                    return@buildParseResult
-                }
+        while (true) {
+            val line = data.readLine() ?: break
+            if (lat == null) {
+                latPattern.find(line)?.doubleGroupOrNull()?.let { lat = it }
+            }
+            if (lon == null) {
+                lonPattern.find(line)?.doubleGroupOrNull()?.let { lon = it }
+            }
+            if (lat != null && lon != null) {
+                points = persistentListOf(WGS84Point(lat, lon, name = name, source = Source.HTML))
+                return@buildParseResult
             }
         }
+    }
 
     override fun toString() = "AppleMapsHtmlInput"
 }
