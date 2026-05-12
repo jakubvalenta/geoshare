@@ -1,17 +1,149 @@
 package page.ooooo.geoshare.lib.inputs
 
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import page.ooooo.geoshare.lib.FakeLog
+import page.ooooo.geoshare.lib.geo.BD09MCPoint
+import page.ooooo.geoshare.lib.geo.Source
 
 class BaiduMapWebViewInputTest : InputTest {
     private val input = BaiduMapWebViewInput
 
     @Test
-    fun parse_returnsNextStep() = runTest {
+    fun parse_whenDataIsValidJsonObject_returnsPoint() = runTest {
         assertEquals(
-            ParseResult(nextStep = NextStep(BaiduMapUriInput, "https://map.baidu.com/redirected")),
-            input.parse("https://map.baidu.com/redirected", "https://map.baidu.com/original"),
+            ParseResult(
+                persistentListOf(
+                    BD09MCPoint(
+                        3315902.2199999997, 13502918.375,
+                        3.14,
+                        name = "黄岩客运中心",
+                        source = Source.JAVASCRIPT,
+                    )
+                )
+            ),
+            input.parse(
+                // language=Json
+                """
+                    {
+                        "lat": 3315902.2199999997,
+                        "lon": 13502918.375,
+                        "z": 3.14,
+                        "name": "黄岩客运中心"
+                    }
+                """.trimIndent(),
+                "https://map.baidu.com/original",
+                log = FakeLog,
+            ),
         )
+        assertEquals(
+            ParseResult(
+                persistentListOf(
+                    BD09MCPoint(
+                        3315902.2199999997, 13502918.375,
+                        source = Source.JAVASCRIPT,
+                    )
+                )
+            ),
+            input.parse(
+                // language=Json
+                """
+                    {
+                        "lat": 3315902.2199999997,
+                        "lon": 13502918.375
+                    }
+                """.trimIndent(),
+                "https://map.baidu.com/original",
+                log = FakeLog,
+            ),
+        )
+        assertEquals(
+            ParseResult(
+                persistentListOf(
+                    BD09MCPoint(
+                        3315902.2199999997,
+                        source = Source.JAVASCRIPT,
+                    )
+                )
+            ),
+            input.parse(
+                // language=Json
+                """
+                    {
+                        "lat": 3315902.2199999997
+                    }
+                """.trimIndent(),
+                "https://map.baidu.com/original",
+                log = FakeLog,
+            ),
+        )
+        assertEquals(
+            ParseResult(
+                persistentListOf(
+                    BD09MCPoint(source = Source.JAVASCRIPT)
+                )
+            ),
+            input.parse(
+                // language=Json
+                "{}",
+                "https://map.baidu.com/original",
+                log = FakeLog,
+            ),
+        )
+    }
+
+    @Test
+    fun parse_whenDataIsValidJsonButHasUnexpectedPropertyType_returnsEmptyResult() = runTest {
+        for (data in listOf(
+            // language=Json
+            """{"lat":  "spam"}""",
+            // language=Json
+            """[]""",
+            // language=Json
+            """"spam"""",
+            // language=Json
+            "0",
+            // language=Json
+            "null",
+        )) {
+            assertEquals(
+                ParseResult(),
+                input.parse(data, "https://map.baidu.com/original", log = FakeLog),
+            )
+        }
+        assertEquals(
+            ParseResult(),
+            input.parse(
+                // language=Json
+                """{"lat":  "spam"}""",
+                "https://map.baidu.com/original",
+                log = FakeLog,
+            ),
+        )
+        assertEquals(
+            ParseResult(),
+            input.parse(
+                // language=Json
+                "[]",
+                "https://map.baidu.com/original",
+                log = FakeLog,
+            ),
+        )
+    }
+
+    @Test
+    fun parse_whenDataIsInvalidJson_returnsEmptyResult() = runTest {
+        for (data in listOf(
+            "{",
+            """{"trailingComma": 0,}""",
+            "",
+        )) {
+            assertEquals(
+                ParseResult(),
+                input.parse(data, "https://map.baidu.com/original", log = FakeLog),
+            )
+        }
     }
 }

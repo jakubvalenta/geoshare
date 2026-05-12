@@ -31,7 +31,7 @@ class YandexMapsHtmlInputTest : InputTest {
     }
 
     @Test
-    fun parse_doesNotContainCoordinates_returnsNull() = runTest {
+    fun parse_doesNotContainCoordinates_returnsEmptyResult() = runTest {
         assertEquals(ParseResult(), input.parse("""<html></html>"""))
     }
 }

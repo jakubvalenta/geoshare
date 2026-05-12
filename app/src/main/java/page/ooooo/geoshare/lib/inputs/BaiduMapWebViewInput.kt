@@ -51,8 +51,11 @@ object BaiduMapWebViewInput : WebViewInput {
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {
+        val json = Json {
+            explicitNulls = false
+        }
         try {
-            Json.decodeFromString<ExtractedPoint>(data)
+            json.decodeFromString<ExtractedPoint>(data)
         } catch (tr: IllegalArgumentException) {
             log.e(TAG, "Deserialization error", tr)
             null
