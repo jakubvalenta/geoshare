@@ -293,4 +293,10 @@
     <string name="srs_description_greater_china_and_taiwan">الصين الكبرى وتايوان</string>
     <string name="converter_cartes_ign_name">Cartes IGN</string>
     <string name="converter_plus_code_name">رموز بلس</string>
+    <string name="output_save_to_contact">احفظ إلى جهة الاتصال</string>
+    <string name="output_save_to_contact_automation_failed">فشل حفظ نقطة الاتصال تلقائيًا</string>
+    <string name="output_save_to_contact_failed">فشل حفظ النقطة في جهة الاتصال</string>
+    <string name="output_send">أرسل نقطة</string>
+    <string name="output_send_via">أرسل نقطة عبر %1$s</string>
+    <string name="conversion_failed_reason_exception">استثناء غير معروف</string>
 </resources>
