@@ -254,8 +254,8 @@
     <string name="conversion_succeeded_check_experimental">由于采用了实验性的提取方法，位置可能不准确。</string>
     <string name="conversion_succeeded_check_map_center">位置可能是地图中心点，而非精准标记点。</string>
     <string name="conversion_succeeded_check_srs">由于坐标系转换，位置可能不准确。</string>
-    <string name="srs_description_mainland_china">中国内地（不含港澳台）</string>
-    <string name="srs_description_greater_china_and_taiwan">中国全境（含港澳台）</string>
+    <string name="srs_description_mainland_china">中国内地</string>
+    <string name="srs_description_greater_china_and_taiwan">中国全境</string>
     <string name="converter_cartes_ign_name">Cartes IGN</string>
     <string name="converter_plus_code_name">Plus Codes</string>
     <string name="output_save_to_contact">保存到联系人</string>
