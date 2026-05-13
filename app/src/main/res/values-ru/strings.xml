@@ -195,14 +195,14 @@
         <item quantity="other">%1$d секунд</item>
     </plurals>
     <string name="reset">сброс</string>
-    <string name="network_exception_unknown">неизвестная ошибка</string>
-    <string name="network_exception_connect_timeout">время ожидания подключения</string>
-    <string name="network_exception_eof">подключение закрыто</string>
-    <string name="network_exception_request_timeout">время ожидания запроса</string>
-    <string name="network_exception_response_error">ошибка в ответе %1$d</string>
-    <string name="network_exception_server_response_error">ошибка в ответе сервера %1$d</string>
-    <string name="network_exception_unresolved_address">не получен адрес</string>
-    <string name="network_exception_socket_timeout">время ожидания сокета</string>
+    <string name="network_exception_unknown">неизвестной ошибки</string>
+    <string name="network_exception_connect_timeout">истечения времени ожидания подключения</string>
+    <string name="network_exception_eof">закрытия подключения</string>
+    <string name="network_exception_request_timeout">истечения времени ожидания запроса</string>
+    <string name="network_exception_response_error">ошибки в ответе %1$d</string>
+    <string name="network_exception_server_response_error">ошибки в ответе сервера %1$d</string>
+    <string name="network_exception_unresolved_address">неполучения адреса</string>
+    <string name="network_exception_socket_timeout">истечения времени ожидания сокета</string>
     <string name="converter_baidu_map_loading_indicator_title">Подключение к Baidu Map…</string>
     <string name="conversion_succeeded_save_gpx_succeeded">Файл GPX сохранён</string>
     <string name="conversion_succeeded_apps_links_configure">Настройка web-карт</string>
@@ -266,16 +266,16 @@
     <string name="user_preferences_connection_option_never">Запретить</string>
     <string name="billing_status_expired">Срок действия вашей подписки скоро истечёт</string>
     <string name="billing_status_pending">Ваш платёж ожидает подтверждения</string>
-    <string name="conversion_failed_reason_invalid_url">неправильный URL</string>
-    <string name="conversion_failed_reason_missing_header">отсутствует HTTP-заголовок</string>
-    <string name="conversion_failed_reason_no_points">точки не найдены</string>
-    <string name="conversion_failed_reason_timeout">истекло время ожидания</string>
-    <string name="network_exception_too_many_requests">слишком много запросов</string>
+    <string name="conversion_failed_reason_invalid_url">Неправильный URL</string>
+    <string name="conversion_failed_reason_missing_header">Отсутствует HTTP-заголовок</string>
+    <string name="conversion_failed_reason_no_points">Точки не найдены</string>
+    <string name="conversion_failed_reason_timeout">Истекло время ожидания</string>
+    <string name="network_exception_too_many_requests">Слишком много запросов</string>
     <string name="licenses">Лицензии</string>
     <string name="conversion_succeeded_check_experimental">Местоположение может быть неточным из-за экспериментального метода извлечения.</string>
     <string name="conversion_succeeded_check_map_center">Местоположение может быть центром карты, а не маркером.</string>
     <string name="conversion_succeeded_check_srs">Местоположение может быть неточным из-за преобразования системы координат.</string>
-    <string name="srs_description_mainland_china">материковый Китай</string>
+    <string name="srs_description_mainland_china">Материковый Китай</string>
     <string name="srs_description_greater_china_and_taiwan">Большой Китай и Тайвань</string>
     <string name="converter_cartes_ign_name">Cartes IGN</string>
     <string name="converter_plus_code_name">Plus Codes</string>
@@ -284,5 +284,5 @@
     <string name="output_save_to_contact">Сохранить точку в контакт</string>
     <string name="output_save_to_contact_automation_failed">Не удалось автоматически сохранить точку в контакт</string>
     <string name="output_send">Отправить точку</string>
-    <string name="conversion_failed_reason_exception">неизвестное исключение</string>
+    <string name="conversion_failed_reason_exception">Неизвестное исключение</string>
 </resources>
