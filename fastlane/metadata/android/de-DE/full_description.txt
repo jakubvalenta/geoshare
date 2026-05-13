@@ -7,6 +7,7 @@ Teile einen Kartenlink mit GeoShare und die App wird ihn in einer anderen instal
 - 2GIS
 - Amap (AutoNavi)
 - Baidu Map (beta, ohne Kurzlinks)
+- Cartes IGN
 - CoMaps
 - HERE WeGo
 - Magic Earth
@@ -15,6 +16,7 @@ Teile einen Kartenlink mit GeoShare und die App wird ihn in einer anderen instal
 - OpenStreetMap
 - Organic Maps
 - OsmAnd
+- Plus Codes (nur globale)
 - Urbi
 - Waze
 - Yandex Maps
