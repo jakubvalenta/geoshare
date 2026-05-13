@@ -17,9 +17,6 @@ object GoogleMapsPlaceListWebViewInput : WebViewInput {
     @Serializable
     private data class ExtractedPoint(val lat: Double?, val lon: Double?)
 
-    @Serializable
-    private data class ExtractedPoints(val points: List<ExtractedPoint>)
-
     @StringRes
     override val permissionTitleResId = R.string.converter_google_maps_permission_title
 
@@ -79,13 +76,12 @@ object GoogleMapsPlaceListWebViewInput : WebViewInput {
             }
             const points = findPointsInAppInitState(window.APP_INITIALIZATION_STATE);
             if (points && points.length) {
-                return JSON.stringify({ points });
+                return JSON.stringify(points);
             }
             return undefined;
         }
     """.trimIndent()
 
-    // TODO Test
     override suspend fun parse(
         data: String,
         match: String,
@@ -97,12 +93,12 @@ object GoogleMapsPlaceListWebViewInput : WebViewInput {
             explicitNulls = false
         }
         try {
-            json.decodeFromString<ExtractedPoints>(data)
+            json.decodeFromString<List<ExtractedPoint>>(data)
         } catch (tr: IllegalArgumentException) {
             log.e(TAG, "Deserialization error", tr)
             null
-        }?.let { extractedPoints ->
-            points = extractedPoints.points.map { GCJ02MainlandChinaPoint(it.lat, it.lon, source = Source.JAVASCRIPT) }
+        }?.run {
+            points = map { GCJ02MainlandChinaPoint(it.lat, it.lon, source = Source.JAVASCRIPT) }
                 .toImmutableList()
         }
     }
