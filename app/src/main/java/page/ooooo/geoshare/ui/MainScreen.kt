@@ -77,6 +77,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.FakeLinkRepository
@@ -796,11 +797,13 @@ private fun MainBottomPane(currentState: State) {
                 extendWebSettings = { currentState.input.extendWebSettings(it) },
                 shouldInterceptRequest = { currentState.input.shouldInterceptRequest(it) },
             )
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surface)
-            )
+            if (!BuildConfig.DEBUG) {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surface)
+                )
+            }
         }
     }
 }

@@ -94,7 +94,7 @@ class ConversionBehaviorTest : BehaviorTest {
         assertConversionSucceeded(
             GCJ02Point(
                 52.4842015, 13.4167277,
-                name = @Suppress("SpellCheckingInspection") "Columbiadamm 160, 12049 Berlin",
+                name = @Suppress("SpellCheckingInspection") "Hasenheide Park",
                 source = Source.URI,
             )
         )
@@ -126,7 +126,7 @@ class ConversionBehaviorTest : BehaviorTest {
         assertConversionSucceeded(
             GCJ02Point(
                 52.4842015, 13.4167277,
-                name = @Suppress("SpellCheckingInspection") "Columbiadamm 160, 12049 Berlin",
+                name = @Suppress("SpellCheckingInspection") "Hasenheide Park",
                 source = Source.URI,
             )
         )
@@ -139,7 +139,7 @@ class ConversionBehaviorTest : BehaviorTest {
         assertConversionSucceeded(
             GCJ02Point(
                 44.4490541, 26.0888398,
-                name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București",
+                name = "RAI - Romantic & Intimate",
                 source = Source.URI,
             )
         )
@@ -458,7 +458,7 @@ class ConversionBehaviorTest : BehaviorTest {
         assertConversionSucceeded(
             GCJ02Point(
                 51.1982447, 6.4389493,
-                name = @Suppress("SpellCheckingInspection") "Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
+                name = @Suppress("SpellCheckingInspection") "Konditorei+Heinemann",
                 source = Source.URI,
             )
         )

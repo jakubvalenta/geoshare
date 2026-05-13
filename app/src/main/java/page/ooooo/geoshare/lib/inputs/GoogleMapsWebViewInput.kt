@@ -1,9 +1,11 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.webkit.WebSettings
 import androidx.annotation.StringRes
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.network.DefaultNetworkTools
 
 object GoogleMapsWebViewInput : WebViewInput {
 
@@ -26,6 +28,16 @@ object GoogleMapsWebViewInput : WebViewInput {
         log: Log,
     ) = buildParseResult {
         nextStep = NextStep(GoogleMapsUriInput, data)
+    }
+
+    /**
+     * Set custom user agent to prevent:
+     *
+     * - Directions getting stuck at intermediate URI with zero coordinates.
+     * - Place lists showing "No list found".
+     */
+    override fun extendWebSettings(settings: WebSettings) {
+        settings.userAgentString = DefaultNetworkTools.DESKTOP_USER_AGENT
     }
 
     override fun shouldInterceptRequest(requestUrlString: String) =

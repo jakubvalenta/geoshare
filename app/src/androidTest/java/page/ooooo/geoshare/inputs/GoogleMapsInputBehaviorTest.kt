@@ -146,7 +146,7 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
         testUri(
             GCJ02Point(
                 51.1982447, 6.4389493,
-                name = @Suppress("SpellCheckingInspection") "Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
+                name = @Suppress("SpellCheckingInspection") "Konditorei+Heinemann",
                 source = Source.URI,
             ),
             "https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8",
@@ -162,6 +162,17 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
         testUri(
             WGS84Point(43.7481, -79.6332, name = "2088 Albion Rd @43.7481,-79.6332", source = Source.HTML),
             @Suppress("SpellCheckingInspection") "https://maps.google.com/maps?f=d&daddr=2088%20Albion%20Rd+@43.7481,-79.6332&doflg=ptm&navigate=yes",
+        )
+
+        // Directions with geocode parameter, which can get stuck at intermediate URI with zero coordinates during web parsing
+        testUri(
+            WGS84Point(
+                40.6400537, 22.9589055,
+                z = 6.0,
+                name = @Suppress("SpellCheckingInspection") "Box+now+Ακροπόλεως+65,+Akropoleos+65,+Thessaloniki+546+34,+Greece",
+                source = Source.URI,
+            ),
+            "https://maps.google.com/maps?oe=utf-8&client=firefox-b&um=1&ie=UTF-8&fb=1&gl=fr&sa=X&geocode=KWmqxjsAOagUMaSMgMRdOas1&daddr=Akropoleos+65,+Thessaloniki+546+34,+Gr%C3%A8ce",
         )
     }
 
