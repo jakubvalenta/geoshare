@@ -458,7 +458,7 @@ class ConversionBehaviorTest : BehaviorTest {
         assertConversionSucceeded(
             GCJ02Point(
                 51.1982447, 6.4389493,
-                name = @Suppress("SpellCheckingInspection") "Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
+                name = @Suppress("SpellCheckingInspection") "Konditorei+Heinemann",
                 source = Source.URI,
             )
         )
