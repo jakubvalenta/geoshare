@@ -796,6 +796,11 @@ private fun MainBottomPane(currentState: State) {
                 extendWebSettings = { currentState.input.extendWebSettings(it) },
                 shouldInterceptRequest = { currentState.input.shouldInterceptRequest(it) },
             )
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.surface)
+            )
         }
     }
 }
@@ -1777,7 +1782,7 @@ private fun WebViewPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             source = "",
-            largeLoadingIndicator = null,
+            largeLoadingIndicator = currentState.getLoadingIndicator(),
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -1849,7 +1854,7 @@ private fun DarkWebViewPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             source = "",
-            largeLoadingIndicator = null,
+            largeLoadingIndicator = currentState.getLoadingIndicator(),
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -1921,7 +1926,7 @@ private fun TabletWebViewPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             source = "",
-            largeLoadingIndicator = null,
+            largeLoadingIndicator = currentState.getLoadingIndicator(),
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
