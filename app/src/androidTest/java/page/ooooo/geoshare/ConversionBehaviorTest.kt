@@ -449,7 +449,7 @@ class ConversionBehaviorTest : BehaviorTest {
         }
 
         // Share a Google Maps short link with the app
-        shareUri("https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8") // Fails in emulator API 36.1 but not API 35 for some reason
+        shareUri("https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8")
 
         // Grant connection permission
         onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()

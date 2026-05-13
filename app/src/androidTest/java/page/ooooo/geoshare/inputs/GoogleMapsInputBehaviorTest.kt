@@ -149,7 +149,7 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
                 name = @Suppress("SpellCheckingInspection") "Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
                 source = Source.URI,
             ),
-            "https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8", // Sometimes fails in emulator
+            "https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8",
         )
 
         // Place
@@ -182,8 +182,6 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
 
     @Test
     fun googleMapsPlaceList() = uiAutomator {
-        assumeTrue("This test currently fails, because Google changed their HTML", false)
-
         // Place list
         testUri(
             persistentListOf(

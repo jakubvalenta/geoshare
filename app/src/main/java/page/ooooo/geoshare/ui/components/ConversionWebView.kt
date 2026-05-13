@@ -157,7 +157,12 @@ fun ConversionWebView(
                                 (() => {
                                     const extract = $unsafeExtractionJavascript;
                                     window.setInterval(
-                                        () => Android.onExtract(extract()),
+                                        () => {
+                                            const data = extract();
+                                            if (data !== null && data !== undefined) {
+                                                Android.onExtract(data);
+                                            }
+                                        },
                                         ${extractionInterval.inWholeMilliseconds}
                                     );
                                 })();

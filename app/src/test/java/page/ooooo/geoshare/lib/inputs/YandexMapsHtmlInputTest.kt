@@ -24,7 +24,7 @@ class YandexMapsHtmlInputTest : InputTest {
             ),
             input.parse(
                 @Suppress("SpellCheckingInspection")
-                """<meta property="og:image" content="https://static-maps.yandex.ru/1.x/?api_key=xxx&amp;theme=light&amp;lang=en_US&amp;size=520%2C440&amp;l=map&amp;spn=0.012927%2C0.024085&amp;ll=37.563875%2C55.881952&amp;lg=0&amp;cr=0&amp;pt=37.566898%2C55.882227%2Cplacemark&amp;signature=xxx">
+                """<meta property="og:image" content="https://static-maps.yandex.ru/1.x/?api_key=XXX&amp;theme=light&amp;lang=en_US&amp;size=520%2C440&amp;l=map&amp;spn=0.012927%2C0.024085&amp;ll=37.563875%2C55.881952&amp;lg=0&amp;cr=0&amp;pt=37.566898%2C55.882227%2Cplacemark&amp;signature=XXX">
                 <h1 class="card-title-view__title" itemProp="name">Keramichesky Drive</h1>""".trimIndent()
             ),
         )

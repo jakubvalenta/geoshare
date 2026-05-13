@@ -1,24 +1,11 @@
 package page.ooooo.geoshare.lib.inputs
 
-import android.webkit.WebSettings
 import androidx.annotation.StringRes
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
-import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.network.DefaultNetworkTools
 
 object GoogleMapsWebViewInput : WebViewInput {
-
-    @Serializable
-    private data class ExtractedPoint(val lat: Double?, val lon: Double?)
-
-    @Serializable
-    private data class ExtractedData(val url: String?, val points: List<ExtractedPoint>?)
 
     @StringRes
     override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -26,67 +13,9 @@ object GoogleMapsWebViewInput : WebViewInput {
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
-    /**
-     * Parse APP_INITIALIZATION_STATE, which has this structure:
-     *
-     * ```
-     * [
-     *    { Uf: ..., Oa: ... },
-     *    { Uf: ... },
-     *    null,
-     *    { Uf: [
-     *        null,
-     *        null,
-     *        ...
-     *        "...[null,[null,null,"",null,"",[null,null,52.50918,13.40685],..."
-     *    ] },
-     *    ...
-     * ]
-     * ```
-     */
     // language=JavaScript
-    override val unsafeExtractionJavascript = $$"""
-        () => {
-            function findPointsInAppInitState(obj) {
-                const MAX_PRECISION = 17;
-                const LAT_NUM = `-?\\d{1,2}(?:\\.\\d{1,${MAX_PRECISION}})?`;
-                const LON_NUM = `-?\\d{1,3}(?:\\.\\d{1,${MAX_PRECISION}})?`;
-                const LAT = `[+ ]?(${LAT_NUM})`;
-                const LON = `[+ ]?(${LON_NUM})`;
-                const regexp = new RegExp(`\\[(?:null,null,|null,\\[)${LAT},${LON}]`, 'g');
-                if (Array.isArray(obj)) {
-                    for (const level1 of obj) {
-                        if (level1 !== null && typeof(level1) === 'object' && !Array.isArray(level1)) {
-                            for (const prop in level1) {
-                                if (Object.hasOwn(level1, prop)) {
-                                    const level2 = level1[prop];
-                                    if (Array.isArray(level2)) {
-                                        for (const level3 of level2) {
-                                            if (typeof level3 === 'string') {
-                                                const matches = [...level3.matchAll(regexp)];
-                                                if (matches.length) {
-                                                    return matches.map(m => ({ lat: m[1], lon: m[2] }));
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                return undefined;
-            }
-            const points = findPointsInAppInitState(window.APP_INITIALIZATION_STATE);
-            if (points && points.length) {
-                return JSON.stringify({ points });
-            }
-            const url = window.location.href !== 'about:blank' ? window.location.href : undefined;
-            if (url) {
-                return JSON.stringify({ url });
-            }
-            return undefined;
-        }
+    override val unsafeExtractionJavascript = """
+        () => window.location.href !== 'about:blank' ? window.location.href : undefined;
     """.trimIndent()
 
     override suspend fun parse(
@@ -96,27 +25,7 @@ object GoogleMapsWebViewInput : WebViewInput {
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {
-        val json = Json {
-            explicitNulls = false
-        }
-        try {
-            json.decodeFromString<ExtractedData>(data)
-        } catch (tr: IllegalArgumentException) {
-            log.e(TAG, "Deserialization error", tr)
-            null
-        }?.let { extractedData ->
-            if (extractedData.points != null) {
-                points = extractedData.points
-                    .map { GCJ02MainlandChinaPoint(it.lat, it.lon, source = Source.JAVASCRIPT) }
-                    .toImmutableList()
-            } else if (extractedData.url != null) {
-                nextStep = NextStep(GoogleMapsUriInput, extractedData.url)
-            }
-        }
-    }
-
-    override fun extendWebSettings(settings: WebSettings) {
-        settings.userAgentString = DefaultNetworkTools.DESKTOP_USER_AGENT
+        nextStep = NextStep(GoogleMapsUriInput, data)
     }
 
     override fun shouldInterceptRequest(requestUrlString: String) =
@@ -146,8 +55,5 @@ object GoogleMapsWebViewInput : WebViewInput {
             // Something that is requested too many times
             || requestUrlString.contains("/maps/res/CompactLegend-Roadmap-")
 
-    private const
-    val TAG = "GoogleMapsWebViewInput"
-
-    override fun toString() = TAG
+    override fun toString() = "GoogleMapsWebViewInput"
 }
