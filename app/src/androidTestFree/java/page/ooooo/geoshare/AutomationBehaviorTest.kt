@@ -96,9 +96,7 @@ class AutomationBehaviorTest : BehaviorTest {
     @Test
     fun opensMessagingApp() = uiAutomator {
         runBlocking {
-            // Test using Telegram fork, because it's available on F-Droid
-            val messagingAppPackageName = PackageNames.TELEGRAM_FORK
-
+            val messagingAppPackageName = PackageNames.CONVERSATIONS
             assumeAppInstalled(messagingAppPackageName)
 
             // Launch application and close intro

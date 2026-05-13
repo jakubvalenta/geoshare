@@ -11,6 +11,7 @@ object PackageNames {
     const val CARTES_IGN = "fr.ign.geoportail"
     const val COMAPS_FDROID = "app.comaps.fdroid"
     const val COMAPS_PREFIX = "app.comaps."
+    const val CONVERSATIONS = "eu.siacs.conversations"
     const val GARMIN_PREFIX = "com.garmin."
     const val GARMIN_EXPLORE = "${GARMIN_PREFIX}android.apps.explore"
     const val GMAPS_WV = "us.spotco.maps"
