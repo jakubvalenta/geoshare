@@ -163,6 +163,16 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
             WGS84Point(43.7481, -79.6332, name = "2088 Albion Rd @43.7481,-79.6332", source = Source.HTML),
             @Suppress("SpellCheckingInspection") "https://maps.google.com/maps?f=d&daddr=2088%20Albion%20Rd+@43.7481,-79.6332&doflg=ptm&navigate=yes",
         )
+
+        // Directions with intermediate zero coordinates
+        testUri(
+            WGS84Point(
+                46.75984, 1.738281,
+                name = @Suppress("SpellCheckingInspection") "Box now Ακροπόλεως 65, Akropoleos 65, Thessaloniki 546 34, Grèce",
+                source = Source.URI,
+            ),
+            "https://maps.google.com/maps?oe=utf-8&client=firefox-b&um=1&ie=UTF-8&fb=1&gl=fr&sa=X&geocode=KWmqxjsAOagUMaSMgMRdOas1&daddr=Akropoleos+65,+Thessaloniki+546+34,+Gr%C3%A8ce",
+        )
     }
 
     @Test
