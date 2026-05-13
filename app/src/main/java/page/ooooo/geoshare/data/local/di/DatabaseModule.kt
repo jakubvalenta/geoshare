@@ -13,7 +13,6 @@ import page.ooooo.geoshare.data.local.database.AppDatabase
 import page.ooooo.geoshare.data.local.database.AppDatabase.Companion.restoreInitialData
 import page.ooooo.geoshare.data.local.database.LinkDao
 import javax.inject.Singleton
-import kotlin.uuid.Uuid
 
 @Module
 @InstallIn(SingletonComponent::class)

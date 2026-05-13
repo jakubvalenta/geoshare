@@ -331,7 +331,7 @@ abstract class AppDatabase : RoomDatabase() {
                 "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "",
-                    @Suppress("SpellCheckingInspection") "Géoportail",
+                    "Géoportail",
                     "WGS84",
                     "DISPLAY",
                     0,
@@ -547,7 +547,7 @@ abstract class AppDatabase : RoomDatabase() {
                     "INSERT OR REPLACE INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "",
-                        @Suppress("SpellCheckingInspection") "Géoportail",
+                        "Géoportail",
                         "WGS84",
                         "DISPLAY",
                         0,

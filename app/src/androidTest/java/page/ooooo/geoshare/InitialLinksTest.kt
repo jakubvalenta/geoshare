@@ -194,7 +194,7 @@ class InitialLinksTest {
                 uuid = UUID.fromString("a0b5b493-31a7-410d-9fe2-285974738ff1"),
             ),
             Link(
-                name = @Suppress("SpellCheckingInspection") "Géoportail",
+                name = "Géoportail",
                 appEnabled = false,
                 coordsUriTemplate = "https://cartes.gouv.fr/explorer-les-cartes?c={lon},{lat}&z={z}",
                 uuid = UUID.fromString("b0f1715a-6645-4ae6-a4ec-36d6e5f08c34"),
