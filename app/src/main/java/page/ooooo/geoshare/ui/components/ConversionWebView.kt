@@ -115,6 +115,10 @@ fun ConversionWebView(
                 // Set background to prevent a visible white rectangle before the URL loads
                 setBackgroundColor(0x00000000)
 
+                // Consume and suppress all touch events
+                @SuppressLint("ClickableViewAccessibility")
+                setOnTouchListener { _, _ -> true }
+
                 // Don't allow cookies
                 val cookieManager = CookieManager.getInstance()
                 cookieManager.setAcceptCookie(false)
