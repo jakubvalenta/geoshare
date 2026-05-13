@@ -1,8 +1,9 @@
-- Added the option to send a point via selected messaging apps.
-- Added the option to save a point to a contact.
+- Added send point via messaging app feature.
+- Added save point to contact feature.
 - Fixed Google Maps place list links.
 - Fixed Baidu Map location accuracy.
 - Fixed pin display when opening Cartes IGN.
 - Fixed splash screen in dark mode.
-- Improved link sharing workflow by closing GeoShare after opening another map app.
+- Improved sharing by closing GeoShare after opening a map app.
+- Improved web parsing UI.
 - Improved network error messages.
