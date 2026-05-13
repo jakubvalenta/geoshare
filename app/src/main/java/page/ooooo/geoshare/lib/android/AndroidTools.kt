@@ -130,6 +130,7 @@ object AndroidTools {
     }
 
     private val ALLOWED_MESSAGING_APPS = setOf(
+        PackageNames.CONVERSATIONS,
         PackageNames.SIGNAL,
         PackageNames.TELEGRAM,
         PackageNames.TELEGRAM_FORK,

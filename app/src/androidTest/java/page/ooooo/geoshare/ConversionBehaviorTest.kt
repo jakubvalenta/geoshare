@@ -468,9 +468,7 @@ class ConversionBehaviorTest : BehaviorTest {
     @Test
     fun opensMessagingApp() = uiAutomator {
         runBlocking {
-            // Test using Telegram fork, because it's available on F-Droid
-            val messagingAppPackageName = PackageNames.TELEGRAM_FORK
-
+            val messagingAppPackageName = PackageNames.CONVERSATIONS
             assumeAppInstalled(messagingAppPackageName)
 
             // Share a geo: URI with the app
