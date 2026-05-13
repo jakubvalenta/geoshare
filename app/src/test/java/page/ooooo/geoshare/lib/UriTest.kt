@@ -516,7 +516,6 @@ class UriTest {
 
     @Test
     fun toString_doesNotEncodeExclamationPointAndAtSignInPath() {
-        @Suppress("SpellCheckingInspection")
         val uriString = "https://www.google.com/maps/@/data=!3m1!4b1!4m3!11m2!2sXXX!3e3?skid=foo&g_ep=bar&entry=tts"
         assertEquals(
             uriString,

@@ -18,8 +18,6 @@ data class NaivePoint(
     val name: String? = null,
     val source: Source,
 ) {
-    fun hasCoordinates(): Boolean = lat != null && lon != null
-
     companion object {
         val example = genRandomPoint(minLat = 0.0, maxLon = -100.0)
 
