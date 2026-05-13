@@ -10,7 +10,6 @@ import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.network.DefaultNetworkTools
 
 object GoogleMapsPlaceListWebViewInput : WebViewInput {
 
@@ -103,10 +102,8 @@ object GoogleMapsPlaceListWebViewInput : WebViewInput {
         }
     }
 
-    override fun extendWebSettings(settings: WebSettings) {
-        // Set custom user agent, so that the page doesn't show "List not found"
-        settings.userAgentString = DefaultNetworkTools.DESKTOP_USER_AGENT
-    }
+    override fun extendWebSettings(settings: WebSettings) =
+        GoogleMapsWebViewInput.extendWebSettings(settings)
 
     override fun shouldInterceptRequest(requestUrlString: String) =
         GoogleMapsWebViewInput.shouldInterceptRequest(requestUrlString)

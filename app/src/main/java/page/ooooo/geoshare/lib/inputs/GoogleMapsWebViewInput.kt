@@ -1,9 +1,11 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.webkit.WebSettings
 import androidx.annotation.StringRes
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.network.DefaultNetworkTools
 
 object GoogleMapsWebViewInput : WebViewInput {
 
@@ -13,14 +15,9 @@ object GoogleMapsWebViewInput : WebViewInput {
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
-    // Quickly check that the URL isn't an intermediate URL with zero coordinates, e.g.
-    // https://www.google.com/maps/dir//{name}/@0,0,{zoom}z/data=...
     // language=JavaScript
     override val unsafeExtractionJavascript = """
-        () =>
-            window.location.href !== 'about:blank' && !window.location.href.includes('/@0,0,')
-                ? window.location.href
-                : undefined;
+        () => window.location.href !== 'about:blank' ? window.location.href : undefined;
     """.trimIndent()
 
     override suspend fun parse(
@@ -31,6 +28,16 @@ object GoogleMapsWebViewInput : WebViewInput {
         log: Log,
     ) = buildParseResult {
         nextStep = NextStep(GoogleMapsUriInput, data)
+    }
+
+    /**
+     * Set custom user agent to prevent:
+     *
+     * - Directions getting stuck at intermediate URI with zero coordinates.
+     * - Place lists showing "No list found".
+     */
+    override fun extendWebSettings(settings: WebSettings) {
+        settings.userAgentString = DefaultNetworkTools.DESKTOP_USER_AGENT
     }
 
     override fun shouldInterceptRequest(requestUrlString: String) =
