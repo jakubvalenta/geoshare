@@ -13,6 +13,7 @@ import page.ooooo.geoshare.data.local.database.AppDatabase
 import page.ooooo.geoshare.data.local.database.AppDatabase.Companion.restoreInitialData
 import page.ooooo.geoshare.data.local.database.LinkDao
 import javax.inject.Singleton
+import kotlin.uuid.Uuid
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -36,6 +37,7 @@ class DatabaseModule {
                 AppDatabase.MIGRATION_2_3,
                 AppDatabase.MIGRATION_3_4,
                 AppDatabase.MIGRATION_4_5,
+                AppDatabase.MIGRATION_5_6,
             )
             .build()
     }

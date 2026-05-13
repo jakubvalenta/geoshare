@@ -327,6 +327,22 @@ abstract class AppDatabase : RoomDatabase() {
                     Uuid.parse("a0b5b493-31a7-410d-9fe2-285974738ff1").toByteArray(),
                 )
             )
+            db.execSQL(
+                "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                arrayOf<Any>(
+                    "",
+                    @Suppress("SpellCheckingInspection") "Géoportail",
+                    "WGS84",
+                    "DISPLAY",
+                    0,
+                    0,
+                    0,
+                    "https://cartes.gouv.fr/explorer-les-cartes?c={lon},{lat}&z={z}",
+                    "",
+                    1778680284986,
+                    Uuid.parse("b0f1715a-6645-4ae6-a4ec-36d6e5f08c34").toByteArray(),
+                )
+            )
         }
 
         val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -524,5 +540,27 @@ abstract class AppDatabase : RoomDatabase() {
                 )
             }
         }
+
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "INSERT OR REPLACE INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    arrayOf<Any>(
+                        "",
+                        @Suppress("SpellCheckingInspection") "Géoportail",
+                        "WGS84",
+                        "DISPLAY",
+                        0,
+                        0,
+                        0,
+                        "https://cartes.gouv.fr/explorer-les-cartes?c={lon},{lat}&z={z}",
+                        "",
+                        1778680284986,
+                        Uuid.parse("b0f1715a-6645-4ae6-a4ec-36d6e5f08c34").toByteArray(),
+                    )
+                )
+            }
+        }
+
     }
 }
