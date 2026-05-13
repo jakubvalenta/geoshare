@@ -36,6 +36,8 @@ Když rádi hledáte místa v Google Mapách, ale pro navigování preferujete j
 - Umožňuje <b>spustit navigaci</b> ve všech aplikacích, které to podporují, včetně TomTom.
 - Umožňuje otevřít místo ve <b>webových mapách</b>, předinstalovaných nebo vašich vlastních.
 - Umožňuje uložit místo jako <b>soubor GPX</b>.
+- Umožňuje odeslat místo pomocí <b>aplikace na posílání zpráv</b>.
+- Umožňuje uložit místo do <b>kontaktu</b>.
 - Opakovaně zkouší spojení při <b>pomalém internetu</b>.
 - Umožňuje <b>vložit odkaz na mapy</b> přímo do aplikace, místo jeho sdílení s aplikací.
 - Rozhraní se přizpůsobuje obrazovce <b>tabletu</b>.

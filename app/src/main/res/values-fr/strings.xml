@@ -229,7 +229,7 @@
     <string name="links_form_uri_template_name">Modèle d’URL lorsqu’un seul terme de recherche est disponible</string>
     <string name="links_insert">Ajouter une carte web</string>
     <string name="links_message_deleted">Carte Web supprimée</string>
-    <string name="links_message_factory_reset">Les cartes Web ont été réinitialisées aux paramètres d’usine par défaut.</string>
+    <string name="links_message_factory_reset">Les cartes Web ont été réinitialisées aux paramètres d’usine par défaut</string>
     <string name="links_message_inserted">Carte Web ajoutée</string>
     <string name="links_message_updated">Carte Web mise à jour</string>
     <string name="links_restore_initial_data">Réinitialiser les cartes Web aux paramètres d’usine par défaut</string>

@@ -7,6 +7,7 @@ Partagez un lien de carte avec GeoShare et l'application l'ouvrira dans une autr
 - 2GIS
 - Amap (AutoNavi)
 - Baidu Map (bêta)
+- Cartes IGN
 - CoMaps
 - HERE WeGo
 - Magic Earth
