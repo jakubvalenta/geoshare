@@ -9,7 +9,7 @@ import kotlin.uuid.Uuid
 
 @Database(
     entities = [Link::class],
-    version = 5,
+    version = 6,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun getLinkDao(): LinkDao
