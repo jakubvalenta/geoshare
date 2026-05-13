@@ -13,9 +13,14 @@ object GoogleMapsWebViewInput : WebViewInput {
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
+    // Quickly check that the URL isn't an intermediate URL with zero coordinates, e.g.
+    // https://www.google.com/maps/dir//{name}/@0,0,{zoom}z/data=...
     // language=JavaScript
     override val unsafeExtractionJavascript = """
-        () => window.location.href !== 'about:blank' ? window.location.href : undefined;
+        () =>
+            window.location.href !== 'about:blank' && !window.location.href.includes('/@0,0,')
+                ? window.location.href
+                : undefined;
     """.trimIndent()
 
     override suspend fun parse(
