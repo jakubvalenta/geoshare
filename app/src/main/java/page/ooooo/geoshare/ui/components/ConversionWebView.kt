@@ -157,7 +157,12 @@ fun ConversionWebView(
                                 (() => {
                                     const extract = $unsafeExtractionJavascript;
                                     window.setInterval(
-                                        () => Android.onExtract(extract()),
+                                        () => {
+                                            const data = extract();
+                                            if (data !== null && data !== undefined) {
+                                                Android.onExtract(data);
+                                            }
+                                        },
                                         ${extractionInterval.inWholeMilliseconds}
                                     );
                                 })();
@@ -196,6 +201,19 @@ fun ConversionWebView(
             webView.stopLoading()
             webView.loadUrl("about:blank")
             webView.clearHistory()
+        },
+        onRelease = { webView ->
+            webView.stopLoading()
+
+            // Neutralize callbacks before any teardown
+            webView.webViewClient = WebViewClient()
+            webView.webChromeClient = null
+            webView.removeJavascriptInterface("Android")
+
+            webView.onPause()
+            webView.pauseTimers()
+            webView.removeAllViews()
+            webView.destroy()
         },
     )
 }

@@ -26,32 +26,31 @@ object YandexMapsHtmlInput : BodyAsChannelInput {
         prevResult: ParseResult?,
         uriQuote: UriQuote,
         log: Log,
-    ) =
-        buildParseResult {
-            val pointPattern = Regex("""pt=$LON%2C$LAT""")
-            val namePattern = Regex("""itemProp="name"[^>]*>([^<]+)""")
+    ) = buildParseResult {
+        val pointPattern = Regex("""pt=$LON%2C$LAT""")
+        val namePattern = Regex("""itemProp="name"[^>]*>([^<]+)""")
 
-            var naivePoint: NaivePoint? = null
-            var name = prevResult?.points?.lastOrNull()?.name
+        var naivePoint: NaivePoint? = null
+        var name = prevResult?.points?.lastOrNull()?.name
 
-            while (true) {
-                val line = data.readLine() ?: break
-                pointPattern.find(line)?.toLonLatPoint(Source.HTML)?.let {
-                    naivePoint = it
-                    continue
-                }
-                namePattern.find(line)?.groupOrNull()?.let {
-                    name = it
-                    break
-                }
+        while (true) {
+            val line = data.readLine() ?: break
+            pointPattern.find(line)?.toLonLatPoint(Source.HTML)?.let {
+                naivePoint = it
+                continue
             }
-
-            naivePoint?.also {
-                points = persistentListOf(WGS84Point(it).copy(name = name))
-            } ?: name?.also {
-                points = persistentListOf(WGS84Point(name = name, source = Source.HTML))
+            namePattern.find(line)?.groupOrNull()?.let {
+                name = it
+                break
             }
         }
+
+        naivePoint?.also {
+            points = persistentListOf(WGS84Point(it).copy(name = name))
+        } ?: name?.also {
+            points = persistentListOf(WGS84Point(name = name, source = Source.HTML))
+        }
+    }
 
     override fun toString() = "YandexMapsHtmlInput"
 }

@@ -6,6 +6,7 @@ import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 
 object GoogleMapsWebViewInput : WebViewInput {
+
     @StringRes
     override val permissionTitleResId = R.string.converter_google_maps_permission_title
 
@@ -50,6 +51,9 @@ object GoogleMapsWebViewInput : WebViewInput {
             || requestUrlString.contains("google.com/gen_204")
             || requestUrlString.contains("google.com/log")
             || requestUrlString.contains(@Suppress("SpellCheckingInspection") "googlesyndication.com/")
+
+            // Something that is requested too many times
+            || requestUrlString.contains("/maps/res/CompactLegend-Roadmap-")
 
     override fun toString() = "GoogleMapsWebViewInput"
 }

@@ -24,20 +24,19 @@ object WazeHtmlInput : BodyAsChannelInput {
         prevResult: ParseResult?,
         uriQuote: UriQuote,
         log: Log,
-    ) =
-        buildParseResult {
-            val pattern = Regex(""""latLng":\{"lat":$LAT,"lng":$LON\}""")
+    ) = buildParseResult {
+        val pattern = Regex(""""latLng":\{"lat":$LAT,"lng":$LON\}""")
 
-            val name = prevResult?.points?.lastOrNull()?.name
+        val name = prevResult?.points?.lastOrNull()?.name
 
-            while (true) {
-                val line = data.readLine() ?: break
-                pattern.find(line)?.toLatLonPoint(Source.JAVASCRIPT)?.let {
-                    points = persistentListOf(WGS84Point(it).copy(name = name))
-                    return@buildParseResult
-                }
+        while (true) {
+            val line = data.readLine() ?: break
+            pattern.find(line)?.toLatLonPoint(Source.JAVASCRIPT)?.let {
+                points = persistentListOf(WGS84Point(it).copy(name = name))
+                return@buildParseResult
             }
         }
+    }
 
     override fun toString() = "WazeHtmlInput"
 }

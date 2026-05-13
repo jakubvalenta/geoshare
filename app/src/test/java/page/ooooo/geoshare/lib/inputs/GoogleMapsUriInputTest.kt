@@ -72,30 +72,15 @@ class GoogleMapsUriInputTest : InputTest {
     @Test
     fun parse_unknownPathOrParams() = runTest {
         assertEquals(
-            ParseResult(
-                nextStep = NextStep(
-                    GoogleMapsHtmlInput,
-                    "https://maps.google.com"
-                )
-            ),
+            ParseResult(),
             input.parse("https://maps.google.com"),
         )
         assertEquals(
-            ParseResult(
-                nextStep = NextStep(
-                    GoogleMapsHtmlInput,
-                    "https://maps.google.com/"
-                )
-            ),
+            ParseResult(),
             input.parse("https://maps.google.com/"),
         )
         assertEquals(
-            ParseResult(
-                nextStep = NextStep(
-                    GoogleMapsHtmlInput,
-                    "https://maps.google.com/?spam=1"
-                )
-            ),
+            ParseResult(),
             input.parse("https://maps.google.com/?spam=1"),
         )
     }
@@ -357,11 +342,11 @@ class GoogleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    GoogleMapsHtmlInput,
-                    "https://www.google.com/maps/placelists/list/abcdef?g_ep=ghijkl%3D&g_st=isi"
+                    GoogleMapsPlaceListWebViewInput,
+                    "https://www.google.com/maps/placelists/list/XXX?g_ep=ghijkl%3D&g_st=isi"
                 )
             ),
-            input.parse("https://www.google.com/maps/placelists/list/abcdef?g_ep=ghijkl%3D&g_st=isi"),
+            input.parse("https://www.google.com/maps/placelists/list/XXX?g_ep=ghijkl%3D&g_st=isi"),
         )
     }
 
@@ -370,11 +355,11 @@ class GoogleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    GoogleMapsHtmlInput,
-                    @Suppress("SpellCheckingInspection") "https://www.google.com/maps/@/data=!3m1!4b1!4m3!11m2!2sXXXYYY!3e3?skid=foo&g_ep=bar&entry=tts"
+                    GoogleMapsPlaceListWebViewInput,
+                    "https://www.google.com/maps/@/data=!3m1!4b1!4m3!11m2!2sXXX!3e3?skid=foo&g_ep=bar&entry=tts"
                 )
             ),
-            input.parse(@Suppress("SpellCheckingInspection") "https://www.google.com/maps/@/data=!3m1!4b1!4m3!11m2!2sXXXYYY!3e3?skid=foo&g_ep=bar&entry=tts"),
+            input.parse("https://www.google.com/maps/@/data=!3m1!4b1!4m3!11m2!2sXXX!3e3?skid=foo&g_ep=bar&entry=tts"),
         )
     }
 
@@ -844,12 +829,7 @@ class GoogleMapsUriInputTest : InputTest {
     @Test
     fun parse_qParameterEmpty() = runTest {
         assertEquals(
-            ParseResult(
-                nextStep = NextStep(
-                    GoogleMapsHtmlInput,
-                    "https://www.google.com/maps"
-                )
-            ),
+            ParseResult(),
             input.parse("https://www.google.com/maps"),
         )
     }
@@ -864,20 +844,20 @@ class GoogleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    GoogleMapsHtmlInput,
-                    "https://www.google.com/maps/d/edit?mid=abcdef"
+                    GoogleMapsPlaceListWebViewInput,
+                    "https://www.google.com/maps/d/edit?mid=XXX"
                 )
             ),
-            input.parse("https://www.google.com/maps/d/edit?mid=abcdef"),
+            input.parse("https://www.google.com/maps/d/edit?mid=XXX"),
         )
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    GoogleMapsHtmlInput,
-                    "https://www.google.com/maps/d/viewer?mid=abcdef"
+                    GoogleMapsPlaceListWebViewInput,
+                    "https://www.google.com/maps/d/viewer?mid=XXX"
                 )
             ),
-            input.parse("https://www.google.com/maps/d/viewer?mid=abcdef"),
+            input.parse("https://www.google.com/maps/d/viewer?mid=XXX"),
         )
     }
 

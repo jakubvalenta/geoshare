@@ -35,9 +35,15 @@ object BaiduMapWebViewInput : WebViewInput {
             const lat =
                 deepGet(window, '_indoorMgr', '_map', 'temp', 'infoWin', 'overlay', 'point', 'lat') ||
                 deepGet(window, '_appStateFromUrl', 'loc', 'y');
+            if (!lat) {
+                return undefined;
+            }
             const lon =
                 deepGet(window, '_indoorMgr', '_map', 'temp', 'infoWin', 'overlay', 'point', 'lng') ||
                 deepGet(window, '_appStateFromUrl', 'loc', 'x');
+            if (!lon) {
+                return undefined;
+            }
             const z = deepGet(window, '_appStateFromUrl', 'loc', 'z');
             const name = deepGet(window, '_appStateFromUrl', 'wd', 0);
             return JSON.stringify({ lat, lon, z, name });
