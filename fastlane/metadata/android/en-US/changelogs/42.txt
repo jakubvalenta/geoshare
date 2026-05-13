@@ -1,5 +1,6 @@
 - Added send point via messaging app feature.
 - Added save point to contact feature.
+- Added web map Géoportail (cartes.gouv.fr).
 - Fixed Google Maps place list links.
 - Fixed Baidu Map location accuracy.
 - Fixed pin display when opening Cartes IGN.
