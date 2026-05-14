@@ -32,7 +32,7 @@
     <string name="permission_do_not_ask">Ne me le demande plus</string>
     <string name="faq_title">FAQ</string>
     <string name="user_preferences_title">Préférences</string>
-    <string name="user_preferences_connection_title">Autoriser la connexion au service de cartographie ?</string>
+    <string name="user_preferences_connection_title">Connexion au service de cartographie</string>
     <string name="user_preferences_connection_description">Pour prendre en charge les liens courts et les liens dont l’URL ne contient pas de coordonnées géographiques, %1$s peut se connecter au service de cartographie (Google Maps, Apple Maps, etc.).</string>
     <string name="yes">Oui</string>
     <string name="user_preferences_connection_option_ask">Demandez avant de vous connecter</string>
