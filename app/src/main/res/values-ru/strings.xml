@@ -195,14 +195,14 @@
         <item quantity="other">%1$d секунд</item>
     </plurals>
     <string name="reset">сброс</string>
-    <string name="network_exception_unknown">неизвестной ошибки</string>
-    <string name="network_exception_connect_timeout">истечения времени ожидания подключения</string>
-    <string name="network_exception_eof">закрытия подключения</string>
-    <string name="network_exception_request_timeout">истечения времени ожидания запроса</string>
-    <string name="network_exception_response_error">ошибки в ответе %1$d</string>
-    <string name="network_exception_server_response_error">ошибки в ответе сервера %1$d</string>
-    <string name="network_exception_unresolved_address">неполучения адреса</string>
-    <string name="network_exception_socket_timeout">истечения времени ожидания сокета</string>
+    <string name="network_exception_unknown">неизвестная ошибка</string>
+    <string name="network_exception_connect_timeout">истекло время ожидания подключения</string>
+    <string name="network_exception_eof">подключение закрыто</string>
+    <string name="network_exception_request_timeout">истекло время ожидания запроса</string>
+    <string name="network_exception_response_error">ошибка в ответе %1$d</string>
+    <string name="network_exception_server_response_error">ошибка в ответе сервера %1$d</string>
+    <string name="network_exception_unresolved_address">не получен адрес</string>
+    <string name="network_exception_socket_timeout">истекло время ожидания сокета</string>
     <string name="converter_baidu_map_loading_indicator_title">Подключение к Baidu Map…</string>
     <string name="conversion_succeeded_save_gpx_succeeded">Файл GPX сохранён</string>
     <string name="conversion_succeeded_apps_links_configure">Настройка web-карт</string>
@@ -270,7 +270,7 @@
     <string name="conversion_failed_reason_missing_header">Отсутствует HTTP-заголовок</string>
     <string name="conversion_failed_reason_no_points">Точки не найдены</string>
     <string name="conversion_failed_reason_timeout">Истекло время ожидания</string>
-    <string name="network_exception_too_many_requests">Слишком много запросов</string>
+    <string name="network_exception_too_many_requests">слишком много запросов</string>
     <string name="licenses">Лицензии</string>
     <string name="conversion_succeeded_check_experimental">Местоположение может быть неточным из-за экспериментального метода извлечения.</string>
     <string name="conversion_succeeded_check_map_center">Местоположение может быть центром карты, а не маркером.</string>
