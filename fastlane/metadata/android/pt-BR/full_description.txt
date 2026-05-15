@@ -36,8 +36,8 @@ Se você gosta do Google Maps para encontrar lugares, mas prefere usar outro app
 - Permite <b>abrir a navegação</b> em todos os apps que suportam, incluindo o TomTom.
 - Permite abrir uma localização em <b>mapas da web</b>, pré-instalados ou os seus.
 - Permite salavar uma localização como um <b>arquivo GPX</b>.
-- Permite enviar a localização por um  <b>mensageiro</b>.
-- Permite salvar a localização em um  <b>contato</b>.
+- Permite enviar a localização por um <b>mensageiro</b>.
+- Permite salvar a localização em um <b>contato</b>.
 - Tenta novamente em <b>conexões instáveis à internet</b>.
 - Permite <b>colar links de mapa</b> diretamente no app, em vez de compartilhá-los com ele.
 - A interface é adaptada para <b>tablets</b>
