@@ -152,6 +152,7 @@ fun HttpClient(
 @Throws(NetworkException::class)
 suspend fun HttpClient.headLocationHeader(url: URL): String =
     config {
+        // FIXME Follow redirects must be set before HttpClient's config
         followRedirects = false
     }
         .head(url)

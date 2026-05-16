@@ -34,11 +34,12 @@ class GetRedirectUrlInputTest {
     private val log = FakeLog
     private val httpClient = HttpClient(
         MockEngine { request ->
-            // FIXME
-            if (request.method == HttpMethod.Get && request.url.equals("https://maps.google.com/foo")) {
+            // TODO Test request URL after redirects
+            if (request.method == HttpMethod.Get && request.url.toString() == "https://maps.google.com/foo") {
                 respond("")
+            } else {
+                throw NotImplementedError()
             }
-            throw NotImplementedError()
         },
         log = log,
     )

@@ -34,10 +34,11 @@ class BodyAsChannelInputTest {
     private val log = FakeLog
     private val httpClient = HttpClient(
         MockEngine { request ->
-            if (request.method == HttpMethod.Get && request.url.equals("https://maps.google.com/foo")) {
+            if (request.method == HttpMethod.Get && request.url.toString() == "https://maps.google.com/foo") {
                 respond("test data")
+            } else {
+                throw NotImplementedError()
             }
-            throw NotImplementedError()
         },
         log = log,
     )
@@ -69,7 +70,7 @@ class BodyAsChannelInputTest {
     fun whenMatchHasNoScheme_makesGetRequestToUrlWithHttpsSchemeAndReturnsResponse() = runTest {
         val match = "maps.google.com/foo"
         assertEquals(
-            ParseResult(nextStep = NextStep(DebugUriInput, "https://${match}-data")),
+            ParseResult(nextStep = NextStep(DebugUriInput, "test data")),
             input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
                     nextStep = NextStep(DebugUriInput, data.readLine()!!) // Store data in nextStep, so we can test it

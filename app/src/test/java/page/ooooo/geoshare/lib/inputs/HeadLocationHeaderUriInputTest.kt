@@ -36,12 +36,13 @@ class HeadLocationHeaderUriInputTest {
     private val log = FakeLog
     private val httpClient = HttpClient(
         MockEngine { request ->
-            if (request.method == HttpMethod.Head && request.url.equals("https://maps.google.com/foo")) {
+            if (request.method == HttpMethod.Head && request.url.toString() == "https://maps.google.com/foo") {
                 respond("", HttpStatusCode.MovedPermanently, headers {
                     append(HttpHeaders.Location, "https://maps.google.com/redirected")
                 })
+            } else {
+                throw NotImplementedError()
             }
-            throw NotImplementedError()
         },
         log = log,
     )
@@ -87,12 +88,13 @@ class HeadLocationHeaderUriInputTest {
         val match = "https://maps.google.com/foo"
         val httpClient = HttpClient(
             MockEngine { request ->
-                if (request.method == HttpMethod.Head && request.url.equals("https://maps.google.com/foo")) {
+                if (request.method == HttpMethod.Head && request.url.toString() == "https://maps.google.com/foo") {
                     respond("", HttpStatusCode.MovedPermanently, headers {
                         append(HttpHeaders.Location, "redirected")
                     })
+                } else {
+                    throw NotImplementedError()
                 }
-                throw NotImplementedError()
             },
             log = log,
         )

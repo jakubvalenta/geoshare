@@ -35,12 +35,13 @@ class HttpClientTest {
         )) {
             val httpClient = HttpClient(
                 MockEngine { request ->
-                    if (request.method == HttpMethod.Head && request.url.equals("https://maps.google.com/foo")) {
+                    if (request.method == HttpMethod.Head && request.url.toString() == "https://maps.google.com/foo") {
                         respond("", status, headers {
                             append(HttpHeaders.Location, "https://maps.google.com/redirected")
                         })
+                    } else {
+                        throw NotImplementedError()
                     }
-                    throw NotImplementedError()
                 },
                 log = log,
             )
@@ -60,10 +61,11 @@ class HttpClientTest {
         )) {
             val httpClient = HttpClient(
                 MockEngine { request ->
-                    if (request.method == HttpMethod.Head && request.url.equals("https://maps.google.com/foo")) {
+                    if (request.method == HttpMethod.Head && request.url.toString() == "https://maps.google.com/foo") {
                         respond("", status)
+                    } else {
+                        throw NotImplementedError()
                     }
-                    throw NotImplementedError()
                 },
                 log = log,
             )
@@ -86,16 +88,17 @@ class HttpClientTest {
         )) {
             val httpClient = HttpClient(
                 MockEngine { request ->
-                    // FIXME
-                    if (request.method == HttpMethod.Get && request.url.equals("https://maps.google.com/foo")) {
+                    // TODO Test request URL after redirects
+                    if (request.method == HttpMethod.Get && request.url.toString() == "https://maps.google.com/foo") {
                         respond("", status)
+                    } else {
+                        throw NotImplementedError()
                     }
-                    throw NotImplementedError()
                 },
                 log = log,
             )
             assertEquals(
-                "https://example.com/",
+                "https://maps.google.com/foo",
                 httpClient.getRedirectUrlString(url),
             )
         }
@@ -103,7 +106,7 @@ class HttpClientTest {
 
     @Test
     fun httpClient_whenResponseIs2xx_andFollowRedirectsIsDefault_returnsResponseIncludingLocationHeader() = runTest {
-        val url = URL("https://example.com/")
+        val url = URL("https://maps.google.com/foo")
         for (status in listOf(
             HttpStatusCode.OK,
             HttpStatusCode.Created,
@@ -125,7 +128,7 @@ class HttpClientTest {
 
     @Test
     fun httpClient_whenResponseIs2xx_andFollowRedirectsIsFalse_returnsResponseIncludingLocationHeader() = runTest {
-        val url = URL("https://example.com/")
+        val url = URL("https://maps.google.com/foo")
         for (status in listOf(
             HttpStatusCode.OK,
             HttpStatusCode.Created,
@@ -148,7 +151,7 @@ class HttpClientTest {
 
     @Test
     fun httpClient_whenResponseIs3xxAndFollowRedirectsIsDefault_throwsUnrecoverableException() = runTest {
-        val url = URL("https://example.com/")
+        val url = URL("https://maps.google.com/foo")
         for (status in listOf(
             HttpStatusCode.MovedPermanently,
             HttpStatusCode.Found,
@@ -175,7 +178,7 @@ class HttpClientTest {
 
     @Test
     fun httpClient_whenResponseIs3xxAndFollowRedirectsIsFalse_returnsResponseIncludingLocationHeader() = runTest {
-        val url = URL("https://example.com/")
+        val url = URL("https://maps.google.com/foo")
         for (status in listOf(
             HttpStatusCode.MovedPermanently,
             HttpStatusCode.Found,
