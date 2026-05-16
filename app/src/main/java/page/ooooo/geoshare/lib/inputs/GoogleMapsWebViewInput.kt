@@ -5,7 +5,7 @@ import androidx.annotation.StringRes
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.network.DefaultNetworkTools
+import page.ooooo.geoshare.lib.network.DESKTOP_USER_AGENT
 
 object GoogleMapsWebViewInput : WebViewInput {
 
@@ -37,7 +37,7 @@ object GoogleMapsWebViewInput : WebViewInput {
      * - Place lists showing "No list found".
      */
     override fun extendWebSettings(settings: WebSettings) {
-        settings.userAgentString = DefaultNetworkTools.DESKTOP_USER_AGENT
+        settings.userAgentString = DESKTOP_USER_AGENT
     }
 
     override fun shouldInterceptRequest(requestUrlString: String) =

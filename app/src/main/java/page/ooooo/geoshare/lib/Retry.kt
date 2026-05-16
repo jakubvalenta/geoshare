@@ -3,9 +3,8 @@ package page.ooooo.geoshare.lib
 import kotlin.math.pow
 import kotlin.math.roundToLong
 
-const val EXPONENTIAL_DELAY_BASE = 2.0
-const val EXPONENTIAL_DELAY_BASE_DELAY_MILLIS = 1_000L
-const val TAG = "Retry"
+private const val EXPONENTIAL_DELAY_BASE = 2.0
+private const val EXPONENTIAL_DELAY_BASE_DELAY_MILLIS = 1_000L
 
 data class Attempt<T : Throwable>(val number: Int, val cause: T)
 

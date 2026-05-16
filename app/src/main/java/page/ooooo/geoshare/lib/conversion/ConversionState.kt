@@ -225,6 +225,7 @@ data class PermissionGrantedBasicInput<T>(
             // Run parsing on another thread, because maybe it's computationally expensive
             val attemptNumber = lastAttempt?.number?.plus(1) ?: 1
             try {
+                // TODO Test retrying
                 if (lastAttempt != null && lastAttempt.number >= maxAttempts) {
                     stateContext.log.w(TAG, "Maximum number of $maxAttempts attempts reached for $match")
                     throw MaxAttemptsReachedNetworkException(lastAttempt.cause)
@@ -238,9 +239,9 @@ data class PermissionGrantedBasicInput<T>(
                 }
                 val result = input.withData(
                     match,
-                    stateContext.networkTools,
-                    stateContext.uriQuote,
                     stateContext.log,
+                    stateContext.httpClient,
+                    stateContext.uriQuote,
                 ) { data ->
                     input.parse(data, match, prevResult, stateContext.uriQuote, stateContext.log)
                 }

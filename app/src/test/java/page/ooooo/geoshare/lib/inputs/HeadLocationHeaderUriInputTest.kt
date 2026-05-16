@@ -1,7 +1,12 @@
 package page.ooooo.geoshare.lib.inputs
 
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.respond
+import io.ktor.client.engine.mock.respondError
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import kotlinx.coroutines.CoroutineDispatcher
+import io.ktor.http.headers
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -10,11 +15,9 @@ import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.network.FakeNetworkTools
-import page.ooooo.geoshare.lib.network.NetworkTools
+import page.ooooo.geoshare.lib.network.HttpClient
 import page.ooooo.geoshare.lib.network.ResponseNetworkException
 import java.net.MalformedURLException
-import java.net.URL
 
 class HeadLocationHeaderUriInputTest {
     val input = object : HeadLocationHeaderInput {
@@ -31,46 +34,34 @@ class HeadLocationHeaderUriInputTest {
         ) = throw NotImplementedError()
     }
     private val log = FakeLog
-    private val maxAttempts = 3
+    private val httpClient = HttpClient(
+        MockEngine { request ->
+            if (request.method == HttpMethod.Head && request.url.equals("https://maps.google.com/foo")) {
+                respond("", HttpStatusCode.MovedPermanently, headers {
+                    append(HttpHeaders.Location, "https://maps.google.com/redirected")
+                })
+            }
+            throw NotImplementedError()
+        },
+        log = log,
+    )
     private val uriQuote = FakeUriQuote
 
     @Test(expected = MalformedURLException::class)
     fun whenMatchIsInvalidURL_throwsMalformedURLException() = runTest {
         val match = "https://[invalid:ipv6]/"
-        val lastAttempt = null
-        val networkTools = FakeNetworkTools()
-        input.withData(
-            match,
-            networkTools,
-            lastAttempt,
-            maxAttempts,
-            uriQuote,
-            log,
-        ) { ParseResult() }
+        input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) {
+            ParseResult()
+        }
     }
 
     @Test
-    fun whenMatchHasScheme_returnsTheResultOfHttpHeadLocationHeader() = runTest {
+    fun whenMatchHasScheme_makesHeadRequestAndReturnsLocationHeader() = runTest {
+        // TODO Test followRedirects
         val match = "https://maps.google.com/foo"
-        val lastAttempt = null
-        val networkTools = object : FakeNetworkTools() {
-            override suspend fun httpHeadLocationHeader(
-                url: URL,
-                lastAttempt: NetworkTools.Attempt?,
-                maxAttempts: Int,
-                dispatcher: CoroutineDispatcher,
-            ) = "${url}-data"
-        }
         assertEquals(
-            ParseResult(nextStep = NextStep(DebugUriInput, "${match}-data")),
-            input.withData(
-                match,
-                networkTools,
-                lastAttempt,
-                maxAttempts,
-                uriQuote,
-                log,
-            ) { data ->
+            ParseResult(nextStep = NextStep(DebugUriInput, "https://maps.google.com/redirected")),
+            input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
                     nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
                 )
@@ -79,27 +70,11 @@ class HeadLocationHeaderUriInputTest {
     }
 
     @Test
-    fun whenMatchHasNoScheme_returnsTheResultOfHttpHeadLocationHeaderCalledWithHttpsScheme() = runTest {
+    fun whenMatchHasNoScheme_makesHeadRequestToUrlWithHttpsSchemeAndReturnsLocationHeader() = runTest {
         val match = "maps.google.com/foo"
-        val lastAttempt = null
-        val networkTools = object : FakeNetworkTools() {
-            override suspend fun httpHeadLocationHeader(
-                url: URL,
-                lastAttempt: NetworkTools.Attempt?,
-                maxAttempts: Int,
-                dispatcher: CoroutineDispatcher,
-            ) = "${url}-data"
-        }
         assertEquals(
-            ParseResult(nextStep = NextStep(DebugUriInput, "https://${match}-data")),
-            input.withData(
-                match,
-                networkTools,
-                lastAttempt,
-                maxAttempts,
-                uriQuote,
-                log,
-            ) { data ->
+            ParseResult(nextStep = NextStep(DebugUriInput, "https://maps.google.com/redirected")),
+            input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
                     nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
                 )
@@ -108,27 +83,22 @@ class HeadLocationHeaderUriInputTest {
     }
 
     @Test
-    fun whenHttpHeadLocationHeaderReturnsRelativeUrl_returnsTheResultOfHttpHeadLocationHeaderAsAbsoluteUrl() = runTest {
+    fun whenHttpClientRespondsLocationHeaderAsRelativeUrl_returnsItAsAbsoluteUrl() = runTest {
         val match = "https://maps.google.com/foo"
-        val lastAttempt = null
-        val networkTools = object : FakeNetworkTools() {
-            override suspend fun httpHeadLocationHeader(
-                url: URL,
-                lastAttempt: NetworkTools.Attempt?,
-                maxAttempts: Int,
-                dispatcher: CoroutineDispatcher,
-            ) = "bar"
-        }
+        val httpClient = HttpClient(
+            MockEngine { request ->
+                if (request.method == HttpMethod.Head && request.url.equals("https://maps.google.com/foo")) {
+                    respond("", HttpStatusCode.MovedPermanently, headers {
+                        append(HttpHeaders.Location, "redirected")
+                    })
+                }
+                throw NotImplementedError()
+            },
+            log = log,
+        )
         assertEquals(
-            ParseResult(nextStep = NextStep(DebugUriInput, "$match/bar")),
-            input.withData(
-                match,
-                networkTools,
-                lastAttempt,
-                maxAttempts,
-                uriQuote,
-                log,
-            ) { data ->
+            ParseResult(nextStep = NextStep(DebugUriInput, "https://maps.google.com/redirected")),
+            input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
                     nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
                 )
@@ -137,24 +107,16 @@ class HeadLocationHeaderUriInputTest {
     }
 
     @Test(expected = ResponseNetworkException::class)
-    fun whenHttpHeadLocationHeaderThrowsAnException_throwsTheSameException() = runTest {
+    fun whenHttpClientRespondsError_throwsNetworkException() = runTest {
         val match = "https://maps.google.com/foo"
-        val lastAttempt = null
-        val networkTools = object : FakeNetworkTools() {
-            override suspend fun httpHeadLocationHeader(
-                url: URL,
-                lastAttempt: NetworkTools.Attempt?,
-                maxAttempts: Int,
-                dispatcher: CoroutineDispatcher,
-            ) = throw ResponseNetworkException(HttpStatusCode.NotFound, Exception())
+        val httpClient = HttpClient(
+            MockEngine {
+                respondError(HttpStatusCode.NotFound)
+            },
+            log = log,
+        )
+        input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) {
+            ParseResult()
         }
-        input.withData(
-            match,
-            networkTools,
-            lastAttempt,
-            maxAttempts,
-            uriQuote,
-            log,
-        ) { ParseResult() }
     }
 }

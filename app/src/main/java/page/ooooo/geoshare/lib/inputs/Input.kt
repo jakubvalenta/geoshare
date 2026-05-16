@@ -1,12 +1,14 @@
 package page.ooooo.geoshare.lib.inputs
 
 import android.webkit.WebSettings
+import io.ktor.client.HttpClient
+import kotlinx.coroutines.Dispatchers
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Point
-import page.ooooo.geoshare.lib.network.NetworkTools
+import kotlin.coroutines.CoroutineContext
 
 sealed interface Input<T> {
     @Suppress("SameReturnValue")
@@ -35,9 +37,10 @@ sealed interface Input<T> {
 interface BasicInput<T> : Input<T> {
     suspend fun withData(
         match: String,
-        networkTools: NetworkTools,
-        uriQuote: UriQuote = DefaultUriQuote,
         log: Log = DefaultLog,
+        httpClient: HttpClient = page.ooooo.geoshare.lib.network.HttpClient(log = log),
+        uriQuote: UriQuote = DefaultUriQuote,
+        coroutineContext: CoroutineContext = Dispatchers.Default,
         block: suspend (T) -> ParseResult,
     ): ParseResult
 }

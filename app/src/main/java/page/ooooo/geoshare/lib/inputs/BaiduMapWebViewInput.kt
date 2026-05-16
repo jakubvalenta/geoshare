@@ -10,7 +10,7 @@ import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
 import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.network.DefaultNetworkTools
+import page.ooooo.geoshare.lib.network.DESKTOP_USER_AGENT
 
 object BaiduMapWebViewInput : WebViewInput {
 
@@ -72,7 +72,7 @@ object BaiduMapWebViewInput : WebViewInput {
 
     override fun extendWebSettings(settings: WebSettings) {
         settings.domStorageEnabled = true
-        settings.userAgentString = DefaultNetworkTools.DESKTOP_USER_AGENT
+        settings.userAgentString = DESKTOP_USER_AGENT
     }
 
     override fun shouldInterceptRequest(requestUrlString: String) =

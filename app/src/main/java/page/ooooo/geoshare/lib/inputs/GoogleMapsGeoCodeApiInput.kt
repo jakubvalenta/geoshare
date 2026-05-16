@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
+import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.accept
@@ -17,7 +18,7 @@ import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.network.NetworkTools
+import kotlin.coroutines.CoroutineContext
 
 object GoogleMapsGeoCodeApiInput : BasicInput<GoogleMapsGeoCodeApiInput.GoogleMapsGeoCodeResult>, Input.HasPermission {
 
@@ -34,12 +35,13 @@ object GoogleMapsGeoCodeApiInput : BasicInput<GoogleMapsGeoCodeApiInput.GoogleMa
 
     override suspend fun withData(
         match: String,
-        networkTools: NetworkTools,
-        uriQuote: UriQuote,
         log: Log,
+        httpClient: HttpClient,
+        uriQuote: UriQuote,
+        coroutineContext: CoroutineContext,
         block: suspend (GoogleMapsGeoCodeResult) -> ParseResult,
     ): ParseResult =
-        networkTools.createClient {
+        httpClient.config {
             install(ContentNegotiation) {
                 json()
             }
