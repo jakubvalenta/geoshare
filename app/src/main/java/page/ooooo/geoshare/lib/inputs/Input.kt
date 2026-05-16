@@ -36,8 +36,6 @@ interface BasicInput<T> : Input<T> {
     suspend fun withData(
         match: String,
         networkTools: NetworkTools,
-        lastAttempt: NetworkTools.Attempt?,
-        maxAttempts: Int,
         uriQuote: UriQuote = DefaultUriQuote,
         log: Log = DefaultLog,
         block: suspend (T) -> ParseResult,

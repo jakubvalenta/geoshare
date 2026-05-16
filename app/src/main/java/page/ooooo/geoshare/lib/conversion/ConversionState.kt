@@ -22,15 +22,17 @@ import page.ooooo.geoshare.data.local.preferences.CachedPurchasePreference
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.Permission
+import page.ooooo.geoshare.lib.Attempt
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingStatus
+import page.ooooo.geoshare.lib.calcExponentialBackoffMillis
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.inputs.WebViewInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.inputs.BasicInput
-import page.ooooo.geoshare.lib.network.NetworkTools
+import page.ooooo.geoshare.lib.network.MaxAttemptsReachedNetworkException
 import page.ooooo.geoshare.lib.network.RecoverableNetworkException
 import page.ooooo.geoshare.lib.network.UnrecoverableNetworkException
 import page.ooooo.geoshare.lib.outputs.Action
@@ -181,7 +183,7 @@ data class PermissionGranted<T>(
     val input: Input<T>,
     val permission: Permission?,
     val prevResult: ParseResult? = null,
-    val lastAttempt: NetworkTools.Attempt? = null,
+    val lastAttempt: Attempt<RecoverableNetworkException>? = null,
     val maxAttempts: Int = 10,
 ) : ConversionState {
     override suspend fun transition(): State =
@@ -191,13 +193,21 @@ data class PermissionGranted<T>(
             )
 
             is WebViewInput -> PermissionGrantedWebViewInput(
-                stateContext, source, match, input, permission, prevResult,
+                stateContext, source, match, input, permission, prevResult
             )
         }
 
     override fun toString() = "PermissionGranted"
 }
 
+/**
+ * TODO Doc
+ *
+ * To enable retrying, pass [maxAttempts] and [lastAttempt]. [maxAttempts] sets the maximum number of requests to
+ * make including the first request. [lastAttempt] tracks how many attempts have already been made. We use this
+ * custom retrying instead of the [io.ktor.client.plugins.HttpRequestRetry] plugin, so that the caller can notify
+ * the user while requests are being retried.
+ */
 data class PermissionGrantedBasicInput<T>(
     val stateContext: ConversionStateContext,
     val source: String,
@@ -205,7 +215,7 @@ data class PermissionGrantedBasicInput<T>(
     val input: BasicInput<T>,
     val permission: Permission?,
     val prevResult: ParseResult? = null,
-    val lastAttempt: NetworkTools.Attempt? = null,
+    val lastAttempt: Attempt<RecoverableNetworkException>? = null,
     val maxAttempts: Int = 10,
     val dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : ConversionState, ConversionState.HasLargeLoadingIndicator {
@@ -213,14 +223,24 @@ data class PermissionGrantedBasicInput<T>(
     override suspend fun transition(): State = try {
         withContext(dispatcher) {
             // Run parsing on another thread, because maybe it's computationally expensive
+            val attemptNumber = lastAttempt?.number?.plus(1) ?: 1
             try {
+                if (lastAttempt != null && lastAttempt.number >= maxAttempts) {
+                    stateContext.log.w(TAG, "Maximum number of $maxAttempts attempts reached for $match")
+                    throw MaxAttemptsReachedNetworkException(lastAttempt.cause)
+                }
+                val delayMillis = calcExponentialBackoffMillis(attemptNumber)
+                if (delayMillis > 0) {
+                    stateContext.log.i(
+                        TAG, "Waiting ${delayMillis}ms before attempt $attemptNumber of $maxAttempts for $match"
+                    )
+                    delay(delayMillis)
+                }
                 val result = input.withData(
                     match,
                     stateContext.networkTools,
-                    lastAttempt,
-                    maxAttempts,
                     stateContext.uriQuote,
-                    stateContext.log
+                    stateContext.log,
                 ) { data ->
                     input.parse(data, match, prevResult, stateContext.uriQuote, stateContext.log)
                 }
@@ -238,7 +258,7 @@ data class PermissionGrantedBasicInput<T>(
                     input,
                     permission,
                     prevResult,
-                    lastAttempt = NetworkTools.Attempt(lastAttempt?.number?.plus(1) ?: 2, tr),
+                    lastAttempt = Attempt(attemptNumber, tr),
                     maxAttempts = maxAttempts,
                 )
             } catch (tr: UnrecoverableNetworkException) {
@@ -271,7 +291,11 @@ data class PermissionGrantedBasicInput<T>(
             )
         }
 
-    override fun toString() = "PermissionGrantedBasicInput"
+    private companion object {
+        private const val TAG = "PermissionGrantedBasicInput"
+    }
+
+    override fun toString() = TAG
 }
 
 /**
