@@ -12,6 +12,6 @@ fun calcExponentialBackoffMillis(attemptNumber: Int = 1): Long =
     if (attemptNumber < 2) {
         0
     } else {
-        (EXPONENTIAL_DELAY_BASE.pow(attemptNumber - 1) * EXPONENTIAL_DELAY_BASE_DELAY_MILLIS)
+        (EXPONENTIAL_DELAY_BASE.pow(attemptNumber - 2) * EXPONENTIAL_DELAY_BASE_DELAY_MILLIS)
             .roundToLong()
     }

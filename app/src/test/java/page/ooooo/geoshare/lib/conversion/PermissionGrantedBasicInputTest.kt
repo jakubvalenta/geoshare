@@ -93,7 +93,15 @@ class PermissionGrantedBasicInputTest {
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedBasicInput(
-            stateContext, source, match = source, input, permission, prevResult, lastAttempt, maxAttempts
+            stateContext,
+            source,
+            match = source,
+            input,
+            permission,
+            prevResult,
+            lastAttempt,
+            maxAttempts,
+            dispatcher = testScheduler,
         )
         assertEquals(
             DataParsed(
@@ -147,7 +155,15 @@ class PermissionGrantedBasicInputTest {
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedBasicInput(
-            stateContext, source, match = source, input, permission, prevResult, lastAttempt, maxAttempts
+            stateContext,
+            source,
+            match = source,
+            input,
+            permission,
+            prevResult,
+            lastAttempt,
+            maxAttempts,
+            dispatcher = testScheduler,
         )
         assertEquals(
             ConversionFailed(resources.getString(R.string.conversion_failed_cancelled), source),
@@ -193,7 +209,15 @@ class PermissionGrantedBasicInputTest {
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedBasicInput(
-            stateContext, source, match = source, input, permission, prevResult, lastAttempt, maxAttempts
+            stateContext,
+            source,
+            match = source,
+            input,
+            permission,
+            prevResult,
+            lastAttempt,
+            maxAttempts,
+            dispatcher = testScheduler,
         )
         assertEquals(
             ConversionFailed(
@@ -244,7 +268,15 @@ class PermissionGrantedBasicInputTest {
                 on { this@on.uriQuote } doReturn uriQuote
             }
             val state = PermissionGrantedBasicInput(
-                stateContext, source, match = source, input, permission, prevResult, lastAttempt, maxAttempts
+                stateContext,
+                source,
+                match = source,
+                input,
+                permission,
+                prevResult,
+                lastAttempt,
+                maxAttempts,
+                dispatcher = testScheduler,
             )
             val workDuration = testScheduler.timeSource.measureTime {
                 assertEquals(
@@ -255,7 +287,7 @@ class PermissionGrantedBasicInputTest {
                         input,
                         permission,
                         prevResult,
-                        lastAttempt = Attempt(2, cause),
+                        lastAttempt = Attempt(1, cause),
                         maxAttempts,
                     ),
                     state.transition(),
@@ -304,7 +336,15 @@ class PermissionGrantedBasicInputTest {
                 on { this@on.uriQuote } doReturn uriQuote
             }
             val state = PermissionGrantedBasicInput(
-                stateContext, source, match = source, input, permission, prevResult, lastAttempt, maxAttempts
+                stateContext,
+                source,
+                match = source,
+                input,
+                permission,
+                prevResult,
+                lastAttempt,
+                maxAttempts,
+                dispatcher = testScheduler,
             )
             val workDuration = testScheduler.timeSource.measureTime {
                 assertEquals(
@@ -321,7 +361,7 @@ class PermissionGrantedBasicInputTest {
                     state.transition(),
                 )
             }
-            assertEquals(0.seconds, workDuration)
+            assertEquals(1.seconds, workDuration)
         }
 
     @Test
@@ -364,7 +404,15 @@ class PermissionGrantedBasicInputTest {
                 on { this@on.uriQuote } doReturn uriQuote
             }
             val state = PermissionGrantedBasicInput(
-                stateContext, source, match = source, input, permission, prevResult, lastAttempt, maxAttempts
+                stateContext,
+                source,
+                match = source,
+                input,
+                permission,
+                prevResult,
+                lastAttempt,
+                maxAttempts,
+                dispatcher = testScheduler,
             )
             val workDuration = testScheduler.timeSource.measureTime {
                 assertEquals(
@@ -381,7 +429,7 @@ class PermissionGrantedBasicInputTest {
                     state.transition(),
                 )
             }
-            assertEquals(1.seconds, workDuration)
+            assertEquals(2.seconds, workDuration)
         }
 
     @Test
@@ -424,7 +472,15 @@ class PermissionGrantedBasicInputTest {
                 on { this@on.uriQuote } doReturn uriQuote
             }
             val state = PermissionGrantedBasicInput(
-                stateContext, source, match = source, input, permission, prevResult, lastAttempt, maxAttempts
+                stateContext,
+                source,
+                match = source,
+                input,
+                permission,
+                prevResult,
+                lastAttempt,
+                maxAttempts,
+                dispatcher = testScheduler,
             )
             val workDuration = testScheduler.timeSource.measureTime {
                 assertEquals(
@@ -439,7 +495,7 @@ class PermissionGrantedBasicInputTest {
         }
 
     @Test
-    fun transition_whenInputWithDataThrowsUnrecoverableNetworkExceptionAndLastAttemptIsNotNull_returnsConversionFailed() =
+    fun transition_whenInputWithDataThrowsUnrecoverableNetworkException_returnsConversionFailed() =
         runTest {
             val source = "https://maps.google.com/foo"
             val cause = ResponseNetworkException(HttpStatusCode.NotFound, Exception())
@@ -469,7 +525,7 @@ class PermissionGrantedBasicInputTest {
             }
             val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
             val prevResult = ParseResult(prevPoints)
-            val lastAttempt = Attempt<RecoverableNetworkException>(1, ConnectionClosedNetworkException(EOFException()))
+            val lastAttempt = null
             val permission = Permission.ALWAYS
             val stateContext: ConversionStateContext = mock {
                 on { this@on.log } doReturn log
@@ -478,7 +534,15 @@ class PermissionGrantedBasicInputTest {
                 on { this@on.uriQuote } doReturn uriQuote
             }
             val state = PermissionGrantedBasicInput(
-                stateContext, source, match = source, input, permission, prevResult, lastAttempt, maxAttempts
+                stateContext,
+                source,
+                match = source,
+                input,
+                permission,
+                prevResult,
+                lastAttempt,
+                maxAttempts,
+                dispatcher = testScheduler,
             )
             assertEquals(
                 ConversionFailed(
@@ -497,7 +561,13 @@ class PermissionGrantedBasicInputTest {
             on { this@on.resources } doReturn resources
         }
         val state = PermissionGrantedBasicInput(
-            stateContext, source, match = source, input, Permission.ALWAYS, lastAttempt = null
+            stateContext,
+            source,
+            match = source,
+            input,
+            Permission.ALWAYS,
+            lastAttempt = null,
+            dispatcher = testScheduler,
         )
         assertEquals(
             LoadingIndicator.Large(
@@ -516,7 +586,13 @@ class PermissionGrantedBasicInputTest {
             on { this@on.resources } doReturn resources
         }
         val state = PermissionGrantedBasicInput(
-            stateContext, source, match = source, input, Permission.ALWAYS, lastAttempt = lastAttempt
+            stateContext,
+            source,
+            match = source,
+            input,
+            Permission.ALWAYS,
+            lastAttempt = lastAttempt,
+            dispatcher = testScheduler,
         )
         assertEquals(
             LoadingIndicator.Large(

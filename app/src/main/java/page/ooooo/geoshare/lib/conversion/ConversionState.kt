@@ -3,7 +3,6 @@ package page.ooooo.geoshare.lib.conversion
 import android.net.Uri
 import androidx.annotation.StringRes
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.TimeoutCancellationException
@@ -217,7 +216,7 @@ data class PermissionGrantedBasicInput<T>(
     val prevResult: ParseResult? = null,
     val lastAttempt: Attempt<RecoverableNetworkException>? = null,
     val maxAttempts: Int = 10,
-    val dispatcher: CoroutineDispatcher = Dispatchers.Default,
+    val dispatcher: CoroutineContext = Dispatchers.Default,
 ) : ConversionState, ConversionState.HasLargeLoadingIndicator {
     @OptIn(FlowPreview::class)
     override suspend fun transition(): State = try {
@@ -225,7 +224,7 @@ data class PermissionGrantedBasicInput<T>(
             // Run parsing on another thread, because maybe it's computationally expensive
             val attemptNumber = lastAttempt?.number?.plus(1) ?: 1
             try {
-                // TODO Test retrying
+                // TODO Check if all retrying branches are tested
                 if (lastAttempt != null && lastAttempt.number >= maxAttempts) {
                     stateContext.log.w(TAG, "Maximum number of $maxAttempts attempts reached for $match")
                     throw MaxAttemptsReachedNetworkException(lastAttempt.cause)
@@ -284,7 +283,7 @@ data class PermissionGrantedBasicInput<T>(
                 description = lastAttempt?.let {
                     stateContext.resources.getString(
                         R.string.conversion_loading_indicator_description,
-                        it.number,
+                        it.number + 1,
                         maxAttempts,
                         it.cause.getMessage(stateContext.resources),
                     )

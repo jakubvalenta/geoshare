@@ -6,15 +6,23 @@ import org.junit.Test
 class RetryTest {
     @Test
     fun calcExponentialBackoffMillis() {
-        for ((expectedMillis, attemptNumber) in mapOf(
-            0 to 1,
-            0 to 2,
-            2 to 3,
-            4 to 4,
-            256 to 10,
-        )) {
-            assertEquals(expectedMillis, calcExponentialBackoffMillis(attemptNumber))
+        mapOf(
+            0L to 1,
+            1000L to 2,
+            2000L to 3,
+            4000L to 4,
+            256000L to 10,
+        ).run {
+            assertEquals(
+                keys.toList(),
+                values.map { calcExponentialBackoffMillis(it) },
+            )
         }
+    }
+
+    @Test
+    fun calcExponentialBackoffMillis_whenAttemptNumberIsZero_returnsZero() {
+        assertEquals(0, calcExponentialBackoffMillis(0))
     }
 
     @Test
