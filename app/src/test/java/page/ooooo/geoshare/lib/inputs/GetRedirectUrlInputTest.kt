@@ -2,8 +2,9 @@ package page.ooooo.geoshare.lib.inputs
 
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.mock.MockEngine
-import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondError
+import io.ktor.client.engine.mock.respondOk
+import io.ktor.client.engine.mock.respondRedirect
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.util.AttributeKey
@@ -36,11 +37,18 @@ class GetRedirectUrlInputTest {
     }
     private val log = FakeLog
     private val engine = MockEngine { request ->
-        // TODO Test request URL after redirects
-        if (request.method == HttpMethod.Get && request.url.toString() == "https://maps.google.com/foo") {
-            respond("")
-        } else {
-            respondError(HttpStatusCode.NotFound)
+        when (request.url.toString()) {
+            "https://maps.google.com/foo" if request.method == HttpMethod.Get ->
+                respondRedirect("https://maps.google.com/bar")
+
+            "https://maps.google.com/bar" if request.method == HttpMethod.Get ->
+                respondRedirect("https://maps.google.com/redirected")
+
+            "https://maps.google.com/redirected" if request.method == HttpMethod.Get ->
+                respondOk()
+
+            else ->
+                respondError(HttpStatusCode.NotFound)
         }
     }
     private val httpClient = HttpClient(engine, log)
@@ -58,7 +66,7 @@ class GetRedirectUrlInputTest {
     fun whenMatchHasScheme_makesGetRequestWithFollowRedirectTrueAndReturnsRequestUrl() = runTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
-            ParseResult(nextStep = NextStep(DebugUriInput, "https://maps.google.com/foo")),
+            ParseResult(nextStep = NextStep(DebugUriInput, "https://maps.google.com/redirected")),
             input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
                     nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
@@ -74,7 +82,7 @@ class GetRedirectUrlInputTest {
     fun whenMatchHasNoScheme_makesGetRequestToUrlWithHttpsSchemeAndReturnsRequestUrl() = runTest {
         val match = "maps.google.com/foo"
         assertEquals(
-            ParseResult(nextStep = NextStep(DebugUriInput, "https://maps.google.com/foo")),
+            ParseResult(nextStep = NextStep(DebugUriInput, "https://maps.google.com/redirected")),
             input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
                     nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
@@ -87,7 +95,7 @@ class GetRedirectUrlInputTest {
     fun whenHttpClientRespondsRequestUrlAsRelativeUrl_returnsItAsAbsoluteUrl() = runTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
-            ParseResult(nextStep = NextStep(DebugUriInput, "https://maps.google.com/foo")),
+            ParseResult(nextStep = NextStep(DebugUriInput, "https://maps.google.com/redirected")),
             input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
                     nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
