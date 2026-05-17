@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.conversion
 
 import android.content.res.Resources
+import io.ktor.client.HttpClient
 import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
@@ -10,17 +11,15 @@ import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.inputs.Input
-import page.ooooo.geoshare.lib.network.DefaultNetworkTools
-import page.ooooo.geoshare.lib.network.NetworkTools
 
 class ConversionStateContext(
     val inputs: List<Input<*>> = emptyList(),
-    val networkTools: NetworkTools = DefaultNetworkTools(),
     val linkRepository: LinkRepository,
     val outputRepository: OutputRepository,
     val resources: Resources,
     val userPreferencesRepository: UserPreferencesRepository,
     val log: Log = DefaultLog,
+    val httpClient: HttpClient = page.ooooo.geoshare.lib.network.HttpClient(log = log),
     val billing: Billing,
     val uriQuote: UriQuote = DefaultUriQuote,
     val onStateChange: (State) -> Unit = {},

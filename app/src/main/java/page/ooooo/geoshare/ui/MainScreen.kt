@@ -85,6 +85,7 @@ import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.data.local.preferences.Permission
+import page.ooooo.geoshare.lib.Attempt
 import page.ooooo.geoshare.lib.Message
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.AppDetails
@@ -126,7 +127,6 @@ import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsWebViewInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.network.ConnectTimeoutNetworkException
-import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.ActionContext
 import page.ooooo.geoshare.lib.outputs.ActionResult
@@ -2227,10 +2227,7 @@ private fun LoadingIndicatorPreview() {
             match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             input = GoogleMapsHtmlInput,
             permission = Permission.ALWAYS,
-            lastAttempt = NetworkTools.Attempt(
-                2,
-                ConnectTimeoutNetworkException(Exception()),
-            ),
+            lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )
         MainScreen(
             currentState = currentState,
@@ -2303,10 +2300,7 @@ private fun DarkLoadingIndicatorPreview() {
             match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             input = GoogleMapsHtmlInput,
             permission = Permission.ALWAYS,
-            lastAttempt = NetworkTools.Attempt(
-                2,
-                ConnectTimeoutNetworkException(Exception()),
-            ),
+            lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )
         MainScreen(
             currentState = currentState,
@@ -2379,10 +2373,7 @@ private fun TabletLoadingIndicatorPreview() {
             match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             input = GoogleMapsHtmlInput,
             permission = Permission.ALWAYS,
-            lastAttempt = NetworkTools.Attempt(
-                2,
-                ConnectTimeoutNetworkException(Exception()),
-            ),
+            lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )
         MainScreen(
             currentState = currentState,

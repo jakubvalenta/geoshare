@@ -2,13 +2,12 @@ package page.ooooo.geoshare.lib.inputs
 
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.mock.MockEngine
-import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondError
+import io.ktor.client.engine.mock.respondOk
+import io.ktor.client.engine.mock.respondRedirect
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.util.AttributeKey
-import io.ktor.utils.io.ByteReadChannel
-import io.ktor.utils.io.readLine
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -16,18 +15,20 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.Log
+import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.network.HttpClient
-import page.ooooo.geoshare.lib.network.NetworkException
+import page.ooooo.geoshare.lib.network.ResponseNetworkException
 import java.net.MalformedURLException
 
-class BodyAsChannelInputTest {
-    val input = object : BodyAsChannelInput {
+class GetLastHopUrlInputTest {
+    val input = object : GetLastHopUrlInput {
+        override val pattern get() = throw NotImplementedError()
         override val permissionTitleResId get() = throw NotImplementedError()
         override val loadingIndicatorTitleResId get() = throw NotImplementedError()
 
         override suspend fun parse(
-            data: ByteReadChannel,
+            data: Uri,
             match: String,
             prevResult: ParseResult?,
             uriQuote: UriQuote,
@@ -36,13 +37,21 @@ class BodyAsChannelInputTest {
     }
     private val log = FakeLog
     private val engine = MockEngine { request ->
-        if (request.method == HttpMethod.Get && request.url.toString() == "https://maps.google.com/foo") {
-            respond("test data")
-        } else {
-            respondError(HttpStatusCode.NotFound)
+        when (request.url.toString()) {
+            "https://maps.google.com/foo" if request.method == HttpMethod.Get ->
+                respondRedirect("https://maps.google.com/bar")
+
+            "https://maps.google.com/bar" if request.method == HttpMethod.Get ->
+                respondRedirect("https://maps.google.com/redirected")
+
+            "https://maps.google.com/redirected" if request.method == HttpMethod.Get ->
+                respondOk()
+
+            else ->
+                respondError(HttpStatusCode.NotFound)
         }
     }
-    private val httpClient = HttpClient(engine, log = log)
+    private val httpClient = HttpClient(engine, log)
     private val uriQuote = FakeUriQuote
 
     @Test(expected = MalformedURLException::class)
@@ -54,13 +63,13 @@ class BodyAsChannelInputTest {
     }
 
     @Test
-    fun whenMatchHasScheme_makesGetRequestWithFollowRedirectsAndReturnsResponse() = runTest {
+    fun whenMatchHasScheme_makesGetRequestWithFollowRedirectTrueAndReturnsRequestUrl() = runTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
-            ParseResult(nextStep = NextStep(DebugUriInput, "test data")),
+            ParseResult(nextStep = NextStep(DebugUriInput, "https://maps.google.com/redirected")),
             input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
-                    nextStep = NextStep(DebugUriInput, data.readLine()!!) // Store data in nextStep, so we can test it
+                    nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
                 )
             }
         )
@@ -70,19 +79,32 @@ class BodyAsChannelInputTest {
     }
 
     @Test
-    fun whenMatchHasNoScheme_makesGetRequestToUrlWithHttpsSchemeAndReturnsResponse() = runTest {
+    fun whenMatchHasNoScheme_makesGetRequestToUrlWithHttpsSchemeAndReturnsRequestUrl() = runTest {
         val match = "maps.google.com/foo"
         assertEquals(
-            ParseResult(nextStep = NextStep(DebugUriInput, "test data")),
+            ParseResult(nextStep = NextStep(DebugUriInput, "https://maps.google.com/redirected")),
             input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
-                    nextStep = NextStep(DebugUriInput, data.readLine()!!) // Store data in nextStep, so we can test it
+                    nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
                 )
             }
         )
     }
 
-    @Test(expected = NetworkException::class)
+    @Test
+    fun whenHttpClientRespondsRequestUrlAsRelativeUrl_returnsItAsAbsoluteUrl() = runTest {
+        val match = "https://maps.google.com/foo"
+        assertEquals(
+            ParseResult(nextStep = NextStep(DebugUriInput, "https://maps.google.com/redirected")),
+            input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) { data ->
+                ParseResult(
+                    nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
+                )
+            }
+        )
+    }
+
+    @Test(expected = ResponseNetworkException::class)
     fun whenHttpClientRespondsError_throwsNetworkException() = runTest {
         val match = "https://maps.google.com/not-found"
         input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) {
