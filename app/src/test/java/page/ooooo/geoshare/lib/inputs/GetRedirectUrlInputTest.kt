@@ -1,12 +1,15 @@
 package page.ooooo.geoshare.lib.inputs
 
+import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondError
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
+import io.ktor.util.AttributeKey
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
@@ -32,17 +35,15 @@ class GetRedirectUrlInputTest {
         ) = throw NotImplementedError()
     }
     private val log = FakeLog
-    private val httpClient = HttpClient(
-        MockEngine { request ->
-            // TODO Test request URL after redirects
-            if (request.method == HttpMethod.Get && request.url.toString() == "https://maps.google.com/foo") {
-                respond("")
-            } else {
-                throw NotImplementedError()
-            }
-        },
-        log = log,
-    )
+    private val engine = MockEngine { request ->
+        // TODO Test request URL after redirects
+        if (request.method == HttpMethod.Get && request.url.toString() == "https://maps.google.com/foo") {
+            respond("")
+        } else {
+            respondError(HttpStatusCode.NotFound)
+        }
+    }
+    private val httpClient = HttpClient(engine, log)
     private val uriQuote = FakeUriQuote
 
     @Test(expected = MalformedURLException::class)
@@ -54,8 +55,7 @@ class GetRedirectUrlInputTest {
     }
 
     @Test
-    fun whenMatchHasScheme_makesGetRequestAndReturnsRequestUrl() = runTest {
-        // TODO Test followRedirects
+    fun whenMatchHasScheme_makesGetRequestWithFollowRedirectTrueAndReturnsRequestUrl() = runTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
             ParseResult(nextStep = NextStep(DebugUriInput, "https://maps.google.com/foo")),
@@ -65,6 +65,9 @@ class GetRedirectUrlInputTest {
                 )
             }
         )
+        val lastRequest = engine.requestHistory.last()
+        val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
+        assertTrue(clientConfig.followRedirects)
     }
 
     @Test
@@ -95,13 +98,7 @@ class GetRedirectUrlInputTest {
 
     @Test(expected = ResponseNetworkException::class)
     fun whenHttpClientRespondsError_throwsNetworkException() = runTest {
-        val match = "https://maps.google.com/foo"
-        val httpClient = HttpClient(
-            MockEngine {
-                respondError(HttpStatusCode.NotFound)
-            },
-            log = log,
-        )
+        val match = "https://maps.google.com/not-found"
         input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) {
             ParseResult()
         }

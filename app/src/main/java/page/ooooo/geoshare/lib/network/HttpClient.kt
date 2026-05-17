@@ -1,11 +1,9 @@
 package page.ooooo.geoshare.lib.network
 
 import io.ktor.client.HttpClient
-import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.network.sockets.ConnectTimeoutException
-import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.HttpTimeout
@@ -33,22 +31,16 @@ const val REQUEST_TIMEOUT = 256_000L
 const val CONNECT_TIMEOUT = 128_000L
 const val SOCKET_TIMEOUT = 128_000L
 
-private const val TAG = "NetworkTools"
+private const val TAG = "HttpClient"
 
 /**
- * Creates a pre-configured HTTP client.
+ * HTTP client with useful basic configuration including the wrapping of exceptions in [NetworkException].
  *
- * TODO Docs
- *
- * Throws [NetworkException] if there is a connection error or if the HTTP response code is unexpected. Expected
- * response codes are 2xx, and if [HttpClientConfig.followRedirects] is false, then also 3xx.
+ * For request to map services, you should always use this HTTP client instead of the default unconfigured one.
  */
-fun HttpClient(
-    engine: HttpClientEngine = CIO.create(),
-    log: Log = DefaultLog,
-    userConfig: HttpClientConfig<*>.() -> Unit = {},
-): HttpClient = HttpClient(engine) {
-    userConfig()
+fun HttpClient(engine: HttpClientEngine = CIO.create(), log: Log = DefaultLog): HttpClient = HttpClient(engine) {
+    expectSuccess = true
+
     // Bypass consent page https://stackoverflow.com/a/78115353
     install(HttpCookies) {
         storage = ConstantCookiesStorage(
@@ -77,28 +69,6 @@ fun HttpClient(
         agent = DESKTOP_USER_AGENT
     }
     HttpResponseValidator {
-        val followRedirects = this@HttpClient.followRedirects
-        validateResponse { response ->
-            val statusCode = response.status.value
-            if (statusCode < 300) {
-                return@validateResponse
-            }
-            val exceptionResponseText = "<not implemented>"
-            val exception = when (statusCode) {
-                in 300..399 -> if (followRedirects) {
-                    RedirectResponseException(response, exceptionResponseText)
-                } else {
-                    // If the caller doesn't want to follow redirect, it probably means it wants to read the
-                    // response Location header and expects the request to return 3xx, so let's not throw
-                    return@validateResponse
-                }
-
-                in 400..499 -> ClientRequestException(response, exceptionResponseText)
-                in 500..599 -> ServerResponseException(response, exceptionResponseText)
-                else -> ResponseException(response, exceptionResponseText)
-            }
-            throw exception
-        }
         handleResponseExceptionWithRequest { cause, request ->
             when (cause) {
                 is UnresolvedAddressException -> {
@@ -151,17 +121,19 @@ fun HttpClient(
  */
 @Throws(NetworkException::class)
 suspend fun HttpClient.headLocationHeader(url: URL): String =
-    config {
-        // FIXME Follow redirects must be set before HttpClient's config
-        followRedirects = false
+    config { followRedirects = false }.run {
+        try {
+            head(url)
+        } catch (e: ResponseNetworkException) {
+            // Expect that the request returns 3xx
+            (e.cause as? RedirectResponseException)?.response ?: throw e
+        }
+            .headers[HttpHeaders.Location] ?: throw MissingHeaderNetworkException()
     }
-        .head(url)
-        .headers[HttpHeaders.Location] ?: throw MissingHeaderNetworkException()
 
 /**
  * Makes a GET request to [url], follows all redirects, and returns the final URL that the request redirected to.
  */
 @Throws(NetworkException::class)
 suspend fun HttpClient.getRedirectUrlString(url: URL): String =
-    get(url)
-        .request.url.toString()
+    get(url).request.url.toString()

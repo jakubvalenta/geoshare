@@ -25,10 +25,7 @@ class UriInputTest {
         ) = throw NotImplementedError()
     }
     private val log = FakeLog
-    private val httpClient = HttpClient(
-        MockEngine { throw NotImplementedError() },
-        log = log,
-    )
+    private val httpClient = HttpClient(MockEngine { throw NotImplementedError() }, log)
     private val uriQuote = FakeUriQuote
 
     @Test

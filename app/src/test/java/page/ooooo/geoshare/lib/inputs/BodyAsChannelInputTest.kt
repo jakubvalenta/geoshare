@@ -1,14 +1,17 @@
 package page.ooooo.geoshare.lib.inputs
 
+import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondError
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
+import io.ktor.util.AttributeKey
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readLine
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
@@ -32,16 +35,14 @@ class BodyAsChannelInputTest {
         ) = throw NotImplementedError()
     }
     private val log = FakeLog
-    private val httpClient = HttpClient(
-        MockEngine { request ->
-            if (request.method == HttpMethod.Get && request.url.toString() == "https://maps.google.com/foo") {
-                respond("test data")
-            } else {
-                throw NotImplementedError()
-            }
-        },
-        log = log,
-    )
+    private val engine = MockEngine { request ->
+        if (request.method == HttpMethod.Get && request.url.toString() == "https://maps.google.com/foo") {
+            respond("test data")
+        } else {
+            respondError(HttpStatusCode.NotFound)
+        }
+    }
+    private val httpClient = HttpClient(engine, log = log)
     private val uriQuote = FakeUriQuote
 
     @Test(expected = MalformedURLException::class)
@@ -53,8 +54,7 @@ class BodyAsChannelInputTest {
     }
 
     @Test
-    fun whenMatchHasScheme_makesGetRequestAndReturnsResponse() = runTest {
-        // TODO Test followRedirects
+    fun whenMatchHasScheme_makesGetRequestWithFollowRedirectsAndReturnsResponse() = runTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
             ParseResult(nextStep = NextStep(DebugUriInput, "test data")),
@@ -64,6 +64,9 @@ class BodyAsChannelInputTest {
                 )
             }
         )
+        val lastRequest = engine.requestHistory.last()
+        val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
+        assertTrue(clientConfig.followRedirects)
     }
 
     @Test
@@ -81,13 +84,7 @@ class BodyAsChannelInputTest {
 
     @Test(expected = NetworkException::class)
     fun whenHttpClientRespondsError_throwsNetworkException() = runTest {
-        val match = "https://maps.google.com/foo"
-        val httpClient = HttpClient(
-            MockEngine {
-                respondError(HttpStatusCode.NotFound)
-            },
-            log = log,
-        )
+        val match = "https://maps.google.com/not-found"
         input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) {
             ParseResult()
         }

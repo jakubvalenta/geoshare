@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondError
@@ -7,8 +8,10 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headers
+import io.ktor.util.AttributeKey
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Test
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
@@ -34,18 +37,16 @@ class HeadLocationHeaderUriInputTest {
         ) = throw NotImplementedError()
     }
     private val log = FakeLog
-    private val httpClient = HttpClient(
-        MockEngine { request ->
-            if (request.method == HttpMethod.Head && request.url.toString() == "https://maps.google.com/foo") {
-                respond("", HttpStatusCode.MovedPermanently, headers {
-                    append(HttpHeaders.Location, "https://maps.google.com/redirected")
-                })
-            } else {
-                throw NotImplementedError()
-            }
-        },
-        log = log,
-    )
+    private val engine = MockEngine { request ->
+        if (request.method == HttpMethod.Head && request.url.toString() == "https://maps.google.com/foo") {
+            respond("", HttpStatusCode.MovedPermanently, headers {
+                append(HttpHeaders.Location, "https://maps.google.com/redirected")
+            })
+        } else {
+            respondError(HttpStatusCode.NotFound)
+        }
+    }
+    private val httpClient = HttpClient(engine, log)
     private val uriQuote = FakeUriQuote
 
     @Test(expected = MalformedURLException::class)
@@ -57,8 +58,7 @@ class HeadLocationHeaderUriInputTest {
     }
 
     @Test
-    fun whenMatchHasScheme_makesHeadRequestAndReturnsLocationHeader() = runTest {
-        // TODO Test followRedirects
+    fun whenMatchHasScheme_makesHeadRequestWithRedirectsFalseAndReturnsLocationHeader() = runTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
             ParseResult(nextStep = NextStep(DebugUriInput, "https://maps.google.com/redirected")),
@@ -68,6 +68,9 @@ class HeadLocationHeaderUriInputTest {
                 )
             }
         )
+        val lastRequest = engine.requestHistory.last()
+        val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
+        assertFalse(clientConfig.followRedirects)
     }
 
     @Test
@@ -86,20 +89,18 @@ class HeadLocationHeaderUriInputTest {
     @Test
     fun whenHttpClientRespondsLocationHeaderAsRelativeUrl_returnsItAsAbsoluteUrl() = runTest {
         val match = "https://maps.google.com/foo"
-        val httpClient = HttpClient(
-            MockEngine { request ->
-                if (request.method == HttpMethod.Head && request.url.toString() == "https://maps.google.com/foo") {
-                    respond("", HttpStatusCode.MovedPermanently, headers {
-                        append(HttpHeaders.Location, "redirected")
-                    })
-                } else {
-                    throw NotImplementedError()
-                }
-            },
-            log = log,
-        )
+        val engine = MockEngine { request ->
+            if (request.method == HttpMethod.Head && request.url.toString() == "https://maps.google.com/foo") {
+                respond("", HttpStatusCode.MovedPermanently, headers {
+                    append(HttpHeaders.Location, "redirected")
+                })
+            } else {
+                respondError(HttpStatusCode.NotFound)
+            }
+        }
+        val httpClient = HttpClient(engine, log)
         assertEquals(
-            ParseResult(nextStep = NextStep(DebugUriInput, "https://maps.google.com/redirected")),
+            ParseResult(nextStep = NextStep(DebugUriInput, "https://maps.google.com/foo/redirected")),
             input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
                     nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
@@ -110,13 +111,7 @@ class HeadLocationHeaderUriInputTest {
 
     @Test(expected = ResponseNetworkException::class)
     fun whenHttpClientRespondsError_throwsNetworkException() = runTest {
-        val match = "https://maps.google.com/foo"
-        val httpClient = HttpClient(
-            MockEngine {
-                respondError(HttpStatusCode.NotFound)
-            },
-            log = log,
-        )
+        val match = "https://maps.google.com/not-found"
         input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) {
             ParseResult()
         }

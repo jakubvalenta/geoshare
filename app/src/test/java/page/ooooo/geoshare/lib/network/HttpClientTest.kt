@@ -5,6 +5,7 @@ import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.network.sockets.ConnectTimeoutException
 import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.ktor.client.plugins.RedirectResponseException
 import io.ktor.client.plugins.ResponseException
 import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.request.get
@@ -12,6 +13,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headers
+import io.ktor.util.AttributeKey
 import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.coroutines.test.runTest
 import kotlinx.io.EOFException
@@ -33,18 +35,16 @@ class HttpClientTest {
             HttpStatusCode.MovedPermanently,
             HttpStatusCode.Found,
         )) {
-            val httpClient = HttpClient(
-                MockEngine { request ->
-                    if (request.method == HttpMethod.Head && request.url.toString() == "https://maps.google.com/foo") {
-                        respond("", status, headers {
-                            append(HttpHeaders.Location, "https://maps.google.com/redirected")
-                        })
-                    } else {
-                        throw NotImplementedError()
-                    }
-                },
-                log = log,
-            )
+            val engine = MockEngine { request ->
+                if (request.method == HttpMethod.Head && request.url.toString() == "https://maps.google.com/foo") {
+                    respond("", status, headers {
+                        append(HttpHeaders.Location, "https://maps.google.com/redirected")
+                    })
+                } else {
+                    throw NotImplementedError()
+                }
+            }
+            val httpClient = HttpClient(engine, log)
             assertEquals(
                 "https://maps.google.com/redirected",
                 httpClient.headLocationHeader(url),
@@ -59,23 +59,40 @@ class HttpClientTest {
             HttpStatusCode.MovedPermanently,
             HttpStatusCode.Found,
         )) {
-            val httpClient = HttpClient(
-                MockEngine { request ->
-                    if (request.method == HttpMethod.Head && request.url.toString() == "https://maps.google.com/foo") {
-                        respond("", status)
-                    } else {
-                        throw NotImplementedError()
-                    }
-                },
-                log = log,
-            )
+            val engine = MockEngine { request ->
+                if (request.method == HttpMethod.Head && request.url.toString() == "https://maps.google.com/foo") {
+                    respond("", status)
+                } else {
+                    throw NotImplementedError()
+                }
+            }
+            val httpClient = HttpClient(engine, log)
+            httpClient.headLocationHeader(url)
+        }
+    }
+
+    @Test
+    fun headLocationHeader_whenResponseIs4xxOr5xx_throwsException() = runTest {
+        val url = URL("https://maps.google.com/foo")
+        for (status in listOf(
+            HttpStatusCode.NotFound,
+            HttpStatusCode.InternalServerError,
+        )) {
+            val engine = MockEngine { request ->
+                if (request.method == HttpMethod.Head && request.url.toString() == "https://maps.google.com/foo") {
+                    respond("", status)
+                } else {
+                    throw NotImplementedError()
+                }
+            }
+            val httpClient = HttpClient(engine, log)
             var threw: Exception? = null
             try {
                 httpClient.headLocationHeader(url)
             } catch (tr: Exception) {
                 threw = tr
             }
-            assertTrue(threw is MissingHeaderNetworkException)
+            assertTrue(threw is NetworkException)
         }
     }
 
@@ -86,17 +103,15 @@ class HttpClientTest {
             HttpStatusCode.OK,
             HttpStatusCode.Created,
         )) {
-            val httpClient = HttpClient(
-                MockEngine { request ->
-                    // TODO Test request URL after redirects
-                    if (request.method == HttpMethod.Get && request.url.toString() == "https://maps.google.com/foo") {
-                        respond("", status)
-                    } else {
-                        throw NotImplementedError()
-                    }
-                },
-                log = log,
-            )
+            val engine = MockEngine { request ->
+                // TODO Test request URL after redirects
+                if (request.method == HttpMethod.Get && request.url.toString() == "https://maps.google.com/foo") {
+                    respond("", status)
+                } else {
+                    throw NotImplementedError()
+                }
+            }
+            val httpClient = HttpClient(engine, log)
             assertEquals(
                 "https://maps.google.com/foo",
                 httpClient.getRedirectUrlString(url),
@@ -105,7 +120,7 @@ class HttpClientTest {
     }
 
     @Test
-    fun httpClient_whenResponseIs2xx_andFollowRedirectsIsDefault_returnsResponseIncludingLocationHeader() = runTest {
+    fun httpClient_whenResponseIs2xx_returnsResponseIncludingLocationHeader() = runTest {
         val url = URL("https://maps.google.com/foo")
         for (status in listOf(
             HttpStatusCode.OK,
@@ -146,6 +161,9 @@ class HttpClientTest {
                     .get(url)
                     .headers[HttpHeaders.Location],
             )
+            val lastRequest = engine.requestHistory.last()
+            val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
+            assertFalse(clientConfig.followRedirects)
         }
     }
 
@@ -166,18 +184,15 @@ class HttpClientTest {
             }
             assertTrue(threw is UnrecoverableNetworkException)
             assertTrue(threw is ResponseNetworkException)
-            assertTrue(threw?.cause is ResponseException)
-            assertFalse(threw?.cause is ServerResponseException)
+            assertTrue(threw?.cause is RedirectResponseException)
             val lastRequest = engine.requestHistory.last()
-            val clientConfig =
-                lastRequest.attributes[io.ktor.util.AttributeKey<HttpClientConfig<*>>("client-config")]
-            assertEquals(lastRequest.method, HttpMethod.Get)
+            val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
             assertTrue(clientConfig.followRedirects)
         }
     }
 
     @Test
-    fun httpClient_whenResponseIs3xxAndFollowRedirectsIsFalse_returnsResponseIncludingLocationHeader() = runTest {
+    fun httpClient_whenResponseIs3xxAndFollowRedirectsIsFalse_throwsUnrecoverableException() = runTest {
         val url = URL("https://maps.google.com/foo")
         for (status in listOf(
             HttpStatusCode.MovedPermanently,
@@ -189,13 +204,20 @@ class HttpClientTest {
                 })
             }
             val httpClient = HttpClient(engine, log)
-            assertEquals(
-                "https://maps.google.com/redirected",
+            var threw: Exception? = null
+            try {
                 httpClient
                     .config { followRedirects = false }
                     .get(url)
-                    .headers[HttpHeaders.Location]
-            )
+            } catch (tr: Exception) {
+                threw = tr
+            }
+            assertTrue(threw is UnrecoverableNetworkException)
+            assertTrue(threw is ResponseNetworkException)
+            assertTrue(threw?.cause is RedirectResponseException)
+            val lastRequest = engine.requestHistory.last()
+            val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
+            assertFalse(clientConfig.followRedirects)
         }
     }
 
@@ -219,11 +241,6 @@ class HttpClientTest {
             assertTrue(threw is ResponseNetworkException)
             assertTrue(threw?.cause is ResponseException)
             assertFalse(threw?.cause is ServerResponseException)
-            val lastRequest = engine.requestHistory.last()
-            val clientConfig =
-                lastRequest.attributes[io.ktor.util.AttributeKey<HttpClientConfig<*>>("client-config")]
-            assertEquals(lastRequest.method, HttpMethod.Get)
-            assertTrue(clientConfig.followRedirects)
         }
     }
 
@@ -245,17 +262,13 @@ class HttpClientTest {
             assertTrue(threw is RecoverableNetworkException)
             assertTrue(threw is ServerResponseNetworkException)
             assertTrue(threw?.cause is ServerResponseException)
-            val lastRequest = engine.requestHistory.last()
-            val clientConfig = lastRequest.attributes[io.ktor.util.AttributeKey<HttpClientConfig<*>>("client-config")]
-            assertEquals(lastRequest.method, HttpMethod.Get)
-            assertTrue(clientConfig.followRedirects)
         }
     }
 
     @Test
     fun httpClient_whenRequestThrowsUnresolvedAddressException_throwsRecoverableException() = runTest {
         val url = URL("https://maps.google.com/foo")
-        val engine = MockEngine { throw io.ktor.util.network.UnresolvedAddressException() }
+        val engine = MockEngine { throw UnresolvedAddressException() }
         val httpClient = HttpClient(engine, log)
         var threw: Exception? = null
         try {
