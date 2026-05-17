@@ -227,7 +227,9 @@ class PermissionGrantedWebViewInputTest {
         val stateContext: ConversionStateContext = mock {
             on { this@on.resources } doReturn resources
         }
-        val state = PermissionGrantedWebViewInput(stateContext, source, match = source, input, Permission.ALWAYS)
+        val state = PermissionGrantedWebViewInput(
+            stateContext, source, match = source, input, Permission.ALWAYS, dispatcher = testScheduler
+        )
         assertEquals(
             LoadingIndicator.Large(
                 title = resources.getString(R.string.converter_google_maps_loading_indicator_title),
