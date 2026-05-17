@@ -135,5 +135,5 @@ suspend fun HttpClient.headLocationHeader(url: URL): String =
  * Makes a GET request to [url], follows all redirects, and returns the final URL that the request redirected to.
  */
 @Throws(NetworkException::class)
-suspend fun HttpClient.getRedirectUrlString(url: URL): String =
+suspend fun HttpClient.getLastHopUrlString(url: URL): String =
     get(url).request.url.toString()

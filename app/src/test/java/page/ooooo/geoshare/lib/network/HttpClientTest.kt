@@ -1,52 +1,29 @@
 package page.ooooo.geoshare.lib.network
 
-import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
-import io.ktor.client.call.HttpClientCall
 import io.ktor.client.engine.mock.MockEngine
-import io.ktor.client.engine.mock.MockEngineConfig
-import io.ktor.client.engine.mock.MockRequestHandleScope
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondError
-import io.ktor.client.engine.mock.respondOk
 import io.ktor.client.engine.mock.respondRedirect
 import io.ktor.client.network.sockets.ConnectTimeoutException
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.RedirectResponseException
 import io.ktor.client.plugins.ResponseException
 import io.ktor.client.plugins.ServerResponseException
-import io.ktor.client.request.HttpRequestData
-import io.ktor.client.request.HttpResponseData
 import io.ktor.client.request.get
-import io.ktor.client.request.request
-import io.ktor.client.request.url
-import io.ktor.client.statement.DefaultHttpResponse
-import io.ktor.client.utils.EmptyContent
-import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
-import io.ktor.http.HttpProtocolVersion
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.Url
-import io.ktor.http.content.OutgoingContent
 import io.ktor.http.headers
-import io.ktor.http.headersOf
 import io.ktor.util.AttributeKey
-import io.ktor.util.Attributes
-import io.ktor.util.date.GMTDate
 import io.ktor.util.network.UnresolvedAddressException
-import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.InternalAPI
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.test.runTest
 import kotlinx.io.EOFException
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
 import page.ooooo.geoshare.lib.FakeLog
 import java.net.SocketTimeoutException
 import java.net.URL
@@ -148,7 +125,7 @@ class HttpClientTest {
             val httpClient = HttpClient(engine, log)
             assertEquals(
                 "https://maps.google.com/redirected",
-                httpClient.getRedirectUrlString(url),
+                httpClient.getLastHopUrlString(url),
             )
         }
     }

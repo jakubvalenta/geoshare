@@ -21,8 +21,8 @@ import page.ooooo.geoshare.lib.network.HttpClient
 import page.ooooo.geoshare.lib.network.ResponseNetworkException
 import java.net.MalformedURLException
 
-class GetRedirectUrlInputTest {
-    val input = object : GetRedirectUrlInput {
+class GetLastHopUrlInputTest {
+    val input = object : GetLastHopUrlInput {
         override val pattern get() = throw NotImplementedError()
         override val permissionTitleResId get() = throw NotImplementedError()
         override val loadingIndicatorTitleResId get() = throw NotImplementedError()

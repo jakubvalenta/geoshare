@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.network.getRedirectUrlString
+import page.ooooo.geoshare.lib.network.getLastHopUrlString
 import page.ooooo.geoshare.lib.network.headLocationHeader
 import java.net.MalformedURLException
 import kotlin.coroutines.CoroutineContext
@@ -48,7 +48,7 @@ interface UriInput : BasicInput<Uri> {
     }
 }
 
-interface GetRedirectUrlInput : UriInput, Input.HasPermission {
+interface GetLastHopUrlInput : UriInput, Input.HasPermission {
     override suspend fun withData(
         match: String,
         log: Log,
@@ -59,7 +59,7 @@ interface GetRedirectUrlInput : UriInput, Input.HasPermission {
     ): ParseResult = withContext(coroutineContext) {
         val uri = Uri.parse(match, uriQuote)
         val url = uri.toUrl() ?: throw MalformedURLException()
-        val unshortenedUrlString = httpClient.getRedirectUrlString(url)
+        val unshortenedUrlString = httpClient.getLastHopUrlString(url)
         val unshortenedUri = Uri.parse(unshortenedUrlString, uriQuote).toAbsoluteUri(uri)
         log.i(TAG, "Resolved short link $match to $unshortenedUri")
         block(unshortenedUri)

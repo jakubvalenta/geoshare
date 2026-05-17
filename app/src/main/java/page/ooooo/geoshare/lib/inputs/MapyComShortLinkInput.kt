@@ -6,7 +6,7 @@ import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 
-object MapyComShortLinkInput : GetRedirectUrlInput {
+object MapyComShortLinkInput : GetLastHopUrlInput {
     override val pattern = Regex("""((?:https?://)?(?:www\.)?mapy\.[a-z]{2,3}/s/\S+)""")
 
     @StringRes
