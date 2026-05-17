@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import io.ktor.client.engine.mock.MockEngine
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -9,10 +10,7 @@ import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.network.FakeNetworkTools
-import page.ooooo.geoshare.lib.network.NetworkTools
-import page.ooooo.geoshare.lib.network.SocketTimeoutNetworkException
-import java.net.SocketTimeoutException
+import page.ooooo.geoshare.lib.network.HttpClient
 
 class UriInputTest {
     val input = object : UriInput {
@@ -27,9 +25,7 @@ class UriInputTest {
         ) = throw NotImplementedError()
     }
     private val log = FakeLog
-    private val lastAttempt = NetworkTools.Attempt(1, SocketTimeoutNetworkException(SocketTimeoutException()))
-    private val maxAttempts = 3
-    private val networkTools = FakeNetworkTools()
+    private val httpClient = HttpClient(MockEngine { throw NotImplementedError() }, log)
     private val uriQuote = FakeUriQuote
 
     @Test
@@ -43,14 +39,7 @@ class UriInputTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
             ParseResult(nextStep = NextStep(DebugUriInput, match)),
-            input.withData(
-                match = match,
-                networkTools = networkTools,
-                lastAttempt = lastAttempt,
-                maxAttempts = maxAttempts,
-                uriQuote = uriQuote,
-                log = log,
-            ) { data ->
+            input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
                     nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
                 )
@@ -63,14 +52,7 @@ class UriInputTest {
         val match = "https://[invalid:ipv6]/"
         assertEquals(
             ParseResult(nextStep = NextStep(DebugUriInput, match)),
-            input.withData(
-                match = match,
-                networkTools = networkTools,
-                lastAttempt = lastAttempt,
-                maxAttempts = maxAttempts,
-                uriQuote = uriQuote,
-                log = log,
-            ) { data ->
+            input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
                     nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
                 )

@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.conversion
 
 import android.content.res.Resources
+import io.ktor.client.HttpClient
 import io.ktor.http.HttpStatusCode
 import io.ktor.utils.io.CancellationException
 import kotlinx.collections.immutable.persistentListOf
@@ -11,6 +12,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.Permission
+import page.ooooo.geoshare.lib.Attempt
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.Log
@@ -24,18 +26,20 @@ import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.NextStep
 import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.network.ConnectionClosedNetworkException
-import page.ooooo.geoshare.lib.network.FakeNetworkTools
-import page.ooooo.geoshare.lib.network.NetworkTools
+import page.ooooo.geoshare.lib.network.RecoverableNetworkException
 import page.ooooo.geoshare.lib.network.ResponseNetworkException
 import page.ooooo.geoshare.lib.network.SocketTimeoutNetworkException
 import java.io.EOFException
 import java.net.MalformedURLException
 import java.net.SocketTimeoutException
+import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.measureTime
 
 class PermissionGrantedBasicInputTest {
     private val log = FakeLog
+    private val httpClient: HttpClient = mock()
     private val maxAttempts = 3
-    private val networkTools = FakeNetworkTools()
     private val resources: Resources = mock {
         on { getString(R.string.converter_google_maps_loading_indicator_title) } doReturn "Connecting to Google..."
         on { getString(R.string.conversion_failed_cancelled) } doReturn "Cancelled"
@@ -57,13 +61,12 @@ class PermissionGrantedBasicInputTest {
         val input = object : BasicInput<String>, Input.HasPermission {
             override suspend fun withData(
                 match: String,
-                networkTools: NetworkTools,
-                lastAttempt: NetworkTools.Attempt?,
-                maxAttempts: Int,
-                uriQuote: UriQuote,
                 log: Log,
+                httpClient: HttpClient,
+                uriQuote: UriQuote,
+                coroutineContext: CoroutineContext,
                 block: suspend (String) -> ParseResult,
-            ) = block("${match}-data")
+            ): ParseResult = block("${match}-data")
 
             override suspend fun parse(
                 data: String,
@@ -84,13 +87,21 @@ class PermissionGrantedBasicInputTest {
         val lastAttempt = null
         val permission = Permission.ALWAYS
         val stateContext: ConversionStateContext = mock {
-            on { this@on.networkTools } doReturn networkTools
             on { this@on.log } doReturn log
+            on { this@on.httpClient } doReturn httpClient
             on { this@on.resources } doReturn resources
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedBasicInput(
-            stateContext, source, match = source, input, permission, prevResult, lastAttempt, maxAttempts
+            stateContext,
+            source,
+            match = source,
+            input,
+            permission,
+            prevResult,
+            lastAttempt,
+            maxAttempts,
+            dispatcher = testScheduler,
         )
         assertEquals(
             DataParsed(
@@ -112,13 +123,12 @@ class PermissionGrantedBasicInputTest {
         val input = object : BasicInput<String>, Input.HasPermission {
             override suspend fun withData(
                 match: String,
-                networkTools: NetworkTools,
-                lastAttempt: NetworkTools.Attempt?,
-                maxAttempts: Int,
-                uriQuote: UriQuote,
                 log: Log,
+                httpClient: HttpClient,
+                uriQuote: UriQuote,
+                coroutineContext: CoroutineContext,
                 block: suspend (String) -> ParseResult,
-            ) = throw CancellationException()
+            ): ParseResult = throw CancellationException()
 
             override suspend fun parse(
                 data: String,
@@ -139,13 +149,21 @@ class PermissionGrantedBasicInputTest {
         val lastAttempt = null
         val permission = Permission.ALWAYS
         val stateContext: ConversionStateContext = mock {
-            on { this@on.networkTools } doReturn networkTools
             on { this@on.log } doReturn log
+            on { this@on.httpClient } doReturn httpClient
             on { this@on.resources } doReturn resources
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedBasicInput(
-            stateContext, source, match = source, input, permission, prevResult, lastAttempt, maxAttempts
+            stateContext,
+            source,
+            match = source,
+            input,
+            permission,
+            prevResult,
+            lastAttempt,
+            maxAttempts,
+            dispatcher = testScheduler,
         )
         assertEquals(
             ConversionFailed(resources.getString(R.string.conversion_failed_cancelled), source),
@@ -159,13 +177,12 @@ class PermissionGrantedBasicInputTest {
         val input = object : BasicInput<String>, Input.HasPermission {
             override suspend fun withData(
                 match: String,
-                networkTools: NetworkTools,
-                lastAttempt: NetworkTools.Attempt?,
-                maxAttempts: Int,
-                uriQuote: UriQuote,
                 log: Log,
+                httpClient: HttpClient,
+                uriQuote: UriQuote,
+                coroutineContext: CoroutineContext,
                 block: suspend (String) -> ParseResult,
-            ) = throw MalformedURLException()
+            ): ParseResult = throw MalformedURLException()
 
             override suspend fun parse(
                 data: String,
@@ -186,13 +203,21 @@ class PermissionGrantedBasicInputTest {
         val lastAttempt = null
         val permission = Permission.ALWAYS
         val stateContext: ConversionStateContext = mock {
-            on { this@on.networkTools } doReturn networkTools
             on { this@on.log } doReturn log
+            on { this@on.httpClient } doReturn httpClient
             on { this@on.resources } doReturn resources
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedBasicInput(
-            stateContext, source, match = source, input, permission, prevResult, lastAttempt, maxAttempts
+            stateContext,
+            source,
+            match = source,
+            input,
+            permission,
+            prevResult,
+            lastAttempt,
+            maxAttempts,
+            dispatcher = testScheduler,
         )
         assertEquals(
             ConversionFailed(
@@ -204,20 +229,19 @@ class PermissionGrantedBasicInputTest {
     }
 
     @Test
-    fun transition_whenInputWithDataThrowsRecoverableNetworkExceptionAndLastAttemptIsNull_returnsPermissionGranted() =
+    fun transition_whenInputWithDataThrowsRecoverableNetworkExceptionAndLastAttemptIsNull_returnsPermissionGrantedBasicInput() =
         runTest {
             val source = "https://maps.google.com/foo"
             val cause = SocketTimeoutNetworkException(SocketTimeoutException())
             val input = object : BasicInput<String>, Input.HasPermission {
                 override suspend fun withData(
                     match: String,
-                    networkTools: NetworkTools,
-                    lastAttempt: NetworkTools.Attempt?,
-                    maxAttempts: Int,
-                    uriQuote: UriQuote,
                     log: Log,
+                    httpClient: HttpClient,
+                    uriQuote: UriQuote,
+                    coroutineContext: CoroutineContext,
                     block: suspend (String) -> ParseResult,
-                ) = throw cause
+                ): ParseResult = throw cause
 
                 override suspend fun parse(
                     data: String,
@@ -238,44 +262,54 @@ class PermissionGrantedBasicInputTest {
             val lastAttempt = null
             val permission = Permission.ALWAYS
             val stateContext: ConversionStateContext = mock {
-                on { this@on.networkTools } doReturn networkTools
                 on { this@on.log } doReturn log
+                on { this@on.httpClient } doReturn httpClient
                 on { this@on.resources } doReturn resources
                 on { this@on.uriQuote } doReturn uriQuote
             }
             val state = PermissionGrantedBasicInput(
-                stateContext, source, match = source, input, permission, prevResult, lastAttempt, maxAttempts
+                stateContext,
+                source,
+                match = source,
+                input,
+                permission,
+                prevResult,
+                lastAttempt,
+                maxAttempts,
+                dispatcher = testScheduler,
             )
-            assertEquals(
-                PermissionGranted(
-                    stateContext,
-                    source,
-                    match = source,
-                    input,
-                    permission,
-                    prevResult,
-                    lastAttempt = NetworkTools.Attempt(2, cause),
-                    maxAttempts,
-                ),
-                state.transition(),
-            )
+            val workDuration = testScheduler.timeSource.measureTime {
+                assertEquals(
+                    PermissionGrantedBasicInput(
+                        stateContext,
+                        source,
+                        match = source,
+                        input,
+                        permission,
+                        prevResult,
+                        lastAttempt = Attempt(1, cause),
+                        maxAttempts,
+                    ),
+                    state.transition(),
+                )
+            }
+            assertEquals(0.seconds, workDuration)
         }
 
     @Test
-    fun transition_whenInputWithDataThrowsARecoverableNetworkExceptionAndLastAttemptIsNotNull_returnsPermissionGranted() =
+    fun transition_whenInputWithDataThrowsRecoverableNetworkExceptionAndLastAttemptIsOne_waitsAndReturnsPermissionGrantedBasicInput() =
         runTest {
             val source = "https://maps.google.com/foo"
             val cause = SocketTimeoutNetworkException(SocketTimeoutException())
             val input = object : BasicInput<String>, Input.HasPermission {
                 override suspend fun withData(
                     match: String,
-                    networkTools: NetworkTools,
-                    lastAttempt: NetworkTools.Attempt?,
-                    maxAttempts: Int,
-                    uriQuote: UriQuote,
                     log: Log,
+                    httpClient: HttpClient,
+                    uriQuote: UriQuote,
+                    coroutineContext: CoroutineContext,
                     block: suspend (String) -> ParseResult,
-                ) = throw cause
+                ): ParseResult = throw cause
 
                 override suspend fun parse(
                     data: String,
@@ -293,47 +327,119 @@ class PermissionGrantedBasicInputTest {
             }
             val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
             val prevResult = ParseResult(prevPoints)
-            val lastAttempt = NetworkTools.Attempt(2, ConnectionClosedNetworkException(EOFException()))
+            val lastAttempt = Attempt<RecoverableNetworkException>(1, ConnectionClosedNetworkException(EOFException()))
             val permission = Permission.ALWAYS
             val stateContext: ConversionStateContext = mock {
-                on { this@on.networkTools } doReturn networkTools
                 on { this@on.log } doReturn log
+                on { this@on.httpClient } doReturn httpClient
                 on { this@on.resources } doReturn resources
                 on { this@on.uriQuote } doReturn uriQuote
             }
             val state = PermissionGrantedBasicInput(
-                stateContext, source, match = source, input, permission, prevResult, lastAttempt, maxAttempts
+                stateContext,
+                source,
+                match = source,
+                input,
+                permission,
+                prevResult,
+                lastAttempt,
+                maxAttempts,
+                dispatcher = testScheduler,
             )
-            assertEquals(
-                PermissionGranted(
-                    stateContext,
-                    source,
-                    match = source,
-                    input,
-                    permission,
-                    prevResult,
-                    lastAttempt = NetworkTools.Attempt(3, cause),
-                    maxAttempts,
-                ),
-                state.transition(),
-            )
+            val workDuration = testScheduler.timeSource.measureTime {
+                assertEquals(
+                    PermissionGrantedBasicInput(
+                        stateContext,
+                        source,
+                        match = source,
+                        input,
+                        permission,
+                        prevResult,
+                        lastAttempt = Attempt(2, cause),
+                        maxAttempts,
+                    ),
+                    state.transition(),
+                )
+            }
+            assertEquals(1.seconds, workDuration)
         }
 
     @Test
-    fun transition_whenInputWithDataThrowsUnrecoverableNetworkExceptionAndLastAttemptIsNotNull_returnsConversionFailed() =
+    fun transition_whenInputWithDataThrowsRecoverableNetworkExceptionAndLastAttemptIsMaxAttempts_returnsConversionFailed() =
+        runTest {
+            val source = "https://maps.google.com/foo"
+            val cause = SocketTimeoutNetworkException(SocketTimeoutException())
+            val input = object : BasicInput<String>, Input.HasPermission {
+                override suspend fun withData(
+                    match: String,
+                    log: Log,
+                    httpClient: HttpClient,
+                    uriQuote: UriQuote,
+                    coroutineContext: CoroutineContext,
+                    block: suspend (String) -> ParseResult,
+                ): ParseResult = throw cause
+
+                override suspend fun parse(
+                    data: String,
+                    match: String,
+                    prevResult: ParseResult?,
+                    uriQuote: UriQuote,
+                    log: Log,
+                ) = ParseResult(
+                    prevResult?.points ?: persistentListOf(),
+                    nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
+                )
+
+                override val permissionTitleResId = R.string.converter_google_maps_permission_title
+                override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
+            }
+            val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+            val prevResult = ParseResult(prevPoints)
+            val lastAttempt = Attempt<RecoverableNetworkException>(3, ConnectionClosedNetworkException(EOFException()))
+            val permission = Permission.ALWAYS
+            val stateContext: ConversionStateContext = mock {
+                on { this@on.log } doReturn log
+                on { this@on.httpClient } doReturn httpClient
+                on { this@on.resources } doReturn resources
+                on { this@on.uriQuote } doReturn uriQuote
+            }
+            val state = PermissionGrantedBasicInput(
+                stateContext,
+                source,
+                match = source,
+                input,
+                permission,
+                prevResult,
+                lastAttempt,
+                maxAttempts,
+                dispatcher = testScheduler,
+            )
+            val workDuration = testScheduler.timeSource.measureTime {
+                assertEquals(
+                    ConversionFailed(
+                        resources.getString(R.string.network_exception_eof),
+                        source,
+                    ),
+                    state.transition(),
+                )
+            }
+            assertEquals(0.seconds, workDuration)
+        }
+
+    @Test
+    fun transition_whenInputWithDataThrowsUnrecoverableNetworkException_returnsConversionFailed() =
         runTest {
             val source = "https://maps.google.com/foo"
             val cause = ResponseNetworkException(HttpStatusCode.NotFound, Exception())
             val input = object : BasicInput<String>, Input.HasPermission {
                 override suspend fun withData(
                     match: String,
-                    networkTools: NetworkTools,
-                    lastAttempt: NetworkTools.Attempt?,
-                    maxAttempts: Int,
-                    uriQuote: UriQuote,
                     log: Log,
+                    httpClient: HttpClient,
+                    uriQuote: UriQuote,
+                    coroutineContext: CoroutineContext,
                     block: suspend (String) -> ParseResult,
-                ) = throw cause
+                ): ParseResult = throw cause
 
                 override suspend fun parse(
                     data: String,
@@ -351,16 +457,24 @@ class PermissionGrantedBasicInputTest {
             }
             val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
             val prevResult = ParseResult(prevPoints)
-            val lastAttempt = NetworkTools.Attempt(2, ConnectionClosedNetworkException(EOFException()))
+            val lastAttempt = null
             val permission = Permission.ALWAYS
             val stateContext: ConversionStateContext = mock {
-                on { this@on.networkTools } doReturn networkTools
                 on { this@on.log } doReturn log
+                on { this@on.httpClient } doReturn httpClient
                 on { this@on.resources } doReturn resources
                 on { this@on.uriQuote } doReturn uriQuote
             }
             val state = PermissionGrantedBasicInput(
-                stateContext, source, match = source, input, permission, prevResult, lastAttempt, maxAttempts
+                stateContext,
+                source,
+                match = source,
+                input,
+                permission,
+                prevResult,
+                lastAttempt,
+                maxAttempts,
+                dispatcher = testScheduler,
             )
             assertEquals(
                 ConversionFailed(
@@ -379,7 +493,13 @@ class PermissionGrantedBasicInputTest {
             on { this@on.resources } doReturn resources
         }
         val state = PermissionGrantedBasicInput(
-            stateContext, source, match = source, input, Permission.ALWAYS, lastAttempt = null
+            stateContext,
+            source,
+            match = source,
+            input,
+            Permission.ALWAYS,
+            lastAttempt = null,
+            dispatcher = testScheduler,
         )
         assertEquals(
             LoadingIndicator.Large(
@@ -390,15 +510,21 @@ class PermissionGrantedBasicInputTest {
     }
 
     @Test
-    fun getLoadingIndicator_whenLastAttemptNumberIsTwo_returnsLargeLoadingIndicatorWithDescription() = runTest {
+    fun getLoadingIndicator_whenLastAttemptNumberIsOne_returnsLargeLoadingIndicatorWithDescription() = runTest {
         val source = "https://maps.google.com/foo"
         val input = GoogleMapsHtmlInput
-        val lastAttempt = NetworkTools.Attempt(2, ConnectionClosedNetworkException(EOFException()))
+        val lastAttempt = Attempt<RecoverableNetworkException>(1, ConnectionClosedNetworkException(EOFException()))
         val stateContext: ConversionStateContext = mock {
             on { this@on.resources } doReturn resources
         }
         val state = PermissionGrantedBasicInput(
-            stateContext, source, match = source, input, Permission.ALWAYS, lastAttempt = lastAttempt
+            stateContext,
+            source,
+            match = source,
+            input,
+            Permission.ALWAYS,
+            lastAttempt = lastAttempt,
+            dispatcher = testScheduler,
         )
         assertEquals(
             LoadingIndicator.Large(

@@ -33,10 +33,9 @@ import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.network.DefaultNetworkTools.Companion.CONNECT_TIMEOUT
-import page.ooooo.geoshare.lib.network.DefaultNetworkTools.Companion.EXPONENTIAL_DELAY_BASE
-import page.ooooo.geoshare.lib.network.DefaultNetworkTools.Companion.EXPONENTIAL_DELAY_BASE_DELAY
-import page.ooooo.geoshare.lib.network.DefaultNetworkTools.Companion.REQUEST_TIMEOUT
+import page.ooooo.geoshare.lib.network.CONNECT_TIMEOUT
+import page.ooooo.geoshare.lib.calcExponentialBackoffMillis
+import page.ooooo.geoshare.lib.network.REQUEST_TIMEOUT
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 import java.net.InetAddress
 import java.net.SocketException
@@ -44,8 +43,6 @@ import java.net.UnknownHostException
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
-import kotlin.math.pow
-import kotlin.math.roundToLong
 
 class MockLocationScope(val locationManager: LocationManager, val mockProviderName: String) {
     fun setLocation(lat: Double, lon: Double) {
@@ -511,7 +508,7 @@ interface BehaviorTest {
         const val ELEMENT_DOES_NOT_EXIST_TIMEOUT = 500L
         const val MAX_ATTEMPTS = 10
         val NETWORK_TIMEOUT = (1..MAX_ATTEMPTS).fold(CONNECT_TIMEOUT + REQUEST_TIMEOUT) { acc, curr ->
-            acc + (EXPONENTIAL_DELAY_BASE.pow(curr - 1) * EXPONENTIAL_DELAY_BASE_DELAY).roundToLong() + CONNECT_TIMEOUT + REQUEST_TIMEOUT
+            acc + calcExponentialBackoffMillis(curr) + CONNECT_TIMEOUT + REQUEST_TIMEOUT
         }
     }
 }
