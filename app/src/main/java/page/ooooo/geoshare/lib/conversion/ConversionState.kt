@@ -3,7 +3,6 @@ package page.ooooo.geoshare.lib.conversion
 import android.net.Uri
 import androidx.annotation.StringRes
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.TimeoutCancellationException
@@ -22,15 +21,17 @@ import page.ooooo.geoshare.data.local.preferences.CachedPurchasePreference
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.Permission
+import page.ooooo.geoshare.lib.Attempt
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingStatus
+import page.ooooo.geoshare.lib.calcExponentialBackoffMillis
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.inputs.WebViewInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.inputs.BasicInput
-import page.ooooo.geoshare.lib.network.NetworkTools
+import page.ooooo.geoshare.lib.network.MaxAttemptsReachedNetworkException
 import page.ooooo.geoshare.lib.network.RecoverableNetworkException
 import page.ooooo.geoshare.lib.network.UnrecoverableNetworkException
 import page.ooooo.geoshare.lib.outputs.Action
@@ -181,23 +182,25 @@ data class PermissionGranted<T>(
     val input: Input<T>,
     val permission: Permission?,
     val prevResult: ParseResult? = null,
-    val lastAttempt: NetworkTools.Attempt? = null,
-    val maxAttempts: Int = 10,
 ) : ConversionState {
     override suspend fun transition(): State =
         when (input) {
-            is BasicInput -> PermissionGrantedBasicInput(
-                stateContext, source, match, input, permission, prevResult, lastAttempt, maxAttempts
-            )
-
-            is WebViewInput -> PermissionGrantedWebViewInput(
-                stateContext, source, match, input, permission, prevResult,
-            )
+            is BasicInput -> PermissionGrantedBasicInput(stateContext, source, match, input, permission, prevResult)
+            is WebViewInput -> PermissionGrantedWebViewInput(stateContext, source, match, input, permission, prevResult)
         }
 
     override fun toString() = "PermissionGranted"
 }
 
+/**
+ * Fetches input data using [BasicInput.withData] and parses it using [BasicInput.parse].
+ *
+ * When [BasicInput.withData] fails, it is retried up to [maxAttempts]. Retrying is done by recursively transitioning
+ * this state while tracking the number of attempts made and the cause of the last failure in [lastAttempt].
+ *
+ * We use this custom retrying instead of the [io.ktor.client.plugins.HttpRequestRetry] plugin, because it makes the
+ * state change, which allows the UI to react to it and show the user a message about the progress of the retrying.
+ */
 data class PermissionGrantedBasicInput<T>(
     val stateContext: ConversionStateContext,
     val source: String,
@@ -205,22 +208,28 @@ data class PermissionGrantedBasicInput<T>(
     val input: BasicInput<T>,
     val permission: Permission?,
     val prevResult: ParseResult? = null,
-    val lastAttempt: NetworkTools.Attempt? = null,
+    val lastAttempt: Attempt<RecoverableNetworkException>? = null,
     val maxAttempts: Int = 10,
-    val dispatcher: CoroutineDispatcher = Dispatchers.Default,
+    val dispatcher: CoroutineContext = Dispatchers.Default,
 ) : ConversionState, ConversionState.HasLargeLoadingIndicator {
     @OptIn(FlowPreview::class)
     override suspend fun transition(): State = try {
         withContext(dispatcher) {
-            // Run parsing on another thread, because maybe it's computationally expensive
+            val attemptNumber = lastAttempt?.number?.plus(1) ?: 1
             try {
+                if (lastAttempt != null && lastAttempt.number >= maxAttempts) {
+                    stateContext.log.w(TAG, "Maximum number of $maxAttempts attempts reached for $match")
+                    throw MaxAttemptsReachedNetworkException(lastAttempt.cause)
+                }
+                val delayMillis = calcExponentialBackoffMillis(attemptNumber)
+                if (delayMillis > 0) {
+                    stateContext.log.i(
+                        TAG, "Waiting ${delayMillis}ms before attempt $attemptNumber of $maxAttempts for $match"
+                    )
+                    delay(delayMillis)
+                }
                 val result = input.withData(
-                    match,
-                    stateContext.networkTools,
-                    lastAttempt,
-                    maxAttempts,
-                    stateContext.uriQuote,
-                    stateContext.log
+                    match, stateContext.log, stateContext.httpClient, stateContext.uriQuote
                 ) { data ->
                     input.parse(data, match, prevResult, stateContext.uriQuote, stateContext.log)
                 }
@@ -231,15 +240,9 @@ data class PermissionGrantedBasicInput<T>(
                     source,
                 )
             } catch (tr: RecoverableNetworkException) {
-                PermissionGranted(
-                    stateContext,
-                    source,
-                    match,
-                    input,
-                    permission,
-                    prevResult,
-                    lastAttempt = NetworkTools.Attempt(lastAttempt?.number?.plus(1) ?: 2, tr),
-                    maxAttempts = maxAttempts,
+                val attempt = Attempt(attemptNumber, tr)
+                PermissionGrantedBasicInput(
+                    stateContext, source, match, input, permission, prevResult, attempt, maxAttempts
                 )
             } catch (tr: UnrecoverableNetworkException) {
                 ConversionFailed(
@@ -263,7 +266,7 @@ data class PermissionGrantedBasicInput<T>(
                 description = lastAttempt?.let {
                     stateContext.resources.getString(
                         R.string.conversion_loading_indicator_description,
-                        it.number,
+                        it.number + 1,
                         maxAttempts,
                         it.cause.getMessage(stateContext.resources),
                     )
@@ -271,7 +274,11 @@ data class PermissionGrantedBasicInput<T>(
             )
         }
 
-    override fun toString() = "PermissionGrantedBasicInput"
+    private companion object {
+        private const val TAG = "PermissionGrantedBasicInput"
+    }
+
+    override fun toString() = TAG
 }
 
 /**
@@ -300,7 +307,6 @@ data class PermissionGrantedWebViewInput(
     @OptIn(FlowPreview::class)
     override suspend fun transition(): State = try {
         withContext(dispatcher) {
-            // Run parsing on another thread, because maybe it's computationally expensive
             try {
                 val data = dataFlow
                     .filterNotNull()

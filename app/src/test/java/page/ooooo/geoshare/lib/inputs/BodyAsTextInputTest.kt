@@ -1,19 +1,23 @@
 package page.ooooo.geoshare.lib.inputs
 
+import io.ktor.client.HttpClientConfig
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.respond
+import io.ktor.client.engine.mock.respondError
+import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import kotlinx.coroutines.CoroutineDispatcher
+import io.ktor.util.AttributeKey
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.network.FakeNetworkTools
-import page.ooooo.geoshare.lib.network.NetworkTools
-import page.ooooo.geoshare.lib.network.ResponseNetworkException
+import page.ooooo.geoshare.lib.network.HttpClient
+import page.ooooo.geoshare.lib.network.NetworkException
 import java.net.MalformedURLException
-import java.net.URL
 
 class BodyAsTextInputTest {
     val input = object : BodyAsTextInput {
@@ -29,97 +33,58 @@ class BodyAsTextInputTest {
         ) = throw NotImplementedError()
     }
     private val log = FakeLog
-    private val maxAttempts = 3
+    private val engine = MockEngine { request ->
+        if (request.method == HttpMethod.Get && request.url.toString() == "https://maps.google.com/foo") {
+            respond("test data")
+        } else {
+            respondError(HttpStatusCode.NotFound)
+        }
+    }
+    private val httpClient = HttpClient(engine, log)
     private val uriQuote = FakeUriQuote
 
     @Test(expected = MalformedURLException::class)
     fun whenMatchIsInvalidURL_throwsMalformedURLException() = runTest {
         val match = "https://[invalid:ipv6]/"
-        val lastAttempt = null
-        val networkTools = FakeNetworkTools()
-        input.withData(
-            match,
-            networkTools,
-            lastAttempt,
-            maxAttempts,
-            uriQuote,
-            log,
-        ) { ParseResult() }
+        input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) {
+            ParseResult()
+        }
     }
 
     @Test
-    fun whenMatchHasScheme_returnsTheResultOfHttpGetBodyAsText() = runTest {
+    fun whenMatchHasScheme_makesGetRequestWithFollowRedirectsAndReturnsResponse() = runTest {
         val match = "https://maps.google.com/foo"
-        val lastAttempt = null
-        val networkTools = object : FakeNetworkTools() {
-            override suspend fun httpGetBodyAsText(
-                url: URL,
-                lastAttempt: NetworkTools.Attempt?,
-                maxAttempts: Int,
-                dispatcher: CoroutineDispatcher,
-            ) = "${url}-data"
-        }
         assertEquals(
-            ParseResult(nextStep = NextStep(DebugUriInput, "${match}-data")),
-            input.withData(
-                match,
-                networkTools,
-                lastAttempt,
-                maxAttempts,
-                uriQuote,
-                log,
-            ) { data ->
-                ParseResult(nextStep = NextStep(DebugUriInput, data)) // Store data in nextStep, so we can test it
+            ParseResult(nextStep = NextStep(DebugUriInput, "test data")),
+            input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) { data ->
+                ParseResult(
+                    nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
+                )
             }
         )
+        val lastRequest = engine.requestHistory.last()
+        val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
+        assertTrue(clientConfig.followRedirects)
     }
 
     @Test
-    fun whenMatchHasNoScheme_returnsTheResultOfHttpGetBodyAsTextCalledWithHttpsScheme() = runTest {
+    fun whenMatchHasNoScheme_makesGetRequestToUrlWithHttpsSchemeAndReturnsResponse() = runTest {
         val match = "maps.google.com/foo"
-        val lastAttempt = null
-        val networkTools = object : FakeNetworkTools() {
-            override suspend fun httpGetBodyAsText(
-                url: URL,
-                lastAttempt: NetworkTools.Attempt?,
-                maxAttempts: Int,
-                dispatcher: CoroutineDispatcher,
-            ) = "${url}-data"
-        }
         assertEquals(
-            ParseResult(nextStep = NextStep(DebugUriInput, "https://${match}-data")),
-            input.withData(
-                match,
-                networkTools,
-                lastAttempt,
-                maxAttempts,
-                uriQuote,
-                log,
-            ) { data ->
-                ParseResult(nextStep = NextStep(DebugUriInput, data)) // Store data in nextStep, so we can test it
+            ParseResult(nextStep = NextStep(DebugUriInput, "test data")),
+            input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) { data ->
+                ParseResult(
+                    nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
+                )
             }
         )
     }
 
-    @Test(expected = ResponseNetworkException::class)
-    fun whenHttpGetBodyAsTextThrowsAnException_throwsTheSameException() = runTest {
-        val match = "https://maps.google.com/foo"
-        val lastAttempt = null
-        val networkTools = object : FakeNetworkTools() {
-            override suspend fun httpGetBodyAsText(
-                url: URL,
-                lastAttempt: NetworkTools.Attempt?,
-                maxAttempts: Int,
-                dispatcher: CoroutineDispatcher,
-            ) = throw ResponseNetworkException(HttpStatusCode.NotFound, Exception())
+    @Test(expected = NetworkException::class)
+    fun whenHttpClientRespondsError_throwsNetworkException() = runTest {
+        val match = "https://maps.google.com/not-found"
+        input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) {
+            ParseResult()
         }
-        input.withData(
-            match,
-            networkTools,
-            lastAttempt,
-            maxAttempts,
-            uriQuote,
-            log,
-        ) { ParseResult() }
     }
 }

@@ -1,13 +1,18 @@
 package page.ooooo.geoshare.lib.inputs
 
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.prepareRequest
 import io.ktor.utils.io.ByteReadChannel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.network.NetworkTools
+import page.ooooo.geoshare.lib.network.getLastHopUrlString
+import page.ooooo.geoshare.lib.network.headLocationHeader
 import java.net.MalformedURLException
+import kotlin.coroutines.CoroutineContext
 
 interface TextInput : BasicInput<String> {
     val pattern: Regex
@@ -16,13 +21,14 @@ interface TextInput : BasicInput<String> {
 
     override suspend fun withData(
         match: String,
-        networkTools: NetworkTools,
-        lastAttempt: NetworkTools.Attempt?,
-        maxAttempts: Int,
-        uriQuote: UriQuote,
         log: Log,
+        httpClient: HttpClient,
+        uriQuote: UriQuote,
+        coroutineContext: CoroutineContext,
         block: suspend (String) -> ParseResult,
-    ) = block(match)
+    ): ParseResult = withContext(coroutineContext) {
+        block(match)
+    }
 }
 
 interface UriInput : BasicInput<Uri> {
@@ -32,33 +38,31 @@ interface UriInput : BasicInput<Uri> {
 
     override suspend fun withData(
         match: String,
-        networkTools: NetworkTools,
-        lastAttempt: NetworkTools.Attempt?,
-        maxAttempts: Int,
-        uriQuote: UriQuote,
         log: Log,
+        httpClient: HttpClient,
+        uriQuote: UriQuote,
+        coroutineContext: CoroutineContext,
         block: suspend (Uri) -> ParseResult,
-    ) = block(Uri.parse(match, uriQuote))
+    ): ParseResult = withContext(coroutineContext) {
+        block(Uri.parse(match, uriQuote))
+    }
 }
 
-interface GetRedirectUrlInput : UriInput, Input.HasPermission {
+interface GetLastHopUrlInput : UriInput, Input.HasPermission {
     override suspend fun withData(
         match: String,
-        networkTools: NetworkTools,
-        lastAttempt: NetworkTools.Attempt?,
-        maxAttempts: Int,
-        uriQuote: UriQuote,
         log: Log,
+        httpClient: HttpClient,
+        uriQuote: UriQuote,
+        coroutineContext: CoroutineContext,
         block: suspend (Uri) -> ParseResult,
-    ): ParseResult {
+    ): ParseResult = withContext(coroutineContext) {
         val uri = Uri.parse(match, uriQuote)
         val url = uri.toUrl() ?: throw MalformedURLException()
-        val unshortenedUrlString = networkTools.httpGetRedirectedUrlString(
-            url, lastAttempt = lastAttempt, maxAttempts = maxAttempts
-        )
+        val unshortenedUrlString = httpClient.getLastHopUrlString(url)
         val unshortenedUri = Uri.parse(unshortenedUrlString, uriQuote).toAbsoluteUri(uri)
         log.i(TAG, "Resolved short link $match to $unshortenedUri")
-        return block(unshortenedUri)
+        block(unshortenedUri)
     }
 
     private companion object {
@@ -69,21 +73,18 @@ interface GetRedirectUrlInput : UriInput, Input.HasPermission {
 interface HeadLocationHeaderInput : UriInput, Input.HasPermission {
     override suspend fun withData(
         match: String,
-        networkTools: NetworkTools,
-        lastAttempt: NetworkTools.Attempt?,
-        maxAttempts: Int,
-        uriQuote: UriQuote,
         log: Log,
+        httpClient: HttpClient,
+        uriQuote: UriQuote,
+        coroutineContext: CoroutineContext,
         block: suspend (Uri) -> ParseResult,
-    ): ParseResult {
+    ): ParseResult = withContext(coroutineContext) {
         val uri = Uri.parse(match, uriQuote)
         val url = uri.toUrl() ?: throw MalformedURLException()
-        val unshortenedUrlString = networkTools.httpHeadLocationHeader(
-            url, lastAttempt = lastAttempt, maxAttempts = maxAttempts
-        )
+        val unshortenedUrlString = httpClient.headLocationHeader(url)
         val unshortenedUri = Uri.parse(unshortenedUrlString, uriQuote).toAbsoluteUri(uri)
         log.i(TAG, "Resolved short link $match to $unshortenedUri")
-        return block(unshortenedUri)
+        block(unshortenedUri)
     }
 
     private companion object {
@@ -94,19 +95,20 @@ interface HeadLocationHeaderInput : UriInput, Input.HasPermission {
 interface BodyAsChannelInput : BasicInput<ByteReadChannel>, Input.HasPermission {
     override suspend fun withData(
         match: String,
-        networkTools: NetworkTools,
-        lastAttempt: NetworkTools.Attempt?,
-        maxAttempts: Int,
-        uriQuote: UriQuote,
         log: Log,
+        httpClient: HttpClient,
+        uriQuote: UriQuote,
+        coroutineContext: CoroutineContext,
         block: suspend (ByteReadChannel) -> ParseResult,
-    ): ParseResult {
+    ): ParseResult = withContext(coroutineContext) {
         val uri = Uri.parse(match, uriQuote)
         val url = uri.toUrl() ?: throw MalformedURLException()
         log.i(TAG, "Downloading $uri")
-        return networkTools.httpGetBodyAsByteReadChannel(
-            url, lastAttempt = lastAttempt, maxAttempts = maxAttempts, dispatcher = Dispatchers.Default, block,
-        )
+        httpClient
+            .prepareRequest(url)
+            .execute { response ->
+                block(response.body())
+            }
     }
 
     private companion object {
@@ -117,20 +119,20 @@ interface BodyAsChannelInput : BasicInput<ByteReadChannel>, Input.HasPermission 
 interface BodyAsTextInput : BasicInput<String>, Input.HasPermission {
     override suspend fun withData(
         match: String,
-        networkTools: NetworkTools,
-        lastAttempt: NetworkTools.Attempt?,
-        maxAttempts: Int,
-        uriQuote: UriQuote,
         log: Log,
+        httpClient: HttpClient,
+        uriQuote: UriQuote,
+        coroutineContext: CoroutineContext,
         block: suspend (String) -> ParseResult,
-    ): ParseResult {
+    ): ParseResult = withContext(coroutineContext) {
         val uri = Uri.parse(match, uriQuote)
         val url = uri.toUrl() ?: throw MalformedURLException()
         log.i(TAG, "Downloading $uri")
-        val text = networkTools.httpGetBodyAsText(
-            url, lastAttempt = lastAttempt, maxAttempts = maxAttempts
-        )
-        return block(text)
+        httpClient
+            .prepareRequest(url)
+            .execute { response ->
+                block(response.body())
+            }
     }
 
     private companion object {
