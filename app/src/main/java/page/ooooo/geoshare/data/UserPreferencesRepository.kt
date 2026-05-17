@@ -35,8 +35,10 @@ class DefaultUserPreferencesRepository @Inject constructor(
             }
         }.map {
             UserPreferencesValues(
+                apiEndpoint = ApiEndpointPreference.getValue(it),
                 automation = AutomationPreference.getValue(it),
                 automationDelay = AutomationDelayPreference.getValue(it),
+                cachedApiToken = CachedApiTokenPreference.getValue(it),
                 cachedPurchase = CachedPurchasePreference.getValue(it),
                 changelogShownForVersionCode = ChangelogShownForVersionCodePreference.getValue(it),
                 connectionPermission = ConnectionPermissionPreference.getValue(it),

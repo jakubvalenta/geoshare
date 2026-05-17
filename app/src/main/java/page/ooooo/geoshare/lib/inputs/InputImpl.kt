@@ -9,6 +9,7 @@ import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
+import page.ooooo.geoshare.lib.network.ApiClient
 import page.ooooo.geoshare.lib.network.getLastHopUrlString
 import page.ooooo.geoshare.lib.network.headLocationHeader
 import java.net.MalformedURLException
@@ -21,6 +22,7 @@ interface TextInput : BasicInput<String> {
 
     override suspend fun withData(
         match: String,
+        apiClient: ApiClient,
         log: Log,
         httpClient: HttpClient,
         uriQuote: UriQuote,
@@ -38,6 +40,7 @@ interface UriInput : BasicInput<Uri> {
 
     override suspend fun withData(
         match: String,
+        apiClient: ApiClient,
         log: Log,
         httpClient: HttpClient,
         uriQuote: UriQuote,
@@ -51,6 +54,7 @@ interface UriInput : BasicInput<Uri> {
 interface GetLastHopUrlInput : UriInput, Input.HasPermission {
     override suspend fun withData(
         match: String,
+        apiClient: ApiClient,
         log: Log,
         httpClient: HttpClient,
         uriQuote: UriQuote,
@@ -73,6 +77,7 @@ interface GetLastHopUrlInput : UriInput, Input.HasPermission {
 interface HeadLocationHeaderInput : UriInput, Input.HasPermission {
     override suspend fun withData(
         match: String,
+        apiClient: ApiClient,
         log: Log,
         httpClient: HttpClient,
         uriQuote: UriQuote,
@@ -95,6 +100,7 @@ interface HeadLocationHeaderInput : UriInput, Input.HasPermission {
 interface BodyAsChannelInput : BasicInput<ByteReadChannel>, Input.HasPermission {
     override suspend fun withData(
         match: String,
+        apiClient: ApiClient,
         log: Log,
         httpClient: HttpClient,
         uriQuote: UriQuote,
@@ -119,6 +125,7 @@ interface BodyAsChannelInput : BasicInput<ByteReadChannel>, Input.HasPermission 
 interface BodyAsTextInput : BasicInput<String>, Input.HasPermission {
     override suspend fun withData(
         match: String,
+        apiClient: ApiClient,
         log: Log,
         httpClient: HttpClient,
         uriQuote: UriQuote,

@@ -11,10 +11,12 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.network.ApiClient
 import page.ooooo.geoshare.lib.network.HttpClient
 import page.ooooo.geoshare.lib.network.NetworkException
 import java.net.MalformedURLException
@@ -32,6 +34,7 @@ class BodyAsTextInputTest {
             log: Log,
         ) = throw NotImplementedError()
     }
+    private val apiClient = ApiClient(userPreferencesRepository = FakeUserPreferencesRepository())
     private val log = FakeLog
     private val engine = MockEngine { request ->
         if (request.method == HttpMethod.Get && request.url.toString() == "https://maps.google.com/foo") {
@@ -46,7 +49,7 @@ class BodyAsTextInputTest {
     @Test(expected = MalformedURLException::class)
     fun whenMatchIsInvalidURL_throwsMalformedURLException() = runTest {
         val match = "https://[invalid:ipv6]/"
-        input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) {
+        input.withData(match, apiClient, log, httpClient, uriQuote, coroutineContext = testScheduler) {
             ParseResult()
         }
     }
@@ -56,7 +59,9 @@ class BodyAsTextInputTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
             ParseResult(nextStep = NextStep(DebugUriInput, "test data")),
-            input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) { data ->
+            input.withData(
+                match, apiClient, log, httpClient, uriQuote, coroutineContext = testScheduler
+            ) { data ->
                 ParseResult(
                     nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
                 )
@@ -72,7 +77,9 @@ class BodyAsTextInputTest {
         val match = "maps.google.com/foo"
         assertEquals(
             ParseResult(nextStep = NextStep(DebugUriInput, "test data")),
-            input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) { data ->
+            input.withData(
+                match, apiClient, log, httpClient, uriQuote, coroutineContext = testScheduler
+            ) { data ->
                 ParseResult(
                     nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
                 )
@@ -83,7 +90,7 @@ class BodyAsTextInputTest {
     @Test(expected = NetworkException::class)
     fun whenHttpClientRespondsError_throwsNetworkException() = runTest {
         val match = "https://maps.google.com/not-found"
-        input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) {
+        input.withData(match, apiClient, log, httpClient, uriQuote, coroutineContext = testScheduler) {
             ParseResult()
         }
     }

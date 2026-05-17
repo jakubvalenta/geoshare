@@ -13,11 +13,13 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Test
+import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.network.ApiClient
 import page.ooooo.geoshare.lib.network.HttpClient
 import page.ooooo.geoshare.lib.network.ResponseNetworkException
 import java.net.MalformedURLException
@@ -36,6 +38,7 @@ class HeadLocationHeaderUriInputTest {
             log: Log,
         ) = throw NotImplementedError()
     }
+    private val apiClient = ApiClient(userPreferencesRepository = FakeUserPreferencesRepository())
     private val log = FakeLog
     private val engine = MockEngine { request ->
         if (request.method == HttpMethod.Head && request.url.toString() == "https://maps.google.com/foo") {
@@ -52,7 +55,7 @@ class HeadLocationHeaderUriInputTest {
     @Test(expected = MalformedURLException::class)
     fun whenMatchIsInvalidURL_throwsMalformedURLException() = runTest {
         val match = "https://[invalid:ipv6]/"
-        input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) {
+        input.withData(match, apiClient, log, httpClient, uriQuote, coroutineContext = testScheduler) {
             ParseResult()
         }
     }
@@ -62,7 +65,9 @@ class HeadLocationHeaderUriInputTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
             ParseResult(nextStep = NextStep(DebugUriInput, "https://maps.google.com/redirected")),
-            input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) { data ->
+            input.withData(
+                match, apiClient, log, httpClient, uriQuote, coroutineContext = testScheduler
+            ) { data ->
                 ParseResult(
                     nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
                 )
@@ -78,7 +83,9 @@ class HeadLocationHeaderUriInputTest {
         val match = "maps.google.com/foo"
         assertEquals(
             ParseResult(nextStep = NextStep(DebugUriInput, "https://maps.google.com/redirected")),
-            input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) { data ->
+            input.withData(
+                match, apiClient, log, httpClient, uriQuote, coroutineContext = testScheduler
+            ) { data ->
                 ParseResult(
                     nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
                 )
@@ -101,7 +108,9 @@ class HeadLocationHeaderUriInputTest {
         val httpClient = HttpClient(engine, log)
         assertEquals(
             ParseResult(nextStep = NextStep(DebugUriInput, "https://maps.google.com/foo/redirected")),
-            input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) { data ->
+            input.withData(
+                match, apiClient, log, httpClient, uriQuote, coroutineContext = testScheduler
+            ) { data ->
                 ParseResult(
                     nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
                 )
@@ -112,7 +121,7 @@ class HeadLocationHeaderUriInputTest {
     @Test(expected = ResponseNetworkException::class)
     fun whenHttpClientRespondsError_throwsNetworkException() = runTest {
         val match = "https://maps.google.com/not-found"
-        input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) {
+        input.withData(match, apiClient, log, httpClient, uriQuote, coroutineContext = testScheduler) {
             ParseResult()
         }
     }

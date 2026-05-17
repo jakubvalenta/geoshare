@@ -25,6 +25,7 @@ import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.NextStep
 import page.ooooo.geoshare.lib.inputs.ParseResult
+import page.ooooo.geoshare.lib.network.ApiClient
 import page.ooooo.geoshare.lib.network.ConnectionClosedNetworkException
 import page.ooooo.geoshare.lib.network.RecoverableNetworkException
 import page.ooooo.geoshare.lib.network.ResponseNetworkException
@@ -61,6 +62,7 @@ class PermissionGrantedBasicInputTest {
         val input = object : BasicInput<String>, Input.HasPermission {
             override suspend fun withData(
                 match: String,
+                apiClient: ApiClient,
                 log: Log,
                 httpClient: HttpClient,
                 uriQuote: UriQuote,
@@ -123,6 +125,7 @@ class PermissionGrantedBasicInputTest {
         val input = object : BasicInput<String>, Input.HasPermission {
             override suspend fun withData(
                 match: String,
+                apiClient: ApiClient,
                 log: Log,
                 httpClient: HttpClient,
                 uriQuote: UriQuote,
@@ -177,6 +180,7 @@ class PermissionGrantedBasicInputTest {
         val input = object : BasicInput<String>, Input.HasPermission {
             override suspend fun withData(
                 match: String,
+                apiClient: ApiClient,
                 log: Log,
                 httpClient: HttpClient,
                 uriQuote: UriQuote,
@@ -236,6 +240,7 @@ class PermissionGrantedBasicInputTest {
             val input = object : BasicInput<String>, Input.HasPermission {
                 override suspend fun withData(
                     match: String,
+                    apiClient: ApiClient,
                     log: Log,
                     httpClient: HttpClient,
                     uriQuote: UriQuote,
@@ -304,6 +309,7 @@ class PermissionGrantedBasicInputTest {
             val input = object : BasicInput<String>, Input.HasPermission {
                 override suspend fun withData(
                     match: String,
+                    apiClient: ApiClient,
                     log: Log,
                     httpClient: HttpClient,
                     uriQuote: UriQuote,
@@ -372,6 +378,7 @@ class PermissionGrantedBasicInputTest {
             val input = object : BasicInput<String>, Input.HasPermission {
                 override suspend fun withData(
                     match: String,
+                    apiClient: ApiClient,
                     log: Log,
                     httpClient: HttpClient,
                     uriQuote: UriQuote,
@@ -434,6 +441,7 @@ class PermissionGrantedBasicInputTest {
             val input = object : BasicInput<String>, Input.HasPermission {
                 override suspend fun withData(
                     match: String,
+                    apiClient: ApiClient,
                     log: Log,
                     httpClient: HttpClient,
                     uriQuote: UriQuote,

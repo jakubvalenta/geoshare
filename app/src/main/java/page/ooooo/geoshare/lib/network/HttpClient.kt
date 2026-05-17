@@ -38,6 +38,7 @@ private const val TAG = "HttpClient"
  *
  * For request to map services, you should always use this HTTP client instead of the default unconfigured one.
  */
+// TODO Close HttpClient everywhere it's used
 fun HttpClient(engine: HttpClientEngine = CIO.create(), log: Log = DefaultLog): HttpClient = HttpClient(engine) {
     expectSuccess = true
 

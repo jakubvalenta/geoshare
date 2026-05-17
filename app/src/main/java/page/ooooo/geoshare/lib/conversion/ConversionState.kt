@@ -31,6 +31,7 @@ import page.ooooo.geoshare.lib.inputs.WebViewInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.inputs.BasicInput
+import page.ooooo.geoshare.lib.network.ApiClient
 import page.ooooo.geoshare.lib.network.MaxAttemptsReachedNetworkException
 import page.ooooo.geoshare.lib.network.RecoverableNetworkException
 import page.ooooo.geoshare.lib.network.UnrecoverableNetworkException
@@ -229,7 +230,11 @@ data class PermissionGrantedBasicInput<T>(
                     delay(delayMillis)
                 }
                 val result = input.withData(
-                    match, stateContext.log, stateContext.httpClient, stateContext.uriQuote
+                    match,
+                    ApiClient(stateContext.userPreferencesRepository),
+                    stateContext.log,
+                    stateContext.httpClient,
+                    stateContext.uriQuote,
                 ) { data ->
                     input.parse(data, match, prevResult, stateContext.uriQuote, stateContext.log)
                 }

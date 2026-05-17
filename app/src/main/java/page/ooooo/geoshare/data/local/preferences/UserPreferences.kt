@@ -13,6 +13,8 @@ import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.DataTypes
+import java.net.MalformedURLException
+import java.net.URL
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -121,11 +123,29 @@ object CoordinateFormatPreference : OptionsPreference<CoordinateFormat> {
     )
 }
 
+object ApiEndpointPreference : TextPreference<URL> {
+    override val key = stringPreferencesKey("api_endpoint")
+    override val default = URL("https://10.0.2.2:8080")
+    val loading = default
+
+    override fun serialize(value: URL, log: Log) = value.toString()
+
+    override fun deserialize(value: String?, log: Log) = try {
+        URL(value)
+    } catch (tr: MalformedURLException) {
+        log.e(TAG, "Invalid URL", tr)
+        default
+    }
+
+    override fun getValue(values: UserPreferencesValues) = values.apiEndpoint
+
+    private const val TAG = "ApiEndpointPreference"
+}
+
 object AutomationPreference : OptionsPreference<Automation> {
     private val key = stringPreferencesKey("automation")
     override val default = NoopAutomation
     val loading = default
-    private const val TAG = "Automation"
 
     /**
      * Instance of [Json] for serialization.
@@ -266,6 +286,8 @@ object AutomationPreference : OptionsPreference<Automation> {
             }
             .takeIf { it.isNotEmpty() },
     )
+
+    private const val TAG = "AutomationPreference"
 }
 
 object AutomationDelayPreference : DurationPreference {
@@ -277,6 +299,37 @@ object AutomationDelayPreference : DurationPreference {
     override val maxSec = 60
 
     override fun getValue(values: UserPreferencesValues) = values.automationDelay
+}
+
+object CachedApiTokenPreference : TextPreference<CachedApiToken?> {
+    override val key = stringPreferencesKey("cached_api_token")
+    override val default = null
+    val loading = default
+
+    override fun serialize(value: CachedApiToken?, log: Log) =
+        try {
+            Json.encodeToString(value)
+        } catch (tr: SerializationException) {
+            // Silently ignore serialization errors, because the value should always serialize
+            log.e(TAG, "Serialization error", tr)
+            ""
+        }
+
+    override fun deserialize(value: String?, log: Log) =
+        if (value != null) {
+            try {
+                Json.decodeFromString<CachedApiToken?>(value)
+            } catch (tr: IllegalArgumentException) {
+                log.e(TAG, "Deserialization error", tr)
+                default
+            }
+        } else {
+            default
+        }
+
+    override fun getValue(values: UserPreferencesValues) = values.cachedApiToken
+
+    private const val TAG = "CachedApiTokenPreference"
 }
 
 object CachedPurchasePreference : TextPreference<CachedPurchase?> {
@@ -307,7 +360,7 @@ object CachedPurchasePreference : TextPreference<CachedPurchase?> {
 
     override fun getValue(values: UserPreferencesValues) = values.cachedPurchase
 
-    private const val TAG = "BillingCachedProductPreference"
+    private const val TAG = "CachedPurchasePreference"
 }
 
 /**
@@ -370,8 +423,10 @@ object ChangelogShownForVersionCodePreference : NullableIntPreference {
 }
 
 data class UserPreferencesValues(
+    val apiEndpoint: URL = ApiEndpointPreference.loading,
     val automation: Automation = AutomationPreference.loading,
     val automationDelay: Duration = AutomationDelayPreference.loading,
+    val cachedApiToken: CachedApiToken? = CachedApiTokenPreference.loading,
     val cachedPurchase: CachedPurchase? = CachedPurchasePreference.loading,
     val changelogShownForVersionCode: Int? = ChangelogShownForVersionCodePreference.loading,
     val connectionPermission: Permission = ConnectionPermissionPreference.loading,

@@ -8,6 +8,7 @@ import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.network.ApiClient
 import kotlin.coroutines.CoroutineContext
 
 sealed interface Input<T> {
@@ -37,6 +38,7 @@ sealed interface Input<T> {
 interface BasicInput<T> : Input<T> {
     suspend fun withData(
         match: String,
+        apiClient: ApiClient, // TODO Inject ApiClient
         log: Log = DefaultLog,
         httpClient: HttpClient = page.ooooo.geoshare.lib.network.HttpClient(log = log),
         uriQuote: UriQuote = DefaultUriQuote,
