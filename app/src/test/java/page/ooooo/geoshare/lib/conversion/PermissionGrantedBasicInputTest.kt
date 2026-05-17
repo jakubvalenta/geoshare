@@ -229,7 +229,7 @@ class PermissionGrantedBasicInputTest {
     }
 
     @Test
-    fun transition_whenInputWithDataThrowsRecoverableNetworkExceptionAndLastAttemptIsNull_returnsPermissionGranted() =
+    fun transition_whenInputWithDataThrowsRecoverableNetworkExceptionAndLastAttemptIsNull_returnsPermissionGrantedBasicInput() =
         runTest {
             val source = "https://maps.google.com/foo"
             val cause = SocketTimeoutNetworkException(SocketTimeoutException())
@@ -280,7 +280,7 @@ class PermissionGrantedBasicInputTest {
             )
             val workDuration = testScheduler.timeSource.measureTime {
                 assertEquals(
-                    PermissionGranted(
+                    PermissionGrantedBasicInput(
                         stateContext,
                         source,
                         match = source,
@@ -297,7 +297,7 @@ class PermissionGrantedBasicInputTest {
         }
 
     @Test
-    fun transition_whenInputWithDataThrowsRecoverableNetworkExceptionAndLastAttemptIsOne_returnsPermissionGranted() =
+    fun transition_whenInputWithDataThrowsRecoverableNetworkExceptionAndLastAttemptIsOne_waitsAndReturnsPermissionGrantedBasicInput() =
         runTest {
             val source = "https://maps.google.com/foo"
             val cause = SocketTimeoutNetworkException(SocketTimeoutException())
@@ -348,7 +348,7 @@ class PermissionGrantedBasicInputTest {
             )
             val workDuration = testScheduler.timeSource.measureTime {
                 assertEquals(
-                    PermissionGranted(
+                    PermissionGrantedBasicInput(
                         stateContext,
                         source,
                         match = source,
@@ -362,74 +362,6 @@ class PermissionGrantedBasicInputTest {
                 )
             }
             assertEquals(1.seconds, workDuration)
-        }
-
-    @Test
-    fun transition_whenInputWithDataThrowsRecoverableNetworkExceptionAndLastAttemptIsTwo_waitsAndReturnsPermissionGranted() =
-        runTest {
-            val source = "https://maps.google.com/foo"
-            val cause = SocketTimeoutNetworkException(SocketTimeoutException())
-            val input = object : BasicInput<String>, Input.HasPermission {
-                override suspend fun withData(
-                    match: String,
-                    log: Log,
-                    httpClient: HttpClient,
-                    uriQuote: UriQuote,
-                    coroutineContext: CoroutineContext,
-                    block: suspend (String) -> ParseResult,
-                ): ParseResult = throw cause
-
-                override suspend fun parse(
-                    data: String,
-                    match: String,
-                    prevResult: ParseResult?,
-                    uriQuote: UriQuote,
-                    log: Log,
-                ) = ParseResult(
-                    prevResult?.points ?: persistentListOf(),
-                    nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
-                )
-
-                override val permissionTitleResId = R.string.converter_google_maps_permission_title
-                override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
-            }
-            val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-            val prevResult = ParseResult(prevPoints)
-            val lastAttempt = Attempt<RecoverableNetworkException>(2, ConnectionClosedNetworkException(EOFException()))
-            val permission = Permission.ALWAYS
-            val stateContext: ConversionStateContext = mock {
-                on { this@on.log } doReturn log
-                on { this@on.httpClient } doReturn httpClient
-                on { this@on.resources } doReturn resources
-                on { this@on.uriQuote } doReturn uriQuote
-            }
-            val state = PermissionGrantedBasicInput(
-                stateContext,
-                source,
-                match = source,
-                input,
-                permission,
-                prevResult,
-                lastAttempt,
-                maxAttempts,
-                dispatcher = testScheduler,
-            )
-            val workDuration = testScheduler.timeSource.measureTime {
-                assertEquals(
-                    PermissionGranted(
-                        stateContext,
-                        source,
-                        match = source,
-                        input,
-                        permission,
-                        prevResult,
-                        lastAttempt = Attempt(3, cause),
-                        maxAttempts,
-                    ),
-                    state.transition(),
-                )
-            }
-            assertEquals(2.seconds, workDuration)
         }
 
     @Test

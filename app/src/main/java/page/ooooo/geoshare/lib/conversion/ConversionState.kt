@@ -182,30 +182,24 @@ data class PermissionGranted<T>(
     val input: Input<T>,
     val permission: Permission?,
     val prevResult: ParseResult? = null,
-    val lastAttempt: Attempt<RecoverableNetworkException>? = null,
-    val maxAttempts: Int = 10,
 ) : ConversionState {
     override suspend fun transition(): State =
         when (input) {
-            is BasicInput -> PermissionGrantedBasicInput(
-                stateContext, source, match, input, permission, prevResult, lastAttempt, maxAttempts
-            )
-
-            is WebViewInput -> PermissionGrantedWebViewInput(
-                stateContext, source, match, input, permission, prevResult
-            )
+            is BasicInput -> PermissionGrantedBasicInput(stateContext, source, match, input, permission, prevResult)
+            is WebViewInput -> PermissionGrantedWebViewInput(stateContext, source, match, input, permission, prevResult)
         }
 
     override fun toString() = "PermissionGranted"
 }
 
 /**
- * TODO Doc
+ * Fetches input data using [BasicInput.withData] and parses it using [BasicInput.parse].
  *
- * To enable retrying, pass [maxAttempts] and [lastAttempt]. [maxAttempts] sets the maximum number of requests to
- * make including the first request. [lastAttempt] tracks how many attempts have already been made. We use this
- * custom retrying instead of the [io.ktor.client.plugins.HttpRequestRetry] plugin, so that the caller can notify
- * the user while requests are being retried.
+ * When [BasicInput.withData] fails, it is retried up to [maxAttempts]. Retrying is done by recursively transitioning
+ * this state while tracking the number of attempts made and the cause of the last failure in [lastAttempt].
+ *
+ * We use this custom retrying instead of the [io.ktor.client.plugins.HttpRequestRetry] plugin, because it makes the
+ * state change, which allows the UI to react to it and show the user a message about the progress of the retrying.
  */
 data class PermissionGrantedBasicInput<T>(
     val stateContext: ConversionStateContext,
@@ -221,10 +215,8 @@ data class PermissionGrantedBasicInput<T>(
     @OptIn(FlowPreview::class)
     override suspend fun transition(): State = try {
         withContext(dispatcher) {
-            // Run parsing on another thread, because maybe it's computationally expensive
             val attemptNumber = lastAttempt?.number?.plus(1) ?: 1
             try {
-                // TODO Check if all retrying branches are tested
                 if (lastAttempt != null && lastAttempt.number >= maxAttempts) {
                     stateContext.log.w(TAG, "Maximum number of $maxAttempts attempts reached for $match")
                     throw MaxAttemptsReachedNetworkException(lastAttempt.cause)
@@ -237,10 +229,7 @@ data class PermissionGrantedBasicInput<T>(
                     delay(delayMillis)
                 }
                 val result = input.withData(
-                    match,
-                    stateContext.log,
-                    stateContext.httpClient,
-                    stateContext.uriQuote,
+                    match, stateContext.log, stateContext.httpClient, stateContext.uriQuote
                 ) { data ->
                     input.parse(data, match, prevResult, stateContext.uriQuote, stateContext.log)
                 }
@@ -251,15 +240,9 @@ data class PermissionGrantedBasicInput<T>(
                     source,
                 )
             } catch (tr: RecoverableNetworkException) {
-                PermissionGranted(
-                    stateContext,
-                    source,
-                    match,
-                    input,
-                    permission,
-                    prevResult,
-                    lastAttempt = Attempt(attemptNumber, tr),
-                    maxAttempts = maxAttempts,
+                val attempt = Attempt(attemptNumber, tr)
+                PermissionGrantedBasicInput(
+                    stateContext, source, match, input, permission, prevResult, attempt, maxAttempts
                 )
             } catch (tr: UnrecoverableNetworkException) {
                 ConversionFailed(
@@ -324,7 +307,6 @@ data class PermissionGrantedWebViewInput(
     @OptIn(FlowPreview::class)
     override suspend fun transition(): State = try {
         withContext(dispatcher) {
-            // Run parsing on another thread, because maybe it's computationally expensive
             try {
                 val data = dataFlow
                     .filterNotNull()
