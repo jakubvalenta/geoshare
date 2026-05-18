@@ -1,5 +1,5 @@
 [versions]
-aboutLibraries = "14.1.0"
+aboutLibraries = "14.2.0"
 accompanistDrawablePainter = "0.37.3"
 agp = "9.2.1"
 androidBillingClient = "8.3.0"
@@ -24,7 +24,7 @@ kotlinxCollectionsImmutable = "0.4.0"
 kotlinxCoroutinesTest = "1.11.0"
 kotlinxSerializationJson = "1.11.0"
 ksp = "2.3.4"
-ktor = "3.4.3"
+ktor = "3.5.0"
 mockitoKotlin = "6.3.0"
 openLocationCode = "1.0.4"
 
