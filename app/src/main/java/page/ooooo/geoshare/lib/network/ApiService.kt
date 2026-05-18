@@ -106,10 +106,7 @@ class ApiService @Inject constructor(
                 json()
             }
         }.use { client ->
-            val privateKeyEntry = getPrivateKeyEntry() ?: run {
-                log.i(TAG, "Private key not found")
-                return null
-            }
+            val privateKeyEntry = getPrivateKeyEntry() ?: return null
             val privateKey = privateKeyEntry.privateKey
             val publicKey = privateKeyEntry.certificateChain[0].publicKey
             val publicKeyBase64 = publicKey.encoded.base64Encode()
@@ -158,10 +155,7 @@ class ApiService @Inject constructor(
             val privateKeyEntry = getPrivateKeyEntry() ?: run {
                 generateKeyPair()
                 getPrivateKeyEntry()
-            } ?: run {
-                log.i(TAG, "Private key not found")
-                return null
-            }
+            } ?: return null
             val privateKey = privateKeyEntry.privateKey
             val publicKey = privateKeyEntry.certificateChain[0].publicKey
             val publicKeyBase64 = publicKey.encoded.base64Encode()
@@ -226,6 +220,7 @@ class ApiService @Inject constructor(
             KeyProperties.KEY_ALGORITHM_EC,
             "AndroidKeyStore",
         )
+        // TODO What happens when we generate a new key pair with the same alias?
         val parameterSpec: KeyGenParameterSpec = KeyGenParameterSpec.Builder(
             KEYSTORE_ALIAS,
             KeyProperties.PURPOSE_SIGN or KeyProperties.PURPOSE_VERIFY,
