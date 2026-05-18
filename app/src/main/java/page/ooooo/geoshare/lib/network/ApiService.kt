@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.lib.network
 
-import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import io.ktor.client.HttpClient
@@ -106,7 +105,7 @@ class ApiService @Inject constructor(
                 json()
             }
         }.use { client ->
-            val privateKeyEntry = getPrivateKeyEntry() ?: return null
+            val privateKeyEntry = getOrGeneratePrivateKey()
             val privateKey = privateKeyEntry.privateKey
             val publicKey = privateKeyEntry.certificateChain[0].publicKey
             val publicKeyBase64 = publicKey.encoded.base64Encode()
@@ -147,15 +146,12 @@ class ApiService @Inject constructor(
         }
     }
 
-    private suspend fun register(engine: HttpClientEngine): BearerTokens? {
+    private suspend fun register(engine: HttpClientEngine): BearerTokens {
         HttpClient(engine) {
             expectSuccess = true
             rethrowExceptionsAsNetworkException(log)
         }.use { client ->
-            val privateKeyEntry = getPrivateKeyEntry() ?: run {
-                generateKeyPair()
-                getPrivateKeyEntry()
-            } ?: return null
+            val privateKeyEntry = getOrGeneratePrivateKey()
             val privateKey = privateKeyEntry.privateKey
             val publicKey = privateKeyEntry.certificateChain[0].publicKey
             val publicKeyBase64 = publicKey.encoded.base64Encode()
@@ -193,49 +189,40 @@ class ApiService @Inject constructor(
     }
 
     /**
-     * See https://developer.android.com/privacy-and-security/keystore#SigningAndVerifyingData
+     * See https://developer.android.com/privacy-and-security/keystore
      */
-    private fun getPrivateKeyEntry(): KeyStore.PrivateKeyEntry? {
-        val ks: KeyStore = KeyStore.getInstance("AndroidKeyStore").apply {
-            load(null)
-        }
+    private fun getOrGeneratePrivateKey(): KeyStore.PrivateKeyEntry {
+        // Try to get private key from the key store
+        val keyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
         val entry = try {
-            ks.getEntry(KEYSTORE_ALIAS, null)
+            keyStore.getEntry(KEYSTORE_ALIAS, null)
         } catch (tr: GeneralSecurityException) {
-            log.e(TAG, "Failed to get keystore entry", tr)
-            return null
+            log.e(TAG, "Failed to get private key from the key store", tr)
+            null
         }
-        if (entry !is KeyStore.PrivateKeyEntry) {
-            log.w(TAG, "Failed to get private key")
-            return null
+        if (entry is KeyStore.PrivateKeyEntry) {
+            return entry
         }
-        return entry
-    }
 
-    /**
-     * See https://developer.android.com/privacy-and-security/keystore#GeneratingANewPrivateKey
-     */
-    private fun generateKeyPair() {
-        val kpg: KeyPairGenerator = KeyPairGenerator.getInstance(
-            KeyProperties.KEY_ALGORITHM_EC,
-            "AndroidKeyStore",
-        )
-        // TODO What happens when we generate a new key pair with the same alias?
-        val parameterSpec: KeyGenParameterSpec = KeyGenParameterSpec.Builder(
-            KEYSTORE_ALIAS,
-            KeyProperties.PURPOSE_SIGN or KeyProperties.PURPOSE_VERIFY,
+        // Generate new private key; if there was a corrupt key in the key store, it will be overwritten
+        log.i(TAG, "Generating new private key")
+        val keyPairGenerator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore")
+        val params = KeyGenParameterSpec.Builder(
+            KEYSTORE_ALIAS, KeyProperties.PURPOSE_SIGN or KeyProperties.PURPOSE_VERIFY
         ).run {
             setAlgorithmParameterSpec(
                 ECGenParameterSpec(@Suppress("SpellCheckingInspection") "secp256r1")
             )
             setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                setIsStrongBoxBacked(true)
-            }
+            // Don't use StrongBox, because it's not available on all devices, and we probably don't need that level of
+            // security
             build()
         }
-        kpg.initialize(parameterSpec)
-        kpg.generateKeyPair()
+        keyPairGenerator.initialize(params)
+        keyPairGenerator.generateKeyPair()
+        keyStore.load(null) // Make sure the key store is fresh
+        return keyStore.getEntry(KEYSTORE_ALIAS, null) as? KeyStore.PrivateKeyEntry
+            ?: throw IllegalStateException("Key generation succeeded but key store entry not found")
     }
 
     private suspend fun logResponseErrorMessage(response: HttpResponse) {
@@ -246,7 +233,7 @@ class ApiService @Inject constructor(
         } catch (_: NoTransformationFoundException) {
             "<no transformation found>"
         }
-        log.i(TAG, "Response error message $message for ${response.request.url}")
+        log.i(TAG, "Response error $message for ${response.request.url}")
     }
 
     private companion object {
