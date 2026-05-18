@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.network
 
+import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
@@ -24,13 +25,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import page.ooooo.geoshare.lib.FakeLog
 import java.net.SocketTimeoutException
 import java.net.URL
 
 class HttpClientTest {
-    private val log = FakeLog
-
     @Test
     fun headLocationHeader_whenResponseIs3xxWithLocationHeader_returnsLocationHeader() = runTest {
         val url = URL("https://maps.google.com/foo")
@@ -47,7 +45,9 @@ class HttpClientTest {
                     throw NotImplementedError()
                 }
             }
-            val header = HttpClient(engine, log).use { client ->
+            val header = HttpClient(engine) {
+                expectSuccess = true
+            }.use { client ->
                 client.headLocationHeader(url)
             }
             assertEquals(
@@ -71,7 +71,9 @@ class HttpClientTest {
                     throw NotImplementedError()
                 }
             }
-            HttpClient(engine, log).use { client ->
+            HttpClient(engine) {
+                expectSuccess = true
+            }.use { client ->
                 client.headLocationHeader(url)
             }
         }
@@ -91,7 +93,9 @@ class HttpClientTest {
                     throw NotImplementedError()
                 }
             }
-            val threw = HttpClient(engine, log).use { client ->
+            val threw = HttpClient(engine) {
+                expectSuccess = true
+            }.use { client ->
                 try {
                     client.headLocationHeader(url)
                     null
@@ -105,7 +109,7 @@ class HttpClientTest {
 
     @OptIn(InternalAPI::class)
     @Test
-    fun getRedirectUrlString_whenResponseIs2xx_returnsRequestUrl() = runTest {
+    fun getLastHopUrlString_whenResponseIs2xx_returnsRequestUrl() = runTest {
         val url = URL("https://maps.google.com/foo")
         for (status in listOf(
             HttpStatusCode.OK,
@@ -126,7 +130,9 @@ class HttpClientTest {
                         respondError(HttpStatusCode.NotFound)
                 }
             }
-            val urlString = HttpClient(engine, log).use { client ->
+            val urlString = HttpClient(engine) {
+                expectSuccess = true
+            }.use { client ->
                 client.getLastHopUrlString(url)
             }
             assertEquals(
@@ -137,7 +143,7 @@ class HttpClientTest {
     }
 
     @Test
-    fun httpClient_whenResponseIs2xx_returnsResponseIncludingLocationHeader() = runTest {
+    fun wrapExceptionsInNetworkException_whenResponseIs2xx_returnsResponseIncludingLocationHeader() = runTest {
         val url = URL("https://maps.google.com/foo")
         for (status in listOf(
             HttpStatusCode.OK,
@@ -148,7 +154,10 @@ class HttpClientTest {
                     append(HttpHeaders.Location, "https://maps.google.com/redirected")
                 })
             }
-            val header = HttpClient(engine, log).use { client ->
+            val header = HttpClient(engine) {
+                expectSuccess = true
+                wrapExceptionsInNetworkException()
+            }.use { client ->
                 client
                     .get(url)
                     .headers[HttpHeaders.Location]
@@ -161,91 +170,103 @@ class HttpClientTest {
     }
 
     @Test
-    fun httpClient_whenResponseIs2xx_andFollowRedirectsIsFalse_returnsResponseIncludingLocationHeader() = runTest {
-        val url = URL("https://maps.google.com/foo")
-        for (status in listOf(
-            HttpStatusCode.OK,
-            HttpStatusCode.Created,
-        )) {
-            val engine = MockEngine {
-                respond("test content", status, headers {
-                    append(HttpHeaders.Location, "https://maps.google.com/redirected")
-                })
-            }
-            val header = HttpClient(engine, log).use { client ->
-                client
-                    .config { followRedirects = false }
-                    .get(url)
-                    .headers[HttpHeaders.Location]
-            }
-            assertEquals(
-                "https://maps.google.com/redirected",
-                header,
-            )
-            val lastRequest = engine.requestHistory.last()
-            val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
-            assertFalse(clientConfig.followRedirects)
-        }
-    }
-
-    @Test
-    fun httpClient_whenResponseIs3xxAndFollowRedirectsIsDefault_throwsUnrecoverableException() = runTest {
-        val url = URL("https://maps.google.com/foo")
-        for (status in listOf(
-            HttpStatusCode.MovedPermanently,
-            HttpStatusCode.Found,
-        )) {
-            val engine = MockEngine { respond("test content", status) }
-            val threw = HttpClient(engine, log).use { client ->
-                try {
-                    client.get(url)
-                    null
-                } catch (tr: Exception) {
-                    tr
+    fun wrapExceptionsInNetworkException_whenResponseIs2xx_andFollowRedirectsIsFalse_returnsResponseIncludingLocationHeader() =
+        runTest {
+            val url = URL("https://maps.google.com/foo")
+            for (status in listOf(
+                HttpStatusCode.OK,
+                HttpStatusCode.Created,
+            )) {
+                val engine = MockEngine {
+                    respond("test content", status, headers {
+                        append(HttpHeaders.Location, "https://maps.google.com/redirected")
+                    })
                 }
-            }
-            assertTrue(threw is UnrecoverableNetworkException)
-            assertTrue(threw is ResponseNetworkException)
-            assertTrue(threw?.cause is RedirectResponseException)
-            val lastRequest = engine.requestHistory.last()
-            val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
-            assertTrue(clientConfig.followRedirects)
-        }
-    }
-
-    @Test
-    fun httpClient_whenResponseIs3xxAndFollowRedirectsIsFalse_throwsUnrecoverableException() = runTest {
-        val url = URL("https://maps.google.com/foo")
-        for (status in listOf(
-            HttpStatusCode.MovedPermanently,
-            HttpStatusCode.Found,
-        )) {
-            val engine = MockEngine {
-                respond("test content", status, headers {
-                    append(HttpHeaders.Location, "https://maps.google.com/redirected")
-                })
-            }
-            val threw = HttpClient(engine, log).use { client ->
-                try {
+                val header = HttpClient(engine) {
+                    expectSuccess = true
+                    wrapExceptionsInNetworkException()
+                }.use { client ->
                     client
                         .config { followRedirects = false }
                         .get(url)
-                    null
-                } catch (tr: Exception) {
-                    tr
+                        .headers[HttpHeaders.Location]
                 }
+                assertEquals(
+                    "https://maps.google.com/redirected",
+                    header,
+                )
+                val lastRequest = engine.requestHistory.last()
+                val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
+                assertFalse(clientConfig.followRedirects)
             }
-            assertTrue(threw is UnrecoverableNetworkException)
-            assertTrue(threw is ResponseNetworkException)
-            assertTrue(threw?.cause is RedirectResponseException)
-            val lastRequest = engine.requestHistory.last()
-            val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
-            assertFalse(clientConfig.followRedirects)
         }
-    }
 
     @Test
-    fun httpClient_whenResponseIs4xx_throwsUnrecoverableException() = runTest {
+    fun wrapExceptionsInNetworkException_whenResponseIs3xxAndFollowRedirectsIsDefault_throwsUnrecoverableException() =
+        runTest {
+            val url = URL("https://maps.google.com/foo")
+            for (status in listOf(
+                HttpStatusCode.MovedPermanently,
+                HttpStatusCode.Found,
+            )) {
+                val engine = MockEngine { respond("test content", status) }
+                val threw = HttpClient(engine) {
+                    expectSuccess = true
+                    wrapExceptionsInNetworkException()
+                }.use { client ->
+                    try {
+                        client.get(url)
+                        null
+                    } catch (tr: Exception) {
+                        tr
+                    }
+                }
+                assertTrue(threw is UnrecoverableNetworkException)
+                assertTrue(threw is ResponseNetworkException)
+                assertTrue(threw?.cause is RedirectResponseException)
+                val lastRequest = engine.requestHistory.last()
+                val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
+                assertTrue(clientConfig.followRedirects)
+            }
+        }
+
+    @Test
+    fun wrapExceptionsInNetworkException_whenResponseIs3xxAndFollowRedirectsIsFalse_throwsUnrecoverableException() =
+        runTest {
+            val url = URL("https://maps.google.com/foo")
+            for (status in listOf(
+                HttpStatusCode.MovedPermanently,
+                HttpStatusCode.Found,
+            )) {
+                val engine = MockEngine {
+                    respond("test content", status, headers {
+                        append(HttpHeaders.Location, "https://maps.google.com/redirected")
+                    })
+                }
+                val threw = HttpClient(engine) {
+                    expectSuccess = true
+                    wrapExceptionsInNetworkException()
+                }.use { client ->
+                    try {
+                        client
+                            .config { followRedirects = false }
+                            .get(url)
+                        null
+                    } catch (tr: Exception) {
+                        tr
+                    }
+                }
+                assertTrue(threw is UnrecoverableNetworkException)
+                assertTrue(threw is ResponseNetworkException)
+                assertTrue(threw?.cause is RedirectResponseException)
+                val lastRequest = engine.requestHistory.last()
+                val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
+                assertFalse(clientConfig.followRedirects)
+            }
+        }
+
+    @Test
+    fun wrapExceptionsInNetworkException_whenResponseIs4xx_throwsUnrecoverableException() = runTest {
         val url = URL("https://maps.google.com/foo")
         for (status in listOf(
             HttpStatusCode.BadRequest,
@@ -253,7 +274,10 @@ class HttpClientTest {
             HttpStatusCode.TooManyRequests,
         )) {
             val engine = MockEngine { respond("test content", status) }
-            val threw = HttpClient(engine, log).use { client ->
+            val threw = HttpClient(engine) {
+                expectSuccess = true
+                wrapExceptionsInNetworkException()
+            }.use { client ->
                 try {
                     client.get(url)
                     null
@@ -269,14 +293,17 @@ class HttpClientTest {
     }
 
     @Test
-    fun httpClient_whenResponseIs5xx_throwsRecoverableException() = runTest {
+    fun wrapExceptionsInNetworkException_whenResponseIs5xx_throwsRecoverableException() = runTest {
         val url = URL("https://maps.google.com/foo")
         for (status in listOf(
             HttpStatusCode.InternalServerError,
             HttpStatusCode.BadGateway,
         )) {
             val engine = MockEngine { respond("test content", status) }
-            val threw = HttpClient(engine, log).use { client ->
+            val threw = HttpClient(engine) {
+                expectSuccess = true
+                wrapExceptionsInNetworkException()
+            }.use { client ->
                 try {
                     client.get(url)
                     null
@@ -291,78 +318,97 @@ class HttpClientTest {
     }
 
     @Test
-    fun httpClient_whenRequestThrowsUnresolvedAddressException_throwsRecoverableException() = runTest {
-        val url = URL("https://maps.google.com/foo")
-        val engine = MockEngine { throw UnresolvedAddressException() }
-        val threw = HttpClient(engine, log).use { client ->
-            try {
-                client.get(url)
-                null
-            } catch (tr: Exception) {
-                tr
+    fun wrapExceptionsInNetworkException_whenRequestThrowsUnresolvedAddressException_throwsRecoverableException() =
+        runTest {
+            val url = URL("https://maps.google.com/foo")
+            val engine = MockEngine { throw UnresolvedAddressException() }
+            val threw = HttpClient(engine) {
+                expectSuccess = true
+                wrapExceptionsInNetworkException()
+            }.use { client ->
+                try {
+                    client.get(url)
+                    null
+                } catch (tr: Exception) {
+                    tr
+                }
             }
+            assertTrue(threw is RecoverableNetworkException)
+            assertTrue(threw is UnresolvedAddressNetworkException)
+            assertTrue(threw?.cause is UnresolvedAddressException)
         }
-        assertTrue(threw is RecoverableNetworkException)
-        assertTrue(threw is UnresolvedAddressNetworkException)
-        assertTrue(threw?.cause is UnresolvedAddressException)
-    }
 
     @Test
-    fun httpClient_whenRequestThrowsHttpRequestTimeoutException_throwsRecoverableException() = runTest {
-        val url = URL("https://maps.google.com/foo")
-        val engine = MockEngine { request -> throw HttpRequestTimeoutException(request) }
-        val threw = HttpClient(engine, log).use { client ->
-            try {
-                client.get(url)
-                null
-            } catch (tr: Exception) {
-                tr
+    fun wrapExceptionsInNetworkException_whenRequestThrowsHttpRequestTimeoutException_throwsRecoverableException() =
+        runTest {
+            val url = URL("https://maps.google.com/foo")
+            val engine = MockEngine { request -> throw HttpRequestTimeoutException(request) }
+            val threw = HttpClient(engine) {
+                expectSuccess = true
+                wrapExceptionsInNetworkException()
+            }.use { client ->
+                try {
+                    client.get(url)
+                    null
+                } catch (tr: Exception) {
+                    tr
+                }
             }
+            assertTrue(threw is RecoverableNetworkException)
+            assertTrue(threw is RequestTimeoutNetworkException)
+            assertTrue(threw?.cause is HttpRequestTimeoutException)
         }
-        assertTrue(threw is RecoverableNetworkException)
-        assertTrue(threw is RequestTimeoutNetworkException)
-        assertTrue(threw?.cause is HttpRequestTimeoutException)
-    }
 
     @Test
-    fun httpClient_whenRequestThrowsSocketTimeoutException_throwsRecoverableException() = runTest {
-        val url = URL("https://maps.google.com/foo")
-        val engine = MockEngine { throw SocketTimeoutException() }
-        val threw = HttpClient(engine, log).use { client ->
-            try {
-                client.get(url)
-                null
-            } catch (tr: Exception) {
-                tr
+    fun wrapExceptionsInNetworkException_whenRequestThrowsSocketTimeoutException_throwsRecoverableException() =
+        runTest {
+            val url = URL("https://maps.google.com/foo")
+            val engine = MockEngine { throw SocketTimeoutException() }
+            val threw = HttpClient(engine) {
+                expectSuccess = true
+                wrapExceptionsInNetworkException()
+            }.use { client ->
+                try {
+                    client.get(url)
+                    null
+                } catch (tr: Exception) {
+                    tr
+                }
             }
+            assertTrue(threw is RecoverableNetworkException)
+            assertTrue(threw is SocketTimeoutNetworkException)
+            assertTrue(threw?.cause is SocketTimeoutException)
         }
-        assertTrue(threw is RecoverableNetworkException)
-        assertTrue(threw is SocketTimeoutNetworkException)
-        assertTrue(threw?.cause is SocketTimeoutException)
-    }
 
     @Test
-    fun httpClient_whenRequestThrowsConnectTimeoutException_throwsRecoverableException() = runTest {
-        val url = URL("https://maps.google.com/foo")
-        val engine = MockEngine { throw ConnectTimeoutException("Connect timeout") }
-        val threw = HttpClient(engine, log).use { client ->
-            try {
-                client.get(url)
-                null
-            } catch (tr: Exception) {
-                tr
+    fun wrapExceptionsInNetworkException_whenRequestThrowsConnectTimeoutException_throwsRecoverableException() =
+        runTest {
+            val url = URL("https://maps.google.com/foo")
+            val engine = MockEngine { throw ConnectTimeoutException("Connect timeout") }
+            val threw = HttpClient(engine) {
+                expectSuccess = true
+                wrapExceptionsInNetworkException()
+            }.use { client ->
+                try {
+                    client.get(url)
+                    null
+                } catch (tr: Exception) {
+                    tr
+                }
             }
+            assertTrue(threw is RecoverableNetworkException)
+            assertTrue(threw is ConnectTimeoutNetworkException)
+            assertTrue(threw?.cause is ConnectTimeoutException)
         }
-        assertTrue(threw is RecoverableNetworkException)
-        assertTrue(threw is ConnectTimeoutNetworkException)
-        assertTrue(threw?.cause is ConnectTimeoutException)
-    }
 
     @Test
-    fun httpClient_whenRequestThrowsEOFException_throwsRecoverableException() = runTest {
+    fun wrapExceptionsInNetworkException_whenRequestThrowsEOFException_throwsRecoverableException() = runTest {
         val url = URL("https://maps.google.com/foo")
         val engine = MockEngine { throw kotlinx.io.EOFException() }
-        val threw = HttpClient(engine, log).use { client ->
+        val threw = HttpClient(engine) {
+            expectSuccess = true
+            wrapExceptionsInNetworkException()
+        }.use { client ->
             try {
                 client.get(url)
                 null
@@ -376,12 +422,15 @@ class HttpClientTest {
     }
 
     @Test
-    fun httpClient_whenRequestThrowsUnknownException_throwsUnrecoverableException() = runTest {
+    fun wrapExceptionsInNetworkException_whenRequestThrowsUnknownException_throwsUnrecoverableException() = runTest {
         class MyException(message: String) : Exception(message)
 
         val url = URL("https://maps.google.com/foo")
         val engine = MockEngine { throw MyException("Unknown exception") }
-        val threw = HttpClient(engine, log).use { client ->
+        val threw = HttpClient(engine) {
+            expectSuccess = true
+            wrapExceptionsInNetworkException()
+        }.use { client ->
             try {
                 client.get(url)
                 null

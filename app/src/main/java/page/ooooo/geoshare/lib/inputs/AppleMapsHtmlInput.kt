@@ -10,6 +10,7 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.network.DESKTOP_USER_AGENT
 
 object AppleMapsHtmlInput : BodyAsChannelInput {
     @StringRes
@@ -17,6 +18,9 @@ object AppleMapsHtmlInput : BodyAsChannelInput {
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_apple_maps_loading_indicator_title
+
+    // Use custom user agent instead of BrowserUserAgent, so that Apple Maps doesn't show "Unsupported browser"
+    override val userAgent = DESKTOP_USER_AGENT
 
     override suspend fun parse(
         data: ByteReadChannel,

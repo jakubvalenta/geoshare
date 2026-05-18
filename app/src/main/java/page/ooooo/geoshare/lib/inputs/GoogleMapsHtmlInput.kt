@@ -23,6 +23,9 @@ object GoogleMapsHtmlInput : BodyAsChannelInput {
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
+    override val cookies = GoogleMapsShortLinkInput.cookies
+    override val userAgent = GoogleMapsShortLinkInput.userAgent
+
     override suspend fun parse(
         data: ByteReadChannel,
         match: String,

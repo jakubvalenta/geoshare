@@ -1,10 +1,13 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
+import io.ktor.client.plugins.cookies.ConstantCookiesStorage
+import io.ktor.http.Cookie
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.network.DESKTOP_USER_AGENT
 
 object GoogleMapsShortLinkInput : HeadLocationHeaderInput {
     override val pattern = Regex("""((?:https?://)?(?:(?:maps\.)?(?:app\.)?goo\.gl|g\.co)/[/A-Za-z0-9_-]+)""")
@@ -23,6 +26,25 @@ object GoogleMapsShortLinkInput : HeadLocationHeaderInput {
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
+
+    // Bypass consent page https://stackoverflow.com/a/78115353
+    override val cookies = ConstantCookiesStorage(
+        Cookie(
+            name = "CONSENT",
+            value = "PENDING+987",
+            domain = "www.google.com",
+        ),
+        @Suppress("SpellCheckingInspection")
+        Cookie(
+            name = "SOCS",
+            value = "CAESHAgBEhJnd3NfMjAyMzA4MTAtMF9SQzIaAmRlIAEaBgiAo_CmBg",
+            domain = "www.google.com",
+        ),
+    )
+
+    // Set custom User-Agent, so that we don't receive Google Lite HTML, which doesn't contain coordinates in
+    // case of Google Maps or maps link in case of Google Search.
+    override val userAgent = DESKTOP_USER_AGENT
 
     override suspend fun parse(
         data: Uri,

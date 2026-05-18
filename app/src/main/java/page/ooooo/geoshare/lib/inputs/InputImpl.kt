@@ -1,7 +1,9 @@
 package page.ooooo.geoshare.lib.inputs
 
+import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.plugins.cookies.CookiesStorage
 import io.ktor.client.request.prepareRequest
 import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.withContext
@@ -9,9 +11,12 @@ import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.network.HttpClient
 import page.ooooo.geoshare.lib.network.getLastHopUrlString
 import page.ooooo.geoshare.lib.network.headLocationHeader
+import page.ooooo.geoshare.lib.network.setCookies
+import page.ooooo.geoshare.lib.network.setGenerousTimeouts
+import page.ooooo.geoshare.lib.network.setUserAgent
+import page.ooooo.geoshare.lib.network.wrapExceptionsInNetworkException
 import java.net.MalformedURLException
 import kotlin.coroutines.CoroutineContext
 
@@ -50,6 +55,9 @@ interface UriInput : BasicInput<Uri> {
 }
 
 interface GetLastHopUrlInput : UriInput, Input.HasPermission {
+    val cookies: CookiesStorage? get() = null
+    val userAgent: String? get() = null
+
     override suspend fun withData(
         match: String,
         engine: HttpClientEngine,
@@ -60,7 +68,13 @@ interface GetLastHopUrlInput : UriInput, Input.HasPermission {
     ): ParseResult = withContext(coroutineContext) {
         val uri = Uri.parse(match, uriQuote)
         val url = uri.toUrl() ?: throw MalformedURLException()
-        val unshortenedUrlString = HttpClient(engine, log).use { client ->
+        val unshortenedUrlString = HttpClient(engine) {
+            expectSuccess = true
+            setCookies(cookies)
+            setUserAgent(userAgent)
+            setGenerousTimeouts()
+            wrapExceptionsInNetworkException()
+        }.use { client ->
             client.getLastHopUrlString(url)
         }
         val unshortenedUri = Uri.parse(unshortenedUrlString, uriQuote).toAbsoluteUri(uri)
@@ -74,6 +88,9 @@ interface GetLastHopUrlInput : UriInput, Input.HasPermission {
 }
 
 interface HeadLocationHeaderInput : UriInput, Input.HasPermission {
+    val cookies: CookiesStorage? get() = null
+    val userAgent: String? get() = null
+
     override suspend fun withData(
         match: String,
         engine: HttpClientEngine,
@@ -84,7 +101,13 @@ interface HeadLocationHeaderInput : UriInput, Input.HasPermission {
     ): ParseResult = withContext(coroutineContext) {
         val uri = Uri.parse(match, uriQuote)
         val url = uri.toUrl() ?: throw MalformedURLException()
-        val unshortenedUrlString = HttpClient(engine, log).use { client ->
+        val unshortenedUrlString = HttpClient(engine) {
+            expectSuccess = true
+            setCookies(cookies)
+            setUserAgent(userAgent)
+            setGenerousTimeouts()
+            wrapExceptionsInNetworkException()
+        }.use { client ->
             client.headLocationHeader(url)
         }
         val unshortenedUri = Uri.parse(unshortenedUrlString, uriQuote).toAbsoluteUri(uri)
@@ -98,6 +121,9 @@ interface HeadLocationHeaderInput : UriInput, Input.HasPermission {
 }
 
 interface BodyAsChannelInput : BasicInput<ByteReadChannel>, Input.HasPermission {
+    val cookies: CookiesStorage? get() = null
+    val userAgent: String? get() = null
+
     override suspend fun withData(
         match: String,
         engine: HttpClientEngine,
@@ -109,7 +135,13 @@ interface BodyAsChannelInput : BasicInput<ByteReadChannel>, Input.HasPermission 
         val uri = Uri.parse(match, uriQuote)
         val url = uri.toUrl() ?: throw MalformedURLException()
         log.i(TAG, "Downloading $uri")
-        HttpClient(engine, log).use { client ->
+        HttpClient(engine) {
+            expectSuccess = true
+            setCookies(cookies)
+            setUserAgent(userAgent)
+            setGenerousTimeouts()
+            wrapExceptionsInNetworkException()
+        }.use { client ->
             client
                 .prepareRequest(url)
                 .execute { response ->
@@ -124,6 +156,9 @@ interface BodyAsChannelInput : BasicInput<ByteReadChannel>, Input.HasPermission 
 }
 
 interface BodyAsTextInput : BasicInput<String>, Input.HasPermission {
+    val cookies: CookiesStorage? get() = null
+    val userAgent: String? get() = null
+
     override suspend fun withData(
         match: String,
         engine: HttpClientEngine,
@@ -135,7 +170,13 @@ interface BodyAsTextInput : BasicInput<String>, Input.HasPermission {
         val uri = Uri.parse(match, uriQuote)
         val url = uri.toUrl() ?: throw MalformedURLException()
         log.i(TAG, "Downloading $uri")
-        HttpClient(engine, log).use { client ->
+        HttpClient(engine) {
+            expectSuccess = true
+            setCookies(cookies)
+            setUserAgent(userAgent)
+            setGenerousTimeouts()
+            wrapExceptionsInNetworkException()
+        }.use { client ->
             client
                 .prepareRequest(url)
                 .execute { response ->
