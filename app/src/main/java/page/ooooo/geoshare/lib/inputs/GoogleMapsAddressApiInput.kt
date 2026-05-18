@@ -61,16 +61,18 @@ class GoogleMapsAddressApiInput @Inject constructor(
         log: Log,
     ) = buildParseResult {
         val prevPoint = prevResult?.points?.lastOrNull()
-        // TODO Either return only one result or put the highest ranked result last
-        points = data.results.map { result ->
-            GCJ02MainlandChinaPoint(
-                result.location.latitude,
-                result.location.longitude,
-                name = prevPoint?.name,
-                z = prevPoint?.z,
-                source = prevPoint?.source ?: Source.API,
-            )
-        }.toImmutableList()
+        points = data.results
+            // Take only the highest ranked result
+            .take(1)
+            .map { result ->
+                GCJ02MainlandChinaPoint(
+                    result.location.latitude,
+                    result.location.longitude,
+                    name = prevPoint?.name,
+                    z = prevPoint?.z,
+                    source = prevPoint?.source ?: Source.API,
+                )
+            }.toImmutableList()
     }
 
     override fun toString() = "GoogleMapsAddressApiInput"
