@@ -55,7 +55,10 @@ interface UriInput : BasicInput<Uri> {
 }
 
 interface GetLastHopUrlInput : UriInput, Input.HasPermission {
+    @Suppress("SameReturnValue")
     val cookies: CookiesStorage? get() = null
+
+    @Suppress("SameReturnValue")
     val userAgent: String? get() = null
 
     override suspend fun withData(
@@ -88,7 +91,10 @@ interface GetLastHopUrlInput : UriInput, Input.HasPermission {
 }
 
 interface HeadLocationHeaderInput : UriInput, Input.HasPermission {
+    @Suppress("SameReturnValue")
     val cookies: CookiesStorage? get() = null
+
+    @Suppress("SameReturnValue")
     val userAgent: String? get() = null
 
     override suspend fun withData(
@@ -121,7 +127,10 @@ interface HeadLocationHeaderInput : UriInput, Input.HasPermission {
 }
 
 interface BodyAsChannelInput : BasicInput<ByteReadChannel>, Input.HasPermission {
+    @Suppress("SameReturnValue")
     val cookies: CookiesStorage? get() = null
+
+    @Suppress("SameReturnValue")
     val userAgent: String? get() = null
 
     override suspend fun withData(
@@ -156,7 +165,10 @@ interface BodyAsChannelInput : BasicInput<ByteReadChannel>, Input.HasPermission 
 }
 
 interface BodyAsTextInput : BasicInput<String>, Input.HasPermission {
+    @Suppress("SameReturnValue")
     val cookies: CookiesStorage? get() = null
+
+    @Suppress("SameReturnValue")
     val userAgent: String? get() = null
 
     override suspend fun withData(
