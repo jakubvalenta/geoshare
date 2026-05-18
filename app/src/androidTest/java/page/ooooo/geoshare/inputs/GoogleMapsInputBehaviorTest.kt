@@ -193,6 +193,10 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
 
     @Test
     fun googleMapsPlaceList() = uiAutomator {
+        runBlocking {
+            assumeDomainResolvable("maps.google.com")
+        }
+
         // Place list
         testUri(
             persistentListOf(
