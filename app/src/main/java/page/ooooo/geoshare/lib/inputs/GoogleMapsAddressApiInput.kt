@@ -9,8 +9,7 @@ import io.ktor.client.request.url
 import io.ktor.http.ContentType
 import io.ktor.http.appendPathSegments
 import io.ktor.http.headers
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.serialization.Serializable
+import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
@@ -20,12 +19,9 @@ import page.ooooo.geoshare.lib.network.ApiService
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-class GoogleMapsGeoCodeApiInput @Inject constructor(
+class GoogleMapsAddressApiInput @Inject constructor(
     private val apiService: ApiService,
-) : BasicInput<GoogleMapsGeoCodeApiInput.GoogleMapsGeoCodeResult>, Input.HasPermission {
-
-    @Serializable
-    class GoogleMapsGeoCodeResult(val latitude: Double, val longitude: Double)
+) : BasicInput<ApiService.GoogleMapsResults>, Input.HasPermission {
 
     @StringRes
     override val permissionTitleResId = R.string.converter_geo_share_permission_title
@@ -39,7 +35,7 @@ class GoogleMapsGeoCodeApiInput @Inject constructor(
         log: Log,
         uriQuote: UriQuote,
         coroutineContext: CoroutineContext,
-        block: suspend (GoogleMapsGeoCodeResult) -> ParseResult,
+        block: suspend (ApiService.GoogleMapsResults) -> ParseResult,
     ): ParseResult =
         apiService
             .createHttpClient(engine)
@@ -47,7 +43,7 @@ class GoogleMapsGeoCodeApiInput @Inject constructor(
                 client
                     .prepareRequest {
                         url(apiService.getEndpoint())
-                            .appendPathSegments("v1", "google-maps", "geocode", "places", match)
+                            .appendPathSegments("v1", "google-maps", "geocode", "address", match)
                         headers {
                             accept(ContentType.Application.Json)
                         }
@@ -58,23 +54,24 @@ class GoogleMapsGeoCodeApiInput @Inject constructor(
             }
 
     override suspend fun parse(
-        data: GoogleMapsGeoCodeResult,
+        data: ApiService.GoogleMapsResults,
         match: String,
         prevResult: ParseResult?,
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {
         val prevPoint = prevResult?.points?.lastOrNull()
-        points = persistentListOf(
+        // TODO Either return only one result or put the highest ranked result last
+        points = data.results.map { result ->
             GCJ02MainlandChinaPoint(
-                data.latitude,
-                data.longitude,
+                result.location.latitude,
+                result.location.longitude,
                 name = prevPoint?.name,
                 z = prevPoint?.z,
                 source = prevPoint?.source ?: Source.API,
             )
-        )
+        }.toImmutableList()
     }
 
-    override fun toString() = "GoogleMapsGeoCodeApiInput"
+    override fun toString() = "GoogleMapsAddressApiInput"
 }

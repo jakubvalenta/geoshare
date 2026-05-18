@@ -15,10 +15,11 @@ import page.ooooo.geoshare.lib.network.getLastHopUrlString
 import page.ooooo.geoshare.lib.network.headLocationHeader
 import page.ooooo.geoshare.lib.network.rethrowExceptionsAsNetworkException
 import page.ooooo.geoshare.lib.network.setCookies
-import page.ooooo.geoshare.lib.network.setGenerousTimeouts
+import page.ooooo.geoshare.lib.network.setDefaultTimeouts
 import page.ooooo.geoshare.lib.network.setUserAgent
 import java.net.MalformedURLException
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.coroutineContext
 
 interface TextInput : BasicInput<String> {
     val pattern: Regex
@@ -74,8 +75,8 @@ interface GetLastHopUrlInput : UriInput, Input.HasPermission {
         val unshortenedUrlString = HttpClient(engine) {
             expectSuccess = true
             setCookies(cookies)
+            setDefaultTimeouts()
             setUserAgent(userAgent)
-            setGenerousTimeouts()
             rethrowExceptionsAsNetworkException(log)
         }.use { client ->
             client.getLastHopUrlString(url)
@@ -110,8 +111,8 @@ interface HeadLocationHeaderInput : UriInput, Input.HasPermission {
         val unshortenedUrlString = HttpClient(engine) {
             expectSuccess = true
             setCookies(cookies)
+            setDefaultTimeouts()
             setUserAgent(userAgent)
-            setGenerousTimeouts()
             rethrowExceptionsAsNetworkException(log)
         }.use { client ->
             client.headLocationHeader(url)
@@ -147,8 +148,8 @@ interface BodyAsChannelInput : BasicInput<ByteReadChannel>, Input.HasPermission 
         HttpClient(engine) {
             expectSuccess = true
             setCookies(cookies)
+            setDefaultTimeouts()
             setUserAgent(userAgent)
-            setGenerousTimeouts()
             rethrowExceptionsAsNetworkException(log)
         }.use { client ->
             client
@@ -185,8 +186,8 @@ interface BodyAsTextInput : BasicInput<String>, Input.HasPermission {
         HttpClient(engine) {
             expectSuccess = true
             setCookies(cookies)
+            setDefaultTimeouts()
             setUserAgent(userAgent)
-            setGenerousTimeouts()
             rethrowExceptionsAsNetworkException(log)
         }.use { client ->
             client

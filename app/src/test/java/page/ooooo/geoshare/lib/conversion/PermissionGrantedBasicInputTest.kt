@@ -3,6 +3,7 @@ package page.ooooo.geoshare.lib.conversion
 import android.content.res.Resources
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
 import io.ktor.utils.io.CancellationException
 import kotlinx.collections.immutable.persistentListOf
@@ -428,63 +429,65 @@ class PermissionGrantedBasicInputTest {
         }
 
     @Test
-    fun transition_whenInputWithDataThrowsUnrecoverableNetworkException_returnsConversionFailed() =
-        runTest {
-            val source = "https://maps.google.com/foo"
-            val cause = ResponseNetworkException(HttpStatusCode.NotFound, Exception())
-            val input = object : BasicInput<String>, Input.HasPermission {
-                override suspend fun withData(
-                    match: String,
-                    engine: HttpClientEngine,
-                    log: Log,
-                    uriQuote: UriQuote,
-                    coroutineContext: CoroutineContext,
-                    block: suspend (String) -> ParseResult,
-                ): ParseResult = throw cause
-
-                override suspend fun parse(
-                    data: String,
-                    match: String,
-                    prevResult: ParseResult?,
-                    uriQuote: UriQuote,
-                    log: Log,
-                ) = ParseResult(
-                    prevResult?.points ?: persistentListOf(),
-                    nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
-                )
-
-                override val permissionTitleResId = R.string.converter_google_maps_permission_title
-                override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
-            }
-            val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-            val prevResult = ParseResult(prevPoints)
-            val lastAttempt = null
-            val permission = Permission.ALWAYS
-            val stateContext: ConversionStateContext = mock {
-                on { this@on.engine } doReturn engine
-                on { this@on.log } doReturn log
-                on { this@on.resources } doReturn resources
-                on { this@on.uriQuote } doReturn uriQuote
-            }
-            val state = PermissionGrantedBasicInput(
-                stateContext,
-                source,
-                match = source,
-                input,
-                permission,
-                prevResult,
-                lastAttempt,
-                maxAttempts,
-                dispatcher = testScheduler,
-            )
-            assertEquals(
-                ConversionFailed(
-                    resources.getString(R.string.network_exception_response_error, HttpStatusCode.NotFound.value),
-                    source,
-                ),
-                state.transition(),
-            )
+    fun transition_whenInputWithDataThrowsUnrecoverableNetworkException_returnsConversionFailed() = runTest {
+        val source = "https://maps.google.com/foo"
+        val response: HttpResponse = mock {
+            on { status } doReturn HttpStatusCode.NotFound
         }
+        val cause = ResponseNetworkException(response, Exception())
+        val input = object : BasicInput<String>, Input.HasPermission {
+            override suspend fun withData(
+                match: String,
+                engine: HttpClientEngine,
+                log: Log,
+                uriQuote: UriQuote,
+                coroutineContext: CoroutineContext,
+                block: suspend (String) -> ParseResult,
+            ): ParseResult = throw cause
+
+            override suspend fun parse(
+                data: String,
+                match: String,
+                prevResult: ParseResult?,
+                uriQuote: UriQuote,
+                log: Log,
+            ) = ParseResult(
+                prevResult?.points ?: persistentListOf(),
+                nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
+            )
+
+            override val permissionTitleResId = R.string.converter_google_maps_permission_title
+            override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
+        }
+        val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+        val prevResult = ParseResult(prevPoints)
+        val lastAttempt = null
+        val permission = Permission.ALWAYS
+        val stateContext: ConversionStateContext = mock {
+            on { this@on.engine } doReturn engine
+            on { this@on.log } doReturn log
+            on { this@on.resources } doReturn resources
+            on { this@on.uriQuote } doReturn uriQuote
+        }
+        val state = PermissionGrantedBasicInput(
+            stateContext,
+            source,
+            match = source,
+            input,
+            permission,
+            prevResult,
+            lastAttempt,
+            maxAttempts,
+            dispatcher = testScheduler,
+        )
+        assertEquals(
+            ConversionFailed(
+                resources.getString(R.string.network_exception_response_error, HttpStatusCode.NotFound.value),
+                source,
+            ),
+            state.transition(),
+        )
+    }
 
     @Test
     fun getLoadingIndicator_whenLastAttemptIsNull_returnsLargeLoadingIndicatorWithoutDescription() = runTest {

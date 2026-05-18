@@ -58,9 +58,20 @@ class ApiService @Inject constructor(
     @Serializable
     data class TokenResponse(val token: String) : AuthenticationResponse
 
+    @Serializable
+    data class GoogleMapsLocation(val latitude: Double, val longitude: Double)
+
+    @Serializable
+    data class GoogleMapsResult(val location: GoogleMapsLocation)
+
+    @Serializable
+    data class GoogleMapsResults(val results: List<GoogleMapsResult>)
+
     fun createHttpClient(engine: HttpClientEngine = CIO.create()): HttpClient =
         HttpClient(engine) {
             expectSuccess = true
+            setDefaultTimeouts()
+            rethrowExceptionsAsNetworkException(log)
 
             install(ContentNegotiation) {
                 json()
@@ -88,7 +99,12 @@ class ApiService @Inject constructor(
     private suspend fun login(engine: HttpClientEngine): BearerTokens? {
         HttpClient(engine) {
             expectSuccess = true
+            setDefaultTimeouts()
             rethrowExceptionsAsNetworkException(log)
+
+            install(ContentNegotiation) {
+                json()
+            }
         }.use { client ->
             val privateKeyEntry = getPrivateKeyEntry() ?: run {
                 log.i(TAG, "Private key not found")
