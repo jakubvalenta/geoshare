@@ -8,7 +8,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class OpenStreetMapApiInputTest : InputTest {
-    private val input = OpenStreetMapApiInput
+    private val input = OpenStreetMapApiInput()
 
     @Test
     fun parse_node() = runTest {

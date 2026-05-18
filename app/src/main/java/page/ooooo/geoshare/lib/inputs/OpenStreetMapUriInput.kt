@@ -13,10 +13,13 @@ import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.decodeOpenStreetMapQuadTileHash
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object OpenStreetMapUriInput : UriInput, Input.HasRandomUri {
-    private const val HASH = """[A-Za-z0-9_~]+-+"""
-
+@Singleton
+class OpenStreetMapUriInput @Inject constructor(
+    private val openStreetMapApiInput: OpenStreetMapApiInput,
+) : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:https?://)?(?:www\.)?(?:openstreetmap|osm)\.org/$URI_REST)""")
     override val documentation = InputDocumentation(
         group = InputDocumentationGroup.OPEN_STREET_MAP,
@@ -83,7 +86,7 @@ object OpenStreetMapUriInput : UriInput, Input.HasRandomUri {
                 pathParts.getOrNull(1).takeIf { it in setOf("node", "relation", "way") }?.let { type ->
                     pathParts.getOrNull(2)?.let { id ->
                         nextStep = NextStep(
-                            OpenStreetMapApiInput,
+                            openStreetMapApiInput,
                             "https://www.openstreetmap.org/api/0.6/$type/$id${if (type != "node") "/full" else ""}.json",
                         )
                     }
@@ -96,4 +99,8 @@ object OpenStreetMapUriInput : UriInput, Input.HasRandomUri {
         UriFormatter.formatUriString(point, "https://www.openstreetmap.org/#map={z}/{lat}/{lon}")
 
     override fun toString() = "OpenStreetMapUriInput"
+
+    private companion object {
+        private const val HASH = """[A-Za-z0-9_~]+-+"""
+    }
 }

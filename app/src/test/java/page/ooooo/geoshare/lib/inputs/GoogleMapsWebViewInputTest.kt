@@ -5,7 +5,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class GoogleMapsWebViewInputTest : InputTest {
-    private val input = GoogleMapsWebViewInput
+    private val input = GoogleMapsWebViewInput()
 
     @Test
     fun parse_returnsNextStep() = runTest {

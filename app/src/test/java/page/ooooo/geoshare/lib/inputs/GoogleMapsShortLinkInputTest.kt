@@ -6,7 +6,7 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 
 class GoogleMapsShortLinkInputTest : InputTest {
-    private val input = GoogleMapsShortLinkInput
+    private val input = GoogleMapsShortLinkInput(GoogleMapsUriInput())
 
     @Test
     fun match_shortLink() {

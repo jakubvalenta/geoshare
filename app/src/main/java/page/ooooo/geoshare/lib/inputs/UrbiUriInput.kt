@@ -13,13 +13,18 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * 2GIS / Urbi input.
  *
  * We call it Urbi, because 2GIS starts with a number, so it couldn't be used as a class name.
  */
-object UrbiUriInput : UriInput, Input.HasRandomUri {
+@Singleton
+class UrbiUriInput @Inject constructor(
+    private val urbiHtmlInput: UrbiHtmlInput,
+) : UriInput, Input.HasRandomUri {
     override val pattern =
         Regex("""((?:https?://)?(?:www\.)?(?:(?:go|maps)\.)?(?:2gis|urbi|urbi-[a-z]{2})(?:\.[a-z]{2,3})?\.[a-z]{2,3}/$URI_REST)""")
     override val documentation = InputDocumentation(
@@ -87,7 +92,7 @@ object UrbiUriInput : UriInput, Input.HasRandomUri {
                 return@run
             }
 
-            nextStep = NextStep(UrbiHtmlInput, match)
+            nextStep = NextStep(urbiHtmlInput, match)
         }
     }
 

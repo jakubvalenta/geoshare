@@ -17,10 +17,10 @@ import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import javax.inject.Singleton
 
-object GeoUriInput : UriInput, Input.HasRandomUri {
-    private const val NAME_REGEX = """\((.+)\)"""
-
+@Singleton
+class GeoUriInput : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""(geo:$LAT_NUM,$LON_NUM\?q=$LAT_NUM,\s*$LON_NUM|geo:$URI_REST)""")
     override val documentation = InputDocumentation(
         group = InputDocumentationGroup.GEO_URI,
@@ -76,4 +76,8 @@ object GeoUriInput : UriInput, Input.HasRandomUri {
         UriFormatter.formatUriString(point, "geo:{lat},{lon}?z={z}&q={lat},{lon}({name})")
 
     override fun toString() = "GeoUriInput"
+
+    private companion object {
+        private const val NAME_REGEX = """\((.+)\)"""
+    }
 }

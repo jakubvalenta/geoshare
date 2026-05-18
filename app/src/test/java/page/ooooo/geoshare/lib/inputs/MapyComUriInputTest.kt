@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class MapyComUriInputTest : InputTest {
-    private val input = MapyComUriInput
+    private val input = MapyComUriInput()
 
     @Test
     fun match_fullUrl() {

@@ -8,7 +8,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class AppleMapsHtmlInputTest : InputTest {
-    private val input = AppleMapsHtmlInput
+    private val input = AppleMapsHtmlInput()
 
     @Test
     fun parse_success() = runTest {

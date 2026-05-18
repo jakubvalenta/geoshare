@@ -5,7 +5,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class BaiduMapShortLinkInputTest : InputTest {
-    private val input = BaiduMapShortLinkInput
+    private val input = BaiduMapShortLinkInput()
 
     @Test
     fun match_shortLink() {

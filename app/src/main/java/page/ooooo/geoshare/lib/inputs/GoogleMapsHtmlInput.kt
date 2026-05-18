@@ -15,8 +15,13 @@ import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Source
+import javax.inject.Singleton
 
-object GoogleMapsHtmlInput : BodyAsChannelInput {
+@Singleton
+class GoogleMapsHtmlInput(
+    private val googleMapsUriInput: GoogleMapsUriInput,
+    private val googleMapsWebViewInput: GoogleMapsWebViewInput,
+) : BodyAsChannelInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_google_maps_permission_title
 
@@ -24,7 +29,7 @@ object GoogleMapsHtmlInput : BodyAsChannelInput {
     override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
     override val cookies = GoogleMapsShortLinkInput.cookies
-    override val userAgent = GoogleMapsShortLinkInput.userAgent
+    override val userAgent = GoogleMapsShortLinkInput.USER_AGENT
 
     override suspend fun parse(
         data: ByteReadChannel,
@@ -106,17 +111,19 @@ object GoogleMapsHtmlInput : BodyAsChannelInput {
                 } else if (redirectUriString != null) {
                     val baseUri = Uri.parse(match, uriQuote)
                     val redirectUri = Uri.parse(redirectUriString, uriQuote).toAbsoluteUri(baseUri)
-                    nextStep = NextStep(GoogleMapsUriInput, redirectUri.toString())
+                    nextStep = NextStep(googleMapsUriInput, redirectUri.toString())
                 } else {
                     // Go to web parsing
-                    nextStep = NextStep(GoogleMapsWebViewInput, match)
+                    nextStep = NextStep(googleMapsWebViewInput, match)
                 }
             }
 
             points = mutableNaivePoints.map { GCJ02MainlandChinaPoint(it) }.toImmutableList()
         }
 
-    private const val TAG = "GoogleMapsHtmlInput"
-
     override fun toString() = TAG
+
+    private companion object {
+        private const val TAG = "GoogleMapsHtmlInput"
+    }
 }

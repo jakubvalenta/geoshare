@@ -5,8 +5,13 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object YandexMapsShortLinkInput : HeadLocationHeaderInput {
+@Singleton
+class YandexMapsShortLinkInput @Inject constructor(
+    private val yandexMapsUriInput: YandexMapsUriInput,
+) : HeadLocationHeaderInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_yandex_maps_permission_title
 
@@ -22,7 +27,7 @@ object YandexMapsShortLinkInput : HeadLocationHeaderInput {
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {
-        nextStep = NextStep(YandexMapsUriInput, data.toString())
+        nextStep = NextStep(yandexMapsUriInput, data.toString())
     }
 
     override fun toString() = "YandexMapsShortLinkInput"

@@ -8,7 +8,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class WazeHtmlInputTest : InputTest {
-    private val input = WazeHtmlInput
+    private val input = WazeHtmlInput()
 
     @Test
     fun parse_containsLatLngJSON_returnsPoint() = runTest {

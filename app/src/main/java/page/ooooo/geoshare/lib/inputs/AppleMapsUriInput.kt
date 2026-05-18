@@ -12,8 +12,13 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object AppleMapsUriInput : UriInput, Input.HasRandomUri {
+@Singleton
+class AppleMapsUriInput @Inject constructor(
+    private val appleMapsHtmlInput: AppleMapsHtmlInput,
+) : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:https?://)?maps\.apple(\.com)?[/?#]$URI_REST)""")
     override val documentation = InputDocumentation(
         group = InputDocumentationGroup.APPLE_MAPS,
@@ -69,7 +74,7 @@ object AppleMapsUriInput : UriInput, Input.HasRandomUri {
                 // https://maps.apple.com/place?place-id={id}...
                 !queryParams["place-id"].isNullOrEmpty()
             ) {
-                nextStep = NextStep(AppleMapsHtmlInput, match)
+                nextStep = NextStep(appleMapsHtmlInput, match)
             }
 
             if (name != null) {

@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class GeoUriUriInputTest : InputTest {
-    private val input = GeoUriInput
+    private val input = GeoUriInput()
 
     @Test
     fun match_geoUri() {

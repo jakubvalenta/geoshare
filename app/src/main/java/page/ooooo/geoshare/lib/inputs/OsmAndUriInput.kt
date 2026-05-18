@@ -13,8 +13,10 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import javax.inject.Singleton
 
-object OsmAndUriInput : UriInput, Input.HasRandomUri {
+@Singleton
+class OsmAndUriInput : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:https?://)?(?:www\.)?osmand\.net/$URI_REST)""")
     override val documentation = InputDocumentation(
         group = InputDocumentationGroup.OSM_AND,

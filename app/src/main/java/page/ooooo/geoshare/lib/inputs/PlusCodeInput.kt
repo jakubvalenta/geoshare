@@ -12,6 +12,7 @@ import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.decodePlusCode
+import javax.inject.Singleton
 
 /**
  * Plus Codes input.
@@ -23,13 +24,8 @@ import page.ooooo.geoshare.lib.geo.decodePlusCode
  *
  * See https://plus.codes/
  */
-object PlusCodeInput : TextInput, Input.HasRandomUri {
-    /**
-     * See https://github.com/google/open-location-code/blob/main/Documentation/Reference/App_Developers.md#supporting-global-codes
-     */
-    private const val GLOBAL_CODE =
-        @Suppress("SpellCheckingInspection") """[23456789C][23456789CFGHJMPQRV][23456789CFGHJMPQRVWX]{6}(?:\+|%2B)[23456789CFGHJMPQRVWX]{2,7}"""
-
+@Singleton
+class PlusCodeInput : TextInput, Input.HasRandomUri {
     override val pattern = Regex(
         """(?:^|\s|https://www\.google\.com/maps/place/|https://plus\.codes/)($GLOBAL_CODE)(?:\s|/|$)""",
         RegexOption.IGNORE_CASE,
@@ -70,4 +66,12 @@ object PlusCodeInput : TextInput, Input.HasRandomUri {
         PlusCodeFormatter.formatPlusCode(point)
 
     override fun toString() = "PlusCodeInput"
+
+    private companion object {
+        /**
+         * See https://github.com/google/open-location-code/blob/main/Documentation/Reference/App_Developers.md#supporting-global-codes
+         */
+        private const val GLOBAL_CODE =
+            @Suppress("SpellCheckingInspection") """[23456789C][23456789CFGHJMPQRV][23456789CFGHJMPQRVWX]{6}(?:\+|%2B)[23456789CFGHJMPQRVWX]{2,7}"""
+    }
 }

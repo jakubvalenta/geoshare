@@ -16,7 +16,7 @@ class SourceReceivedTest {
         on { getString(R.string.conversion_failed_unsupported_service) } doReturn "Unsupported map service"
     }
     private val stateContext: ConversionStateContext = mock {
-        on { inputs } doReturn listOf(GeoUriInput, GoogleMapsUriInput)
+        on { inputs } doReturn listOf(GeoUriInput(), GoogleMapsUriInput)
         on { this@on.resources } doReturn resources
     }
 
@@ -35,7 +35,7 @@ class SourceReceivedTest {
         val source = "geo:1,2?q="
         val state = SourceReceived(stateContext, source)
         assertEquals(
-            InputFound(stateContext, source, match = source, GeoUriInput, permission = null),
+            InputFound(stateContext, source, match = source, GeoUriInput(), permission = null),
             state.transition(),
         )
     }

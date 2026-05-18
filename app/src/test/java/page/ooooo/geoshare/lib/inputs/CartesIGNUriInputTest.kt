@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class CartesIGNUriInputTest : InputTest {
-    private val input = CartesIGNUriInput
+    private val input = CartesIGNUriInput()
 
     @Test
     fun match_fullUrl() {

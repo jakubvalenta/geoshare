@@ -17,6 +17,8 @@ import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Handles Google Maps full URIs.
@@ -25,7 +27,12 @@ import page.ooooo.geoshare.lib.geo.Source
  * but only puts it in the point name. The reason is that Plus Codes are handled by [PlusCodeInput], which has higher
  * priority, so URIs containing Plus Codes should never reach [GoogleMapsUriInput].
  */
-object GoogleMapsUriInput : UriInput, Input.HasRandomUri {
+@Singleton
+class GoogleMapsUriInput @Inject constructor(
+    private val googleMapsPlaceApiInput: GoogleMapsPlaceApiInput,
+    private val googleMapsHtmlInput: GoogleMapsHtmlInput,
+    private val googleMapsPlaceListWebViewInput: GoogleMapsPlaceListWebViewInput,
+) : UriInput, Input.HasRandomUri {
     override val pattern =
         Regex("""((?:https?://)?(?:(?:www|maps)\.)?google(?:\.[a-z]{2,3})?\.[a-z]{2,3}[/?#]$URI_REST)""")
     override val documentation = InputDocumentation(
@@ -61,7 +68,7 @@ object GoogleMapsUriInput : UriInput, Input.HasRandomUri {
                     points = naivePoints.map { GCJ02MainlandChinaPoint(it).copy(z = z) }.toImmutableList()
                     if (points.any { !it.hasCoordinates() }) {
                         // Go to HTML parsing unless all points have coordinates
-                        nextStep = NextStep(GoogleMapsHtmlInput, match)
+                        nextStep = NextStep(googleMapsHtmlInput, match)
                     }
                     return@run
                 }
@@ -105,7 +112,7 @@ object GoogleMapsUriInput : UriInput, Input.HasRandomUri {
                 Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull()?.let { name ->
                     points = persistentListOf(GCJ02MainlandChinaPoint(z = z, name = name, source = Source.URI))
                     // Go to HTML parsing
-                    nextStep = NextStep(GoogleMapsHtmlInput, match)
+                    nextStep = NextStep(googleMapsHtmlInput, match)
                     return@run
                 }
             }
@@ -118,13 +125,21 @@ object GoogleMapsUriInput : UriInput, Input.HasRandomUri {
 
                 // Directions
                 // https://www.google.com/maps/place/{point}/{point}/@{centerX},{centerY},{centerZ}
-                // Place
-                // https://www.google.com/maps/place/{name}/@{centerX},{centerY},{centerZ}
-                firstPart == "dir" || firstPart == "place" -> {
+                firstPart == "dir" -> {
                     points = parseParts(parts.drop(1), z)
                     if (points.lastOrNull()?.hasCoordinates() != true) {
                         // Go to HTML parsing
-                        nextStep = NextStep(GoogleMapsHtmlInput, match)
+                        nextStep = NextStep(googleMapsHtmlInput, match)
+                    }
+                }
+
+                // Place
+                // https://www.google.com/maps/place/{name}/@{centerX},{centerY},{centerZ}
+                firstPart == "place" -> {
+                    points = parseParts(parts.drop(1), z)
+                    if (points.lastOrNull()?.hasCoordinates() != true) {
+                        // Go to HTML parsing
+                        nextStep = NextStep(googleMapsPlaceApiInput, match)
                     }
                 }
 
@@ -135,7 +150,7 @@ object GoogleMapsUriInput : UriInput, Input.HasRandomUri {
                 // https://www.google.com/maps/d/view?mid={id}
                 firstPart == "placelists" || firstPart == "@" || firstPart == "d" -> {
                     // Go to place list WebView parsing
-                    nextStep = NextStep(GoogleMapsPlaceListWebViewInput, match)
+                    nextStep = NextStep(googleMapsPlaceListWebViewInput, match)
                 }
 
                 // Search
@@ -234,4 +249,10 @@ object GoogleMapsUriInput : UriInput, Input.HasRandomUri {
         )
 
     override fun toString() = "GoogleMapsUriInput"
+
+    companion object {
+        fun parsePoints(data: Uri): Points? = {
+
+        }
+    }
 }

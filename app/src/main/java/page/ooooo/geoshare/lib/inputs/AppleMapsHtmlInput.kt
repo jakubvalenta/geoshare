@@ -11,8 +11,10 @@ import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.network.DESKTOP_USER_AGENT
+import javax.inject.Singleton
 
-object AppleMapsHtmlInput : BodyAsChannelInput {
+@Singleton
+class AppleMapsHtmlInput : BodyAsChannelInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_apple_maps_permission_title
 

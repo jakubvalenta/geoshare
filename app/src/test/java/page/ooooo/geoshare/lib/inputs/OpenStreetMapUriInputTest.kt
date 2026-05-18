@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class OpenStreetMapUriInputTest : InputTest {
-    private val input = OpenStreetMapUriInput
+    private val input = OpenStreetMapUriInput(OpenStreetMapApiInput())
 
     @Test
     fun match_fullUrl() {
@@ -124,14 +124,17 @@ class OpenStreetMapUriInputTest : InputTest {
     fun parse_element() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(OpenStreetMapApiInput, "https://www.openstreetmap.org/api/0.6/node/6284640534.json")
+                nextStep = NextStep(
+                    OpenStreetMapApiInput(),
+                    "https://www.openstreetmap.org/api/0.6/node/6284640534.json"
+                )
             ),
             input.parse("https://www.openstreetmap.org/node/6284640534"),
         )
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    OpenStreetMapApiInput,
+                    OpenStreetMapApiInput(),
                     "https://www.openstreetmap.org/api/0.6/relation/910699/full.json"
                 )
             ),
@@ -140,7 +143,7 @@ class OpenStreetMapUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    OpenStreetMapApiInput,
+                    OpenStreetMapApiInput(),
                     "https://www.openstreetmap.org/api/0.6/way/596674456/full.json"
                 )
             ),

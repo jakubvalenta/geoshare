@@ -17,8 +17,10 @@ import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.network.ApiService
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 
+@Singleton
 class GoogleMapsPlaceApiInput @Inject constructor(
     private val apiService: ApiService,
 ) : BasicInput<ApiService.GoogleMapsResult>, Input.HasPermission {

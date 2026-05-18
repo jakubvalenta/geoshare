@@ -5,8 +5,13 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object MapyComShortLinkInput : GetLastHopUrlInput {
+@Singleton
+class MapyComShortLinkInput @Inject constructor(
+    private val mapyComUriInput: MapyComUriInput,
+) : GetLastHopUrlInput {
     override val pattern = Regex("""((?:https?://)?(?:www\.)?mapy\.[a-z]{2,3}/s/\S+)""")
 
     @StringRes
@@ -22,7 +27,7 @@ object MapyComShortLinkInput : GetLastHopUrlInput {
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {
-        nextStep = NextStep(MapyComUriInput, data.toString())
+        nextStep = NextStep(mapyComUriInput, data.toString())
     }
 
     override fun toString() = "MapyComShortLinkInput"

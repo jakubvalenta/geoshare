@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class CoordinatesUriInputTest : InputTest {
-    private val input = CoordinateInput
+    private val input = CoordinateInput()
 
     @Test
     fun match_coordinates() {

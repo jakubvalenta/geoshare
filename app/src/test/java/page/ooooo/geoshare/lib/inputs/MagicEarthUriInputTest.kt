@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class MagicEarthUriInputTest : InputTest {
-    private val input = MagicEarthUriInput
+    private val input = MagicEarthUriInput()
 
     @Test
     fun match_fullUrl() {

@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 
 class GoogleMapsUriInputTest : InputTest {
-    private val input = GoogleMapsUriInput
+    private val input = GoogleMapsUriInput()
 
     @Test
     fun match_fullUrl() {

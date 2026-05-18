@@ -15,13 +15,16 @@ import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.decodeWazeGeoHash
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * See https://developers.google.com/waze/deeplinks/
  */
-object WazeUriInput : UriInput, Input.HasRandomUri {
-    private const val HASH = @Suppress("SpellCheckingInspection") """[0-9bcdefghjkmnpqrstuvwxyz]+"""
-
+@Singleton
+class WazeUriInput @Inject constructor(
+    private val wazeHtmlInput: WazeHtmlInput,
+) : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:https?://)?(?:(?:www|ul)\.)?waze\.com/$URI_REST)""")
 
     override val documentation = InputDocumentation(
@@ -91,7 +94,7 @@ object WazeUriInput : UriInput, Input.HasRandomUri {
                 // with this one:
                 // https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020
                 nextStep = NextStep(
-                    WazeHtmlInput,
+                    wazeHtmlInput,
                     Uri(
                         scheme = "https",
                         host = "www.waze.com",
@@ -106,7 +109,7 @@ object WazeUriInput : UriInput, Input.HasRandomUri {
                 // with this one:
                 // https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020
                 nextStep = NextStep(
-                    WazeHtmlInput,
+                    wazeHtmlInput,
                     Uri(
                         scheme = "https",
                         host = "www.waze.com",
@@ -116,7 +119,7 @@ object WazeUriInput : UriInput, Input.HasRandomUri {
                     ).toString(),
                 )
             } ?: queryParams["to"]?.takeIf { it.startsWith("place.") }?.let {
-                nextStep = NextStep(WazeHtmlInput, match)
+                nextStep = NextStep(wazeHtmlInput, match)
             }
         }
     }
@@ -125,4 +128,8 @@ object WazeUriInput : UriInput, Input.HasRandomUri {
         UriFormatter.formatUriString(point, "https://waze.com/ul?ll={lat}%2C{lon}&z={z}")
 
     override fun toString() = "WazeUriInput"
+
+    private companion object {
+        private const val HASH = @Suppress("SpellCheckingInspection") """[0-9bcdefghjkmnpqrstuvwxyz]+"""
+    }
 }

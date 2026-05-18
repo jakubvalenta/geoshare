@@ -59,10 +59,13 @@ class HeadLocationHeaderUriInputTest {
     fun whenMatchHasScheme_makesHeadRequestWithRedirectsFalseAndReturnsLocationHeader() = runTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
-            ParseResult(nextStep = NextStep(DebugUriInput, "https://maps.google.com/redirected")),
+            ParseResult(nextStep = NextStep(DebugUriInput(DebugWebViewInput()), "https://maps.google.com/redirected")),
             input.withData(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
-                    nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
+                    nextStep = NextStep(
+                        DebugUriInput(DebugWebViewInput()),
+                        data.toString()
+                    ) // Store data in nextStep, so we can test it
                 )
             }
         )
@@ -75,10 +78,13 @@ class HeadLocationHeaderUriInputTest {
     fun whenMatchHasNoScheme_makesHeadRequestToUrlWithHttpsSchemeAndReturnsLocationHeader() = runTest {
         val match = "maps.google.com/foo"
         assertEquals(
-            ParseResult(nextStep = NextStep(DebugUriInput, "https://maps.google.com/redirected")),
+            ParseResult(nextStep = NextStep(DebugUriInput(DebugWebViewInput()), "https://maps.google.com/redirected")),
             input.withData(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
-                    nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
+                    nextStep = NextStep(
+                        DebugUriInput(DebugWebViewInput()),
+                        data.toString()
+                    ) // Store data in nextStep, so we can test it
                 )
             }
         )
@@ -97,10 +103,18 @@ class HeadLocationHeaderUriInputTest {
             }
         }
         assertEquals(
-            ParseResult(nextStep = NextStep(DebugUriInput, "https://maps.google.com/foo/redirected")),
+            ParseResult(
+                nextStep = NextStep(
+                    DebugUriInput(DebugWebViewInput()),
+                    "https://maps.google.com/foo/redirected"
+                )
+            ),
             input.withData(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
-                    nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
+                    nextStep = NextStep(
+                        DebugUriInput(DebugWebViewInput()),
+                        data.toString()
+                    ) // Store data in nextStep, so we can test it
                 )
             }
         )

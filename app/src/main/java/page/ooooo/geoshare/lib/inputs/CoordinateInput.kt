@@ -13,19 +13,10 @@ import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import javax.inject.Singleton
 
-object CoordinateInput : TextInput, Input.HasRandomUri {
-    private const val CHARS = @Suppress("SpellCheckingInspection") """[\p{Zs},°'′"″NSWE]"""
-    private const val SPACE = """\p{Zs}*"""
-    private const val LAT_SIG = """(-?)"""
-    private const val LAT_DEG = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
-    private const val LAT_MIN = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
-    private const val LAT_SEC = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
-    private const val LON_SIG = """(-?)"""
-    private const val LON_DEG = """(\d{1,3}(?:\.\d{1,$MAX_PRECISION})?)"""
-    private const val LON_MIN = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
-    private const val LON_SEC = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
-
+@Singleton
+class CoordinateInput : TextInput, Input.HasRandomUri {
     override val pattern = Regex("""([\d.\-\p{Zs},°'′"″NSWE]*\d[\d.\-\p{Zs},°'′"″NSWE]*)""")
     override val documentation = InputDocumentation(
         group = InputDocumentationGroup.COORDINATES,
@@ -140,4 +131,17 @@ object CoordinateInput : TextInput, Input.HasRandomUri {
         UriFormatter.formatUriString(point, "N {lat}, E {lon}")
 
     override fun toString() = "CoordinateInput"
+
+    private companion object {
+        private const val CHARS = @Suppress("SpellCheckingInspection") """[\p{Zs},°'′"″NSWE]"""
+        private const val SPACE = """\p{Zs}*"""
+        private const val LAT_SIG = """(-?)"""
+        private const val LAT_DEG = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
+        private const val LAT_MIN = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
+        private const val LAT_SEC = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
+        private const val LON_SIG = """(-?)"""
+        private const val LON_DEG = """(\d{1,3}(?:\.\d{1,$MAX_PRECISION})?)"""
+        private const val LON_MIN = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
+        private const val LON_SEC = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
+    }
 }

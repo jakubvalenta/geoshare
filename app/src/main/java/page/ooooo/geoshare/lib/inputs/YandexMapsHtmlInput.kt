@@ -12,8 +12,10 @@ import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import javax.inject.Singleton
 
-object YandexMapsHtmlInput : BodyAsChannelInput {
+@Singleton
+class YandexMapsHtmlInput : BodyAsChannelInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_yandex_maps_permission_title
 

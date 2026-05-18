@@ -14,7 +14,8 @@ import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
 import page.ooooo.geoshare.lib.geo.Source
 
-object BaiduMapUriInput : UriInput {
+@Singleton
+class BaiduMapUriInput : UriInput {
     private const val X = """(\d+(?:\.\d+)?)"""
     private const val Y = """(\d+(?:\.\d+)?)"""
     private const val CENTER = """@$X,$Y,${Z}z.*"""

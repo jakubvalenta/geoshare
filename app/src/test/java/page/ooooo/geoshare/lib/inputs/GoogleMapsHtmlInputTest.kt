@@ -8,7 +8,7 @@ import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 
 class GoogleMapsHtmlInputTest : InputTest {
-    private val input = GoogleMapsHtmlInput
+    private val input = GoogleMapsHtmlInput()
 
     @Test
     fun parse_link() = runTest {

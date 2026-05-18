@@ -10,7 +10,7 @@ import page.ooooo.geoshare.lib.geo.BD09MCPoint
 import page.ooooo.geoshare.lib.geo.Source
 
 class BaiduMapUriInputTest : InputTest {
-    private val input = BaiduMapUriInput
+    private val input = BaiduMapUriInput()
 
     @Test
     fun match_fullUrl() {

@@ -5,8 +5,13 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object AmapShortLinkInput : HeadLocationHeaderInput {
+@Singleton
+class AmapShortLinkInput @Inject constructor(
+    private val amapUriInput: AmapUriInput,
+) : HeadLocationHeaderInput {
     override val pattern = Regex("""((?:https?://)?surl\.amap\.com/\S+)""")
     override val documentation = InputDocumentation(
         group = InputDocumentationGroup.AMAP,
@@ -28,7 +33,7 @@ object AmapShortLinkInput : HeadLocationHeaderInput {
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {
-        nextStep = NextStep(AmapUriInput, data.toString())
+        nextStep = NextStep(amapUriInput, data.toString())
     }
 
     override fun toString() = "AmapShortLinkInput"

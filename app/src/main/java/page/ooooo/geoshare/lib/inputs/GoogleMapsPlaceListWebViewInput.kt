@@ -10,8 +10,10 @@ import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
+import javax.inject.Singleton
 
-object GoogleMapsPlaceListWebViewInput : WebViewInput {
+@Singleton
+class GoogleMapsPlaceListWebViewInput : WebViewInput {
 
     @Serializable
     private data class ExtractedPoint(val lat: Double?, val lon: Double?)
@@ -108,7 +110,9 @@ object GoogleMapsPlaceListWebViewInput : WebViewInput {
     override fun shouldInterceptRequest(requestUrlString: String) =
         GoogleMapsWebViewInput.shouldInterceptRequest(requestUrlString)
 
-    private const val TAG = "GoogleMapsPlaceListWebViewInput"
-
     override fun toString() = TAG
+
+    private companion object {
+        private const val TAG = "GoogleMapsPlaceListWebViewInput"
+    }
 }

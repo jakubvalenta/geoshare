@@ -5,8 +5,13 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object BaiduMapShortLinkInput : HeadLocationHeaderInput {
+@Singleton
+class BaiduMapShortLinkInput @Inject constructor(
+    private val baiduMapUriInput: BaiduMapUriInput,
+) : HeadLocationHeaderInput {
     override val documentation = InputDocumentation(
         group = InputDocumentationGroup.BAIDU_MAP,
         items = listOf(
@@ -28,7 +33,7 @@ object BaiduMapShortLinkInput : HeadLocationHeaderInput {
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {
-        nextStep = NextStep(BaiduMapUriInput, data.toString())
+        nextStep = NextStep(baiduMapUriInput, data.toString())
     }
 
     override fun toString() = "BaiduMapShortLinkInput"

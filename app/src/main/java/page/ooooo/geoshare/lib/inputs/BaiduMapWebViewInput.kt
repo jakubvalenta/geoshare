@@ -11,8 +11,10 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.network.DESKTOP_USER_AGENT
+import javax.inject.Singleton
 
-object BaiduMapWebViewInput : WebViewInput {
+@Singleton
+class BaiduMapWebViewInput : WebViewInput {
 
     @Serializable
     private data class ExtractedPoint(val lat: Double?, val lon: Double?, val z: Double?, val name: String?)
@@ -89,7 +91,9 @@ object BaiduMapWebViewInput : WebViewInput {
             || requestUrlString.contains(@Suppress("SpellCheckingInspection") "/alog.min.js")
             || requestUrlString.contains(@Suppress("SpellCheckingInspection") "map.baidu.com/newmap_test/static/common/images/transparent.gif")
 
-    private const val TAG = "BaiduMapWebViewInput"
-
     override fun toString() = TAG
+
+    private companion object {
+        private const val TAG = "BaiduMapWebViewInput"
+    }
 }

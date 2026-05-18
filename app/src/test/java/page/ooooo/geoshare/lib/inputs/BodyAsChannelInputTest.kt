@@ -55,11 +55,11 @@ class BodyAsChannelInputTest {
     fun whenMatchHasScheme_makesGetRequestWithFollowRedirectsAndReturnsResponse() = runTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
-            ParseResult(nextStep = NextStep(DebugUriInput, "test data")),
+            ParseResult(nextStep = NextStep(DebugUriInput(DebugWebViewInput()), "test data")),
             input.withData(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
                     nextStep = NextStep(
-                        DebugUriInput,
+                        DebugUriInput(DebugWebViewInput()),
                         data.readLine()!!
                     ) // Store data in nextStep, so we can test it
                 )
@@ -74,11 +74,11 @@ class BodyAsChannelInputTest {
     fun whenMatchHasNoScheme_makesGetRequestToUrlWithHttpsSchemeAndReturnsResponse() = runTest {
         val match = "maps.google.com/foo"
         assertEquals(
-            ParseResult(nextStep = NextStep(DebugUriInput, "test data")),
+            ParseResult(nextStep = NextStep(DebugUriInput(DebugWebViewInput()), "test data")),
             input.withData(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
                     nextStep = NextStep(
-                        DebugUriInput,
+                        DebugUriInput(DebugWebViewInput()),
                         data.readLine()!!
                     ) // Store data in nextStep, so we can test it
                 )

@@ -8,8 +8,10 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import javax.inject.Singleton
 
-object OpenStreetMapApiInput : BodyAsTextInput {
+@Singleton
+class OpenStreetMapApiInput : BodyAsTextInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_open_street_map_permission_title
 

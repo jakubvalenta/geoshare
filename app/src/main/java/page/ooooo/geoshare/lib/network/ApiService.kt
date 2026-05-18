@@ -105,9 +105,9 @@ class ApiService @Inject constructor(
                 json()
             }
         }.use { client ->
-            val privateKeyEntry = getOrGeneratePrivateKey()
+            val privateKeyEntry = getOrGenerateKey()
             val privateKey = privateKeyEntry.privateKey
-            val publicKey = privateKeyEntry.certificateChain[0].publicKey
+            val publicKey = privateKeyEntry.certificateChain.first().publicKey
             val publicKeyBase64 = publicKey.encoded.base64Encode()
 
             // Login challenge
@@ -151,9 +151,9 @@ class ApiService @Inject constructor(
             expectSuccess = true
             rethrowExceptionsAsNetworkException(log)
         }.use { client ->
-            val privateKeyEntry = getOrGeneratePrivateKey()
+            val privateKeyEntry = getOrGenerateKey()
             val privateKey = privateKeyEntry.privateKey
-            val publicKey = privateKeyEntry.certificateChain[0].publicKey
+            val publicKey = privateKeyEntry.certificateChain.first().publicKey
             val publicKeyBase64 = publicKey.encoded.base64Encode()
 
             // Registration challenge
@@ -191,21 +191,21 @@ class ApiService @Inject constructor(
     /**
      * See https://developer.android.com/privacy-and-security/keystore
      */
-    private fun getOrGeneratePrivateKey(): KeyStore.PrivateKeyEntry {
-        // Try to get private key from the key store
+    private fun getOrGenerateKey(): KeyStore.PrivateKeyEntry {
+        // Try to get key from the key store
         val keyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
         val entry = try {
             keyStore.getEntry(KEYSTORE_ALIAS, null)
         } catch (tr: GeneralSecurityException) {
-            log.e(TAG, "Failed to get private key from the key store", tr)
+            log.e(TAG, "Failed to get key from the key store", tr)
             null
         }
         if (entry is KeyStore.PrivateKeyEntry) {
             return entry
         }
 
-        // Generate new private key; if there was a corrupt key in the key store, it will be overwritten
-        log.i(TAG, "Generating new private key")
+        // Generate new key; if there was a corrupt key in the key store, overwrite it
+        log.i(TAG, "Generating new key")
         val keyPairGenerator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore")
         val params = KeyGenParameterSpec.Builder(
             KEYSTORE_ALIAS, KeyProperties.PURPOSE_SIGN or KeyProperties.PURPOSE_VERIFY

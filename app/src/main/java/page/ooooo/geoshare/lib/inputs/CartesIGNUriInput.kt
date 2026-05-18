@@ -10,8 +10,10 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import javax.inject.Singleton
 
-object CartesIGNUriInput : UriInput, Input.HasRandomUri {
+@Singleton
+class CartesIGNUriInput : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:https?://)?cartes-ign\.ign\.fr$URI_REST)""")
     override val documentation = InputDocumentation(
         group = InputDocumentationGroup.CARTES_IGN,

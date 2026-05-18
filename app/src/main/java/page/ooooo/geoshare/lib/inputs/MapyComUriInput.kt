@@ -11,7 +11,8 @@ import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-object MapyComUriInput : UriInput, Input.HasRandomUri {
+@Singleton
+class MapyComUriInput : UriInput, Input.HasRandomUri {
     private const val COORDS = """(\d{1,2}(?:\.\d{1,16})?)[NS], (\d{1,3}(?:\.\d{1,16})?)[WE]"""
 
     override val pattern =

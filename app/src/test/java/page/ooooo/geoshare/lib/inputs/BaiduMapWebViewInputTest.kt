@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.geo.BD09MCPoint
 import page.ooooo.geoshare.lib.geo.Source
 
 class BaiduMapWebViewInputTest : InputTest {
-    private val input = BaiduMapWebViewInput
+    private val input = BaiduMapWebViewInput()
 
     @Test
     fun parse_whenDataIsValidJsonObject_returnsPoint() = runTest {

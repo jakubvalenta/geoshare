@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class MapsMeUriInputTest : InputTest {
-    private val input = MapsMeUriInput
+    private val input = MapsMeUriInput()
 
     @Test
     fun match_shortLink() {

@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class YandexMapsUriInputTest : InputTest {
-    private val input = YandexMapsUriInput
+    private val input = YandexMapsUriInput(YandexMapsHtmlInput())
 
     @Test
     fun match_fullUrl() {
@@ -151,7 +151,7 @@ class YandexMapsUriInputTest : InputTest {
                     )
                 ),
                 nextStep = NextStep(
-                    YandexMapsHtmlInput,
+                    YandexMapsHtmlInput(),
                     "https://yandex.ru/maps/213/moscow/geo/keramicheskiy_proyezd/8062907/"
                 )
             ),
@@ -160,7 +160,7 @@ class YandexMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    YandexMapsHtmlInput,
+                    YandexMapsHtmlInput(),
                     "https://yandex.com/maps/org/94933420809"
                 )
             ),
@@ -169,7 +169,7 @@ class YandexMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    YandexMapsHtmlInput,
+                    YandexMapsHtmlInput(),
                     "https://yandex.com/maps/org/94933420809/"
                 )
             ),
@@ -178,7 +178,7 @@ class YandexMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    YandexMapsHtmlInput,
+                    YandexMapsHtmlInput(),
                     "https://yandex.com/maps/org/94933420809?spam"
                 )
             ),

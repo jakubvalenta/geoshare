@@ -29,7 +29,31 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class InputRepository @Inject constructor() {
+class InputRepository @Inject constructor(
+    amapShortLinkInput: AmapShortLinkInput,
+    amapUriInput: AmapUriInput,
+    appleMapsUriInput: AppleMapsUriInput,
+    baiduMapShortLinkInput: BaiduMapShortLinkInput,
+    baiduMapUriInput: BaiduMapUriInput,
+    cartesIGNUriInput: CartesIGNUriInput,
+    coordinateInput: CoordinateInput,
+    debugUriInput: DebugUriInput,
+    geoUriInput: GeoUriInput,
+    googleMapsShortLinkInput: GoogleMapsShortLinkInput,
+    googleMapsUriInput: GoogleMapsUriInput,
+    hereWeGoUriInput: HereWeGoUriInput,
+    magicEarthUriInput: MagicEarthUriInput,
+    mapsMeUriInput: MapsMeUriInput,
+    mapyComShortLinkInput: MapyComShortLinkInput,
+    mapyComUriInput: MapyComUriInput,
+    openStreetMapUriInput: OpenStreetMapUriInput,
+    osmAndUriInput: OsmAndUriInput,
+    plusCodeInput: PlusCodeInput,
+    urbiUriInput: UrbiUriInput,
+    wazeUriInput: WazeUriInput,
+    yandexMapsShortLinkInput: YandexMapsShortLinkInput,
+    yandexMapsUriInput: YandexMapsUriInput,
+) {
     /**
      * All [page.ooooo.geoshare.lib.inputs.Input] objects.
      *
@@ -37,31 +61,32 @@ class InputRepository @Inject constructor() {
      * parsing a URI.
      */
     val all = listOf<Input<*>>(
-        GeoUriInput,
-        PlusCodeInput,
-        GoogleMapsShortLinkInput,
-        GoogleMapsUriInput,
-        AppleMapsUriInput,
-        AmapShortLinkInput,
-        AmapUriInput,
-        BaiduMapShortLinkInput,
-        BaiduMapUriInput,
-        CartesIGNUriInput,
-        HereWeGoUriInput,
-        MagicEarthUriInput,
-        MapsMeUriInput,
-        MapyComShortLinkInput,
-        MapyComUriInput,
-        OpenStreetMapUriInput,
-        OsmAndUriInput,
-        UrbiUriInput,
-        WazeUriInput,
-        YandexMapsShortLinkInput,
-        YandexMapsUriInput,
-        CoordinateInput,
+        geoUriInput,
+        plusCodeInput,
+        googleMapsShortLinkInput,
+        googleMapsUriInput,
+        appleMapsUriInput,
+        amapShortLinkInput,
+        amapUriInput,
+        baiduMapShortLinkInput,
+        baiduMapUriInput,
+        cartesIGNUriInput,
+        hereWeGoUriInput,
+        magicEarthUriInput,
+        mapsMeUriInput,
+        mapyComShortLinkInput,
+        mapyComUriInput,
+        openStreetMapUriInput,
+        osmAndUriInput,
+        urbiUriInput,
+        wazeUriInput,
+        yandexMapsShortLinkInput,
+        yandexMapsUriInput,
+        coordinateInput,
+        debugUriInput,
     ).run {
         if (BuildConfig.DEBUG) {
-            this + DebugUriInput
+            this + debugUriInput
         } else {
             this
         }

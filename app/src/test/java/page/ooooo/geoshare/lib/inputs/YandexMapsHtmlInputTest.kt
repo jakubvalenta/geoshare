@@ -8,7 +8,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class YandexMapsHtmlInputTest : InputTest {
-    private val input = YandexMapsHtmlInput
+    private val input = YandexMapsHtmlInput()
 
     @Test
     fun parse_containsCoordinates_returnsPoint() = runTest {

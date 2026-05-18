@@ -13,12 +13,12 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import javax.inject.Singleton
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-object HereWeGoUriInput : UriInput, Input.HasRandomUri {
-    private const val SIMPLIFIED_BASE64 = """[A-Za-z0-9+/]+=*"""
-
+@Singleton
+class HereWeGoUriInput : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:https?://)?(?:share|wego)\.here\.com/$URI_REST)""")
     override val documentation = InputDocumentation(
         group = InputDocumentationGroup.HERE_WEGO,
@@ -78,4 +78,8 @@ object HereWeGoUriInput : UriInput, Input.HasRandomUri {
         UriFormatter.formatUriString(point, "https://wego.here.com/?map={lat}%2C{lon},{z}")
 
     override fun toString() = "HereWegoUriInput"
+
+    private companion object {
+        private const val SIMPLIFIED_BASE64 = """[A-Za-z0-9+/]+=*"""
+    }
 }

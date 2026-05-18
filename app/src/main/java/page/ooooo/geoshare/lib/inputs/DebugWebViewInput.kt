@@ -11,7 +11,8 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 /**
  * @see DebugUriInput
  */
-object DebugWebViewInput : WebViewInput {
+@Singleton
+class DebugWebViewInput : WebViewInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_debug_permission_title
 
