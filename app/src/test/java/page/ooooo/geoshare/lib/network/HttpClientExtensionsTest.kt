@@ -29,7 +29,7 @@ import page.ooooo.geoshare.lib.FakeLog
 import java.net.SocketTimeoutException
 import java.net.URL
 
-class HttpClientTest {
+class HttpClientExtensionsTest {
     private val log = FakeLog
 
     @Test

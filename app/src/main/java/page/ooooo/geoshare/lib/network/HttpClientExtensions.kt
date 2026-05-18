@@ -120,13 +120,13 @@ fun HttpClientConfig<*>.rethrowExceptionsAsNetworkException(log: Log = DefaultLo
 
                 is ServerResponseException -> {
                     log.w(TAG, "Server error ${cause.response.status} for ${request.url}", cause)
-                    throw ServerResponseNetworkException(cause.response.status, cause)
+                    throw ServerResponseNetworkException(cause.response, cause)
                 }
 
                 is ResponseException -> {
                     // Catches also subclasses such as RedirectResponseException and ClientRequestException
                     log.w(TAG, "Unexpected response code ${cause.response.status} for ${request.url}", cause)
-                    throw ResponseNetworkException(cause.response.status, cause)
+                    throw ResponseNetworkException(cause.response, cause)
                 }
 
                 else -> {

@@ -1,0 +1,245 @@
+package page.ooooo.geoshare.lib.network
+
+import android.os.Build
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
+import io.ktor.client.HttpClient
+import io.ktor.client.call.DoubleReceiveException
+import io.ktor.client.call.NoTransformationFoundException
+import io.ktor.client.call.body
+import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.auth.Auth
+import io.ktor.client.plugins.auth.providers.BearerTokens
+import io.ktor.client.plugins.auth.providers.bearer
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.request
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.Serializable
+import page.ooooo.geoshare.data.UserPreferencesRepository
+import page.ooooo.geoshare.data.local.preferences.ApiEndpointPreference
+import page.ooooo.geoshare.data.local.preferences.CachedApiTokenPreference
+import page.ooooo.geoshare.lib.DefaultLog
+import page.ooooo.geoshare.lib.Log
+import page.ooooo.geoshare.lib.extensions.base64Decode
+import page.ooooo.geoshare.lib.extensions.base64Encode
+import page.ooooo.geoshare.lib.extensions.sign
+import java.net.URL
+import java.security.GeneralSecurityException
+import java.security.KeyPairGenerator
+import java.security.KeyStore
+import java.security.spec.ECGenParameterSpec
+import javax.inject.Inject
+
+class ApiService @Inject constructor(
+    private val userPreferencesRepository: UserPreferencesRepository,
+    private val log: Log = DefaultLog,
+) {
+    @Serializable
+    data class ChallengeResponse(val challenge: String)
+
+    @Serializable
+    data class RegisterRequest(val challenge: String, val signature: String, val certificateChain: List<String>)
+
+    @Serializable
+    data class LoginRequest(val challenge: String, val signature: String, val publicKey: String)
+
+    sealed interface AuthenticationResponse
+
+    @Serializable
+    data class ErrorResponse(val message: String) : AuthenticationResponse
+
+    @Serializable
+    data class TokenResponse(val token: String) : AuthenticationResponse
+
+    fun createHttpClient(engine: HttpClientEngine = CIO.create()): HttpClient =
+        HttpClient(engine) {
+            expectSuccess = true
+
+            install(ContentNegotiation) {
+                json()
+            }
+            install(Auth) {
+                bearer {
+                    loadTokens {
+                        this@ApiService.loadTokens()
+                    }
+                    refreshTokens {
+                        login(engine) ?: register(engine)
+                    }
+                }
+            }
+        }
+
+    suspend fun getEndpoint(): URL =
+        userPreferencesRepository.getValue(ApiEndpointPreference)
+
+    suspend fun loadTokens(): BearerTokens? =
+        userPreferencesRepository.getValue(CachedApiTokenPreference)?.let {
+            BearerTokens(it.token, it.publicKey)
+        }
+
+    private suspend fun login(engine: HttpClientEngine): BearerTokens? {
+        HttpClient(engine) {
+            expectSuccess = true
+            rethrowExceptionsAsNetworkException(log)
+        }.use { client ->
+            val privateKeyEntry = getPrivateKeyEntry() ?: run {
+                log.i(TAG, "Private key not found")
+                return null
+            }
+            val privateKey = privateKeyEntry.privateKey
+            val publicKey = privateKeyEntry.certificateChain[0].publicKey
+            val publicKeyBase64 = publicKey.encoded.base64Encode()
+
+            // Login challenge
+            val loginChallenge = try {
+                client
+                    .post("/v1/auth/challenge")
+                    .body<ChallengeResponse>().challenge.base64Decode()
+            } catch (e: ResponseNetworkException) {
+                logResponseErrorMessage(e.response)
+                throw e
+            }
+
+            // Login
+            val loginSignature = privateKey.sign(loginChallenge)
+            val token = try {
+                client
+                    .post("/v1/auth/login") {
+                        contentType(ContentType.Application.Json)
+                        setBody(
+                            LoginRequest(
+                                challenge = loginChallenge.base64Encode(),
+                                signature = loginSignature.base64Encode(),
+                                publicKey = publicKeyBase64,
+                            )
+                        )
+                    }
+                    .body<TokenResponse>().token
+            } catch (e: ResponseNetworkException) {
+                logResponseErrorMessage(e.response)
+                if (e.response.status == HttpStatusCode.Unauthorized) {
+                    return null
+                }
+                throw e
+            }
+            return BearerTokens(token, publicKeyBase64)
+        }
+    }
+
+    private suspend fun register(engine: HttpClientEngine): BearerTokens? {
+        HttpClient(engine) {
+            expectSuccess = true
+            rethrowExceptionsAsNetworkException(log)
+        }.use { client ->
+            val privateKeyEntry = getPrivateKeyEntry() ?: run {
+                generateKeyPair()
+                getPrivateKeyEntry()
+            } ?: run {
+                log.i(TAG, "Private key not found")
+                return null
+            }
+            val privateKey = privateKeyEntry.privateKey
+            val publicKey = privateKeyEntry.certificateChain[0].publicKey
+            val publicKeyBase64 = publicKey.encoded.base64Encode()
+
+            // Registration challenge
+            val registrationChallenge = try {
+                client.post("/v1/auth/challenge")
+                    .body<ChallengeResponse>().challenge.base64Decode()
+            } catch (e: ResponseNetworkException) {
+                logResponseErrorMessage(e.response)
+                throw e
+            }
+
+            // Register
+            val registrationSignature = privateKey.sign(registrationChallenge)
+            val token = try {
+                client
+                    .post("/v1/auth/register") {
+                        contentType(ContentType.Application.Json)
+                        setBody(
+                            RegisterRequest(
+                                challenge = registrationChallenge.base64Encode(),
+                                signature = registrationSignature.base64Encode(),
+                                certificateChain = privateKeyEntry.certificateChain.map { it.encoded.base64Encode() },
+                            )
+                        )
+                    }
+                    .body<TokenResponse>().token
+            } catch (e: ResponseNetworkException) {
+                logResponseErrorMessage(e.response)
+                throw e
+            }
+            return BearerTokens(token, publicKeyBase64)
+        }
+    }
+
+    /**
+     * See https://developer.android.com/privacy-and-security/keystore#SigningAndVerifyingData
+     */
+    private fun getPrivateKeyEntry(): KeyStore.PrivateKeyEntry? {
+        val ks: KeyStore = KeyStore.getInstance("AndroidKeyStore").apply {
+            load(null)
+        }
+        val entry = try {
+            ks.getEntry(KEYSTORE_ALIAS, null)
+        } catch (tr: GeneralSecurityException) {
+            log.e(TAG, "Failed to get keystore entry", tr)
+            return null
+        }
+        if (entry !is KeyStore.PrivateKeyEntry) {
+            log.w(TAG, "Failed to get private key")
+            return null
+        }
+        return entry
+    }
+
+    /**
+     * See https://developer.android.com/privacy-and-security/keystore#GeneratingANewPrivateKey
+     */
+    private fun generateKeyPair() {
+        val kpg: KeyPairGenerator = KeyPairGenerator.getInstance(
+            KeyProperties.KEY_ALGORITHM_EC,
+            "AndroidKeyStore",
+        )
+        val parameterSpec: KeyGenParameterSpec = KeyGenParameterSpec.Builder(
+            KEYSTORE_ALIAS,
+            KeyProperties.PURPOSE_SIGN or KeyProperties.PURPOSE_VERIFY,
+        ).run {
+            setAlgorithmParameterSpec(
+                ECGenParameterSpec(@Suppress("SpellCheckingInspection") "secp256r1")
+            )
+            setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                setIsStrongBoxBacked(true)
+            }
+            build()
+        }
+        kpg.initialize(parameterSpec)
+        kpg.generateKeyPair()
+    }
+
+    private suspend fun logResponseErrorMessage(response: HttpResponse) {
+        val message = try {
+            response.body<ErrorResponse>().message
+        } catch (_: DoubleReceiveException) {
+            "<double receive>"
+        } catch (_: NoTransformationFoundException) {
+            "<no transformation found>"
+        }
+        log.i(TAG, "Response error message $message for ${response.request.url}")
+    }
+
+    private companion object {
+        private const val KEYSTORE_ALIAS = "geoshare_api"
+        private const val TAG = "ApiService"
+    }
+}

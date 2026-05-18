@@ -1,8 +1,8 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
-import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.request.accept
 import io.ktor.client.request.prepareRequest
 import io.ktor.client.request.url
@@ -16,10 +16,13 @@ import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.network.ApiClient
+import page.ooooo.geoshare.lib.network.ApiService
+import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-object GoogleMapsGeoCodeApiInput : BasicInput<GoogleMapsGeoCodeApiInput.GoogleMapsGeoCodeResult>, Input.HasPermission {
+class GoogleMapsGeoCodeApiInput @Inject constructor(
+    private val apiService: ApiService,
+) : BasicInput<GoogleMapsGeoCodeApiInput.GoogleMapsGeoCodeResult>, Input.HasPermission {
 
     @Serializable
     class GoogleMapsGeoCodeResult(val latitude: Double, val longitude: Double)
@@ -32,24 +35,26 @@ object GoogleMapsGeoCodeApiInput : BasicInput<GoogleMapsGeoCodeApiInput.GoogleMa
 
     override suspend fun withData(
         match: String,
-        apiClient: ApiClient,
+        engine: HttpClientEngine,
         log: Log,
-        httpClient: HttpClient,
         uriQuote: UriQuote,
         coroutineContext: CoroutineContext,
         block: suspend (GoogleMapsGeoCodeResult) -> ParseResult,
     ): ParseResult =
-        apiClient
-            .configHttpClient(httpClient)
-            .prepareRequest {
-                url(apiClient.getEndpoint())
-                    .appendPathSegments("v1", "google-maps", "geocode", "places", match)
-                headers {
-                    accept(ContentType.Application.Json)
-                }
-            }
-            .execute { response ->
-                block(response.body())
+        apiService
+            .createHttpClient(engine)
+            .use { client ->
+                client
+                    .prepareRequest {
+                        url(apiService.getEndpoint())
+                            .appendPathSegments("v1", "google-maps", "geocode", "places", match)
+                        headers {
+                            accept(ContentType.Application.Json)
+                        }
+                    }
+                    .execute { response ->
+                        block(response.body())
+                    }
             }
 
     override suspend fun parse(

@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.network
 
 import android.content.res.Resources
+import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
 import page.ooooo.geoshare.R
 
@@ -32,16 +33,17 @@ class ConnectionClosedNetworkException(cause: Throwable) : RecoverableNetworkExc
     override fun getMessage(resources: Resources) = resources.getString(R.string.network_exception_eof)
 }
 
-class ServerResponseNetworkException(val code: HttpStatusCode, cause: Throwable) : RecoverableNetworkException(cause) {
+class ServerResponseNetworkException(val response: HttpResponse, cause: Throwable) :
+    RecoverableNetworkException(cause) {
     override fun getMessage(resources: Resources) =
-        resources.getString(R.string.network_exception_server_response_error, code.value)
+        resources.getString(R.string.network_exception_server_response_error, response.status.value)
 }
 
-class ResponseNetworkException(val code: HttpStatusCode, cause: Throwable) : UnrecoverableNetworkException(cause) {
+class ResponseNetworkException(val response: HttpResponse, cause: Throwable) : UnrecoverableNetworkException(cause) {
     override fun getMessage(resources: Resources) =
-        when (code.value) {
-            429 -> resources.getString(R.string.network_exception_too_many_requests)
-            else -> resources.getString(R.string.network_exception_response_error, code.value)
+        when (response.status) {
+            HttpStatusCode.TooManyRequests -> resources.getString(R.string.network_exception_too_many_requests)
+            else -> resources.getString(R.string.network_exception_response_error, response.status.value)
         }
 }
 

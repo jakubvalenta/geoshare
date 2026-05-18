@@ -1,18 +1,11 @@
 package page.ooooo.geoshare.lib.extensions
 
-import java.security.MessageDigest
-import java.util.Base64
-
-fun ByteArray.sha256Hex(): String =
-    MessageDigest.getInstance("SHA-256")
-        .digest(this)
-        .joinToString("") { "%02x".format(it) }
+import android.util.Base64
 
 fun ByteArray.base64Encode(): String =
-    Base64.getEncoder().encodeToString(this)
-
-fun String.sha256Hex(): String =
-    this.toByteArray().sha256Hex()
+    // Use android.util.Base64, because java.util.Base64 is not available on API < 26
+    Base64.encodeToString(this, Base64.NO_WRAP)
 
 fun String.base64Decode(): ByteArray =
-    Base64.getDecoder().decode(this)
+    // Use android.util.Base64, because java.util.Base64 is not available on API < 26
+    Base64.decode(this, Base64.NO_WRAP)
