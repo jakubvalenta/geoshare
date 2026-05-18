@@ -150,7 +150,7 @@ class YandexMapsUriInputTest : InputTest {
                         source = Source.URI,
                     )
                 ),
-                nextStep = NextStep(
+                nextStep = NextStep.NextInput(
                     YandexMapsHtmlInput(),
                     "https://yandex.ru/maps/213/moscow/geo/keramicheskiy_proyezd/8062907/"
                 )
@@ -159,7 +159,7 @@ class YandexMapsUriInputTest : InputTest {
         )
         assertEquals(
             ParseResult(
-                nextStep = NextStep(
+                nextStep = NextStep.NextInput(
                     YandexMapsHtmlInput(),
                     "https://yandex.com/maps/org/94933420809"
                 )
@@ -168,7 +168,7 @@ class YandexMapsUriInputTest : InputTest {
         )
         assertEquals(
             ParseResult(
-                nextStep = NextStep(
+                nextStep = NextStep.NextInput(
                     YandexMapsHtmlInput(),
                     "https://yandex.com/maps/org/94933420809/"
                 )
@@ -177,7 +177,7 @@ class YandexMapsUriInputTest : InputTest {
         )
         assertEquals(
             ParseResult(
-                nextStep = NextStep(
+                nextStep = NextStep.NextInput(
                     YandexMapsHtmlInput(),
                     "https://yandex.com/maps/org/94933420809?spam"
                 )

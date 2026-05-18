@@ -25,6 +25,7 @@ import page.ooooo.geoshare.lib.inputs.BasicInput
 import page.ooooo.geoshare.lib.inputs.DebugUriInput
 import page.ooooo.geoshare.lib.inputs.DebugWebViewInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInput
+import page.ooooo.geoshare.lib.inputs.GoogleMapsWebViewInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.NextStep
 import page.ooooo.geoshare.lib.inputs.ParseResult
@@ -79,7 +80,7 @@ class PermissionGrantedBasicInputTest {
                 log: Log,
             ) = ParseResult(
                 prevResult?.points ?: persistentListOf(),
-                nextStep = NextStep(
+                nextStep = NextStep.NextInput(
                     DebugUriInput(DebugWebViewInput()),
                     data
                 ) // Store data in nextStep, so we can test it
@@ -115,7 +116,10 @@ class PermissionGrantedBasicInputTest {
                 source,
                 match = source,
                 input,
-                ParseResult(prevPoints, nextStep = NextStep(DebugUriInput(DebugWebViewInput()), "${source}-data")),
+                ParseResult(
+                    prevPoints,
+                    nextStep = NextStep.NextInput(DebugUriInput(DebugWebViewInput()), "${source}-data")
+                ),
                 permission,
                 prevResult,
             ),
@@ -144,7 +148,7 @@ class PermissionGrantedBasicInputTest {
                 log: Log,
             ) = ParseResult(
                 prevResult?.points ?: persistentListOf(),
-                nextStep = NextStep(
+                nextStep = NextStep.NextInput(
                     DebugUriInput(DebugWebViewInput()),
                     data
                 ) // Store data in nextStep, so we can test it
@@ -201,7 +205,7 @@ class PermissionGrantedBasicInputTest {
                 log: Log,
             ) = ParseResult(
                 prevResult?.points ?: persistentListOf(),
-                nextStep = NextStep(
+                nextStep = NextStep.NextInput(
                     DebugUriInput(DebugWebViewInput()),
                     data
                 ) // Store data in nextStep, so we can test it
@@ -263,7 +267,7 @@ class PermissionGrantedBasicInputTest {
                     log: Log,
                 ) = ParseResult(
                     prevResult?.points ?: persistentListOf(),
-                    nextStep = NextStep(
+                    nextStep = NextStep.NextInput(
                         DebugUriInput(DebugWebViewInput()),
                         data
                     ) // Store data in nextStep, so we can test it
@@ -334,7 +338,7 @@ class PermissionGrantedBasicInputTest {
                     log: Log,
                 ) = ParseResult(
                     prevResult?.points ?: persistentListOf(),
-                    nextStep = NextStep(
+                    nextStep = NextStep.NextInput(
                         DebugUriInput(DebugWebViewInput()),
                         data
                     ) // Store data in nextStep, so we can test it
@@ -405,7 +409,7 @@ class PermissionGrantedBasicInputTest {
                     log: Log,
                 ) = ParseResult(
                     prevResult?.points ?: persistentListOf(),
-                    nextStep = NextStep(
+                    nextStep = NextStep.NextInput(
                         DebugUriInput(DebugWebViewInput()),
                         data
                     ) // Store data in nextStep, so we can test it
@@ -472,7 +476,7 @@ class PermissionGrantedBasicInputTest {
                 log: Log,
             ) = ParseResult(
                 prevResult?.points ?: persistentListOf(),
-                nextStep = NextStep(
+                nextStep = NextStep.NextInput(
                     DebugUriInput(DebugWebViewInput()),
                     data
                 ) // Store data in nextStep, so we can test it
@@ -514,7 +518,7 @@ class PermissionGrantedBasicInputTest {
     @Test
     fun getLoadingIndicator_whenLastAttemptIsNull_returnsLargeLoadingIndicatorWithoutDescription() = runTest {
         val source = "https://maps.google.com/foo"
-        val input = GoogleMapsHtmlInput
+        val input = GoogleMapsHtmlInput(GoogleMapsWebViewInput())
         val stateContext: ConversionStateContext = mock {
             on { this@on.resources } doReturn resources
         }
@@ -538,7 +542,7 @@ class PermissionGrantedBasicInputTest {
     @Test
     fun getLoadingIndicator_whenLastAttemptNumberIsOne_returnsLargeLoadingIndicatorWithDescription() = runTest {
         val source = "https://maps.google.com/foo"
-        val input = GoogleMapsHtmlInput
+        val input = GoogleMapsHtmlInput(GoogleMapsWebViewInput())
         val lastAttempt = Attempt<RecoverableNetworkException>(1, ConnectionClosedNetworkException(EOFException()))
         val stateContext: ConversionStateContext = mock {
             on { this@on.resources } doReturn resources

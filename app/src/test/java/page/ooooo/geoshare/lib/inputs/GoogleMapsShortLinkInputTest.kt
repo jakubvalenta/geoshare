@@ -4,9 +4,16 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
+import page.ooooo.geoshare.lib.network.ApiService
 
 class GoogleMapsShortLinkInputTest : InputTest {
-    private val input = GoogleMapsShortLinkInput(GoogleMapsUriInput())
+    private val uriInput = GoogleMapsUriInput(
+        GoogleMapsHtmlInput(GoogleMapsWebViewInput()),
+        GoogleMapsPlaceApiInput(ApiService(FakeUserPreferencesRepository())),
+        GoogleMapsPlaceListWebViewInput(),
+    )
+    private val input = GoogleMapsShortLinkInput(uriInput)
 
     @Test
     fun match_shortLink() {
@@ -94,7 +101,10 @@ class GoogleMapsShortLinkInputTest : InputTest {
     fun parse_returnsNextStep() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(GoogleMapsUriInput, "https://www.google.com/maps/search/39.920439,+116.331538")
+                nextStep = NextStep.NextInput(
+                    uriInput,
+                    "https://www.google.com/maps/search/39.920439,+116.331538"
+                )
             ),
             input.parse("https://www.google.com/maps/search/39.920439,+116.331538"),
         )
@@ -104,8 +114,8 @@ class GoogleMapsShortLinkInputTest : InputTest {
     fun parse_googleMapsGo_returnsNextStep() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(
-                    GoogleMapsUriInput,
+                nextStep = NextStep.NextInput(
+                    uriInput,
                     @Suppress("SpellCheckingInspection") "https://www.google.com/maps/dir//The+Station,+1+Mends+St,+South+Perth+WA+6151/@-31.9614112,115.8523381,14z/data=!4m6!4m5!1m0!1m2!1m1!1s0x2a32a529928d7447:0x4a1084749ffdee05!3e0!11m1!6b1?entry=ml&utm_campaign=ml-navnp-dr&coh=230964"
                 )
             ),

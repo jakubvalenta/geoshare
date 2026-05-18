@@ -29,6 +29,7 @@ import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.inputs.BasicInput
 import page.ooooo.geoshare.lib.inputs.Input
+import page.ooooo.geoshare.lib.inputs.NextStep
 import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.inputs.WebViewInput
 import page.ooooo.geoshare.lib.network.MaxAttemptsReachedNetworkException
@@ -363,7 +364,17 @@ data class DataParsed<T>(
                 stateContext.log.i(
                     TAG, "Failed to extract point with coordinates from $match, going to next step"
                 )
-                InputFound(stateContext, source, nextStep.match, nextStep.input, permission, prevResult = this)
+                when (nextStep) {
+                    is NextStep.NextInput ->
+                        InputFound(stateContext, source, nextStep.match, nextStep.input, permission, prevResult = this)
+
+                    is NextStep.NextSource ->
+                        // TODO Test
+                        // TODO Overwrites original link
+                        // TODO Loses permission and previous result
+                        SourceReceived(stateContext, nextStep.source)
+                }
+
             } else if (points.lastOrNull()?.hasName() == true) {
                 stateContext.log.i(
                     TAG, "Extracted point with name $points from $match"

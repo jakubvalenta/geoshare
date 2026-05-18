@@ -8,10 +8,10 @@ data class ParseResult(
     val nextStep: NextStep? = null,
 )
 
-data class NextStep(
-    val input: Input<*>,
-    val match: String,
-)
+sealed interface NextStep {
+    data class NextSource(val source: String) : NextStep
+    data class NextInput(val input: Input<*>, val match: String) : NextStep
+}
 
 class ParseResultScope {
     var points: Points = persistentListOf()

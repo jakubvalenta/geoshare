@@ -33,7 +33,7 @@ class BaiduMapShortLinkInput @Inject constructor(
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {
-        nextStep = NextStep(baiduMapUriInput, data.toString())
+        nextStep = NextStep.NextInput(baiduMapUriInput, data.toString())
     }
 
     override fun toString() = "BaiduMapShortLinkInput"

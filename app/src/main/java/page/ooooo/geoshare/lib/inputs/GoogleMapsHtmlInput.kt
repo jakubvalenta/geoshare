@@ -19,7 +19,6 @@ import javax.inject.Singleton
 
 @Singleton
 class GoogleMapsHtmlInput(
-    private val googleMapsUriInput: GoogleMapsUriInput,
     private val googleMapsWebViewInput: GoogleMapsWebViewInput,
 ) : BodyAsChannelInput {
     @StringRes
@@ -111,10 +110,10 @@ class GoogleMapsHtmlInput(
                 } else if (redirectUriString != null) {
                     val baseUri = Uri.parse(match, uriQuote)
                     val redirectUri = Uri.parse(redirectUriString, uriQuote).toAbsoluteUri(baseUri)
-                    nextStep = NextStep(googleMapsUriInput, redirectUri.toString())
+                    nextStep = NextStep.NextSource(redirectUri.toString())
                 } else {
                     // Go to web parsing
-                    nextStep = NextStep(googleMapsWebViewInput, match)
+                    nextStep = NextStep.NextInput(googleMapsWebViewInput, match)
                 }
             }
 

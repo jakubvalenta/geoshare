@@ -46,11 +46,11 @@ class GoogleMapsShortLinkInput @Inject constructor(
             // Google Maps Go
             // https://maps.app.goo.gl/?link={url}
             queryParams["link"]?.takeIf { it.isNotEmpty() }?.let {
-                nextStep = NextStep(googleMapsUriInput, it)
+                nextStep = NextStep.NextInput(googleMapsUriInput, it)
                 return@buildParseResult
             }
 
-            nextStep = NextStep(googleMapsUriInput, data.toString())
+            nextStep = NextStep.NextInput(googleMapsUriInput, data.toString())
         }
     }
 

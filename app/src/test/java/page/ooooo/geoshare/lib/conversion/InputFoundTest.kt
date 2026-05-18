@@ -14,8 +14,9 @@ import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.inputs.GeoUriInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInput
-import page.ooooo.geoshare.lib.inputs.GoogleMapsUriInput
+import page.ooooo.geoshare.lib.inputs.GoogleMapsWebViewInput
 import page.ooooo.geoshare.lib.inputs.ParseResult
 
 class InputFoundTest {
@@ -24,7 +25,7 @@ class InputFoundTest {
     @Test
     fun transition_whenPermissionIsAlways_returnsPermissionGrantedAndPassesPermissionParam() = runTest {
         val source = "https://maps.app.goo.gl/foo"
-        val input = GoogleMapsHtmlInput
+        val input = GoogleMapsHtmlInput(GoogleMapsWebViewInput())
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val prevResult = ParseResult(prevPoints)
         val userPreferencesRepository: FakeUserPreferencesRepository = mock {
@@ -44,7 +45,7 @@ class InputFoundTest {
     @Test
     fun transition_whenPermissionIsAsk_returnsPermissionRequested() = runTest {
         val source = "https://maps.app.goo.gl/foo"
-        val input = GoogleMapsHtmlInput
+        val input = GoogleMapsHtmlInput(GoogleMapsWebViewInput())
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val prevResult = ParseResult(prevPoints)
         val userPreferencesRepository: FakeUserPreferencesRepository = mock {
@@ -64,7 +65,7 @@ class InputFoundTest {
     @Test
     fun transition_whenPermissionIsNever_returnsDataParsed() = runTest {
         val source = "https://maps.app.goo.gl/foo"
-        val input = GoogleMapsHtmlInput
+        val input = GoogleMapsHtmlInput(GoogleMapsWebViewInput())
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val prevResult = ParseResult(prevPoints)
         val userPreferencesRepository: FakeUserPreferencesRepository = mock {
@@ -87,7 +88,7 @@ class InputFoundTest {
     fun transition_whenPermissionIsNullAndPreferencePermissionIsAlways_returnsPermissionGrantedAndSetsPermissionParam() =
         runTest {
             val source = "https://maps.app.goo.gl/foo"
-            val input = GoogleMapsHtmlInput
+            val input = GoogleMapsHtmlInput(GoogleMapsWebViewInput())
             val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
             val prevResult = ParseResult(prevPoints)
             val userPreferencesRepository: FakeUserPreferencesRepository = mock {
@@ -107,7 +108,7 @@ class InputFoundTest {
     @Test
     fun transition_whenPermissionIsNullAndPreferencePermissionIsAsk_returnsPermissionRequested() = runTest {
         val source = "https://maps.app.goo.gl/foo"
-        val input = GoogleMapsHtmlInput
+        val input = GoogleMapsHtmlInput(GoogleMapsWebViewInput())
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val prevResult = ParseResult(prevPoints)
         val userPreferencesRepository: FakeUserPreferencesRepository = mock {
@@ -127,7 +128,7 @@ class InputFoundTest {
     @Test
     fun transition_whenPermissionIsNullAndPreferencePermissionIsNever_returnsDataParsed() = runTest {
         val source = "https://maps.app.goo.gl/foo"
-        val input = GoogleMapsHtmlInput
+        val input = GoogleMapsHtmlInput(GoogleMapsWebViewInput())
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val prevResult = ParseResult(prevPoints)
         val userPreferencesRepository: FakeUserPreferencesRepository = mock {
@@ -149,7 +150,7 @@ class InputFoundTest {
     @Test
     fun transition_whenInputDoesNotHavePermission_returnsPermissionGrantedAndPassesPermissionParam() = runTest {
         val source = "https://maps.app.goo.gl/foo"
-        val input = GoogleMapsUriInput
+        val input = GeoUriInput()
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val prevResult = ParseResult(prevPoints)
         val stateContext: ConversionStateContext = mock {

@@ -21,6 +21,7 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.DebugUriInput
+import page.ooooo.geoshare.lib.inputs.DebugWebViewInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsWebViewInput
 import page.ooooo.geoshare.lib.inputs.NextStep
 import page.ooooo.geoshare.lib.inputs.ParseResult
@@ -57,7 +58,7 @@ class PermissionGrantedWebViewInputTest {
                 log: Log,
             ) = ParseResult(
                 prevResult?.points ?: persistentListOf(),
-                nextStep = NextStep(
+                nextStep = NextStep.NextInput(
                     DebugUriInput(DebugWebViewInput()),
                     data
                 ) // Store data in nextStep, so we can test it
@@ -87,7 +88,10 @@ class PermissionGrantedWebViewInputTest {
                 source,
                 match = source,
                 input,
-                ParseResult(prevPoints, nextStep = NextStep(DebugUriInput(DebugWebViewInput()), "${source}-data")),
+                ParseResult(
+                    prevPoints,
+                    nextStep = NextStep.NextInput(DebugUriInput(DebugWebViewInput()), "${source}-data")
+                ),
                 permission,
                 prevResult,
             ),
@@ -111,7 +115,7 @@ class PermissionGrantedWebViewInputTest {
                 log: Log,
             ) = ParseResult(
                 prevResult?.points ?: persistentListOf(),
-                nextStep = NextStep(
+                nextStep = NextStep.NextInput(
                     DebugUriInput(DebugWebViewInput()),
                     data
                 ) // Store data in nextStep, so we can test it
@@ -229,7 +233,7 @@ class PermissionGrantedWebViewInputTest {
     @Test
     fun getLoadingIndicator_whenLastAttemptIsNull_returnsLargeLoadingIndicatorWithoutDescription() = runTest {
         val source = "https://maps.google.com/foo"
-        val input = GoogleMapsWebViewInput
+        val input = GoogleMapsWebViewInput()
         val stateContext: ConversionStateContext = mock {
             on { this@on.resources } doReturn resources
         }

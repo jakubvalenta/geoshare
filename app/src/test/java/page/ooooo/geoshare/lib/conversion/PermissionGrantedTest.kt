@@ -16,7 +16,7 @@ class PermissionGrantedTest {
     @Test
     fun transition_whenInputIsBasicInput_returnsPermissionGrantedBasicInput() = runTest {
         val source = "https://maps.app.goo.gl/foo"
-        val input = GoogleMapsHtmlInput
+        val input = GoogleMapsHtmlInput(GoogleMapsWebViewInput())
         val permission = Permission.ALWAYS
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val prevResult = ParseResult(prevPoints)
@@ -31,7 +31,7 @@ class PermissionGrantedTest {
     @Test
     fun transition_whenInputIsWebViewInput_returnsPermissionGrantedWebViewInput() = runTest {
         val source = "https://maps.app.goo.gl/foo"
-        val input = GoogleMapsWebViewInput
+        val input = GoogleMapsWebViewInput()
         val permission = Permission.ALWAYS
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val prevResult = ParseResult(prevPoints)

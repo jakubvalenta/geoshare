@@ -33,7 +33,7 @@ class AmapShortLinkInput @Inject constructor(
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {
-        nextStep = NextStep(amapUriInput, data.toString())
+        nextStep = NextStep.NextInput(amapUriInput, data.toString())
     }
 
     override fun toString() = "AmapShortLinkInput"

@@ -7,6 +7,7 @@ import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import javax.inject.Singleton
 
 /**
  * @see DebugUriInput

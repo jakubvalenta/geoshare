@@ -85,7 +85,7 @@ class OpenStreetMapUriInput @Inject constructor(
             if (pathParts.firstOrNull() == "") {
                 pathParts.getOrNull(1).takeIf { it in setOf("node", "relation", "way") }?.let { type ->
                     pathParts.getOrNull(2)?.let { id ->
-                        nextStep = NextStep(
+                        nextStep = NextStep.NextInput(
                             openStreetMapApiInput,
                             "https://www.openstreetmap.org/api/0.6/$type/$id${if (type != "node") "/full" else ""}.json",
                         )

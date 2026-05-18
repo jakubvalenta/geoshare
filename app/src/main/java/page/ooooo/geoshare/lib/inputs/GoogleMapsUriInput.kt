@@ -29,8 +29,8 @@ import javax.inject.Singleton
  */
 @Singleton
 class GoogleMapsUriInput @Inject constructor(
-    private val googleMapsPlaceApiInput: GoogleMapsPlaceApiInput,
     private val googleMapsHtmlInput: GoogleMapsHtmlInput,
+    private val googleMapsPlaceApiInput: GoogleMapsPlaceApiInput,
     private val googleMapsPlaceListWebViewInput: GoogleMapsPlaceListWebViewInput,
 ) : UriInput, Input.HasRandomUri {
     override val pattern =
@@ -68,7 +68,7 @@ class GoogleMapsUriInput @Inject constructor(
                     points = naivePoints.map { GCJ02MainlandChinaPoint(it).copy(z = z) }.toImmutableList()
                     if (points.any { !it.hasCoordinates() }) {
                         // Go to HTML parsing unless all points have coordinates
-                        nextStep = NextStep(googleMapsHtmlInput, match)
+                        nextStep = NextStep.NextInput(googleMapsHtmlInput, match)
                     }
                     return@run
                 }
@@ -112,7 +112,7 @@ class GoogleMapsUriInput @Inject constructor(
                 Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull()?.let { name ->
                     points = persistentListOf(GCJ02MainlandChinaPoint(z = z, name = name, source = Source.URI))
                     // Go to HTML parsing
-                    nextStep = NextStep(googleMapsHtmlInput, match)
+                    nextStep = NextStep.NextInput(googleMapsHtmlInput, match)
                     return@run
                 }
             }
@@ -129,7 +129,7 @@ class GoogleMapsUriInput @Inject constructor(
                     points = parseParts(parts.drop(1), z)
                     if (points.lastOrNull()?.hasCoordinates() != true) {
                         // Go to HTML parsing
-                        nextStep = NextStep(googleMapsHtmlInput, match)
+                        nextStep = NextStep.NextInput(googleMapsHtmlInput, match)
                     }
                 }
 
@@ -139,7 +139,7 @@ class GoogleMapsUriInput @Inject constructor(
                     points = parseParts(parts.drop(1), z)
                     if (points.lastOrNull()?.hasCoordinates() != true) {
                         // Go to HTML parsing
-                        nextStep = NextStep(googleMapsPlaceApiInput, match)
+                        nextStep = NextStep.NextInput(googleMapsPlaceApiInput, match)
                     }
                 }
 
@@ -150,7 +150,7 @@ class GoogleMapsUriInput @Inject constructor(
                 // https://www.google.com/maps/d/view?mid={id}
                 firstPart == "placelists" || firstPart == "@" || firstPart == "d" -> {
                     // Go to place list WebView parsing
-                    nextStep = NextStep(googleMapsPlaceListWebViewInput, match)
+                    nextStep = NextStep.NextInput(googleMapsPlaceListWebViewInput, match)
                 }
 
                 // Search
@@ -249,10 +249,4 @@ class GoogleMapsUriInput @Inject constructor(
         )
 
     override fun toString() = "GoogleMapsUriInput"
-
-    companion object {
-        fun parsePoints(data: Uri): Points? = {
-
-        }
-    }
 }

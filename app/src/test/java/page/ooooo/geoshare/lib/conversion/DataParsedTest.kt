@@ -44,7 +44,7 @@ class DataParsedTest {
     fun transition_whenLastPointHasNoCoordinatesAndNextStepIsSet_returnsInputFound() = runTest {
         val source = "https://maps.apple.com/foo"
         val points = persistentListOf(WGS84Point(name = "bar", source = Source.GENERATED))
-        val nextStep = NextStep(GoogleMapsHtmlInput, "https://maps.apple.com/foo")
+        val nextStep = NextStep.NextInput(GoogleMapsHtmlInput, "https://maps.apple.com/foo")
         val result = ParseResult(points, nextStep)
         val permission = Permission.ALWAYS
         val state = DataParsed(stateContext, source, match = source, GoogleMapsUriInput, result, permission)

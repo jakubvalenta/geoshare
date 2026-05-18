@@ -1766,7 +1766,7 @@ private fun WebViewPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://www.example.com/",
-            input = GoogleMapsWebViewInput,
+            input = GoogleMapsWebViewInput(),
             permission = Permission.ALWAYS,
         )
         MainScreen(
@@ -1838,7 +1838,7 @@ private fun DarkWebViewPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://www.example.com/",
-            input = GoogleMapsWebViewInput,
+            input = GoogleMapsWebViewInput(),
             permission = Permission.ALWAYS,
         )
         MainScreen(
@@ -1910,7 +1910,7 @@ private fun TabletWebViewPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://www.example.com/",
-            input = GoogleMapsWebViewInput,
+            input = GoogleMapsWebViewInput(),
             permission = Permission.ALWAYS,
         )
         MainScreen(
@@ -2225,7 +2225,7 @@ private fun LoadingIndicatorPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            input = GoogleMapsHtmlInput,
+            input = GoogleMapsHtmlInput(GoogleMapsWebViewInput()),
             permission = Permission.ALWAYS,
             lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )
@@ -2298,7 +2298,7 @@ private fun DarkLoadingIndicatorPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            input = GoogleMapsHtmlInput,
+            input = GoogleMapsHtmlInput(GoogleMapsWebViewInput()),
             permission = Permission.ALWAYS,
             lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )
@@ -2371,7 +2371,7 @@ private fun TabletLoadingIndicatorPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            input = GoogleMapsHtmlInput,
+            input = GoogleMapsHtmlInput(GoogleMapsWebViewInput()),
             permission = Permission.ALWAYS,
             lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )

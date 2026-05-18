@@ -6,7 +6,6 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.network.DESKTOP_USER_AGENT
-import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
@@ -29,7 +28,7 @@ class GoogleMapsWebViewInput : WebViewInput {
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {
-        nextStep = NextStep(googleMapsUriInput, data)
+        nextStep = NextStep.NextSource(data)
     }
 
     override fun extendWebSettings(settings: WebSettings) = Companion.extendWebSettings(settings)

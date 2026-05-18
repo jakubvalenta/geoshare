@@ -9,6 +9,8 @@ import org.mockito.kotlin.mock
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.inputs.GeoUriInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsUriInput
+import page.ooooo.geoshare.lib.inputs.OsmAndUriInput
+import page.ooooo.geoshare.lib.inputs.OsmAndUriInputTest
 
 class SourceReceivedTest {
     private val resources: Resources = mock {
@@ -16,7 +18,7 @@ class SourceReceivedTest {
         on { getString(R.string.conversion_failed_unsupported_service) } doReturn "Unsupported map service"
     }
     private val stateContext: ConversionStateContext = mock {
-        on { inputs } doReturn listOf(GeoUriInput(), GoogleMapsUriInput)
+        on { inputs } doReturn listOf(GeoUriInput(), OsmAndUriInput())
         on { this@on.resources } doReturn resources
     }
 
@@ -42,21 +44,21 @@ class SourceReceivedTest {
 
     @Test
     fun transition_whenSourceHasUriInTheMiddle_returnsInputFound() = runTest {
-        val source = "FOO\nhttps://maps.google.com/foo\nBAR"
-        val match = "https://maps.google.com/foo"
+        val source = "FOO\nhttps://www.osmand.net/foo\nBAR"
+        val match = "https://www.osmand.net/foo"
         val state = SourceReceived(stateContext, source)
         assertEquals(
-            InputFound(stateContext, source, match, GoogleMapsUriInput, permission = null),
+            InputFound(stateContext, source, match, OsmAndUriInput(), permission = null),
             state.transition(),
         )
     }
 
     @Test
     fun transition_whenSourceMatchesAnInput_returnsInputFound() = runTest {
-        val source = "https://maps.google.com/foo"
+        val source = "https://www.osmand.net/foo"
         val state = SourceReceived(stateContext, source)
         assertEquals(
-            InputFound(stateContext, source, match = source, GoogleMapsUriInput, permission = null),
+            InputFound(stateContext, source, match = source, OsmAndUriInput(), permission = null),
             state.transition(),
         )
     }

@@ -270,7 +270,7 @@ class AppleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 persistentListOf(),
-                nextStep = NextStep(
+                nextStep = NextStep.NextInput(
                     AppleMapsHtmlInput(),
                     "https://maps.apple.com/place?auid=17017496253231963769&lsp=7618"
                 )
@@ -284,7 +284,7 @@ class AppleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 persistentListOf(),
-                nextStep = NextStep(
+                nextStep = NextStep.NextInput(
                     AppleMapsHtmlInput(),
                     "https://maps.apple.com/place?place-id=I3B04EDEB21D5F86&_provider=9902"
                 )
@@ -298,7 +298,7 @@ class AppleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 persistentListOf(WGS84Point(name = "Central Park", source = Source.URI)),
-                nextStep = NextStep(
+                nextStep = NextStep.NextInput(
                     AppleMapsHtmlInput(),
                     "https://maps.apple.com/place?place-id=I3B04EDEB21D5F86&_provider=9902&q=Central+Park"
                 )
@@ -311,7 +311,7 @@ class AppleMapsUriInputTest : InputTest {
     fun parse_shortLink() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(
+                nextStep = NextStep.NextInput(
                     AppleMapsHtmlInput(),
                     "https://maps.apple/p/7E-Brjrk_THN14"
                 )

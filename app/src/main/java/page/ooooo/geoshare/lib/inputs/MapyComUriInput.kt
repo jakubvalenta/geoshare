@@ -10,11 +10,10 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import javax.inject.Singleton
 
 @Singleton
 class MapyComUriInput : UriInput, Input.HasRandomUri {
-    private const val COORDS = """(\d{1,2}(?:\.\d{1,16})?)[NS], (\d{1,3}(?:\.\d{1,16})?)[WE]"""
-
     override val pattern =
         Regex("""($COORDS|(?:https?://)?(?:(?:hapticke|www)\.)?mapy\.[a-z]{2,3}[/?]$URI_REST)""")
     override val documentation = InputDocumentation(
@@ -67,4 +66,8 @@ class MapyComUriInput : UriInput, Input.HasRandomUri {
         UriFormatter.formatUriString(point, "https://mapy.com/en/zakladni?x={lon}&y={lat}&z={z}")
 
     override fun toString() = "MapsComUriInput"
+
+    private companion object {
+        private const val COORDS = """(\d{1,2}(?:\.\d{1,16})?)[NS], (\d{1,3}(?:\.\d{1,16})?)[WE]"""
+    }
 }

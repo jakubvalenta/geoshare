@@ -27,7 +27,7 @@ class YandexMapsShortLinkInput @Inject constructor(
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {
-        nextStep = NextStep(yandexMapsUriInput, data.toString())
+        nextStep = NextStep.NextInput(yandexMapsUriInput, data.toString())
     }
 
     override fun toString() = "YandexMapsShortLinkInput"
