@@ -19,7 +19,6 @@ import page.ooooo.geoshare.lib.network.setDefaultTimeouts
 import page.ooooo.geoshare.lib.network.setUserAgent
 import java.net.MalformedURLException
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.coroutineContext
 
 interface TextInput : BasicInput<String> {
     val pattern: Regex
