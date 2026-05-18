@@ -25,10 +25,13 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import page.ooooo.geoshare.lib.FakeLog
 import java.net.SocketTimeoutException
 import java.net.URL
 
 class HttpClientTest {
+    private val log = FakeLog
+
     @Test
     fun headLocationHeader_whenResponseIs3xxWithLocationHeader_returnsLocationHeader() = runTest {
         val url = URL("https://maps.google.com/foo")
@@ -57,6 +60,36 @@ class HttpClientTest {
         }
     }
 
+    @Test
+    fun headLocationHeader_whenResponseIs3xxWithLocationHeaderAndExceptionsAreRethrownAsNetworkException_returnsLocationHeader() =
+        runTest {
+            val url = URL("https://maps.google.com/foo")
+            for (status in listOf(
+                HttpStatusCode.MovedPermanently,
+                HttpStatusCode.Found,
+            )) {
+                val engine = MockEngine { request ->
+                    if (request.method == HttpMethod.Head && request.url.toString() == "https://maps.google.com/foo") {
+                        respond("", status, headers {
+                            append(HttpHeaders.Location, "https://maps.google.com/redirected")
+                        })
+                    } else {
+                        throw NotImplementedError()
+                    }
+                }
+                val header = HttpClient(engine) {
+                    expectSuccess = true
+                    rethrowExceptionsAsNetworkException(log)
+                }.use { client ->
+                    client.headLocationHeader(url)
+                }
+                assertEquals(
+                    "https://maps.google.com/redirected",
+                    header,
+                )
+            }
+        }
+
     @Test(expected = MissingHeaderNetworkException::class)
     fun headLocationHeader_whenResponseIs3xxWithoutLocationHeader_throwsMissingHeaderNetworkException() = runTest {
         val url = URL("https://maps.google.com/foo")
@@ -78,6 +111,30 @@ class HttpClientTest {
             }
         }
     }
+
+    @Test(expected = MissingHeaderNetworkException::class)
+    fun headLocationHeader_whenResponseIs3xxWithoutLocationHeaderAndExceptionsAreRethrownAsNetworkException_throwsMissingHeaderNetworkException() =
+        runTest {
+            val url = URL("https://maps.google.com/foo")
+            for (status in listOf(
+                HttpStatusCode.MovedPermanently,
+                HttpStatusCode.Found,
+            )) {
+                val engine = MockEngine { request ->
+                    if (request.method == HttpMethod.Head && request.url.toString() == "https://maps.google.com/foo") {
+                        respond("", status)
+                    } else {
+                        throw NotImplementedError()
+                    }
+                }
+                HttpClient(engine) {
+                    expectSuccess = true
+                    rethrowExceptionsAsNetworkException(log)
+                }.use { client ->
+                    client.headLocationHeader(url)
+                }
+            }
+        }
 
     @Test
     fun headLocationHeader_whenResponseIs4xxOr5xx_throwsException() = runTest {
@@ -103,9 +160,39 @@ class HttpClientTest {
                     tr
                 }
             }
-            assertTrue(threw is NetworkException)
+            assertTrue(threw is ResponseException)
         }
     }
+
+    @Test
+    fun headLocationHeader_whenResponseIs4xxOr5xxAndExceptionsAreRethrownAsNetworkException_throwsException() =
+        runTest {
+            val url = URL("https://maps.google.com/foo")
+            for (status in listOf(
+                HttpStatusCode.NotFound,
+                HttpStatusCode.InternalServerError,
+            )) {
+                val engine = MockEngine { request ->
+                    if (request.method == HttpMethod.Head && request.url.toString() == "https://maps.google.com/foo") {
+                        respond("", status)
+                    } else {
+                        throw NotImplementedError()
+                    }
+                }
+                val threw = HttpClient(engine) {
+                    expectSuccess = true
+                    rethrowExceptionsAsNetworkException(log)
+                }.use { client ->
+                    try {
+                        client.headLocationHeader(url)
+                        null
+                    } catch (tr: Exception) {
+                        tr
+                    }
+                }
+                assertTrue(threw is NetworkException)
+            }
+        }
 
     @OptIn(InternalAPI::class)
     @Test
@@ -143,7 +230,7 @@ class HttpClientTest {
     }
 
     @Test
-    fun wrapExceptionsInNetworkException_whenResponseIs2xx_returnsResponseIncludingLocationHeader() = runTest {
+    fun rethrowExceptionsAsNetworkException_whenResponseIs2xx_returnsResponseIncludingLocationHeader() = runTest {
         val url = URL("https://maps.google.com/foo")
         for (status in listOf(
             HttpStatusCode.OK,
@@ -156,7 +243,7 @@ class HttpClientTest {
             }
             val header = HttpClient(engine) {
                 expectSuccess = true
-                wrapExceptionsInNetworkException()
+                rethrowExceptionsAsNetworkException(log)
             }.use { client ->
                 client
                     .get(url)
@@ -170,7 +257,7 @@ class HttpClientTest {
     }
 
     @Test
-    fun wrapExceptionsInNetworkException_whenResponseIs2xx_andFollowRedirectsIsFalse_returnsResponseIncludingLocationHeader() =
+    fun rethrowExceptionsAsNetworkException_whenResponseIs2xx_andFollowRedirectsIsFalse_returnsResponseIncludingLocationHeader() =
         runTest {
             val url = URL("https://maps.google.com/foo")
             for (status in listOf(
@@ -184,7 +271,7 @@ class HttpClientTest {
                 }
                 val header = HttpClient(engine) {
                     expectSuccess = true
-                    wrapExceptionsInNetworkException()
+                    rethrowExceptionsAsNetworkException(log)
                 }.use { client ->
                     client
                         .config { followRedirects = false }
@@ -202,7 +289,7 @@ class HttpClientTest {
         }
 
     @Test
-    fun wrapExceptionsInNetworkException_whenResponseIs3xxAndFollowRedirectsIsDefault_throwsUnrecoverableException() =
+    fun rethrowExceptionsAsNetworkException_whenResponseIs3xxAndFollowRedirectsIsDefault_throwsUnrecoverableException() =
         runTest {
             val url = URL("https://maps.google.com/foo")
             for (status in listOf(
@@ -212,7 +299,7 @@ class HttpClientTest {
                 val engine = MockEngine { respond("test content", status) }
                 val threw = HttpClient(engine) {
                     expectSuccess = true
-                    wrapExceptionsInNetworkException()
+                    rethrowExceptionsAsNetworkException(log)
                 }.use { client ->
                     try {
                         client.get(url)
@@ -231,7 +318,7 @@ class HttpClientTest {
         }
 
     @Test
-    fun wrapExceptionsInNetworkException_whenResponseIs3xxAndFollowRedirectsIsFalse_throwsUnrecoverableException() =
+    fun rethrowExceptionsAsNetworkException_whenResponseIs3xxAndFollowRedirectsIsFalse_throwsUnrecoverableException() =
         runTest {
             val url = URL("https://maps.google.com/foo")
             for (status in listOf(
@@ -245,7 +332,7 @@ class HttpClientTest {
                 }
                 val threw = HttpClient(engine) {
                     expectSuccess = true
-                    wrapExceptionsInNetworkException()
+                    rethrowExceptionsAsNetworkException(log)
                 }.use { client ->
                     try {
                         client
@@ -266,7 +353,7 @@ class HttpClientTest {
         }
 
     @Test
-    fun wrapExceptionsInNetworkException_whenResponseIs4xx_throwsUnrecoverableException() = runTest {
+    fun rethrowExceptionsAsNetworkException_whenResponseIs4xx_throwsUnrecoverableException() = runTest {
         val url = URL("https://maps.google.com/foo")
         for (status in listOf(
             HttpStatusCode.BadRequest,
@@ -276,7 +363,7 @@ class HttpClientTest {
             val engine = MockEngine { respond("test content", status) }
             val threw = HttpClient(engine) {
                 expectSuccess = true
-                wrapExceptionsInNetworkException()
+                rethrowExceptionsAsNetworkException(log)
             }.use { client ->
                 try {
                     client.get(url)
@@ -293,7 +380,7 @@ class HttpClientTest {
     }
 
     @Test
-    fun wrapExceptionsInNetworkException_whenResponseIs5xx_throwsRecoverableException() = runTest {
+    fun rethrowExceptionsAsNetworkException_whenResponseIs5xx_throwsRecoverableException() = runTest {
         val url = URL("https://maps.google.com/foo")
         for (status in listOf(
             HttpStatusCode.InternalServerError,
@@ -302,7 +389,7 @@ class HttpClientTest {
             val engine = MockEngine { respond("test content", status) }
             val threw = HttpClient(engine) {
                 expectSuccess = true
-                wrapExceptionsInNetworkException()
+                rethrowExceptionsAsNetworkException(log)
             }.use { client ->
                 try {
                     client.get(url)
@@ -318,13 +405,13 @@ class HttpClientTest {
     }
 
     @Test
-    fun wrapExceptionsInNetworkException_whenRequestThrowsUnresolvedAddressException_throwsRecoverableException() =
+    fun rethrowExceptionsAsNetworkException_whenRequestThrowsUnresolvedAddressException_throwsRecoverableException() =
         runTest {
             val url = URL("https://maps.google.com/foo")
             val engine = MockEngine { throw UnresolvedAddressException() }
             val threw = HttpClient(engine) {
                 expectSuccess = true
-                wrapExceptionsInNetworkException()
+                rethrowExceptionsAsNetworkException(log)
             }.use { client ->
                 try {
                     client.get(url)
@@ -339,13 +426,13 @@ class HttpClientTest {
         }
 
     @Test
-    fun wrapExceptionsInNetworkException_whenRequestThrowsHttpRequestTimeoutException_throwsRecoverableException() =
+    fun rethrowExceptionsAsNetworkException_whenRequestThrowsHttpRequestTimeoutException_throwsRecoverableException() =
         runTest {
             val url = URL("https://maps.google.com/foo")
             val engine = MockEngine { request -> throw HttpRequestTimeoutException(request) }
             val threw = HttpClient(engine) {
                 expectSuccess = true
-                wrapExceptionsInNetworkException()
+                rethrowExceptionsAsNetworkException(log)
             }.use { client ->
                 try {
                     client.get(url)
@@ -360,13 +447,13 @@ class HttpClientTest {
         }
 
     @Test
-    fun wrapExceptionsInNetworkException_whenRequestThrowsSocketTimeoutException_throwsRecoverableException() =
+    fun rethrowExceptionsAsNetworkException_whenRequestThrowsSocketTimeoutException_throwsRecoverableException() =
         runTest {
             val url = URL("https://maps.google.com/foo")
             val engine = MockEngine { throw SocketTimeoutException() }
             val threw = HttpClient(engine) {
                 expectSuccess = true
-                wrapExceptionsInNetworkException()
+                rethrowExceptionsAsNetworkException(log)
             }.use { client ->
                 try {
                     client.get(url)
@@ -381,13 +468,13 @@ class HttpClientTest {
         }
 
     @Test
-    fun wrapExceptionsInNetworkException_whenRequestThrowsConnectTimeoutException_throwsRecoverableException() =
+    fun rethrowExceptionsAsNetworkException_whenRequestThrowsConnectTimeoutException_throwsRecoverableException() =
         runTest {
             val url = URL("https://maps.google.com/foo")
             val engine = MockEngine { throw ConnectTimeoutException("Connect timeout") }
             val threw = HttpClient(engine) {
                 expectSuccess = true
-                wrapExceptionsInNetworkException()
+                rethrowExceptionsAsNetworkException(log)
             }.use { client ->
                 try {
                     client.get(url)
@@ -402,12 +489,12 @@ class HttpClientTest {
         }
 
     @Test
-    fun wrapExceptionsInNetworkException_whenRequestThrowsEOFException_throwsRecoverableException() = runTest {
+    fun rethrowExceptionsAsNetworkException_whenRequestThrowsEOFException_throwsRecoverableException() = runTest {
         val url = URL("https://maps.google.com/foo")
         val engine = MockEngine { throw kotlinx.io.EOFException() }
         val threw = HttpClient(engine) {
             expectSuccess = true
-            wrapExceptionsInNetworkException()
+            rethrowExceptionsAsNetworkException(log)
         }.use { client ->
             try {
                 client.get(url)
@@ -422,14 +509,14 @@ class HttpClientTest {
     }
 
     @Test
-    fun wrapExceptionsInNetworkException_whenRequestThrowsUnknownException_throwsUnrecoverableException() = runTest {
+    fun rethrowExceptionsAsNetworkException_whenRequestThrowsUnknownException_throwsUnrecoverableException() = runTest {
         class MyException(message: String) : Exception(message)
 
         val url = URL("https://maps.google.com/foo")
         val engine = MockEngine { throw MyException("Unknown exception") }
         val threw = HttpClient(engine) {
             expectSuccess = true
-            wrapExceptionsInNetworkException()
+            rethrowExceptionsAsNetworkException(log)
         }.use { client ->
             try {
                 client.get(url)

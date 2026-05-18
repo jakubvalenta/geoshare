@@ -41,8 +41,11 @@ suspend fun HttpClient.headLocationHeader(url: URL): String =
     }.use { client ->
         try {
             client.head(url)
-        } catch (e: ResponseNetworkException) {
+        } catch (e: RedirectResponseException) {
             // Expect that the request returns 3xx
+            e.response
+        } catch (e: ResponseNetworkException) {
+            // Expect that the request returns 3xx; version for when the exception is wrapped in NetworkException
             (e.cause as? RedirectResponseException)?.response ?: throw e
         }
             .headers[HttpHeaders.Location] ?: throw MissingHeaderNetworkException()
@@ -86,7 +89,7 @@ fun HttpClientConfig<*>.setGenerousTimeouts() {
  * Configures [HttpClient] to rethrow all exceptions as [NetworkException], so the caller can decide whether to retry a
  * request based on whether the exception is [RecoverableNetworkException] or [UnrecoverableNetworkException].
  */
-fun HttpClientConfig<*>.wrapExceptionsInNetworkException(log: Log = DefaultLog) {
+fun HttpClientConfig<*>.rethrowExceptionsAsNetworkException(log: Log = DefaultLog) {
     HttpResponseValidator {
         handleResponseExceptionWithRequest { cause, request ->
             when (cause) {

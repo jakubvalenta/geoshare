@@ -13,10 +13,10 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.network.getLastHopUrlString
 import page.ooooo.geoshare.lib.network.headLocationHeader
+import page.ooooo.geoshare.lib.network.rethrowExceptionsAsNetworkException
 import page.ooooo.geoshare.lib.network.setCookies
 import page.ooooo.geoshare.lib.network.setGenerousTimeouts
 import page.ooooo.geoshare.lib.network.setUserAgent
-import page.ooooo.geoshare.lib.network.wrapExceptionsInNetworkException
 import java.net.MalformedURLException
 import kotlin.coroutines.CoroutineContext
 
@@ -73,7 +73,7 @@ interface GetLastHopUrlInput : UriInput, Input.HasPermission {
             setCookies(cookies)
             setUserAgent(userAgent)
             setGenerousTimeouts()
-            wrapExceptionsInNetworkException()
+            rethrowExceptionsAsNetworkException(log)
         }.use { client ->
             client.getLastHopUrlString(url)
         }
@@ -106,7 +106,7 @@ interface HeadLocationHeaderInput : UriInput, Input.HasPermission {
             setCookies(cookies)
             setUserAgent(userAgent)
             setGenerousTimeouts()
-            wrapExceptionsInNetworkException()
+            rethrowExceptionsAsNetworkException(log)
         }.use { client ->
             client.headLocationHeader(url)
         }
@@ -140,7 +140,7 @@ interface BodyAsChannelInput : BasicInput<ByteReadChannel>, Input.HasPermission 
             setCookies(cookies)
             setUserAgent(userAgent)
             setGenerousTimeouts()
-            wrapExceptionsInNetworkException()
+            rethrowExceptionsAsNetworkException(log)
         }.use { client ->
             client
                 .prepareRequest(url)
@@ -175,7 +175,7 @@ interface BodyAsTextInput : BasicInput<String>, Input.HasPermission {
             setCookies(cookies)
             setUserAgent(userAgent)
             setGenerousTimeouts()
-            wrapExceptionsInNetworkException()
+            rethrowExceptionsAsNetworkException(log)
         }.use { client ->
             client
                 .prepareRequest(url)
