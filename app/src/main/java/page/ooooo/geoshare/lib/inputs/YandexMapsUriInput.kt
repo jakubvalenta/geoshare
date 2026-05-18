@@ -1,11 +1,14 @@
 package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
+import page.ooooo.geoshare.lib.extensions.findAll
 import page.ooooo.geoshare.lib.extensions.matchEntire
+import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
@@ -46,6 +49,17 @@ object YandexMapsUriInput : UriInput, Input.HasRandomUri {
             data.run {
                 val z = listOf(@Suppress("SpellCheckingInspection") "whatshere[zoom]", "z")
                     .firstNotNullOfOrNull { key -> Z_PATTERN.matchEntire(queryParams[key])?.doubleGroupOrNull() }
+
+                // Directions
+                // https://yandex.com/maps?rtext={lat}%2C{lon}~{lat}%2C{lon}~{lat}%2C{lon}
+                LAT_LON_PATTERN.findAll(queryParams[@Suppress("SpellCheckingInspection") "rtext"])
+                    .mapNotNull { m -> m.toLatLonPoint(Source.URI)?.copy(z = z)?.let { WGS84Point(it) } }
+                    .toImmutableList()
+                    .takeIf { it.isNotEmpty() }
+                    ?.let {
+                        points = it
+                        return@buildParseResult
+                    }
 
                 // Coordinates
                 // https://yandex.com/maps?ll={lon},{lat}
