@@ -102,6 +102,29 @@ class YandexMapsUriInputTest : InputTest {
     }
 
     @Test
+    fun parse_directions() = runTest {
+        assertEquals(
+            ParseResult(
+                persistentListOf(
+                    WGS84Point(51.106893, 6.569370, source = Source.URI),
+                    WGS84Point(51.228358, 6.502698, source = Source.URI),
+                )
+            ),
+            input.parse("https://yandex.com/maps?rtext=51.106893%2C6.569370~51.228358%2C6.502698&rtt=auto"),
+        )
+        assertEquals(
+            ParseResult(
+                persistentListOf(
+                    WGS84Point(51.106893, 6.569370, z = 13.0, source = Source.URI),
+                    WGS84Point(51.197102, 6.606140, z = 13.0, source = Source.URI),
+                    WGS84Point(51.228358, 6.502698, z = 13.0, source = Source.URI),
+                )
+            ),
+            input.parse("https://yandex.com/maps/?ll=6.549320%2C51.168727&mode=routes&rtext=51.106893%2C6.569370~51.197102%2C6.606140~51.228358%2C6.502698&rtt=auto&ruri=~~&z=13"),
+        )
+    }
+
+    @Test
     fun parse_poiWithCoordinatesAndPoint() = runTest {
         assertEquals(
             ParseResult(persistentListOf(WGS84Point(52.294001, 8.065475, z = 13.24, source = Source.URI))),
