@@ -34,11 +34,12 @@ const val SOCKET_TIMEOUT = 128_000L
 private const val TAG = "HttpClient"
 
 /**
- * HTTP client with useful basic configuration including the wrapping of exceptions in [NetworkException].
+ * Creates an [io.ktor.client.HttpClient] with useful configuration, e.g. wrapping of exceptions in [NetworkException].
  *
- * For request to map services, you should always use this HTTP client instead of the default unconfigured one.
+ * For requests to map services, you should always use this HTTP client instead of the default unconfigured one.
+ *
+ * Remember that [io.ktor.client.HttpClient] is a Closeable, so it must be closed to free resources.
  */
-// TODO Close HttpClient everywhere it's used
 fun HttpClient(engine: HttpClientEngine = CIO.create(), log: Log = DefaultLog): HttpClient = HttpClient(engine) {
     expectSuccess = true
 

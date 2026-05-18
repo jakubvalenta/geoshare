@@ -1,7 +1,8 @@
 package page.ooooo.geoshare.lib.conversion
 
 import android.content.res.Resources
-import io.ktor.client.HttpClient
+import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.engine.mock.MockEngine
 import io.ktor.http.HttpStatusCode
 import io.ktor.utils.io.CancellationException
 import kotlinx.collections.immutable.persistentListOf
@@ -25,7 +26,6 @@ import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.NextStep
 import page.ooooo.geoshare.lib.inputs.ParseResult
-import page.ooooo.geoshare.lib.network.ApiClient
 import page.ooooo.geoshare.lib.network.ConnectionClosedNetworkException
 import page.ooooo.geoshare.lib.network.RecoverableNetworkException
 import page.ooooo.geoshare.lib.network.ResponseNetworkException
@@ -38,8 +38,8 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
 
 class PermissionGrantedBasicInputTest {
+    private val engine = MockEngine { throw NotImplementedError() }
     private val log = FakeLog
-    private val httpClient: HttpClient = mock()
     private val maxAttempts = 3
     private val resources: Resources = mock {
         on { getString(R.string.converter_google_maps_loading_indicator_title) } doReturn "Connecting to Google..."
@@ -62,9 +62,8 @@ class PermissionGrantedBasicInputTest {
         val input = object : BasicInput<String>, Input.HasPermission {
             override suspend fun withData(
                 match: String,
-                apiClient: ApiClient,
+                engine: HttpClientEngine,
                 log: Log,
-                httpClient: HttpClient,
                 uriQuote: UriQuote,
                 coroutineContext: CoroutineContext,
                 block: suspend (String) -> ParseResult,
@@ -89,8 +88,8 @@ class PermissionGrantedBasicInputTest {
         val lastAttempt = null
         val permission = Permission.ALWAYS
         val stateContext: ConversionStateContext = mock {
+            on { this@on.engine } doReturn engine
             on { this@on.log } doReturn log
-            on { this@on.httpClient } doReturn httpClient
             on { this@on.resources } doReturn resources
             on { this@on.uriQuote } doReturn uriQuote
         }
@@ -125,9 +124,8 @@ class PermissionGrantedBasicInputTest {
         val input = object : BasicInput<String>, Input.HasPermission {
             override suspend fun withData(
                 match: String,
-                apiClient: ApiClient,
+                engine: HttpClientEngine,
                 log: Log,
-                httpClient: HttpClient,
                 uriQuote: UriQuote,
                 coroutineContext: CoroutineContext,
                 block: suspend (String) -> ParseResult,
@@ -152,8 +150,8 @@ class PermissionGrantedBasicInputTest {
         val lastAttempt = null
         val permission = Permission.ALWAYS
         val stateContext: ConversionStateContext = mock {
+            on { this@on.engine } doReturn engine
             on { this@on.log } doReturn log
-            on { this@on.httpClient } doReturn httpClient
             on { this@on.resources } doReturn resources
             on { this@on.uriQuote } doReturn uriQuote
         }
@@ -180,9 +178,8 @@ class PermissionGrantedBasicInputTest {
         val input = object : BasicInput<String>, Input.HasPermission {
             override suspend fun withData(
                 match: String,
-                apiClient: ApiClient,
+                engine: HttpClientEngine,
                 log: Log,
-                httpClient: HttpClient,
                 uriQuote: UriQuote,
                 coroutineContext: CoroutineContext,
                 block: suspend (String) -> ParseResult,
@@ -207,8 +204,8 @@ class PermissionGrantedBasicInputTest {
         val lastAttempt = null
         val permission = Permission.ALWAYS
         val stateContext: ConversionStateContext = mock {
+            on { this@on.engine } doReturn engine
             on { this@on.log } doReturn log
-            on { this@on.httpClient } doReturn httpClient
             on { this@on.resources } doReturn resources
             on { this@on.uriQuote } doReturn uriQuote
         }
@@ -240,9 +237,8 @@ class PermissionGrantedBasicInputTest {
             val input = object : BasicInput<String>, Input.HasPermission {
                 override suspend fun withData(
                     match: String,
-                    apiClient: ApiClient,
+                    engine: HttpClientEngine,
                     log: Log,
-                    httpClient: HttpClient,
                     uriQuote: UriQuote,
                     coroutineContext: CoroutineContext,
                     block: suspend (String) -> ParseResult,
@@ -267,8 +263,8 @@ class PermissionGrantedBasicInputTest {
             val lastAttempt = null
             val permission = Permission.ALWAYS
             val stateContext: ConversionStateContext = mock {
+                on { this@on.engine } doReturn engine
                 on { this@on.log } doReturn log
-                on { this@on.httpClient } doReturn httpClient
                 on { this@on.resources } doReturn resources
                 on { this@on.uriQuote } doReturn uriQuote
             }
@@ -309,9 +305,8 @@ class PermissionGrantedBasicInputTest {
             val input = object : BasicInput<String>, Input.HasPermission {
                 override suspend fun withData(
                     match: String,
-                    apiClient: ApiClient,
+                    engine: HttpClientEngine,
                     log: Log,
-                    httpClient: HttpClient,
                     uriQuote: UriQuote,
                     coroutineContext: CoroutineContext,
                     block: suspend (String) -> ParseResult,
@@ -336,8 +331,8 @@ class PermissionGrantedBasicInputTest {
             val lastAttempt = Attempt<RecoverableNetworkException>(1, ConnectionClosedNetworkException(EOFException()))
             val permission = Permission.ALWAYS
             val stateContext: ConversionStateContext = mock {
+                on { this@on.engine } doReturn engine
                 on { this@on.log } doReturn log
-                on { this@on.httpClient } doReturn httpClient
                 on { this@on.resources } doReturn resources
                 on { this@on.uriQuote } doReturn uriQuote
             }
@@ -378,9 +373,8 @@ class PermissionGrantedBasicInputTest {
             val input = object : BasicInput<String>, Input.HasPermission {
                 override suspend fun withData(
                     match: String,
-                    apiClient: ApiClient,
+                    engine: HttpClientEngine,
                     log: Log,
-                    httpClient: HttpClient,
                     uriQuote: UriQuote,
                     coroutineContext: CoroutineContext,
                     block: suspend (String) -> ParseResult,
@@ -405,8 +399,8 @@ class PermissionGrantedBasicInputTest {
             val lastAttempt = Attempt<RecoverableNetworkException>(3, ConnectionClosedNetworkException(EOFException()))
             val permission = Permission.ALWAYS
             val stateContext: ConversionStateContext = mock {
+                on { this@on.engine } doReturn engine
                 on { this@on.log } doReturn log
-                on { this@on.httpClient } doReturn httpClient
                 on { this@on.resources } doReturn resources
                 on { this@on.uriQuote } doReturn uriQuote
             }
@@ -441,9 +435,8 @@ class PermissionGrantedBasicInputTest {
             val input = object : BasicInput<String>, Input.HasPermission {
                 override suspend fun withData(
                     match: String,
-                    apiClient: ApiClient,
+                    engine: HttpClientEngine,
                     log: Log,
-                    httpClient: HttpClient,
                     uriQuote: UriQuote,
                     coroutineContext: CoroutineContext,
                     block: suspend (String) -> ParseResult,
@@ -468,8 +461,8 @@ class PermissionGrantedBasicInputTest {
             val lastAttempt = null
             val permission = Permission.ALWAYS
             val stateContext: ConversionStateContext = mock {
+                on { this@on.engine } doReturn engine
                 on { this@on.log } doReturn log
-                on { this@on.httpClient } doReturn httpClient
                 on { this@on.resources } doReturn resources
                 on { this@on.uriQuote } doReturn uriQuote
             }

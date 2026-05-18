@@ -1,7 +1,8 @@
 package page.ooooo.geoshare.lib.conversion
 
 import android.content.res.Resources
-import io.ktor.client.HttpClient
+import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.engine.cio.CIO
 import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
@@ -18,8 +19,8 @@ class ConversionStateContext(
     val outputRepository: OutputRepository,
     val resources: Resources,
     val userPreferencesRepository: UserPreferencesRepository,
+    val engine: HttpClientEngine = CIO.create(),
     val log: Log = DefaultLog,
-    val httpClient: HttpClient = page.ooooo.geoshare.lib.network.HttpClient(log = log),
     val billing: Billing,
     val uriQuote: UriQuote = DefaultUriQuote,
     val onStateChange: (State) -> Unit = {},

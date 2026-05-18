@@ -27,11 +27,10 @@ import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.calcExponentialBackoffMillis
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
-import page.ooooo.geoshare.lib.inputs.WebViewInput
+import page.ooooo.geoshare.lib.inputs.BasicInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.ParseResult
-import page.ooooo.geoshare.lib.inputs.BasicInput
-import page.ooooo.geoshare.lib.network.ApiClient
+import page.ooooo.geoshare.lib.inputs.WebViewInput
 import page.ooooo.geoshare.lib.network.MaxAttemptsReachedNetworkException
 import page.ooooo.geoshare.lib.network.RecoverableNetworkException
 import page.ooooo.geoshare.lib.network.UnrecoverableNetworkException
@@ -231,9 +230,8 @@ data class PermissionGrantedBasicInput<T>(
                 }
                 val result = input.withData(
                     match,
-                    ApiClient(stateContext.userPreferencesRepository),
+                    stateContext.engine,
                     stateContext.log,
-                    stateContext.httpClient,
                     stateContext.uriQuote,
                 ) { data ->
                     input.parse(data, match, prevResult, stateContext.uriQuote, stateContext.log)

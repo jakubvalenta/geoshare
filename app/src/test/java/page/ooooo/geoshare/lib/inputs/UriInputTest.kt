@@ -5,14 +5,11 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
-import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.network.ApiClient
-import page.ooooo.geoshare.lib.network.HttpClient
 
 class UriInputTest {
     val input = object : UriInput {
@@ -26,9 +23,8 @@ class UriInputTest {
             log: Log,
         ) = throw NotImplementedError()
     }
-    private val apiClient = ApiClient(userPreferencesRepository = FakeUserPreferencesRepository())
     private val log = FakeLog
-    private val httpClient = HttpClient(MockEngine { throw NotImplementedError() }, log)
+    private val engine = MockEngine { throw NotImplementedError() }
     private val uriQuote = FakeUriQuote
 
     @Test
@@ -42,9 +38,7 @@ class UriInputTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
             ParseResult(nextStep = NextStep(DebugUriInput, match)),
-            input.withData(
-                match, apiClient, log, httpClient, uriQuote, coroutineContext = testScheduler
-            ) { data ->
+            input.withData(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
                     nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
                 )
@@ -57,9 +51,7 @@ class UriInputTest {
         val match = "https://[invalid:ipv6]/"
         assertEquals(
             ParseResult(nextStep = NextStep(DebugUriInput, match)),
-            input.withData(
-                match, apiClient, log, httpClient, uriQuote, coroutineContext = testScheduler
-            ) { data ->
+            input.withData(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
                     nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
                 )
