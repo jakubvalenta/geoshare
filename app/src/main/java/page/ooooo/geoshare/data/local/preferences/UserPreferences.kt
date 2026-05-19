@@ -126,7 +126,7 @@ object CoordinateFormatPreference : OptionsPreference<CoordinateFormat> {
 // TODO Rename to API base URL
 object ApiEndpointPreference : TextPreference<URL> {
     override val key = stringPreferencesKey("api_endpoint")
-    override val default = URL("http://10.0.2.2:8080")
+    override val default = URL("http://localhost:8080") // TODO Replace with real host
     val loading = default
 
     override fun serialize(value: URL, log: Log) = value.toString()
