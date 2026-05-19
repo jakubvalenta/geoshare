@@ -343,7 +343,7 @@ class GoogleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    FakeInputRepository.googleMapsPlaceListInput,
+                    FakeInputRepository.googleMapsHtmlInput,
                     "https://www.google.com/maps/placelists/list/XXX?g_ep=ghijkl%3D&g_st=isi"
                 )
             ),
@@ -356,7 +356,7 @@ class GoogleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    FakeInputRepository.googleMapsPlaceListInput,
+                    FakeInputRepository.googleMapsHtmlInput,
                     "https://www.google.com/maps/@/data=!3m1!4b1!4m3!11m2!2sXXX!3e3?skid=foo&g_ep=bar&entry=tts"
                 )
             ),
@@ -854,7 +854,7 @@ class GoogleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    FakeInputRepository.googleMapsPlaceListInput,
+                    FakeInputRepository.googleMapsHtmlInput,
                     "https://www.google.com/maps/d/edit?mid=XXX"
                 )
             ),
@@ -863,7 +863,7 @@ class GoogleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    FakeInputRepository.googleMapsPlaceListInput,
+                    FakeInputRepository.googleMapsHtmlInput,
                     "https://www.google.com/maps/d/viewer?mid=XXX"
                 )
             ),

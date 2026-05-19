@@ -30,7 +30,6 @@ import javax.inject.Singleton
 @Singleton
 class GoogleMapsUriInput @Inject constructor(
     private val googleMapsHtmlInput: dagger.Lazy<GoogleMapsHtmlInput<*>>,
-    private val googleMapsPlaceListInput: dagger.Lazy<GoogleMapsPlaceListInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
     override val pattern =
@@ -144,7 +143,8 @@ class GoogleMapsUriInput @Inject constructor(
                 // https://www.google.com/maps/d/view?mid={id}
                 firstPart == "placelists" || firstPart == "@" || firstPart == "d" -> {
                     // Go to HTML parsing
-                    nextStep = NextStep(googleMapsPlaceListInput.get(), match)
+                    // TODO Go to googleMapsPlaceListInput()
+                    nextStep = NextStep(googleMapsHtmlInput.get(), match)
                 }
 
                 // Search

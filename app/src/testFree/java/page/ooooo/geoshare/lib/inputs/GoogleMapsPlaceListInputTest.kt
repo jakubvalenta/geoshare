@@ -4,12 +4,14 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import page.ooooo.geoshare.data.di.FakeInputRepository
+import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 
 class GoogleMapsPlaceListInputTest : InputTest {
-    private val input = FakeInputRepository.googleMapsPlaceListInput
+    private val input = GoogleMapsPlaceListInput(
+        log = FakeLog,
+    )
 
     @Test
     fun parse_whenDataIsValidJsonObject_returnsPoints() = runTest {

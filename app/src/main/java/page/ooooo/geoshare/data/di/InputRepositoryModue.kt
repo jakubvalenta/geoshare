@@ -22,7 +22,6 @@ import page.ooooo.geoshare.lib.inputs.DebugUriInput
 import page.ooooo.geoshare.lib.inputs.DebugWebViewInput
 import page.ooooo.geoshare.lib.inputs.GeoUriInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInput
-import page.ooooo.geoshare.lib.inputs.GoogleMapsPlaceListInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsShortLinkInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsUriInput
 import page.ooooo.geoshare.lib.inputs.HereWeGoUriInput
@@ -158,24 +157,12 @@ object FakeInputRepository : InputRepository {
     )
     override val googleMapsUriInput = GoogleMapsUriInput(
         googleMapsHtmlInput = { googleMapsHtmlInput },
-        googleMapsPlaceListInput = { googleMapsPlaceListInput },
         uriQuote = uriQuote,
     )
     val googleMapsHtmlInput = object : GoogleMapsHtmlInput<Unit> {
-        override suspend fun fetch(
-            match: String,
-            block: suspend (Unit) -> ParseResult,
-        ) = throw NotImplementedError()
-
-        override suspend fun parse(
-            data: Unit,
-            match: String,
-            prevResult: ParseResult?,
-        ) = throw NotImplementedError()
+        override suspend fun fetch(match: String, block: suspend (Unit) -> ParseResult) = throw NotImplementedError()
+        override suspend fun parse(data: Unit, match: String, prevResult: ParseResult?) = throw NotImplementedError()
     }
-    val googleMapsPlaceListInput = GoogleMapsPlaceListInput(
-        log = log,
-    )
     override val hereWeGoUriInput = HereWeGoUriInput(
         uriQuote = uriQuote,
     )

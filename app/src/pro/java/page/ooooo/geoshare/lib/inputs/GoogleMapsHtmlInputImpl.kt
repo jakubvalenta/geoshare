@@ -57,6 +57,15 @@ class GoogleMapsHtmlInputImpl @Inject constructor(
                         return@buildParseResult
                     }
 
+                // Place list
+                // https://www.google.com/maps/placelists/list/{id}
+                // https://www.google.com/maps/@/data=!3m1!4b1!...!2s{id}
+                // https://www.google.com/maps/d/edit?mid={id}
+                // https://www.google.com/maps/d/view?mid={id}
+                "placelists", "@", "d" -> {
+                    // TODO Show an error that place lists are not supported
+                }
+
                 // Search
                 // https://www.google.com/maps/search/{query}
                 "search" ->
