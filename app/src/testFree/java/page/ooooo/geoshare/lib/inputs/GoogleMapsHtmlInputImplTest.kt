@@ -7,7 +7,7 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 
-class GoogleMapsHtmlInputTest : InputTest {
+class GoogleMapsHtmlInputImplTest : InputTest {
     private val googleMapsWebViewInput = GoogleMapsWebViewInput(
         googleMapsUriInput = { throw NotImplementedError() },
     )
@@ -15,7 +15,7 @@ class GoogleMapsHtmlInputTest : InputTest {
         googleMapsHtmlInput = { throw NotImplementedError() },
         googleMapsPlaceListInput = { throw NotImplementedError() },
     )
-    private val input = GoogleMapsHtmlInput(
+    private val input = GoogleMapsHtmlInputImpl(
         googleMapsUriInput = { googleMapsUriInput },
         googleMapsWebViewInput = { googleMapsWebViewInput },
     )

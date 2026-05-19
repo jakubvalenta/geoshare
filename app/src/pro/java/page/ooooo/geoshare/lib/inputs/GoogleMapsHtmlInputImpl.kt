@@ -12,10 +12,10 @@ import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 
 @Singleton
-class GoogleMapsHtmlInput @Inject constructor(
-    private val googleMapsAddressApiInput: dagger.Lazy<GoogleMapsAddressApiInput> = { throw NotImplementedError() },
-    private val googleMapsPlaceApiInput: dagger.Lazy<GoogleMapsPlaceApiInput> = { throw NotImplementedError() },
-) : BasicInput<Uri> {
+class GoogleMapsHtmlInputImpl @Inject constructor(
+    private val googleMapsAddressApiInput: dagger.Lazy<GoogleMapsAddressApiInput>,
+    private val googleMapsPlaceApiInput: dagger.Lazy<GoogleMapsPlaceApiInput>,
+) : GoogleMapsHtmlInput<Uri>, BasicInput<Uri> {
 
     override suspend fun fetch(
         match: String,

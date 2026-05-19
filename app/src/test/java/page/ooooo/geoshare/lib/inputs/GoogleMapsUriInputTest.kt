@@ -1,15 +1,36 @@
 package page.ooooo.geoshare.lib.inputs
 
+import io.ktor.client.engine.HttpClientEngine
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import page.ooooo.geoshare.lib.Log
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
+import kotlin.coroutines.CoroutineContext
 
 class GoogleMapsUriInputTest : InputTest {
-    private val googleMapsHtmlInput = GoogleMapsHtmlInput()
+    private val googleMapsHtmlInput = object : GoogleMapsHtmlInput<Unit> {
+        override suspend fun fetch(
+            match: String,
+            engine: HttpClientEngine,
+            log: Log,
+            uriQuote: UriQuote,
+            coroutineContext: CoroutineContext,
+            block: suspend (Unit) -> ParseResult,
+        ) = throw NotImplementedError()
+
+        override suspend fun parse(
+            data: Unit,
+            match: String,
+            prevResult: ParseResult?,
+            uriQuote: UriQuote,
+            log: Log,
+        ) = throw NotImplementedError()
+    }
     private val googleMapsPlaceListInput = GoogleMapsPlaceListInput()
     private val input = GoogleMapsUriInput(
         googleMapsHtmlInput = { googleMapsHtmlInput },

@@ -25,11 +25,12 @@ import javax.inject.Singleton
  *
  * If the URI contains a Plus Code, e.g. https://www.google.com/maps/place/8FJ3HVHW%2B96, it doesn't process the code
  * but only puts it in the point name. The reason is that Plus Codes are handled by [PlusCodeInput], which has higher
- * priority, so URIs containing Plus Codes should never reach [GoogleMapsUriInput].
+ * priority in [page.ooooo.geoshare.data.InputRepository], so Google Maps URIs containing Plus Codes should never reach
+ * [GoogleMapsUriInput].
  */
 @Singleton
 class GoogleMapsUriInput @Inject constructor(
-    private val googleMapsHtmlInput: dagger.Lazy<GoogleMapsHtmlInput>,
+    private val googleMapsHtmlInput: dagger.Lazy<GoogleMapsHtmlInput<*>>,
     private val googleMapsPlaceListInput: dagger.Lazy<GoogleMapsPlaceListInput>,
 ) : UriInput, Input.HasRandomUri {
     override val pattern =
