@@ -28,8 +28,12 @@ import page.ooooo.geoshare.lib.inputs.YandexMapsUriInput
 import javax.inject.Inject
 import javax.inject.Singleton
 
+interface InputRepository {
+    val all: List<Input<*>>
+}
+
 @Singleton
-class InputRepository @Inject constructor(
+class DefaultInputRepository @Inject constructor(
     amapShortLinkInput: AmapShortLinkInput,
     amapUriInput: AmapUriInput,
     appleMapsUriInput: AppleMapsUriInput,
@@ -53,14 +57,14 @@ class InputRepository @Inject constructor(
     wazeUriInput: WazeUriInput,
     yandexMapsShortLinkInput: YandexMapsShortLinkInput,
     yandexMapsUriInput: YandexMapsUriInput,
-) {
+) : InputRepository {
     /**
-     * All [page.ooooo.geoshare.lib.inputs.Input] objects.
+     * All [Input] objects.
      *
      * Order matters, because [page.ooooo.geoshare.lib.conversion.ConversionState] will try the inputs in order when
      * parsing a URI.
      */
-    val all = listOf<Input<*>>(
+    override val all = listOf(
         geoUriInput,
         plusCodeInput,
         googleMapsShortLinkInput,

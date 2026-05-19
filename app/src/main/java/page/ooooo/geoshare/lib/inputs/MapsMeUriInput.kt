@@ -9,10 +9,11 @@ import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.decodeGe0Hash
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class MapsMeUriInput : UriInput {
+class MapsMeUriInput @Inject constructor() : UriInput {
     override val pattern = Regex("""((?:(?:https?://)?(?:comaps\.at|ge0\.me|omaps\.app)|ge0:/)/$URI_REST)""")
     override val documentation = InputDocumentation(
         group = InputDocumentationGroup.MAPS_ME,

@@ -13,7 +13,7 @@ import javax.inject.Singleton
 
 @Singleton
 class GoogleMapsShortLinkInput @Inject constructor(
-    private val googleMapsUriInput: GoogleMapsUriInput,
+    private val googleMapsUriInput: dagger.Lazy<GoogleMapsUriInput>,
 ) : HeadLocationHeaderInput {
     override val pattern = Regex("""((?:https?://)?(?:(?:maps\.)?(?:app\.)?goo\.gl|g\.co)/[/A-Za-z0-9_-]+)""")
     override val documentation = InputDocumentation(
@@ -46,11 +46,11 @@ class GoogleMapsShortLinkInput @Inject constructor(
             // Google Maps Go
             // https://maps.app.goo.gl/?link={url}
             queryParams["link"]?.takeIf { it.isNotEmpty() }?.let {
-                nextStep = NextStep(GoogleMapsUriInput, it)
+                nextStep = NextStep(googleMapsUriInput.get(), it)
                 return@buildParseResult
             }
 
-            nextStep = NextStep(GoogleMapsUriInput, data.toString())
+            nextStep = NextStep(googleMapsUriInput.get(), data.toString())
         }
     }
 

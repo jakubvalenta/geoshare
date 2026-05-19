@@ -23,6 +23,7 @@ class UriInputTest {
             log: Log,
         ) = throw NotImplementedError()
     }
+    private val nextInput = OsmAndUriInput()
     private val log = FakeLog
     private val engine = MockEngine { throw NotImplementedError() }
     private val uriQuote = FakeUriQuote
@@ -37,10 +38,10 @@ class UriInputTest {
     fun withData_whenDataIsValidUrl_returnsUri() = runTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
-            ParseResult(nextStep = NextStep(DebugUriInput, match)),
+            ParseResult(nextStep = NextStep(nextInput, match)),
             input.withData(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
-                    nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
+                    nextStep = NextStep(nextInput, data.toString()) // Store data in nextStep, so we can test it
                 )
             }
         )
@@ -50,10 +51,10 @@ class UriInputTest {
     fun withData_whenDataIsInvalidUrl_returnsUri() = runTest {
         val match = "https://[invalid:ipv6]/"
         assertEquals(
-            ParseResult(nextStep = NextStep(DebugUriInput, match)),
+            ParseResult(nextStep = NextStep(nextInput, match)),
             input.withData(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
-                    nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
+                    nextStep = NextStep(nextInput, data.toString()) // Store data in nextStep, so we can test it
                 )
             }
         )

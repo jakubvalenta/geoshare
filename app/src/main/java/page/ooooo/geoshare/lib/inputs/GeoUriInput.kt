@@ -17,10 +17,11 @@ import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GeoUriInput : UriInput, Input.HasRandomUri {
+class GeoUriInput @Inject constructor() : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""(geo:$LAT_NUM,$LON_NUM\?q=$LAT_NUM,\s*$LON_NUM|geo:$URI_REST)""")
     override val documentation = InputDocumentation(
         group = InputDocumentationGroup.GEO_URI,

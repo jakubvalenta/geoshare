@@ -13,10 +13,13 @@ import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
 import page.ooooo.geoshare.lib.geo.Source
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class BaiduMapUriInput : UriInput {
+class BaiduMapUriInput @Inject constructor(
+    private val baiduMapWebViewInput: dagger.Lazy<BaiduMapWebViewInput>,
+) : UriInput {
     override val pattern = Regex("""((?:https?://)?(?:j\.)?map\.baidu\.com/$URI_REST)""")
 
     override val documentation = InputDocumentation(
@@ -48,7 +51,7 @@ class BaiduMapUriInput : UriInput {
                     // https://map.baidu.com/?poiShareId={id}
                     // https://map.baidu.com/?shareurl=1&poiShareUid={uid}
                     // https://map.baidu.com/?newmap=1&s=inf%26uid%3D{uid}
-                    nextStep = NextStep(BaiduMapWebViewInput, match)
+                    nextStep = NextStep(baiduMapWebViewInput.get(), match)
                 }
 
             } else if (firstPart.startsWith('@')) {
@@ -92,7 +95,7 @@ class BaiduMapUriInput : UriInput {
                     ?: run {
                         // Mobile place detail without coords
                         // "https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid={uid}/act=read_share&vt=map&da_from=weixin&openna=1"
-                        nextStep = NextStep(BaiduMapWebViewInput, match)
+                        nextStep = NextStep(baiduMapWebViewInput.get(), match)
                     }
             }
         }

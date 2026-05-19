@@ -8,10 +8,13 @@ import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.decodeBasicHtmlEntities
 import page.ooooo.geoshare.lib.extensions.groupOrNull
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class UrbiHtmlInput : BodyAsChannelInput {
+class UrbiHtmlInput @Inject constructor(
+    private val urbiUriInput: dagger.Lazy<UrbiUriInput>,
+) : BodyAsChannelInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_urbi_permission_title
 
@@ -32,7 +35,7 @@ class UrbiHtmlInput : BodyAsChannelInput {
         while (true) {
             val line = data.readLine() ?: break
             pattern.find(line)?.groupOrNull()?.let { attr ->
-                nextStep = NextStep(UrbiUriInput, attr.decodeBasicHtmlEntities())
+                nextStep = NextStep(urbiUriInput.get(), attr.decodeBasicHtmlEntities())
                 return@buildParseResult
             }
         }

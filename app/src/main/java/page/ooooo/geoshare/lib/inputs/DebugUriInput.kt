@@ -13,7 +13,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class DebugUriInput @Inject constructor(
-    private val debugWebViewInput: DebugWebViewInput,
+    private val debugWebViewInput: dagger.Lazy<DebugWebViewInput>,
 ) : UriInput {
     override val pattern = Regex("""((?:https?://)?(?:www\.)?example\.com(?:/\S+|$))""")
     override val documentation = InputDocumentation(
@@ -28,7 +28,7 @@ class DebugUriInput @Inject constructor(
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {
-        nextStep = NextStep(DebugWebViewInput, match)
+        nextStep = NextStep(debugWebViewInput.get(), match)
     }
 
     override fun toString() = "DebugUriInput"

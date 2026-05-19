@@ -23,7 +23,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class UrbiUriInput @Inject constructor(
-    private val urbiHtmlInput: UrbiHtmlInput,
+    private val urbiHtmlInput: dagger.Lazy<UrbiHtmlInput>,
 ) : UriInput, Input.HasRandomUri {
     override val pattern =
         Regex("""((?:https?://)?(?:www\.)?(?:(?:go|maps)\.)?(?:2gis|urbi|urbi-[a-z]{2})(?:\.[a-z]{2,3})?\.[a-z]{2,3}/$URI_REST)""")
@@ -92,7 +92,7 @@ class UrbiUriInput @Inject constructor(
                 return@run
             }
 
-            nextStep = NextStep(UrbiHtmlInput, match)
+            nextStep = NextStep(urbiHtmlInput.get(), match)
         }
     }
 

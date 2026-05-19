@@ -29,7 +29,6 @@ import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.inputs.BasicInput
 import page.ooooo.geoshare.lib.inputs.Input
-import page.ooooo.geoshare.lib.inputs.NextStep
 import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.inputs.WebViewInput
 import page.ooooo.geoshare.lib.network.MaxAttemptsReachedNetworkException
@@ -229,14 +228,12 @@ data class PermissionGrantedBasicInput<T>(
                     )
                     delay(delayMillis)
                 }
-                val result = input.withData(
-                    match,
-                    stateContext.engine,
-                    stateContext.log,
-                    stateContext.uriQuote,
-                ) { data ->
-                    input.parse(data, match, prevResult, stateContext.uriQuote, stateContext.log)
-                }
+                val result =
+                    input.withData(
+                        match, stateContext.engine, stateContext.log, stateContext.uriQuote
+                    ) { data ->
+                        input.parse(data, match, prevResult, stateContext.uriQuote, stateContext.log)
+                    }
                 DataParsed(stateContext, source, match, input, result, permission, prevResult)
             } catch (_: MalformedURLException) {
                 ConversionFailed(

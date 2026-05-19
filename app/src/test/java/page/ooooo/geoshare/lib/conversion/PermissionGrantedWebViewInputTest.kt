@@ -21,7 +21,6 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.DebugUriInput
-import page.ooooo.geoshare.lib.inputs.DebugWebViewInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsWebViewInput
 import page.ooooo.geoshare.lib.inputs.NextStep
 import page.ooooo.geoshare.lib.inputs.ParseResult
@@ -40,11 +39,16 @@ class PermissionGrantedWebViewInputTest {
             getString(R.string.conversion_loading_indicator_description, 2, 10, "connection closed")
         } doReturn "Attempt 2 out of 10 due to connection closed."
     }
+    private val source = "https://maps.google.com/foo"
+    private val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+    private val prevResult = ParseResult(prevPoints)
+    private val debugUriInput = DebugUriInput(
+        debugWebViewInput = { throw NotImplementedError() }
+    )
     private val uriQuote = FakeUriQuote
 
     @Test
     fun transition_whenSetDataIsCalled_returnsDataParsed() = runTest {
-        val source = "https://maps.google.com/foo"
         val input = object : WebViewInput {
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
@@ -58,11 +62,9 @@ class PermissionGrantedWebViewInputTest {
                 log: Log,
             ) = ParseResult(
                 prevResult?.points ?: persistentListOf(),
-                nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
+                nextStep = NextStep(debugUriInput, data) // Store data in nextStep, so we can test it
             )
         }
-        val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val prevResult = ParseResult(prevPoints)
         val permission = Permission.ALWAYS
         val timeout = 7.seconds
         val stateContext: ConversionStateContext = mock {
@@ -85,7 +87,7 @@ class PermissionGrantedWebViewInputTest {
                 source,
                 match = source,
                 input,
-                ParseResult(prevPoints, nextStep = NextStep(DebugUriInput, "${source}-data")),
+                ParseResult(prevPoints, nextStep = NextStep(debugUriInput, "${source}-data")),
                 permission,
                 prevResult,
             ),
@@ -95,7 +97,6 @@ class PermissionGrantedWebViewInputTest {
 
     @Test
     fun transition_whenSetDataIsNotCalledWithinTimeout_returnsConversionFailed() = runTest {
-        val source = "https://maps.google.com/foo"
         val input = object : WebViewInput {
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
@@ -109,11 +110,9 @@ class PermissionGrantedWebViewInputTest {
                 log: Log,
             ) = ParseResult(
                 prevResult?.points ?: persistentListOf(),
-                nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
+                nextStep = NextStep(debugUriInput, data) // Store data in nextStep, so we can test it
             )
         }
-        val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val prevResult = ParseResult(prevPoints)
         val permission = Permission.ALWAYS
         val timeout = 7.seconds
         val stateContext: ConversionStateContext = mock {
@@ -138,7 +137,6 @@ class PermissionGrantedWebViewInputTest {
 
     @Test
     fun transition_whenInputParseThrowsCancellationException_returnsConversionFailed() = runTest {
-        val source = "https://maps.google.com/foo"
         val input = object : WebViewInput {
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
@@ -152,8 +150,6 @@ class PermissionGrantedWebViewInputTest {
                 log: Log,
             ) = throw CancellationException()
         }
-        val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val prevResult = ParseResult(prevPoints)
         val permission = Permission.ALWAYS
         val timeout = 7.seconds
         val stateContext: ConversionStateContext = mock {
@@ -178,7 +174,6 @@ class PermissionGrantedWebViewInputTest {
 
     @Test
     fun transition_whenItIsCancelled_returnsConversionFailed() = runTest {
-        val source = "https://maps.google.com/foo"
         val input = object : WebViewInput {
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
@@ -192,8 +187,6 @@ class PermissionGrantedWebViewInputTest {
                 log: Log,
             ) = ParseResult()
         }
-        val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val prevResult = ParseResult(prevPoints)
         val permission = Permission.ALWAYS
         val timeout = 7.seconds
         val stateContext: ConversionStateContext = mock {
@@ -223,8 +216,9 @@ class PermissionGrantedWebViewInputTest {
 
     @Test
     fun getLoadingIndicator_whenLastAttemptIsNull_returnsLargeLoadingIndicatorWithoutDescription() = runTest {
-        val source = "https://maps.google.com/foo"
-        val input = GoogleMapsWebViewInput()
+        val input = GoogleMapsWebViewInput(
+            googleMapsUriInput = { throw NotImplementedError() },
+        )
         val stateContext: ConversionStateContext = mock {
             on { this@on.resources } doReturn resources
         }

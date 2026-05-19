@@ -18,13 +18,13 @@ import kotlin.time.measureTime
 
 class ActionSucceededTest {
     private val coordinateConverter: CoordinateConverter = mock()
+    private val source = "https://maps.google.com/foo"
+    private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+    private val output = SavePointsGpxOutput(coordinateConverter)
+    private val actionResult = ActionResult.SucceededAndFinish
 
     @Test
     fun transition_whenExecutionIsNotCancelled_waitsAndReturnsActionFinished() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val output = SavePointsGpxOutput(coordinateConverter)
-        val actionResult = ActionResult.SucceededAndFinish
         val state = ActionSucceeded(source, points, actionResult, output)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
@@ -37,10 +37,6 @@ class ActionSucceededTest {
 
     @Test
     fun transition_whenExecutionIsCancelled_returnsActionFinished() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val output = SavePointsGpxOutput(coordinateConverter)
-        val actionResult = ActionResult.SucceededAndFinish
         val state = ActionSucceeded(source, points, actionResult, output)
         var res: State? = null
         val job = launch {

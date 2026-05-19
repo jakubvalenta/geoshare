@@ -13,12 +13,13 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 @Singleton
-class HereWeGoUriInput : UriInput, Input.HasRandomUri {
+class HereWeGoUriInput @Inject constructor() : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:https?://)?(?:share|wego)\.here\.com/$URI_REST)""")
     override val documentation = InputDocumentation(
         group = InputDocumentationGroup.HERE_WEGO,

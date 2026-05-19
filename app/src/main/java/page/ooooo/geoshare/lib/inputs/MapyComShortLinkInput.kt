@@ -10,7 +10,7 @@ import javax.inject.Singleton
 
 @Singleton
 class MapyComShortLinkInput @Inject constructor(
-    private val mapyComUriInput: MapyComUriInput,
+    private val mapyComUriInput: dagger.Lazy<MapyComUriInput>,
 ) : GetLastHopUrlInput {
     override val pattern = Regex("""((?:https?://)?(?:www\.)?mapy\.[a-z]{2,3}/s/\S+)""")
 
@@ -27,7 +27,7 @@ class MapyComShortLinkInput @Inject constructor(
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {
-        nextStep = NextStep(MapyComUriInput, data.toString())
+        nextStep = NextStep(mapyComUriInput.get(), data.toString())
     }
 
     override fun toString() = "MapyComShortLinkInput"

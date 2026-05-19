@@ -11,13 +11,14 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
  * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/
  */
 @Singleton
-class MagicEarthUriInput : UriInput, Input.HasRandomUri {
+class MagicEarthUriInput @Inject constructor() : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:(?:https?://)?magicearth.com|magicearth:/)/\?$URI_REST)""")
     override val documentation = InputDocumentation(
         group = InputDocumentationGroup.MAGIC_EARTH,

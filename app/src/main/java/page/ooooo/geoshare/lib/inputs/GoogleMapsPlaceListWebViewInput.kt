@@ -10,10 +10,11 @@ import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GoogleMapsPlaceListWebViewInput : WebViewInput {
+class GoogleMapsPlaceListWebViewInput @Inject constructor() : WebViewInput {
 
     @Serializable
     private data class ExtractedPoint(val lat: Double?, val lon: Double?)

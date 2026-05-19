@@ -22,7 +22,7 @@ import kotlin.coroutines.CoroutineContext
 
 @Singleton
 class GoogleMapsPlaceApiInput @Inject constructor(
-    private val apiService: ApiService,
+    private val apiService: dagger.Lazy<ApiService>,
 ) : BasicInput<ApiService.GoogleMapsResult>, Input.HasPermission {
 
     @StringRes
@@ -39,21 +39,22 @@ class GoogleMapsPlaceApiInput @Inject constructor(
         coroutineContext: CoroutineContext,
         block: suspend (ApiService.GoogleMapsResult) -> ParseResult,
     ): ParseResult =
-        apiService
-            .createHttpClient(engine)
-            .use { client ->
-                client
-                    .prepareRequest {
-                        url(apiService.getEndpoint())
-                            .appendPathSegments("v1", "google-maps", "geocode", "place", match)
-                        headers {
-                            accept(ContentType.Application.Json)
+        apiService.get().run {
+            createHttpClient(engine)
+                .use { client ->
+                    client
+                        .prepareRequest {
+                            url(getEndpoint())
+                                .appendPathSegments("v1", "google-maps", "geocode", "place", match)
+                            headers {
+                                accept(ContentType.Application.Json)
+                            }
                         }
-                    }
-                    .execute { response ->
-                        block(response.body())
-                    }
-            }
+                        .execute { response ->
+                            block(response.body())
+                        }
+                }
+        }
 
     override suspend fun parse(
         data: ApiService.GoogleMapsResult,

@@ -10,7 +10,7 @@ import javax.inject.Singleton
 
 @Singleton
 class YandexMapsShortLinkInput @Inject constructor(
-    private val yandexMapsUriInput: YandexMapsUriInput,
+    private val yandexMapsUriInput: dagger.Lazy<YandexMapsUriInput>,
 ) : HeadLocationHeaderInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_yandex_maps_permission_title
@@ -27,7 +27,7 @@ class YandexMapsShortLinkInput @Inject constructor(
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {
-        nextStep = NextStep(YandexMapsUriInput, data.toString())
+        nextStep = NextStep(yandexMapsUriInput.get(), data.toString())
     }
 
     override fun toString() = "YandexMapsShortLinkInput"

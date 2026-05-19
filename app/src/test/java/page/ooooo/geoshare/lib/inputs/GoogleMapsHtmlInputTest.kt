@@ -8,7 +8,18 @@ import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 
 class GoogleMapsHtmlInputTest : InputTest {
-    private val input = GoogleMapsHtmlInput(GoogleMapsWebViewInput())
+    private val googleMapsWebViewInput = GoogleMapsWebViewInput(
+        googleMapsUriInput = { throw NotImplementedError() },
+    )
+    private val googleMapsUriInput = GoogleMapsUriInput(
+        googleMapsHtmlInput = { throw NotImplementedError() },
+        googleMapsPlaceApiInput = { throw NotImplementedError() },
+        googleMapsPlaceListWebViewInput = { throw NotImplementedError() },
+    )
+    private val input = GoogleMapsHtmlInput(
+        googleMapsUriInput = { googleMapsUriInput },
+        googleMapsWebViewInput = { googleMapsWebViewInput },
+    )
 
     @Test
     fun parse_link() = runTest {
@@ -52,7 +63,7 @@ class GoogleMapsHtmlInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    GoogleMapsWebViewInput,
+                    googleMapsWebViewInput,
                     "https://www.google.com/maps/place/Berlin,+Germany/"
                 )
             ),
@@ -180,7 +191,7 @@ class GoogleMapsHtmlInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    GoogleMapsWebViewInput,
+                    googleMapsWebViewInput,
                     "https://www.google.com/maps/place/Berlin,+Germany/"
                 )
             ),
@@ -193,7 +204,7 @@ class GoogleMapsHtmlInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    GoogleMapsWebViewInput,
+                    googleMapsWebViewInput,
                     "https://www.google.com/maps/place/Berlin,+Germany/"
                 )
             ),
@@ -206,7 +217,7 @@ class GoogleMapsHtmlInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    GoogleMapsUriInput,
+                    googleMapsUriInput,
                     "https://www.google.com/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705%3A0xa9ea51361ed84bda?sa=X&ved=2ahUKEwiY7vv80aeKAxU41QIHHSgBOlsQ4kB6BAgHEAA&hl=de&gl=de"
                 )
             ),
@@ -230,7 +241,7 @@ class GoogleMapsHtmlInputTest : InputTest {
     fun parse_googleSearchHtmlContainsAbsoluteUrl_returnsNextStep() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(GoogleMapsUriInput, "https://www.example.com/foo")
+                nextStep = NextStep(googleMapsUriInput, "https://www.example.com/foo")
             ),
             input.parse("""<html><a href="" data-url="https://www.example.com/foo"></a></html>"""),
         )
@@ -240,7 +251,7 @@ class GoogleMapsHtmlInputTest : InputTest {
     fun parse_googleSearchHtmlContainsInvalidUrl_returnsNextStep() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(GoogleMapsUriInput, "https://example.com//spam")
+                nextStep = NextStep(googleMapsUriInput, "https://example.com//spam")
             ),
             input.parse("""<html><a href="" data-url="spam"></a></html>"""),
         )

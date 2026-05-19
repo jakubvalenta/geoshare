@@ -11,10 +11,11 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.network.DESKTOP_USER_AGENT
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class BaiduMapWebViewInput : WebViewInput {
+class BaiduMapWebViewInput @Inject constructor() : WebViewInput {
 
     @Serializable
     private data class ExtractedPoint(val lat: Double?, val lon: Double?, val z: Double?, val name: String?)

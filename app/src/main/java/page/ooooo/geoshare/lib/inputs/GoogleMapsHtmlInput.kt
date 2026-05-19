@@ -15,11 +15,13 @@ import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Source
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GoogleMapsHtmlInput(
-    private val googleMapsWebViewInput: GoogleMapsWebViewInput,
+class GoogleMapsHtmlInput @Inject constructor(
+    private val googleMapsUriInput: dagger.Lazy<GoogleMapsUriInput>,
+    private val googleMapsWebViewInput: dagger.Lazy<GoogleMapsWebViewInput>,
 ) : BodyAsChannelInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -110,10 +112,10 @@ class GoogleMapsHtmlInput(
                 } else if (redirectUriString != null) {
                     val baseUri = Uri.parse(match, uriQuote)
                     val redirectUri = Uri.parse(redirectUriString, uriQuote).toAbsoluteUri(baseUri)
-                    nextStep = NextStep(GoogleMapsUriInput, redirectUri.toString())
+                    nextStep = NextStep(googleMapsUriInput.get(), redirectUri.toString())
                 } else {
                     // Go to web parsing
-                    nextStep = NextStep(GoogleMapsWebViewInput, match)
+                    nextStep = NextStep(googleMapsWebViewInput.get(), match)
                 }
             }
 

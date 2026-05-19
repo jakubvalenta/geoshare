@@ -29,9 +29,9 @@ import javax.inject.Singleton
  */
 @Singleton
 class GoogleMapsUriInput @Inject constructor(
-    private val googleMapsHtmlInput: GoogleMapsHtmlInput,
-    private val googleMapsPlaceApiInput: GoogleMapsPlaceApiInput,
-    private val googleMapsPlaceListWebViewInput: GoogleMapsPlaceListWebViewInput,
+    private val googleMapsHtmlInput: dagger.Lazy<GoogleMapsHtmlInput>,
+    private val googleMapsPlaceApiInput: dagger.Lazy<GoogleMapsPlaceApiInput>,
+    private val googleMapsPlaceListWebViewInput: dagger.Lazy<GoogleMapsPlaceListWebViewInput>,
 ) : UriInput, Input.HasRandomUri {
     override val pattern =
         Regex("""((?:https?://)?(?:(?:www|maps)\.)?google(?:\.[a-z]{2,3})?\.[a-z]{2,3}[/?#]$URI_REST)""")
@@ -68,7 +68,7 @@ class GoogleMapsUriInput @Inject constructor(
                     points = naivePoints.map { GCJ02MainlandChinaPoint(it).copy(z = z) }.toImmutableList()
                     if (points.any { !it.hasCoordinates() }) {
                         // Go to HTML parsing unless all points have coordinates
-                        nextStep = NextStep(GoogleMapsHtmlInput, match)
+                        nextStep = NextStep(googleMapsHtmlInput.get(), match)
                     }
                     return@run
                 }
@@ -112,7 +112,7 @@ class GoogleMapsUriInput @Inject constructor(
                 Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull()?.let { name ->
                     points = persistentListOf(GCJ02MainlandChinaPoint(z = z, name = name, source = Source.URI))
                     // Go to HTML parsing
-                    nextStep = NextStep(GoogleMapsHtmlInput, match)
+                    nextStep = NextStep(googleMapsHtmlInput.get(), match)
                     return@run
                 }
             }
@@ -129,17 +129,18 @@ class GoogleMapsUriInput @Inject constructor(
                     points = parseParts(parts.drop(1), z)
                     if (points.lastOrNull()?.hasCoordinates() != true) {
                         // Go to HTML parsing
-                        nextStep = NextStep.NextInput(googleMapsHtmlInput, match)
+                        nextStep = NextStep(googleMapsHtmlInput.get(), match)
                     }
                 }
 
                 // Place
                 // https://www.google.com/maps/place/{name}/@{centerX},{centerY},{centerZ}
-                firstPart == "dir" || firstPart == "place" -> {
+                firstPart == "place" -> {
                     points = parseParts(parts.drop(1), z)
                     if (points.lastOrNull()?.hasCoordinates() != true) {
                         // Go to HTML parsing
-                        nextStep = NextStep(GoogleMapsHtmlInput, match)
+                        // TODO Go to API input
+                        nextStep = NextStep(googleMapsHtmlInput.get(), match)
                     }
                 }
 
@@ -150,13 +151,14 @@ class GoogleMapsUriInput @Inject constructor(
                 // https://www.google.com/maps/d/view?mid={id}
                 firstPart == "placelists" || firstPart == "@" || firstPart == "d" -> {
                     // Go to place list WebView parsing
-                    nextStep = NextStep(GoogleMapsPlaceListWebViewInput, match)
+                    nextStep = NextStep(googleMapsPlaceListWebViewInput.get(), match)
                 }
 
                 // Search
                 // https://www.google.com/maps/search/{query}
                 firstPart == "search" -> {
                     points = parseParts(parts.drop(1), z)
+                    // TODO Go to API input
                 }
 
                 // Map center

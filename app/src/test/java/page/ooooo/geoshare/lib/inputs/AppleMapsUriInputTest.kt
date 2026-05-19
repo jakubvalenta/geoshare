@@ -12,7 +12,8 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
  * See https://developer.apple.com/library/archive/featuredarticles/iPhoneURLScheme_Reference/MapLinks/MapLinks.html
  */
 class AppleMapsUriInputTest : InputTest {
-    private val input = AppleMapsUriInput(AppleMapsHtmlInput())
+    private val appleMapsHtmlInput = AppleMapsHtmlInput()
+    private val input = AppleMapsUriInput(appleMapsHtmlInput = { appleMapsHtmlInput })
 
     @Test
     fun match_fullUrl() {
@@ -271,7 +272,7 @@ class AppleMapsUriInputTest : InputTest {
             ParseResult(
                 persistentListOf(),
                 nextStep = NextStep(
-                    AppleMapsHtmlInput,
+                    appleMapsHtmlInput,
                     "https://maps.apple.com/place?auid=17017496253231963769&lsp=7618"
                 )
             ),
@@ -285,7 +286,7 @@ class AppleMapsUriInputTest : InputTest {
             ParseResult(
                 persistentListOf(),
                 nextStep = NextStep(
-                    AppleMapsHtmlInput,
+                    appleMapsHtmlInput,
                     "https://maps.apple.com/place?place-id=I3B04EDEB21D5F86&_provider=9902"
                 )
             ),
@@ -299,7 +300,7 @@ class AppleMapsUriInputTest : InputTest {
             ParseResult(
                 persistentListOf(WGS84Point(name = "Central Park", source = Source.URI)),
                 nextStep = NextStep(
-                    AppleMapsHtmlInput,
+                    appleMapsHtmlInput,
                     "https://maps.apple.com/place?place-id=I3B04EDEB21D5F86&_provider=9902&q=Central+Park"
                 )
             ),
@@ -312,7 +313,7 @@ class AppleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    AppleMapsHtmlInput,
+                    appleMapsHtmlInput,
                     "https://maps.apple/p/7E-Brjrk_THN14"
                 )
             ),

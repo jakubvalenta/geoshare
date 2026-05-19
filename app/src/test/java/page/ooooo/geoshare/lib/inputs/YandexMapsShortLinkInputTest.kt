@@ -6,7 +6,9 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 
 class YandexMapsShortLinkInputTest : InputTest {
-    private val input = YandexMapsShortLinkInput(YandexMapsUriInput(YandexMapsHtmlInput()))
+    private val yandexMapsHtmlInput = YandexMapsHtmlInput()
+    private val yandexMapsUriInput = YandexMapsUriInput(yandexMapsHtmlInput = { yandexMapsHtmlInput })
+    private val input = YandexMapsShortLinkInput(yandexMapsUriInput = { yandexMapsUriInput })
 
     @Test
     fun match_correct() {
@@ -31,7 +33,7 @@ class YandexMapsShortLinkInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    YandexMapsUriInput,
+                    yandexMapsUriInput,
                     "https://yandex.com/maps/org/94933420809/?display-text=Cafes&ll=8.668963,50.111192"
                 )
             ),

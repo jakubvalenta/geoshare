@@ -19,7 +19,7 @@ import javax.inject.Singleton
 
 @Singleton
 class YandexMapsUriInput @Inject constructor(
-    private val yandexMapsHtmlInput: YandexMapsHtmlInput,
+    private val yandexMapsHtmlInput: dagger.Lazy<YandexMapsHtmlInput>,
 ) : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/$URI_REST)""")
     override val documentation = InputDocumentation(
@@ -88,14 +88,14 @@ class YandexMapsUriInput @Inject constructor(
                                     source = Source.URI,
                                 ),
                             )
-                            nextStep = NextStep(YandexMapsHtmlInput, match)
+                            nextStep = NextStep(yandexMapsHtmlInput.get(), match)
                             return@buildParseResult
                         }
 
                         "org" -> {
                             // Old POI -- these links seem to return 404 now; we still keep the code in case they start working again
                             // https://yandex.com/maps/org/{id}?...
-                            nextStep = NextStep(YandexMapsHtmlInput, match)
+                            nextStep = NextStep(yandexMapsHtmlInput.get(), match)
                             return@buildParseResult
                         }
                     }

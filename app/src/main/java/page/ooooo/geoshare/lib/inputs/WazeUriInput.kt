@@ -23,7 +23,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class WazeUriInput @Inject constructor(
-    private val wazeHtmlInput: WazeHtmlInput,
+    private val wazeHtmlInput: dagger.Lazy<WazeHtmlInput>,
 ) : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:https?://)?(?:(?:www|ul)\.)?waze\.com/$URI_REST)""")
 
@@ -94,7 +94,7 @@ class WazeUriInput @Inject constructor(
                 // with this one:
                 // https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020
                 nextStep = NextStep(
-                    WazeHtmlInput,
+                    wazeHtmlInput.get(),
                     Uri(
                         scheme = "https",
                         host = "www.waze.com",
@@ -109,7 +109,7 @@ class WazeUriInput @Inject constructor(
                 // with this one:
                 // https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020
                 nextStep = NextStep(
-                    WazeHtmlInput,
+                    wazeHtmlInput.get(),
                     Uri(
                         scheme = "https",
                         host = "www.waze.com",
@@ -119,7 +119,7 @@ class WazeUriInput @Inject constructor(
                     ).toString(),
                 )
             } ?: queryParams["to"]?.takeIf { it.startsWith("place.") }?.let {
-                nextStep = NextStep(WazeHtmlInput, match)
+                nextStep = NextStep(wazeHtmlInput.get(), match)
             }
         }
     }

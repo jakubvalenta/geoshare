@@ -13,10 +13,11 @@ import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class CoordinateInput : TextInput, Input.HasRandomUri {
+class CoordinateInput @Inject constructor() : TextInput, Input.HasRandomUri {
     override val pattern = Regex("""([\d.\-\p{Zs},°'′"″NSWE]*\d[\d.\-\p{Zs},°'′"″NSWE]*)""")
     override val documentation = InputDocumentation(
         group = InputDocumentationGroup.COORDINATES,

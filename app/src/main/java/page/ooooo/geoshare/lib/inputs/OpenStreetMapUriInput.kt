@@ -18,7 +18,7 @@ import javax.inject.Singleton
 
 @Singleton
 class OpenStreetMapUriInput @Inject constructor(
-    private val openStreetMapApiInput: OpenStreetMapApiInput,
+    private val openStreetMapApiInput: dagger.Lazy<OpenStreetMapApiInput>,
 ) : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:https?://)?(?:www\.)?(?:openstreetmap|osm)\.org/$URI_REST)""")
     override val documentation = InputDocumentation(
@@ -86,7 +86,7 @@ class OpenStreetMapUriInput @Inject constructor(
                 pathParts.getOrNull(1).takeIf { it in setOf("node", "relation", "way") }?.let { type ->
                     pathParts.getOrNull(2)?.let { id ->
                         nextStep = NextStep(
-                            OpenStreetMapApiInput,
+                            openStreetMapApiInput.get(),
                             "https://www.openstreetmap.org/api/0.6/$type/$id${if (type != "node") "/full" else ""}.json",
                         )
                     }

@@ -10,7 +10,7 @@ import javax.inject.Singleton
 
 @Singleton
 class BaiduMapShortLinkInput @Inject constructor(
-    private val baiduMapUriInput: BaiduMapUriInput,
+    private val baiduMapUriInput: dagger.Lazy<BaiduMapUriInput>,
 ) : HeadLocationHeaderInput {
     override val documentation = InputDocumentation(
         group = InputDocumentationGroup.BAIDU_MAP,
@@ -33,7 +33,7 @@ class BaiduMapShortLinkInput @Inject constructor(
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {
-        nextStep = NextStep(BaiduMapUriInput, data.toString())
+        nextStep = NextStep(baiduMapUriInput.get(), data.toString())
     }
 
     override fun toString() = "BaiduMapShortLinkInput"

@@ -12,6 +12,7 @@ import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.decodePlusCode
+import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
@@ -25,7 +26,7 @@ import javax.inject.Singleton
  * See https://plus.codes/
  */
 @Singleton
-class PlusCodeInput : TextInput, Input.HasRandomUri {
+class PlusCodeInput @Inject constructor() : TextInput, Input.HasRandomUri {
     override val pattern = Regex(
         """(?:^|\s|https://www\.google\.com/maps/place/|https://plus\.codes/)($GLOBAL_CODE)(?:\s|/|$)""",
         RegexOption.IGNORE_CASE,

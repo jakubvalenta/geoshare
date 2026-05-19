@@ -10,10 +10,11 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.GCJ02GreaterChinaAndTaiwanPoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AmapUriInput : UriInput, Input.HasRandomUri {
+class AmapUriInput @Inject constructor() : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:https?://)?wb\.amap\.com/$URI_REST)""")
     override val documentation = InputDocumentation(
         group = InputDocumentationGroup.AMAP,

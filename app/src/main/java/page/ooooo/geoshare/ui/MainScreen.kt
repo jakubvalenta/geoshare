@@ -123,8 +123,8 @@ import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.inputs.DebugWebViewInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInput
-import page.ooooo.geoshare.lib.inputs.GoogleMapsWebViewInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.network.ConnectTimeoutNetworkException
 import page.ooooo.geoshare.lib.outputs.Action
@@ -1766,7 +1766,7 @@ private fun WebViewPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://www.example.com/",
-            input = GoogleMapsWebViewInput(),
+            input = DebugWebViewInput(),
             permission = Permission.ALWAYS,
         )
         MainScreen(
@@ -1838,7 +1838,7 @@ private fun DarkWebViewPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://www.example.com/",
-            input = GoogleMapsWebViewInput(),
+            input = DebugWebViewInput(),
             permission = Permission.ALWAYS,
         )
         MainScreen(
@@ -1910,7 +1910,7 @@ private fun TabletWebViewPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://www.example.com/",
-            input = GoogleMapsWebViewInput(),
+            input = DebugWebViewInput(),
             permission = Permission.ALWAYS,
         )
         MainScreen(
@@ -2225,7 +2225,10 @@ private fun LoadingIndicatorPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            input = GoogleMapsHtmlInput(GoogleMapsWebViewInput()),
+            input = GoogleMapsHtmlInput(
+                googleMapsUriInput = { throw NotImplementedError() },
+                googleMapsWebViewInput = { throw NotImplementedError() },
+            ),
             permission = Permission.ALWAYS,
             lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )
@@ -2298,7 +2301,10 @@ private fun DarkLoadingIndicatorPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            input = GoogleMapsHtmlInput(GoogleMapsWebViewInput()),
+            input = GoogleMapsHtmlInput(
+                googleMapsUriInput = { throw NotImplementedError() },
+                googleMapsWebViewInput = { throw NotImplementedError() },
+            ),
             permission = Permission.ALWAYS,
             lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )
@@ -2371,7 +2377,10 @@ private fun TabletLoadingIndicatorPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            input = GoogleMapsHtmlInput(GoogleMapsWebViewInput()),
+            input = GoogleMapsHtmlInput(
+                googleMapsUriInput = { throw NotImplementedError() },
+                googleMapsWebViewInput = { throw NotImplementedError() },
+            ),
             permission = Permission.ALWAYS,
             lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )

@@ -15,8 +15,10 @@ class SourceReceivedTest {
         on { getString(R.string.conversion_failed_missing_url) } doReturn "Missing URL"
         on { getString(R.string.conversion_failed_unsupported_service) } doReturn "Unsupported map service"
     }
+    private val geoUriInput = GeoUriInput()
+    private val osmAndUriInput = OsmAndUriInput()
     private val stateContext: ConversionStateContext = mock {
-        on { inputs } doReturn listOf(GeoUriInput(), OsmAndUriInput())
+        on { inputs } doReturn listOf(geoUriInput, osmAndUriInput)
         on { this@on.resources } doReturn resources
     }
 
@@ -35,7 +37,7 @@ class SourceReceivedTest {
         val source = "geo:1,2?q="
         val state = SourceReceived(stateContext, source)
         assertEquals(
-            InputFound(stateContext, source, match = source, GeoUriInput(), permission = null),
+            InputFound(stateContext, source, match = source, geoUriInput, permission = null),
             state.transition(),
         )
     }
@@ -46,7 +48,7 @@ class SourceReceivedTest {
         val match = "https://www.osmand.net/foo"
         val state = SourceReceived(stateContext, source)
         assertEquals(
-            InputFound(stateContext, source, match, OsmAndUriInput(), permission = null),
+            InputFound(stateContext, source, match, osmAndUriInput, permission = null),
             state.transition(),
         )
     }
@@ -56,7 +58,7 @@ class SourceReceivedTest {
         val source = "https://www.osmand.net/foo"
         val state = SourceReceived(stateContext, source)
         assertEquals(
-            InputFound(stateContext, source, match = source, OsmAndUriInput(), permission = null),
+            InputFound(stateContext, source, match = source, osmAndUriInput, permission = null),
             state.transition(),
         )
     }

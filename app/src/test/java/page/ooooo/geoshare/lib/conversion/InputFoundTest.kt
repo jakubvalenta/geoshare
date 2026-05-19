@@ -16,18 +16,20 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.GeoUriInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInput
-import page.ooooo.geoshare.lib.inputs.GoogleMapsWebViewInput
 import page.ooooo.geoshare.lib.inputs.ParseResult
 
 class InputFoundTest {
     private val log = FakeLog
+    private val source = "https://maps.app.goo.gl/foo"
+    private val input = GoogleMapsHtmlInput(
+        googleMapsUriInput = { throw NotImplementedError() },
+        googleMapsWebViewInput = { throw NotImplementedError() },
+    )
+    private val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+    private val prevResult = ParseResult(prevPoints)
 
     @Test
     fun transition_whenPermissionIsAlways_returnsPermissionGrantedAndPassesPermissionParam() = runTest {
-        val source = "https://maps.app.goo.gl/foo"
-        val input = GoogleMapsHtmlInput(GoogleMapsWebViewInput())
-        val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val prevResult = ParseResult(prevPoints)
         val userPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(eq(ConnectionPermissionPreference)) } doThrow NotImplementedError()
         }
@@ -44,10 +46,6 @@ class InputFoundTest {
 
     @Test
     fun transition_whenPermissionIsAsk_returnsPermissionRequested() = runTest {
-        val source = "https://maps.app.goo.gl/foo"
-        val input = GoogleMapsHtmlInput(GoogleMapsWebViewInput())
-        val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val prevResult = ParseResult(prevPoints)
         val userPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(eq(ConnectionPermissionPreference)) } doThrow NotImplementedError()
         }
@@ -64,10 +62,6 @@ class InputFoundTest {
 
     @Test
     fun transition_whenPermissionIsNever_returnsDataParsed() = runTest {
-        val source = "https://maps.app.goo.gl/foo"
-        val input = GoogleMapsHtmlInput(GoogleMapsWebViewInput())
-        val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val prevResult = ParseResult(prevPoints)
         val userPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(eq(ConnectionPermissionPreference)) } doThrow NotImplementedError()
         }
@@ -87,10 +81,6 @@ class InputFoundTest {
     @Test
     fun transition_whenPermissionIsNullAndPreferencePermissionIsAlways_returnsPermissionGrantedAndSetsPermissionParam() =
         runTest {
-            val source = "https://maps.app.goo.gl/foo"
-            val input = GoogleMapsHtmlInput(GoogleMapsWebViewInput())
-            val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-            val prevResult = ParseResult(prevPoints)
             val userPreferencesRepository: FakeUserPreferencesRepository = mock {
                 on { getValue(eq(ConnectionPermissionPreference)) } doReturn Permission.ALWAYS
             }
@@ -107,10 +97,6 @@ class InputFoundTest {
 
     @Test
     fun transition_whenPermissionIsNullAndPreferencePermissionIsAsk_returnsPermissionRequested() = runTest {
-        val source = "https://maps.app.goo.gl/foo"
-        val input = GoogleMapsHtmlInput(GoogleMapsWebViewInput())
-        val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val prevResult = ParseResult(prevPoints)
         val userPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(eq(ConnectionPermissionPreference)) } doReturn Permission.ASK
         }
@@ -127,10 +113,6 @@ class InputFoundTest {
 
     @Test
     fun transition_whenPermissionIsNullAndPreferencePermissionIsNever_returnsDataParsed() = runTest {
-        val source = "https://maps.app.goo.gl/foo"
-        val input = GoogleMapsHtmlInput(GoogleMapsWebViewInput())
-        val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val prevResult = ParseResult(prevPoints)
         val userPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(eq(ConnectionPermissionPreference)) } doReturn Permission.NEVER
         }
@@ -149,10 +131,7 @@ class InputFoundTest {
 
     @Test
     fun transition_whenInputDoesNotHavePermission_returnsPermissionGrantedAndPassesPermissionParam() = runTest {
-        val source = "https://maps.app.goo.gl/foo"
         val input = GeoUriInput()
-        val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val prevResult = ParseResult(prevPoints)
         val stateContext: ConversionStateContext = mock {
             on { this@on.log } doReturn log
         }

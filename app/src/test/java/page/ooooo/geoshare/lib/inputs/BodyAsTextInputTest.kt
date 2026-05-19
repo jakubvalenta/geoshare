@@ -31,6 +31,7 @@ class BodyAsTextInputTest {
             log: Log,
         ) = throw NotImplementedError()
     }
+    private val nextInput = OsmAndUriInput()
     private val log = FakeLog
     private val engine = MockEngine { request ->
         if (request.method == HttpMethod.Get && request.url.toString() == "https://maps.google.com/foo") {
@@ -53,10 +54,10 @@ class BodyAsTextInputTest {
     fun whenMatchHasScheme_makesGetRequestWithFollowRedirectsAndReturnsResponse() = runTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
-            ParseResult(nextStep = NextStep(DebugUriInput, "test data")),
+            ParseResult(nextStep = NextStep(nextInput, "test data")),
             input.withData(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
-                    nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
+                    nextStep = NextStep(nextInput, data) // Store data in nextStep, so we can test it
                 )
             }
         )
@@ -69,10 +70,10 @@ class BodyAsTextInputTest {
     fun whenMatchHasNoScheme_makesGetRequestToUrlWithHttpsSchemeAndReturnsResponse() = runTest {
         val match = "maps.google.com/foo"
         assertEquals(
-            ParseResult(nextStep = NextStep(DebugUriInput, "test data")),
+            ParseResult(nextStep = NextStep(nextInput, "test data")),
             input.withData(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
-                    nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
+                    nextStep = NextStep(nextInput, data) // Store data in nextStep, so we can test it
                 )
             }
         )
