@@ -130,12 +130,17 @@ object ApiEndpointPreference : TextPreference<URL> {
 
     override fun serialize(value: URL, log: Log) = value.toString()
 
-    override fun deserialize(value: String?, log: Log) = try {
-        URL(value)
-    } catch (tr: MalformedURLException) {
-        log.e(TAG, "Invalid URL", tr)
-        default
-    }
+    override fun deserialize(value: String?, log: Log) =
+        if (!value.isNullOrEmpty()) {
+            try {
+                URL(value)
+            } catch (tr: MalformedURLException) {
+                log.e(TAG, "Invalid URL", tr)
+                default
+            }
+        } else {
+            default
+        }
 
     override fun getValue(values: UserPreferencesValues) = values.apiEndpoint
 
