@@ -21,6 +21,7 @@ import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.io.EOFException
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.Log
+import java.net.ConnectException
 import java.net.URL
 
 const val DESKTOP_USER_AGENT =
@@ -116,6 +117,12 @@ fun HttpClientConfig<*>.rethrowExceptionsAsNetworkException(log: Log = DefaultLo
                 is EOFException -> {
                     log.w(TAG, "EOF exception for ${request.url}", cause)
                     throw ConnectionClosedNetworkException(cause)
+                }
+
+                is ConnectException -> {
+                    // TODO Test
+                    log.w(TAG, "Connection refused for ${request.url}", cause)
+                    throw ConnectionRefusedNetworkException(cause)
                 }
 
                 is ServerResponseException -> {

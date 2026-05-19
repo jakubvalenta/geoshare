@@ -33,6 +33,10 @@ class ConnectionClosedNetworkException(cause: Throwable) : RecoverableNetworkExc
     override fun getMessage(resources: Resources) = resources.getString(R.string.network_exception_eof)
 }
 
+class ConnectionRefusedNetworkException(cause: Throwable) : RecoverableNetworkException(cause) {
+    override fun getMessage(resources: Resources) = resources.getString(R.string.network_exception_connect_exception)
+}
+
 class ServerResponseNetworkException(val response: HttpResponse, cause: Throwable) :
     RecoverableNetworkException(cause) {
     override fun getMessage(resources: Resources) =
