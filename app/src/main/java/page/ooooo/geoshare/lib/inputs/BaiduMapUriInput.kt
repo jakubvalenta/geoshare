@@ -48,7 +48,7 @@ class BaiduMapUriInput : UriInput {
                     // https://map.baidu.com/?poiShareId={id}
                     // https://map.baidu.com/?shareurl=1&poiShareUid={uid}
                     // https://map.baidu.com/?newmap=1&s=inf%26uid%3D{uid}
-                    nextStep = NextStep.NextInput(BaiduMapWebViewInput(), match)
+                    nextStep = NextStep(BaiduMapWebViewInput, match)
                 }
 
             } else if (firstPart.startsWith('@')) {
@@ -92,7 +92,7 @@ class BaiduMapUriInput : UriInput {
                     ?: run {
                         // Mobile place detail without coords
                         // "https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid={uid}/act=read_share&vt=map&da_from=weixin&openna=1"
-                        nextStep = NextStep.NextInput(BaiduMapWebViewInput(), match)
+                        nextStep = NextStep(BaiduMapWebViewInput, match)
                     }
             }
         }

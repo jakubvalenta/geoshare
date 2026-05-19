@@ -10,7 +10,7 @@ import javax.inject.Singleton
 
 @Singleton
 class AmapShortLinkInput @Inject constructor(
-    private val amapUriInput: AmapUriInput,
+    private val amapUriInput: dagger.Lazy<AmapUriInput>,
 ) : HeadLocationHeaderInput {
     override val pattern = Regex("""((?:https?://)?surl\.amap\.com/\S+)""")
     override val documentation = InputDocumentation(
@@ -33,7 +33,7 @@ class AmapShortLinkInput @Inject constructor(
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {
-        nextStep = NextStep.NextInput(amapUriInput, data.toString())
+        nextStep = NextStep(AmapUriInput, data.toString())
     }
 
     override fun toString() = "AmapShortLinkInput"

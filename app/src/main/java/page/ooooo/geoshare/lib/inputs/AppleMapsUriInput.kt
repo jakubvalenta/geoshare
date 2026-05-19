@@ -17,7 +17,7 @@ import javax.inject.Singleton
 
 @Singleton
 class AppleMapsUriInput @Inject constructor(
-    private val appleMapsHtmlInput: AppleMapsHtmlInput,
+    private val appleMapsHtmlInput: dagger.Lazy<AppleMapsHtmlInput>,
 ) : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:https?://)?maps\.apple(\.com)?[/?#]$URI_REST)""")
     override val documentation = InputDocumentation(
@@ -74,7 +74,7 @@ class AppleMapsUriInput @Inject constructor(
                 // https://maps.apple.com/place?place-id={id}...
                 !queryParams["place-id"].isNullOrEmpty()
             ) {
-                nextStep = NextStep.NextInput(appleMapsHtmlInput, match)
+                nextStep = NextStep(AppleMapsHtmlInput, match)
             }
 
             if (name != null) {

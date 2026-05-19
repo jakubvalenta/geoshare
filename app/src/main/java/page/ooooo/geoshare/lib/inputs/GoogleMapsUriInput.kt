@@ -68,7 +68,7 @@ class GoogleMapsUriInput @Inject constructor(
                     points = naivePoints.map { GCJ02MainlandChinaPoint(it).copy(z = z) }.toImmutableList()
                     if (points.any { !it.hasCoordinates() }) {
                         // Go to HTML parsing unless all points have coordinates
-                        nextStep = NextStep.NextInput(googleMapsHtmlInput, match)
+                        nextStep = NextStep(GoogleMapsHtmlInput, match)
                     }
                     return@run
                 }
@@ -112,7 +112,7 @@ class GoogleMapsUriInput @Inject constructor(
                 Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull()?.let { name ->
                     points = persistentListOf(GCJ02MainlandChinaPoint(z = z, name = name, source = Source.URI))
                     // Go to HTML parsing
-                    nextStep = NextStep.NextInput(googleMapsHtmlInput, match)
+                    nextStep = NextStep(GoogleMapsHtmlInput, match)
                     return@run
                 }
             }
@@ -135,11 +135,11 @@ class GoogleMapsUriInput @Inject constructor(
 
                 // Place
                 // https://www.google.com/maps/place/{name}/@{centerX},{centerY},{centerZ}
-                firstPart == "place" -> {
+                firstPart == "dir" || firstPart == "place" -> {
                     points = parseParts(parts.drop(1), z)
                     if (points.lastOrNull()?.hasCoordinates() != true) {
                         // Go to HTML parsing
-                        nextStep = NextStep.NextInput(googleMapsPlaceApiInput, match)
+                        nextStep = NextStep(GoogleMapsHtmlInput, match)
                     }
                 }
 
@@ -150,7 +150,7 @@ class GoogleMapsUriInput @Inject constructor(
                 // https://www.google.com/maps/d/view?mid={id}
                 firstPart == "placelists" || firstPart == "@" || firstPart == "d" -> {
                     // Go to place list WebView parsing
-                    nextStep = NextStep.NextInput(googleMapsPlaceListWebViewInput, match)
+                    nextStep = NextStep(GoogleMapsPlaceListWebViewInput, match)
                 }
 
                 // Search

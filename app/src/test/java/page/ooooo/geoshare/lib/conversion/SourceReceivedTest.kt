@@ -8,9 +8,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.inputs.GeoUriInput
-import page.ooooo.geoshare.lib.inputs.GoogleMapsUriInput
 import page.ooooo.geoshare.lib.inputs.OsmAndUriInput
-import page.ooooo.geoshare.lib.inputs.OsmAndUriInputTest
 
 class SourceReceivedTest {
     private val resources: Resources = mock {

@@ -31,8 +31,8 @@ class MapyComShortLinkInputTest : InputTest {
     fun parse_returnsNextStep() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep.NextInput(
-                    MapyComUriInput(),
+                nextStep = NextStep(
+                    MapyComUriInput,
                     "https://mapy.com/en/turisticka?source=base&id=1723771&x=14.4549515&y=50.0831498&z=17"
                 )
             ),

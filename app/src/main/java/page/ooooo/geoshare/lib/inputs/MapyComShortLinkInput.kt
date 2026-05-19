@@ -27,7 +27,7 @@ class MapyComShortLinkInput @Inject constructor(
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {
-        nextStep = NextStep.NextInput(mapyComUriInput, data.toString())
+        nextStep = NextStep(MapyComUriInput, data.toString())
     }
 
     override fun toString() = "MapyComShortLinkInput"

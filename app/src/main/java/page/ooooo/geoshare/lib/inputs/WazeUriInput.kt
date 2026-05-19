@@ -93,8 +93,8 @@ class WazeUriInput @Inject constructor(
                 // https://www.waze.com/ul?venue_id=2884104.28644432.6709020
                 // with this one:
                 // https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020
-                nextStep = NextStep.NextInput(
-                    wazeHtmlInput,
+                nextStep = NextStep(
+                    WazeHtmlInput,
                     Uri(
                         scheme = "https",
                         host = "www.waze.com",
@@ -108,8 +108,8 @@ class WazeUriInput @Inject constructor(
                 // https://www.waze.com/live-map/directions?place=w.2884104.28644432.6709020
                 // with this one:
                 // https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020
-                nextStep = NextStep.NextInput(
-                    wazeHtmlInput,
+                nextStep = NextStep(
+                    WazeHtmlInput,
                     Uri(
                         scheme = "https",
                         host = "www.waze.com",
@@ -119,7 +119,7 @@ class WazeUriInput @Inject constructor(
                     ).toString(),
                 )
             } ?: queryParams["to"]?.takeIf { it.startsWith("place.") }?.let {
-                nextStep = NextStep.NextInput(wazeHtmlInput, match)
+                nextStep = NextStep(WazeHtmlInput, match)
             }
         }
     }

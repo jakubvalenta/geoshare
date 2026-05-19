@@ -30,8 +30,8 @@ class YandexMapsShortLinkInputTest : InputTest {
     fun parse_returnsNextStep() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep.NextInput(
-                    YandexMapsUriInput(YandexMapsHtmlInput()),
+                nextStep = NextStep(
+                    YandexMapsUriInput,
                     "https://yandex.com/maps/org/94933420809/?display-text=Cafes&ll=8.668963,50.111192"
                 )
             ),

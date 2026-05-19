@@ -144,8 +144,8 @@ class WazeUriInputTest : InputTest {
     fun parse_directionsPlace() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep.NextInput(
-                    WazeHtmlInput(),
+                nextStep = NextStep(
+                    WazeHtmlInput,
                     "https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020"
                 )
             ),
@@ -153,8 +153,8 @@ class WazeUriInputTest : InputTest {
         )
         assertEquals(
             ParseResult(
-                nextStep = NextStep.NextInput(
-                    WazeHtmlInput(),
+                nextStep = NextStep(
+                    WazeHtmlInput,
                     "https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020"
                 )
             ),
@@ -162,8 +162,8 @@ class WazeUriInputTest : InputTest {
         )
         assertEquals(
             ParseResult(
-                nextStep = NextStep.NextInput(
-                    WazeHtmlInput(),
+                nextStep = NextStep(
+                    WazeHtmlInput,
                     "https://www.waze.com/live-map/directions/cn-tower-front-st-w-301-toronto?to=place.w.2884104.28644432.6709020"
                 )
             ),
@@ -171,8 +171,8 @@ class WazeUriInputTest : InputTest {
         )
         assertEquals(
             ParseResult(
-                nextStep = NextStep.NextInput(
-                    WazeHtmlInput(),
+                nextStep = NextStep(
+                    WazeHtmlInput,
                     "https://www.waze.com/live-map/directions/potsdam-bb-de?to=place.ChIJt9Y6hM31qEcRm-yqC5j4ZcU&from=place.ChIJAVkDPzdOqEcRcDteW0YgIQQ"
                 )
             ),
@@ -184,8 +184,8 @@ class WazeUriInputTest : InputTest {
     fun parse_place() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep.NextInput(
-                    WazeHtmlInput(),
+                nextStep = NextStep(
+                    WazeHtmlInput,
                     "https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020"
                 )
             ),
@@ -193,8 +193,8 @@ class WazeUriInputTest : InputTest {
         )
         assertEquals(
             ParseResult(
-                nextStep = NextStep.NextInput(
-                    WazeHtmlInput(),
+                nextStep = NextStep(
+                    WazeHtmlInput,
                     "https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020"
                 )
             ),

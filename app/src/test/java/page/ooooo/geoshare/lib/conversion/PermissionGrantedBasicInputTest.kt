@@ -80,10 +80,7 @@ class PermissionGrantedBasicInputTest {
                 log: Log,
             ) = ParseResult(
                 prevResult?.points ?: persistentListOf(),
-                nextStep = NextStep.NextInput(
-                    DebugUriInput(DebugWebViewInput()),
-                    data
-                ) // Store data in nextStep, so we can test it
+                nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
             )
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -116,10 +113,7 @@ class PermissionGrantedBasicInputTest {
                 source,
                 match = source,
                 input,
-                ParseResult(
-                    prevPoints,
-                    nextStep = NextStep.NextInput(DebugUriInput(DebugWebViewInput()), "${source}-data")
-                ),
+                ParseResult(prevPoints, nextStep = NextStep(DebugUriInput, "${source}-data")),
                 permission,
                 prevResult,
             ),
@@ -148,10 +142,7 @@ class PermissionGrantedBasicInputTest {
                 log: Log,
             ) = ParseResult(
                 prevResult?.points ?: persistentListOf(),
-                nextStep = NextStep.NextInput(
-                    DebugUriInput(DebugWebViewInput()),
-                    data
-                ) // Store data in nextStep, so we can test it
+                nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
             )
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -205,10 +196,7 @@ class PermissionGrantedBasicInputTest {
                 log: Log,
             ) = ParseResult(
                 prevResult?.points ?: persistentListOf(),
-                nextStep = NextStep.NextInput(
-                    DebugUriInput(DebugWebViewInput()),
-                    data
-                ) // Store data in nextStep, so we can test it
+                nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
             )
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -267,10 +255,7 @@ class PermissionGrantedBasicInputTest {
                     log: Log,
                 ) = ParseResult(
                     prevResult?.points ?: persistentListOf(),
-                    nextStep = NextStep.NextInput(
-                        DebugUriInput(DebugWebViewInput()),
-                        data
-                    ) // Store data in nextStep, so we can test it
+                    nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
                 )
 
                 override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -338,10 +323,7 @@ class PermissionGrantedBasicInputTest {
                     log: Log,
                 ) = ParseResult(
                     prevResult?.points ?: persistentListOf(),
-                    nextStep = NextStep.NextInput(
-                        DebugUriInput(DebugWebViewInput()),
-                        data
-                    ) // Store data in nextStep, so we can test it
+                    nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
                 )
 
                 override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -409,10 +391,7 @@ class PermissionGrantedBasicInputTest {
                     log: Log,
                 ) = ParseResult(
                     prevResult?.points ?: persistentListOf(),
-                    nextStep = NextStep.NextInput(
-                        DebugUriInput(DebugWebViewInput()),
-                        data
-                    ) // Store data in nextStep, so we can test it
+                    nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
                 )
 
                 override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -476,10 +455,7 @@ class PermissionGrantedBasicInputTest {
                 log: Log,
             ) = ParseResult(
                 prevResult?.points ?: persistentListOf(),
-                nextStep = NextStep.NextInput(
-                    DebugUriInput(DebugWebViewInput()),
-                    data
-                ) // Store data in nextStep, so we can test it
+                nextStep = NextStep(DebugUriInput, data) // Store data in nextStep, so we can test it
             )
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title

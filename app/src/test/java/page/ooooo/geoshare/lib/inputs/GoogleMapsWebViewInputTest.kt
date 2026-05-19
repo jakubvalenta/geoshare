@@ -10,7 +10,7 @@ class GoogleMapsWebViewInputTest : InputTest {
     @Test
     fun parse_returnsNextStep() = runTest {
         assertEquals(
-            ParseResult(nextStep = NextStep.NextSource("https://maps.google.com/redirected")),
+            ParseResult(nextStep = NextStep(GoogleMapsUriInput, "https://maps.google.com/redirected")),
             input.parse("https://maps.google.com/redirected", "https://maps.google.com/original"),
         )
     }

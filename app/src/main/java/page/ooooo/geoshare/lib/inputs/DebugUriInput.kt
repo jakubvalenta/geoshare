@@ -28,7 +28,7 @@ class DebugUriInput @Inject constructor(
         uriQuote: UriQuote,
         log: Log,
     ) = buildParseResult {
-        nextStep = NextStep.NextInput(debugWebViewInput, match)
+        nextStep = NextStep(DebugWebViewInput, match)
     }
 
     override fun toString() = "DebugUriInput"

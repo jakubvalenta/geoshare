@@ -32,7 +32,7 @@ class UrbiHtmlInput : BodyAsChannelInput {
         while (true) {
             val line = data.readLine() ?: break
             pattern.find(line)?.groupOrNull()?.let { attr ->
-                nextStep = NextStep.NextSource(attr.decodeBasicHtmlEntities())
+                nextStep = NextStep(UrbiUriInput, attr.decodeBasicHtmlEntities())
                 return@buildParseResult
             }
         }

@@ -364,17 +364,7 @@ data class DataParsed<T>(
                 stateContext.log.i(
                     TAG, "Failed to extract point with coordinates from $match, going to next step"
                 )
-                when (nextStep) {
-                    is NextStep.NextInput ->
-                        InputFound(stateContext, source, nextStep.match, nextStep.input, permission, prevResult = this)
-
-                    is NextStep.NextSource ->
-                        // TODO Test
-                        // TODO Overwrites original link
-                        // TODO Loses permission and previous result
-                        SourceReceived(stateContext, nextStep.source)
-                }
-
+                InputFound(stateContext, source, nextStep.match, nextStep.input, permission, prevResult = this)
             } else if (points.lastOrNull()?.hasName() == true) {
                 stateContext.log.i(
                     TAG, "Extracted point with name $points from $match"

@@ -88,14 +88,14 @@ class YandexMapsUriInput @Inject constructor(
                                     source = Source.URI,
                                 ),
                             )
-                            nextStep = NextStep.NextInput(yandexMapsHtmlInput, match)
+                            nextStep = NextStep(YandexMapsHtmlInput, match)
                             return@buildParseResult
                         }
 
                         "org" -> {
                             // Old POI -- these links seem to return 404 now; we still keep the code in case they start working again
                             // https://yandex.com/maps/org/{id}?...
-                            nextStep = NextStep.NextInput(yandexMapsHtmlInput, match)
+                            nextStep = NextStep(YandexMapsHtmlInput, match)
                             return@buildParseResult
                         }
                     }

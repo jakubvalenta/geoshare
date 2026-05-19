@@ -92,7 +92,7 @@ class UrbiUriInput @Inject constructor(
                 return@run
             }
 
-            nextStep = NextStep.NextInput(urbiHtmlInput, match)
+            nextStep = NextStep(UrbiHtmlInput, match)
         }
     }
 
