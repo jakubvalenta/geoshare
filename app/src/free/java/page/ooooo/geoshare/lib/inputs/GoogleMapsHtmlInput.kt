@@ -17,11 +17,12 @@ import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Source
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.collections.addAll
 
 @Singleton
 class GoogleMapsHtmlInput @Inject constructor(
-    private val googleMapsUriInput: dagger.Lazy<GoogleMapsUriInput>,
-    private val googleMapsWebViewInput: dagger.Lazy<GoogleMapsWebViewInput>,
+    private val googleMapsUriInput: dagger.Lazy<GoogleMapsUriInput> = { throw NotImplementedError() },
+    private val googleMapsWebViewInput: dagger.Lazy<GoogleMapsWebViewInput> = { throw NotImplementedError() },
 ) : BodyAsChannelInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_google_maps_permission_title

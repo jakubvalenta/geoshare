@@ -9,18 +9,11 @@ import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 
 class GoogleMapsUriInputTest : InputTest {
-    private val googleMapsHtmlInput = GoogleMapsHtmlInput(
-        googleMapsUriInput = { throw NotImplementedError() },
-        googleMapsWebViewInput = { throw NotImplementedError() },
-    )
-    private val googleMapsPlaceApiInput = GoogleMapsPlaceApiInput(
-        apiService = { throw NotImplementedError() }
-    )
-    private val googleMapsPlaceListWebViewInput = GoogleMapsPlaceListWebViewInput()
+    private val googleMapsHtmlInput = GoogleMapsHtmlInput()
+    private val googleMapsPlaceListInput = GoogleMapsPlaceListInput()
     private val input = GoogleMapsUriInput(
         googleMapsHtmlInput = { googleMapsHtmlInput },
-        googleMapsPlaceApiInput = { googleMapsPlaceApiInput },
-        googleMapsPlaceListWebViewInput = { googleMapsPlaceListWebViewInput },
+        googleMapsPlaceListInput = { googleMapsPlaceListInput },
     )
 
     @Test
@@ -354,7 +347,7 @@ class GoogleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    googleMapsPlaceListWebViewInput,
+                    googleMapsPlaceListInput,
                     "https://www.google.com/maps/placelists/list/XXX?g_ep=ghijkl%3D&g_st=isi"
                 )
             ),
@@ -367,7 +360,7 @@ class GoogleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    googleMapsPlaceListWebViewInput,
+                    googleMapsPlaceListInput,
                     "https://www.google.com/maps/@/data=!3m1!4b1!4m3!11m2!2sXXX!3e3?skid=foo&g_ep=bar&entry=tts"
                 )
             ),
@@ -856,7 +849,7 @@ class GoogleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    googleMapsPlaceListWebViewInput,
+                    googleMapsPlaceListInput,
                     "https://www.google.com/maps/d/edit?mid=XXX"
                 )
             ),
@@ -865,7 +858,7 @@ class GoogleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    googleMapsPlaceListWebViewInput,
+                    googleMapsPlaceListInput,
                     "https://www.google.com/maps/d/viewer?mid=XXX"
                 )
             ),

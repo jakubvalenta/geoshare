@@ -13,6 +13,7 @@ import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.Attempt
 import page.ooooo.geoshare.lib.FakeLog
@@ -22,8 +23,6 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.BasicInput
-import page.ooooo.geoshare.lib.inputs.DebugUriInput
-import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.NextStep
 import page.ooooo.geoshare.lib.inputs.ParseResult
@@ -42,16 +41,11 @@ class PermissionGrantedBasicInputTest {
     private val engine = MockEngine { throw NotImplementedError() }
     private val log = FakeLog
     private val source = "https://maps.google.com/foo"
+    private val inputRepository = FakeInputRepository()
+    private val nextInput = inputRepository.debugUriInput
     private val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val prevResult = ParseResult(prevPoints)
     private val permission = Permission.ALWAYS
-    private val debugUriInput = DebugUriInput(
-        debugWebViewInput = { throw NotImplementedError() }
-    )
-    private val googleMapsHtmlInput = GoogleMapsHtmlInput(
-        googleMapsUriInput = { throw NotImplementedError() },
-        googleMapsWebViewInput = { throw NotImplementedError() },
-    )
     private val maxAttempts = 3
     private val resources: Resources = mock {
         on { getString(R.string.converter_google_maps_loading_indicator_title) } doReturn "Connecting to Google..."
@@ -69,9 +63,9 @@ class PermissionGrantedBasicInputTest {
     private val uriQuote = FakeUriQuote
 
     @Test
-    fun transition_whenInputWithDataDoesNotThrowException_returnsDataParsed() = runTest {
+    fun transition_whenInputFetchDoesNotThrowException_returnsDataParsed() = runTest {
         val input = object : BasicInput<String>, Input.HasPermission {
-            override suspend fun withData(
+            override suspend fun fetch(
                 match: String,
                 engine: HttpClientEngine,
                 log: Log,
@@ -88,7 +82,7 @@ class PermissionGrantedBasicInputTest {
                 log: Log,
             ) = ParseResult(
                 prevResult?.points ?: persistentListOf(),
-                nextStep = NextStep(debugUriInput, data) // Store data in nextStep, so we can test it
+                nextStep = NextStep(nextInput, data) // Store data in nextStep, so we can test it
             )
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -118,7 +112,7 @@ class PermissionGrantedBasicInputTest {
                 source,
                 match = source,
                 input,
-                ParseResult(prevPoints, nextStep = NextStep(debugUriInput, "${source}-data")),
+                ParseResult(prevPoints, nextStep = NextStep(nextInput, "${source}-data")),
                 permission,
                 prevResult,
             ),
@@ -127,9 +121,9 @@ class PermissionGrantedBasicInputTest {
     }
 
     @Test
-    fun transition_whenInputWithDataThrowsCancellationException_returnsConversionFailed() = runTest {
+    fun transition_whenInputFetchThrowsCancellationException_returnsConversionFailed() = runTest {
         val input = object : BasicInput<String>, Input.HasPermission {
-            override suspend fun withData(
+            override suspend fun fetch(
                 match: String,
                 engine: HttpClientEngine,
                 log: Log,
@@ -146,7 +140,7 @@ class PermissionGrantedBasicInputTest {
                 log: Log,
             ) = ParseResult(
                 prevResult?.points ?: persistentListOf(),
-                nextStep = NextStep(debugUriInput, data) // Store data in nextStep, so we can test it
+                nextStep = NextStep(nextInput, data) // Store data in nextStep, so we can test it
             )
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -177,9 +171,9 @@ class PermissionGrantedBasicInputTest {
     }
 
     @Test
-    fun transition_whenInputWithDataThrowsMalformedURLException_returnsConversionFailed() = runTest {
+    fun transition_whenInputFetchThrowsMalformedURLException_returnsConversionFailed() = runTest {
         val input = object : BasicInput<String>, Input.HasPermission {
-            override suspend fun withData(
+            override suspend fun fetch(
                 match: String,
                 engine: HttpClientEngine,
                 log: Log,
@@ -196,7 +190,7 @@ class PermissionGrantedBasicInputTest {
                 log: Log,
             ) = ParseResult(
                 prevResult?.points ?: persistentListOf(),
-                nextStep = NextStep(debugUriInput, data) // Store data in nextStep, so we can test it
+                nextStep = NextStep(nextInput, data) // Store data in nextStep, so we can test it
             )
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -230,12 +224,12 @@ class PermissionGrantedBasicInputTest {
     }
 
     @Test
-    fun transition_whenInputWithDataThrowsRecoverableNetworkExceptionAndLastAttemptIsNull_returnsPermissionGrantedBasicInput() =
+    fun transition_whenInputFetchThrowsRecoverableNetworkExceptionAndLastAttemptIsNull_returnsPermissionGrantedBasicInput() =
         runTest {
             val source = "https://maps.google.com/foo"
             val cause = SocketTimeoutNetworkException(SocketTimeoutException())
             val input = object : BasicInput<String>, Input.HasPermission {
-                override suspend fun withData(
+                override suspend fun fetch(
                     match: String,
                     engine: HttpClientEngine,
                     log: Log,
@@ -252,7 +246,7 @@ class PermissionGrantedBasicInputTest {
                     log: Log,
                 ) = ParseResult(
                     prevResult?.points ?: persistentListOf(),
-                    nextStep = NextStep(debugUriInput, data) // Store data in nextStep, so we can test it
+                    nextStep = NextStep(nextInput, data) // Store data in nextStep, so we can test it
                 )
 
                 override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -298,12 +292,12 @@ class PermissionGrantedBasicInputTest {
         }
 
     @Test
-    fun transition_whenInputWithDataThrowsRecoverableNetworkExceptionAndLastAttemptIsOne_waitsAndReturnsPermissionGrantedBasicInput() =
+    fun transition_whenInputFetchThrowsRecoverableNetworkExceptionAndLastAttemptIsOne_waitsAndReturnsPermissionGrantedBasicInput() =
         runTest {
             val source = "https://maps.google.com/foo"
             val cause = SocketTimeoutNetworkException(SocketTimeoutException())
             val input = object : BasicInput<String>, Input.HasPermission {
-                override suspend fun withData(
+                override suspend fun fetch(
                     match: String,
                     engine: HttpClientEngine,
                     log: Log,
@@ -320,7 +314,7 @@ class PermissionGrantedBasicInputTest {
                     log: Log,
                 ) = ParseResult(
                     prevResult?.points ?: persistentListOf(),
-                    nextStep = NextStep(debugUriInput, data) // Store data in nextStep, so we can test it
+                    nextStep = NextStep(nextInput, data) // Store data in nextStep, so we can test it
                 )
 
                 override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -363,12 +357,12 @@ class PermissionGrantedBasicInputTest {
         }
 
     @Test
-    fun transition_whenInputWithDataThrowsRecoverableNetworkExceptionAndLastAttemptIsMaxAttempts_returnsConversionFailed() =
+    fun transition_whenInputFetchThrowsRecoverableNetworkExceptionAndLastAttemptIsMaxAttempts_returnsConversionFailed() =
         runTest {
             val source = "https://maps.google.com/foo"
             val cause = SocketTimeoutNetworkException(SocketTimeoutException())
             val input = object : BasicInput<String>, Input.HasPermission {
-                override suspend fun withData(
+                override suspend fun fetch(
                     match: String,
                     engine: HttpClientEngine,
                     log: Log,
@@ -385,7 +379,7 @@ class PermissionGrantedBasicInputTest {
                     log: Log,
                 ) = ParseResult(
                     prevResult?.points ?: persistentListOf(),
-                    nextStep = NextStep(debugUriInput, data) // Store data in nextStep, so we can test it
+                    nextStep = NextStep(nextInput, data) // Store data in nextStep, so we can test it
                 )
 
                 override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -422,13 +416,13 @@ class PermissionGrantedBasicInputTest {
         }
 
     @Test
-    fun transition_whenInputWithDataThrowsUnrecoverableNetworkException_returnsConversionFailed() = runTest {
+    fun transition_whenInputFetchThrowsUnrecoverableNetworkException_returnsConversionFailed() = runTest {
         val response: HttpResponse = mock {
             on { status } doReturn HttpStatusCode.NotFound
         }
         val cause = ResponseNetworkException(response, Exception())
         val input = object : BasicInput<String>, Input.HasPermission {
-            override suspend fun withData(
+            override suspend fun fetch(
                 match: String,
                 engine: HttpClientEngine,
                 log: Log,
@@ -445,7 +439,7 @@ class PermissionGrantedBasicInputTest {
                 log: Log,
             ) = ParseResult(
                 prevResult?.points ?: persistentListOf(),
-                nextStep = NextStep(debugUriInput, data) // Store data in nextStep, so we can test it
+                nextStep = NextStep(nextInput, data) // Store data in nextStep, so we can test it
             )
 
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -480,7 +474,7 @@ class PermissionGrantedBasicInputTest {
 
     @Test
     fun getLoadingIndicator_whenLastAttemptIsNull_returnsLargeLoadingIndicatorWithoutDescription() = runTest {
-        val input = googleMapsHtmlInput
+        val input = inputRepository.googleMapsShortLinkInput
         val stateContext: ConversionStateContext = mock {
             on { this@on.resources } doReturn resources
         }
@@ -503,7 +497,7 @@ class PermissionGrantedBasicInputTest {
 
     @Test
     fun getLoadingIndicator_whenLastAttemptNumberIsOne_returnsLargeLoadingIndicatorWithDescription() = runTest {
-        val input = googleMapsHtmlInput
+        val input = inputRepository.googleMapsShortLinkInput
         val lastAttempt = Attempt<RecoverableNetworkException>(1, ConnectionClosedNetworkException(EOFException()))
         val stateContext: ConversionStateContext = mock {
             on { this@on.resources } doReturn resources

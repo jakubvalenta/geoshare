@@ -21,7 +21,6 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.DebugUriInput
-import page.ooooo.geoshare.lib.inputs.GoogleMapsWebViewInput
 import page.ooooo.geoshare.lib.inputs.NextStep
 import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.inputs.WebViewInput
@@ -216,9 +215,19 @@ class PermissionGrantedWebViewInputTest {
 
     @Test
     fun getLoadingIndicator_whenLastAttemptIsNull_returnsLargeLoadingIndicatorWithoutDescription() = runTest {
-        val input = GoogleMapsWebViewInput(
-            googleMapsUriInput = { throw NotImplementedError() },
-        )
+        val input = object : WebViewInput {
+            override val permissionTitleResId = R.string.converter_google_maps_permission_title
+            override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
+            override val unsafeExtractionJavascript = "undefined"
+
+            override suspend fun parse(
+                data: String,
+                match: String,
+                prevResult: ParseResult?,
+                uriQuote: UriQuote,
+                log: Log,
+            ) = throw NotImplementedError()
+        }
         val stateContext: ConversionStateContext = mock {
             on { this@on.resources } doReturn resources
         }

@@ -56,7 +56,7 @@ class GetLastHopUrlInputTest {
     @Test(expected = MalformedURLException::class)
     fun whenMatchIsInvalidURL_throwsMalformedURLException() = runTest {
         val match = "https://[invalid:ipv6]/"
-        input.withData(match, engine, log, uriQuote, coroutineContext = testScheduler) {
+        input.fetch(match, engine, log, uriQuote, coroutineContext = testScheduler) {
             ParseResult()
         }
     }
@@ -66,7 +66,7 @@ class GetLastHopUrlInputTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
             ParseResult(nextStep = NextStep(nextInput, "https://maps.google.com/redirected")),
-            input.withData(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
+            input.fetch(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
                     nextStep = NextStep(nextInput, data.toString()) // Store data in nextStep, so we can test it
                 )
@@ -82,7 +82,7 @@ class GetLastHopUrlInputTest {
         val match = "maps.google.com/foo"
         assertEquals(
             ParseResult(nextStep = NextStep(nextInput, "https://maps.google.com/redirected")),
-            input.withData(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
+            input.fetch(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
                     nextStep = NextStep(nextInput, data.toString()) // Store data in nextStep, so we can test it
                 )
@@ -95,7 +95,7 @@ class GetLastHopUrlInputTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
             ParseResult(nextStep = NextStep(nextInput, "https://maps.google.com/redirected")),
-            input.withData(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
+            input.fetch(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
                     nextStep = NextStep(nextInput, data.toString()) // Store data in nextStep, so we can test it
                 )
@@ -106,7 +106,7 @@ class GetLastHopUrlInputTest {
     @Test(expected = ResponseNetworkException::class)
     fun whenHttpClientRespondsError_throwsNetworkException() = runTest {
         val match = "https://maps.google.com/not-found"
-        input.withData(match, engine, log, uriQuote, coroutineContext = testScheduler) {
+        input.fetch(match, engine, log, uriQuote, coroutineContext = testScheduler) {
             ParseResult()
         }
     }

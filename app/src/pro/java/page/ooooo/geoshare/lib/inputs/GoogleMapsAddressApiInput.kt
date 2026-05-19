@@ -31,7 +31,7 @@ class GoogleMapsAddressApiInput @Inject constructor(
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_geo_share_loading_indicator_title
 
-    override suspend fun withData(
+    override suspend fun fetch(
         match: String,
         engine: HttpClientEngine,
         log: Log,
@@ -39,21 +39,22 @@ class GoogleMapsAddressApiInput @Inject constructor(
         coroutineContext: CoroutineContext,
         block: suspend (ApiService.GoogleMapsResults) -> ParseResult,
     ): ParseResult =
-        apiService
-            .createHttpClient(engine)
-            .use { client ->
-                client
-                    .prepareRequest {
-                        url(apiService.getEndpoint())
-                            .appendPathSegments("v1", "google-maps", "geocode", "address", match)
-                        headers {
-                            accept(ContentType.Application.Json)
+        apiService.run {
+            createHttpClient(engine)
+                .use { client ->
+                    client
+                        .prepareRequest {
+                            url(getEndpoint())
+                                .appendPathSegments("v1", "google-maps", "geocode", "address", match)
+                            headers {
+                                accept(ContentType.Application.Json)
+                            }
                         }
-                    }
-                    .execute { response ->
-                        block(response.body())
-                    }
-            }
+                        .execute { response ->
+                            block(response.body())
+                        }
+                }
+        }
 
     override suspend fun parse(
         data: ApiService.GoogleMapsResults,

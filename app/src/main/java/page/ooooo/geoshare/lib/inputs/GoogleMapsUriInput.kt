@@ -30,8 +30,7 @@ import javax.inject.Singleton
 @Singleton
 class GoogleMapsUriInput @Inject constructor(
     private val googleMapsHtmlInput: dagger.Lazy<GoogleMapsHtmlInput>,
-    private val googleMapsPlaceApiInput: dagger.Lazy<GoogleMapsPlaceApiInput>,
-    private val googleMapsPlaceListWebViewInput: dagger.Lazy<GoogleMapsPlaceListWebViewInput>,
+    private val googleMapsPlaceListInput: dagger.Lazy<GoogleMapsPlaceListInput>,
 ) : UriInput, Input.HasRandomUri {
     override val pattern =
         Regex("""((?:https?://)?(?:(?:www|maps)\.)?google(?:\.[a-z]{2,3})?\.[a-z]{2,3}[/?#]$URI_REST)""")
@@ -139,7 +138,6 @@ class GoogleMapsUriInput @Inject constructor(
                     points = parseParts(parts.drop(1), z)
                     if (points.lastOrNull()?.hasCoordinates() != true) {
                         // Go to HTML parsing
-                        // TODO Go to API input
                         nextStep = NextStep(googleMapsHtmlInput.get(), match)
                     }
                 }
@@ -150,8 +148,8 @@ class GoogleMapsUriInput @Inject constructor(
                 // https://www.google.com/maps/d/edit?mid={id}
                 // https://www.google.com/maps/d/view?mid={id}
                 firstPart == "placelists" || firstPart == "@" || firstPart == "d" -> {
-                    // Go to place list WebView parsing
-                    nextStep = NextStep(googleMapsPlaceListWebViewInput.get(), match)
+                    // Go to HTML parsing
+                    nextStep = NextStep(googleMapsPlaceListInput.get(), match)
                 }
 
                 // Search

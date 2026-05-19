@@ -35,11 +35,11 @@ class UriInputTest {
     }
 
     @Test
-    fun withData_whenDataIsValidUrl_returnsUri() = runTest {
+    fun fetch_whenDataIsValidUrl_returnsUri() = runTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
             ParseResult(nextStep = NextStep(nextInput, match)),
-            input.withData(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
+            input.fetch(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
                     nextStep = NextStep(nextInput, data.toString()) // Store data in nextStep, so we can test it
                 )
@@ -48,11 +48,11 @@ class UriInputTest {
     }
 
     @Test
-    fun withData_whenDataIsInvalidUrl_returnsUri() = runTest {
+    fun fetch_whenDataIsInvalidUrl_returnsUri() = runTest {
         val match = "https://[invalid:ipv6]/"
         assertEquals(
             ParseResult(nextStep = NextStep(nextInput, match)),
-            input.withData(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
+            input.fetch(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
                     nextStep = NextStep(nextInput, data.toString()) // Store data in nextStep, so we can test it
                 )

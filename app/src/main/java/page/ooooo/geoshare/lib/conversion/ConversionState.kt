@@ -193,9 +193,9 @@ data class PermissionGranted<T>(
 }
 
 /**
- * Fetches input data using [BasicInput.withData] and parses it using [BasicInput.parse].
+ * Fetches input data using [BasicInput.fetch] and parses it using [BasicInput.parse].
  *
- * When [BasicInput.withData] fails, it is retried up to [maxAttempts]. Retrying is done by recursively transitioning
+ * When [BasicInput.fetch] fails, it is retried up to [maxAttempts]. Retrying is done by recursively transitioning
  * this state while tracking the number of attempts made and the cause of the last failure in [lastAttempt].
  *
  * We use this custom retrying instead of the [io.ktor.client.plugins.HttpRequestRetry] plugin, because it makes the
@@ -228,8 +228,9 @@ data class PermissionGrantedBasicInput<T>(
                     )
                     delay(delayMillis)
                 }
+                // TODO Pass dispatcher
                 val result =
-                    input.withData(
+                    input.fetch(
                         match, stateContext.engine, stateContext.log, stateContext.uriQuote
                     ) { data ->
                         input.parse(data, match, prevResult, stateContext.uriQuote, stateContext.log)

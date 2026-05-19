@@ -14,7 +14,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GoogleMapsPlaceListWebViewInput @Inject constructor() : WebViewInput {
+class GoogleMapsPlaceListInput @Inject constructor() : WebViewInput {
 
     @Serializable
     private data class ExtractedPoint(val lat: Double?, val lon: Double?)

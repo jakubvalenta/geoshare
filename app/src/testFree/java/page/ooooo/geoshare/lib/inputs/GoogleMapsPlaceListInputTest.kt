@@ -8,8 +8,8 @@ import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 
-class GoogleMapsPlaceListWebViewInputTest : InputTest {
-    private val input = GoogleMapsPlaceListWebViewInput()
+class GoogleMapsPlaceListInputTest : InputTest {
+    private val input = GoogleMapsPlaceListInput()
 
     @Test
     fun parse_whenDataIsValidJsonObject_returnsPoints() = runTest {

@@ -25,7 +25,7 @@ interface TextInput : BasicInput<String> {
 
     override fun match(source: String) = pattern.find(source)?.groupOrNull()
 
-    override suspend fun withData(
+    override suspend fun fetch(
         match: String,
         engine: HttpClientEngine,
         log: Log,
@@ -42,7 +42,7 @@ interface UriInput : BasicInput<Uri> {
 
     override fun match(source: String) = pattern.find(source)?.groupOrNull()
 
-    override suspend fun withData(
+    override suspend fun fetch(
         match: String,
         engine: HttpClientEngine,
         log: Log,
@@ -61,7 +61,7 @@ interface GetLastHopUrlInput : UriInput, Input.HasPermission {
     @Suppress("SameReturnValue")
     val userAgent: String? get() = null
 
-    override suspend fun withData(
+    override suspend fun fetch(
         match: String,
         engine: HttpClientEngine,
         log: Log,
@@ -97,7 +97,7 @@ interface HeadLocationHeaderInput : UriInput, Input.HasPermission {
     @Suppress("SameReturnValue")
     val userAgent: String? get() = null
 
-    override suspend fun withData(
+    override suspend fun fetch(
         match: String,
         engine: HttpClientEngine,
         log: Log,
@@ -133,7 +133,7 @@ interface BodyAsChannelInput : BasicInput<ByteReadChannel>, Input.HasPermission 
     @Suppress("SameReturnValue")
     val userAgent: String? get() = null
 
-    override suspend fun withData(
+    override suspend fun fetch(
         match: String,
         engine: HttpClientEngine,
         log: Log,
@@ -171,7 +171,7 @@ interface BodyAsTextInput : BasicInput<String>, Input.HasPermission {
     @Suppress("SameReturnValue")
     val userAgent: String? get() = null
 
-    override suspend fun withData(
+    override suspend fun fetch(
         match: String,
         engine: HttpClientEngine,
         log: Log,

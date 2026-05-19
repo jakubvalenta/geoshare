@@ -31,7 +31,7 @@ class GoogleMapsPlaceApiInput @Inject constructor(
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_geo_share_loading_indicator_title
 
-    override suspend fun withData(
+    override suspend fun fetch(
         match: String,
         engine: HttpClientEngine,
         log: Log,

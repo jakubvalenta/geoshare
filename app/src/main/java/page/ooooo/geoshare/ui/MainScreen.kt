@@ -80,6 +80,7 @@ import kotlinx.coroutines.launch
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
+import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.di.FakeLinkRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
@@ -124,7 +125,6 @@ import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.DebugWebViewInput
-import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.network.ConnectTimeoutNetworkException
 import page.ooooo.geoshare.lib.outputs.Action
@@ -2212,6 +2212,7 @@ private fun LoadingIndicatorPreview() {
         val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val inputRepository = FakeInputRepository()
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
@@ -2225,10 +2226,7 @@ private fun LoadingIndicatorPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            input = GoogleMapsHtmlInput(
-                googleMapsUriInput = { throw NotImplementedError() },
-                googleMapsWebViewInput = { throw NotImplementedError() },
-            ),
+            input = inputRepository.googleMapsShortLinkInput,
             permission = Permission.ALWAYS,
             lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )
@@ -2288,6 +2286,7 @@ private fun DarkLoadingIndicatorPreview() {
         val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val inputRepository = FakeInputRepository()
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
@@ -2301,10 +2300,7 @@ private fun DarkLoadingIndicatorPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            input = GoogleMapsHtmlInput(
-                googleMapsUriInput = { throw NotImplementedError() },
-                googleMapsWebViewInput = { throw NotImplementedError() },
-            ),
+            input = inputRepository.googleMapsShortLinkInput,
             permission = Permission.ALWAYS,
             lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )
@@ -2364,6 +2360,7 @@ private fun TabletLoadingIndicatorPreview() {
         val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val inputRepository = FakeInputRepository()
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
@@ -2377,10 +2374,7 @@ private fun TabletLoadingIndicatorPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            input = GoogleMapsHtmlInput(
-                googleMapsUriInput = { throw NotImplementedError() },
-                googleMapsWebViewInput = { throw NotImplementedError() },
-            ),
+            input = inputRepository.googleMapsShortLinkInput,
             permission = Permission.ALWAYS,
             lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )

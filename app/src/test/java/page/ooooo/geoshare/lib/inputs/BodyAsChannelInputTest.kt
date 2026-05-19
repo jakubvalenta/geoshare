@@ -47,7 +47,7 @@ class BodyAsChannelInputTest {
     @Test(expected = MalformedURLException::class)
     fun whenMatchIsInvalidURL_throwsMalformedURLException() = runTest {
         val match = "https://[invalid:ipv6]/"
-        input.withData(match, engine, log, uriQuote, coroutineContext = testScheduler) {
+        input.fetch(match, engine, log, uriQuote, coroutineContext = testScheduler) {
             ParseResult()
         }
     }
@@ -57,7 +57,7 @@ class BodyAsChannelInputTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
             ParseResult(nextStep = NextStep(nextInput, "test data")),
-            input.withData(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
+            input.fetch(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
                     nextStep = NextStep(
                         nextInput,
@@ -76,7 +76,7 @@ class BodyAsChannelInputTest {
         val match = "maps.google.com/foo"
         assertEquals(
             ParseResult(nextStep = NextStep(nextInput, "test data")),
-            input.withData(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
+            input.fetch(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
                 ParseResult(
                     nextStep = NextStep(
                         nextInput,
@@ -90,7 +90,7 @@ class BodyAsChannelInputTest {
     @Test(expected = NetworkException::class)
     fun whenHttpClientRespondsError_throwsNetworkException() = runTest {
         val match = "https://maps.google.com/not-found"
-        input.withData(match, engine, log, uriQuote, coroutineContext = testScheduler) {
+        input.fetch(match, engine, log, uriQuote, coroutineContext = testScheduler) {
             ParseResult()
         }
     }

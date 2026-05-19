@@ -36,7 +36,7 @@ sealed interface Input<T> {
 }
 
 interface BasicInput<T> : Input<T> {
-    suspend fun withData(
+    suspend fun fetch(
         match: String,
         engine: HttpClientEngine = CIO.create(),
         log: Log = DefaultLog,

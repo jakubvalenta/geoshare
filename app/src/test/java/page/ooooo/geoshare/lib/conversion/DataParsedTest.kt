@@ -8,12 +8,11 @@ import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInput
-import page.ooooo.geoshare.lib.inputs.GoogleMapsUriInput
 import page.ooooo.geoshare.lib.inputs.NextStep
 import page.ooooo.geoshare.lib.inputs.ParseResult
 
@@ -25,15 +24,9 @@ class DataParsedTest {
     }
     private val source = "https://maps.google.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-    private val googleMapsHtmlInput = GoogleMapsHtmlInput(
-        googleMapsUriInput = { throw NotImplementedError() },
-        googleMapsWebViewInput = { throw NotImplementedError() },
-    )
-    private val input = GoogleMapsUriInput(
-        googleMapsHtmlInput = { googleMapsHtmlInput },
-        googleMapsPlaceApiInput = { throw NotImplementedError() },
-        googleMapsPlaceListWebViewInput = { throw NotImplementedError() }
-    )
+    private val inputRepository = FakeInputRepository()
+    private val input = inputRepository.googleMapsShortLinkInput
+    private val nextInput = inputRepository.debugUriInput
     private val stateContext: ConversionStateContext = mock {
         on { this@on.log } doReturn log
         on { this@on.resources } doReturn resources
@@ -52,7 +45,7 @@ class DataParsedTest {
     @Test
     fun transition_whenLastPointHasNoCoordinatesAndNextStepIsSet_returnsInputFound() = runTest {
         val points = persistentListOf(WGS84Point(name = "bar", source = Source.GENERATED))
-        val nextStep = NextStep(googleMapsHtmlInput, source)
+        val nextStep = NextStep(nextInput, source)
         val result = ParseResult(points, nextStep)
         val permission = Permission.ALWAYS
         val state = DataParsed(stateContext, source, match = source, input, result, permission)

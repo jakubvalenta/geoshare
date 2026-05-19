@@ -7,8 +7,7 @@ import org.junit.Test
 class GoogleMapsWebViewInputTest : InputTest {
     private val googleMapsUriInput = GoogleMapsUriInput(
         googleMapsHtmlInput = { throw NotImplementedError() },
-        googleMapsPlaceApiInput = { throw NotImplementedError() },
-        googleMapsPlaceListWebViewInput = { throw NotImplementedError() },
+        googleMapsPlaceListInput = { throw NotImplementedError() },
     )
     private val input = GoogleMapsWebViewInput(
         googleMapsUriInput = { googleMapsUriInput },
