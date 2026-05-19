@@ -119,6 +119,7 @@ fun ResultError(
                 }
             }
         } else {
+            // TODO Retry loading indicator could use some bottom padding
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                 LoadingIndicator(Modifier.size(96.dp), color = LocalContentColor.current)
             }
