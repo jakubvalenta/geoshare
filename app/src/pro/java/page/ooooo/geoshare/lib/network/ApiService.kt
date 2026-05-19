@@ -111,7 +111,7 @@ class ApiService @Inject constructor(
                 json()
             }
         }.use { client ->
-            val privateKeyEntry = getOrGenerateKey()
+            val privateKeyEntry = getKey() ?: return null
             val privateKey = privateKeyEntry.privateKey
             val publicKey = privateKeyEntry.certificateChain.first().publicKey
             val publicKeyBase64 = publicKey.encoded.base64Encode()
@@ -163,11 +163,6 @@ class ApiService @Inject constructor(
                 json()
             }
         }.use { client ->
-            val privateKeyEntry = getOrGenerateKey()
-            val privateKey = privateKeyEntry.privateKey
-            val publicKey = privateKeyEntry.certificateChain.first().publicKey
-            val publicKeyBase64 = publicKey.encoded.base64Encode()
-
             // Registration challenge
             val registrationChallenge = try {
                 client
@@ -177,6 +172,11 @@ class ApiService @Inject constructor(
                 logResponseErrorMessage(e.response)
                 throw e
             }
+
+            val privateKeyEntry = generateKey(registrationChallenge)
+            val privateKey = privateKeyEntry.privateKey
+            val publicKey = privateKeyEntry.certificateChain.first().publicKey
+            val publicKeyBase64 = publicKey.encoded.base64Encode()
 
             // Register
             val registrationSignature = privateKey.sign(registrationChallenge)
@@ -202,10 +202,9 @@ class ApiService @Inject constructor(
     }
 
     /**
-     * See https://developer.android.com/privacy-and-security/keystore
+     * Try to get a key from the key store.
      */
-    private fun getOrGenerateKey(): KeyStore.PrivateKeyEntry {
-        // Try to get key from the key store
+    private fun getKey(): KeyStore.PrivateKeyEntry? {
         val keyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
         val entry = try {
             keyStore.getEntry(KEYSTORE_ALIAS, null)
@@ -213,27 +212,35 @@ class ApiService @Inject constructor(
             log.e(TAG, "Failed to get key from the key store", tr)
             null
         }
-        if (entry is KeyStore.PrivateKeyEntry) {
-            return entry
-        }
+        return entry as? KeyStore.PrivateKeyEntry
+    }
 
-        // Generate new key; if there was a corrupt key in the key store, overwrite it
+    /**
+     * Generate new key and save it in the key store.
+     *
+     * If there was a corrupt key in the key store, overwrite it.
+     */
+    private fun generateKey(challenge: ByteArray): KeyStore.PrivateKeyEntry {
         log.i(TAG, "Generating new key")
         val keyPairGenerator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore")
         val params = KeyGenParameterSpec.Builder(
-            KEYSTORE_ALIAS, KeyProperties.PURPOSE_SIGN or KeyProperties.PURPOSE_VERIFY
+            KEYSTORE_ALIAS,
+            KeyProperties.PURPOSE_SIGN or KeyProperties.PURPOSE_VERIFY
         ).run {
             setAlgorithmParameterSpec(
                 ECGenParameterSpec(@Suppress("SpellCheckingInspection") "secp256r1")
             )
             setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512)
+            // Setting attestation challenge triggers the signing of the certificate by the attestation certificate
+            setAttestationChallenge(challenge)
             // Don't use StrongBox, because it's not available on all devices, and we probably don't need that level of
             // security
             build()
         }
         keyPairGenerator.initialize(params)
         keyPairGenerator.generateKeyPair()
-        keyStore.load(null) // Make sure the key store is fresh
+
+        val keyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
         return keyStore.getEntry(KEYSTORE_ALIAS, null) as? KeyStore.PrivateKeyEntry
             ?: throw IllegalStateException("Key generation succeeded but key store entry not found")
     }
