@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
+import io.ktor.client.engine.HttpClientEngine
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
@@ -11,6 +12,9 @@ import javax.inject.Singleton
 @Singleton
 class AmapShortLinkInput @Inject constructor(
     private val amapUriInput: dagger.Lazy<AmapUriInput>,
+    override val engine: HttpClientEngine,
+    override val log: Log,
+    override val uriQuote: UriQuote,
 ) : HeadLocationHeaderInput {
     override val pattern = Regex("""((?:https?://)?surl\.amap\.com/\S+)""")
     override val documentation = InputDocumentation(
@@ -26,13 +30,7 @@ class AmapShortLinkInput @Inject constructor(
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_amap_loading_indicator_title
 
-    override suspend fun parse(
-        data: Uri,
-        match: String,
-        prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
-    ) = buildParseResult {
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = buildParseResult {
         nextStep = NextStep(amapUriInput.get(), data.toString())
     }
 

@@ -4,17 +4,25 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import io.ktor.client.engine.mock.MockEngine
 import page.ooooo.geoshare.data.DefaultInputRepository
 import page.ooooo.geoshare.data.InputRepository
+import page.ooooo.geoshare.lib.FakeLog
+import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.inputs.AmapShortLinkInput
 import page.ooooo.geoshare.lib.inputs.AmapUriInput
+import page.ooooo.geoshare.lib.inputs.AppleMapsHtmlInput
 import page.ooooo.geoshare.lib.inputs.AppleMapsUriInput
 import page.ooooo.geoshare.lib.inputs.BaiduMapShortLinkInput
 import page.ooooo.geoshare.lib.inputs.BaiduMapUriInput
+import page.ooooo.geoshare.lib.inputs.BaiduMapWebViewInput
 import page.ooooo.geoshare.lib.inputs.CartesIGNUriInput
 import page.ooooo.geoshare.lib.inputs.CoordinateInput
 import page.ooooo.geoshare.lib.inputs.DebugUriInput
+import page.ooooo.geoshare.lib.inputs.DebugWebViewInput
 import page.ooooo.geoshare.lib.inputs.GeoUriInput
+import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInput
+import page.ooooo.geoshare.lib.inputs.GoogleMapsPlaceListInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsShortLinkInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsUriInput
 import page.ooooo.geoshare.lib.inputs.HereWeGoUriInput
@@ -22,11 +30,16 @@ import page.ooooo.geoshare.lib.inputs.MagicEarthUriInput
 import page.ooooo.geoshare.lib.inputs.MapsMeUriInput
 import page.ooooo.geoshare.lib.inputs.MapyComShortLinkInput
 import page.ooooo.geoshare.lib.inputs.MapyComUriInput
+import page.ooooo.geoshare.lib.inputs.OpenStreetMapApiInput
 import page.ooooo.geoshare.lib.inputs.OpenStreetMapUriInput
 import page.ooooo.geoshare.lib.inputs.OsmAndUriInput
+import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.inputs.PlusCodeInput
+import page.ooooo.geoshare.lib.inputs.UrbiHtmlInput
 import page.ooooo.geoshare.lib.inputs.UrbiUriInput
+import page.ooooo.geoshare.lib.inputs.WazeHtmlInput
 import page.ooooo.geoshare.lib.inputs.WazeUriInput
+import page.ooooo.geoshare.lib.inputs.YandexMapsHtmlInput
 import page.ooooo.geoshare.lib.inputs.YandexMapsShortLinkInput
 import page.ooooo.geoshare.lib.inputs.YandexMapsUriInput
 import javax.inject.Singleton
@@ -89,55 +102,143 @@ object InputRepositoryModule {
         )
 }
 
-class FakeInputRepository(
-    override val amapShortLinkInput: AmapShortLinkInput = AmapShortLinkInput(
-        amapUriInput = { throw NotImplementedError() },
-    ),
-    override val amapUriInput: AmapUriInput = AmapUriInput(),
-    override val appleMapsUriInput: AppleMapsUriInput = AppleMapsUriInput(
-        appleMapsHtmlInput = { throw NotImplementedError() },
-    ),
-    override val baiduMapShortLinkInput: BaiduMapShortLinkInput = BaiduMapShortLinkInput(
-        baiduMapUriInput = { throw NotImplementedError() },
-    ),
-    override val baiduMapUriInput: BaiduMapUriInput = BaiduMapUriInput(
-        baiduMapWebViewInput = { throw NotImplementedError() },
-    ),
-    override val cartesIGNUriInput: CartesIGNUriInput = CartesIGNUriInput(),
-    override val coordinateInput: CoordinateInput = CoordinateInput(),
-    override val debugUriInput: DebugUriInput = DebugUriInput(
-        debugWebViewInput = { throw NotImplementedError() },
-    ),
-    override val geoUriInput: GeoUriInput = GeoUriInput(),
-    override val googleMapsShortLinkInput: GoogleMapsShortLinkInput = GoogleMapsShortLinkInput(
-        googleMapsUriInput = { throw NotImplementedError() },
-    ),
-    override val googleMapsUriInput: GoogleMapsUriInput = GoogleMapsUriInput(
-        googleMapsHtmlInput = { throw NotImplementedError() },
-        googleMapsPlaceListInput = { throw NotImplementedError() },
-    ),
-    override val hereWeGoUriInput: HereWeGoUriInput = HereWeGoUriInput(),
-    override val magicEarthUriInput: MagicEarthUriInput = MagicEarthUriInput(),
-    override val mapsMeUriInput: MapsMeUriInput = MapsMeUriInput(),
-    override val mapyComShortLinkInput: MapyComShortLinkInput = MapyComShortLinkInput(
-        mapyComUriInput = { throw NotImplementedError() },
-    ),
-    override val mapyComUriInput: MapyComUriInput = MapyComUriInput(),
-    override val openStreetMapUriInput: OpenStreetMapUriInput = OpenStreetMapUriInput(
-        openStreetMapApiInput = { throw NotImplementedError() },
-    ),
-    override val osmAndUriInput: OsmAndUriInput = OsmAndUriInput(),
-    override val plusCodeInput: PlusCodeInput = PlusCodeInput(),
-    override val urbiUriInput: UrbiUriInput = UrbiUriInput(
-        urbiHtmlInput = { throw NotImplementedError() },
-    ),
-    override val wazeUriInput: WazeUriInput = WazeUriInput(
-        wazeHtmlInput = { throw NotImplementedError() },
-    ),
-    override val yandexMapsShortLinkInput: YandexMapsShortLinkInput = YandexMapsShortLinkInput(
-        yandexMapsUriInput = { throw NotImplementedError() },
-    ),
-    override val yandexMapsUriInput: YandexMapsUriInput = YandexMapsUriInput(
-        yandexMapsHtmlInput = { throw NotImplementedError() },
-    ),
-) : InputRepository
+object FakeInputRepository : InputRepository {
+    private val engine = MockEngine { throw NotImplementedError() }
+    private val log = FakeLog
+    private val uriQuote = FakeUriQuote
+
+    override val amapShortLinkInput = AmapShortLinkInput(
+        amapUriInput = { amapUriInput },
+        engine = engine,
+        log = log,
+        uriQuote = uriQuote,
+    )
+    override val amapUriInput = AmapUriInput(
+        uriQuote = uriQuote,
+    )
+    override val appleMapsUriInput = AppleMapsUriInput(
+        appleMapsHtmlInput = { appleMapsHtmlInput },
+        uriQuote = uriQuote,
+    )
+    val appleMapsHtmlInput = AppleMapsHtmlInput(
+        engine = engine,
+        log = log,
+        uriQuote = uriQuote,
+    )
+    override val baiduMapShortLinkInput = BaiduMapShortLinkInput(
+        baiduMapUriInput = { baiduMapUriInput },
+        engine = engine,
+        log = log,
+        uriQuote = uriQuote,
+    )
+    override val baiduMapUriInput = BaiduMapUriInput(
+        baiduMapWebViewInput = { baiduMapWebViewInput },
+        uriQuote = uriQuote,
+    )
+    val baiduMapWebViewInput = BaiduMapWebViewInput(
+        log = FakeLog,
+    )
+    override val cartesIGNUriInput = CartesIGNUriInput(
+        uriQuote = uriQuote,
+    )
+    override val coordinateInput = CoordinateInput()
+    override val debugUriInput = DebugUriInput(
+        debugWebViewInput = { debugWebViewInput },
+        uriQuote = uriQuote,
+    )
+    val debugWebViewInput = DebugWebViewInput()
+    override val geoUriInput = GeoUriInput(
+        uriQuote = uriQuote,
+    )
+    override val googleMapsShortLinkInput = GoogleMapsShortLinkInput(
+        googleMapsUriInput = { googleMapsUriInput },
+        engine = engine,
+        log = log,
+        uriQuote = uriQuote,
+    )
+    override val googleMapsUriInput = GoogleMapsUriInput(
+        googleMapsHtmlInput = { googleMapsHtmlInput },
+        googleMapsPlaceListInput = { googleMapsPlaceListInput },
+        uriQuote = uriQuote,
+    )
+    val googleMapsHtmlInput = object : GoogleMapsHtmlInput<Unit> {
+        override suspend fun fetch(
+            match: String,
+            block: suspend (Unit) -> ParseResult,
+        ) = throw NotImplementedError()
+
+        override suspend fun parse(
+            data: Unit,
+            match: String,
+            prevResult: ParseResult?,
+        ) = throw NotImplementedError()
+    }
+    val googleMapsPlaceListInput = GoogleMapsPlaceListInput(
+        log = log,
+    )
+    override val hereWeGoUriInput = HereWeGoUriInput(
+        uriQuote = uriQuote,
+    )
+    override val magicEarthUriInput = MagicEarthUriInput(
+        uriQuote = uriQuote,
+    )
+    override val mapsMeUriInput = MapsMeUriInput(
+        uriQuote = uriQuote,
+    )
+    override val mapyComShortLinkInput = MapyComShortLinkInput(
+        mapyComUriInput = { mapyComUriInput },
+        engine = engine,
+        log = log,
+        uriQuote = uriQuote,
+    )
+    override val mapyComUriInput = MapyComUriInput(
+        uriQuote = uriQuote,
+    )
+    override val openStreetMapUriInput = OpenStreetMapUriInput(
+        openStreetMapApiInput = { openStreetMapApiInput },
+        uriQuote = uriQuote,
+    )
+    val openStreetMapApiInput = OpenStreetMapApiInput(
+        engine = engine,
+        log = log,
+        uriQuote = uriQuote,
+    )
+    override val osmAndUriInput = OsmAndUriInput(
+        uriQuote = uriQuote,
+    )
+    override val plusCodeInput = PlusCodeInput()
+    override val urbiUriInput = UrbiUriInput(
+        urbiHtmlInput = { urbiHtmlInput },
+        uriQuote = uriQuote,
+    )
+    val urbiHtmlInput: UrbiHtmlInput = UrbiHtmlInput(
+        urbiUriInput = { urbiUriInput },
+        engine = engine,
+        log = log,
+        uriQuote = uriQuote,
+    )
+    override val wazeUriInput = WazeUriInput(
+        wazeHtmlInput = { wazeHtmlInput },
+        uriQuote = uriQuote
+    )
+    val wazeHtmlInput = WazeHtmlInput(
+        engine = engine,
+        log = log,
+        uriQuote = uriQuote,
+    )
+    override val yandexMapsShortLinkInput = YandexMapsShortLinkInput(
+        yandexMapsUriInput = { yandexMapsUriInput },
+        engine = engine,
+        log = log,
+        uriQuote = uriQuote,
+    )
+    override val yandexMapsUriInput = YandexMapsUriInput(
+        yandexMapsHtmlInput = { yandexMapsHtmlInput },
+        uriQuote = uriQuote,
+    )
+    val yandexMapsHtmlInput = YandexMapsHtmlInput(
+        engine = engine,
+        log = log,
+        uriQuote = uriQuote,
+    )
+}

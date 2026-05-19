@@ -7,7 +7,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.network.DESKTOP_USER_AGENT
@@ -15,7 +14,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class BaiduMapWebViewInput @Inject constructor() : WebViewInput {
+class BaiduMapWebViewInput @Inject constructor(
+    private val log: Log,
+) : WebViewInput {
 
     @Serializable
     private data class ExtractedPoint(val lat: Double?, val lon: Double?, val z: Double?, val name: String?)
@@ -57,8 +58,6 @@ class BaiduMapWebViewInput @Inject constructor() : WebViewInput {
         data: String,
         match: String,
         prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
     ) = buildParseResult {
         val json = Json {
             explicitNulls = false

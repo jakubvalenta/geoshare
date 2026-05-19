@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
+import io.ktor.client.engine.HttpClientEngine
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readLine
 import kotlinx.collections.immutable.persistentListOf
@@ -16,7 +17,11 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class YandexMapsHtmlInput @Inject constructor() : BodyAsChannelInput {
+class YandexMapsHtmlInput @Inject constructor(
+    override val engine: HttpClientEngine,
+    override val log: Log,
+    override val uriQuote: UriQuote,
+) : BodyAsChannelInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_yandex_maps_permission_title
 
@@ -27,8 +32,6 @@ class YandexMapsHtmlInput @Inject constructor() : BodyAsChannelInput {
         data: ByteReadChannel,
         match: String,
         prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
     ) = buildParseResult {
         val pointPattern = Regex("""pt=$LON%2C$LAT""")
         val namePattern = Regex("""itemProp="name"[^>]*>([^<]+)""")

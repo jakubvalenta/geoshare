@@ -1,41 +1,16 @@
 package page.ooooo.geoshare.lib.inputs
 
-import io.ktor.client.engine.HttpClientEngine
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
-import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
-import kotlin.coroutines.CoroutineContext
 
 class GoogleMapsUriInputTest : InputTest {
-    private val googleMapsHtmlInput = object : GoogleMapsHtmlInput<Unit> {
-        override suspend fun fetch(
-            match: String,
-            engine: HttpClientEngine,
-            log: Log,
-            uriQuote: UriQuote,
-            coroutineContext: CoroutineContext,
-            block: suspend (Unit) -> ParseResult,
-        ) = throw NotImplementedError()
-
-        override suspend fun parse(
-            data: Unit,
-            match: String,
-            prevResult: ParseResult?,
-            uriQuote: UriQuote,
-            log: Log,
-        ) = throw NotImplementedError()
-    }
-    private val googleMapsPlaceListInput = GoogleMapsPlaceListInput()
-    private val input = GoogleMapsUriInput(
-        googleMapsHtmlInput = { googleMapsHtmlInput },
-        googleMapsPlaceListInput = { googleMapsPlaceListInput },
-    )
+    private val input = FakeInputRepository.googleMapsUriInput
 
     @Test
     fun match_fullUrl() {
@@ -327,7 +302,7 @@ class GoogleMapsUriInputTest : InputTest {
                     )
                 ),
                 nextStep = NextStep(
-                    googleMapsHtmlInput,
+                    FakeInputRepository.googleMapsHtmlInput,
                     "https://www.google.com/maps/place/Pozna%C5%84+Old+Town,+61-001+Pozna%C5%84,+Poland/data=12345?utm_source=mstt_1&entry=gps&coh=12345&g_ep=abcd"
                 )
             ),
@@ -342,7 +317,7 @@ class GoogleMapsUriInputTest : InputTest {
                     )
                 ),
                 nextStep = NextStep(
-                    googleMapsHtmlInput,
+                    FakeInputRepository.googleMapsHtmlInput,
                     "https://www.google.com/maps/place/Wikimedia+Foundation,+Inc.,+1+Sansome+St+%231895,+San+Francisco,+CA+94104,+Vereinigte+Staaten/data=!4m2!3m1!1s0x8085807d3bb6272b:0xfeadb8d7203f8179!17m2!4m1!1e3!18m1!1e1"
                 )
             ),
@@ -355,7 +330,7 @@ class GoogleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    googleMapsHtmlInput,
+                    FakeInputRepository.googleMapsHtmlInput,
                     "https://www.google.com/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705:0xa9ea51361ed84bda"
                 )
             ),
@@ -368,7 +343,7 @@ class GoogleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    googleMapsPlaceListInput,
+                    FakeInputRepository.googleMapsPlaceListInput,
                     "https://www.google.com/maps/placelists/list/XXX?g_ep=ghijkl%3D&g_st=isi"
                 )
             ),
@@ -381,7 +356,7 @@ class GoogleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    googleMapsPlaceListInput,
+                    FakeInputRepository.googleMapsPlaceListInput,
                     "https://www.google.com/maps/@/data=!3m1!4b1!4m3!11m2!2sXXX!3e3?skid=foo&g_ep=bar&entry=tts"
                 )
             ),
@@ -430,7 +405,7 @@ class GoogleMapsUriInputTest : InputTest {
                     )
                 ),
                 nextStep = NextStep(
-                    googleMapsHtmlInput,
+                    FakeInputRepository.googleMapsHtmlInput,
                     "https://www.google.com/maps/search/?api=1&query=centurylink%2Bfield"
                 )
             ),
@@ -482,7 +457,7 @@ class GoogleMapsUriInputTest : InputTest {
             ParseResult(
                 persistentListOf(GCJ02MainlandChinaPoint(name = "Cherbourg,France", source = Source.URI)),
                 nextStep = NextStep(
-                    googleMapsHtmlInput,
+                    FakeInputRepository.googleMapsHtmlInput,
                     "https://www.google.com/?destination=Cherbourg,France&q=Paris,France"
                 )
             ),
@@ -492,7 +467,7 @@ class GoogleMapsUriInputTest : InputTest {
             ParseResult(
                 persistentListOf(GCJ02MainlandChinaPoint(name = "Cherbourg,France", source = Source.URI)),
                 nextStep = NextStep(
-                    googleMapsHtmlInput,
+                    FakeInputRepository.googleMapsHtmlInput,
                     "https://www.google.com/?destination=Cherbourg,France&query=Paris,France"
                 )
             ),
@@ -552,7 +527,10 @@ class GoogleMapsUriInputTest : InputTest {
                     GCJ02MainlandChinaPoint(name = "New York, NY", source = Source.URI),
                     GCJ02MainlandChinaPoint(name = "Los Angeles, CA", source = Source.URI),
                 ),
-                nextStep = NextStep(googleMapsHtmlInput, "https://www.google.com/maps/dir/New+York,+NY/Los+Angeles,+CA")
+                nextStep = NextStep(
+                    FakeInputRepository.googleMapsHtmlInput,
+                    "https://www.google.com/maps/dir/New+York,+NY/Los+Angeles,+CA"
+                )
             ),
             input.parse("https://www.google.com/maps/dir/New+York,+NY/Los+Angeles,+CA"),
         )
@@ -566,7 +544,10 @@ class GoogleMapsUriInputTest : InputTest {
                     GCJ02MainlandChinaPoint(name = "Berlin", source = Source.URI),
                     GCJ02MainlandChinaPoint(name = "Potsdam", source = Source.URI),
                 ),
-                nextStep = NextStep(googleMapsHtmlInput, "https://www.google.com/maps/dir/Berlin/Potsdam/data=spam")
+                nextStep = NextStep(
+                    FakeInputRepository.googleMapsHtmlInput,
+                    "https://www.google.com/maps/dir/Berlin/Potsdam/data=spam"
+                )
             ),
             input.parse("https://www.google.com/maps/dir/Berlin/Potsdam/data=spam"),
         )
@@ -582,7 +563,7 @@ class GoogleMapsUriInputTest : InputTest {
                     GCJ02MainlandChinaPoint(name = "Washington, DC", source = Source.URI),
                 ),
                 nextStep = NextStep(
-                    googleMapsHtmlInput,
+                    FakeInputRepository.googleMapsHtmlInput,
                     "https://www.google.com/maps/dir/New+York,+NY/Philadelphia,+PA/Washington,+DC"
                 )
             ),
@@ -696,7 +677,7 @@ class GoogleMapsUriInputTest : InputTest {
                     )
                 ),
                 nextStep = NextStep(
-                    googleMapsHtmlInput,
+                    FakeInputRepository.googleMapsHtmlInput,
                     "https://maps.google.com/maps?f=d&daddr=2088 Albion Rd+@43.7481,-79.6332"
                 )
             ),
@@ -709,7 +690,7 @@ class GoogleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    googleMapsHtmlInput,
+                    FakeInputRepository.googleMapsHtmlInput,
                     "https://www.google.com/maps/dir/"
                 )
             ),
@@ -782,7 +763,7 @@ class GoogleMapsUriInputTest : InputTest {
                     GCJ02MainlandChinaPoint(name = "Cherbourg,France", source = Source.URI),
                 ),
                 nextStep = NextStep(
-                    googleMapsHtmlInput,
+                    FakeInputRepository.googleMapsHtmlInput,
                     "https://www.google.com/maps/dir/?api=1&origin=Paris,France&destination=Cherbourg,France&travelmode=driving&waypoints=Versailles,France%7CChartres,France%7CLe%2BMans,France%7CCaen,France"
                 )
             ),
@@ -827,7 +808,10 @@ class GoogleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 persistentListOf(GCJ02MainlandChinaPoint(name = "Central Park", source = Source.URI)),
-                nextStep = NextStep(googleMapsHtmlInput, "https://www.google.com/maps?foo=bar&q=Central Park&spam")
+                nextStep = NextStep(
+                    FakeInputRepository.googleMapsHtmlInput,
+                    "https://www.google.com/maps?foo=bar&q=Central Park&spam"
+                )
             ),
             input.parse("https://www.google.com/maps?foo=bar&q=Central Park&spam"),
         )
@@ -844,7 +828,7 @@ class GoogleMapsUriInputTest : InputTest {
                     )
                 ),
                 nextStep = NextStep(
-                    googleMapsHtmlInput,
+                    FakeInputRepository.googleMapsHtmlInput,
                     "https://maps.google.com?q=Caf%C3%A9+Heinemann,+Bismarckstra%C3%9Fe+91,+41061+M%C3%B6nchengladbach&ftid=0x47b8ac99b0a68bdd:0x8024629be3e9996&entry=gps&lucs=,94224825,94227247,94227248,47071704,47069508,94218641,94233073,94203019,47084304,94208458,94208447"
                 )
             ),
@@ -870,7 +854,7 @@ class GoogleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    googleMapsPlaceListInput,
+                    FakeInputRepository.googleMapsPlaceListInput,
                     "https://www.google.com/maps/d/edit?mid=XXX"
                 )
             ),
@@ -879,7 +863,7 @@ class GoogleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    googleMapsPlaceListInput,
+                    FakeInputRepository.googleMapsPlaceListInput,
                     "https://www.google.com/maps/d/viewer?mid=XXX"
                 )
             ),

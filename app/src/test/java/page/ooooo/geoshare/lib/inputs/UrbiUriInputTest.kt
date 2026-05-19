@@ -5,12 +5,12 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class UrbiUriInputTest : InputTest {
-    private val urbiHtmlInput = UrbiHtmlInput(urbiUriInput = { throw NotImplementedError() })
-    private val input = UrbiUriInput(urbiHtmlInput = { urbiHtmlInput })
+    private val input = FakeInputRepository.urbiUriInput
 
     @Test
     fun match_fullUrl() {
@@ -164,7 +164,7 @@ class UrbiUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    urbiHtmlInput,
+                    FakeInputRepository.urbiHtmlInput,
                     "https://maps.urbi.ae/dubai/geo/13933621232533580"
                 )
             ),
@@ -177,7 +177,7 @@ class UrbiUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    urbiHtmlInput,
+                    FakeInputRepository.urbiHtmlInput,
                     "https://2gis.uz/tashkent/firm/70000001060803297"
                 )
             ),
@@ -206,7 +206,7 @@ class UrbiUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    urbiHtmlInput,
+                    FakeInputRepository.urbiHtmlInput,
                     "https://go.2gis.com/WSTdK"
                 )
             ),
@@ -215,7 +215,7 @@ class UrbiUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    urbiHtmlInput,
+                    FakeInputRepository.urbiHtmlInput,
                     "https://go.urbi.ae/3JtpM"
                 )
             ),

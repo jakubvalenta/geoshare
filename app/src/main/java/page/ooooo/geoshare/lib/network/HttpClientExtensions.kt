@@ -94,6 +94,12 @@ fun HttpClientConfig<*>.rethrowExceptionsAsNetworkException(log: Log = DefaultLo
     HttpResponseValidator {
         handleResponseExceptionWithRequest { cause, request ->
             when (cause) {
+                is NetworkException -> {
+                    // The exception has already been wrapped, probably because it was thrown during authentication
+                    // TODO Test
+                    throw cause
+                }
+
                 is UnresolvedAddressException -> {
                     log.w(TAG, "Unresolved address for ${request.url}", cause)
                     throw UnresolvedAddressNetworkException(cause)

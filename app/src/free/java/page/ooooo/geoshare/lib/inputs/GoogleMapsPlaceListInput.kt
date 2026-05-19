@@ -7,14 +7,15 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GoogleMapsPlaceListInput @Inject constructor() : WebViewInput {
+class GoogleMapsPlaceListInput @Inject constructor(
+    private val log: Log,
+) : WebViewInput {
 
     @Serializable
     private data class ExtractedPoint(val lat: Double?, val lon: Double?)
@@ -84,13 +85,7 @@ class GoogleMapsPlaceListInput @Inject constructor() : WebViewInput {
         }
     """.trimIndent()
 
-    override suspend fun parse(
-        data: String,
-        match: String,
-        prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
-    ) = buildParseResult {
+    override suspend fun parse(data: String, match: String, prevResult: ParseResult?) = buildParseResult {
         val json = Json {
             explicitNulls = false
         }

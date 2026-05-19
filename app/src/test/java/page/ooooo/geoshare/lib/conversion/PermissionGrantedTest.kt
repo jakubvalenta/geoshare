@@ -8,8 +8,6 @@ import org.mockito.kotlin.mock
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.local.preferences.Permission
-import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.ParseResult
@@ -17,7 +15,6 @@ import page.ooooo.geoshare.lib.inputs.WebViewInput
 
 class PermissionGrantedTest {
     private val source = "https://maps.google.com/foo"
-    private val inputRepository = FakeInputRepository()
     private val permission = Permission.ALWAYS
     private val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val prevResult = ParseResult(prevPoints)
@@ -25,7 +22,7 @@ class PermissionGrantedTest {
 
     @Test
     fun transition_whenInputIsBasicInput_returnsPermissionGrantedBasicInput() = runTest {
-        val input = inputRepository.googleMapsShortLinkInput
+        val input = FakeInputRepository.googleMapsShortLinkInput
         val state = PermissionGranted(stateContext, source, match = source, input, permission, prevResult)
         assertEquals(
             PermissionGrantedBasicInput(stateContext, source, match = source, input, permission, prevResult),
@@ -44,8 +41,6 @@ class PermissionGrantedTest {
                 data: String,
                 match: String,
                 prevResult: ParseResult?,
-                uriQuote: UriQuote,
-                log: Log,
             ) = throw NotImplementedError()
         }
         val state = PermissionGranted(stateContext, source, match = source, input, permission, prevResult)

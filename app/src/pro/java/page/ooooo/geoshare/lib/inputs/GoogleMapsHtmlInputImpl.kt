@@ -1,40 +1,23 @@
 package page.ooooo.geoshare.lib.inputs
 
-import io.ktor.client.engine.HttpClientEngine
-import kotlinx.coroutines.withContext
-import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.coroutines.CoroutineContext
 
 @Singleton
 class GoogleMapsHtmlInputImpl @Inject constructor(
     private val googleMapsAddressApiInput: dagger.Lazy<GoogleMapsAddressApiInput>,
     private val googleMapsPlaceApiInput: dagger.Lazy<GoogleMapsPlaceApiInput>,
+    private val uriQuote: UriQuote,
 ) : GoogleMapsHtmlInput<Uri>, BasicInput<Uri> {
 
-    override suspend fun fetch(
-        match: String,
-        engine: HttpClientEngine,
-        log: Log,
-        uriQuote: UriQuote,
-        coroutineContext: CoroutineContext,
-        block: suspend (Uri) -> ParseResult,
-    ) = withContext(coroutineContext) {
+    override suspend fun fetch(match: String, block: suspend (Uri) -> ParseResult) =
         block(Uri.parse(match, uriQuote))
-    }
 
-    override suspend fun parse(
-        data: Uri,
-        match: String,
-        prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
-    ) = buildParseResult {
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = buildParseResult {
         data.run {
             // API directions
             // https://www.google.com/maps/dir/?origin={name}&destination={name}

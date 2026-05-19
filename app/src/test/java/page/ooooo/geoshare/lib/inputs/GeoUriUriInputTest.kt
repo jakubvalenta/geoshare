@@ -5,11 +5,12 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class GeoUriUriInputTest : InputTest {
-    private val input = GeoUriInput()
+    private val input = FakeInputRepository.geoUriInput
 
     @Test
     fun match_geoUri() {

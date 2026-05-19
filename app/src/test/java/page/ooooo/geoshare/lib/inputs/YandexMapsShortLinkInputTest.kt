@@ -4,11 +4,10 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import page.ooooo.geoshare.data.di.FakeInputRepository
 
 class YandexMapsShortLinkInputTest : InputTest {
-    private val yandexMapsHtmlInput = YandexMapsHtmlInput()
-    private val yandexMapsUriInput = YandexMapsUriInput(yandexMapsHtmlInput = { yandexMapsHtmlInput })
-    private val input = YandexMapsShortLinkInput(yandexMapsUriInput = { yandexMapsUriInput })
+    private val input = FakeInputRepository.yandexMapsShortLinkInput
 
     @Test
     fun match_correct() {
@@ -33,7 +32,7 @@ class YandexMapsShortLinkInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    yandexMapsUriInput,
+                    FakeInputRepository.yandexMapsUriInput,
                     "https://yandex.com/maps/org/94933420809/?display-text=Cafes&ll=8.668963,50.111192"
                 )
             ),

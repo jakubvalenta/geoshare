@@ -3,8 +3,6 @@ package page.ooooo.geoshare.lib.inputs
 import android.webkit.WebSettings
 import androidx.annotation.StringRes
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.network.DESKTOP_USER_AGENT
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -24,13 +22,7 @@ class GoogleMapsWebViewInput @Inject constructor(
         () => window.location.href !== 'about:blank' ? window.location.href : undefined;
     """.trimIndent()
 
-    override suspend fun parse(
-        data: String,
-        match: String,
-        prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
-    ) = buildParseResult {
+    override suspend fun parse(data: String, match: String, prevResult: ParseResult?) = buildParseResult {
         nextStep = NextStep(googleMapsUriInput.get(), data)
     }
 

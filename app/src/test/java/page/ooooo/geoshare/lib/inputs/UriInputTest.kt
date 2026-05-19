@@ -1,32 +1,26 @@
 package page.ooooo.geoshare.lib.inputs
 
-import io.ktor.client.engine.mock.MockEngine
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
-import page.ooooo.geoshare.lib.FakeLog
+import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.FakeUriQuote
-import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
 
 class UriInputTest {
     val input = object : UriInput {
+        override val uriQuote = FakeUriQuote
+
         override val pattern = Regex("""(foo)""")
 
         override suspend fun parse(
             data: Uri,
             match: String,
             prevResult: ParseResult?,
-            uriQuote: UriQuote,
-            log: Log,
         ) = throw NotImplementedError()
     }
-    private val nextInput = OsmAndUriInput()
-    private val log = FakeLog
-    private val engine = MockEngine { throw NotImplementedError() }
-    private val uriQuote = FakeUriQuote
+    private val nextInput = FakeInputRepository.osmAndUriInput
 
     @Test
     fun match_returnsFirstRegexGroup() {
@@ -39,7 +33,7 @@ class UriInputTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
             ParseResult(nextStep = NextStep(nextInput, match)),
-            input.fetch(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
+            input.fetch(match) { data ->
                 ParseResult(
                     nextStep = NextStep(nextInput, data.toString()) // Store data in nextStep, so we can test it
                 )
@@ -52,7 +46,7 @@ class UriInputTest {
         val match = "https://[invalid:ipv6]/"
         assertEquals(
             ParseResult(nextStep = NextStep(nextInput, match)),
-            input.fetch(match, engine, log, uriQuote, coroutineContext = testScheduler) { data ->
+            input.fetch(match) { data ->
                 ParseResult(
                     nextStep = NextStep(nextInput, data.toString()) // Store data in nextStep, so we can test it
                 )

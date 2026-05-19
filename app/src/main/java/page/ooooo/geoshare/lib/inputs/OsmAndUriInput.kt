@@ -2,7 +2,6 @@ package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
@@ -17,7 +16,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class OsmAndUriInput @Inject constructor() : UriInput, Input.HasRandomUri {
+class OsmAndUriInput @Inject constructor(
+    override val uriQuote: UriQuote,
+) : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:https?://)?(?:www\.)?osmand\.net/$URI_REST)""")
     override val documentation = InputDocumentation(
         group = InputDocumentationGroup.OSM_AND,
@@ -26,13 +27,7 @@ class OsmAndUriInput @Inject constructor() : UriInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parse(
-        data: Uri,
-        match: String,
-        prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
-    ) = buildParseResult {
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = buildParseResult {
         data.run {
             val z = Regex("""$Z/.*""").matchEntire(fragment)?.doubleGroupOrNull()
 

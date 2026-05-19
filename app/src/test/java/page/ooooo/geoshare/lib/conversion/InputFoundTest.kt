@@ -15,14 +15,12 @@ import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import page.ooooo.geoshare.lib.inputs.GeoUriInput
 import page.ooooo.geoshare.lib.inputs.ParseResult
 
 class InputFoundTest {
     private val log = FakeLog
     private val source = "https://maps.app.goo.gl/foo"
-    private val inputRepository = FakeInputRepository()
-    private val input = inputRepository.googleMapsShortLinkInput
+    private val input = FakeInputRepository.googleMapsShortLinkInput
     private val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val prevResult = ParseResult(prevPoints)
 
@@ -129,7 +127,7 @@ class InputFoundTest {
 
     @Test
     fun transition_whenInputDoesNotHavePermission_returnsPermissionGrantedAndPassesPermissionParam() = runTest {
-        val input = GeoUriInput()
+        val input = FakeInputRepository.geoUriInput
         val stateContext: ConversionStateContext = mock {
             on { this@on.log } doReturn log
         }

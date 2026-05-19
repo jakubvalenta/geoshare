@@ -2,7 +2,6 @@ package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
@@ -20,6 +19,7 @@ import javax.inject.Singleton
 @Singleton
 class YandexMapsUriInput @Inject constructor(
     private val yandexMapsHtmlInput: dagger.Lazy<YandexMapsHtmlInput>,
+    override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/$URI_REST)""")
     override val documentation = InputDocumentation(
@@ -49,13 +49,7 @@ class YandexMapsUriInput @Inject constructor(
         ),
     )
 
-    override suspend fun parse(
-        data: Uri,
-        match: String,
-        prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
-    ) = buildParseResult {
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = buildParseResult {
         data.run {
             val z = listOf(@Suppress("SpellCheckingInspection") "whatshere[zoom]", "z")
                 .firstNotNullOfOrNull { key -> Z_PATTERN.matchEntire(queryParams[key])?.doubleGroupOrNull() }

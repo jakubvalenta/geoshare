@@ -2,7 +2,6 @@ package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.find
@@ -19,6 +18,7 @@ import javax.inject.Singleton
 @Singleton
 class BaiduMapUriInput @Inject constructor(
     private val baiduMapWebViewInput: dagger.Lazy<BaiduMapWebViewInput>,
+    override val uriQuote: UriQuote,
 ) : UriInput {
     override val pattern = Regex("""((?:https?://)?(?:j\.)?map\.baidu\.com/$URI_REST)""")
 
@@ -30,13 +30,7 @@ class BaiduMapUriInput @Inject constructor(
     )
 
     @Suppress("SpellCheckingInspection")
-    override suspend fun parse(
-        data: Uri,
-        match: String,
-        prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
-    ) = buildParseResult {
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = buildParseResult {
         data.run {
             val parts = data.pathParts.drop(1)
             val firstPart = parts.firstOrNull() ?: return@run

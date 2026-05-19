@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
+import io.ktor.client.engine.HttpClientEngine
 import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
@@ -12,7 +13,11 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class OpenStreetMapApiInput @Inject constructor() : BodyAsTextInput {
+class OpenStreetMapApiInput @Inject constructor(
+    override val engine: HttpClientEngine,
+    override val log: Log,
+    override val uriQuote: UriQuote,
+) : BodyAsTextInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_open_street_map_permission_title
 
@@ -23,8 +28,6 @@ class OpenStreetMapApiInput @Inject constructor() : BodyAsTextInput {
         data: String,
         match: String,
         prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
     ) = buildParseResult {
         // Use a simple regex instead of JSON parsing, because it works fine
         val pattern = Regex(""""lat":$LAT,"lon":$LON""")

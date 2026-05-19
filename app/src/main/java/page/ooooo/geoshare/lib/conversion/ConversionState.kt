@@ -228,13 +228,9 @@ data class PermissionGrantedBasicInput<T>(
                     )
                     delay(delayMillis)
                 }
-                // TODO Pass dispatcher
-                val result =
-                    input.fetch(
-                        match, stateContext.engine, stateContext.log, stateContext.uriQuote
-                    ) { data ->
-                        input.parse(data, match, prevResult, stateContext.uriQuote, stateContext.log)
-                    }
+                val result = input.fetch(match) { data ->
+                    input.parse(data, match, prevResult)
+                }
                 DataParsed(stateContext, source, match, input, result, permission, prevResult)
             } catch (_: MalformedURLException) {
                 ConversionFailed(
@@ -314,7 +310,7 @@ data class PermissionGrantedWebViewInput(
                     .filterNotNull()
                     .timeout(timeout)
                     .first()
-                val result = input.parse(data, match, prevResult, stateContext.uriQuote, stateContext.log)
+                val result = input.parse(data, match, prevResult)
                 DataParsed(stateContext, source, match, input, result, permission, prevResult)
             } catch (_: TimeoutCancellationException) {
                 stateContext.log.e(TAG, "Timed out")

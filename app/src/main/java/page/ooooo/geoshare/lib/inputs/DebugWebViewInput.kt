@@ -3,8 +3,6 @@ package page.ooooo.geoshare.lib.inputs
 import androidx.annotation.StringRes
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import javax.inject.Inject
@@ -30,8 +28,6 @@ class DebugWebViewInput @Inject constructor() : WebViewInput {
         data: String,
         match: String,
         prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
     ) = buildParseResult {
         points = persistentListOf(WGS84Point(NaivePoint.genRandomPoint()))
     }

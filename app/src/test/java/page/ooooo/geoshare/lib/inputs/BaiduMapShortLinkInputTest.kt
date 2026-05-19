@@ -3,11 +3,10 @@ package page.ooooo.geoshare.lib.inputs
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import page.ooooo.geoshare.data.di.FakeInputRepository
 
 class BaiduMapShortLinkInputTest : InputTest {
-    private val baiduMapWebViewInput = BaiduMapWebViewInput()
-    private val baiduMapUriInput = BaiduMapUriInput(baiduMapWebViewInput = { baiduMapWebViewInput })
-    private val input = BaiduMapShortLinkInput(baiduMapUriInput = { baiduMapUriInput })
+    private val input = FakeInputRepository.baiduMapShortLinkInput
 
     @Test
     fun match_shortLink() {
@@ -30,7 +29,7 @@ class BaiduMapShortLinkInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    baiduMapUriInput,
+                    FakeInputRepository.baiduMapUriInput,
                     "https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13392211,3619117,17z"
                 )
             ),

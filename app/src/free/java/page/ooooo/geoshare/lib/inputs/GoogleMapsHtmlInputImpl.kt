@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
+import io.ktor.client.engine.HttpClientEngine
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readLine
 import kotlinx.collections.immutable.toImmutableList
@@ -17,12 +18,14 @@ import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Source
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.collections.addAll
 
 @Singleton
 class GoogleMapsHtmlInputImpl @Inject constructor(
     private val googleMapsUriInput: dagger.Lazy<GoogleMapsUriInput>,
     private val googleMapsWebViewInput: dagger.Lazy<GoogleMapsWebViewInput>,
+    override val log: Log,
+    override val engine: HttpClientEngine,
+    override val uriQuote: UriQuote,
 ) : GoogleMapsHtmlInput<ByteReadChannel>, BodyAsChannelInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -33,13 +36,7 @@ class GoogleMapsHtmlInputImpl @Inject constructor(
     override val cookies = GoogleMapsShortLinkInput.cookies
     override val userAgent = GoogleMapsShortLinkInput.USER_AGENT
 
-    override suspend fun parse(
-        data: ByteReadChannel,
-        match: String,
-        prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
-    ) = buildParseResult {
+    override suspend fun parse(data: ByteReadChannel, match: String, prevResult: ParseResult?) = buildParseResult {
         val directionsPreviewPattern = Regex("""%213d$LAT%214d$LON""")
         val pointPattern = Regex("""\[(?:null,null,|null,\[)$LAT,$LON]""")
         val defaultPointLinkPattern = Regex("""/@$LAT,$LON""")

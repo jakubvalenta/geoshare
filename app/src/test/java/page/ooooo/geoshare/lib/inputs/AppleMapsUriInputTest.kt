@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
@@ -12,8 +13,7 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
  * See https://developer.apple.com/library/archive/featuredarticles/iPhoneURLScheme_Reference/MapLinks/MapLinks.html
  */
 class AppleMapsUriInputTest : InputTest {
-    private val appleMapsHtmlInput = AppleMapsHtmlInput()
-    private val input = AppleMapsUriInput(appleMapsHtmlInput = { appleMapsHtmlInput })
+    private val input = FakeInputRepository.appleMapsUriInput
 
     @Test
     fun match_fullUrl() {
@@ -272,7 +272,7 @@ class AppleMapsUriInputTest : InputTest {
             ParseResult(
                 persistentListOf(),
                 nextStep = NextStep(
-                    appleMapsHtmlInput,
+                    FakeInputRepository.appleMapsHtmlInput,
                     "https://maps.apple.com/place?auid=17017496253231963769&lsp=7618"
                 )
             ),
@@ -286,7 +286,7 @@ class AppleMapsUriInputTest : InputTest {
             ParseResult(
                 persistentListOf(),
                 nextStep = NextStep(
-                    appleMapsHtmlInput,
+                    FakeInputRepository.appleMapsHtmlInput,
                     "https://maps.apple.com/place?place-id=I3B04EDEB21D5F86&_provider=9902"
                 )
             ),
@@ -300,7 +300,7 @@ class AppleMapsUriInputTest : InputTest {
             ParseResult(
                 persistentListOf(WGS84Point(name = "Central Park", source = Source.URI)),
                 nextStep = NextStep(
-                    appleMapsHtmlInput,
+                    FakeInputRepository.appleMapsHtmlInput,
                     "https://maps.apple.com/place?place-id=I3B04EDEB21D5F86&_provider=9902&q=Central+Park"
                 )
             ),
@@ -313,7 +313,7 @@ class AppleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    appleMapsHtmlInput,
+                    FakeInputRepository.appleMapsHtmlInput,
                     "https://maps.apple/p/7E-Brjrk_THN14"
                 )
             ),

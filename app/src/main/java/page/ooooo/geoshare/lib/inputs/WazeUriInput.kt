@@ -2,7 +2,6 @@ package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
-import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
@@ -24,6 +23,7 @@ import javax.inject.Singleton
 @Singleton
 class WazeUriInput @Inject constructor(
     private val wazeHtmlInput: dagger.Lazy<WazeHtmlInput>,
+    override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:https?://)?(?:(?:www|ul)\.)?waze\.com/$URI_REST)""")
 
@@ -38,13 +38,7 @@ class WazeUriInput @Inject constructor(
         ),
     )
 
-    override suspend fun parse(
-        data: Uri,
-        match: String,
-        prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
-    ) = buildParseResult {
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = buildParseResult {
         data.run {
             // Short link
             // https://waze.com/ul/h{hash}

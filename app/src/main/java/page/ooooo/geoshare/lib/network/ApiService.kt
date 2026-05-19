@@ -7,7 +7,7 @@ import io.ktor.client.call.DoubleReceiveException
 import io.ktor.client.call.NoTransformationFoundException
 import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngine
-import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
@@ -37,8 +37,9 @@ import java.security.spec.ECGenParameterSpec
 import javax.inject.Inject
 
 class ApiService @Inject constructor(
-    private val userPreferencesRepository: UserPreferencesRepository,
+    private val engine: HttpClientEngine,
     private val log: Log = DefaultLog,
+    private val userPreferencesRepository: UserPreferencesRepository,
 ) {
     @Serializable
     data class ChallengeResponse(val challenge: String)
@@ -66,12 +67,16 @@ class ApiService @Inject constructor(
     @Serializable
     data class GoogleMapsResults(val results: List<GoogleMapsResult>)
 
-    fun createHttpClient(engine: HttpClientEngine = CIO.create()): HttpClient =
-        HttpClient(engine) {
+    suspend fun createHttpClient(): HttpClient {
+        val endpoint = userPreferencesRepository.getValue(ApiEndpointPreference)
+        return HttpClient(engine) {
             expectSuccess = true
             setDefaultTimeouts()
             rethrowExceptionsAsNetworkException(log)
 
+            install(DefaultRequest) {
+                url(endpoint.toString())
+            }
             install(ContentNegotiation) {
                 json()
             }
@@ -81,26 +86,26 @@ class ApiService @Inject constructor(
                         this@ApiService.loadTokens()
                     }
                     refreshTokens {
-                        login(engine) ?: register(engine)
+                        login(endpoint) ?: register(endpoint)
                     }
                 }
             }
         }
-
-    suspend fun getEndpoint(): URL =
-        userPreferencesRepository.getValue(ApiEndpointPreference)
+    }
 
     suspend fun loadTokens(): BearerTokens? =
         userPreferencesRepository.getValue(CachedApiTokenPreference)?.let {
             BearerTokens(it.token, it.publicKey)
         }
 
-    private suspend fun login(engine: HttpClientEngine): BearerTokens? {
+    private suspend fun login(endpoint: URL): BearerTokens? {
         HttpClient(engine) {
             expectSuccess = true
             setDefaultTimeouts()
-            rethrowExceptionsAsNetworkException(log)
 
+            install(DefaultRequest) {
+                url(endpoint.toString())
+            }
             install(ContentNegotiation) {
                 json()
             }
@@ -146,10 +151,16 @@ class ApiService @Inject constructor(
         }
     }
 
-    private suspend fun register(engine: HttpClientEngine): BearerTokens {
+    private suspend fun register(endpoint: URL): BearerTokens {
         HttpClient(engine) {
             expectSuccess = true
-            rethrowExceptionsAsNetworkException(log)
+
+            install(DefaultRequest) {
+                url(endpoint.toString())
+            }
+            install(ContentNegotiation) {
+                json()
+            }
         }.use { client ->
             val privateKeyEntry = getOrGenerateKey()
             val privateKey = privateKeyEntry.privateKey

@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
+import io.ktor.client.engine.HttpClientEngine
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readLine
 import kotlinx.collections.immutable.persistentListOf
@@ -15,7 +16,11 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AppleMapsHtmlInput @Inject constructor() : BodyAsChannelInput {
+class AppleMapsHtmlInput @Inject constructor(
+    override val engine: HttpClientEngine,
+    override val log: Log,
+    override val uriQuote: UriQuote,
+) : BodyAsChannelInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_apple_maps_permission_title
 
@@ -29,8 +34,6 @@ class AppleMapsHtmlInput @Inject constructor() : BodyAsChannelInput {
         data: ByteReadChannel,
         match: String,
         prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
     ) = buildParseResult {
         val latPattern = Regex("""<meta property="place:location:latitude" content="$LAT"""")
         val lonPattern = Regex("""<meta property="place:location:longitude" content="$LON"""")

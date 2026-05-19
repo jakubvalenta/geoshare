@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
+import io.ktor.client.engine.HttpClientEngine
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
@@ -11,6 +12,9 @@ import javax.inject.Singleton
 @Singleton
 class YandexMapsShortLinkInput @Inject constructor(
     private val yandexMapsUriInput: dagger.Lazy<YandexMapsUriInput>,
+    override val engine: HttpClientEngine,
+    override val log: Log,
+    override val uriQuote: UriQuote,
 ) : HeadLocationHeaderInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_yandex_maps_permission_title
@@ -20,13 +24,7 @@ class YandexMapsShortLinkInput @Inject constructor(
 
     override val pattern = Regex("""((?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/maps/-/\S+)""")
 
-    override suspend fun parse(
-        data: Uri,
-        match: String,
-        prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
-    ) = buildParseResult {
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = buildParseResult {
         nextStep = NextStep(yandexMapsUriInput.get(), data.toString())
     }
 

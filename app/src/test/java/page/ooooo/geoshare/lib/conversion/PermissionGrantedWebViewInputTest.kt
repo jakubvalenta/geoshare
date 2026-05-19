@@ -13,14 +13,12 @@ import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
-import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import page.ooooo.geoshare.lib.inputs.DebugUriInput
 import page.ooooo.geoshare.lib.inputs.NextStep
 import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.inputs.WebViewInput
@@ -41,9 +39,7 @@ class PermissionGrantedWebViewInputTest {
     private val source = "https://maps.google.com/foo"
     private val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val prevResult = ParseResult(prevPoints)
-    private val debugUriInput = DebugUriInput(
-        debugWebViewInput = { throw NotImplementedError() }
-    )
+    private val nextInput = FakeInputRepository.debugUriInput
     private val uriQuote = FakeUriQuote
 
     @Test
@@ -57,11 +53,9 @@ class PermissionGrantedWebViewInputTest {
                 data: String,
                 match: String,
                 prevResult: ParseResult?,
-                uriQuote: UriQuote,
-                log: Log,
             ) = ParseResult(
                 prevResult?.points ?: persistentListOf(),
-                nextStep = NextStep(debugUriInput, data) // Store data in nextStep, so we can test it
+                nextStep = NextStep(nextInput, data) // Store data in nextStep, so we can test it
             )
         }
         val permission = Permission.ALWAYS
@@ -86,7 +80,7 @@ class PermissionGrantedWebViewInputTest {
                 source,
                 match = source,
                 input,
-                ParseResult(prevPoints, nextStep = NextStep(debugUriInput, "${source}-data")),
+                ParseResult(prevPoints, nextStep = NextStep(nextInput, "${source}-data")),
                 permission,
                 prevResult,
             ),
@@ -105,11 +99,9 @@ class PermissionGrantedWebViewInputTest {
                 data: String,
                 match: String,
                 prevResult: ParseResult?,
-                uriQuote: UriQuote,
-                log: Log,
             ) = ParseResult(
                 prevResult?.points ?: persistentListOf(),
-                nextStep = NextStep(debugUriInput, data) // Store data in nextStep, so we can test it
+                nextStep = NextStep(nextInput, data) // Store data in nextStep, so we can test it
             )
         }
         val permission = Permission.ALWAYS
@@ -145,8 +137,6 @@ class PermissionGrantedWebViewInputTest {
                 data: String,
                 match: String,
                 prevResult: ParseResult?,
-                uriQuote: UriQuote,
-                log: Log,
             ) = throw CancellationException()
         }
         val permission = Permission.ALWAYS
@@ -182,8 +172,6 @@ class PermissionGrantedWebViewInputTest {
                 data: String,
                 match: String,
                 prevResult: ParseResult?,
-                uriQuote: UriQuote,
-                log: Log,
             ) = ParseResult()
         }
         val permission = Permission.ALWAYS
@@ -224,8 +212,6 @@ class PermissionGrantedWebViewInputTest {
                 data: String,
                 match: String,
                 prevResult: ParseResult?,
-                uriQuote: UriQuote,
-                log: Log,
             ) = throw NotImplementedError()
         }
         val stateContext: ConversionStateContext = mock {

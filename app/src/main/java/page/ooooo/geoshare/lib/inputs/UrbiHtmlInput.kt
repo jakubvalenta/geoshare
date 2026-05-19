@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
+import io.ktor.client.engine.HttpClientEngine
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readLine
 import page.ooooo.geoshare.R
@@ -14,6 +15,9 @@ import javax.inject.Singleton
 @Singleton
 class UrbiHtmlInput @Inject constructor(
     private val urbiUriInput: dagger.Lazy<UrbiUriInput>,
+    override val engine: HttpClientEngine,
+    override val log: Log,
+    override val uriQuote: UriQuote,
 ) : BodyAsChannelInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_urbi_permission_title
@@ -25,8 +29,6 @@ class UrbiHtmlInput @Inject constructor(
         data: ByteReadChannel,
         match: String,
         prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
     ) = buildParseResult {
         val pattern = Regex("""property="twitter:image" content="([^"]+)""")
 

@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
+import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.cookies.ConstantCookiesStorage
 import io.ktor.http.Cookie
 import page.ooooo.geoshare.R
@@ -14,6 +15,9 @@ import javax.inject.Singleton
 @Singleton
 class GoogleMapsShortLinkInput @Inject constructor(
     private val googleMapsUriInput: dagger.Lazy<GoogleMapsUriInput>,
+    override val engine: HttpClientEngine,
+    override val log: Log,
+    override val uriQuote: UriQuote,
 ) : HeadLocationHeaderInput {
     override val pattern = Regex("""((?:https?://)?(?:(?:maps\.)?(?:app\.)?goo\.gl|g\.co)/[/A-Za-z0-9_-]+)""")
     override val documentation = InputDocumentation(
@@ -35,13 +39,7 @@ class GoogleMapsShortLinkInput @Inject constructor(
     override val cookies = Companion.cookies
     override val userAgent = USER_AGENT
 
-    override suspend fun parse(
-        data: Uri,
-        match: String,
-        prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
-    ) = buildParseResult {
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = buildParseResult {
         data.run {
             // Google Maps Go
             // https://maps.app.goo.gl/?link={url}

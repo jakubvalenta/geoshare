@@ -6,12 +6,12 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assume.assumeTrue
 import org.junit.Test
+import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
 import page.ooooo.geoshare.lib.geo.Source
 
 class BaiduMapUriInputTest : InputTest {
-    private val baiduMapWebViewInput = BaiduMapWebViewInput()
-    private val input = BaiduMapUriInput(baiduMapWebViewInput = { baiduMapWebViewInput })
+    private val input = FakeInputRepository.baiduMapUriInput
 
     @Test
     fun match_fullUrl() {
@@ -117,7 +117,7 @@ class BaiduMapUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    baiduMapWebViewInput,
+                    FakeInputRepository.baiduMapWebViewInput,
                     "https://map.baidu.com/?poiShareId=p8cdf0522067cf66173901fc9e4"
                 )
             ),
@@ -130,7 +130,7 @@ class BaiduMapUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    baiduMapWebViewInput,
+                    FakeInputRepository.baiduMapWebViewInput,
                     "https://map.baidu.com/?newmap=1&s=inf%26uid%3D2c2bd9487c142391100daa62&sharecallbackflag=poiDetailPage"
                 )
             ),
@@ -143,7 +143,7 @@ class BaiduMapUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    baiduMapWebViewInput,
+                    FakeInputRepository.baiduMapWebViewInput,
                     "https://map.baidu.com/?shareurl=1&poiShareUid=fef3b5922f87e66c63180999"
                 )
             ),
@@ -156,7 +156,7 @@ class BaiduMapUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    baiduMapWebViewInput,
+                    FakeInputRepository.baiduMapWebViewInput,
                     "https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=p8cdf0522067cf66173901fc9e4/act=read_share&vt=map&da_from=weixin&openna=1"
                 )
             ),

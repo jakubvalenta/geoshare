@@ -21,8 +21,7 @@ import page.ooooo.geoshare.lib.inputs.ParseResult
 
 class PermissionRequestedTest {
     private val source = "https://maps.app.goo.gl/foo"
-    private val inputRepository = FakeInputRepository()
-    private val input = inputRepository.googleMapsShortLinkInput
+    private val input = FakeInputRepository.googleMapsShortLinkInput
     private val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val prevResult = ParseResult(prevPoints)
 

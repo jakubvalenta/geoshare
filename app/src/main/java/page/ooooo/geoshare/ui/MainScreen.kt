@@ -669,7 +669,7 @@ private fun MainScreen(
                     AnnotatedString.fromHtml(
                         stringResource(
                             R.string.conversion_permission_common_text,
-                            currentState.match.truncateMiddle(),
+                            currentState.match.truncateMiddle(), // TODO Replace match with original link
                             appName,
                         )
                     ),
@@ -2212,7 +2212,6 @@ private fun LoadingIndicatorPreview() {
         val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val inputRepository = FakeInputRepository()
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
@@ -2226,7 +2225,7 @@ private fun LoadingIndicatorPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            input = inputRepository.googleMapsShortLinkInput,
+            input = FakeInputRepository.googleMapsShortLinkInput,
             permission = Permission.ALWAYS,
             lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )
@@ -2286,7 +2285,6 @@ private fun DarkLoadingIndicatorPreview() {
         val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val inputRepository = FakeInputRepository()
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
@@ -2300,7 +2298,7 @@ private fun DarkLoadingIndicatorPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            input = inputRepository.googleMapsShortLinkInput,
+            input = FakeInputRepository.googleMapsShortLinkInput,
             permission = Permission.ALWAYS,
             lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )
@@ -2360,7 +2358,6 @@ private fun TabletLoadingIndicatorPreview() {
         val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val inputRepository = FakeInputRepository()
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
@@ -2374,7 +2371,7 @@ private fun TabletLoadingIndicatorPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            input = inputRepository.googleMapsShortLinkInput,
+            input = FakeInputRepository.googleMapsShortLinkInput,
             permission = Permission.ALWAYS,
             lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )

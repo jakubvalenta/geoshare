@@ -1,8 +1,6 @@
 package page.ooooo.geoshare.lib.conversion
 
 import android.content.res.Resources
-import io.ktor.client.engine.HttpClientEngine
-import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
 import io.ktor.utils.io.CancellationException
@@ -18,8 +16,6 @@ import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.Attempt
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
-import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.BasicInput
@@ -33,18 +29,15 @@ import page.ooooo.geoshare.lib.network.SocketTimeoutNetworkException
 import java.io.EOFException
 import java.net.MalformedURLException
 import java.net.SocketTimeoutException
-import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
 
 class PermissionGrantedBasicInputTest {
-    private val engine = MockEngine { throw NotImplementedError() }
     private val log = FakeLog
     private val source = "https://maps.google.com/foo"
-    private val inputRepository = FakeInputRepository()
-    private val nextInput = inputRepository.debugUriInput
     private val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val prevResult = ParseResult(prevPoints)
+    private val nextInput = FakeInputRepository.debugUriInput
     private val permission = Permission.ALWAYS
     private val maxAttempts = 3
     private val resources: Resources = mock {
@@ -67,10 +60,6 @@ class PermissionGrantedBasicInputTest {
         val input = object : BasicInput<String>, Input.HasPermission {
             override suspend fun fetch(
                 match: String,
-                engine: HttpClientEngine,
-                log: Log,
-                uriQuote: UriQuote,
-                coroutineContext: CoroutineContext,
                 block: suspend (String) -> ParseResult,
             ): ParseResult = block("${match}-data")
 
@@ -78,8 +67,6 @@ class PermissionGrantedBasicInputTest {
                 data: String,
                 match: String,
                 prevResult: ParseResult?,
-                uriQuote: UriQuote,
-                log: Log,
             ) = ParseResult(
                 prevResult?.points ?: persistentListOf(),
                 nextStep = NextStep(nextInput, data) // Store data in nextStep, so we can test it
@@ -90,7 +77,6 @@ class PermissionGrantedBasicInputTest {
         }
         val lastAttempt = null
         val stateContext: ConversionStateContext = mock {
-            on { this@on.engine } doReturn engine
             on { this@on.log } doReturn log
             on { this@on.resources } doReturn resources
             on { this@on.uriQuote } doReturn uriQuote
@@ -125,10 +111,6 @@ class PermissionGrantedBasicInputTest {
         val input = object : BasicInput<String>, Input.HasPermission {
             override suspend fun fetch(
                 match: String,
-                engine: HttpClientEngine,
-                log: Log,
-                uriQuote: UriQuote,
-                coroutineContext: CoroutineContext,
                 block: suspend (String) -> ParseResult,
             ): ParseResult = throw CancellationException()
 
@@ -136,8 +118,6 @@ class PermissionGrantedBasicInputTest {
                 data: String,
                 match: String,
                 prevResult: ParseResult?,
-                uriQuote: UriQuote,
-                log: Log,
             ) = ParseResult(
                 prevResult?.points ?: persistentListOf(),
                 nextStep = NextStep(nextInput, data) // Store data in nextStep, so we can test it
@@ -148,7 +128,6 @@ class PermissionGrantedBasicInputTest {
         }
         val lastAttempt = null
         val stateContext: ConversionStateContext = mock {
-            on { this@on.engine } doReturn engine
             on { this@on.log } doReturn log
             on { this@on.resources } doReturn resources
             on { this@on.uriQuote } doReturn uriQuote
@@ -175,10 +154,6 @@ class PermissionGrantedBasicInputTest {
         val input = object : BasicInput<String>, Input.HasPermission {
             override suspend fun fetch(
                 match: String,
-                engine: HttpClientEngine,
-                log: Log,
-                uriQuote: UriQuote,
-                coroutineContext: CoroutineContext,
                 block: suspend (String) -> ParseResult,
             ): ParseResult = throw MalformedURLException()
 
@@ -186,8 +161,6 @@ class PermissionGrantedBasicInputTest {
                 data: String,
                 match: String,
                 prevResult: ParseResult?,
-                uriQuote: UriQuote,
-                log: Log,
             ) = ParseResult(
                 prevResult?.points ?: persistentListOf(),
                 nextStep = NextStep(nextInput, data) // Store data in nextStep, so we can test it
@@ -198,7 +171,6 @@ class PermissionGrantedBasicInputTest {
         }
         val lastAttempt = null
         val stateContext: ConversionStateContext = mock {
-            on { this@on.engine } doReturn engine
             on { this@on.log } doReturn log
             on { this@on.resources } doReturn resources
             on { this@on.uriQuote } doReturn uriQuote
@@ -231,10 +203,6 @@ class PermissionGrantedBasicInputTest {
             val input = object : BasicInput<String>, Input.HasPermission {
                 override suspend fun fetch(
                     match: String,
-                    engine: HttpClientEngine,
-                    log: Log,
-                    uriQuote: UriQuote,
-                    coroutineContext: CoroutineContext,
                     block: suspend (String) -> ParseResult,
                 ): ParseResult = throw cause
 
@@ -242,8 +210,6 @@ class PermissionGrantedBasicInputTest {
                     data: String,
                     match: String,
                     prevResult: ParseResult?,
-                    uriQuote: UriQuote,
-                    log: Log,
                 ) = ParseResult(
                     prevResult?.points ?: persistentListOf(),
                     nextStep = NextStep(nextInput, data) // Store data in nextStep, so we can test it
@@ -257,7 +223,6 @@ class PermissionGrantedBasicInputTest {
             val lastAttempt = null
             val permission = Permission.ALWAYS
             val stateContext: ConversionStateContext = mock {
-                on { this@on.engine } doReturn engine
                 on { this@on.log } doReturn log
                 on { this@on.resources } doReturn resources
                 on { this@on.uriQuote } doReturn uriQuote
@@ -299,10 +264,6 @@ class PermissionGrantedBasicInputTest {
             val input = object : BasicInput<String>, Input.HasPermission {
                 override suspend fun fetch(
                     match: String,
-                    engine: HttpClientEngine,
-                    log: Log,
-                    uriQuote: UriQuote,
-                    coroutineContext: CoroutineContext,
                     block: suspend (String) -> ParseResult,
                 ): ParseResult = throw cause
 
@@ -310,8 +271,6 @@ class PermissionGrantedBasicInputTest {
                     data: String,
                     match: String,
                     prevResult: ParseResult?,
-                    uriQuote: UriQuote,
-                    log: Log,
                 ) = ParseResult(
                     prevResult?.points ?: persistentListOf(),
                     nextStep = NextStep(nextInput, data) // Store data in nextStep, so we can test it
@@ -322,7 +281,6 @@ class PermissionGrantedBasicInputTest {
             }
             val lastAttempt = Attempt<RecoverableNetworkException>(1, ConnectionClosedNetworkException(EOFException()))
             val stateContext: ConversionStateContext = mock {
-                on { this@on.engine } doReturn engine
                 on { this@on.log } doReturn log
                 on { this@on.resources } doReturn resources
                 on { this@on.uriQuote } doReturn uriQuote
@@ -364,10 +322,6 @@ class PermissionGrantedBasicInputTest {
             val input = object : BasicInput<String>, Input.HasPermission {
                 override suspend fun fetch(
                     match: String,
-                    engine: HttpClientEngine,
-                    log: Log,
-                    uriQuote: UriQuote,
-                    coroutineContext: CoroutineContext,
                     block: suspend (String) -> ParseResult,
                 ): ParseResult = throw cause
 
@@ -375,8 +329,6 @@ class PermissionGrantedBasicInputTest {
                     data: String,
                     match: String,
                     prevResult: ParseResult?,
-                    uriQuote: UriQuote,
-                    log: Log,
                 ) = ParseResult(
                     prevResult?.points ?: persistentListOf(),
                     nextStep = NextStep(nextInput, data) // Store data in nextStep, so we can test it
@@ -387,7 +339,6 @@ class PermissionGrantedBasicInputTest {
             }
             val lastAttempt = Attempt<RecoverableNetworkException>(3, ConnectionClosedNetworkException(EOFException()))
             val stateContext: ConversionStateContext = mock {
-                on { this@on.engine } doReturn engine
                 on { this@on.log } doReturn log
                 on { this@on.resources } doReturn resources
                 on { this@on.uriQuote } doReturn uriQuote
@@ -424,10 +375,6 @@ class PermissionGrantedBasicInputTest {
         val input = object : BasicInput<String>, Input.HasPermission {
             override suspend fun fetch(
                 match: String,
-                engine: HttpClientEngine,
-                log: Log,
-                uriQuote: UriQuote,
-                coroutineContext: CoroutineContext,
                 block: suspend (String) -> ParseResult,
             ): ParseResult = throw cause
 
@@ -435,8 +382,6 @@ class PermissionGrantedBasicInputTest {
                 data: String,
                 match: String,
                 prevResult: ParseResult?,
-                uriQuote: UriQuote,
-                log: Log,
             ) = ParseResult(
                 prevResult?.points ?: persistentListOf(),
                 nextStep = NextStep(nextInput, data) // Store data in nextStep, so we can test it
@@ -447,7 +392,6 @@ class PermissionGrantedBasicInputTest {
         }
         val lastAttempt = null
         val stateContext: ConversionStateContext = mock {
-            on { this@on.engine } doReturn engine
             on { this@on.log } doReturn log
             on { this@on.resources } doReturn resources
             on { this@on.uriQuote } doReturn uriQuote
@@ -474,7 +418,7 @@ class PermissionGrantedBasicInputTest {
 
     @Test
     fun getLoadingIndicator_whenLastAttemptIsNull_returnsLargeLoadingIndicatorWithoutDescription() = runTest {
-        val input = inputRepository.googleMapsShortLinkInput
+        val input = FakeInputRepository.googleMapsShortLinkInput
         val stateContext: ConversionStateContext = mock {
             on { this@on.resources } doReturn resources
         }
@@ -497,7 +441,7 @@ class PermissionGrantedBasicInputTest {
 
     @Test
     fun getLoadingIndicator_whenLastAttemptNumberIsOne_returnsLargeLoadingIndicatorWithDescription() = runTest {
-        val input = inputRepository.googleMapsShortLinkInput
+        val input = FakeInputRepository.googleMapsShortLinkInput
         val lastAttempt = Attempt<RecoverableNetworkException>(1, ConnectionClosedNetworkException(EOFException()))
         val stateContext: ConversionStateContext = mock {
             on { this@on.resources } doReturn resources

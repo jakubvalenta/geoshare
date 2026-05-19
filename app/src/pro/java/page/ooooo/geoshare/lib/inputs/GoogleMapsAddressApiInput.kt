@@ -2,23 +2,18 @@ package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
 import io.ktor.client.call.body
-import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.request.accept
 import io.ktor.client.request.prepareRequest
-import io.ktor.client.request.url
 import io.ktor.http.ContentType
 import io.ktor.http.appendPathSegments
 import io.ktor.http.headers
 import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.network.ApiService
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.coroutines.CoroutineContext
 
 @Singleton
 class GoogleMapsAddressApiInput @Inject constructor(
@@ -33,26 +28,20 @@ class GoogleMapsAddressApiInput @Inject constructor(
 
     override suspend fun fetch(
         match: String,
-        engine: HttpClientEngine,
-        log: Log,
-        uriQuote: UriQuote,
-        coroutineContext: CoroutineContext,
         block: suspend (ApiService.GoogleMapsResults) -> ParseResult,
     ): ParseResult =
-        apiService.run {
-            createHttpClient(engine)
-                .use { client ->
-                    client
-                        .prepareRequest {
-                            url(getEndpoint())
-                                .appendPathSegments("v1", "google-maps", "geocode", "address", match)
-                            headers {
-                                accept(ContentType.Application.Json)
-                            }
-                        }
-                        .execute { response ->
-                            block(response.body())
-                        }
+        apiService.createHttpClient().use { client ->
+            client
+                .prepareRequest {
+                    url {
+                        appendPathSegments("v1", "google-maps", "geocode", "address", match)
+                    }
+                    headers {
+                        accept(ContentType.Application.Json)
+                    }
+                }
+                .execute { response ->
+                    block(response.body())
                 }
         }
 
@@ -60,8 +49,6 @@ class GoogleMapsAddressApiInput @Inject constructor(
         data: ApiService.GoogleMapsResults,
         match: String,
         prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
     ) = buildParseResult {
         val prevPoint = prevResult?.points?.lastOrNull()
         points = data.results

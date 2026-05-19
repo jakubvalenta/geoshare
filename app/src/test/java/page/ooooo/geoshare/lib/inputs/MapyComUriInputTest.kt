@@ -5,11 +5,12 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class MapyComUriInputTest : InputTest {
-    private val input = MapyComUriInput()
+    private val input = FakeInputRepository.mapyComUriInput
 
     @Test
     fun match_fullUrl() {

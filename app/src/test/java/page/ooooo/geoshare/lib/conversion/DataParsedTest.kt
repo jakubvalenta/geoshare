@@ -24,9 +24,8 @@ class DataParsedTest {
     }
     private val source = "https://maps.google.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-    private val inputRepository = FakeInputRepository()
-    private val input = inputRepository.googleMapsShortLinkInput
-    private val nextInput = inputRepository.debugUriInput
+    private val input = FakeInputRepository.googleMapsShortLinkInput
+    private val nextInput = FakeInputRepository.googleMapsUriInput
     private val stateContext: ConversionStateContext = mock {
         on { this@on.log } doReturn log
         on { this@on.resources } doReturn resources
