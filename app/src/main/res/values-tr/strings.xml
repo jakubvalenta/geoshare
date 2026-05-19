@@ -267,4 +267,6 @@
     <string name="output_send">Noktayı gönder</string>
     <string name="output_send_via">Noktayı %1$s ile gönder</string>
     <string name="conversion_failed_reason_exception">bilinmeyen istisna</string>
+    <string name="output_save_to_contact_failed">Nokta rehbere kaydedilemedi</string>
+    <string name="output_save_to_contact_automation_failed">Nokta otomatik olarak rehbere kaydedilemedi</string>
 </resources>
