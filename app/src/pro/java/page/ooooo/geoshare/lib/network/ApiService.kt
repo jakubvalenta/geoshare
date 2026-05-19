@@ -7,6 +7,7 @@ import io.ktor.client.call.DoubleReceiveException
 import io.ktor.client.call.NoTransformationFoundException
 import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
@@ -120,7 +121,7 @@ class ApiService @Inject constructor(
                 client
                     .post("/v1/auth/challenge")
                     .body<ChallengeResponse>().challenge.base64Decode()
-            } catch (e: ResponseNetworkException) {
+            } catch (e: ClientRequestException) {
                 logResponseErrorMessage(e.response)
                 throw e
             }
@@ -140,7 +141,7 @@ class ApiService @Inject constructor(
                         )
                     }
                     .body<TokenResponse>().token
-            } catch (e: ResponseNetworkException) {
+            } catch (e: ClientRequestException) {
                 logResponseErrorMessage(e.response)
                 if (e.response.status == HttpStatusCode.Unauthorized) {
                     return null
@@ -169,9 +170,10 @@ class ApiService @Inject constructor(
 
             // Registration challenge
             val registrationChallenge = try {
-                client.post("/v1/auth/challenge")
+                client
+                    .post("/v1/auth/challenge")
                     .body<ChallengeResponse>().challenge.base64Decode()
-            } catch (e: ResponseNetworkException) {
+            } catch (e: ClientRequestException) {
                 logResponseErrorMessage(e.response)
                 throw e
             }
@@ -191,7 +193,7 @@ class ApiService @Inject constructor(
                         )
                     }
                     .body<TokenResponse>().token
-            } catch (e: ResponseNetworkException) {
+            } catch (e: ClientRequestException) {
                 logResponseErrorMessage(e.response)
                 throw e
             }
