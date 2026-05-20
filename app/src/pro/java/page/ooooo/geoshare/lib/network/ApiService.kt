@@ -22,7 +22,7 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.data.local.preferences.ApiEndpointPreference
+import page.ooooo.geoshare.data.local.preferences.ApiBaseUrlPreference
 import page.ooooo.geoshare.data.local.preferences.CachedApiTokenPreference
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.Log
@@ -68,14 +68,14 @@ class ApiService @Inject constructor(
     data class GoogleMapsResults(val results: List<GoogleMapsResult>)
 
     suspend fun createHttpClient(): HttpClient {
-        val endpoint = userPreferencesRepository.getValue(ApiEndpointPreference)
+        val baseUrl = userPreferencesRepository.getValue(ApiBaseUrlPreference)
         return HttpClient(engine) {
             expectSuccess = true
             setDefaultTimeouts()
             rethrowExceptionsAsNetworkException(log)
 
             install(DefaultRequest) {
-                url(endpoint.toString())
+                url(baseUrl.toString())
             }
             install(ContentNegotiation) {
                 json()
@@ -86,7 +86,7 @@ class ApiService @Inject constructor(
                         this@ApiService.loadTokens()
                     }
                     refreshTokens {
-                        login(endpoint) ?: register(endpoint)
+                        login(baseUrl) ?: register(baseUrl)
                     }
                 }
             }
@@ -98,14 +98,14 @@ class ApiService @Inject constructor(
             BearerTokens(it.token, it.publicKey)
         }
 
-    private suspend fun login(endpoint: URL): BearerTokens? {
+    private suspend fun login(baseUrl: URL): BearerTokens? {
         HttpClient(engine) {
             expectSuccess = true
             setDefaultTimeouts()
             rethrowExceptionsAsNetworkException(log)
 
             install(DefaultRequest) {
-                url(endpoint.toString())
+                url(baseUrl.toString())
             }
             install(ContentNegotiation) {
                 json()
@@ -158,14 +158,14 @@ class ApiService @Inject constructor(
         }
     }
 
-    private suspend fun register(endpoint: URL): BearerTokens {
+    private suspend fun register(baseUrl: URL): BearerTokens {
         HttpClient(engine) {
             expectSuccess = true
             setDefaultTimeouts()
             rethrowExceptionsAsNetworkException(log)
 
             install(DefaultRequest) {
-                url(endpoint.toString())
+                url(baseUrl.toString())
             }
             install(ContentNegotiation) {
                 json()

@@ -123,10 +123,9 @@ object CoordinateFormatPreference : OptionsPreference<CoordinateFormat> {
     )
 }
 
-// TODO Rename to API base URL
-object ApiEndpointPreference : TextPreference<URL> {
-    override val key = stringPreferencesKey("api_endpoint")
-    override val default = URL("http://localhost:8080") // TODO Replace with real host
+object ApiBaseUrlPreference : TextPreference<URL> {
+    override val key = stringPreferencesKey("api_base_url")
+    override val default = URL("https://api.geoshare-app.net")
     val loading = default
 
     override fun serialize(value: URL, log: Log) = value.toString()
@@ -143,9 +142,9 @@ object ApiEndpointPreference : TextPreference<URL> {
             default
         }
 
-    override fun getValue(values: UserPreferencesValues) = values.apiEndpoint
+    override fun getValue(values: UserPreferencesValues) = values.apiBaseUrl
 
-    private const val TAG = "ApiEndpointPreference"
+    private const val TAG = "ApiBaseUrlPreference"
 }
 
 object AutomationPreference : OptionsPreference<Automation> {
@@ -429,7 +428,7 @@ object ChangelogShownForVersionCodePreference : NullableIntPreference {
 }
 
 data class UserPreferencesValues(
-    val apiEndpoint: URL = ApiEndpointPreference.loading,
+    val apiBaseUrl: URL = ApiBaseUrlPreference.loading,
     val automation: Automation = AutomationPreference.loading,
     val automationDelay: Duration = AutomationDelayPreference.loading,
     val cachedApiToken: CachedApiToken? = CachedApiTokenPreference.loading,
