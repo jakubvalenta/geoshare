@@ -198,7 +198,6 @@ class PermissionGrantedBasicInputTest {
     @Test
     fun transition_whenInputFetchThrowsRecoverableNetworkExceptionAndLastAttemptIsNull_returnsPermissionGrantedBasicInput() =
         runTest {
-            val source = "https://maps.google.com/foo"
             val cause = SocketTimeoutNetworkException(SocketTimeoutException())
             val input = object : BasicInput<String>, Input.HasPermission {
                 override suspend fun fetch(
@@ -259,7 +258,6 @@ class PermissionGrantedBasicInputTest {
     @Test
     fun transition_whenInputFetchThrowsRecoverableNetworkExceptionAndLastAttemptIsOne_waitsAndReturnsPermissionGrantedBasicInput() =
         runTest {
-            val source = "https://maps.google.com/foo"
             val cause = SocketTimeoutNetworkException(SocketTimeoutException())
             val input = object : BasicInput<String>, Input.HasPermission {
                 override suspend fun fetch(
@@ -317,7 +315,6 @@ class PermissionGrantedBasicInputTest {
     @Test
     fun transition_whenInputFetchThrowsRecoverableNetworkExceptionAndLastAttemptIsMaxAttempts_returnsConversionFailed() =
         runTest {
-            val source = "https://maps.google.com/foo"
             val cause = SocketTimeoutNetworkException(SocketTimeoutException())
             val input = object : BasicInput<String>, Input.HasPermission {
                 override suspend fun fetch(

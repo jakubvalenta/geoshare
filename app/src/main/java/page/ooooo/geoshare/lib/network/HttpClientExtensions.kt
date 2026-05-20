@@ -95,9 +95,10 @@ fun HttpClientConfig<*>.rethrowExceptionsAsNetworkException(log: Log = DefaultLo
         handleResponseExceptionWithRequest { cause, request ->
             when (cause) {
                 is NetworkException -> {
-                    // The exception has already been wrapped, probably because it was thrown during authentication
-                    // TODO Test
-                    throw cause
+                    // If the exception already is NetworkException, it probably means that it comes from another HTTP
+                    // client created inside this HttpClient. Then we must throw the NetworkException cause, otherwise
+                    // the original cause ends up wrapped in NetworkException twice for some reason
+                    throw cause.cause ?: cause
                 }
 
                 is UnresolvedAddressException -> {
@@ -120,15 +121,14 @@ fun HttpClientConfig<*>.rethrowExceptionsAsNetworkException(log: Log = DefaultLo
                     throw ConnectTimeoutNetworkException(cause)
                 }
 
+                is ConnectException -> {
+                    log.w(TAG, "Connection refused for ${request.url}", cause)
+                    throw ConnectionRefusedNetworkException(cause)
+                }
+
                 is EOFException -> {
                     log.w(TAG, "EOF exception for ${request.url}", cause)
                     throw ConnectionClosedNetworkException(cause)
-                }
-
-                is ConnectException -> {
-                    // TODO Test
-                    log.w(TAG, "Connection refused for ${request.url}", cause)
-                    throw ConnectionRefusedNetworkException(cause)
                 }
 
                 is ServerResponseException -> {

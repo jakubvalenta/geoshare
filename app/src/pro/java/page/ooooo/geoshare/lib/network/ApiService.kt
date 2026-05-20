@@ -16,7 +16,6 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.request
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
@@ -103,6 +102,7 @@ class ApiService @Inject constructor(
         HttpClient(engine) {
             expectSuccess = true
             setDefaultTimeouts()
+            rethrowExceptionsAsNetworkException(log)
 
             install(DefaultRequest) {
                 url(endpoint.toString())
@@ -111,6 +111,7 @@ class ApiService @Inject constructor(
                 json()
             }
         }.use { client ->
+            // Get key
             val privateKeyEntry = getKey() ?: return null
             val privateKey = privateKeyEntry.privateKey
             val publicKey = privateKeyEntry.certificateChain.first().publicKey
@@ -122,7 +123,9 @@ class ApiService @Inject constructor(
                     .post("/v1/auth/challenge")
                     .body<ChallengeResponse>().challenge.base64Decode()
             } catch (e: ClientRequestException) {
-                logResponseErrorMessage(e.response)
+                with(e.response) {
+                    log.e(TAG, "Login challenge failed: ${status.value} ${bodyAsErrorMessage()}")
+                }
                 throw e
             }
 
@@ -142,12 +145,15 @@ class ApiService @Inject constructor(
                     }
                     .body<TokenResponse>().token
             } catch (e: ClientRequestException) {
-                logResponseErrorMessage(e.response)
                 if (e.response.status == HttpStatusCode.Unauthorized) {
                     return null
                 }
+                with(e.response) {
+                    log.e(TAG, "Login failed: ${status.value} ${bodyAsErrorMessage()}")
+                }
                 throw e
             }
+            log.i(TAG, "Login succeeded")
             return BearerTokens(token, publicKeyBase64)
         }
     }
@@ -155,6 +161,8 @@ class ApiService @Inject constructor(
     private suspend fun register(endpoint: URL): BearerTokens {
         HttpClient(engine) {
             expectSuccess = true
+            setDefaultTimeouts()
+            rethrowExceptionsAsNetworkException(log)
 
             install(DefaultRequest) {
                 url(endpoint.toString())
@@ -169,10 +177,13 @@ class ApiService @Inject constructor(
                     .post("/v1/auth/challenge")
                     .body<ChallengeResponse>().challenge.base64Decode()
             } catch (e: ClientRequestException) {
-                logResponseErrorMessage(e.response)
+                with(e.response) {
+                    log.e(TAG, "Registration challenge failed: ${status.value} ${bodyAsErrorMessage()}")
+                }
                 throw e
             }
 
+            // Generate key
             val privateKeyEntry = generateKey(registrationChallenge)
             val privateKey = privateKeyEntry.privateKey
             val publicKey = privateKeyEntry.certificateChain.first().publicKey
@@ -194,9 +205,12 @@ class ApiService @Inject constructor(
                     }
                     .body<TokenResponse>().token
             } catch (e: ClientRequestException) {
-                logResponseErrorMessage(e.response)
+                with(e.response) {
+                    log.e(TAG, "Registration failed: ${status.value} ${bodyAsErrorMessage()}")
+                }
                 throw e
             }
+            log.i(TAG, "Registration succeeded")
             return BearerTokens(token, publicKeyBase64)
         }
     }
@@ -209,10 +223,14 @@ class ApiService @Inject constructor(
         val entry = try {
             keyStore.getEntry(KEYSTORE_ALIAS, null)
         } catch (tr: GeneralSecurityException) {
-            log.e(TAG, "Failed to get key from the key store", tr)
-            null
+            log.e(TAG, "Error when getting key from the key store", tr)
+            return null
         }
-        return entry as? KeyStore.PrivateKeyEntry
+        if (entry !is KeyStore.PrivateKeyEntry) {
+            log.e(TAG, "Got key from the key store but it's not a private key")
+            return null
+        }
+        return entry
     }
 
     /**
@@ -221,7 +239,6 @@ class ApiService @Inject constructor(
      * If there was a corrupt key in the key store, overwrite it.
      */
     private fun generateKey(challenge: ByteArray): KeyStore.PrivateKeyEntry {
-        log.i(TAG, "Generating new key")
         val keyPairGenerator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore")
         val params = KeyGenParameterSpec.Builder(
             KEYSTORE_ALIAS,
@@ -245,15 +262,12 @@ class ApiService @Inject constructor(
             ?: throw IllegalStateException("Key generation succeeded but key store entry not found")
     }
 
-    private suspend fun logResponseErrorMessage(response: HttpResponse) {
-        val message = try {
-            response.body<ErrorResponse>().message
-        } catch (_: DoubleReceiveException) {
-            "<double receive>"
-        } catch (_: NoTransformationFoundException) {
-            "<no transformation found>"
-        }
-        log.i(TAG, "Response error $message for ${response.request.url}")
+    private suspend fun HttpResponse.bodyAsErrorMessage(): String = try {
+        body<ErrorResponse>().message
+    } catch (_: DoubleReceiveException) {
+        "<double receive>"
+    } catch (_: NoTransformationFoundException) {
+        "<no transformation found>"
     }
 
     private companion object {
