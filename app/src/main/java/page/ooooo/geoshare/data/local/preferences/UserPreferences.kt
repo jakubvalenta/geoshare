@@ -13,8 +13,6 @@ import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.DataTypes
-import java.net.MalformedURLException
-import java.net.URL
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -123,12 +121,14 @@ object CoordinateFormatPreference : OptionsPreference<CoordinateFormat> {
     )
 }
 
-object GoogleMapsApiAuthenticationPreference : TextPreference<Authentication> {
-    override val key = stringPreferencesKey("google_maps_api_authentication")
-    override val default = Authentication.ApiKey("X-Goog-Api-Key", "") // TODO Set default in pro version
+interface ApiConfigPreference : TextPreference<ApiConfig?>
+
+object GoogleMapsApiPreference : ApiConfigPreference {
+    override val key = stringPreferencesKey("google_maps_api_config")
+    override val default = null
     val loading = default
 
-    override fun serialize(value: Authentication, log: Log) =
+    override fun serialize(value: ApiConfig?, log: Log) =
         try {
             Json.encodeToString(value)
         } catch (tr: SerializationException) {
@@ -140,7 +140,7 @@ object GoogleMapsApiAuthenticationPreference : TextPreference<Authentication> {
     override fun deserialize(value: String?, log: Log) =
         if (value != null) {
             try {
-                Json.decodeFromString<Authentication>(value)
+                Json.decodeFromString<ApiConfig>(value)
             } catch (tr: IllegalArgumentException) {
                 log.e(TAG, "Deserialization error", tr)
                 default
@@ -149,33 +149,9 @@ object GoogleMapsApiAuthenticationPreference : TextPreference<Authentication> {
             default
         }
 
-    override fun getValue(values: UserPreferencesValues) = values.googleMapsApiAuthentication
+    override fun getValue(values: UserPreferencesValues) = values.googleMapsApiConfig
 
-    private const val TAG = "GoogleMapsApiAuthenticationPreference"
-}
-
-object GoogleMapsApiBaseUrlPreference : TextPreference<URL?> {
-    override val key = stringPreferencesKey("google_maps_api_base_url")
-    override val default = null // TODO Set default in pro version
-    val loading = null
-
-    override fun serialize(value: URL?, log: Log) = value?.toString() ?: ""
-
-    override fun deserialize(value: String?, log: Log) =
-        if (!value.isNullOrEmpty()) {
-            try {
-                URL(value)
-            } catch (tr: MalformedURLException) {
-                log.e(TAG, "Invalid URL", tr)
-                default
-            }
-        } else {
-            default
-        }
-
-    override fun getValue(values: UserPreferencesValues) = values.googleMapsApiBaseUrl
-
-    private const val TAG = "GoogleMapsApiBaseUrlPreference"
+    private const val TAG = "GoogleMapsApiPreference"
 }
 
 object AutomationPreference : OptionsPreference<Automation> {
@@ -459,8 +435,7 @@ object ChangelogShownForVersionCodePreference : NullableIntPreference {
 }
 
 data class UserPreferencesValues(
-    val googleMapsApiAuthentication: Authentication = GoogleMapsApiAuthenticationPreference.loading,
-    val googleMapsApiBaseUrl: URL? = GoogleMapsApiBaseUrlPreference.loading,
+    val googleMapsApiConfig: ApiConfig? = GoogleMapsApiPreference.loading,
     val automation: Automation = AutomationPreference.loading,
     val automationDelay: Duration = AutomationDelayPreference.loading,
     val cachedApiToken: CachedApiToken? = CachedApiTokenPreference.loading,

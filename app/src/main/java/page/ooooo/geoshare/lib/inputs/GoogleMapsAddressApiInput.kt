@@ -11,8 +11,7 @@ import io.ktor.http.headers
 import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.data.local.preferences.GoogleMapsApiAuthenticationPreference
-import page.ooooo.geoshare.data.local.preferences.GoogleMapsApiBaseUrlPreference
+import page.ooooo.geoshare.data.local.preferences.GoogleMapsApiPreference
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
@@ -41,17 +40,14 @@ class GoogleMapsAddressApiInput @Inject constructor(
         block(Uri.parse(match, uriQuote))
 
     override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = buildParseResult {
-        val baseUrl = userPreferencesRepository.getValue(GoogleMapsApiBaseUrlPreference)
-            ?: run {
-                // Go to HTML parsing, if API is not configured
-                nextStep = NextStep(googleMapsHtmlInput.get(), match)
-                return@buildParseResult
-            }
-        val authentication = userPreferencesRepository.getValue(
-            GoogleMapsApiAuthenticationPreference
-        )
+        val apiConfig = userPreferencesRepository.getValue(GoogleMapsApiPreference) ?: run {
+            // Go to HTML parsing, if API is not configured
+            nextStep = NextStep(googleMapsHtmlInput.get(), match)
+            return@buildParseResult
+        }
+        val client = apiService.createHttpClient(apiConfig)
         val query = parseQuery(data) ?: return@buildParseResult
-        val res = apiService.createHttpClient(baseUrl, authentication).use { client ->
+        val res = client.use { client ->
             client
                 .prepareRequest {
                     url {

@@ -35,7 +35,7 @@ class DefaultUserPreferencesRepository @Inject constructor(
             }
         }.map {
             UserPreferencesValues(
-                googleMapsApiBaseUrl = GoogleMapsApiBaseUrlPreference.getValue(it),
+                googleMapsApiConfig = GoogleMapsApiPreference.getValue(it),
                 automation = AutomationPreference.getValue(it),
                 automationDelay = AutomationDelayPreference.getValue(it),
                 cachedApiToken = CachedApiTokenPreference.getValue(it),

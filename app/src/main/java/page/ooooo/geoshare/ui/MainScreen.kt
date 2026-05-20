@@ -669,7 +669,7 @@ private fun MainScreen(
                     AnnotatedString.fromHtml(
                         stringResource(
                             R.string.conversion_permission_common_text,
-                            currentState.match.truncateMiddle(), // TODO Replace match with original link
+                            currentState.match.truncateMiddle(),
                             appName,
                         )
                     ),

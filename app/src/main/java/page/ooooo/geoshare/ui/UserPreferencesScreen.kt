@@ -65,6 +65,8 @@ import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.database.findByUUID
+import page.ooooo.geoshare.data.local.preferences.ApiConfig
+import page.ooooo.geoshare.data.local.preferences.ApiConfigPreference
 import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
 import page.ooooo.geoshare.data.local.preferences.AutomationPreference
@@ -73,7 +75,7 @@ import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePr
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormatPreference
-import page.ooooo.geoshare.data.local.preferences.GoogleMapsApiBaseUrlPreference
+import page.ooooo.geoshare.data.local.preferences.GoogleMapsApiPreference
 import page.ooooo.geoshare.data.local.preferences.HiddenAppsPreference
 import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.OptionsPreference
@@ -96,6 +98,7 @@ import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.Output
+import page.ooooo.geoshare.ui.components.DropdownField
 import page.ooooo.geoshare.ui.components.FeatureBadgeSmall
 import page.ooooo.geoshare.ui.components.FeatureWall
 import page.ooooo.geoshare.ui.components.IconFromDescriptor
@@ -323,25 +326,28 @@ private fun UserPreferencesListPane(
                 currentGroupId = currentGroupId,
             )
         }
-        item {
-            UserPreferencesListSection(
-                groups = listOf(
-                    UserPreferencesGroup(
-                        id = UserPreferencesGroupId.GOOGLE_MAPS_API,
-                        headline = { stringResource(R.string.user_preferences_google_maps_api_title) },
-                        supportingContent = {
-                            Text(
-                                GoogleMapsApiBaseUrlPreference.getValue(values)?.toString()
-                                    ?: stringResource(R.string.not_configured),
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
-                            )
-                        },
-                        onClick = { onNavigateToGroup(UserPreferencesGroupId.GOOGLE_MAPS_API) },
+        if (BuildConfig.DEBUG) {
+            item {
+                UserPreferencesListSection(
+                    groups = listOf(
+                        UserPreferencesGroup(
+                            id = UserPreferencesGroupId.GOOGLE_MAPS_API,
+                            headline = { stringResource(R.string.user_preferences_google_maps_api_title) },
+                            enabled = ConnectionPermissionPreference.getValue(values) != Permission.NEVER,
+                            supportingContent = {
+                                Text(
+                                    GoogleMapsApiPreference.getValue(values)?.baseUrl
+                                        ?: stringResource(R.string.not_configured),
+                                    overflow = TextOverflow.Ellipsis,
+                                    maxLines = 1,
+                                )
+                            },
+                            onClick = { onNavigateToGroup(UserPreferencesGroupId.GOOGLE_MAPS_API) },
+                        ),
                     ),
-                ),
-                currentGroupId = currentGroupId,
-            )
+                    currentGroupId = currentGroupId,
+                )
+            }
         }
         item {
             SegmentedListLabel(stringResource(R.string.user_preferences_automation_title))
@@ -754,13 +760,11 @@ private fun UserPreferencesDetailPane(
                 onBack = onBack,
                 onNavigateToBillingScreen = onNavigateToBillingScreen,
             ) {
-                userPreferencesTextControl(
-                    userPreference = GoogleMapsApiBaseUrlPreference,
+                userPreferencesApiConfigControl(
+                    userPreference = GoogleMapsApiPreference,
                     values = values,
                     onValueChange = onValueChange,
-                    modifier = Modifier.testTag("geoShareUserPreferenceGoogleMapsApiBaseUrl"),
                 )
-                // TODO Add authentication controls
             }
 
         UserPreferencesGroupId.HIDDEN_APPS ->
@@ -1019,6 +1023,101 @@ private fun <T> LazyListScope.userPreferencesTextControl(
             isError = !isValid,
             singleLine = true,
         )
+    }
+}
+
+private enum class AuthType { KEY, ATTESTATION }
+
+private fun LazyListScope.userPreferencesApiConfigControl(
+    userPreference: ApiConfigPreference,
+    values: UserPreferencesValues,
+    onValueChange: ((MutablePreferences) -> Unit) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) {
+    item {
+        // TODO Add presets
+        val spacing = LocalSpacing.current
+        val value = userPreference.getValue(values)
+        var baseUrl by remember(value) { mutableStateOf(value?.baseUrl ?: "") }
+        var authType by remember(value) {
+            mutableStateOf(
+                when (value) {
+                    is ApiConfig.WithKeyAuth, null -> AuthType.KEY
+                    is ApiConfig.WithAttestationAuth -> AuthType.ATTESTATION
+                }
+            )
+        }
+        var header by remember(value) { mutableStateOf((value as? ApiConfig.WithKeyAuth)?.header ?: "") }
+        var key by remember(value) { mutableStateOf((value as? ApiConfig.WithKeyAuth)?.key ?: "") }
+
+        val apiConfig = remember(baseUrl, authType, header, key) {
+            when (authType) {
+                AuthType.KEY -> ApiConfig.WithKeyAuth(baseUrl, header, key)
+                AuthType.ATTESTATION -> ApiConfig.WithAttestationAuth(baseUrl)
+            }
+        }
+
+        Column(modifier, verticalArrangement = Arrangement.spacedBy(spacing.small)) {
+            TextField(
+                value = baseUrl,
+                onValueChange = {
+                    baseUrl = it
+                    onValueChange { preferences ->
+                        userPreference.setValue(preferences, apiConfig)
+                    }
+                },
+                modifier = modifier.fillMaxWidth(),
+                enabled = enabled,
+                label = { Text(stringResource(R.string.user_preferences_api_base_url)) },
+                singleLine = true,
+            )
+            DropdownField(
+                value = authType,
+                options = AuthType.entries.associateWith { authType ->
+                    when (authType) {
+                        AuthType.KEY -> stringResource(R.string.user_preferences_api_key)
+                        AuthType.ATTESTATION -> stringResource(R.string.user_preferences_api_attestation)
+                    }
+                },
+                onValueChange = {
+                    authType = it
+                    onValueChange { preferences ->
+                        userPreference.setValue(preferences, apiConfig)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = enabled,
+                label = { Text(stringResource(R.string.user_preferences_api_authentication)) },
+            )
+            TextField(
+                value = header,
+                onValueChange = {
+                    header = it
+                    onValueChange { preferences ->
+                        userPreference.setValue(preferences, apiConfig)
+                    }
+                },
+                modifier = modifier.fillMaxWidth(),
+                enabled = enabled && authType == AuthType.KEY,
+                label = { Text(stringResource(R.string.user_preferences_api_header)) },
+                singleLine = true,
+            )
+            TextField(
+                value = key,
+                onValueChange = {
+                    key = it
+                    onValueChange { preferences ->
+                        userPreference.setValue(preferences, apiConfig)
+                    }
+                },
+                modifier = modifier.fillMaxWidth(),
+                enabled = enabled && authType == AuthType.KEY,
+                label = { Text(stringResource(R.string.user_preferences_api_key)) },
+                supportingText = { Text(stringResource(R.string.user_preferences_api_key_supporting_text)) },
+                singleLine = true,
+            )
+        }
     }
 }
 
@@ -1973,6 +2072,7 @@ private fun DeveloperOptionsPreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        connectionPermission = Permission.NEVER,
                         hiddenApps = emptySet(),
                     ),
                     onBack = {},
@@ -2002,6 +2102,7 @@ private fun DarkDeveloperOptionsPreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        connectionPermission = Permission.NEVER,
                         hiddenApps = emptySet(),
                     ),
                     onBack = {},
@@ -2031,6 +2132,7 @@ private fun TableDeveloperOptionsPreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        connectionPermission = Permission.NEVER,
                         hiddenApps = emptySet(),
                     ),
                     onBack = {},
