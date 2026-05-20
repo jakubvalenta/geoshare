@@ -2,6 +2,7 @@
     <string name="app_name" translatable="false">GeoShare</string>
     <string name="app_name_pro" translatable="false">GeoShare Pro</string>
     <string name="not_available">Not available</string>
+    <string name="not_configured">Not configured</string>
     <string name="billing_consume_purchases" translatable="false">consume purchases</string>
     <string name="billing_feature_all" translatable="false">All features of the basic version</string>
     <string name="billing_feature_automation_description" translatable="false">Save time by performing an action automatically when a map link is converted to coordinates: open map app, launch navigation (TomTom, Waze, etc.), copy to clipboard, save GPX.</string>
@@ -316,9 +317,15 @@
         <item quantity="one">%1$d app out of %2$d is visible</item>
         <item quantity="other">%1$d apps out of %2$d are visible</item>
     </plurals>
+    <string name="user_preferences_api_attestation">Hardware-backed key attestation</string>
+    <string name="user_preferences_api_authentication">Authentication</string>
+    <string name="user_preferences_api_base_url">Base URL</string>
+    <string name="user_preferences_api_key">API key</string>
     <string name="user_preferences_apps_description">Choose which of your installed apps should be displayed after converting a map link to coordinates.</string>
     <string name="user_preferences_apps_message_hidden">The app has been hidden. You can show it again in preferences.</string>
     <string name="user_preferences_apps_title">Apps</string>
+    <string name="user_preferences_google_maps_api_description">To support a wider variety of Google Maps links, %1$s can connect to the paid Google Maps API using the official URL or a proxy.</string>
+    <string name="user_preferences_google_maps_api_title">Google Maps API</string>
     <string name="user_preferences_section_input">Input</string>
     <string name="user_preferences_section_output">Output</string>
     <string name="yes">Yes</string>

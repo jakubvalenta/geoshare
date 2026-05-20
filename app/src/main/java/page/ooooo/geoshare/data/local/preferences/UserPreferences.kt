@@ -123,12 +123,51 @@ object CoordinateFormatPreference : OptionsPreference<CoordinateFormat> {
     )
 }
 
-object ApiBaseUrlPreference : TextPreference<URL> {
-    override val key = stringPreferencesKey("api_base_url")
-    override val default = URL("https://api.geoshare-app.net")
+object GoogleMapsApiAuthenticationPreference : OptionsPreference<Authentication> {
+    private val key = stringPreferencesKey("google_maps_api_authentication")
+    override val default = Authentication.API_KEY // TODO Set default in pro version
     val loading = default
 
-    override fun serialize(value: URL, log: Log) = value.toString()
+    override fun getValue(values: UserPreferencesValues) = values.googleMapsApiAuthentication
+
+    override fun getValue(preferences: Preferences, log: Log) = preferences[key]?.let {
+        try {
+            Authentication.valueOf(it)
+        } catch (_: IllegalArgumentException) {
+            null
+        }
+    } ?: default
+
+    override fun setValue(preferences: MutablePreferences, value: Authentication, log: Log) {
+        preferences[key] = value.name
+    }
+
+    fun getOptionGroups(): List<List<Authentication>> = listOf(
+        listOf(
+            Authentication.API_KEY,
+            Authentication.ATTESTATION,
+        ),
+    )
+}
+
+object GoogleMapsApiKeyPreference : TextPreference<String?> {
+    override val key = stringPreferencesKey("google_maps_api_key")
+    override val default = ""
+    val loading = null
+
+    override fun serialize(value: String?, log: Log) = value ?: ""
+
+    override fun deserialize(value: String?, log: Log) = value ?: ""
+
+    override fun getValue(values: UserPreferencesValues) = values.googleMapsApiKey
+}
+
+object GoogleMapsApiBaseUrlPreference : TextPreference<URL?> {
+    override val key = stringPreferencesKey("google_maps_api_base_url")
+    override val default = null // TODO Set default in pro version
+    val loading = null
+
+    override fun serialize(value: URL?, log: Log) = value?.toString() ?: ""
 
     override fun deserialize(value: String?, log: Log) =
         if (!value.isNullOrEmpty()) {
@@ -142,9 +181,9 @@ object ApiBaseUrlPreference : TextPreference<URL> {
             default
         }
 
-    override fun getValue(values: UserPreferencesValues) = values.apiBaseUrl
+    override fun getValue(values: UserPreferencesValues) = values.googleMapsApiBaseUrl
 
-    private const val TAG = "ApiBaseUrlPreference"
+    private const val TAG = "GoogleMapsApiBaseUrlPreference"
 }
 
 object AutomationPreference : OptionsPreference<Automation> {
@@ -428,7 +467,9 @@ object ChangelogShownForVersionCodePreference : NullableIntPreference {
 }
 
 data class UserPreferencesValues(
-    val apiBaseUrl: URL = ApiBaseUrlPreference.loading,
+    val googleMapsApiAuthentication: Authentication = GoogleMapsApiAuthenticationPreference.loading,
+    val googleMapsApiBaseUrl: URL? = GoogleMapsApiBaseUrlPreference.loading,
+    val googleMapsApiKey: String? = GoogleMapsApiKeyPreference.loading,
     val automation: Automation = AutomationPreference.loading,
     val automationDelay: Duration = AutomationDelayPreference.loading,
     val cachedApiToken: CachedApiToken? = CachedApiTokenPreference.loading,

@@ -65,6 +65,7 @@ import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.database.findByUUID
+import page.ooooo.geoshare.data.local.preferences.Authentication
 import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
 import page.ooooo.geoshare.data.local.preferences.AutomationPreference
@@ -73,6 +74,9 @@ import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePr
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormatPreference
+import page.ooooo.geoshare.data.local.preferences.GoogleMapsApiAuthenticationPreference
+import page.ooooo.geoshare.data.local.preferences.GoogleMapsApiBaseUrlPreference
+import page.ooooo.geoshare.data.local.preferences.GoogleMapsApiKeyPreference
 import page.ooooo.geoshare.data.local.preferences.HiddenAppsPreference
 import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.OptionsPreference
@@ -118,6 +122,7 @@ enum class UserPreferencesGroupId {
     CONNECTION_PERMISSION,
     COORDINATE_FORMAT,
     DEVELOPER_OPTIONS,
+    GOOGLE_MAPS_API,
     HIDDEN_APPS,
     LINKS,
 }
@@ -322,6 +327,26 @@ private fun UserPreferencesListPane(
             )
         }
         item {
+            UserPreferencesListSection(
+                groups = listOf(
+                    UserPreferencesGroup(
+                        id = UserPreferencesGroupId.GOOGLE_MAPS_API,
+                        headline = { stringResource(R.string.user_preferences_google_maps_api_title) },
+                        supportingContent = {
+                            Text(
+                                GoogleMapsApiBaseUrlPreference.getValue(values)?.toString()
+                                    ?: stringResource(R.string.not_configured),
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1,
+                            )
+                        },
+                        onClick = { onNavigateToGroup(UserPreferencesGroupId.GOOGLE_MAPS_API) },
+                    ),
+                ),
+                currentGroupId = currentGroupId,
+            )
+        }
+        item {
             SegmentedListLabel(stringResource(R.string.user_preferences_automation_title))
         }
         item {
@@ -481,6 +506,18 @@ private fun CoordinateFormatPreferenceValue(value: CoordinateFormat) {
 }
 
 @Composable
+private fun AuthenticationPreferenceValue(value: Authentication) {
+    Text(
+        stringResource(
+            when (value) {
+                Authentication.API_KEY -> R.string.user_preferences_api_key
+                Authentication.ATTESTATION -> R.string.user_preferences_api_attestation
+            }
+        )
+    )
+}
+
+@Composable
 private fun AutomationPreferenceValue(
     value: Automation,
     appDetails: AppDetails,
@@ -557,12 +594,7 @@ private fun UserPreferencesDetailPane(
             ) {
                 userPreferencesOptionsControl(
                     userPreference = AutomationPreference,
-                    optionGroups = AutomationPreference.getOptionGroups(
-                        apps,
-                        appDetails,
-                        values.hiddenApps,
-                        links,
-                    ),
+                    optionGroups = AutomationPreference.getOptionGroups(apps, appDetails, values.hiddenApps, links),
                     values = values,
                     enabled = AutomationFeature in billingFeatures && billingStatus is BillingStatus.Purchased,
                     getItemTestTag = { option ->
@@ -632,9 +664,7 @@ private fun UserPreferencesDetailPane(
                     values = values,
                     onValueChange = onValueChange,
                     optionGroups = ConnectionPermissionPreference.getOptionGroups(),
-                    getItemTestTag = { option ->
-                        "geoShareUserPreferenceConnectionPermission_${option}"
-                    },
+                    getItemTestTag = { option -> "geoShareUserPreferenceConnectionPermission_${option}" },
                 ) { option ->
                     ConnectionPermissionPreferenceValue(option)
                 }
@@ -656,9 +686,7 @@ private fun UserPreferencesDetailPane(
                     values = values,
                     onValueChange = onValueChange,
                     optionGroups = CoordinateFormatPreference.getOptionGroups(),
-                    getItemTestTag = { option ->
-                        "geoShareUserPreferenceCoordinateFormat_${option}"
-                    },
+                    getItemTestTag = { option -> "geoShareUserPreferenceCoordinateFormat_${option}" },
                 ) { option ->
                     Column {
                         CoordinateFormatPreferenceValue(option)
@@ -724,6 +752,43 @@ private fun UserPreferencesDetailPane(
                     userPreference = CachedPurchasePreference,
                     values = values,
                     onValueChange = onValueChange,
+                )
+            }
+
+        UserPreferencesGroupId.GOOGLE_MAPS_API ->
+            UserPreferencesControls(
+                titleResId = R.string.user_preferences_google_maps_api_title,
+                description = {
+                    stringResource(
+                        R.string.user_preferences_google_maps_api_description,
+                        stringResource(R.string.app_name),
+                    )
+                },
+                billingAppNameResId = billingAppNameResId,
+                wide = wide,
+                onBack = onBack,
+                onNavigateToBillingScreen = onNavigateToBillingScreen,
+            ) {
+                userPreferencesTextControl(
+                    userPreference = GoogleMapsApiBaseUrlPreference,
+                    values = values,
+                    onValueChange = onValueChange,
+                    modifier = Modifier.testTag("geoShareUserPreferenceGoogleMapsApiBaseUrl"),
+                )
+                userPreferencesOptionsControl(
+                    userPreference = GoogleMapsApiAuthenticationPreference,
+                    values = values,
+                    onValueChange = onValueChange,
+                    optionGroups = GoogleMapsApiAuthenticationPreference.getOptionGroups(),
+                    getItemTestTag = { option -> "geoShareUserPreferenceGoogleMapsApiAuthentication_${option}" },
+                ) { option ->
+                    AuthenticationPreferenceValue(option)
+                }
+                userPreferencesTextControl(
+                    userPreference = GoogleMapsApiKeyPreference,
+                    values = values,
+                    onValueChange = onValueChange,
+                    modifier = Modifier.testTag("geoShareUserPreferenceGoogleMapsApiKey"),
                 )
             }
 
@@ -1556,6 +1621,84 @@ private fun TableAutomationDelayPreview() {
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
                     ),
+                    onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToBillingScreen = {},
+                    onNavigateToLinksScreen = {},
+                    onValueChange = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun GoogleMapsApiPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                UserPreferencesScreen(
+                    initialGroupId = UserPreferencesGroupId.GOOGLE_MAPS_API,
+                    apps = emptyMap(),
+                    appDetails = emptyMap(),
+                    billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Loading(),
+                    links = defaultFakeLinks,
+                    userPreferencesValues = defaultFakeUserPreferences,
+                    onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToBillingScreen = {},
+                    onNavigateToLinksScreen = {},
+                    onValueChange = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkGoogleMapsApiPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                UserPreferencesScreen(
+                    initialGroupId = UserPreferencesGroupId.GOOGLE_MAPS_API,
+                    apps = emptyMap(),
+                    appDetails = emptyMap(),
+                    billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Loading(),
+                    links = defaultFakeLinks,
+                    userPreferencesValues = defaultFakeUserPreferences,
+                    onBack = {},
+                    onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToBillingScreen = {},
+                    onNavigateToLinksScreen = {},
+                    onValueChange = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, device = Devices.TABLET)
+@Composable
+private fun TableGoogleMapsApiPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                UserPreferencesScreen(
+                    initialGroupId = UserPreferencesGroupId.GOOGLE_MAPS_API,
+                    apps = emptyMap(),
+                    appDetails = emptyMap(),
+                    billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Loading(),
+                    links = defaultFakeLinks,
+                    userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
