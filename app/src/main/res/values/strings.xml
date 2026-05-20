@@ -320,7 +320,7 @@
     <string name="user_preferences_api_attestation">Hardware-backed key attestation</string>
     <string name="user_preferences_api_authentication">Authentication</string>
     <string name="user_preferences_api_base_url">Base URL</string>
-    <string name="user_preferences_api_key">API key</string>
+    <string name="user_preferences_api_key">API key (with appropriate service restrictions and usage limits)</string>
     <string name="user_preferences_apps_description">Choose which of your installed apps should be displayed after converting a map link to coordinates.</string>
     <string name="user_preferences_apps_message_hidden">The app has been hidden. You can show it again in preferences.</string>
     <string name="user_preferences_apps_title">Apps</string>

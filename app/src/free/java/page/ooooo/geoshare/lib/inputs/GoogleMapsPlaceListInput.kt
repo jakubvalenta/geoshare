@@ -12,10 +12,11 @@ import page.ooooo.geoshare.lib.geo.Source
 import javax.inject.Inject
 import javax.inject.Singleton
 
+// TOOD Create variants and fail in pro version
 @Singleton
-class GoogleMapsPlaceListInput @Inject constructor(
+class GoogleMapsPlaceListInputImpl @Inject constructor(
     private val log: Log,
-) : WebViewInput {
+) : GoogleMapsPlaceListInput<*>, WebViewInput {
 
     @Serializable
     private data class ExtractedPoint(val lat: Double?, val lon: Double?)

@@ -18,6 +18,7 @@ class GoogleMapsHtmlInputImpl @Inject constructor(
         block(Uri.parse(match, uriQuote))
 
     override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = buildParseResult {
+        // TODO Return failure in pro version
         data.run {
             // API directions
             // https://www.google.com/maps/dir/?origin={name}&destination={name}

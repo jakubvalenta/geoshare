@@ -1,6 +1,6 @@
 package page.ooooo.geoshare.data.local.preferences
 
-enum class Authentication {
-    API_KEY,
-    ATTESTATION,
+sealed interface Authentication {
+    data class ApiKey(val header: String, val value: String) : Authentication
+    class Attestation : Authentication
 }

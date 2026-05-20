@@ -9,6 +9,9 @@ import io.ktor.http.appendPathSegments
 import io.ktor.http.headers
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.UserPreferencesRepository
+import page.ooooo.geoshare.data.local.preferences.GoogleMapsApiAuthenticationPreference
+import page.ooooo.geoshare.data.local.preferences.GoogleMapsApiBaseUrlPreference
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.network.ApiService
@@ -18,6 +21,8 @@ import javax.inject.Singleton
 @Singleton
 class GoogleMapsPlaceApiInput @Inject constructor(
     private val apiService: ApiService,
+    private val googleMapsHtmlInput: GoogleMapsHtmlInput<*>,
+    private val userPreferencesRepository: UserPreferencesRepository,
 ) : BasicInput<ApiService.GoogleMapsResult>, Input.HasPermission {
 
     @StringRes
@@ -29,8 +34,15 @@ class GoogleMapsPlaceApiInput @Inject constructor(
     override suspend fun fetch(
         match: String,
         block: suspend (ApiService.GoogleMapsResult) -> ParseResult,
-    ): ParseResult =
-        apiService.createHttpClient().use { client ->
+    ): ParseResult {
+        val baseUrl = userPreferencesRepository.getValue(GoogleMapsApiBaseUrlPreference)
+            ?: return buildParseResult {
+                // TODO Now match must be full URL
+                // Go to HTML parsing, if API is not configured
+                nextStep = NextStep(googleMapsHtmlInput, match)
+            }
+        val authentication = userPreferencesRepository.getValue(GoogleMapsApiAuthenticationPreference)
+        return apiService.createHttpClient(baseUrl, authentication).use { client ->
             client
                 .prepareRequest {
                     url {
@@ -44,6 +56,7 @@ class GoogleMapsPlaceApiInput @Inject constructor(
                     block(response.body())
                 }
         }
+    }
 
     override suspend fun parse(
         data: ApiService.GoogleMapsResult,

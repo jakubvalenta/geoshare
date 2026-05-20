@@ -13,6 +13,7 @@ import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
@@ -22,7 +23,8 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.data.local.preferences.ApiBaseUrlPreference
+import page.ooooo.geoshare.data.local.preferences.Authentication
+import page.ooooo.geoshare.data.local.preferences.GoogleMapsApiBaseUrlPreference
 import page.ooooo.geoshare.data.local.preferences.CachedApiTokenPreference
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.Log
@@ -67,38 +69,47 @@ class ApiService @Inject constructor(
     @Serializable
     data class GoogleMapsResults(val results: List<GoogleMapsResult>)
 
-    suspend fun createHttpClient(): HttpClient {
-        val baseUrl = userPreferencesRepository.getValue(ApiBaseUrlPreference)
-        return HttpClient(engine) {
+    fun createHttpClient(baseUrl: URL, authentication: Authentication): HttpClient =
+        HttpClient(engine) {
             expectSuccess = true
             setDefaultTimeouts()
             rethrowExceptionsAsNetworkException(log)
 
-            install(DefaultRequest) {
-                url(baseUrl.toString())
+            when (authentication) {
+                is Authentication.ApiKey -> {
+                    install(DefaultRequest) {
+                        url(baseUrl.toString())
+                        header(authentication.header, authentication.value)
+                    }
+                }
+
+                is Authentication.Attestation -> {
+                    install(DefaultRequest) {
+                        url(baseUrl.toString())
+                    }
+                    install(Auth) {
+                        bearer {
+                            loadTokens {
+                                attestationLoadTokens()
+                            }
+                            refreshTokens {
+                                attestationLogin(baseUrl) ?: attestationRegister(baseUrl)
+                            }
+                        }
+                    }
+                }
             }
             install(ContentNegotiation) {
                 json()
             }
-            install(Auth) {
-                bearer {
-                    loadTokens {
-                        this@ApiService.loadTokens()
-                    }
-                    refreshTokens {
-                        login(baseUrl) ?: register(baseUrl)
-                    }
-                }
-            }
         }
-    }
 
-    suspend fun loadTokens(): BearerTokens? =
+    suspend fun attestationLoadTokens(): BearerTokens? =
         userPreferencesRepository.getValue(CachedApiTokenPreference)?.let {
             BearerTokens(it.token, it.publicKey)
         }
 
-    private suspend fun login(baseUrl: URL): BearerTokens? {
+    private suspend fun attestationLogin(baseUrl: URL): BearerTokens? {
         HttpClient(engine) {
             expectSuccess = true
             setDefaultTimeouts()
@@ -158,7 +169,7 @@ class ApiService @Inject constructor(
         }
     }
 
-    private suspend fun register(baseUrl: URL): BearerTokens {
+    private suspend fun attestationRegister(baseUrl: URL): BearerTokens {
         HttpClient(engine) {
             expectSuccess = true
             setDefaultTimeouts()
