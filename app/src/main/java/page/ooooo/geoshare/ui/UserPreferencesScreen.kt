@@ -1039,8 +1039,8 @@ private fun LazyListScope.userPreferencesApiConfigControl(
         // TODO Add presets
         val spacing = LocalSpacing.current
         val value = userPreference.getValue(values)
-        var baseUrl by remember(value) { mutableStateOf(value?.baseUrl ?: "") }
-        var authType by remember(value) {
+        var baseUrl by remember { mutableStateOf(value?.baseUrl ?: "") }
+        var authType by remember {
             mutableStateOf(
                 when (value) {
                     is ApiConfig.WithKeyAuth, null -> AuthType.KEY
@@ -1048,13 +1048,16 @@ private fun LazyListScope.userPreferencesApiConfigControl(
                 }
             )
         }
-        var header by remember(value) { mutableStateOf((value as? ApiConfig.WithKeyAuth)?.header ?: "") }
-        var key by remember(value) { mutableStateOf((value as? ApiConfig.WithKeyAuth)?.key ?: "") }
+        var header by remember { mutableStateOf((value as? ApiConfig.WithKeyAuth)?.header ?: "") }
+        var key by remember { mutableStateOf((value as? ApiConfig.WithKeyAuth)?.key ?: "") }
 
-        val apiConfig = remember(baseUrl, authType, header, key) {
-            when (authType) {
+        fun onFieldValueChange() {
+            val apiConfig = when (authType) {
                 AuthType.KEY -> ApiConfig.WithKeyAuth(baseUrl, header, key)
                 AuthType.ATTESTATION -> ApiConfig.WithAttestationAuth(baseUrl)
+            }
+            onValueChange { preferences ->
+                userPreference.setValue(preferences, apiConfig)
             }
         }
 
@@ -1063,9 +1066,7 @@ private fun LazyListScope.userPreferencesApiConfigControl(
                 value = baseUrl,
                 onValueChange = {
                     baseUrl = it
-                    onValueChange { preferences ->
-                        userPreference.setValue(preferences, apiConfig)
-                    }
+                    onFieldValueChange()
                 },
                 modifier = modifier.fillMaxWidth(),
                 enabled = enabled,
@@ -1082,9 +1083,7 @@ private fun LazyListScope.userPreferencesApiConfigControl(
                 },
                 onValueChange = {
                     authType = it
-                    onValueChange { preferences ->
-                        userPreference.setValue(preferences, apiConfig)
-                    }
+                    onFieldValueChange()
                 },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = enabled,
@@ -1094,9 +1093,7 @@ private fun LazyListScope.userPreferencesApiConfigControl(
                 value = header,
                 onValueChange = {
                     header = it
-                    onValueChange { preferences ->
-                        userPreference.setValue(preferences, apiConfig)
-                    }
+                    onFieldValueChange()
                 },
                 modifier = modifier.fillMaxWidth(),
                 enabled = enabled && authType == AuthType.KEY,
@@ -1107,9 +1104,7 @@ private fun LazyListScope.userPreferencesApiConfigControl(
                 value = key,
                 onValueChange = {
                     key = it
-                    onValueChange { preferences ->
-                        userPreference.setValue(preferences, apiConfig)
-                    }
+                    onFieldValueChange()
                 },
                 modifier = modifier.fillMaxWidth(),
                 enabled = enabled && authType == AuthType.KEY,
