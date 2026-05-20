@@ -7,6 +7,6 @@ import javax.inject.Singleton
  * Not available in this build flavor.
  */
 @Singleton
-class GoogleMapsHtmlInputImpl @Inject constructor() : GoogleMapsHtmlInput, NoopInput {
+class GoogleMapsPlaceListInputImpl @Inject constructor() : GoogleMapsPlaceListInput, NoopInput {
     override fun toString() = "GoogleMapsHtmlInput"
 }

@@ -21,7 +21,10 @@ import page.ooooo.geoshare.lib.inputs.CoordinateInput
 import page.ooooo.geoshare.lib.inputs.DebugUriInput
 import page.ooooo.geoshare.lib.inputs.DebugWebViewInput
 import page.ooooo.geoshare.lib.inputs.GeoUriInput
+import page.ooooo.geoshare.lib.inputs.GoogleMapsAddressApiInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInput
+import page.ooooo.geoshare.lib.inputs.GoogleMapsPlaceApiInput
+import page.ooooo.geoshare.lib.inputs.GoogleMapsPlaceListInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsShortLinkInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsUriInput
 import page.ooooo.geoshare.lib.inputs.HereWeGoUriInput
@@ -32,7 +35,6 @@ import page.ooooo.geoshare.lib.inputs.MapyComUriInput
 import page.ooooo.geoshare.lib.inputs.OpenStreetMapApiInput
 import page.ooooo.geoshare.lib.inputs.OpenStreetMapUriInput
 import page.ooooo.geoshare.lib.inputs.OsmAndUriInput
-import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.inputs.PlusCodeInput
 import page.ooooo.geoshare.lib.inputs.UrbiHtmlInput
 import page.ooooo.geoshare.lib.inputs.UrbiUriInput
@@ -41,6 +43,7 @@ import page.ooooo.geoshare.lib.inputs.WazeUriInput
 import page.ooooo.geoshare.lib.inputs.YandexMapsHtmlInput
 import page.ooooo.geoshare.lib.inputs.YandexMapsShortLinkInput
 import page.ooooo.geoshare.lib.inputs.YandexMapsUriInput
+import page.ooooo.geoshare.lib.network.ApiService
 import javax.inject.Singleton
 
 @Module
@@ -105,6 +108,12 @@ object FakeInputRepository : InputRepository {
     private val engine = MockEngine { throw NotImplementedError() }
     private val log = FakeLog
     private val uriQuote = FakeUriQuote
+    private val userPreferencesRepository = FakeUserPreferencesRepository()
+    private val apiService = ApiService(
+        engine = engine,
+        log = log,
+        userPreferencesRepository = userPreferencesRepository,
+    )
 
     override val amapShortLinkInput = AmapShortLinkInput(
         amapUriInput = { amapUriInput },
@@ -156,13 +165,25 @@ object FakeInputRepository : InputRepository {
         uriQuote = uriQuote,
     )
     override val googleMapsUriInput = GoogleMapsUriInput(
-        googleMapsHtmlInput = { googleMapsHtmlInput },
+        googleMapsAddressApiInput = { googleMapsAddressApiInput },
+        googleMapsPlaceApiInput = { googleMapsPlaceApiInput },
+        googleMapsPlaceListInput = { googleMapsPlaceListInput },
         uriQuote = uriQuote,
     )
-    val googleMapsHtmlInput = object : GoogleMapsHtmlInput<Unit> {
-        override suspend fun fetch(match: String, block: suspend (Unit) -> ParseResult) = throw NotImplementedError()
-        override suspend fun parse(data: Unit, match: String, prevResult: ParseResult?) = throw NotImplementedError()
-    }
+    val googleMapsAddressApiInput = GoogleMapsAddressApiInput(
+        apiService = apiService,
+        googleMapsHtmlInput = { googleMapsHtmlInput },
+        userPreferencesRepository = userPreferencesRepository,
+        uriQuote = uriQuote,
+    )
+    val googleMapsPlaceApiInput = GoogleMapsPlaceApiInput(
+        apiService = apiService,
+        googleMapsHtmlInput = { googleMapsHtmlInput },
+        userPreferencesRepository = userPreferencesRepository,
+        uriQuote = uriQuote,
+    )
+    val googleMapsHtmlInput = object : GoogleMapsHtmlInput {}
+    val googleMapsPlaceListInput = object : GoogleMapsPlaceListInput {}
     override val hereWeGoUriInput = HereWeGoUriInput(
         uriQuote = uriQuote,
     )

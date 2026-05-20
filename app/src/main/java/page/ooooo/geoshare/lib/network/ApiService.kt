@@ -24,7 +24,6 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.Authentication
-import page.ooooo.geoshare.data.local.preferences.GoogleMapsApiBaseUrlPreference
 import page.ooooo.geoshare.data.local.preferences.CachedApiTokenPreference
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.Log
@@ -77,14 +76,14 @@ class ApiService @Inject constructor(
 
             when (authentication) {
                 is Authentication.ApiKey -> {
-                    install(DefaultRequest) {
+                    install(DefaultRequest.Plugin) {
                         url(baseUrl.toString())
                         header(authentication.header, authentication.value)
                     }
                 }
 
                 is Authentication.Attestation -> {
-                    install(DefaultRequest) {
+                    install(DefaultRequest.Plugin) {
                         url(baseUrl.toString())
                     }
                     install(Auth) {
@@ -115,7 +114,7 @@ class ApiService @Inject constructor(
             setDefaultTimeouts()
             rethrowExceptionsAsNetworkException(log)
 
-            install(DefaultRequest) {
+            install(DefaultRequest.Plugin) {
                 url(baseUrl.toString())
             }
             install(ContentNegotiation) {
@@ -175,7 +174,7 @@ class ApiService @Inject constructor(
             setDefaultTimeouts()
             rethrowExceptionsAsNetworkException(log)
 
-            install(DefaultRequest) {
+            install(DefaultRequest.Plugin) {
                 url(baseUrl.toString())
             }
             install(ContentNegotiation) {

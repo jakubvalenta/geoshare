@@ -65,7 +65,6 @@ import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.database.findByUUID
-import page.ooooo.geoshare.data.local.preferences.Authentication
 import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
 import page.ooooo.geoshare.data.local.preferences.AutomationPreference
@@ -74,9 +73,7 @@ import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePr
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormatPreference
-import page.ooooo.geoshare.data.local.preferences.GoogleMapsApiAuthenticationPreference
 import page.ooooo.geoshare.data.local.preferences.GoogleMapsApiBaseUrlPreference
-import page.ooooo.geoshare.data.local.preferences.GoogleMapsApiKeyPreference
 import page.ooooo.geoshare.data.local.preferences.HiddenAppsPreference
 import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.OptionsPreference
@@ -506,18 +503,6 @@ private fun CoordinateFormatPreferenceValue(value: CoordinateFormat) {
 }
 
 @Composable
-private fun AuthenticationPreferenceValue(value: Authentication) {
-    Text(
-        stringResource(
-            when (value) {
-                Authentication.API_KEY -> R.string.user_preferences_api_key
-                Authentication.ATTESTATION -> R.string.user_preferences_api_attestation
-            }
-        )
-    )
-}
-
-@Composable
 private fun AutomationPreferenceValue(
     value: Automation,
     appDetails: AppDetails,
@@ -775,21 +760,7 @@ private fun UserPreferencesDetailPane(
                     onValueChange = onValueChange,
                     modifier = Modifier.testTag("geoShareUserPreferenceGoogleMapsApiBaseUrl"),
                 )
-                userPreferencesOptionsControl(
-                    userPreference = GoogleMapsApiAuthenticationPreference,
-                    values = values,
-                    onValueChange = onValueChange,
-                    optionGroups = GoogleMapsApiAuthenticationPreference.getOptionGroups(),
-                    getItemTestTag = { option -> "geoShareUserPreferenceGoogleMapsApiAuthentication_${option}" },
-                ) { option ->
-                    AuthenticationPreferenceValue(option)
-                }
-                userPreferencesTextControl(
-                    userPreference = GoogleMapsApiKeyPreference,
-                    values = values,
-                    onValueChange = onValueChange,
-                    modifier = Modifier.testTag("geoShareUserPreferenceGoogleMapsApiKey"),
-                )
+                // TODO Add authentication controls
             }
 
         UserPreferencesGroupId.HIDDEN_APPS ->

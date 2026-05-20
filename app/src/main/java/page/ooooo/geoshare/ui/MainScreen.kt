@@ -394,7 +394,7 @@ fun MainScreen(
 @Composable
 private fun MainScreen(
     currentState: State,
-    allInputs: List<Input<*>>,
+    allInputs: List<Input>,
     appDetails: AppDetails,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
@@ -654,7 +654,7 @@ private fun MainScreen(
     }
 
     when (currentState) {
-        is PermissionRequested<*> -> {
+        is PermissionRequested -> {
             PermissionDialog(
                 title = stringResource(currentState.permissionTitleResId),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
@@ -810,7 +810,7 @@ private fun MainBottomPane(currentState: State) {
 
 @Composable
 private fun MainSupportingPane(
-    allInputs: List<Input<*>>,
+    allInputs: List<Input>,
     appDetails: AppDetails,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,

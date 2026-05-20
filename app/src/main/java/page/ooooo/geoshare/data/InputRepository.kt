@@ -59,7 +59,7 @@ interface InputRepository {
      * Order matters, because [page.ooooo.geoshare.lib.conversion.ConversionState] will try the inputs in order when
      * parsing a URI.
      */
-    val all: List<Input<*>>
+    val all: List<Input>
         get() = listOf(
             geoUriInput,
             plusCodeInput,

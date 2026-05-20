@@ -145,8 +145,6 @@
     <string name="converter_debug_loading_indicator_title" translatable="false">Connecting to Debug Input…</string>
     <string name="converter_ge0_name">Maps.me, Organic Maps, CoMaps</string>
     <string name="converter_geo_name">geo:</string>
-    <string name="converter_geo_share_loading_indicator_title">Connecting to GeoShare server…</string>
-    <string name="converter_geo_share_permission_title">Connect to GeoShare server?</string>
     <string name="converter_google_maps_loading_indicator_title">Connecting to Google…</string>
     <string name="converter_google_maps_name">Google Maps</string>
     <string name="converter_google_maps_permission_title">Connect to Google?</string>

@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 
 class GoogleMapsPlaceListInputTest : InputTest {
-    private val input = GoogleMapsPlaceListInput(
+    private val input = GoogleMapsPlaceListInputImpl(
         log = FakeLog,
     )
 

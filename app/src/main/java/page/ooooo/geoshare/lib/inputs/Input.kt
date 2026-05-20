@@ -3,13 +3,11 @@ package page.ooooo.geoshare.lib.inputs
 import android.webkit.WebSettings
 import page.ooooo.geoshare.lib.geo.Point
 
-sealed interface Input<T> {
+sealed interface Input {
     @Suppress("SameReturnValue")
     val documentation: InputDocumentation? get() = null
 
     fun match(source: String): String? = null
-
-    suspend fun parse(data: T, match: String, prevResult: ParseResult? = null): ParseResult
 
     interface HasPermission {
         val permissionTitleResId: Int
@@ -21,13 +19,19 @@ sealed interface Input<T> {
     }
 }
 
-interface BasicInput<T> : Input<T> {
+interface BasicInput<T> : Input {
     suspend fun fetch(match: String, block: suspend (T) -> ParseResult): ParseResult
+
+    suspend fun parse(data: T, match: String, prevResult: ParseResult? = null): ParseResult
 }
 
-interface WebViewInput : Input<String>, Input.HasPermission {
+interface WebViewInput : Input, Input.HasPermission {
     val unsafeExtractionJavascript: String
+
+    suspend fun parse(data: String, match: String, prevResult: ParseResult? = null): ParseResult
 
     fun extendWebSettings(settings: WebSettings) {}
     fun shouldInterceptRequest(requestUrlString: String): Boolean = false
 }
+
+interface NoopInput : Input

@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
+import dagger.Lazy
 import io.ktor.client.call.body
 import io.ktor.client.request.accept
 import io.ktor.client.request.prepareRequest
@@ -12,6 +13,8 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.GoogleMapsApiAuthenticationPreference
 import page.ooooo.geoshare.data.local.preferences.GoogleMapsApiBaseUrlPreference
+import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.network.ApiService
@@ -21,59 +24,62 @@ import javax.inject.Singleton
 @Singleton
 class GoogleMapsPlaceApiInput @Inject constructor(
     private val apiService: ApiService,
-    private val googleMapsHtmlInput: GoogleMapsHtmlInput<*>,
+    private val googleMapsHtmlInput: Lazy<GoogleMapsHtmlInput>,
     private val userPreferencesRepository: UserPreferencesRepository,
-) : BasicInput<ApiService.GoogleMapsResult>, Input.HasPermission {
+    private val uriQuote: UriQuote,
+) : BasicInput<Uri>, Input.HasPermission {
 
     @StringRes
-    override val permissionTitleResId = R.string.converter_geo_share_permission_title
+    override val permissionTitleResId = R.string.converter_google_maps_permission_title
 
     @StringRes
-    override val loadingIndicatorTitleResId = R.string.converter_geo_share_loading_indicator_title
+    override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
-    override suspend fun fetch(
-        match: String,
-        block: suspend (ApiService.GoogleMapsResult) -> ParseResult,
-    ): ParseResult {
+    override suspend fun fetch(match: String, block: suspend (Uri) -> ParseResult) =
+        block(Uri.parse(match, uriQuote))
+
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = buildParseResult {
         val baseUrl = userPreferencesRepository.getValue(GoogleMapsApiBaseUrlPreference)
-            ?: return buildParseResult {
-                // TODO Now match must be full URL
+            ?: run {
                 // Go to HTML parsing, if API is not configured
-                nextStep = NextStep(googleMapsHtmlInput, match)
+                nextStep = NextStep(googleMapsHtmlInput.get(), match)
+                return@buildParseResult
             }
-        val authentication = userPreferencesRepository.getValue(GoogleMapsApiAuthenticationPreference)
-        return apiService.createHttpClient(baseUrl, authentication).use { client ->
+        val authentication = userPreferencesRepository.getValue(
+            GoogleMapsApiAuthenticationPreference
+        )
+        val placeId = parsePlaceId(data) ?: return@buildParseResult
+        val res = apiService.createHttpClient(baseUrl, authentication).use { client ->
             client
                 .prepareRequest {
                     url {
-                        appendPathSegments("v1", "google-maps", "geocode", "place", match)
+                        appendPathSegments("v1", "google-maps", "geocode", "place", placeId)
                     }
                     headers {
                         accept(ContentType.Application.Json)
                     }
                 }
                 .execute { response ->
-                    block(response.body())
+                    response.body<ApiService.GoogleMapsResult>()
                 }
         }
-    }
-
-    override suspend fun parse(
-        data: ApiService.GoogleMapsResult,
-        match: String,
-        prevResult: ParseResult?,
-    ) = buildParseResult {
         val prevPoint = prevResult?.points?.lastOrNull()
         points = persistentListOf(
             GCJ02MainlandChinaPoint(
-                data.location.latitude,
-                data.location.longitude,
+                res.location.latitude,
+                res.location.longitude,
                 name = prevPoint?.name,
                 z = prevPoint?.z,
                 source = prevPoint?.source ?: Source.API,
             )
         )
     }
+
+    private fun parsePlaceId(uri: Uri): String? =
+        uri.run {
+            // TODO Parse place id
+            null
+        }
 
     override fun toString() = "GoogleMapsPlaceApiInput"
 }

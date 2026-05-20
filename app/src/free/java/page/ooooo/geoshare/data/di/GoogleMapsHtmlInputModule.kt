@@ -25,7 +25,7 @@ object GoogleMapsHtmlInputModule {
         engine: HttpClientEngine,
         log: Log,
         uriQuote: UriQuote,
-    ): GoogleMapsHtmlInput<*> =
+    ): GoogleMapsHtmlInput =
         GoogleMapsHtmlInputImpl(
             googleMapsUriInput = { googleMapsUriInput },
             googleMapsWebViewInput = { googleMapsWebViewInput },

@@ -26,7 +26,7 @@ class GoogleMapsHtmlInputImpl @Inject constructor(
     override val log: Log,
     override val engine: HttpClientEngine,
     override val uriQuote: UriQuote,
-) : GoogleMapsHtmlInput<ByteReadChannel>, BodyAsChannelInput {
+) : GoogleMapsHtmlInput, BodyAsChannelInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_google_maps_permission_title
 

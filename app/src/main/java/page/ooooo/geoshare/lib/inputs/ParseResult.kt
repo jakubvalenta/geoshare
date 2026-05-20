@@ -9,7 +9,7 @@ data class ParseResult(
 )
 
 data class NextStep(
-    val input: Input<*>,
+    val input: Input,
     val match: String,
 )
 

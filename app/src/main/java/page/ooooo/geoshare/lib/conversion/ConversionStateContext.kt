@@ -12,7 +12,7 @@ import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.inputs.Input
 
 class ConversionStateContext(
-    val inputs: List<Input<*>> = emptyList(),
+    val inputs: List<Input> = emptyList(),
     val linkRepository: LinkRepository,
     val outputRepository: OutputRepository,
     val resources: Resources,

@@ -29,8 +29,9 @@ import javax.inject.Singleton
  */
 @Singleton
 class GoogleMapsUriInput @Inject constructor(
-    private val googleMapsHtmlInput: dagger.Lazy<GoogleMapsHtmlInput<*>>,
-    private val googleMapsPlaceListInput: dagger.Lazy<GoogleMapsPlaceListInput<*>>,
+    private val googleMapsAddressApiInput: dagger.Lazy<GoogleMapsAddressApiInput>,
+    private val googleMapsPlaceApiInput: dagger.Lazy<GoogleMapsPlaceApiInput>,
+    private val googleMapsPlaceListInput: dagger.Lazy<GoogleMapsPlaceListInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
     override val pattern =
@@ -61,9 +62,8 @@ class GoogleMapsUriInput @Inject constructor(
                 ?.let { naivePoints ->
                     points = naivePoints.map { GCJ02MainlandChinaPoint(it).copy(z = z) }.toImmutableList()
                     if (points.any { !it.hasCoordinates() }) {
-                        // Go to HTML parsing unless coordinates have been extracted for all point
-                        // TODO If API configured, go to googleMapsAddressApiInput, else go to googleMapsHtmlInput
-                        nextStep = NextStep(googleMapsHtmlInput.get(), match)
+                        // Go to HTML parsing, unless coordinates have been extracted for all points
+                        nextStep = NextStep(googleMapsAddressApiInput.get(), match)
                     }
                     return@run
                 }
@@ -105,10 +105,9 @@ class GoogleMapsUriInput @Inject constructor(
                 "query",
             ).forEach { key ->
                 Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull()?.let { name ->
-                    // Go to HTML or API parsing
+                    // Go to API parsing
                     points = persistentListOf(GCJ02MainlandChinaPoint(z = z, name = name, source = Source.URI))
-                    // TODO If API configured, go to googleMapsAddressApiInput, else go to googleMapsHtmlInput
-                    nextStep = NextStep(googleMapsHtmlInput.get(), match)
+                    nextStep = NextStep(googleMapsAddressApiInput.get(), match)
                     return@run
                 }
             }
@@ -124,9 +123,8 @@ class GoogleMapsUriInput @Inject constructor(
                 firstPart == "dir" -> {
                     points = parseParts(parts.drop(1), z)
                     if (points.lastOrNull()?.hasCoordinates() != true) {
-                        // Go to HTML or API parsing, if no coordinates have been extracted
-                        // TODO If API configured, go to googleMapsAddressApiInput, else go to googleMapsHtmlInput
-                        nextStep = NextStep(googleMapsHtmlInput.get(), match)
+                        // Go to API parsing, if no coordinates have been extracted
+                        nextStep = NextStep(googleMapsAddressApiInput.get(), match)
                     }
                 }
 
@@ -135,10 +133,9 @@ class GoogleMapsUriInput @Inject constructor(
                 firstPart == "place" -> {
                     points = parseParts(parts.drop(1), z)
                     if (points.lastOrNull()?.hasCoordinates() != true) {
-                        // Go to HTML or API parsing, if no coordinates have been extracted
-                        // TODO If API configured, go to googleMapsAddressApiInput, else go to googleMapsHtmlInput
-                        // TODO If API configured and place id found, go to googleMapsPlaceApiInput
-                        nextStep = NextStep(googleMapsHtmlInput.get(), match)
+                        // Go to API parsing, if no coordinates have been extracted
+                        // TODO Parse place id and go to googleMapsPlaceApiInput
+                        nextStep = NextStep(googleMapsAddressApiInput.get(), match)
                     }
                 }
 
@@ -148,7 +145,7 @@ class GoogleMapsUriInput @Inject constructor(
                 // https://www.google.com/maps/d/edit?mid={id}
                 // https://www.google.com/maps/d/view?mid={id}
                 firstPart == "placelists" || firstPart == "@" || firstPart == "d" -> {
-                    // Go to HTML or API parsing
+                    // Go to API parsing
                     nextStep = NextStep(googleMapsPlaceListInput.get(), match)
                 }
 
@@ -156,7 +153,10 @@ class GoogleMapsUriInput @Inject constructor(
                 // https://www.google.com/maps/search/{query}
                 firstPart == "search" -> {
                     points = parseParts(parts.drop(1), z)
-                    // TODO Go to API parsing, if it's configured
+                    if (points.lastOrNull()?.hasCoordinates() != true) {
+                        // Go to API parsing, if no coordinates have been extracted
+                        nextStep = NextStep(googleMapsAddressApiInput.get(), match)
+                    }
                 }
 
                 // Map center
