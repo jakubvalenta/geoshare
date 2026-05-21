@@ -190,7 +190,7 @@ class AppleMapsUriInputTest : InputTest {
     }
 
     @Test
-    fun parse_parameterLlTakesPrecedenceOverCenterAndSllAndCoordinate() = runTest {
+    fun parse_parameterLLTakesPrecedenceOverCenterAndSllAndCoordinate() = runTest {
         assertEquals(
             ParseResult(persistentListOf(WGS84Point(-17.2165721, -149.9470294, source = Source.URI))),
             input.parse("https://maps.apple.com/?ll=-17.2165721,-149.9470294&center=52.49115540927951,13.42595574770533"),
