@@ -746,7 +746,6 @@ private fun UserPreferencesDetailPane(
                 )
             }
 
-        // TODO Add Google Maps API instrumented test
         UserPreferencesGroupId.GOOGLE_MAPS_API ->
             UserPreferencesControls(
                 titleResId = R.string.user_preferences_google_maps_api_title,

@@ -41,6 +41,8 @@ class GoogleMapsPlaceApiInput @Inject constructor(
         val apiConfig = userPreferencesRepository.getValue(GoogleMapsApiPreference) ?: run {
             // Go to HTML parsing, if API is not configured
             nextStep = NextStep(googleMapsHtmlInput.get(), match)
+            // Copy point names from URI input
+            prevResult?.points?.let { points = it }
             return@parseResult
         }
         val client = apiService.createHttpClient(apiConfig)

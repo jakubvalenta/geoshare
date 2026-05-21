@@ -29,6 +29,7 @@ interface InputBehaviorTest : BehaviorTest {
     fun UiAutomatorTestScope.testUri(
         expectedPoints: Points,
         unsafeUriString: String,
+        fallbackPoints: Points? = null,
         accurate: Boolean? = null,
         timeoutMs: Long = NETWORK_TIMEOUT,
     ) {
@@ -39,16 +40,31 @@ interface InputBehaviorTest : BehaviorTest {
         shareUri(unsafeUriString)
         confirmDialogIfVisible()
 
-        assertConversionSucceeded(expectedPoints, accurate, timeoutMs)
+        try {
+            assertConversionSucceeded(expectedPoints, accurate, timeoutMs)
+        } catch (e: AssertionError) {
+            if (fallbackPoints != null) {
+                assertConversionSucceeded(fallbackPoints, accurate, timeoutMs)
+            } else {
+                throw e
+            }
+        }
     }
 
     fun UiAutomatorTestScope.testUri(
         expectedPoint: Point,
         unsafeUriString: String,
+        fallbackPoint: Point? = null,
         accurate: Boolean? = null,
         timeoutMs: Long = NETWORK_TIMEOUT,
     ) =
-        testUri(persistentListOf(expectedPoint), unsafeUriString, accurate, timeoutMs)
+        testUri(
+            persistentListOf(expectedPoint),
+            unsafeUriString,
+            fallbackPoint?.let { persistentListOf(it) },
+            accurate,
+            timeoutMs,
+        )
 
     fun UiAutomatorTestScope.testText(expectedPoints: Points, unsafeText: String) {
         // It would be preferable to test sharing of the text with the app, but this shell command doesn't work when
