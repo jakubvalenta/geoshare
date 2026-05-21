@@ -746,6 +746,7 @@ private fun UserPreferencesDetailPane(
                 )
             }
 
+        // TODO Add Google Maps API instrumented test
         UserPreferencesGroupId.GOOGLE_MAPS_API ->
             UserPreferencesControls(
                 titleResId = R.string.user_preferences_google_maps_api_title,
@@ -1051,9 +1052,13 @@ private fun LazyListScope.userPreferencesApiConfigControl(
         var key by remember { mutableStateOf((value as? ApiConfig.WithKeyAuth)?.key ?: "") }
 
         fun onFieldValueChange() {
-            val apiConfig = when (authType) {
-                AuthType.KEY -> ApiConfig.WithKeyAuth(baseUrl, header, key)
-                AuthType.ATTESTATION -> ApiConfig.WithAttestationAuth(baseUrl)
+            val apiConfig = if (!baseUrl.isEmpty()) {
+                when (authType) {
+                    AuthType.KEY -> ApiConfig.WithKeyAuth(baseUrl, header, key)
+                    AuthType.ATTESTATION -> ApiConfig.WithAttestationAuth(baseUrl)
+                }
+            } else {
+                null
             }
             onValueChange { preferences ->
                 userPreference.setValue(preferences, apiConfig)
