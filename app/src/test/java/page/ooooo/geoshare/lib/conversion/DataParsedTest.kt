@@ -72,8 +72,8 @@ class DataParsedTest {
         val state = DataParsed(stateContext, source, match = source, input, result, permission = null)
         assertEquals(
             ConversionFailed(
-                resources.getString(R.string.conversion_failed_reason_no_points),
                 source,
+                resources.getString(R.string.conversion_failed_reason_no_points),
             ),
             state.transition(),
         )
@@ -86,8 +86,8 @@ class DataParsedTest {
         val state = DataParsed(stateContext, source, match = source, input, result, permission = null)
         assertEquals(
             ConversionFailed(
-                resources.getString(R.string.conversion_failed_reason_no_points),
                 source,
+                resources.getString(R.string.conversion_failed_reason_no_points),
             ),
             state.transition(),
         )
@@ -104,8 +104,8 @@ class DataParsedTest {
         )
         assertEquals(
             ConversionFailed(
-                resources.getString(R.string.conversion_failed_reason_no_points),
                 source,
+                resources.getString(R.string.conversion_failed_reason_no_points),
             ),
             state.transition(),
         )
@@ -122,8 +122,8 @@ class DataParsedTest {
         )
         assertEquals(
             ConversionFailed(
-                resources.getString(R.string.conversion_failed_connection_permission_denied),
                 source,
+                resources.getString(R.string.conversion_failed_connection_permission_denied),
             ),
             state.transition(),
         )

@@ -117,8 +117,8 @@ class PermissionGrantedWebViewInputTest {
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
                 ConversionFailed(
-                    resources.getString(R.string.conversion_failed_reason_timeout),
                     source,
+                    resources.getString(R.string.conversion_failed_reason_timeout),
                 ),
                 state.transition(),
             )
@@ -156,7 +156,7 @@ class PermissionGrantedWebViewInputTest {
         state.setData("${source}-data")
         advanceUntilIdle()
         assertEquals(
-            ConversionFailed(resources.getString(R.string.conversion_failed_cancelled), source),
+            ConversionFailed(source, resources.getString(R.string.conversion_failed_cancelled)),
             res,
         )
     }
@@ -196,7 +196,7 @@ class PermissionGrantedWebViewInputTest {
             // Do nothing
         }
         assertEquals(
-            ConversionFailed(resources.getString(R.string.conversion_failed_cancelled), source),
+            ConversionFailed(source, resources.getString(R.string.conversion_failed_cancelled)),
             res,
         )
     }
