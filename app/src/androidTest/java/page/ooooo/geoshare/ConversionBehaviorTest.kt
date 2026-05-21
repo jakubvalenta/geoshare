@@ -579,9 +579,10 @@ class ConversionBehaviorTest : BehaviorTest {
             onElement { viewIdResourceName == "geoShareResultSuccessSheet" }
                 // Scroll again, because only now can the lazy column pane scroll all the way to the bottom
                 .scrollToElement(Direction.DOWN) {
-                    viewIdResourceName == "geoShareResultSuccessSheetItemHeadline" &&
-                        textAsString() in
-                        setOf("Save GPX route", @Suppress("SpellCheckingInspection") "Enregistrer l’itinéraire GPX")
+                    viewIdResourceName == "geoShareResultSuccessSheetItemHeadline" && textAsString() in setOf(
+                        "Save GPX route",
+                        @Suppress("SpellCheckingInspection") "Enregistrer l’itinéraire GPX",
+                    )
                 }
                 .click()
         }
@@ -622,9 +623,10 @@ class ConversionBehaviorTest : BehaviorTest {
             onElement { viewIdResourceName == "geoShareResultSuccessSheet" }
                 // Scroll again, because only now can the lazy column pane scroll all the way to the bottom
                 .scrollToElement(Direction.DOWN) {
-                    viewIdResourceName == "geoShareResultSuccessSheetItemHeadline" &&
-                        textAsString() in
-                        setOf("Save to contact", @Suppress("SpellCheckingInspection") "Enregistrer dans un contact")
+                    viewIdResourceName == "geoShareResultSuccessSheetItemHeadline" && textAsString() in setOf(
+                        "Save to contact",
+                        @Suppress("SpellCheckingInspection") "Enregistrer dans les contacts",
+                    )
                 }
                 .click()
         }
@@ -642,8 +644,7 @@ class ConversionBehaviorTest : BehaviorTest {
 
     private fun UiAutomatorTestScope.assertPermissionDenied() {
         onElement {
-            viewIdResourceName == "geoShareConversionErrorMessage" &&
-                textAsString() in setOf(
+            viewIdResourceName == "geoShareConversionErrorMessage" && textAsString() in setOf(
                 "This link is not supported without connecting to the map service",
                 @Suppress("SpellCheckingInspection") "Ce lien n’est pas pris en charge sans connexion au service de cartographie",
             )
