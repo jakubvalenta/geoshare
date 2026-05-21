@@ -24,7 +24,7 @@ class SourceReceivedTest {
         val source = ""
         val state = SourceReceived(stateContext, "")
         assertEquals(
-            ConversionFailed(resources.getString(R.string.conversion_failed_missing_url), source),
+            ConversionFailed(source, resources.getString(R.string.conversion_failed_missing_url)),
             state.transition(),
         )
     }
@@ -65,7 +65,10 @@ class SourceReceivedTest {
         val source = "https://maps.example.com/foo"
         val state = SourceReceived(stateContext, source)
         assertEquals(
-            ConversionFailed(resources.getString(R.string.conversion_failed_unsupported_service), source),
+            ConversionFailed(
+                source,
+                resources.getString(R.string.conversion_failed_unsupported_service)
+            ),
             state.transition(),
         )
     }

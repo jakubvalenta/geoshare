@@ -19,11 +19,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,13 +36,16 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ResultError(
-    message: String,
     source: String,
+    message: String,
+    details: String?,
+    initialExpanded: Boolean = false,
     onNavigateToInputsScreen: () -> Unit,
     onRetry: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
     val uriHandler = LocalUriHandler.current
+    var expanded by remember { mutableStateOf(initialExpanded) }
 
     // Animate alpha when the conversion is being retried, so that there's a visual feedback even if the conversion
     // leads to the same result and nothing changes in the end
@@ -57,12 +62,39 @@ fun ResultError(
     ) {
         Column(Modifier.padding(horizontal = spacing.windowPadding)) {
             Headline(stringResource(R.string.conversion_error_title))
-            SelectionContainer(Modifier.padding(bottom = spacing.smallAdaptive)) {
-                Text(
-                    message,
-                    Modifier.testTag("geoShareConversionErrorMessage"),
-                    style = MaterialTheme.typography.bodyLarge,
-                )
+            if (details != null) {
+                ExpandablePane(
+                    expanded = expanded,
+                    onSetExpanded = { expanded = it },
+                    title = {
+                        SelectionContainer(Modifier.weight(1f)) {
+                            Text(
+                                message,
+                                Modifier.testTag("geoShareConversionErrorMessage"),
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        }
+                    },
+                    modifier = Modifier.padding(bottom = spacing.smallAdaptive),
+                ) {
+                    SelectionContainer {
+                        Text(
+                            details,
+                            Modifier.padding(top = spacing.tinyAdaptive),
+                            fontFamily = FontFamily.Monospace,
+                            maxLines = 25,
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                }
+            } else {
+                SelectionContainer(Modifier.fillMaxWidth()) {
+                    Text(
+                        message,
+                        Modifier.testTag("geoShareConversionErrorMessage"),
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
             }
             if (source.isNotEmpty()) {
                 SelectionContainer(Modifier.padding(bottom = spacing.smallAdaptive)) {
@@ -128,8 +160,9 @@ private fun DefaultPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultError(
-                message = stringResource(R.string.conversion_failed_reason_no_points),
                 source = "https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398",
+                message = stringResource(R.string.conversion_failed_reason_no_points),
+                details = null,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -146,8 +179,9 @@ private fun DarkPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultError(
-                message = stringResource(R.string.conversion_failed_reason_no_points),
                 source = "https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398",
+                message = stringResource(R.string.conversion_failed_reason_no_points),
+                details = null,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -164,8 +198,9 @@ private fun CoordinatesPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultError(
-                message = stringResource(R.string.conversion_failed_reason_no_points),
                 source = "41°24′12.2″N 2°10′26.5″E",
+                message = stringResource(R.string.conversion_failed_reason_no_points),
+                details = NotImplementedError().stackTraceToString(),
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -182,8 +217,49 @@ private fun DarkCoordinatesPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultError(
-                message = stringResource(R.string.conversion_failed_reason_no_points),
                 source = "41°24′12.2″N 2°10′26.5″E",
+                message = stringResource(R.string.conversion_failed_reason_no_points),
+                details = NotImplementedError().stackTraceToString(),
+                onNavigateToInputsScreen = {},
+                onRetry = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ExpandedPreview() {
+    AppTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ) {
+            ResultError(
+                source = "41°24′12.2″N 2°10′26.5″E",
+                message = stringResource(R.string.conversion_failed_reason_no_points),
+                details = NotImplementedError().stackTraceToString(),
+                initialExpanded = true,
+                onNavigateToInputsScreen = {},
+                onRetry = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkExpandedPreview() {
+    AppTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ) {
+            ResultError(
+                source = "41°24′12.2″N 2°10′26.5″E",
+                message = stringResource(R.string.conversion_failed_reason_no_points),
+                details = NotImplementedError().stackTraceToString(),
+                initialExpanded = true,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -200,8 +276,10 @@ private fun EmptyPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultError(
-                message = stringResource(R.string.conversion_failed_reason_no_points),
                 source = "",
+                message = stringResource(R.string.conversion_failed_reason_no_points),
+                details = null,
+                initialExpanded = false,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -218,8 +296,10 @@ private fun DarkEmptyPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultError(
-                message = stringResource(R.string.conversion_failed_reason_no_points),
                 source = "",
+                message = stringResource(R.string.conversion_failed_reason_no_points),
+                details = null,
+                initialExpanded = false,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
