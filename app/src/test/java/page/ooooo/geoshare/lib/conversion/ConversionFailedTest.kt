@@ -9,7 +9,7 @@ class ConversionFailedTest {
 
     @Test
     fun returnsNull() = runTest {
-        val state = ConversionFailed("Test message", source)
+        val state = ConversionFailed(source, "Test message")
         assertNull(state.transition())
     }
 }
