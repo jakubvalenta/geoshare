@@ -382,7 +382,7 @@ class GoogleMapsUriInputTest : InputTest {
                 nextStep = NextStep(
                     FakeInputRepository.googleMapsAddressApiInput,
                     "https://www.google.com/maps/search/restaurants+near+me"
-                ),
+                )
             ),
             input.parse("https://www.google.com/maps/search/restaurants+near+me"),
         )
@@ -418,7 +418,34 @@ class GoogleMapsUriInputTest : InputTest {
     }
 
     @Test
-    fun parse_parameterLlTakesPrecedenceOverViewpointAndCenter() = runTest {
+    fun parse_searchQueryPlaceWithPlaceId() = runTest {
+        assertEquals(
+            ParseResult(
+                persistentListOf(GCJ02MainlandChinaPoint(name = "Lumen Field", source = Source.URI)),
+                nextStep = NextStep(
+                    FakeInputRepository.googleMapsPlaceApiInput,
+                    "https://www.google.com/maps/search/?query_place_id=ChIJKxjxuaNqkFQR3CK6O1HNNqY&query=Lumen%20Field&api=1",
+                )
+            ),
+            input.parse("https://www.google.com/maps/search/?query_place_id=ChIJKxjxuaNqkFQR3CK6O1HNNqY&query=Lumen%20Field&api=1"),
+        )
+    }
+
+    @Test
+    fun parse_searchQueryPlaceIdOnly() = runTest {
+        assertEquals(
+            ParseResult(
+                nextStep = NextStep(
+                    FakeInputRepository.googleMapsPlaceApiInput,
+                    "https://www.google.com/maps/search/?query_place_id=ChIJKxjxuaNqkFQR3CK6O1HNNqY&api=1",
+                )
+            ),
+            input.parse("https://www.google.com/maps/search/?query_place_id=ChIJKxjxuaNqkFQR3CK6O1HNNqY&api=1"),
+        )
+    }
+
+    @Test
+    fun parse_parameterLLTakesPrecedenceOverViewpointAndCenter() = runTest {
         assertEquals(
             ParseResult(
                 persistentListOf(GCJ02MainlandChinaPoint(49.93556240, -7.30123395, source = Source.URI))
@@ -434,7 +461,7 @@ class GoogleMapsUriInputTest : InputTest {
     }
 
     @Test
-    fun parse_parameterQTakesPrecedenceOverLlAndViewpointAndCenter() = runTest {
+    fun parse_parameterQTakesPrecedenceOverLLAndViewpointAndCenter() = runTest {
         assertEquals(
             ParseResult(
                 persistentListOf(GCJ02MainlandChinaPoint(40.7128, -74.0060, source = Source.URI))
