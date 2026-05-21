@@ -121,11 +121,43 @@ object CoordinateFormatPreference : OptionsPreference<CoordinateFormat> {
     )
 }
 
+interface ApiConfigPreference : TextPreference<ApiConfig?>
+
+object GoogleMapsApiPreference : ApiConfigPreference {
+    override val key = stringPreferencesKey("google_maps_api_config")
+    override val default = null
+    val loading = default
+
+    override fun serialize(value: ApiConfig?, log: Log) =
+        try {
+            Json.encodeToString(value)
+        } catch (tr: SerializationException) {
+            // Silently ignore serialization errors, because the value should always serialize
+            log.e(TAG, "Serialization error", tr)
+            ""
+        }
+
+    override fun deserialize(value: String?, log: Log) =
+        if (value != null) {
+            try {
+                Json.decodeFromString<ApiConfig>(value)
+            } catch (tr: IllegalArgumentException) {
+                log.e(TAG, "Deserialization error", tr)
+                default
+            }
+        } else {
+            default
+        }
+
+    override fun getValue(values: UserPreferencesValues) = values.googleMapsApiConfig
+
+    private const val TAG = "GoogleMapsApiPreference"
+}
+
 object AutomationPreference : OptionsPreference<Automation> {
     private val key = stringPreferencesKey("automation")
     override val default = NoopAutomation
     val loading = default
-    private const val TAG = "Automation"
 
     /**
      * Instance of [Json] for serialization.
@@ -266,6 +298,8 @@ object AutomationPreference : OptionsPreference<Automation> {
             }
             .takeIf { it.isNotEmpty() },
     )
+
+    private const val TAG = "AutomationPreference"
 }
 
 object AutomationDelayPreference : DurationPreference {
@@ -277,6 +311,37 @@ object AutomationDelayPreference : DurationPreference {
     override val maxSec = 60
 
     override fun getValue(values: UserPreferencesValues) = values.automationDelay
+}
+
+object CachedApiTokenPreference : TextPreference<CachedApiToken?> {
+    override val key = stringPreferencesKey("cached_api_token")
+    override val default = null
+    val loading = default
+
+    override fun serialize(value: CachedApiToken?, log: Log) =
+        try {
+            Json.encodeToString(value)
+        } catch (tr: SerializationException) {
+            // Silently ignore serialization errors, because the value should always serialize
+            log.e(TAG, "Serialization error", tr)
+            ""
+        }
+
+    override fun deserialize(value: String?, log: Log) =
+        if (value != null) {
+            try {
+                Json.decodeFromString<CachedApiToken?>(value)
+            } catch (tr: IllegalArgumentException) {
+                log.e(TAG, "Deserialization error", tr)
+                default
+            }
+        } else {
+            default
+        }
+
+    override fun getValue(values: UserPreferencesValues) = values.cachedApiToken
+
+    private const val TAG = "CachedApiTokenPreference"
 }
 
 object CachedPurchasePreference : TextPreference<CachedPurchase?> {
@@ -307,7 +372,7 @@ object CachedPurchasePreference : TextPreference<CachedPurchase?> {
 
     override fun getValue(values: UserPreferencesValues) = values.cachedPurchase
 
-    private const val TAG = "BillingCachedProductPreference"
+    private const val TAG = "CachedPurchasePreference"
 }
 
 /**
@@ -370,8 +435,10 @@ object ChangelogShownForVersionCodePreference : NullableIntPreference {
 }
 
 data class UserPreferencesValues(
+    val googleMapsApiConfig: ApiConfig? = GoogleMapsApiPreference.loading,
     val automation: Automation = AutomationPreference.loading,
     val automationDelay: Duration = AutomationDelayPreference.loading,
+    val cachedApiToken: CachedApiToken? = CachedApiTokenPreference.loading,
     val cachedPurchase: CachedPurchase? = CachedPurchasePreference.loading,
     val changelogShownForVersionCode: Int? = ChangelogShownForVersionCodePreference.loading,
     val connectionPermission: Permission = ConnectionPermissionPreference.loading,

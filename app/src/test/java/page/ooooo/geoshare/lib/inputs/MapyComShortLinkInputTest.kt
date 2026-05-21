@@ -4,9 +4,10 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import page.ooooo.geoshare.data.di.FakeInputRepository
 
 class MapyComShortLinkInputTest : InputTest {
-    private val input = MapyComShortLinkInput
+    private val input = FakeInputRepository.mapyComShortLinkInput
 
     @Test
     fun match_correct() {
@@ -32,7 +33,7 @@ class MapyComShortLinkInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    MapyComUriInput,
+                    FakeInputRepository.mapyComUriInput,
                     "https://mapy.com/en/turisticka?source=base&id=1723771&x=14.4549515&y=50.0831498&z=17"
                 )
             ),

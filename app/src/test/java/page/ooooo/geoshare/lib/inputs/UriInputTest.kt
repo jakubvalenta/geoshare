@@ -1,32 +1,26 @@
 package page.ooooo.geoshare.lib.inputs
 
-import io.ktor.client.engine.mock.MockEngine
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
-import page.ooooo.geoshare.lib.FakeLog
+import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.FakeUriQuote
-import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.network.HttpClient
 
 class UriInputTest {
     val input = object : UriInput {
+        override val uriQuote = FakeUriQuote
+
         override val pattern = Regex("""(foo)""")
 
         override suspend fun parse(
             data: Uri,
             match: String,
             prevResult: ParseResult?,
-            uriQuote: UriQuote,
-            log: Log,
         ) = throw NotImplementedError()
     }
-    private val log = FakeLog
-    private val httpClient = HttpClient(MockEngine { throw NotImplementedError() }, log)
-    private val uriQuote = FakeUriQuote
+    private val nextInput = FakeInputRepository.osmAndUriInput
 
     @Test
     fun match_returnsFirstRegexGroup() {
@@ -35,26 +29,26 @@ class UriInputTest {
     }
 
     @Test
-    fun withData_whenDataIsValidUrl_returnsUri() = runTest {
+    fun fetch_whenDataIsValidUrl_returnsUri() = runTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
-            ParseResult(nextStep = NextStep(DebugUriInput, match)),
-            input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) { data ->
+            ParseResult(nextStep = NextStep(nextInput, match)),
+            input.fetch(match) { data ->
                 ParseResult(
-                    nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
+                    nextStep = NextStep(nextInput, data.toString()) // Store data in nextStep, so we can test it
                 )
             }
         )
     }
 
     @Test
-    fun withData_whenDataIsInvalidUrl_returnsUri() = runTest {
+    fun fetch_whenDataIsInvalidUrl_returnsUri() = runTest {
         val match = "https://[invalid:ipv6]/"
         assertEquals(
-            ParseResult(nextStep = NextStep(DebugUriInput, match)),
-            input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) { data ->
+            ParseResult(nextStep = NextStep(nextInput, match)),
+            input.fetch(match) { data ->
                 ParseResult(
-                    nextStep = NextStep(DebugUriInput, data.toString()) // Store data in nextStep, so we can test it
+                    nextStep = NextStep(nextInput, data.toString()) // Store data in nextStep, so we can test it
                 )
             }
         )

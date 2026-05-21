@@ -2,7 +2,6 @@ package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
-import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
@@ -15,13 +14,17 @@ import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.decodeWazeGeoHash
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * See https://developers.google.com/waze/deeplinks/
  */
-object WazeUriInput : UriInput, Input.HasRandomUri {
-    private const val HASH = @Suppress("SpellCheckingInspection") """[0-9bcdefghjkmnpqrstuvwxyz]+"""
-
+@Singleton
+class WazeUriInput @Inject constructor(
+    private val wazeHtmlInput: dagger.Lazy<WazeHtmlInput>,
+    override val uriQuote: UriQuote,
+) : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:https?://)?(?:(?:www|ul)\.)?waze\.com/$URI_REST)""")
 
     override val documentation = InputDocumentation(
@@ -35,13 +38,7 @@ object WazeUriInput : UriInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parse(
-        data: Uri,
-        match: String,
-        prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
-    ) = buildParseResult {
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
         data.run {
             // Short link
             // https://waze.com/ul/h{hash}
@@ -91,7 +88,7 @@ object WazeUriInput : UriInput, Input.HasRandomUri {
                 // with this one:
                 // https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020
                 nextStep = NextStep(
-                    WazeHtmlInput,
+                    wazeHtmlInput.get(),
                     Uri(
                         scheme = "https",
                         host = "www.waze.com",
@@ -106,7 +103,7 @@ object WazeUriInput : UriInput, Input.HasRandomUri {
                 // with this one:
                 // https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020
                 nextStep = NextStep(
-                    WazeHtmlInput,
+                    wazeHtmlInput.get(),
                     Uri(
                         scheme = "https",
                         host = "www.waze.com",
@@ -116,7 +113,7 @@ object WazeUriInput : UriInput, Input.HasRandomUri {
                     ).toString(),
                 )
             } ?: queryParams["to"]?.takeIf { it.startsWith("place.") }?.let {
-                nextStep = NextStep(WazeHtmlInput, match)
+                nextStep = NextStep(wazeHtmlInput.get(), match)
             }
         }
     }
@@ -125,4 +122,8 @@ object WazeUriInput : UriInput, Input.HasRandomUri {
         UriFormatter.formatUriString(point, "https://waze.com/ul?ll={lat}%2C{lon}&z={z}")
 
     override fun toString() = "WazeUriInput"
+
+    private companion object {
+        private const val HASH = @Suppress("SpellCheckingInspection") """[0-9bcdefghjkmnpqrstuvwxyz]+"""
+    }
 }

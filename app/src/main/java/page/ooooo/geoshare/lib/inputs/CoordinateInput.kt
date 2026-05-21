@@ -3,8 +3,6 @@ package page.ooooo.geoshare.lib.inputs
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
@@ -13,19 +11,11 @@ import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object CoordinateInput : TextInput, Input.HasRandomUri {
-    private const val CHARS = @Suppress("SpellCheckingInspection") """[\p{Zs},°'′"″NSWE]"""
-    private const val SPACE = """\p{Zs}*"""
-    private const val LAT_SIG = """(-?)"""
-    private const val LAT_DEG = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
-    private const val LAT_MIN = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
-    private const val LAT_SEC = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
-    private const val LON_SIG = """(-?)"""
-    private const val LON_DEG = """(\d{1,3}(?:\.\d{1,$MAX_PRECISION})?)"""
-    private const val LON_MIN = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
-    private const val LON_SEC = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
-
+@Singleton
+class CoordinateInput @Inject constructor() : TextInput, Input.HasRandomUri {
     override val pattern = Regex("""([\d.\-\p{Zs},°'′"″NSWE]*\d[\d.\-\p{Zs},°'′"″NSWE]*)""")
     override val documentation = InputDocumentation(
         group = InputDocumentationGroup.COORDINATES,
@@ -38,13 +28,7 @@ object CoordinateInput : TextInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parse(
-        data: String,
-        match: String,
-        prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
-    ) = buildParseResult {
+    override suspend fun parse(data: String, match: String, prevResult: ParseResult?) = parseResult {
         // Decimal
         // e.g. `N 41.40338, E 2.17403`
         Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""")
@@ -65,7 +49,7 @@ object CoordinateInput : TextInput, Input.HasRandomUri {
                         source = Source.TEXT,
                     )
                 )
-                return@buildParseResult
+                return@parseResult
             }
 
         // Degrees minutes seconds
@@ -92,7 +76,7 @@ object CoordinateInput : TextInput, Input.HasRandomUri {
                         source = Source.TEXT,
                     )
                 )
-                return@buildParseResult
+                return@parseResult
             }
 
         // Degrees minutes
@@ -117,7 +101,7 @@ object CoordinateInput : TextInput, Input.HasRandomUri {
                         source = Source.TEXT,
                     )
                 )
-                return@buildParseResult
+                return@parseResult
             }
     }
 
@@ -140,4 +124,17 @@ object CoordinateInput : TextInput, Input.HasRandomUri {
         UriFormatter.formatUriString(point, "N {lat}, E {lon}")
 
     override fun toString() = "CoordinateInput"
+
+    private companion object {
+        private const val CHARS = @Suppress("SpellCheckingInspection") """[\p{Zs},°'′"″NSWE]"""
+        private const val SPACE = """\p{Zs}*"""
+        private const val LAT_SIG = """(-?)"""
+        private const val LAT_DEG = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
+        private const val LAT_MIN = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
+        private const val LAT_SEC = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
+        private const val LON_SIG = """(-?)"""
+        private const val LON_DEG = """(\d{1,3}(?:\.\d{1,$MAX_PRECISION})?)"""
+        private const val LON_MIN = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
+        private const val LON_SEC = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
+    }
 }

@@ -173,6 +173,12 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
                 source = Source.URI,
             ),
             "https://maps.google.com/maps?oe=utf-8&client=firefox-b&um=1&ie=UTF-8&fb=1&gl=fr&sa=X&geocode=KWmqxjsAOagUMaSMgMRdOas1&daddr=Akropoleos+65,+Thessaloniki+546+34,+Gr%C3%A8ce",
+            fallbackPoint = WGS84Point(
+                40.6400537, 22.9589055,
+                z = 6.0,
+                name = @Suppress("SpellCheckingInspection") "Box+now+Ακροπόλεως+65,+Akropoleos+65,+Thessaloniki+546+34,+Grèce",
+                source = Source.URI,
+            ),
         )
     }
 
@@ -193,6 +199,10 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
 
     @Test
     fun googleMapsPlaceList() = uiAutomator {
+        runBlocking {
+            assumeDomainResolvable("maps.google.com")
+        }
+
         // Place list
         testUri(
             persistentListOf(

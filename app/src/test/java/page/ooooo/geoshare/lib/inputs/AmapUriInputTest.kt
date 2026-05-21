@@ -6,11 +6,12 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assume.assumeTrue
 import org.junit.Test
+import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.GCJ02GreaterChinaAndTaiwanPoint
 import page.ooooo.geoshare.lib.geo.Source
 
 class AmapUriInputTest : InputTest {
-    private val input = AmapUriInput
+    private val input = FakeInputRepository.amapUriInput
 
     @Test
     fun match_fullUrl() {

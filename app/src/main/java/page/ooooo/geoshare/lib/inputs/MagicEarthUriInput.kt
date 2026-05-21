@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
@@ -11,11 +10,16 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/
  */
-object MagicEarthUriInput : UriInput, Input.HasRandomUri {
+@Singleton
+class MagicEarthUriInput @Inject constructor(
+    override val uriQuote: UriQuote,
+) : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:(?:https?://)?magicearth.com|magicearth:/)/\?$URI_REST)""")
     override val documentation = InputDocumentation(
         group = InputDocumentationGroup.MAGIC_EARTH,
@@ -24,13 +28,7 @@ object MagicEarthUriInput : UriInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parse(
-        data: Uri,
-        match: String,
-        prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
-    ) = buildParseResult {
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
         data.run {
             val z = listOf("z", "zoom")
                 .firstNotNullOfOrNull { key -> Z_PATTERN.matchEntire(queryParams[key])?.doubleGroupOrNull() }

@@ -15,11 +15,11 @@ import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
 
 class ActionReadyTest {
     private val coordinateConverter: CoordinateConverter = mock()
+    private val source = "https://maps.google.com/foo"
+    private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
 
     @Test
     fun transition_whenActionIsCopyCoordsDec_returnsBasicActionReady() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
         val state = ActionReady(source, points, action, isAutomation = true)
         assertEquals(
@@ -30,8 +30,6 @@ class ActionReadyTest {
 
     @Test
     fun transition_whenActionIsSavePointsGpx_returnsFileUriRequested() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val action = SavePointsGpxOutput(coordinateConverter).toAction(points)
         val state = ActionReady(source, points, action, isAutomation = true)
         assertEquals(
@@ -42,8 +40,6 @@ class ActionReadyTest {
 
     @Test
     fun transition_whenActionIsOpenRouteOnePointGpx_returnsLocationRationaleRequested() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val action = OpenRouteOnePointGpxOutput(PackageNames.GOOGLE_MAPS, coordinateConverter).toAction(points.last())
         val state = ActionReady(source, points, action, isAutomation = true)
         assertEquals(

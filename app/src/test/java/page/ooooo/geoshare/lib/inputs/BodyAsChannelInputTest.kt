@@ -13,16 +13,25 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
-import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.network.HttpClient
 import page.ooooo.geoshare.lib.network.NetworkException
 import java.net.MalformedURLException
 
 class BodyAsChannelInputTest {
+    val engine = MockEngine { request ->
+        if (request.method == HttpMethod.Get && request.url.toString() == "https://maps.google.com/foo") {
+            respond("test data")
+        } else {
+            respondError(HttpStatusCode.NotFound)
+        }
+    }
     val input = object : BodyAsChannelInput {
+        override val engine = this@BodyAsChannelInputTest.engine
+        override val log = FakeLog
+        override val uriQuote = FakeUriQuote
+
         override val permissionTitleResId get() = throw NotImplementedError()
         override val loadingIndicatorTitleResId get() = throw NotImplementedError()
 
@@ -30,25 +39,14 @@ class BodyAsChannelInputTest {
             data: ByteReadChannel,
             match: String,
             prevResult: ParseResult?,
-            uriQuote: UriQuote,
-            log: Log,
         ) = throw NotImplementedError()
     }
-    private val log = FakeLog
-    private val engine = MockEngine { request ->
-        if (request.method == HttpMethod.Get && request.url.toString() == "https://maps.google.com/foo") {
-            respond("test data")
-        } else {
-            respondError(HttpStatusCode.NotFound)
-        }
-    }
-    private val httpClient = HttpClient(engine, log = log)
-    private val uriQuote = FakeUriQuote
+    private val nextInput = FakeInputRepository.osmAndUriInput
 
     @Test(expected = MalformedURLException::class)
     fun whenMatchIsInvalidURL_throwsMalformedURLException() = runTest {
         val match = "https://[invalid:ipv6]/"
-        input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) {
+        input.fetch(match) {
             ParseResult()
         }
     }
@@ -57,10 +55,13 @@ class BodyAsChannelInputTest {
     fun whenMatchHasScheme_makesGetRequestWithFollowRedirectsAndReturnsResponse() = runTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
-            ParseResult(nextStep = NextStep(DebugUriInput, "test data")),
-            input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) { data ->
+            ParseResult(nextStep = NextStep(nextInput, "test data")),
+            input.fetch(match) { data ->
                 ParseResult(
-                    nextStep = NextStep(DebugUriInput, data.readLine()!!) // Store data in nextStep, so we can test it
+                    nextStep = NextStep(
+                        nextInput,
+                        data.readLine()!!
+                    ) // Store data in nextStep, so we can test it
                 )
             }
         )
@@ -73,10 +74,13 @@ class BodyAsChannelInputTest {
     fun whenMatchHasNoScheme_makesGetRequestToUrlWithHttpsSchemeAndReturnsResponse() = runTest {
         val match = "maps.google.com/foo"
         assertEquals(
-            ParseResult(nextStep = NextStep(DebugUriInput, "test data")),
-            input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) { data ->
+            ParseResult(nextStep = NextStep(nextInput, "test data")),
+            input.fetch(match) { data ->
                 ParseResult(
-                    nextStep = NextStep(DebugUriInput, data.readLine()!!) // Store data in nextStep, so we can test it
+                    nextStep = NextStep(
+                        nextInput,
+                        data.readLine()!!
+                    ) // Store data in nextStep, so we can test it
                 )
             }
         )
@@ -85,7 +89,7 @@ class BodyAsChannelInputTest {
     @Test(expected = NetworkException::class)
     fun whenHttpClientRespondsError_throwsNetworkException() = runTest {
         val match = "https://maps.google.com/not-found"
-        input.withData(match, log, httpClient, uriQuote, coroutineContext = testScheduler) {
+        input.fetch(match) {
             ParseResult()
         }
     }
