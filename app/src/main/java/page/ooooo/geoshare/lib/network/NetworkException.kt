@@ -2,11 +2,14 @@ package page.ooooo.geoshare.lib.network
 
 import android.content.res.Resources
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.request
 import io.ktor.http.HttpStatusCode
 import page.ooooo.geoshare.R
 
 sealed class NetworkException(cause: Throwable) : Exception(cause) {
     abstract fun getMessage(resources: Resources): String
+
+    open fun getDetails(): String? = null
 }
 
 sealed class RecoverableNetworkException(cause: Throwable) : NetworkException(cause)
@@ -49,10 +52,14 @@ class ResponseNetworkException(val response: HttpResponse, cause: Throwable) : U
             HttpStatusCode.TooManyRequests -> resources.getString(R.string.network_exception_too_many_requests)
             else -> resources.getString(R.string.network_exception_response_error, response.status.value)
         }
+
+    override fun getDetails() = "Request URL: ${response.request.url}"
 }
 
 class UnknownNetworkException(cause: Throwable) : UnrecoverableNetworkException(cause) {
     override fun getMessage(resources: Resources) = resources.getString(R.string.network_exception_unknown)
+
+    override fun getDetails() = cause?.stackTraceToString()
 }
 
 class MissingHeaderNetworkException : UnrecoverableNetworkException(Throwable()) {

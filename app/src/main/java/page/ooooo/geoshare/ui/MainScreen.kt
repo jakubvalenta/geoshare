@@ -738,8 +738,9 @@ private fun MainMainPane(
 
         is ConversionState.HasError -> {
             ResultError(
-                currentState.message,
                 currentState.source,
+                currentState.message,
+                currentState.details,
                 onNavigateToInputsScreen = onNavigateToInputsScreen,
                 onRetry = onRetry,
             )
@@ -1985,8 +1986,8 @@ private fun ErrorPreview() {
         val coordinateConverter = CoordinateConverter(geometries)
         MainScreen(
             currentState = ConversionFailed(
-                message = stringResource(R.string.conversion_failed_reason_no_points),
                 source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
             allInputs = emptyList(),
             appDetails = emptyMap(),
@@ -2044,8 +2045,8 @@ private fun DarkErrorPreview() {
         val coordinateConverter = CoordinateConverter(geometries)
         MainScreen(
             currentState = ConversionFailed(
-                message = stringResource(R.string.conversion_failed_reason_no_points),
                 source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
             allInputs = emptyList(),
             appDetails = emptyMap(),
@@ -2103,8 +2104,8 @@ private fun TabletErrorPreview() {
         val coordinateConverter = CoordinateConverter(geometries)
         MainScreen(
             currentState = ConversionFailed(
-                message = stringResource(R.string.conversion_failed_reason_no_points),
                 source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
             allInputs = emptyList(),
             appDetails = emptyMap(),

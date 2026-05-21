@@ -52,8 +52,9 @@ interface ConversionState : State {
     override suspend fun transition(): State? = null
 
     interface HasError {
-        val message: String
         val source: String
+        val message: String
+        val details: String?
     }
 
     interface HasResult {
@@ -88,8 +89,8 @@ data class SourceReceived(
     override suspend fun transition(): State {
         if (source.isEmpty()) {
             return ConversionFailed(
-                stateContext.resources.getString(R.string.conversion_failed_missing_url),
                 source,
+                stateContext.resources.getString(R.string.conversion_failed_missing_url),
             )
         }
         for (input in stateContext.inputs) {
@@ -99,8 +100,8 @@ data class SourceReceived(
             }
         }
         return ConversionFailed(
-            stateContext.resources.getString(R.string.conversion_failed_unsupported_service),
             source,
+            stateContext.resources.getString(R.string.conversion_failed_unsupported_service),
         )
     }
 
@@ -238,8 +239,8 @@ data class PermissionGrantedBasicInput<T>(
                 DataParsed(stateContext, source, match, input, result, permission, prevResult)
             } catch (_: MalformedURLException) {
                 ConversionFailed(
-                    stateContext.resources.getString(R.string.conversion_failed_reason_invalid_url),
                     source,
+                    stateContext.resources.getString(R.string.conversion_failed_reason_invalid_url),
                 )
             } catch (tr: RecoverableNetworkException) {
                 val attempt = Attempt(attemptNumber, tr)
@@ -248,16 +249,17 @@ data class PermissionGrantedBasicInput<T>(
                 )
             } catch (tr: UnrecoverableNetworkException) {
                 ConversionFailed(
-                    tr.getMessage(stateContext.resources),
                     source,
+                    tr.getMessage(stateContext.resources),
+                    details = tr.getDetails(),
                 )
             }
         }
     } catch (_: CancellationException) {
         // Cancellation must be caught outside withContext, because withContext somehow rethrows errors
         ConversionFailed(
+            source,
             stateContext.resources.getString(R.string.conversion_failed_cancelled),
-            source
         )
     }
 
@@ -319,16 +321,16 @@ data class PermissionGrantedWebViewInput(
             } catch (_: TimeoutCancellationException) {
                 stateContext.log.e(TAG, "Timed out")
                 ConversionFailed(
-                    stateContext.resources.getString(R.string.conversion_failed_reason_timeout),
                     source,
+                    stateContext.resources.getString(R.string.conversion_failed_reason_timeout),
                 )
             }
         }
     } catch (_: CancellationException) {
         // Cancellation must be caught outside withContext, because withContext somehow rethrows errors
         ConversionFailed(
-            stateContext.resources.getString(R.string.conversion_failed_cancelled),
             source,
+            stateContext.resources.getString(R.string.conversion_failed_cancelled),
         )
     }
 
@@ -378,16 +380,16 @@ data class DataParsed(
                     TAG, "Failed to extract point from $match, because permission was denied"
                 )
                 ConversionFailed(
-                    stateContext.resources.getString(R.string.conversion_failed_connection_permission_denied),
                     source,
+                    stateContext.resources.getString(R.string.conversion_failed_connection_permission_denied),
                 )
             } else {
                 stateContext.log.i(
                     TAG, "Failed to extract point from $match"
                 )
                 ConversionFailed(
-                    stateContext.resources.getString(R.string.conversion_failed_reason_no_points),
                     source,
+                    stateContext.resources.getString(R.string.conversion_failed_reason_no_points),
                 )
             }
         }
@@ -482,8 +484,9 @@ data class ConversionSucceeded(
 }
 
 data class ConversionFailed(
-    override val message: String,
     override val source: String,
+    override val message: String,
+    override val details: String? = null,
 ) : ConversionState, ConversionState.HasError {
     override fun toString() = "ConversionFailed"
 }
