@@ -30,7 +30,7 @@ class BaiduMapShortLinkInput @Inject constructor(
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_baidu_map_loading_indicator_title
 
-    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = buildParseResult {
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
         nextStep = NextStep(baiduMapUriInput.get(), data.toString())
     }
 

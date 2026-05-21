@@ -20,6 +20,5 @@ class ParseResultScope {
     internal fun build() = ParseResult(points, nextStep)
 }
 
-// TODO Rename to parseResult
-suspend fun buildParseResult(block: suspend ParseResultScope.() -> Unit): ParseResult =
+suspend fun parseResult(block: suspend ParseResultScope.() -> Unit): ParseResult =
     ParseResultScope().apply { this.block() }.build()

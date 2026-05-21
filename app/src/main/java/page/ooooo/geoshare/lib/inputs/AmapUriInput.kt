@@ -24,7 +24,7 @@ class AmapUriInput @Inject constructor(
         ),
     )
 
-    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = buildParseResult {
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
         data.run {
             // Query param p
             // https://wb.amap.com/?p=<id>,<lat>,<lon>,<name>

@@ -28,7 +28,7 @@ class MagicEarthUriInput @Inject constructor(
         ),
     )
 
-    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = buildParseResult {
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
         data.run {
             val z = listOf("z", "zoom")
                 .firstNotNullOfOrNull { key -> Z_PATTERN.matchEntire(queryParams[key])?.doubleGroupOrNull() }

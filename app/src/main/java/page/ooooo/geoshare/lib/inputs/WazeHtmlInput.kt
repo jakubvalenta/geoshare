@@ -26,11 +26,7 @@ class WazeHtmlInput @Inject constructor(
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_waze_loading_indicator_title
 
-    override suspend fun parse(
-        data: ByteReadChannel,
-        match: String,
-        prevResult: ParseResult?,
-    ) = buildParseResult {
+    override suspend fun parse(data: ByteReadChannel, match: String, prevResult: ParseResult?) = parseResult {
         val pattern = Regex(""""latLng":\{"lat":$LAT,"lng":$LON\}""")
 
         val name = prevResult?.points?.lastOrNull()?.name
@@ -39,7 +35,7 @@ class WazeHtmlInput @Inject constructor(
             val line = data.readLine() ?: break
             pattern.find(line)?.toLatLonPoint(Source.JAVASCRIPT)?.let {
                 points = persistentListOf(WGS84Point(it).copy(name = name))
-                return@buildParseResult
+                return@parseResult
             }
         }
     }

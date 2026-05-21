@@ -159,6 +159,7 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
         )
 
         // Directions address
+        // FIXME
         testUri(
             WGS84Point(43.7481, -79.6332, name = "2088 Albion Rd @43.7481,-79.6332", source = Source.HTML),
             @Suppress("SpellCheckingInspection") "https://maps.google.com/maps?f=d&daddr=2088%20Albion%20Rd+@43.7481,-79.6332&doflg=ptm&navigate=yes",

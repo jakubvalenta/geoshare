@@ -25,7 +25,7 @@ class MapsMeUriInput @Inject constructor(
         ),
     )
 
-    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = buildParseResult {
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
         data.run {
             val name = (if (scheme == "ge0") pathParts.getOrNull(1) else pathParts.getOrNull(2))
                 ?.let { Q_PATH_PATTERN.matchEntire(it) }

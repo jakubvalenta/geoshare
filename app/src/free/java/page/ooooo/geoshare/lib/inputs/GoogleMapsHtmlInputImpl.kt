@@ -36,7 +36,7 @@ class GoogleMapsHtmlInputImpl @Inject constructor(
     override val cookies = GoogleMapsShortLinkInput.cookies
     override val userAgent = GoogleMapsShortLinkInput.USER_AGENT
 
-    override suspend fun parse(data: ByteReadChannel, match: String, prevResult: ParseResult?) = buildParseResult {
+    override suspend fun parse(data: ByteReadChannel, match: String, prevResult: ParseResult?) = parseResult {
         val directionsPreviewPattern = Regex("""%213d$LAT%214d$LON""")
         val pointPattern = Regex("""\[(?:null,null,|null,\[)$LAT,$LON]""")
         val defaultPointLinkPattern = Regex("""/@$LAT,$LON""")

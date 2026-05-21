@@ -24,11 +24,7 @@ class DebugWebViewInput @Inject constructor() : WebViewInput {
         () => window.location.href !== 'about:blank' ? window.location.href : undefined;
     """.trimIndent()
 
-    override suspend fun parse(
-        data: String,
-        match: String,
-        prevResult: ParseResult?,
-    ) = buildParseResult {
+    override suspend fun parse(data: String, match: String, prevResult: ParseResult?) = parseResult {
         points = persistentListOf(WGS84Point(NaivePoint.genRandomPoint()))
     }
 }

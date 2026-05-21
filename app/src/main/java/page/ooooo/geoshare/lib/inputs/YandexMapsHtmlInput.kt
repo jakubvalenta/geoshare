@@ -28,11 +28,7 @@ class YandexMapsHtmlInput @Inject constructor(
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_yandex_maps_loading_indicator_title
 
-    override suspend fun parse(
-        data: ByteReadChannel,
-        match: String,
-        prevResult: ParseResult?,
-    ) = buildParseResult {
+    override suspend fun parse(data: ByteReadChannel, match: String, prevResult: ParseResult?) = parseResult {
         val pointPattern = Regex("""pt=$LON%2C$LAT""")
         val namePattern = Regex("""itemProp="name"[^>]*>([^<]+)""")
 

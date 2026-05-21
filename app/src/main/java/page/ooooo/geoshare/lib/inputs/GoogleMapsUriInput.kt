@@ -45,7 +45,7 @@ class GoogleMapsUriInput @Inject constructor(
         ),
     )
 
-    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = buildParseResult {
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
         data.run {
             val z = Z_PATTERN.matchEntire(queryParams["zoom"])?.doubleGroupOrNull()
 

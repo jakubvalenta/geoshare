@@ -29,7 +29,7 @@ class UrbiHtmlInput @Inject constructor(
         data: ByteReadChannel,
         match: String,
         prevResult: ParseResult?,
-    ) = buildParseResult {
+    ) = parseResult {
         val pattern = Regex("""property="twitter:image" content="([^"]+)""")
 
         // Notice that unlike in other Inputs, we don't copy any point names from prevResult here
@@ -38,7 +38,7 @@ class UrbiHtmlInput @Inject constructor(
             val line = data.readLine() ?: break
             pattern.find(line)?.groupOrNull()?.let { attr ->
                 nextStep = NextStep(urbiUriInput.get(), attr.decodeBasicHtmlEntities())
-                return@buildParseResult
+                return@parseResult
             }
         }
     }

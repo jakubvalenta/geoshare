@@ -38,7 +38,7 @@ class WazeUriInput @Inject constructor(
         ),
     )
 
-    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = buildParseResult {
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
         data.run {
             // Short link
             // https://waze.com/ul/h{hash}

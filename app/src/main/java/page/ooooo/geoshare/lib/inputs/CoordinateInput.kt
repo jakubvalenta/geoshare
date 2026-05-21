@@ -28,11 +28,7 @@ class CoordinateInput @Inject constructor() : TextInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parse(
-        data: String,
-        match: String,
-        prevResult: ParseResult?,
-    ) = buildParseResult {
+    override suspend fun parse(data: String, match: String, prevResult: ParseResult?) = parseResult {
         // Decimal
         // e.g. `N 41.40338, E 2.17403`
         Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""")
@@ -53,7 +49,7 @@ class CoordinateInput @Inject constructor() : TextInput, Input.HasRandomUri {
                         source = Source.TEXT,
                     )
                 )
-                return@buildParseResult
+                return@parseResult
             }
 
         // Degrees minutes seconds
@@ -80,7 +76,7 @@ class CoordinateInput @Inject constructor() : TextInput, Input.HasRandomUri {
                         source = Source.TEXT,
                     )
                 )
-                return@buildParseResult
+                return@parseResult
             }
 
         // Degrees minutes
@@ -105,7 +101,7 @@ class CoordinateInput @Inject constructor() : TextInput, Input.HasRandomUri {
                         source = Source.TEXT,
                     )
                 )
-                return@buildParseResult
+                return@parseResult
             }
     }
 

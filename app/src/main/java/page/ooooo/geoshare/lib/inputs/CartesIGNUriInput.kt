@@ -24,7 +24,7 @@ class CartesIGNUriInput @Inject constructor(
         ),
     )
 
-    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = buildParseResult {
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
         data.run {
             // Coordinates
             // https://cartes-ign.ign.fr?lng={lon}&lat={lat}&z={z}

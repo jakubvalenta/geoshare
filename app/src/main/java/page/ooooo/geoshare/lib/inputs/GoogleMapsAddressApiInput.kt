@@ -39,14 +39,14 @@ class GoogleMapsAddressApiInput @Inject constructor(
     override suspend fun fetch(match: String, block: suspend (Uri) -> ParseResult) =
         block(Uri.parse(match, uriQuote))
 
-    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = buildParseResult {
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
         val apiConfig = userPreferencesRepository.getValue(GoogleMapsApiPreference) ?: run {
             // Go to HTML parsing, if API is not configured
             nextStep = NextStep(googleMapsHtmlInput.get(), match)
-            return@buildParseResult
+            return@parseResult
         }
         val client = apiService.createHttpClient(apiConfig)
-        val query = parseQuery(data) ?: return@buildParseResult
+        val query = parseQuery(data) ?: return@parseResult
         val res = client.use { client ->
             client
                 .prepareRequest {
