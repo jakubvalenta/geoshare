@@ -1036,7 +1036,6 @@ private fun LazyListScope.userPreferencesApiConfigControl(
     enabled: Boolean = true,
 ) {
     item {
-        // TODO Add presets
         val spacing = LocalSpacing.current
         val value = userPreference.getValue(values)
         var baseUrl by remember { mutableStateOf(value?.baseUrl ?: "") }

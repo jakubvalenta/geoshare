@@ -1,37 +1,32 @@
 package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LoadingIndicator
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.retain.retain
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -41,87 +36,82 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun ResultError(
     message: String,
     source: String,
-    initialRetryLoadingIndicatorVisible: Boolean = false,
     onNavigateToInputsScreen: () -> Unit,
     onRetry: () -> Unit,
 ) {
-    val coroutineScope = rememberCoroutineScope()
     val spacing = LocalSpacing.current
     val uriHandler = LocalUriHandler.current
 
-    val (retryLoadingIndicatorVisible, setRetryLoadingIndicatorVisible) = retain {
-        mutableStateOf(initialRetryLoadingIndicatorVisible)
-    }
+    // Animate alpha when the conversion is being retried, so that there's a visual feedback even if the conversion
+    // leads to the same result and nothing changes in the end
+    val (isRetrying, setIsRetrying) = remember { mutableStateOf(false) }
+    val animatedAlpha by animateFloatAsState(
+        targetValue = if (isRetrying) 0.5f else 1f,
+        finishedListener = { setIsRetrying(false) },
+    )
 
-    Column(Modifier.fillMaxWidth()) {
-        if (!retryLoadingIndicatorVisible) {
-            Column(Modifier.padding(horizontal = spacing.windowPadding)) {
-                Headline(stringResource(R.string.conversion_error_title))
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .graphicsLayer { alpha = animatedAlpha }
+    ) {
+        Column(Modifier.padding(horizontal = spacing.windowPadding)) {
+            Headline(stringResource(R.string.conversion_error_title))
+            SelectionContainer(Modifier.padding(bottom = spacing.smallAdaptive)) {
+                Text(
+                    message,
+                    Modifier.testTag("geoShareConversionErrorMessage"),
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+            }
+            if (source.isNotEmpty()) {
                 SelectionContainer(Modifier.padding(bottom = spacing.smallAdaptive)) {
-                    Text(
-                        message,
-                        Modifier.testTag("geoShareConversionErrorMessage"),
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
-                }
-                if (source.isNotEmpty()) {
-                    SelectionContainer(Modifier.padding(bottom = spacing.smallAdaptive)) {
-                        if (source.startsWith("https://")) {
-                            Text(
-                                source,
-                                modifier = Modifier.clickable { uriHandler.openUri(source) },
-                                textDecoration = TextDecoration.Underline,
-                                style = MaterialTheme.typography.bodySmall,
-                            )
-                        } else {
-                            Text(
-                                source,
-                                fontStyle = FontStyle.Italic,
-                                style = MaterialTheme.typography.bodySmall,
-                            )
-                        }
+                    if (source.startsWith("https://")) {
+                        Text(
+                            source,
+                            modifier = Modifier.clickable { uriHandler.openUri(source) },
+                            textDecoration = TextDecoration.Underline,
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    } else {
+                        Text(
+                            source,
+                            fontStyle = FontStyle.Italic,
+                            style = MaterialTheme.typography.bodySmall,
+                        )
                     }
                 }
             }
-            ScrollableChips {
-                item {
-                    StyledChip(
-                        stringResource(R.string.conversion_error_retry),
-                        icon = {
-                            Icon(Icons.Default.Refresh, null)
-                        },
-                        onClick = {
-                            coroutineScope.launch {
-                                setRetryLoadingIndicatorVisible(true)
-                                delay(1000)
-                                setRetryLoadingIndicatorVisible(false)
-                                onRetry()
-                            }
-                        },
-                    )
-                }
-                item {
-                    StyledChip(
-                        stringResource(R.string.conversion_error_report),
-                    ) {
-                        uriHandler.openUri("https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml")
-                    }
-                }
-                item {
-                    StyledChip(
-                        stringResource(R.string.inputs_title),
-                        icon = {
-                            Icon(Icons.Outlined.Info, null)
-                        },
-                    ) {
-                        onNavigateToInputsScreen()
-                    }
+        }
+        ScrollableChips {
+            item {
+                StyledChip(
+                    stringResource(R.string.conversion_error_retry),
+                    icon = {
+                        Icon(Icons.Default.Refresh, null)
+                    },
+                    onClick = {
+                        setIsRetrying(true)
+                        onRetry()
+                    },
+                )
+            }
+            item {
+                StyledChip(
+                    stringResource(R.string.conversion_error_report),
+                ) {
+                    uriHandler.openUri("https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml")
                 }
             }
-        } else {
-            // TODO Retry loading indicator could use some bottom padding
-            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                LoadingIndicator(Modifier.size(96.dp), color = LocalContentColor.current)
+            item {
+                StyledChip(
+                    stringResource(R.string.inputs_title),
+                    icon = {
+                        Icon(Icons.Outlined.Info, null)
+                    },
+                ) {
+                    onNavigateToInputsScreen()
+                }
             }
         }
     }
@@ -140,7 +130,6 @@ private fun DefaultPreview() {
             ResultError(
                 message = stringResource(R.string.conversion_failed_reason_no_points),
                 source = "https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398",
-                initialRetryLoadingIndicatorVisible = false,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -159,7 +148,6 @@ private fun DarkPreview() {
             ResultError(
                 message = stringResource(R.string.conversion_failed_reason_no_points),
                 source = "https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398",
-                initialRetryLoadingIndicatorVisible = false,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -178,7 +166,6 @@ private fun CoordinatesPreview() {
             ResultError(
                 message = stringResource(R.string.conversion_failed_reason_no_points),
                 source = "41°24′12.2″N 2°10′26.5″E",
-                initialRetryLoadingIndicatorVisible = false,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -197,7 +184,6 @@ private fun DarkCoordinatesPreview() {
             ResultError(
                 message = stringResource(R.string.conversion_failed_reason_no_points),
                 source = "41°24′12.2″N 2°10′26.5″E",
-                initialRetryLoadingIndicatorVisible = false,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -216,7 +202,6 @@ private fun EmptyPreview() {
             ResultError(
                 message = stringResource(R.string.conversion_failed_reason_no_points),
                 source = "",
-                initialRetryLoadingIndicatorVisible = false,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -235,45 +220,6 @@ private fun DarkEmptyPreview() {
             ResultError(
                 message = stringResource(R.string.conversion_failed_reason_no_points),
                 source = "",
-                initialRetryLoadingIndicatorVisible = false,
-                onNavigateToInputsScreen = {},
-                onRetry = {},
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun LoadingIndicatorPreview() {
-    AppTheme {
-        Surface(
-            color = MaterialTheme.colorScheme.errorContainer,
-            contentColor = MaterialTheme.colorScheme.onErrorContainer,
-        ) {
-            ResultError(
-                message = stringResource(R.string.conversion_failed_reason_no_points),
-                source = "",
-                initialRetryLoadingIndicatorVisible = true,
-                onNavigateToInputsScreen = {},
-                onRetry = {},
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkLoadingIndicatorPreview() {
-    AppTheme {
-        Surface(
-            color = MaterialTheme.colorScheme.errorContainer,
-            contentColor = MaterialTheme.colorScheme.onErrorContainer,
-        ) {
-            ResultError(
-                message = stringResource(R.string.conversion_failed_reason_no_points),
-                source = "",
-                initialRetryLoadingIndicatorVisible = true,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
