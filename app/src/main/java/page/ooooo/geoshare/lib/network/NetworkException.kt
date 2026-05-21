@@ -58,6 +58,8 @@ class ResponseNetworkException(val response: HttpResponse, cause: Throwable) : U
 
 class UnknownNetworkException(cause: Throwable) : UnrecoverableNetworkException(cause) {
     override fun getMessage(resources: Resources) = resources.getString(R.string.network_exception_unknown)
+
+    override fun getDetails() = cause?.stackTraceToString()
 }
 
 class MissingHeaderNetworkException : UnrecoverableNetworkException(Throwable()) {

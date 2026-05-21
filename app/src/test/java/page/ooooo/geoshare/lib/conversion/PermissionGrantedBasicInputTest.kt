@@ -1,8 +1,11 @@
 package page.ooooo.geoshare.lib.conversion
 
 import android.content.res.Resources
+import io.ktor.client.call.HttpClientCall
+import io.ktor.client.request.HttpRequest
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.Url
 import io.ktor.utils.io.CancellationException
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
@@ -365,10 +368,19 @@ class PermissionGrantedBasicInputTest {
 
     @Test
     fun transition_whenInputFetchThrowsUnrecoverableNetworkException_returnsConversionFailed() = runTest {
+        val requestUrl = "https://www.example.com/request"
+        val request: HttpRequest = mock {
+            on { url } doReturn Url(requestUrl)
+        }
+        val call: HttpClientCall = mock {
+            on { this.request } doReturn request
+        }
         val response: HttpResponse = mock {
             on { status } doReturn HttpStatusCode.NotFound
+            on { this.call } doReturn call
         }
-        val cause = ResponseNetworkException(response, Exception())
+        val tr = Exception()
+        val cause = ResponseNetworkException(response, tr)
         val input = object : BasicInput<String>, Input.HasPermission {
             override suspend fun fetch(
                 match: String,
@@ -408,6 +420,7 @@ class PermissionGrantedBasicInputTest {
             ConversionFailed(
                 source,
                 resources.getString(R.string.network_exception_response_error, HttpStatusCode.NotFound.value),
+                details = "Request URL: $requestUrl",
             ),
             state.transition(),
         )
