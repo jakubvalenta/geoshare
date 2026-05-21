@@ -99,17 +99,24 @@ class GoogleMapsUriInput @Inject constructor(
 
             // API search
             // https://maps.google.com/?q={name}
-            listOf(
+            // https://maps.google.com/?query_place_id={name}
+            val query = listOf(
                 @Suppress("SpellCheckingInspection") "daddr",
                 "q",
                 "query",
-            ).forEach { key ->
-                Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull()?.let { name ->
-                    // Go to API parsing
-                    points = persistentListOf(GCJ02MainlandChinaPoint(z = z, name = name, source = Source.URI))
-                    nextStep = NextStep(googleMapsAddressApiInput.get(), match)
-                    return@run
+            ).firstNotNullOfOrNull { key -> Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull() }
+            val placeId = Q_PARAM_PATTERN.matchEntire(queryParams["query_place_id"])?.groupOrNull()
+            if (query != null || placeId != null) {
+                // Go to API parsing
+                if (query != null) {
+                    points = persistentListOf(GCJ02MainlandChinaPoint(z = z, name = query, source = Source.URI))
                 }
+                nextStep = if (placeId != null) {
+                    NextStep(googleMapsPlaceApiInput.get(), match)
+                } else {
+                    NextStep(googleMapsAddressApiInput.get(), match)
+                }
+                return@run
             }
 
             val parts = pathParts.dropWhile { it.isEmpty() || it == "maps" }
@@ -134,7 +141,6 @@ class GoogleMapsUriInput @Inject constructor(
                     points = parseParts(parts.drop(1), z)
                     if (points.lastOrNull()?.hasCoordinates() != true) {
                         // Go to API parsing, if no coordinates have been extracted
-                        // TODO Parse place id and go to googleMapsPlaceApiInput
                         nextStep = NextStep(googleMapsAddressApiInput.get(), match)
                     }
                 }

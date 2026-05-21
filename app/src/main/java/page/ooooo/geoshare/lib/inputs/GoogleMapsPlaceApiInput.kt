@@ -14,6 +14,8 @@ import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.GoogleMapsApiPreference
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.extensions.groupOrNull
+import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.network.ApiService
@@ -75,8 +77,7 @@ class GoogleMapsPlaceApiInput @Inject constructor(
 
     private fun parsePlaceId(uri: Uri): String? =
         uri.run {
-            // TODO Parse place id
-            null
+            Q_PARAM_PATTERN.matchEntire(queryParams["query_place_id"])?.groupOrNull()
         }
 
     override fun toString() = "GoogleMapsPlaceApiInput"
