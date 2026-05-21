@@ -13,12 +13,12 @@ import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 
 class LocationRationaleRequestedTest {
     private val coordinateConverter: CoordinateConverter = mock()
+    private val source = "https://maps.google.com/foo"
+    private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+    private val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter).toAction(points.last())
 
     @Test
     fun transition_returnsNull() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter).toAction(points.last())
         val state = LocationRationaleRequested(source, points, action, isAutomation = false)
         assertNull(state.transition())
     }

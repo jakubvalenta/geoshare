@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
@@ -10,8 +9,13 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object CartesIGNUriInput : UriInput, Input.HasRandomUri {
+@Singleton
+class CartesIGNUriInput @Inject constructor(
+    override val uriQuote: UriQuote,
+) : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:https?://)?cartes-ign\.ign\.fr$URI_REST)""")
     override val documentation = InputDocumentation(
         group = InputDocumentationGroup.CARTES_IGN,
@@ -20,13 +24,7 @@ object CartesIGNUriInput : UriInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parse(
-        data: Uri,
-        match: String,
-        prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
-    ) = buildParseResult {
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
         data.run {
             // Coordinates
             // https://cartes-ign.ign.fr?lng={lon}&lat={lat}&z={z}

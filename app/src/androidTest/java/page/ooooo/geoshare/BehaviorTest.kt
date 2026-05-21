@@ -171,7 +171,9 @@ interface BehaviorTest {
     suspend fun assumeHttpHeadIsSuccess(@Suppress("SameParameterValue") url: String) {
         val status = try {
             withContext(Dispatchers.IO) {
-                HttpClient(CIO).head(url).status
+                HttpClient(CIO).use { client ->
+                    client.head(url).status
+                }
             }
         } catch (_: SocketException) {
             null

@@ -27,10 +27,11 @@ import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.calcExponentialBackoffMillis
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
-import page.ooooo.geoshare.lib.inputs.WebViewInput
-import page.ooooo.geoshare.lib.inputs.Input
-import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.inputs.BasicInput
+import page.ooooo.geoshare.lib.inputs.Input
+import page.ooooo.geoshare.lib.inputs.NoopInput
+import page.ooooo.geoshare.lib.inputs.ParseResult
+import page.ooooo.geoshare.lib.inputs.WebViewInput
 import page.ooooo.geoshare.lib.network.MaxAttemptsReachedNetworkException
 import page.ooooo.geoshare.lib.network.RecoverableNetworkException
 import page.ooooo.geoshare.lib.network.UnrecoverableNetworkException
@@ -106,11 +107,11 @@ data class SourceReceived(
     override fun toString() = "SourceReceived"
 }
 
-data class InputFound<T>(
+data class InputFound(
     val stateContext: ConversionStateContext,
     val source: String,
     val match: String,
-    val input: Input<T>,
+    val input: Input,
     val permission: Permission? = null,
     val prevResult: ParseResult? = null,
 ) : ConversionState {
@@ -148,11 +149,11 @@ data class InputFound<T>(
     override fun toString() = TAG
 }
 
-data class PermissionRequested<T>(
+data class PermissionRequested(
     val stateContext: ConversionStateContext,
     val source: String,
     val match: String,
-    val input: Input<T>,
+    val input: Input,
     val prevResult: ParseResult? = null,
     override val permissionTitleResId: Int,
 ) : ConversionState, ConversionState.HasPermission {
@@ -175,27 +176,30 @@ data class PermissionRequested<T>(
     override fun toString() = "PermissionRequested"
 }
 
-data class PermissionGranted<T>(
+data class PermissionGranted(
     val stateContext: ConversionStateContext,
     val source: String,
     val match: String,
-    val input: Input<T>,
+    val input: Input,
     val permission: Permission?,
     val prevResult: ParseResult? = null,
 ) : ConversionState {
     override suspend fun transition(): State =
         when (input) {
-            is BasicInput -> PermissionGrantedBasicInput(stateContext, source, match, input, permission, prevResult)
+            is BasicInput<*> -> PermissionGrantedBasicInput(stateContext, source, match, input, permission, prevResult)
             is WebViewInput -> PermissionGrantedWebViewInput(stateContext, source, match, input, permission, prevResult)
+            is NoopInput -> DataParsed(
+                stateContext, source, match, input, result = prevResult ?: ParseResult(), permission,
+            )
         }
 
     override fun toString() = "PermissionGranted"
 }
 
 /**
- * Fetches input data using [BasicInput.withData] and parses it using [BasicInput.parse].
+ * Fetches input data using [BasicInput.fetch] and parses it using [BasicInput.parse].
  *
- * When [BasicInput.withData] fails, it is retried up to [maxAttempts]. Retrying is done by recursively transitioning
+ * When [BasicInput.fetch] fails, it is retried up to [maxAttempts]. Retrying is done by recursively transitioning
  * this state while tracking the number of attempts made and the cause of the last failure in [lastAttempt].
  *
  * We use this custom retrying instead of the [io.ktor.client.plugins.HttpRequestRetry] plugin, because it makes the
@@ -228,10 +232,8 @@ data class PermissionGrantedBasicInput<T>(
                     )
                     delay(delayMillis)
                 }
-                val result = input.withData(
-                    match, stateContext.log, stateContext.httpClient, stateContext.uriQuote
-                ) { data ->
-                    input.parse(data, match, prevResult, stateContext.uriQuote, stateContext.log)
+                val result = input.fetch(match) { data ->
+                    input.parse(data, match, prevResult)
                 }
                 DataParsed(stateContext, source, match, input, result, permission, prevResult)
             } catch (_: MalformedURLException) {
@@ -312,7 +314,7 @@ data class PermissionGrantedWebViewInput(
                     .filterNotNull()
                     .timeout(timeout)
                     .first()
-                val result = input.parse(data, match, prevResult, stateContext.uriQuote, stateContext.log)
+                val result = input.parse(data, match, prevResult)
                 DataParsed(stateContext, source, match, input, result, permission, prevResult)
             } catch (_: TimeoutCancellationException) {
                 stateContext.log.e(TAG, "Timed out")
@@ -340,11 +342,11 @@ data class PermissionGrantedWebViewInput(
     override fun toString() = TAG
 }
 
-data class DataParsed<T>(
+data class DataParsed(
     val stateContext: ConversionStateContext,
     val source: String,
     val match: String,
-    val input: Input<T>,
+    val input: Input,
     val result: ParseResult,
     val permission: Permission?,
     val prevResult: ParseResult? = null,

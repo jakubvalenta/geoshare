@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
@@ -13,12 +12,15 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-object HereWeGoUriInput : UriInput, Input.HasRandomUri {
-    private const val SIMPLIFIED_BASE64 = """[A-Za-z0-9+/]+=*"""
-
+@Singleton
+class HereWeGoUriInput @Inject constructor(
+    override val uriQuote: UriQuote,
+) : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""((?:https?://)?(?:share|wego)\.here\.com/$URI_REST)""")
     override val documentation = InputDocumentation(
         group = InputDocumentationGroup.HERE_WEGO,
@@ -31,13 +33,7 @@ object HereWeGoUriInput : UriInput, Input.HasRandomUri {
     )
 
     @OptIn(ExperimentalEncodingApi::class)
-    override suspend fun parse(
-        data: Uri,
-        match: String,
-        prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
-    ) = buildParseResult {
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
         data.run {
             val parts = data.pathParts.drop(1)
             val firstPart = parts.firstOrNull() ?: return@run
@@ -78,4 +74,8 @@ object HereWeGoUriInput : UriInput, Input.HasRandomUri {
         UriFormatter.formatUriString(point, "https://wego.here.com/?map={lat}%2C{lon},{z}")
 
     override fun toString() = "HereWegoUriInput"
+
+    private companion object {
+        private const val SIMPLIFIED_BASE64 = """[A-Za-z0-9+/]+=*"""
+    }
 }

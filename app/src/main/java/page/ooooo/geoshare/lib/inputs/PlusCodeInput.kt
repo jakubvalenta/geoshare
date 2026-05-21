@@ -3,8 +3,6 @@ package page.ooooo.geoshare.lib.inputs
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.formatters.PlusCodeFormatter
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
@@ -12,6 +10,8 @@ import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.decodePlusCode
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Plus Codes input.
@@ -23,13 +23,8 @@ import page.ooooo.geoshare.lib.geo.decodePlusCode
  *
  * See https://plus.codes/
  */
-object PlusCodeInput : TextInput, Input.HasRandomUri {
-    /**
-     * See https://github.com/google/open-location-code/blob/main/Documentation/Reference/App_Developers.md#supporting-global-codes
-     */
-    private const val GLOBAL_CODE =
-        @Suppress("SpellCheckingInspection") """[23456789C][23456789CFGHJMPQRV][23456789CFGHJMPQRVWX]{6}(?:\+|%2B)[23456789CFGHJMPQRVWX]{2,7}"""
-
+@Singleton
+class PlusCodeInput @Inject constructor() : TextInput, Input.HasRandomUri {
     override val pattern = Regex(
         """(?:^|\s|https://www\.google\.com/maps/place/|https://plus\.codes/)($GLOBAL_CODE)(?:\s|/|$)""",
         RegexOption.IGNORE_CASE,
@@ -48,26 +43,37 @@ object PlusCodeInput : TextInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parse(data: String, match: String, prevResult: ParseResult?, uriQuote: UriQuote, log: Log) =
-        buildParseResult {
-            // URL-decode code string if it was extracted from a URL
-            val codeString = data.replace("%2B", "+")
+    override suspend fun parse(
+        data: String,
+        match: String,
+        prevResult: ParseResult?,
+    ) = parseResult {
+        // URL-decode code string if it was extracted from a URL
+        val codeString = data.replace("%2B", "+")
 
-            // Global code
-            // e.g. `796RWF8Q+WF`
-            decodePlusCode(codeString)?.let {
-                points = persistentListOf(
-                    GCJ02MainlandChinaPoint(it).copy(lat = it.lat?.toScale(6), lon = it.lon?.toScale(6))
-                )
-                return@buildParseResult
-            }
-
-            // Local code (not implemented yet)
-            // e.g. `28WR+CW` or `28WR+CW Comstock Park, Michigan`
+        // Global code
+        // e.g. `796RWF8Q+WF`
+        decodePlusCode(codeString)?.let {
+            points = persistentListOf(
+                GCJ02MainlandChinaPoint(it).copy(lat = it.lat?.toScale(6), lon = it.lon?.toScale(6))
+            )
+            return@parseResult
         }
+
+        // Local code (not implemented yet)
+        // e.g. `28WR+CW` or `28WR+CW Comstock Park, Michigan`
+    }
 
     override fun genRandomUri(point: Point): String? =
         PlusCodeFormatter.formatPlusCode(point)
 
     override fun toString() = "PlusCodeInput"
+
+    private companion object {
+        /**
+         * See https://github.com/google/open-location-code/blob/main/Documentation/Reference/App_Developers.md#supporting-global-codes
+         */
+        private const val GLOBAL_CODE =
+            @Suppress("SpellCheckingInspection") """[23456789C][23456789CFGHJMPQRV][23456789CFGHJMPQRVWX]{6}(?:\+|%2B)[23456789CFGHJMPQRVWX]{2,7}"""
+    }
 }

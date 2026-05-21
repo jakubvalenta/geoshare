@@ -5,11 +5,12 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class MapsMeUriInputTest : InputTest {
-    private val input = MapsMeUriInput
+    private val input = FakeInputRepository.mapsMeUriInput
 
     @Test
     fun match_shortLink() {

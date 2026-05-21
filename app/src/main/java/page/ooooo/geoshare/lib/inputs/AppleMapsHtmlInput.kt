@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
+import io.ktor.client.engine.HttpClientEngine
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readLine
 import kotlinx.collections.immutable.persistentListOf
@@ -10,21 +11,26 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.network.DESKTOP_USER_AGENT
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object AppleMapsHtmlInput : BodyAsChannelInput {
+@Singleton
+class AppleMapsHtmlInput @Inject constructor(
+    override val engine: HttpClientEngine,
+    override val log: Log,
+    override val uriQuote: UriQuote,
+) : BodyAsChannelInput {
     @StringRes
     override val permissionTitleResId = R.string.converter_apple_maps_permission_title
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_apple_maps_loading_indicator_title
 
-    override suspend fun parse(
-        data: ByteReadChannel,
-        match: String,
-        prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
-    ) = buildParseResult {
+    // Use custom user agent instead of BrowserUserAgent, so that Apple Maps doesn't show "Unsupported browser"
+    override val userAgent = DESKTOP_USER_AGENT
+
+    override suspend fun parse(data: ByteReadChannel, match: String, prevResult: ParseResult?) = parseResult {
         val latPattern = Regex("""<meta property="place:location:latitude" content="$LAT"""")
         val lonPattern = Regex("""<meta property="place:location:longitude" content="$LON"""")
 
@@ -42,7 +48,7 @@ object AppleMapsHtmlInput : BodyAsChannelInput {
             }
             if (lat != null && lon != null) {
                 points = persistentListOf(WGS84Point(lat, lon, name = name, source = Source.HTML))
-                return@buildParseResult
+                return@parseResult
             }
         }
     }

@@ -16,11 +16,12 @@ class ActionRanTest {
     private val coordinateConverter: CoordinateConverter = mock()
     private val source = "https://maps.google.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+    private val output = SavePointsGpxOutput(coordinateConverter)
+    private val action = output.toAction(points)
 
     @Test
     fun transition_whenAutomationIsFalseAndResultIsSucceeded_returnsActionSucceededOrFinished() = runTest {
         for (actionResult in setOf(ActionResult.Succeeded, ActionResult.SucceededAndFinish)) {
-            val output = SavePointsGpxOutput(coordinateConverter)
             val action = output.toAction(points)
             assertEquals(
                 ActionSucceeded(source, points, actionResult, output),
@@ -35,8 +36,6 @@ class ActionRanTest {
 
     @Test
     fun transition_whenAutomationIsFalseAndResultIsFailed_returnsActionFailedOrFinished() = runTest {
-        val output = SavePointsGpxOutput(coordinateConverter)
-        val action = output.toAction(points)
         val actionResult = ActionResult.Failed
         assertEquals(
             ActionFailed(source, points, actionResult, output),
@@ -51,8 +50,6 @@ class ActionRanTest {
     @Test
     fun transition_whenAutomationIsTrueAndResultIsSucceeded_returnsActionAutomationSucceededOrFinished() = runTest {
         for (actionResult in setOf(ActionResult.Succeeded, ActionResult.SucceededAndFinish)) {
-            val output = SavePointsGpxOutput(coordinateConverter)
-            val action = output.toAction(points)
             assertEquals(
                 ActionAutomationSucceeded(source, points, actionResult, output),
                 ActionRan(source, points, action, actionResult, isAutomation = true).transition(),
@@ -66,8 +63,6 @@ class ActionRanTest {
 
     @Test
     fun transition_whenAutomationIsTrueAndResultIsFailed_returnsActionAutomationFailedOrFinished() = runTest {
-        val output = SavePointsGpxOutput(coordinateConverter)
-        val action = output.toAction(points)
         val actionResult = ActionResult.Failed
         assertEquals(
             ActionAutomationFailed(source, points, actionResult, output),

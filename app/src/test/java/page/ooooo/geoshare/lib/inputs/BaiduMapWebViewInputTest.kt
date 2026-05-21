@@ -4,12 +4,12 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import page.ooooo.geoshare.lib.FakeLog
+import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
 import page.ooooo.geoshare.lib.geo.Source
 
 class BaiduMapWebViewInputTest : InputTest {
-    private val input = BaiduMapWebViewInput
+    private val input = FakeInputRepository.baiduMapWebViewInput
 
     @Test
     fun parse_whenDataIsValidJsonObject_returnsPoint() = runTest {
@@ -35,7 +35,6 @@ class BaiduMapWebViewInputTest : InputTest {
                     }
                 """.trimIndent(),
                 "https://map.baidu.com/original",
-                log = FakeLog,
             ),
         )
         assertEquals(
@@ -56,7 +55,6 @@ class BaiduMapWebViewInputTest : InputTest {
                     }
                 """.trimIndent(),
                 "https://map.baidu.com/original",
-                log = FakeLog,
             ),
         )
         assertEquals(
@@ -76,7 +74,6 @@ class BaiduMapWebViewInputTest : InputTest {
                     }
                 """.trimIndent(),
                 "https://map.baidu.com/original",
-                log = FakeLog,
             ),
         )
         assertEquals(
@@ -89,7 +86,6 @@ class BaiduMapWebViewInputTest : InputTest {
                 // language=Json
                 "{}",
                 "https://map.baidu.com/original",
-                log = FakeLog,
             ),
         )
     }
@@ -110,7 +106,7 @@ class BaiduMapWebViewInputTest : InputTest {
         )) {
             assertEquals(
                 ParseResult(),
-                input.parse(data, "https://map.baidu.com/original", log = FakeLog),
+                input.parse(data, "https://map.baidu.com/original"),
             )
         }
         assertEquals(
@@ -119,7 +115,6 @@ class BaiduMapWebViewInputTest : InputTest {
                 // language=Json
                 """{"lat":  "spam"}""",
                 "https://map.baidu.com/original",
-                log = FakeLog,
             ),
         )
         assertEquals(
@@ -128,7 +123,6 @@ class BaiduMapWebViewInputTest : InputTest {
                 // language=Json
                 "[]",
                 "https://map.baidu.com/original",
-                log = FakeLog,
             ),
         )
     }
@@ -142,7 +136,7 @@ class BaiduMapWebViewInputTest : InputTest {
         )) {
             assertEquals(
                 ParseResult(),
-                input.parse(data, "https://map.baidu.com/original", log = FakeLog),
+                input.parse(data, "https://map.baidu.com/original"),
             )
         }
     }

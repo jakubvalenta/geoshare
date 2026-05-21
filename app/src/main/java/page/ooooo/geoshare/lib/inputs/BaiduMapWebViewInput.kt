@@ -7,12 +7,16 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.network.DESKTOP_USER_AGENT
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object BaiduMapWebViewInput : WebViewInput {
+@Singleton
+class BaiduMapWebViewInput @Inject constructor(
+    private val log: Log,
+) : WebViewInput {
 
     @Serializable
     private data class ExtractedPoint(val lat: Double?, val lon: Double?, val z: Double?, val name: String?)
@@ -50,13 +54,7 @@ object BaiduMapWebViewInput : WebViewInput {
         };
     """.trimIndent()
 
-    override suspend fun parse(
-        data: String,
-        match: String,
-        prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
-    ) = buildParseResult {
+    override suspend fun parse(data: String, match: String, prevResult: ParseResult?) = parseResult {
         val json = Json {
             explicitNulls = false
         }
@@ -89,7 +87,9 @@ object BaiduMapWebViewInput : WebViewInput {
             || requestUrlString.contains(@Suppress("SpellCheckingInspection") "/alog.min.js")
             || requestUrlString.contains(@Suppress("SpellCheckingInspection") "map.baidu.com/newmap_test/static/common/images/transparent.gif")
 
-    private const val TAG = "BaiduMapWebViewInput"
-
     override fun toString() = TAG
+
+    private companion object {
+        private const val TAG = "BaiduMapWebViewInput"
+    }
 }

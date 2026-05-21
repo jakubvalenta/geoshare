@@ -53,10 +53,11 @@ class ConversionSucceededTest {
     private val linkRepository: LinkRepository = FakeLinkRepository()
     private val log = FakeLog
     private val outputRepository = OutputRepository(coordinateConverter)
+    private val source = "https://maps.google.com/foo"
+    private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
 
     @Test
     fun transition_whenPointsAreEmpty_returnsNull() = runTest {
-        val source = "https://maps.google.com/foo"
         val points = persistentListOf<WGS84Point>()
         val automation = CopyCoordsDecAutomation
         val userPreferencesRepository: FakeUserPreferencesRepository = mock {
@@ -74,8 +75,6 @@ class ConversionSucceededTest {
 
     @Test
     fun transition_whenUserPreferenceAutomationIsNoop_returnsNull() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val automation = NoopAutomation
         val userPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(AutomationPreference) } doReturn automation
@@ -92,8 +91,6 @@ class ConversionSucceededTest {
 
     @Test
     fun transition_whenBillingStatusIsLoadingAndCachedProductIdIsNotSet_returnsNull() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val automation = CopyCoordsDecAutomation
         val billing: Billing = mock {
             on { status } doReturn MutableStateFlow(BillingStatus.Loading())
@@ -121,8 +118,6 @@ class ConversionSucceededTest {
 
     @Test
     fun transition_whenBillingStatusIsLoadingAndCachedProductIsAnUnknownProduct_returnsNull() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val automation = CopyCoordsDecAutomation
         val billing: Billing = mock {
             on { status } doReturn MutableStateFlow(BillingStatus.Loading())
@@ -152,8 +147,6 @@ class ConversionSucceededTest {
 
     @Test
     fun transition_whenBillingStatusIsLoadingAndCachedProductIsAKnownProduct_returnsActionReady() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val automation = CopyCoordsDecAutomation
         val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
         val billing: Billing = mock {
@@ -187,8 +180,6 @@ class ConversionSucceededTest {
 
     @Test
     fun transition_whenBillingStatusDoesNotContainAutomationFeature_returnsNull() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val automation = CopyCoordsDecAutomation
         val billing: Billing = mock {
             on { status } doReturn MutableStateFlow(
@@ -223,8 +214,6 @@ class ConversionSucceededTest {
 
     @Test
     fun transition_whenBillingStatusContainsAutomationFeature_returnsActionReady() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val automation = CopyCoordsDecAutomation
         val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
         val billing: Billing = mock {
@@ -262,8 +251,6 @@ class ConversionSucceededTest {
 
     @Test
     fun transition_whenBillingStatusIsLoadingAndItBecomesPurchasedWithinTimeout_returnsActionReady() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val automation = CopyCoordsDecAutomation
         val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
         val mockStatus = MutableStateFlow<BillingStatus>(BillingStatus.Loading())
@@ -307,8 +294,6 @@ class ConversionSucceededTest {
 
     @Test
     fun transition_whenBillingStatusIsNotPurchasedAndItBecomesPurchasedWithinTimeout_returnsNull() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val automation = CopyCoordsDecAutomation
         val mockStatus = MutableStateFlow<BillingStatus>(BillingStatus.NotPurchased())
         val billing: Billing = mock {
@@ -348,8 +333,6 @@ class ConversionSucceededTest {
 
     @Test
     fun transition_whenBillingStatusIsLoadingAndItBecomesPurchasedAfterTimeout_returnsNull() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val automation = CopyCoordsDecAutomation
         val mockStatus = MutableStateFlow<BillingStatus>(BillingStatus.Loading())
         val billing: Billing = mock {
@@ -389,8 +372,6 @@ class ConversionSucceededTest {
 
     @Test
     fun transition_whenUserPreferenceAutomationIsCopyCoords_returnsActionReady() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val automation = CopyCoordsDecAutomation
         val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
         val billing: Billing = mock {
@@ -424,8 +405,6 @@ class ConversionSucceededTest {
 
     @Test
     fun transition_whenUserPreferenceAutomationIsOpenApp_returnsActionWaiting() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val automation = OpenDisplayGeoUriAutomation(PackageNames.GOOGLE_MAPS)
         val output = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
         val action = output.toAction(points.last())
@@ -462,8 +441,6 @@ class ConversionSucceededTest {
 
     @Test
     fun transition_whenUserPreferenceAutomationIsOpenLink_returnsActionWaiting() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val automation = ShareLinkUriAutomation(FakeGoogleMapsDisplayLink.uuid)
         val output = ShareLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter)
         val action = output.toAction(points.last())
@@ -500,8 +477,6 @@ class ConversionSucceededTest {
 
     @Test
     fun transition_whenUserPreferenceAutomationIsOpenLinkAndLinkIsUnknown_returnsNull() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val automation = ShareLinkUriAutomation(Link(name = "Link that is not in repository").uuid)
         val delay = 2.seconds
         val billing: Billing = mock {
@@ -533,8 +508,6 @@ class ConversionSucceededTest {
 
     @Test
     fun transition_whenUserPreferenceAutomationIsSaveGpx_returnsActionWaiting() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val automation = SavePointsGpxAutomation
         val output = SavePointsGpxOutput(coordinateConverter)
         val action = output.toAction(points)
@@ -571,8 +544,6 @@ class ConversionSucceededTest {
 
     @Test
     fun transition_whenUserPreferenceAutomationIsShare_returnsActionWaiting() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val automation = OpenDisplayGeoUriAutomation(PackageNames.GOOGLE_MAPS)
         val output = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
         val action = output.toAction(points.last())

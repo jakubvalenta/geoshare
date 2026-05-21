@@ -19,14 +19,14 @@ import kotlin.time.measureTime
 
 class ActionWaitingTest {
     private val coordinateConverter: CoordinateConverter = mock()
+    private val source = "https://maps.google.com/foo"
+    private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+    private val output = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
+    private val action = output.toAction(points.last())
     private val stateContext: ConversionStateContext = mock()
 
     @Test
     fun transition_whenExecutionIsNotCancelled_waitsAndReturnsActionReady() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val output = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-        val action = output.toAction(points.last())
         val state = ActionWaiting(stateContext, source, points, action, output, isAutomation = true, 3.seconds)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
@@ -39,10 +39,6 @@ class ActionWaitingTest {
 
     @Test
     fun transition_whenExecutionIsNotCancelledAndDelayIsNotPositive_doesNotWaitAndReturnsActionReady() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val output = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-        val action = output.toAction(points.last())
         val state = ActionWaiting(stateContext, source, points, action, output, isAutomation = true, (-1).seconds)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
@@ -55,10 +51,6 @@ class ActionWaitingTest {
 
     @Test
     fun transition_whenExecutionIsCancelled_returnsActionFinished() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val output = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-        val action = output.toAction(points.last())
         val state = ActionWaiting(stateContext, source, points, action, output, isAutomation = true, 3.seconds)
         var res: State? = null
         val job = launch {

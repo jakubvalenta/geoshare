@@ -8,8 +8,10 @@ import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 
-class GoogleMapsPlaceListWebViewInputTest : InputTest {
-    private val input = GoogleMapsPlaceListWebViewInput
+class GoogleMapsPlaceListInputTest : InputTest {
+    private val input = GoogleMapsPlaceListInputImpl(
+        log = FakeLog,
+    )
 
     @Test
     fun parse_whenDataIsValidJsonObject_returnsPoints() = runTest {
@@ -31,7 +33,6 @@ class GoogleMapsPlaceListWebViewInputTest : InputTest {
                     ]
                 """.trimIndent(),
                 "https://maps.google.com/original",
-                log = FakeLog,
             ),
         )
         assertEquals(
@@ -48,7 +49,6 @@ class GoogleMapsPlaceListWebViewInputTest : InputTest {
                     ]
                 """.trimIndent(),
                 "https://maps.google.com/original",
-                log = FakeLog,
             ),
         )
         assertEquals(
@@ -61,7 +61,6 @@ class GoogleMapsPlaceListWebViewInputTest : InputTest {
                 // language=Json
                 "[{}]",
                 "https://maps.google.com/original",
-                log = FakeLog,
             ),
         )
         assertEquals(
@@ -70,7 +69,6 @@ class GoogleMapsPlaceListWebViewInputTest : InputTest {
                 // language=Json
                 "[]",
                 "https://maps.google.com/original",
-                log = FakeLog,
             ),
         )
     }
@@ -91,7 +89,7 @@ class GoogleMapsPlaceListWebViewInputTest : InputTest {
         )) {
             assertEquals(
                 ParseResult(),
-                input.parse(data, "https://maps.google.com/original", log = FakeLog),
+                input.parse(data, "https://maps.google.com/original"),
             )
         }
         assertEquals(
@@ -100,7 +98,6 @@ class GoogleMapsPlaceListWebViewInputTest : InputTest {
                 // language=Json
                 """{"lat":  "spam"}""",
                 "https://maps.google.com/original",
-                log = FakeLog,
             ),
         )
         assertEquals(
@@ -109,7 +106,6 @@ class GoogleMapsPlaceListWebViewInputTest : InputTest {
                 // language=Json
                 "[]",
                 "https://maps.google.com/original",
-                log = FakeLog,
             ),
         )
     }
@@ -123,7 +119,7 @@ class GoogleMapsPlaceListWebViewInputTest : InputTest {
         )) {
             assertEquals(
                 ParseResult(),
-                input.parse(data, "https://maps.google.com/original", log = FakeLog),
+                input.parse(data, "https://maps.google.com/original"),
             )
         }
     }

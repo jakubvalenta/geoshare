@@ -20,24 +20,21 @@ class LocationPermissionReceivedTest {
     private val resources: Resources = mock {
         on { getString(R.string.conversion_succeeded_location_loading_indicator_title) } doReturn "Finding your location..."
     }
+    private val source = "https://maps.apple.com/foo"
+    private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+    private val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter).toAction(points.last())
     private val stateContext: ConversionStateContext = mock {
         on { this@on.resources } doReturn resources
     }
 
     @Test
     fun transition_returnsNull() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter).toAction(points.last())
         val state = LocationPermissionReceived(stateContext, source, points, action, isAutomation = false)
         assertNull(state.transition())
     }
 
     @Test
     fun getLoadingIndicator_returnsSmallLoadingIndicator() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter).toAction(points.last())
         val state = LocationPermissionReceived(stateContext, source, points, action, isAutomation = false)
         assertEquals(
             LoadingIndicator.Small(
