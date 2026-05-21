@@ -41,7 +41,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.InputRepository
+import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.inputs.InputDocumentation
 import page.ooooo.geoshare.lib.inputs.InputDocumentationGroup
@@ -349,8 +349,7 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             Column {
-                val inputRepository = InputRepository()
-                val allDocumentations = inputRepository.all
+                val allDocumentations = FakeInputRepository.all
                     .mapNotNull { input -> input.documentation }
                     .groupBy { documentation -> documentation.group }
                     .map { (group, documentations) ->
@@ -375,8 +374,7 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             Column {
-                val inputRepository = InputRepository()
-                val allDocumentations = inputRepository.all
+                val allDocumentations = FakeInputRepository.all
                     .mapNotNull { input -> input.documentation }
                     .groupBy { documentation -> documentation.group }
                     .map { (group, documentations) ->
@@ -401,8 +399,7 @@ private fun TabletPreview() {
     AppTheme {
         Surface {
             Column {
-                val inputRepository = InputRepository()
-                val allDocumentations = inputRepository.all
+                val allDocumentations = FakeInputRepository.all
                     .mapNotNull { input -> input.documentation }
                     .groupBy { documentation -> documentation.group }
                     .map { (group, documentations) ->
@@ -427,8 +424,7 @@ private fun NoRecentPreview() {
     AppTheme {
         Surface {
             Column {
-                val inputRepository = InputRepository()
-                val allDocumentations = inputRepository.all
+                val allDocumentations = FakeInputRepository.all
                     .mapNotNull { input -> input.documentation }
                     .groupBy { documentation -> documentation.group }
                     .map { (group, documentations) ->
@@ -451,8 +447,7 @@ private fun DarkNoRecentPreview() {
     AppTheme {
         Surface {
             Column {
-                val inputRepository = InputRepository()
-                val allDocumentations = inputRepository.all
+                val allDocumentations = FakeInputRepository.all
                     .mapNotNull { input -> input.documentation }
                     .groupBy { documentation -> documentation.group }
                     .map { (group, documentations) ->
@@ -475,8 +470,7 @@ private fun TabletNoRecentPreview() {
     AppTheme {
         Surface {
             Column {
-                val inputRepository = InputRepository()
-                val allDocumentations = inputRepository.all
+                val allDocumentations = FakeInputRepository.all
                     .mapNotNull { input -> input.documentation }
                     .groupBy { documentation -> documentation.group }
                     .map { (group, documentations) ->
@@ -499,8 +493,7 @@ private fun OpenStreetMapPreview() {
     AppTheme {
         Surface {
             Column {
-                val inputRepository = InputRepository()
-                val allDocumentations = inputRepository.all
+                val allDocumentations = FakeInputRepository.all
                     .mapNotNull { input -> input.documentation }
                     .groupBy { documentation -> documentation.group }
                     .map { (group, documentations) ->
@@ -525,8 +518,7 @@ private fun DarkOpenStreetMapPreview() {
     AppTheme {
         Surface {
             Column {
-                val inputRepository = InputRepository()
-                val allDocumentations = inputRepository.all
+                val allDocumentations = FakeInputRepository.all
                     .mapNotNull { input -> input.documentation }
                     .groupBy { documentation -> documentation.group }
                     .map { (group, documentations) ->
@@ -551,8 +543,7 @@ private fun TabletOpenStreetMapPreview() {
     AppTheme {
         Surface {
             Column {
-                val inputRepository = InputRepository()
-                val allDocumentations = inputRepository.all
+                val allDocumentations = FakeInputRepository.all
                     .mapNotNull { input -> input.documentation }
                     .groupBy { documentation -> documentation.group }
                     .map { (group, documentations) ->
@@ -577,8 +568,7 @@ private fun GeoUriPreview() {
     AppTheme {
         Surface {
             Column {
-                val inputRepository = InputRepository()
-                val allDocumentations = inputRepository.all
+                val allDocumentations = FakeInputRepository.all
                     .mapNotNull { input -> input.documentation }
                     .groupBy { documentation -> documentation.group }
                     .map { (group, documentations) ->
@@ -603,8 +593,7 @@ private fun DarkGeoUriPreview() {
     AppTheme {
         Surface {
             Column {
-                val inputRepository = InputRepository()
-                val allDocumentations = inputRepository.all
+                val allDocumentations = FakeInputRepository.all
                     .mapNotNull { input -> input.documentation }
                     .groupBy { documentation -> documentation.group }
                     .map { (group, documentations) ->
@@ -629,8 +618,7 @@ private fun TabletGeoUriPreview() {
     AppTheme {
         Surface {
             Column {
-                val inputRepository = InputRepository()
-                val allDocumentations = inputRepository.all
+                val allDocumentations = FakeInputRepository.all
                     .mapNotNull { input -> input.documentation }
                     .groupBy { documentation -> documentation.group }
                     .map { (group, documentations) ->

@@ -9,7 +9,7 @@ data class ParseResult(
 )
 
 data class NextStep(
-    val input: Input<*>,
+    val input: Input,
     val match: String,
 )
 
@@ -20,5 +20,5 @@ class ParseResultScope {
     internal fun build() = ParseResult(points, nextStep)
 }
 
-suspend fun buildParseResult(block: suspend ParseResultScope.() -> Unit): ParseResult =
+suspend fun parseResult(block: suspend ParseResultScope.() -> Unit): ParseResult =
     ParseResultScope().apply { this.block() }.build()

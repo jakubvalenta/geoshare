@@ -2,7 +2,6 @@ package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
@@ -17,15 +16,24 @@ import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Handles Google Maps full URIs.
  *
  * If the URI contains a Plus Code, e.g. https://www.google.com/maps/place/8FJ3HVHW%2B96, it doesn't process the code
  * but only puts it in the point name. The reason is that Plus Codes are handled by [PlusCodeInput], which has higher
- * priority, so URIs containing Plus Codes should never reach [GoogleMapsUriInput].
+ * priority in [page.ooooo.geoshare.data.InputRepository], so Google Maps URIs containing Plus Codes should never reach
+ * [GoogleMapsUriInput].
  */
-object GoogleMapsUriInput : UriInput, Input.HasRandomUri {
+@Singleton
+class GoogleMapsUriInput @Inject constructor(
+    private val googleMapsAddressApiInput: dagger.Lazy<GoogleMapsAddressApiInput>,
+    private val googleMapsPlaceApiInput: dagger.Lazy<GoogleMapsPlaceApiInput>,
+    private val googleMapsPlaceListInput: dagger.Lazy<GoogleMapsPlaceListInput>,
+    override val uriQuote: UriQuote,
+) : UriInput, Input.HasRandomUri {
     override val pattern =
         Regex("""((?:https?://)?(?:(?:www|maps)\.)?google(?:\.[a-z]{2,3})?\.[a-z]{2,3}[/?#]$URI_REST)""")
     override val documentation = InputDocumentation(
@@ -37,13 +45,7 @@ object GoogleMapsUriInput : UriInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parse(
-        data: Uri,
-        match: String,
-        prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
-    ) = buildParseResult {
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
         data.run {
             val z = Z_PATTERN.matchEntire(queryParams["zoom"])?.doubleGroupOrNull()
 
@@ -60,8 +62,8 @@ object GoogleMapsUriInput : UriInput, Input.HasRandomUri {
                 ?.let { naivePoints ->
                     points = naivePoints.map { GCJ02MainlandChinaPoint(it).copy(z = z) }.toImmutableList()
                     if (points.any { !it.hasCoordinates() }) {
-                        // Go to HTML parsing unless all points have coordinates
-                        nextStep = NextStep(GoogleMapsHtmlInput, match)
+                        // Go to HTML parsing, unless coordinates have been extracted for all points
+                        nextStep = NextStep(googleMapsAddressApiInput.get(), match)
                     }
                     return@run
                 }
@@ -103,9 +105,9 @@ object GoogleMapsUriInput : UriInput, Input.HasRandomUri {
                 "query",
             ).forEach { key ->
                 Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull()?.let { name ->
+                    // Go to API parsing
                     points = persistentListOf(GCJ02MainlandChinaPoint(z = z, name = name, source = Source.URI))
-                    // Go to HTML parsing
-                    nextStep = NextStep(GoogleMapsHtmlInput, match)
+                    nextStep = NextStep(googleMapsAddressApiInput.get(), match)
                     return@run
                 }
             }
@@ -118,13 +120,22 @@ object GoogleMapsUriInput : UriInput, Input.HasRandomUri {
 
                 // Directions
                 // https://www.google.com/maps/place/{point}/{point}/@{centerX},{centerY},{centerZ}
-                // Place
-                // https://www.google.com/maps/place/{name}/@{centerX},{centerY},{centerZ}
-                firstPart == "dir" || firstPart == "place" -> {
+                firstPart == "dir" -> {
                     points = parseParts(parts.drop(1), z)
                     if (points.lastOrNull()?.hasCoordinates() != true) {
-                        // Go to HTML parsing
-                        nextStep = NextStep(GoogleMapsHtmlInput, match)
+                        // Go to API parsing, if no coordinates have been extracted
+                        nextStep = NextStep(googleMapsAddressApiInput.get(), match)
+                    }
+                }
+
+                // Place
+                // https://www.google.com/maps/place/{name}/@{centerX},{centerY},{centerZ}
+                firstPart == "place" -> {
+                    points = parseParts(parts.drop(1), z)
+                    if (points.lastOrNull()?.hasCoordinates() != true) {
+                        // Go to API parsing, if no coordinates have been extracted
+                        // TODO Parse place id and go to googleMapsPlaceApiInput
+                        nextStep = NextStep(googleMapsAddressApiInput.get(), match)
                     }
                 }
 
@@ -134,14 +145,18 @@ object GoogleMapsUriInput : UriInput, Input.HasRandomUri {
                 // https://www.google.com/maps/d/edit?mid={id}
                 // https://www.google.com/maps/d/view?mid={id}
                 firstPart == "placelists" || firstPart == "@" || firstPart == "d" -> {
-                    // Go to place list WebView parsing
-                    nextStep = NextStep(GoogleMapsPlaceListWebViewInput, match)
+                    // Go to API parsing
+                    nextStep = NextStep(googleMapsPlaceListInput.get(), match)
                 }
 
                 // Search
                 // https://www.google.com/maps/search/{query}
                 firstPart == "search" -> {
                     points = parseParts(parts.drop(1), z)
+                    if (points.lastOrNull()?.hasCoordinates() != true) {
+                        // Go to API parsing, if no coordinates have been extracted
+                        nextStep = NextStep(googleMapsAddressApiInput.get(), match)
+                    }
                 }
 
                 // Map center

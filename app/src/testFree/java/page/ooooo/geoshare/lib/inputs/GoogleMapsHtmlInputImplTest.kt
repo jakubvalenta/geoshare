@@ -1,14 +1,27 @@
 package page.ooooo.geoshare.lib.inputs
 
+import io.ktor.client.engine.mock.MockEngine
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import page.ooooo.geoshare.data.di.FakeInputRepository
+import page.ooooo.geoshare.lib.FakeLog
+import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 
-class GoogleMapsHtmlInputTest : InputTest {
-    private val input = GoogleMapsHtmlInput
+class GoogleMapsHtmlInputImplTest : InputTest {
+    private val googleMapsWebViewInput = GoogleMapsWebViewInput(
+        googleMapsUriInput = { FakeInputRepository.googleMapsUriInput },
+    )
+    private val input = GoogleMapsHtmlInputImpl(
+        googleMapsUriInput = { FakeInputRepository.googleMapsUriInput },
+        googleMapsWebViewInput = { googleMapsWebViewInput },
+        log = FakeLog,
+        engine = MockEngine { throw NotImplementedError() },
+        uriQuote = FakeUriQuote,
+    )
 
     @Test
     fun parse_link() = runTest {
@@ -52,7 +65,7 @@ class GoogleMapsHtmlInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    GoogleMapsWebViewInput,
+                    googleMapsWebViewInput,
                     "https://www.google.com/maps/place/Berlin,+Germany/"
                 )
             ),
@@ -180,7 +193,7 @@ class GoogleMapsHtmlInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    GoogleMapsWebViewInput,
+                    googleMapsWebViewInput,
                     "https://www.google.com/maps/place/Berlin,+Germany/"
                 )
             ),
@@ -193,7 +206,7 @@ class GoogleMapsHtmlInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    GoogleMapsWebViewInput,
+                    googleMapsWebViewInput,
                     "https://www.google.com/maps/place/Berlin,+Germany/"
                 )
             ),
@@ -206,7 +219,7 @@ class GoogleMapsHtmlInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    GoogleMapsUriInput,
+                    FakeInputRepository.googleMapsUriInput,
                     "https://www.google.com/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705%3A0xa9ea51361ed84bda?sa=X&ved=2ahUKEwiY7vv80aeKAxU41QIHHSgBOlsQ4kB6BAgHEAA&hl=de&gl=de"
                 )
             ),
@@ -230,7 +243,7 @@ class GoogleMapsHtmlInputTest : InputTest {
     fun parse_googleSearchHtmlContainsAbsoluteUrl_returnsNextStep() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(GoogleMapsUriInput, "https://www.example.com/foo")
+                nextStep = NextStep(FakeInputRepository.googleMapsUriInput, "https://www.example.com/foo")
             ),
             input.parse("""<html><a href="" data-url="https://www.example.com/foo"></a></html>"""),
         )
@@ -240,7 +253,7 @@ class GoogleMapsHtmlInputTest : InputTest {
     fun parse_googleSearchHtmlContainsInvalidUrl_returnsNextStep() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(GoogleMapsUriInput, "https://example.com//spam")
+                nextStep = NextStep(FakeInputRepository.googleMapsUriInput, "https://example.com//spam")
             ),
             input.parse("""<html><a href="" data-url="spam"></a></html>"""),
         )

@@ -5,11 +5,12 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class WazeUriInputTest : InputTest {
-    private val input = WazeUriInput
+    private val input = FakeInputRepository.wazeUriInput
 
     @Test
     fun match_fullUrl() {
@@ -145,7 +146,7 @@ class WazeUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    WazeHtmlInput,
+                    FakeInputRepository.wazeHtmlInput,
                     "https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020"
                 )
             ),
@@ -154,7 +155,7 @@ class WazeUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    WazeHtmlInput,
+                    FakeInputRepository.wazeHtmlInput,
                     "https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020"
                 )
             ),
@@ -163,7 +164,7 @@ class WazeUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    WazeHtmlInput,
+                    FakeInputRepository.wazeHtmlInput,
                     "https://www.waze.com/live-map/directions/cn-tower-front-st-w-301-toronto?to=place.w.2884104.28644432.6709020"
                 )
             ),
@@ -172,7 +173,7 @@ class WazeUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    WazeHtmlInput,
+                    FakeInputRepository.wazeHtmlInput,
                     "https://www.waze.com/live-map/directions/potsdam-bb-de?to=place.ChIJt9Y6hM31qEcRm-yqC5j4ZcU&from=place.ChIJAVkDPzdOqEcRcDteW0YgIQQ"
                 )
             ),
@@ -185,7 +186,7 @@ class WazeUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    WazeHtmlInput,
+                    FakeInputRepository.wazeHtmlInput,
                     "https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020"
                 )
             ),
@@ -194,7 +195,7 @@ class WazeUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    WazeHtmlInput,
+                    FakeInputRepository.wazeHtmlInput,
                     "https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020"
                 )
             ),

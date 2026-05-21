@@ -249,6 +249,12 @@ To share a text input, run:
 adb -s emulator-5554 shell am start -W -a android.intent.action.SEND -t text/plain -e android.intent.extra.TEXT 'N-68.648556,\ E-152.775879' page.ooooo.geoshare.debug
 ```
 
+### Running against local API server
+
+```shell
+adb reverse tcp:8080 upd:8080
+```
+
 ## Contributing
 
 Contributions are welcome. To claim a bug or feature request, comment on the

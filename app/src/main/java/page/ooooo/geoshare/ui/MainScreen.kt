@@ -80,6 +80,7 @@ import kotlinx.coroutines.launch
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
+import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.di.FakeLinkRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
@@ -123,8 +124,7 @@ import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInput
-import page.ooooo.geoshare.lib.inputs.GoogleMapsWebViewInput
+import page.ooooo.geoshare.lib.inputs.DebugWebViewInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.network.ConnectTimeoutNetworkException
 import page.ooooo.geoshare.lib.outputs.Action
@@ -344,6 +344,10 @@ fun MainScreen(
         onDismissLinkMessage = { linkViewModel.dismissMessage() },
         onDismissUserPreferenceMessage = { userPreferencesViewModel.dismissMessage() },
         onGrant = { doNotAsk -> conversionViewModel.grant(doNotAsk) },
+        onExecute = { action ->
+            conversionViewModel.cancel()
+            conversionViewModel.startAction(action)
+        },
         onHideApp = { packageName -> userPreferencesViewModel.hideApp(resources, packageName) },
         onNavigateToAboutScreen = {
             conversionViewModel.cancel()
@@ -381,10 +385,7 @@ fun MainScreen(
             conversionViewModel.cancel()
             conversionViewModel.reset()
         },
-        onExecute = { action ->
-            conversionViewModel.cancel()
-            conversionViewModel.startAction(action)
-        },
+        onRetry = { conversionViewModel.retry() },
         onStart = { conversionViewModel.start() },
     ) { conversionViewModel.source = it }
 }
@@ -394,7 +395,7 @@ fun MainScreen(
 @Composable
 private fun MainScreen(
     currentState: State,
-    allInputs: List<Input<*>>,
+    allInputs: List<Input>,
     appDetails: AppDetails,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
@@ -429,6 +430,7 @@ private fun MainScreen(
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
     onReset: () -> Unit,
+    onRetry: () -> Unit,
     onExecute: (Action<*>) -> Unit,
     onStart: () -> Unit,
     onUpdateInput: (String) -> Unit,
@@ -519,6 +521,7 @@ private fun MainScreen(
                         onCancel = onCancel,
                         onNavigateToInputsScreen = onNavigateToInputsScreen,
                         onExecute = onExecute,
+                        onRetry = onRetry,
                         onSelect = { index ->
                             onCancel()
                             setSelectedPointIndex(index)
@@ -654,7 +657,7 @@ private fun MainScreen(
     }
 
     when (currentState) {
-        is PermissionRequested<*> -> {
+        is PermissionRequested -> {
             PermissionDialog(
                 title = stringResource(currentState.permissionTitleResId),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
@@ -719,6 +722,7 @@ private fun MainMainPane(
     onCancel: () -> Unit,
     onNavigateToInputsScreen: () -> Unit,
     onExecute: (Action<*>) -> Unit,
+    onRetry: () -> Unit,
     onSelect: (Int?) -> Unit,
     onSetErrorMessageResId: (Int?) -> Unit,
     onStart: () -> Unit,
@@ -737,10 +741,7 @@ private fun MainMainPane(
                 currentState.message,
                 currentState.source,
                 onNavigateToInputsScreen = onNavigateToInputsScreen,
-                onRetry = {
-                    onUpdateInput(currentState.source)
-                    onStart()
-                },
+                onRetry = onRetry,
             )
         }
 
@@ -810,7 +811,7 @@ private fun MainBottomPane(currentState: State) {
 
 @Composable
 private fun MainSupportingPane(
-    allInputs: List<Input<*>>,
+    allInputs: List<Input>,
     appDetails: AppDetails,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
@@ -1009,6 +1010,7 @@ private fun DefaultPreview() {
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onDeny = {},
+            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1020,7 +1022,7 @@ private fun DefaultPreview() {
             onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onExecute = {},
+            onRetry = {},
             onStart = {},
         ) {}
     }
@@ -1059,6 +1061,7 @@ private fun DarkPreview() {
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onDeny = {},
+            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1070,7 +1073,7 @@ private fun DarkPreview() {
             onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onExecute = {},
+            onRetry = {},
             onStart = {},
         ) {}
     }
@@ -1109,6 +1112,7 @@ private fun TabletPreview() {
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onDeny = {},
+            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1120,7 +1124,7 @@ private fun TabletPreview() {
             onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onExecute = {},
+            onRetry = {},
             onStart = {},
         ) {}
     }
@@ -1187,6 +1191,7 @@ private fun SucceededPreview() {
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onDeny = {},
+            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1198,7 +1203,7 @@ private fun SucceededPreview() {
             onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onExecute = {},
+            onRetry = {},
             onStart = {},
         ) {}
     }
@@ -1265,6 +1270,7 @@ private fun DarkSucceededPreview() {
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onDeny = {},
+            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1276,7 +1282,7 @@ private fun DarkSucceededPreview() {
             onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onExecute = {},
+            onRetry = {},
             onStart = {},
         ) {}
     }
@@ -1343,6 +1349,7 @@ private fun SmallSucceededPreview() {
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onDeny = {},
+            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1354,7 +1361,7 @@ private fun SmallSucceededPreview() {
             onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onExecute = {},
+            onRetry = {},
             onStart = {},
         ) {}
     }
@@ -1421,6 +1428,7 @@ private fun TabletSucceededPreview() {
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onDeny = {},
+            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1432,7 +1440,7 @@ private fun TabletSucceededPreview() {
             onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onExecute = {},
+            onRetry = {},
             onStart = {},
         ) {}
     }
@@ -1491,6 +1499,7 @@ private fun DarkTabletSucceededPreview() {
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onDeny = {},
+            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1502,7 +1511,7 @@ private fun DarkTabletSucceededPreview() {
             onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onExecute = {},
+            onRetry = {},
             onStart = {},
         ) {}
     }
@@ -1570,6 +1579,7 @@ private fun AutomationPreview() {
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onDeny = {},
+            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1581,7 +1591,7 @@ private fun AutomationPreview() {
             onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onExecute = {},
+            onRetry = {},
             onStart = {},
         ) {}
     }
@@ -1649,6 +1659,7 @@ private fun DarkAutomationPreview() {
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onDeny = {},
+            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1660,7 +1671,7 @@ private fun DarkAutomationPreview() {
             onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onExecute = {},
+            onRetry = {},
             onStart = {},
         ) {}
     }
@@ -1728,6 +1739,7 @@ private fun TabletAutomationPreview() {
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onDeny = {},
+            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1739,7 +1751,7 @@ private fun TabletAutomationPreview() {
             onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onExecute = {},
+            onRetry = {},
             onStart = {},
         ) {}
     }
@@ -1766,7 +1778,7 @@ private fun WebViewPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://www.example.com/",
-            input = GoogleMapsWebViewInput,
+            input = DebugWebViewInput(),
             permission = Permission.ALWAYS,
         )
         MainScreen(
@@ -1800,6 +1812,7 @@ private fun WebViewPreview() {
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onDeny = {},
+            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1811,7 +1824,7 @@ private fun WebViewPreview() {
             onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onExecute = {},
+            onRetry = {},
             onStart = {},
         ) {}
     }
@@ -1838,7 +1851,7 @@ private fun DarkWebViewPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://www.example.com/",
-            input = GoogleMapsWebViewInput,
+            input = DebugWebViewInput(),
             permission = Permission.ALWAYS,
         )
         MainScreen(
@@ -1872,6 +1885,7 @@ private fun DarkWebViewPreview() {
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onDeny = {},
+            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1883,7 +1897,7 @@ private fun DarkWebViewPreview() {
             onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onExecute = {},
+            onRetry = {},
             onStart = {},
         ) {}
     }
@@ -1910,7 +1924,7 @@ private fun TabletWebViewPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://www.example.com/",
-            input = GoogleMapsWebViewInput,
+            input = DebugWebViewInput(),
             permission = Permission.ALWAYS,
         )
         MainScreen(
@@ -1944,6 +1958,7 @@ private fun TabletWebViewPreview() {
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onDeny = {},
+            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1955,7 +1970,7 @@ private fun TabletWebViewPreview() {
             onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onExecute = {},
+            onRetry = {},
             onStart = {},
         ) {}
     }
@@ -2002,6 +2017,7 @@ private fun ErrorPreview() {
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onDeny = {},
+            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -2013,7 +2029,7 @@ private fun ErrorPreview() {
             onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onExecute = {},
+            onRetry = {},
             onStart = {},
         ) {}
     }
@@ -2060,6 +2076,7 @@ private fun DarkErrorPreview() {
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onDeny = {},
+            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -2071,7 +2088,7 @@ private fun DarkErrorPreview() {
             onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onExecute = {},
+            onRetry = {},
             onStart = {},
         ) {}
     }
@@ -2118,6 +2135,7 @@ private fun TabletErrorPreview() {
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onDeny = {},
+            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -2129,7 +2147,7 @@ private fun TabletErrorPreview() {
             onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onExecute = {},
+            onRetry = {},
             onStart = {},
         ) {}
     }
@@ -2187,6 +2205,7 @@ private fun EmptyPreview() {
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onDeny = {},
+            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -2198,7 +2217,7 @@ private fun EmptyPreview() {
             onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onExecute = {},
+            onRetry = {},
             onStart = {},
         ) {}
     }
@@ -2225,7 +2244,7 @@ private fun LoadingIndicatorPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            input = GoogleMapsHtmlInput,
+            input = FakeInputRepository.googleMapsShortLinkInput,
             permission = Permission.ALWAYS,
             lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )
@@ -2260,6 +2279,7 @@ private fun LoadingIndicatorPreview() {
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onDeny = {},
+            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -2271,7 +2291,7 @@ private fun LoadingIndicatorPreview() {
             onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onExecute = {},
+            onRetry = {},
             onStart = {},
         ) {}
     }
@@ -2298,7 +2318,7 @@ private fun DarkLoadingIndicatorPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            input = GoogleMapsHtmlInput,
+            input = FakeInputRepository.googleMapsShortLinkInput,
             permission = Permission.ALWAYS,
             lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )
@@ -2333,6 +2353,7 @@ private fun DarkLoadingIndicatorPreview() {
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onDeny = {},
+            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -2344,7 +2365,7 @@ private fun DarkLoadingIndicatorPreview() {
             onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onExecute = {},
+            onRetry = {},
             onStart = {},
         ) {}
     }
@@ -2371,7 +2392,7 @@ private fun TabletLoadingIndicatorPreview() {
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            input = GoogleMapsHtmlInput,
+            input = FakeInputRepository.googleMapsShortLinkInput,
             permission = Permission.ALWAYS,
             lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )
@@ -2406,6 +2427,7 @@ private fun TabletLoadingIndicatorPreview() {
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onDeny = {},
+            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -2417,7 +2439,7 @@ private fun TabletLoadingIndicatorPreview() {
             onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onExecute = {},
+            onRetry = {},
             onStart = {},
         ) {}
     }

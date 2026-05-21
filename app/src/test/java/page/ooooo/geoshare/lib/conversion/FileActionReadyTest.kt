@@ -14,11 +14,11 @@ import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
 
 class FileActionReadyTest {
     private val coordinateConverter: CoordinateConverter = mock()
+    private val source = "https://maps.apple.com/foo"
+    private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
 
     @Test
     fun transition_returnsNull() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val action = SavePointsGpxOutput(coordinateConverter).toAction(points)
         val fileUri: Uri = mock()
         val state = FileActionReady(source, points, action, isAutomation = true, fileUri)

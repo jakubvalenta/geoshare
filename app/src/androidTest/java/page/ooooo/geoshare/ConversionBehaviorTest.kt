@@ -91,13 +91,23 @@ class ConversionBehaviorTest : BehaviorTest {
         onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
 
         // Shows precise location
-        assertConversionSucceeded(
-            GCJ02Point(
-                52.4842015, 13.4167277,
-                name = @Suppress("SpellCheckingInspection") "Hasenheide Park",
-                source = Source.URI,
+        try {
+            assertConversionSucceeded(
+                GCJ02Point(
+                    52.4842015, 13.4167277,
+                    name = @Suppress("SpellCheckingInspection") "Hasenheide Park",
+                    source = Source.URI,
+                )
             )
-        )
+        } catch (_: AssertionError) {
+            assertConversionSucceeded(
+                GCJ02Point(
+                    52.4842015, 13.4167277,
+                    name = @Suppress("SpellCheckingInspection") "Parc public Hasenheide",
+                    source = Source.URI,
+                )
+            )
+        }
 
         // Share another Google Maps short link with the app
         shareUri("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA")
@@ -123,13 +133,23 @@ class ConversionBehaviorTest : BehaviorTest {
         }
 
         // Shows precise location
-        assertConversionSucceeded(
-            GCJ02Point(
-                52.4842015, 13.4167277,
-                name = @Suppress("SpellCheckingInspection") "Hasenheide Park",
-                source = Source.URI,
+        try {
+            assertConversionSucceeded(
+                GCJ02Point(
+                    52.4842015, 13.4167277,
+                    name = @Suppress("SpellCheckingInspection") "Hasenheide Park",
+                    source = Source.URI,
+                )
             )
-        )
+        } catch (_: AssertionError) {
+            assertConversionSucceeded(
+                GCJ02Point(
+                    52.4842015, 13.4167277,
+                    name = @Suppress("SpellCheckingInspection") "Parc public Hasenheide",
+                    source = Source.URI,
+                )
+            )
+        }
 
         // Share another Google Maps short link with the app
         shareUri("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA")
@@ -559,9 +579,10 @@ class ConversionBehaviorTest : BehaviorTest {
             onElement { viewIdResourceName == "geoShareResultSuccessSheet" }
                 // Scroll again, because only now can the lazy column pane scroll all the way to the bottom
                 .scrollToElement(Direction.DOWN) {
-                    viewIdResourceName == "geoShareResultSuccessSheetItemHeadline" &&
-                        textAsString() in
-                        setOf("Save GPX route", @Suppress("SpellCheckingInspection") "Enregistrer l’itinéraire GPX")
+                    viewIdResourceName == "geoShareResultSuccessSheetItemHeadline" && textAsString() in setOf(
+                        "Save GPX route",
+                        @Suppress("SpellCheckingInspection") "Enregistrer l’itinéraire GPX",
+                    )
                 }
                 .click()
         }
@@ -602,9 +623,10 @@ class ConversionBehaviorTest : BehaviorTest {
             onElement { viewIdResourceName == "geoShareResultSuccessSheet" }
                 // Scroll again, because only now can the lazy column pane scroll all the way to the bottom
                 .scrollToElement(Direction.DOWN) {
-                    viewIdResourceName == "geoShareResultSuccessSheetItemHeadline" &&
-                        textAsString() in
-                        setOf("Save to contact", @Suppress("SpellCheckingInspection") "Enregistrer dans un contact")
+                    viewIdResourceName == "geoShareResultSuccessSheetItemHeadline" && textAsString() in setOf(
+                        "Save to contact",
+                        @Suppress("SpellCheckingInspection") "Enregistrer dans les contacts",
+                    )
                 }
                 .click()
         }
@@ -622,8 +644,7 @@ class ConversionBehaviorTest : BehaviorTest {
 
     private fun UiAutomatorTestScope.assertPermissionDenied() {
         onElement {
-            viewIdResourceName == "geoShareConversionErrorMessage" &&
-                textAsString() in setOf(
+            viewIdResourceName == "geoShareConversionErrorMessage" && textAsString() in setOf(
                 "This link is not supported without connecting to the map service",
                 @Suppress("SpellCheckingInspection") "Ce lien n’est pas pris en charge sans connexion au service de cartographie",
             )

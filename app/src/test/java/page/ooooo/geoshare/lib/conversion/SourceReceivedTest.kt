@@ -7,8 +7,7 @@ import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.inputs.GeoUriInput
-import page.ooooo.geoshare.lib.inputs.GoogleMapsUriInput
+import page.ooooo.geoshare.data.di.FakeInputRepository
 
 class SourceReceivedTest {
     private val resources: Resources = mock {
@@ -16,7 +15,7 @@ class SourceReceivedTest {
         on { getString(R.string.conversion_failed_unsupported_service) } doReturn "Unsupported map service"
     }
     private val stateContext: ConversionStateContext = mock {
-        on { inputs } doReturn listOf(GeoUriInput, GoogleMapsUriInput)
+        on { inputs } doReturn listOf(FakeInputRepository.geoUriInput, FakeInputRepository.osmAndUriInput)
         on { this@on.resources } doReturn resources
     }
 
@@ -35,28 +34,28 @@ class SourceReceivedTest {
         val source = "geo:1,2?q="
         val state = SourceReceived(stateContext, source)
         assertEquals(
-            InputFound(stateContext, source, match = source, GeoUriInput, permission = null),
+            InputFound(stateContext, source, match = source, FakeInputRepository.geoUriInput, permission = null),
             state.transition(),
         )
     }
 
     @Test
     fun transition_whenSourceHasUriInTheMiddle_returnsInputFound() = runTest {
-        val source = "FOO\nhttps://maps.google.com/foo\nBAR"
-        val match = "https://maps.google.com/foo"
+        val source = "FOO\nhttps://www.osmand.net/foo\nBAR"
+        val match = "https://www.osmand.net/foo"
         val state = SourceReceived(stateContext, source)
         assertEquals(
-            InputFound(stateContext, source, match, GoogleMapsUriInput, permission = null),
+            InputFound(stateContext, source, match, FakeInputRepository.osmAndUriInput, permission = null),
             state.transition(),
         )
     }
 
     @Test
     fun transition_whenSourceMatchesAnInput_returnsInputFound() = runTest {
-        val source = "https://maps.google.com/foo"
+        val source = "https://www.osmand.net/foo"
         val state = SourceReceived(stateContext, source)
         assertEquals(
-            InputFound(stateContext, source, match = source, GoogleMapsUriInput, permission = null),
+            InputFound(stateContext, source, match = source, FakeInputRepository.osmAndUriInput, permission = null),
             state.transition(),
         )
     }
