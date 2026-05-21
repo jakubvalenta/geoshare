@@ -144,7 +144,7 @@ class PermissionGrantedBasicInputTest {
             dispatcher = testScheduler,
         )
         assertEquals(
-            ConversionFailed(resources.getString(R.string.conversion_failed_cancelled), source),
+            ConversionFailed(source, resources.getString(R.string.conversion_failed_cancelled)),
             state.transition(),
         )
     }
@@ -188,8 +188,8 @@ class PermissionGrantedBasicInputTest {
         )
         assertEquals(
             ConversionFailed(
-                resources.getString(R.string.conversion_failed_reason_invalid_url),
                 source,
+                resources.getString(R.string.conversion_failed_reason_invalid_url),
             ),
             state.transition(),
         )
@@ -354,8 +354,8 @@ class PermissionGrantedBasicInputTest {
             val workDuration = testScheduler.timeSource.measureTime {
                 assertEquals(
                     ConversionFailed(
-                        resources.getString(R.string.network_exception_eof),
                         source,
+                        resources.getString(R.string.network_exception_eof),
                     ),
                     state.transition(),
                 )
@@ -406,8 +406,8 @@ class PermissionGrantedBasicInputTest {
         )
         assertEquals(
             ConversionFailed(
-                resources.getString(R.string.network_exception_response_error, HttpStatusCode.NotFound.value),
                 source,
+                resources.getString(R.string.network_exception_response_error, HttpStatusCode.NotFound.value),
             ),
             state.transition(),
         )

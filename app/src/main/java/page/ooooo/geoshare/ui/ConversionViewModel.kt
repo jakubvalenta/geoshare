@@ -95,11 +95,11 @@ class ConversionViewModel @Inject constructor(
                 }
                 stateContext.transition()
             } catch (tr: Exception) {
-                stateContext.log.e(TAG, "Exception while transitioning state", tr)
-                stateContext.log.e(TAG, tr.stackTraceToString())
+                stateContext.log.e(TAG, "Exception when transitioning state", tr)
                 stateContext.currentState = ConversionFailed(
-                    stateContext.resources.getString(R.string.conversion_failed_reason_exception),
                     source,
+                    stateContext.resources.getString(R.string.conversion_failed_reason_exception),
+                    details = "${tr.message}\n${tr.stackTraceToString()}",
                 )
             }
         }
