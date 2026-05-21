@@ -3,7 +3,6 @@ package page.ooooo.geoshare.lib.inputs
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
@@ -17,10 +16,13 @@ import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object GeoUriInput : UriInput, Input.HasRandomUri {
-    private const val NAME_REGEX = """\((.+)\)"""
-
+@Singleton
+class GeoUriInput @Inject constructor(
+    override val uriQuote: UriQuote,
+) : UriInput, Input.HasRandomUri {
     override val pattern = Regex("""(geo:$URI_REST)""")
     override val documentation = InputDocumentation(
         group = InputDocumentationGroup.GEO_URI,
@@ -31,13 +33,7 @@ object GeoUriInput : UriInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parse(
-        data: Uri,
-        match: String,
-        prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
-    ) = buildParseResult {
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
         data.run {
             val z = Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()
 
@@ -76,4 +72,8 @@ object GeoUriInput : UriInput, Input.HasRandomUri {
         UriFormatter.formatUriString(point, "geo:{lat},{lon}?z={z}&q={lat},{lon}({name})")
 
     override fun toString() = "GeoUriInput"
+
+    private companion object {
+        private const val NAME_REGEX = """\((.+)\)"""
+    }
 }

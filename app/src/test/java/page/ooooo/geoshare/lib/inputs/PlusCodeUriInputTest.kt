@@ -5,11 +5,12 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assume.assumeTrue
 import org.junit.Test
+import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 
 class PlusCodeUriInputTest : InputTest {
-    private val input = PlusCodeInput
+    private val input = FakeInputRepository.plusCodeInput
 
     @Test
     fun match_globalCode() {

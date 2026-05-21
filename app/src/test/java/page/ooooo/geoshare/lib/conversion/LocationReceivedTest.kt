@@ -14,12 +14,12 @@ import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 
 class LocationReceivedTest {
     private val coordinateConverter: CoordinateConverter = mock()
+    private val source = "https://maps.google.com/foo"
+    private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+    private val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter).toAction(points.last())
 
     @Test
     fun transition_whenLocationIsNull_returnsLocationFindingFailed() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter).toAction(points.last())
         val state = LocationReceived(source, points, action, isAutomation = false, location = null)
         assertEquals(
             LocationFindingFailed(source, points, ActionResult.Failed),
@@ -29,9 +29,6 @@ class LocationReceivedTest {
 
     @Test
     fun transition_whenLocationIsNotNull_returnsLocationActionReady() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter).toAction(points.last())
         val location = WGS84Point(3.0, 4.0, source = Source.GENERATED)
         val state = LocationReceived(source, points, action, isAutomation = false, location)
         assertEquals(

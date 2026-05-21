@@ -1,8 +1,7 @@
 package page.ooooo.geoshare.lib.network
 
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.HttpClientEngine
-import io.ktor.client.engine.cio.CIO
+import io.ktor.client.HttpClientConfig
 import io.ktor.client.network.sockets.ConnectTimeoutException
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.HttpResponseValidator
@@ -11,18 +10,18 @@ import io.ktor.client.plugins.RedirectResponseException
 import io.ktor.client.plugins.ResponseException
 import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.plugins.UserAgent
-import io.ktor.client.plugins.cookies.ConstantCookiesStorage
+import io.ktor.client.plugins.cookies.CookiesStorage
 import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.request.get
 import io.ktor.client.request.head
 import io.ktor.client.statement.request
-import io.ktor.http.Cookie
 import io.ktor.http.HttpHeaders
 import io.ktor.network.sockets.SocketTimeoutException
 import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.io.EOFException
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.Log
+import java.net.ConnectException
 import java.net.URL
 
 const val DESKTOP_USER_AGENT =
@@ -34,43 +33,74 @@ const val SOCKET_TIMEOUT = 128_000L
 private const val TAG = "HttpClient"
 
 /**
- * HTTP client with useful basic configuration including the wrapping of exceptions in [NetworkException].
- *
- * For request to map services, you should always use this HTTP client instead of the default unconfigured one.
+ * Makes a HEAD request to [url] and returns the value of the response Location header.
  */
-fun HttpClient(engine: HttpClientEngine = CIO.create(), log: Log = DefaultLog): HttpClient = HttpClient(engine) {
-    expectSuccess = true
-
-    // Bypass consent page https://stackoverflow.com/a/78115353
-    install(HttpCookies) {
-        storage = ConstantCookiesStorage(
-            Cookie(
-                name = "CONSENT",
-                value = "PENDING+987",
-                domain = "www.google.com",
-            ),
-            @Suppress("SpellCheckingInspection")
-            Cookie(
-                name = "SOCS",
-                value = "CAESHAgBEhJnd3NfMjAyMzA4MTAtMF9SQzIaAmRlIAEaBgiAo_CmBg",
-                domain = "www.google.com",
-            ),
-        )
+@Throws(NetworkException::class)
+suspend fun HttpClient.headLocationHeader(url: URL): String =
+    config {
+        followRedirects = false
+    }.use { client ->
+        try {
+            client.head(url)
+        } catch (e: RedirectResponseException) {
+            // Expect that the request returns 3xx
+            e.response
+        } catch (e: ResponseNetworkException) {
+            // Expect that the request returns 3xx; version for when the exception is wrapped in NetworkException
+            (e.cause as? RedirectResponseException)?.response ?: throw e
+        }
+            .headers[HttpHeaders.Location] ?: throw MissingHeaderNetworkException()
     }
+
+/**
+ * Makes a GET request to [url], follows all redirects, and returns the final URL that the request redirected to.
+ */
+@Throws(NetworkException::class)
+suspend fun HttpClient.getLastHopUrlString(url: URL): String =
+    get(url).request.url.toString()
+
+fun HttpClientConfig<*>.setCookies(cookies: CookiesStorage?) {
+    if (cookies != null) {
+        install(HttpCookies) {
+            storage = cookies
+        }
+    }
+}
+
+fun HttpClientConfig<*>.setUserAgent(userAgent: String?) {
+    if (userAgent != null) {
+        install(UserAgent) {
+            agent = userAgent
+        }
+    }
+}
+
+/**
+ * Sets timeouts to values that are suited for slow internet connection.
+ */
+fun HttpClientConfig<*>.setDefaultTimeouts() {
     install(HttpTimeout) {
         requestTimeoutMillis = REQUEST_TIMEOUT
         connectTimeoutMillis = CONNECT_TIMEOUT
         socketTimeoutMillis = SOCKET_TIMEOUT
     }
-    // Set custom User-Agent, so that we don't receive Google Lite HTML, which doesn't contain coordinates in
-    // case of Google Maps or maps link in case of Google Search.
-    install(UserAgent) {
-        // Use custom user agent, because BrowserUserAgent() shows unsupported browser error in Apple Maps.
-        agent = DESKTOP_USER_AGENT
-    }
+}
+
+/**
+ * Configures [HttpClient] to rethrow all exceptions as [NetworkException], so the caller can decide whether to retry a
+ * request based on whether the exception is [RecoverableNetworkException] or [UnrecoverableNetworkException].
+ */
+fun HttpClientConfig<*>.rethrowExceptionsAsNetworkException(log: Log = DefaultLog) {
     HttpResponseValidator {
         handleResponseExceptionWithRequest { cause, request ->
             when (cause) {
+                is NetworkException -> {
+                    // If the exception already is NetworkException, it probably means that it comes from another HTTP
+                    // client created inside this HttpClient. Then we must throw the NetworkException cause, otherwise
+                    // the original cause ends up wrapped in NetworkException twice for some reason
+                    throw cause.cause ?: cause
+                }
+
                 is UnresolvedAddressException -> {
                     log.w(TAG, "Unresolved address for ${request.url}", cause)
                     throw UnresolvedAddressNetworkException(cause)
@@ -91,6 +121,11 @@ fun HttpClient(engine: HttpClientEngine = CIO.create(), log: Log = DefaultLog): 
                     throw ConnectTimeoutNetworkException(cause)
                 }
 
+                is ConnectException -> {
+                    log.w(TAG, "Connection refused for ${request.url}", cause)
+                    throw ConnectionRefusedNetworkException(cause)
+                }
+
                 is EOFException -> {
                     log.w(TAG, "EOF exception for ${request.url}", cause)
                     throw ConnectionClosedNetworkException(cause)
@@ -98,13 +133,13 @@ fun HttpClient(engine: HttpClientEngine = CIO.create(), log: Log = DefaultLog): 
 
                 is ServerResponseException -> {
                     log.w(TAG, "Server error ${cause.response.status} for ${request.url}", cause)
-                    throw ServerResponseNetworkException(cause.response.status, cause)
+                    throw ServerResponseNetworkException(cause.response, cause)
                 }
 
                 is ResponseException -> {
                     // Catches also subclasses such as RedirectResponseException and ClientRequestException
                     log.w(TAG, "Unexpected response code ${cause.response.status} for ${request.url}", cause)
-                    throw ResponseNetworkException(cause.response.status, cause)
+                    throw ResponseNetworkException(cause.response, cause)
                 }
 
                 else -> {
@@ -115,25 +150,3 @@ fun HttpClient(engine: HttpClientEngine = CIO.create(), log: Log = DefaultLog): 
         }
     }
 }
-
-/**
- * Makes a HEAD request to [url] and returns the value of the response Location header.
- */
-@Throws(NetworkException::class)
-suspend fun HttpClient.headLocationHeader(url: URL): String =
-    config { followRedirects = false }.run {
-        try {
-            head(url)
-        } catch (e: ResponseNetworkException) {
-            // Expect that the request returns 3xx
-            (e.cause as? RedirectResponseException)?.response ?: throw e
-        }
-            .headers[HttpHeaders.Location] ?: throw MissingHeaderNetworkException()
-    }
-
-/**
- * Makes a GET request to [url], follows all redirects, and returns the final URL that the request redirected to.
- */
-@Throws(NetworkException::class)
-suspend fun HttpClient.getLastHopUrlString(url: URL): String =
-    get(url).request.url.toString()

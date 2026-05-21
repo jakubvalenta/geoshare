@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
@@ -13,13 +12,19 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * 2GIS / Urbi input.
  *
  * We call it Urbi, because 2GIS starts with a number, so it couldn't be used as a class name.
  */
-object UrbiUriInput : UriInput, Input.HasRandomUri {
+@Singleton
+class UrbiUriInput @Inject constructor(
+    private val urbiHtmlInput: dagger.Lazy<UrbiHtmlInput>,
+    override val uriQuote: UriQuote,
+) : UriInput, Input.HasRandomUri {
     override val pattern =
         Regex("""((?:https?://)?(?:www\.)?(?:(?:go|maps)\.)?(?:2gis|urbi|urbi-[a-z]{2})(?:\.[a-z]{2,3})?\.[a-z]{2,3}/$URI_REST)""")
     override val documentation = InputDocumentation(
@@ -51,13 +56,7 @@ object UrbiUriInput : UriInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parse(
-        data: Uri,
-        match: String,
-        prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
-    ) = buildParseResult {
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
         data.run {
             // Marker
             // https://maps.urbi.ae/dubai/geo/{lon}%2C{lat}?m={lon},{lat}/{z}
@@ -87,7 +86,7 @@ object UrbiUriInput : UriInput, Input.HasRandomUri {
                 return@run
             }
 
-            nextStep = NextStep(UrbiHtmlInput, match)
+            nextStep = NextStep(urbiHtmlInput.get(), match)
         }
     }
 

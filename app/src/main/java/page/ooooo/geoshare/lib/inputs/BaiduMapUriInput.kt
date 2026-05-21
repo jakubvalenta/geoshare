@@ -2,7 +2,6 @@ package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.find
@@ -13,13 +12,14 @@ import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
 import page.ooooo.geoshare.lib.geo.Source
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object BaiduMapUriInput : UriInput {
-    private const val X = """(\d+(?:\.\d+)?)"""
-    private const val Y = """(\d+(?:\.\d+)?)"""
-    private const val CENTER = """@$X,$Y,${Z}z.*"""
-    private const val WAYPOINT = """1\$\$\$\$$X,$Y\$\$([^$]+)"""
-
+@Singleton
+class BaiduMapUriInput @Inject constructor(
+    private val baiduMapWebViewInput: dagger.Lazy<BaiduMapWebViewInput>,
+    override val uriQuote: UriQuote,
+) : UriInput {
     override val pattern = Regex("""((?:https?://)?(?:j\.)?map\.baidu\.com/$URI_REST)""")
 
     override val documentation = InputDocumentation(
@@ -30,13 +30,7 @@ object BaiduMapUriInput : UriInput {
     )
 
     @Suppress("SpellCheckingInspection")
-    override suspend fun parse(
-        data: Uri,
-        match: String,
-        prevResult: ParseResult?,
-        uriQuote: UriQuote,
-        log: Log,
-    ) = buildParseResult {
+    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
         data.run {
             val parts = data.pathParts.drop(1)
             val firstPart = parts.firstOrNull() ?: return@run
@@ -51,7 +45,7 @@ object BaiduMapUriInput : UriInput {
                     // https://map.baidu.com/?poiShareId={id}
                     // https://map.baidu.com/?shareurl=1&poiShareUid={uid}
                     // https://map.baidu.com/?newmap=1&s=inf%26uid%3D{uid}
-                    nextStep = NextStep(BaiduMapWebViewInput, match)
+                    nextStep = NextStep(baiduMapWebViewInput.get(), match)
                 }
 
             } else if (firstPart.startsWith('@')) {
@@ -95,11 +89,18 @@ object BaiduMapUriInput : UriInput {
                     ?: run {
                         // Mobile place detail without coords
                         // "https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid={uid}/act=read_share&vt=map&da_from=weixin&openna=1"
-                        nextStep = NextStep(BaiduMapWebViewInput, match)
+                        nextStep = NextStep(baiduMapWebViewInput.get(), match)
                     }
             }
         }
     }
 
     override fun toString() = "BaiduMapUriInput"
+
+    private companion object {
+        private const val X = """(\d+(?:\.\d+)?)"""
+        private const val Y = """(\d+(?:\.\d+)?)"""
+        private const val CENTER = """@$X,$Y,${Z}z.*"""
+        private const val WAYPOINT = """1\$\$\$\$$X,$Y\$\$([^$]+)"""
+    }
 }

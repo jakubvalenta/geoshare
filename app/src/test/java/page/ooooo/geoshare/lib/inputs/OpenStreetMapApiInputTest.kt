@@ -4,11 +4,12 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class OpenStreetMapApiInputTest : InputTest {
-    private val input = OpenStreetMapApiInput
+    private val input = FakeInputRepository.openStreetMapApiInput
 
     @Test
     fun parse_node() = runTest {

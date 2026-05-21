@@ -14,11 +14,12 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
 
 class LocationFindingFailedTest {
+    private val source = "https://maps.apple.com/foo"
+    private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+    private val actionResult = ActionResult.Failed
+
     @Test
     fun locationFindingFailed_executionIsNotCancelled_waitsAndReturnsActionFinished() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val actionResult = ActionResult.Failed
         val state = LocationFindingFailed(source, points, actionResult)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
@@ -31,9 +32,6 @@ class LocationFindingFailedTest {
 
     @Test
     fun locationFindingFailed_executionIsCancelled_returnsActionFinished() = runTest {
-        val source = "https://maps.google.com/foo"
-        val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-        val actionResult = ActionResult.Failed
         val state = LocationFindingFailed(source, points, actionResult)
         var res: State? = null
         val job = launch {

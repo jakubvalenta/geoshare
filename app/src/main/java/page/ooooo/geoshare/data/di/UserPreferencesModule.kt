@@ -14,7 +14,6 @@ import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
-import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.seconds
 
@@ -30,7 +29,7 @@ interface UserPreferencesModule {
     ): UserPreferencesRepository
 }
 
-class FakeUserPreferencesRepository @Inject constructor() : UserPreferencesRepository {
+class FakeUserPreferencesRepository : UserPreferencesRepository {
     override val values: Flow<UserPreferencesValues> = flowOf(defaultFakeUserPreferences)
 
     override suspend fun <T> getValue(userPreference: UserPreference<T>): T {

@@ -5,11 +5,12 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class YandexMapsUriInputTest : InputTest {
-    private val input = YandexMapsUriInput
+    private val input = FakeInputRepository.yandexMapsUriInput
 
     @Test
     fun match_fullUrl() {
@@ -151,7 +152,7 @@ class YandexMapsUriInputTest : InputTest {
                     )
                 ),
                 nextStep = NextStep(
-                    YandexMapsHtmlInput,
+                    FakeInputRepository.yandexMapsHtmlInput,
                     "https://yandex.ru/maps/213/moscow/geo/keramicheskiy_proyezd/8062907/"
                 )
             ),
@@ -160,7 +161,7 @@ class YandexMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    YandexMapsHtmlInput,
+                    FakeInputRepository.yandexMapsHtmlInput,
                     "https://yandex.com/maps/org/94933420809"
                 )
             ),
@@ -169,7 +170,7 @@ class YandexMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    YandexMapsHtmlInput,
+                    FakeInputRepository.yandexMapsHtmlInput,
                     "https://yandex.com/maps/org/94933420809/"
                 )
             ),
@@ -178,7 +179,7 @@ class YandexMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 nextStep = NextStep(
-                    YandexMapsHtmlInput,
+                    FakeInputRepository.yandexMapsHtmlInput,
                     "https://yandex.com/maps/org/94933420809?spam"
                 )
             ),
