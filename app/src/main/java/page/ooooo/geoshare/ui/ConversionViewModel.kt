@@ -14,6 +14,7 @@ import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import androidx.lifecycle.viewmodel.compose.saveable
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -78,30 +79,26 @@ class ConversionViewModel @Inject constructor(
     var source by savedStateHandle.saveable("source") { mutableStateOf("") }
 
     private var transitionJob: Job? = null
+    private val transitionExceptionHandler = CoroutineExceptionHandler { _, tr ->
+        stateContext.log.e(TAG, "Exception when transitioning state", tr)
+        stateContext.currentState = ConversionFailed(
+            source,
+            stateContext.resources.getString(R.string.conversion_failed_reason_exception),
+            details = tr.stackTraceToString(),
+        )
+    }
 
     // Methods
 
     fun start() {
-        stateContext.currentState = SourceReceived(stateContext, source)
-        transition()
+        transition { SourceReceived(stateContext, source) }
     }
 
-    private fun transition(initialState: (suspend () -> State?)? = null) {
+    private fun transition(initialState: (suspend () -> State)) {
         transitionJob?.cancel()
-        transitionJob = viewModelScope.launch {
-            try {
-                if (initialState != null) {
-                    stateContext.currentState = initialState() ?: return@launch
-                }
-                stateContext.transition()
-            } catch (tr: Exception) {
-                stateContext.log.e(TAG, "Exception when transitioning state", tr)
-                stateContext.currentState = ConversionFailed(
-                    source,
-                    stateContext.resources.getString(R.string.conversion_failed_reason_exception),
-                    details = "${tr.message}\n${tr.stackTraceToString()}",
-                )
-            }
+        transitionJob = viewModelScope.launch(transitionExceptionHandler) {
+            stateContext.currentState = initialState()
+            stateContext.transition()
         }
     }
 
