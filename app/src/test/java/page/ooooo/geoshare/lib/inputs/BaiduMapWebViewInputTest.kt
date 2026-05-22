@@ -91,7 +91,7 @@ class BaiduMapWebViewInputTest : InputTest {
     }
 
     @Test
-    fun parse_whenDataIsValidJsonButHasUnexpectedPropertyType_returnsEmptyResult() = runTest {
+    fun parse_whenDataIsValidJsonButHasUnexpectedPropertyType_returnsNoPoints() = runTest {
         for (data in listOf(
             // language=Json
             """{"lat":  "spam"}""",
@@ -128,7 +128,7 @@ class BaiduMapWebViewInputTest : InputTest {
     }
 
     @Test
-    fun parse_whenDataIsInvalidJson_returnsEmptyResult() = runTest {
+    fun parse_whenDataIsInvalidJson_returnsNoPoints() = runTest {
         for (data in listOf(
             "{",
             """{"trailingComma": 0,}""",
