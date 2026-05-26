@@ -24,25 +24,14 @@ class OpenStreetMapApiInput @Inject constructor(
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_open_street_map_loading_indicator_title
 
-    override suspend fun parse(data: String, match: String, prevResult: ParseResult?) = parseResult {
+    override suspend fun parse(data: String, match: String) = parseResult {
         // Use a simple regex instead of JSON parsing, because it works fine
         val pattern = Regex(""""lat":$LAT,"lon":$LON""")
 
-        val mutablePoints = mutableListOf<WGS84Point>()
-        val name = prevResult?.points?.lastOrNull()?.name
-
-        mutablePoints.addAll(
-            pattern.findAll(data)
-                .mapNotNull { m -> m.toLatLonPoint(Source.API)?.let { WGS84Point(it) } }
-        )
-
-        if (name != null) {
-            mutablePoints.removeLastOrNull()?.let { lastPoint ->
-                mutablePoints.add(lastPoint.copy(name = name))
-            }
-        }
-
-        points = mutablePoints.toImmutableList()
+        points = pattern
+            .findAll(data)
+            .mapNotNull { m -> m.toLatLonPoint(Source.API)?.let { WGS84Point(it) } }
+            .toImmutableList()
     }
 
     override fun toString() = "OpenStreetMapApiInput"

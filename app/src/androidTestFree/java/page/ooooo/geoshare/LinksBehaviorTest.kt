@@ -12,7 +12,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
-@RunWith(AndroidJUnit4::class)
 class LinksBehaviorTest : BehaviorTest {
     @Test
     fun whenLinkIsInserted_allowsCopyingIt() = uiAutomator {

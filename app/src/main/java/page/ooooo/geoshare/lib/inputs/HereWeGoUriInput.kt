@@ -33,7 +33,7 @@ class HereWeGoUriInput @Inject constructor(
     )
 
     @OptIn(ExperimentalEncodingApi::class)
-    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
+    override suspend fun parse(data: Uri, match: String) = parseResult {
         data.run {
             val parts = data.pathParts.drop(1)
             val firstPart = parts.firstOrNull() ?: return@run
@@ -47,7 +47,7 @@ class HereWeGoUriInput @Inject constructor(
                     val z = Regex(""".*,$Z""").matchEntire(queryParams["map"])?.doubleGroupOrNull()
                     if (firstPart == "l") {
                         LAT_LON_PATTERN.matchEntire(secondPart)?.toLatLonPoint(Source.URI)?.let {
-                            points = persistentListOf(WGS84Point(it).copy(z = z))
+                            points = persistentListOf(WGS84Point(it, z))
                         }
                     } else if (firstPart == "p") {
                         Regex("""[a-z]-($SIMPLIFIED_BASE64)""").matchEntire(secondPart)

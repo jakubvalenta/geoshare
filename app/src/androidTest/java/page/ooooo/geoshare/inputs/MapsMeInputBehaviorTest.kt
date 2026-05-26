@@ -27,8 +27,12 @@ class MapsMeInputBehaviorTest : InputBehaviorTest {
 
         // Organic Maps short link
         testUri(
-            @Suppress("SpellCheckingInspection")
-            WGS84Point(40.7127405, -74.005997, z = 9.0, name = "Nova Iorque", source = Source.HASH),
+            WGS84Point(
+                40.7127405, -74.005997,
+                z = 9.0,
+                name = @Suppress("SpellCheckingInspection") "Nova Iorque",
+                source = Source.HASH
+            ),
             "https://omaps.app/Umse5f0H8a/Nova_Iorque",
         )
 

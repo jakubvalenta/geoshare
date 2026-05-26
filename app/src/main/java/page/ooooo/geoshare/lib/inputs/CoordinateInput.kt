@@ -28,7 +28,7 @@ class CoordinateInput @Inject constructor() : TextInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parse(data: String, match: String, prevResult: ParseResult?) = parseResult {
+    override suspend fun parse(data: String, match: String) = parseResult {
         // Decimal
         // e.g. `N 41.40338, E 2.17403`
         Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""")

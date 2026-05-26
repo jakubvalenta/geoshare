@@ -1,6 +1,5 @@
 package page.ooooo.geoshare
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.UiAutomatorTestScope
 import androidx.test.uiautomator.scrollToElement
@@ -12,7 +11,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import org.junit.runner.RunWith
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
@@ -22,7 +20,6 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import kotlin.time.Duration.Companion.seconds
 
-@RunWith(AndroidJUnit4::class)
 class ConversionBehaviorTest : BehaviorTest {
     @Test
     fun whenFullUriIsShared_showsPointAndAllowsOpeningGoogleMaps() = uiAutomator {
@@ -35,7 +32,7 @@ class ConversionBehaviorTest : BehaviorTest {
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
         // Shows precise location
-        assertConversionSucceeded(GCJ02Point(52.5067296, 13.2599309, z = 11.0, source = Source.MAP_CENTER))
+        assertConversionSucceeded(WGS84Point(52.5067296, 13.2599309, z = 11.0, source = Source.MAP_CENTER))
 
         // Tap the Google Maps icon
         onElement { viewIdResourceName == "geoShareApp_${PackageNames.GOOGLE_MAPS}" }.click()
@@ -83,33 +80,19 @@ class ConversionBehaviorTest : BehaviorTest {
             assumeDomainResolvable("maps.google.com")
         }
 
-        // Share a Google Maps short link with the app
-        shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
+        // Share a short link with the app
+        shareUri("https://maps.apple/p/7E-Brjrk_THN14")
 
         // Grant connection permission
         onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
 
         // Shows precise location
-        try {
-            assertConversionSucceeded(
-                GCJ02Point(
-                    52.4842015, 13.4167277,
-                    name = @Suppress("SpellCheckingInspection") "Hasenheide Park",
-                    source = Source.URI,
-                )
-            )
-        } catch (_: AssertionError) {
-            assertConversionSucceeded(
-                GCJ02Point(
-                    52.4842015, 13.4167277,
-                    name = @Suppress("SpellCheckingInspection") "Parc public Hasenheide",
-                    source = Source.URI,
-                )
-            )
-        }
+        assertConversionSucceeded(
+            WGS84Point(52.4737758, 13.4373898, source = Source.HTML),
+        )
 
-        // Share another Google Maps short link with the app
-        shareUri("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA")
+        // Share a short link with the app again
+        shareUri("https://maps.apple/p/7E-Brjrk_THN14")
         waitForStableInActiveWindow()
 
         // Connection permission dialog is visible again
@@ -119,11 +102,11 @@ class ConversionBehaviorTest : BehaviorTest {
     @Test
     fun whenShortLinkIsSharedAndPermissionIsGrantedWithDoNotAsk_showsPointAndDoesNotShowDialogAgain() = uiAutomator {
         runBlocking {
-            assumeDomainResolvable("maps.google.com")
+            assumeDomainResolvable("maps.apple.com")
         }
 
-        // Share a Google Maps short link with the app
-        shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
+        // Share a short link with the app
+        shareUri("https://maps.apple/p/7E-Brjrk_THN14")
 
         // Grant connection permission and check "Don't ask me again"
         onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
@@ -132,46 +115,28 @@ class ConversionBehaviorTest : BehaviorTest {
         }
 
         // Shows precise location
-        try {
-            assertConversionSucceeded(
-                GCJ02Point(
-                    52.4842015, 13.4167277,
-                    name = @Suppress("SpellCheckingInspection") "Hasenheide Park",
-                    source = Source.URI,
-                )
-            )
-        } catch (_: AssertionError) {
-            assertConversionSucceeded(
-                GCJ02Point(
-                    52.4842015, 13.4167277,
-                    name = @Suppress("SpellCheckingInspection") "Parc public Hasenheide",
-                    source = Source.URI,
-                )
-            )
-        }
+        assertConversionSucceeded(
+            WGS84Point(52.4737758, 13.4373898, source = Source.HTML),
+        )
 
-        // Share another Google Maps short link with the app
-        shareUri("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA")
+        // Share a short link with the app again
+        shareUri("https://maps.apple/p/7E-Brjrk_THN14")
         quickWaitForStableInActiveWindow()
 
         // Shows precise location again
         assertConversionSucceeded(
-            GCJ02Point(
-                44.4490541, 26.0888398,
-                name = "RAI - Romantic & Intimate",
-                source = Source.URI,
-            )
+            WGS84Point(52.4737758, 13.4373898, source = Source.HTML),
         )
     }
 
     @Test
     fun whenShortLinkIsSharedAndPermissionIsDeniedWithoutDoNotAsk_closesDialogAndShowsDialogAgain() = uiAutomator {
         runBlocking {
-            assumeDomainResolvable("maps.google.com")
+            assumeDomainResolvable("maps.apple.com")
         }
 
         // Share a Google Maps short link with the app
-        shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
+        shareUri("https://maps.apple/p/7E-Brjrk_THN14")
 
         // Deny connection permission
         onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.dismissDialog()
@@ -180,7 +145,7 @@ class ConversionBehaviorTest : BehaviorTest {
         assertPermissionDenied()
 
         // Share the Google Maps short link with the app again
-        shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
+        shareUri("https://maps.apple/p/7E-Brjrk_THN14")
 
         // Connection permission dialog is visible again
         onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }
@@ -189,11 +154,11 @@ class ConversionBehaviorTest : BehaviorTest {
     @Test
     fun whenShortLinkIsSharedAndPermissionIsDeniedWithDoNotAsk_closesDialogAndDoesNotShowDialogAgain() = uiAutomator {
         runBlocking {
-            assumeDomainResolvable("maps.google.com")
+            assumeDomainResolvable("maps.apple")
         }
 
         // Share a Google Maps short link with the app
-        shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
+        shareUri("https://maps.apple/p/7E-Brjrk_THN14")
 
         // Deny connection permission
         onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
@@ -205,7 +170,7 @@ class ConversionBehaviorTest : BehaviorTest {
         assertPermissionDenied()
 
         // Share the Google Maps short link with the app again
-        shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
+        shareUri("https://maps.apple/p/7E-Brjrk_THN14")
 
         // Shows permission denied error
         assertPermissionDenied()
@@ -326,162 +291,6 @@ class ConversionBehaviorTest : BehaviorTest {
             // Shows permission denied error
             assertPermissionDenied()
         }
-
-    @Test
-    fun whenLinkWithPlaceOnlyIsSharedAndPermissionIsGrantedWithoutDoNotAsk_showsPointAndShowsDialogAgain() =
-        uiAutomator {
-            runBlocking {
-                assumeDomainResolvable("maps.google.com")
-            }
-
-            // Share a Google Maps place link with the app
-            shareUri("https://www.google.com/maps/place/Hermannstr.+10,+Berlin/")
-
-            // Grant connection permission
-            onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
-
-            // Shows precise location
-            assertConversionSucceeded(
-                GCJ02Point(
-                    52.4848232, 13.4240791,
-                    name = @Suppress("SpellCheckingInspection") "Hermannstraße 10, 12049 Berlin",
-                    source = Source.URI,
-                )
-            )
-
-            // Share another Google Maps place link with the app
-            shareUri("https://www.google.com/maps/place/Hermannstr.+11,+Berlin/")
-            quickWaitForStableInActiveWindow()
-
-            // Connection permission dialog is visible again
-            onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }
-        }
-
-    @Test
-    fun whenLinkWithPlaceOnlyIsSharedAndPermissionIsGrantedWithDoNotAsk_showsPointAndDoesNotShowDialogAgain() =
-        uiAutomator {
-            runBlocking {
-                assumeDomainResolvable("maps.google.com")
-            }
-
-            // Share a Google Maps place link with the app
-            shareUri("https://www.google.com/maps/place/Hermannstr.+20,+Berlin/")
-
-            // Grant connection permission and check "Don't ask me again"
-            onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
-                toggleDoNotAsk()
-                confirmDialog()
-            }
-
-            // Shows precise location
-            assertConversionSucceeded(
-                GCJ02Point(
-                    52.4834254, 13.4245399,
-                    name = @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin",
-                    source = Source.URI,
-                ),
-            )
-
-            // Share another Google Maps place link with the app
-            shareUri("https://www.google.com/maps/place/Hermannstr.+21,+Berlin/")
-            quickWaitForStableInActiveWindow()
-
-            // Shows precise location again
-            assertConversionSucceeded(
-                GCJ02Point(
-                    52.4832988, 13.4245179,
-                    name = @Suppress("SpellCheckingInspection") "Hermannstraße 21, 12049 Berlin",
-                    source = Source.URI,
-                )
-            )
-        }
-
-    @Test
-    fun whenLinkWithPlaceOnlyIsSharedAndPermissionIsDeniedWithoutDoNotAsk_closesDialogAndShowsDialogAgain() =
-        uiAutomator {
-            runBlocking {
-                assumeDomainResolvable("maps.google.com")
-            }
-
-            // Share a Google Maps place link with the app
-            shareUri("https://www.google.com/maps/place/Hermannstr.+30,+Berlin/")
-
-            // Deny connection permission
-            onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.dismissDialog()
-
-            // Shows location search
-            assertConversionSucceeded(
-                GCJ02Point(
-                    name = @Suppress("SpellCheckingInspection") "Hermannstr. 30, Berlin",
-                    source = Source.URI,
-                )
-            )
-
-            // Share another Google Maps place link with the app
-            shareUri("https://www.google.com/maps/place/Hermannstr.+31,+Berlin/")
-
-            // Connection permission dialog is visible again
-            onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }
-        }
-
-    @Test
-    fun whenLinkWithPlaceOnlyIsSharedAndPermissionIsDeniedWithDoNotAsk_closesDialogAndDoesNotShowDialogAgain() =
-        uiAutomator {
-            runBlocking {
-                assumeDomainResolvable("maps.google.com")
-            }
-
-            // Share a Google Maps place link with the app
-            shareUri("https://www.google.com/maps/place/Hermannstr.+40,+Berlin/")
-
-            // Deny connection permission
-            onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
-                toggleDoNotAsk()
-                dismissDialog()
-            }
-
-            // Shows location search
-            assertConversionSucceeded(
-                GCJ02Point(
-                    name = @Suppress("SpellCheckingInspection") "Hermannstr. 40, Berlin",
-                    source = Source.URI,
-                )
-            )
-
-            // Share another Google Maps place link with the app
-            shareUri("https://www.google.com/maps/place/Hermannstr.+41,+Berlin/")
-            quickWaitForStableInActiveWindow()
-
-            // Shows location search
-            assertConversionSucceeded(
-                GCJ02Point(
-                    name = @Suppress("SpellCheckingInspection") "Hermannstr. 41, Berlin",
-                    source = Source.URI,
-                )
-            )
-        }
-
-    @Test
-    fun whenShortLinkWithCoordinatesInHtmlIsSharedAndPermissionIsGranted_doesNotAskForPermission() = uiAutomator {
-        runBlocking {
-            assumeDomainResolvable("maps.google.com")
-        }
-
-        // Share a Google Maps short link with the app
-        shareUri("https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8")
-
-        // Grant connection permission
-        onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
-
-        // Shows precise location
-        assertConversionSucceeded(
-            GCJ02Point(
-                51.1982447, 6.4389493,
-                name = @Suppress("SpellCheckingInspection") "Konditorei+Heinemann",
-                source = Source.URI,
-            )
-        )
-    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test

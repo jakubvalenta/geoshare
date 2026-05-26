@@ -38,7 +38,6 @@ class BodyAsChannelInputTest {
         override suspend fun parse(
             data: ByteReadChannel,
             match: String,
-            prevResult: ParseResult?,
         ) = throw NotImplementedError()
     }
     private val nextInput = FakeInputRepository.osmAndUriInput

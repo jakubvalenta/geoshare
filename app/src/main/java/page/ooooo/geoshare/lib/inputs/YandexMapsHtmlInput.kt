@@ -28,12 +28,12 @@ class YandexMapsHtmlInput @Inject constructor(
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_yandex_maps_loading_indicator_title
 
-    override suspend fun parse(data: ByteReadChannel, match: String, prevResult: ParseResult?) = parseResult {
+    override suspend fun parse(data: ByteReadChannel, match: String) = parseResult {
         val pointPattern = Regex("""pt=$LON%2C$LAT""")
         val namePattern = Regex("""itemProp="name"[^>]*>([^<]+)""")
 
         var naivePoint: NaivePoint? = null
-        var name = prevResult?.points?.lastOrNull()?.name
+        var name: String? = null
 
         while (true) {
             val line = data.readLine() ?: break
@@ -48,9 +48,9 @@ class YandexMapsHtmlInput @Inject constructor(
         }
 
         naivePoint?.also {
-            points = persistentListOf(WGS84Point(it).copy(name = name))
+            points = persistentListOf(WGS84Point(it, name = name))
         } ?: name?.also {
-            points = persistentListOf(WGS84Point(name = name, source = Source.HTML))
+            points = persistentListOf(WGS84Point(name = it, source = Source.HTML))
         }
     }
 
