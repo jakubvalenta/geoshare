@@ -37,7 +37,7 @@ body:
       label: Version
       description: What version of the app are you running?
       placeholder: |
-          Example: 1.2.0
+          Example: 6.4.0
     validations:
       required: true
   - type: input
@@ -45,7 +45,7 @@ body:
     attributes:
       label: Android
       description: What version of Android are you running?
-      placeholder: "15"
+      placeholder: "16"
     validations:
       required: true
   - type: textarea
