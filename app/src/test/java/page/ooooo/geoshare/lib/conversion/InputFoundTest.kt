@@ -64,7 +64,7 @@ class InputFoundTest {
     }
 
     @Test
-    fun transition_whenPermissionIsNever_returnsDataParsed() = runTest {
+    fun transition_whenPermissionIsNever_returnsPermissionDenied() = runTest {
         val userPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(eq(ConnectionPermissionPreference)) } doThrow NotImplementedError()
         }
@@ -74,9 +74,7 @@ class InputFoundTest {
         }
         val state = InputFound(stateContext, source, match = source, input, Permission.NEVER, listOf(prevResult))
         assertEquals(
-            DataParsed(
-                stateContext, source, match = source, input, Permission.NEVER, listOf(prevResult)
-            ),
+            PermissionDenied(stateContext, source, match = source, input, listOf(prevResult)),
             state.transition(),
         )
     }
@@ -117,7 +115,7 @@ class InputFoundTest {
     }
 
     @Test
-    fun transition_whenPermissionIsNullAndPreferencePermissionIsNever_returnsDataParsed() = runTest {
+    fun transition_whenPermissionIsNullAndPreferencePermissionIsNever_returnsPermissionDenied() = runTest {
         val userPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(eq(ConnectionPermissionPreference)) } doReturn Permission.NEVER
         }
@@ -127,9 +125,7 @@ class InputFoundTest {
         }
         val state = InputFound(stateContext, source, match = source, input, permission = null, listOf(prevResult))
         assertEquals(
-            DataParsed(
-                stateContext, source, match = source, input, Permission.NEVER, listOf(prevResult)
-            ),
+            PermissionDenied(stateContext, source, match = source, input, listOf(prevResult)),
             state.transition(),
         )
     }

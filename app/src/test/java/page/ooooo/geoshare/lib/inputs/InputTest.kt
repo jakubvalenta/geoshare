@@ -5,6 +5,9 @@ import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.Uri
 
 interface InputTest {
+    suspend fun NoopInput.parse(match: String = "https://example.com/") =
+        this.parse(Unit, match)
+
     suspend fun TextInput.parse(text: String, match: String = "https://example.com/") =
         this.parse(text, match)
 

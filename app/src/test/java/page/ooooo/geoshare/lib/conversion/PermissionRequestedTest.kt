@@ -83,7 +83,7 @@ class PermissionRequestedTest {
     }
 
     @Test
-    fun deny_whenDoNotAskIsFalse_doesNotSavePreferenceAndReturnsDataParsed() = runTest {
+    fun deny_whenDoNotAskIsFalse_doesNotSavePreferenceAndReturnsPermissionDenied() = runTest {
         val userPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { setValue(eq(ConnectionPermissionPreference), any()) } doReturn Unit
         }
@@ -100,9 +100,7 @@ class PermissionRequestedTest {
                 input.permissionTitleResId
             )
         assertEquals(
-            DataParsed(
-                stateContext, source, match = source, input, Permission.NEVER, listOf(ParseResult(), prevResult)
-            ),
+            PermissionDenied(stateContext, source, match = source, input, listOf(prevResult)),
             state.deny(false),
         )
         verify(userPreferencesRepository, never()).setValue(
@@ -112,7 +110,7 @@ class PermissionRequestedTest {
     }
 
     @Test
-    fun deny_whenDoNotIsAskIsTrue_savesPreferenceAndReturnsDataParsed() = runTest {
+    fun deny_whenDoNotIsAskIsTrue_savesPreferenceAndReturnsPermissionDenied() = runTest {
         val userPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { setValue(eq(ConnectionPermissionPreference), any()) } doReturn Unit
         }
@@ -123,9 +121,7 @@ class PermissionRequestedTest {
             stateContext, source, match = source, input, listOf(prevResult), input.permissionTitleResId
         )
         assertEquals(
-            DataParsed(
-                stateContext, source, match = source, input, Permission.NEVER, listOf(ParseResult(), prevResult)
-            ),
+            PermissionDenied(stateContext, source, match = source, input, listOf(prevResult)),
             state.deny(true),
         )
         verify(userPreferencesRepository).setValue(

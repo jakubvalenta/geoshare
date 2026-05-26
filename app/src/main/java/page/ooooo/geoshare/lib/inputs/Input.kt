@@ -33,5 +33,3 @@ interface WebViewInput : Input, Input.HasPermission {
     fun extendWebSettings(settings: WebSettings) {}
     fun shouldInterceptRequest(requestUrlString: String): Boolean = false
 }
-
-interface NoopInput : Input

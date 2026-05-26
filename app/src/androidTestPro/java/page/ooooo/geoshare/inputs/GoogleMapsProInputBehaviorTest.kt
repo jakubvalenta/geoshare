@@ -20,7 +20,6 @@ class GoogleMapsProInputBehaviorTest : InputBehaviorTest {
         setUserPreferenceConnectionPermissionToAlways()
 
         // Search
-        // FIXME Conversion loop due to nextStep in prevResult
         testUri(
             WGS84Point(
                 name = @Suppress("SpellCheckingInspection") "Louisenstraße 60, 01099 Dresden",
@@ -32,7 +31,7 @@ class GoogleMapsProInputBehaviorTest : InputBehaviorTest {
         // Short link with coordinates in HTML
         testUri(
             WGS84Point(
-                name = @Suppress("SpellCheckingInspection") "Konditorei+Heinemann",
+                name = @Suppress("SpellCheckingInspection") "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
                 source = Source.URI,
             ),
             "https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8",
@@ -46,19 +45,19 @@ class GoogleMapsProInputBehaviorTest : InputBehaviorTest {
 
         // Directions address
         testUri(
-            WGS84Point(name = "2088 Albion Rd @43.7481,-79.6332", source = Source.HTML),
+            WGS84Point(name = "2088 Albion Rd @43.7481,-79.6332", source = Source.URI),
             @Suppress("SpellCheckingInspection") "https://maps.google.com/maps?f=d&daddr=2088%20Albion%20Rd+@43.7481,-79.6332&doflg=ptm&navigate=yes",
         )
 
         // Directions with geocode parameter, which can get stuck at intermediate URI with zero coordinates during web parsing
         testUri(
             WGS84Point(
-                name = @Suppress("SpellCheckingInspection") "Box+now+Ακροπόλεως+65,+Akropoleos+65,+Thessaloniki+546+34,+Greece",
+                name = @Suppress("SpellCheckingInspection") "Akropoleos+65,+Thessaloniki+546+34,+Greece",
                 source = Source.URI,
             ),
             "https://maps.google.com/maps?oe=utf-8&client=firefox-b&um=1&ie=UTF-8&fb=1&gl=fr&sa=X&geocode=KWmqxjsAOagUMaSMgMRdOas1&daddr=Akropoleos+65,+Thessaloniki+546+34,+Gr%C3%A8ce",
             fallbackPoint = WGS84Point(
-                name = @Suppress("SpellCheckingInspection") "Box+now+Ακροπόλεως+65,+Akropoleos+65,+Thessaloniki+546+34,+Grèce",
+                name = @Suppress("SpellCheckingInspection") "Akropoleos+65,+Thessaloniki+546+34,+Grèce",
                 source = Source.URI,
             ),
         )
