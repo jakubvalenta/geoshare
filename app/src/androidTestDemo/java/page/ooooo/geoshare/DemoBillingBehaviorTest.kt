@@ -17,7 +17,6 @@ import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
 @RunWith(AndroidJUnit4::class)
 class DemoBillingBehaviorTest : BehaviorTest {
-
     @Test
     fun allowsPurchasingAndRefundingOneTimeProduct() = uiAutomator {
         // Launch application and close intro

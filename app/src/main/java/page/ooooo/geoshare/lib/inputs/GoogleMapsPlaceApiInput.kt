@@ -75,10 +75,9 @@ class GoogleMapsPlaceApiInput @Inject constructor(
         )
     }
 
-    private fun parsePlaceId(uri: Uri): String? =
-        uri.run {
-            Q_PARAM_PATTERN.matchEntire(queryParams["query_place_id"])?.groupOrNull()
-        }
+    private fun parsePlaceId(uri: Uri): String? = uri.run {
+        Q_PARAM_PATTERN.matchEntire(queryParams["query_place_id"])?.groupOrNull()
+    }
 
     override fun toString() = "GoogleMapsPlaceApiInput"
 }

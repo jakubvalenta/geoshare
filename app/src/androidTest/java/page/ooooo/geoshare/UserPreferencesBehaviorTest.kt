@@ -22,7 +22,6 @@ import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
 @RunWith(AndroidJUnit4::class)
 class UserPreferencesBehaviorTest : BehaviorTest {
-
     @Test
     fun whenCoordinateFormatIsSet_showsCoordinatesInThatFormat() = uiAutomator {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
