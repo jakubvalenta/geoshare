@@ -183,14 +183,14 @@
     <string name="inputs_recent">Adicionados recentemente</string>
     <string name="inputs_settings">Vá às configurações do Android para escolher quais ligações devem sempre abrir no %1$s</string>
     <string name="inputs_title">Mapas suportados</string>
-    <string name="network_exception_connect_timeout">tempo limite da conexão esgotado</string>
-    <string name="network_exception_eof">conexão fechada</string>
-    <string name="network_exception_request_timeout">tempo limite da solicitação esgotado</string>
-    <string name="network_exception_response_error">erro de resposta %1$d</string>
-    <string name="network_exception_server_response_error">erro da resposta do servidor %1$d</string>
-    <string name="network_exception_socket_timeout">tempo limite do soquete esgotado</string>
-    <string name="network_exception_unknown">erro desconhecido</string>
-    <string name="network_exception_unresolved_address">endereço não traduzido</string>
+    <string name="network_exception_connect_timeout">Tempo limite da conexão esgotado</string>
+    <string name="network_exception_eof">Conexão fechada</string>
+    <string name="network_exception_request_timeout">Tempo limite da solicitação esgotado</string>
+    <string name="network_exception_response_error">Erro de resposta %1$d</string>
+    <string name="network_exception_server_response_error">Erro da resposta do servidor %1$d</string>
+    <string name="network_exception_socket_timeout">Tempo limite do soquete esgotado</string>
+    <string name="network_exception_unknown">Erro desconhecido</string>
+    <string name="network_exception_unresolved_address">Endereço não traduzido</string>
     <string name="reset">repôr</string>
     <string name="seconds_unit">segundos</string>
     <plurals name="seconds">
@@ -226,9 +226,9 @@
     <string name="user_preferences_coordinate_format_option_deg_min_sec">Graus, minutos, segundos</string>
     <string name="user_preferences_coordinate_format_title">Formato das coordenadas</string>
     <string name="conversion_failed_reason_invalid_url">URL inválido</string>
-    <string name="conversion_failed_reason_missing_header">cabelhaço HTTP ausente</string>
-    <string name="conversion_failed_reason_no_points">nenhum ponto encontrado</string>
-    <string name="conversion_failed_reason_timeout">tempo esgotado</string>
+    <string name="conversion_failed_reason_missing_header">Cabelhaço HTTP ausente</string>
+    <string name="conversion_failed_reason_no_points">Nenhum ponto encontrado</string>
+    <string name="conversion_failed_reason_timeout">Tempo esgotado</string>
     <string name="licenses">Licenças</string>
     <string name="links_delete">Apagar</string>
     <string name="links_delete_text">O mapa da web \"%1$s\" será apagado permanentemente.</string>
@@ -256,7 +256,7 @@
     <string name="links_restore_initial_data_title">Reconfigurar os mapas da web?</string>
     <string name="links_title">Mapas da web</string>
     <string name="links_update">Editar mapa da web</string>
-    <string name="network_exception_too_many_requests">solicitações demais</string>
+    <string name="network_exception_too_many_requests">Solicitações demais</string>
     <string name="srs_description_mainland_china">China continental</string>
     <string name="srs_description_greater_china_and_taiwan">China e Taiwan geral</string>
     <string name="user_preferences_apps_visible_all">Todas as apps estão visíveis</string>
@@ -270,4 +270,10 @@
     <string name="user_preferences_apps_title">Apps</string>
     <string name="user_preferences_section_input">Entrada</string>
     <string name="user_preferences_section_output">Saída</string>
+    <string name="output_save_to_contact">Gravar no contacto</string>
+    <string name="output_save_to_contact_automation_failed">Falha ao automaticamente gravar o ponto em contacto</string>
+    <string name="output_save_to_contact_failed">Falha ao gravar ponto em contacto</string>
+    <string name="output_send">Enviar ponto</string>
+    <string name="output_send_via">Enviar ponto via %1$s</string>
+    <string name="conversion_failed_reason_exception">Exceção desconhecida</string>
 </resources>
