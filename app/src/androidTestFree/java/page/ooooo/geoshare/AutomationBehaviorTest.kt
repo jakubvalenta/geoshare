@@ -30,7 +30,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @RunWith(AndroidJUnit4::class)
 class AutomationBehaviorTest : BehaviorTest {
-
     @Test
     fun copiesCoordinates() = uiAutomator {
         // Launch application and close intro

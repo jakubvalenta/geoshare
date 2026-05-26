@@ -38,7 +38,7 @@ class WazeHtmlInputTest : InputTest {
     }
 
     @Test
-    fun parse_containsInvalidDataCoordinates_returnsEmptyResult() = runTest {
+    fun parse_containsInvalidDataCoordinates_returnsNoPoints() = runTest {
         assertEquals(
             ParseResult(),
             input.parse("""<html><script>{"routing": {"to": {"address":"301 Front St W, Toronto, Ontario, Canada","latLng":{"lat":spam,"lng":spam},"title":"CN Tower"}}}}</script></html>""")
@@ -46,7 +46,7 @@ class WazeHtmlInputTest : InputTest {
     }
 
     @Test
-    fun parse_doesNotContainCoordinates_returnsEmptyResult() = runTest {
+    fun parse_doesNotContainCoordinates_returnsNoPoints() = runTest {
         assertEquals(ParseResult(), input.parse("""<html></html>"""))
     }
 }

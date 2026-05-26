@@ -180,7 +180,7 @@ class PlusCodeUriInputTest : InputTest {
     }
 
     @Test
-    fun parse_localCodeWithoutLocality_returnsEmptyResult() = runTest {
+    fun parse_localCodeWithoutLocality_returnsNoPoints() = runTest {
         assertEquals(ParseResult(), input.parse("8F+GG"))
         assertEquals(ParseResult(), input.parse("6C8F+GG"))
         assertEquals(ParseResult(), input.parse("WF8Q+WF"))
