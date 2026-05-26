@@ -1,6 +1,5 @@
 package page.ooooo.geoshare
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.scrollToElement
@@ -9,7 +8,6 @@ import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
-import org.junit.runner.RunWith
 import page.ooooo.geoshare.BehaviorTest.Companion.ELEMENT_DOES_NOT_EXIST_TIMEOUT
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.lib.android.PackageNames
@@ -20,7 +18,6 @@ import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
-@RunWith(AndroidJUnit4::class)
 class UserPreferencesBehaviorTest : BehaviorTest {
     @Test
     fun whenCoordinateFormatIsSet_showsCoordinatesInThatFormat() = uiAutomator {

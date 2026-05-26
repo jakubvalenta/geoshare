@@ -1,14 +1,14 @@
 package page.ooooo.geoshare.lib.inputs
 
-import org.junit.Assert.assertTrue
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class GoogleMapsPlaceListInputImplTest {
+class GoogleMapsPlaceListInputImplTest : InputTest {
     private val input = GoogleMapsPlaceListInputImpl()
 
     @Test
-    fun itIsNoopInput() {
-        @Suppress("USELESS_IS_CHECK")
-        assertTrue(input is NoopInput)
+    fun parse_returnsNoPoints() = runTest {
+        assertEquals(ParseResult(), input.parse(Unit, "https://maps.google.com/foo"))
     }
 }

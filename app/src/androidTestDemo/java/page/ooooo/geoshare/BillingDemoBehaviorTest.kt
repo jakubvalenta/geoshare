@@ -15,8 +15,7 @@ import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.lib.billing.Offer
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
-@RunWith(AndroidJUnit4::class)
-class DemoBillingBehaviorTest : BehaviorTest {
+class BillingDemoBehaviorTest : BehaviorTest {
     @Test
     fun allowsPurchasingAndRefundingOneTimeProduct() = uiAutomator {
         // Launch application and close intro

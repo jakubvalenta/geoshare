@@ -30,7 +30,7 @@ class BaiduMapUriInput @Inject constructor(
     )
 
     @Suppress("SpellCheckingInspection")
-    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
+    override suspend fun parse(data: Uri, match: String) = parseResult {
         data.run {
             val parts = data.pathParts.drop(1)
             val firstPart = parts.firstOrNull() ?: return@run
@@ -59,7 +59,7 @@ class BaiduMapUriInput @Inject constructor(
                 // POI
                 // https://map.baidu.com/poi/{name}/@{x},{y},{z}
                 Regex(CENTER).matchEntire(parts.getOrNull(2))?.toLonLatZPoint(Source.MAP_CENTER)?.let {
-                    points = persistentListOf(BD09MCPoint(it).copy(name = parts.getOrNull(1)))
+                    points = persistentListOf(BD09MCPoint(it, name = parts.getOrNull(1)))
                 }
 
             } else if (firstPart == "dir") {

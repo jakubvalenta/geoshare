@@ -49,7 +49,6 @@ class HeadLocationHeaderUriInputTest {
         override suspend fun parse(
             data: Uri,
             match: String,
-            prevResult: ParseResult?,
         ) = throw NotImplementedError()
     }
     private val nextInput = FakeInputRepository.osmAndUriInput

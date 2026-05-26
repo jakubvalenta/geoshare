@@ -36,7 +36,7 @@ class GoogleMapsHtmlInputImpl @Inject constructor(
     override val cookies = GoogleMapsShortLinkInput.cookies
     override val userAgent = GoogleMapsShortLinkInput.USER_AGENT
 
-    override suspend fun parse(data: ByteReadChannel, match: String, prevResult: ParseResult?) = parseResult {
+    override suspend fun parse(data: ByteReadChannel, match: String) = parseResult {
         val directionsPreviewPattern = Regex("""%213d$LAT%214d$LON""")
         val pointPattern = Regex("""\[(?:null,null,|null,\[)$LAT,$LON]""")
         val defaultPointLinkPattern = Regex("""/@$LAT,$LON""")
@@ -51,7 +51,6 @@ class GoogleMapsHtmlInputImpl @Inject constructor(
         var defaultNaivePoint: NaivePoint? = null
         var genericMetaTagFound = false
         var redirectUriString: String? = null
-        val name = prevResult?.points?.lastOrNull()?.name
 
         while (true) {
             val line = data.readLine() ?: break
@@ -61,9 +60,8 @@ class GoogleMapsHtmlInputImpl @Inject constructor(
             }
             if (
                 mutableNaivePoints.addAll(
-                    directionsPreviewPattern.findAll(line).mapNotNull { m ->
-                        m.toLatLonPoint(Source.HTML)?.copy(name = name)
-                    }
+                    directionsPreviewPattern.findAll(line)
+                        .mapNotNull { m -> m.toLatLonPoint(Source.HTML) }
                 )
             ) {
                 log.d(TAG, "Directions preview pattern matched line $line")
@@ -72,9 +70,8 @@ class GoogleMapsHtmlInputImpl @Inject constructor(
             }
             if (
                 mutableNaivePoints.addAll(
-                    pointPattern.findAll(line).mapNotNull { m ->
-                        m.toLatLonPoint(Source.JAVASCRIPT)?.copy(name = name)
-                    }
+                    pointPattern.findAll(line)
+                        .mapNotNull { m -> m.toLatLonPoint(Source.JAVASCRIPT) }
                 )
             ) {
                 log.d(TAG, "Point pattern matched line $line")
@@ -82,7 +79,7 @@ class GoogleMapsHtmlInputImpl @Inject constructor(
             if (defaultNaivePoint == null) {
                 defaultPointLinkPattern.find(line)?.toLatLonPoint(Source.JAVASCRIPT)?.let {
                     log.d(TAG, "Default point pattern 1 matched line $line")
-                    defaultNaivePoint = it.copy(name = name)
+                    defaultNaivePoint = it
                 }
             }
             if (defaultNaivePoint == null && !genericMetaTagFound) {
@@ -92,7 +89,7 @@ class GoogleMapsHtmlInputImpl @Inject constructor(
                 // ignore these coordinates.
                 defaultPointAppInitStatePattern.find(line)?.toLonLatPoint(Source.JAVASCRIPT)?.let {
                     log.d(TAG, "Default point pattern 2 matched line $line")
-                    defaultNaivePoint = it.copy(name = name)
+                    defaultNaivePoint = it
                 }
             }
             if (redirectUriString == null) {

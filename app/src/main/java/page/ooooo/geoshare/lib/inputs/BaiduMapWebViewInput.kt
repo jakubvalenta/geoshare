@@ -54,7 +54,7 @@ class BaiduMapWebViewInput @Inject constructor(
         };
     """.trimIndent()
 
-    override suspend fun parse(data: String, match: String, prevResult: ParseResult?) = parseResult {
+    override suspend fun parse(data: String, match: String) = parseResult {
         val json = Json {
             explicitNulls = false
         }

@@ -199,7 +199,7 @@ fun LinkForm(
                             SuggestionChip(
                                 onClick = {
                                     UriFormatter.formatUriString(
-                                        coordinateConverter.toSrs(point.copy(name = name), srs),
+                                        coordinateConverter.toSrs(point, srs).copy(name = name),
                                         coordsUriTemplate,
                                         nameUriTemplate,
                                     )?.let {

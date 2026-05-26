@@ -34,7 +34,7 @@ class DataParsedTest {
     @Test
     fun transition_whenLastPointHasCoordinates_returnsConversionSucceeded() = runTest {
         val result = ParseResult(points)
-        val state = DataParsed(stateContext, source, match = source, input, result, permission = null)
+        val state = DataParsed(stateContext, source, match = source, input, permission = null, listOf(result))
         assertEquals(
             ConversionSucceeded(stateContext, source, points),
             state.transition(),
@@ -42,14 +42,57 @@ class DataParsedTest {
     }
 
     @Test
+    fun transition_whenLastPointHasCoordinatesAndZoomAndNameAndThereArePrevResults_returnsConversionSucceeded() =
+        runTest {
+            val points = persistentListOf(WGS84Point(1.0, 2.0, z = 3.14, name = "foo", source = Source.GENERATED))
+            val results = listOf(
+                ParseResult(points),
+                ParseResult(),
+                ParseResult(persistentListOf(WGS84Point(5.0, 6.0, source = Source.JAVASCRIPT))),
+                ParseResult(persistentListOf(WGS84Point(z = 3.14, source = Source.HTML))),
+                ParseResult(persistentListOf(WGS84Point(name = "bar", source = Source.URI))),
+            )
+            val state = DataParsed(stateContext, source, match = source, input, permission = null, results)
+            assertEquals(
+                ConversionSucceeded(stateContext, source, points),
+                state.transition(),
+            )
+        }
+
+    @Test
+    fun transition_whenLastPointHasCoordinatesAndNoZoomAndNoNameAndThereArePrevResults_returnsConversionSucceededWithMergedResult() =
+        runTest {
+            val results = listOf(
+                ParseResult(points),
+                ParseResult(),
+                ParseResult(persistentListOf(WGS84Point(5.0, 6.0, source = Source.JAVASCRIPT))),
+                ParseResult(persistentListOf(WGS84Point(z = 3.14, source = Source.HTML))),
+                ParseResult(persistentListOf(WGS84Point(name = "bar", source = Source.URI))),
+            )
+            val state = DataParsed(
+                stateContext, source, match = source, input, permission = null, results
+            )
+            assertEquals(
+                ConversionSucceeded(
+                    stateContext,
+                    source,
+                    persistentListOf(
+                        WGS84Point(1.0, 2.0, z = 3.14, name = "bar", source = Source.GENERATED)
+                    ),
+                ),
+                state.transition()
+            )
+        }
+
+    @Test
     fun transition_whenLastPointHasNoCoordinatesAndNextStepIsSet_returnsInputFound() = runTest {
         val points = persistentListOf(WGS84Point(name = "bar", source = Source.GENERATED))
         val nextStep = NextStep(nextInput, source)
         val result = ParseResult(points, nextStep)
         val permission = Permission.ALWAYS
-        val state = DataParsed(stateContext, source, match = source, input, result, permission)
+        val state = DataParsed(stateContext, source, match = source, input, permission, listOf(result))
         assertEquals(
-            InputFound(stateContext, source, nextStep.match, nextStep.input, permission, prevResult = result),
+            InputFound(stateContext, source, nextStep.match, nextStep.input, permission, listOf(result)),
             state.transition(),
         )
     }
@@ -58,7 +101,7 @@ class DataParsedTest {
     fun transition_whenLastPointHasNameOnly_returnsConversionSucceeded() = runTest {
         val points = persistentListOf(WGS84Point(name = "bar", source = Source.GENERATED))
         val result = ParseResult(points)
-        val state = DataParsed(stateContext, source, match = source, input, result, permission = null)
+        val state = DataParsed(stateContext, source, match = source, input, permission = null, listOf(result))
         assertEquals(
             ConversionSucceeded(stateContext, source, points),
             state.transition(),
@@ -69,7 +112,7 @@ class DataParsedTest {
     fun transition_whenLastPointIsEmpty_returnsConversionFailed() = runTest {
         val points = persistentListOf(WGS84Point(source = Source.GENERATED))
         val result = ParseResult(points)
-        val state = DataParsed(stateContext, source, match = source, input, result, permission = null)
+        val state = DataParsed(stateContext, source, match = source, input, permission = null, listOf(result))
         assertEquals(
             ConversionFailed(
                 source,
@@ -83,7 +126,7 @@ class DataParsedTest {
     fun transition_whenPointsAreEmpty_returnsConversionFailed() = runTest {
         val points = persistentListOf<WGS84Point>()
         val result = ParseResult(points)
-        val state = DataParsed(stateContext, source, match = source, input, result, permission = null)
+        val state = DataParsed(stateContext, source, match = source, input, permission = null, listOf(result))
         assertEquals(
             ConversionFailed(
                 source,
@@ -100,7 +143,7 @@ class DataParsedTest {
         val prevPoints = persistentListOf<WGS84Point>()
         val prevResult = ParseResult(prevPoints)
         val state = DataParsed(
-            stateContext, source, match = source, input, result, permission = null, prevResult
+            stateContext, source, match = source, input, permission = null, listOf(result, prevResult)
         )
         assertEquals(
             ConversionFailed(
@@ -118,7 +161,7 @@ class DataParsedTest {
         val prevPoints = persistentListOf<WGS84Point>()
         val prevResult = ParseResult(prevPoints)
         val state = DataParsed(
-            stateContext, source, match = source, input, result, permission = Permission.NEVER, prevResult
+            stateContext, source, match = source, input, permission = Permission.NEVER, listOf(result, prevResult)
         )
         assertEquals(
             ConversionFailed(
@@ -130,16 +173,19 @@ class DataParsedTest {
     }
 
     @Test
-    fun transition_whenPointsAreEmptyAndPrevResultHasCoordinates_returnsConversionSucceeded() = runTest {
+    fun transition_whenPointsAreEmptyAndPrevResultHasCoordinates_returnsConversionFailed() = runTest {
         val points = persistentListOf<WGS84Point>()
         val result = ParseResult(points)
         val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val prevResult = ParseResult(prevPoints)
         val state = DataParsed(
-            stateContext, source, match = source, input, result, permission = null, prevResult
+            stateContext, source, match = source, input, permission = null, listOf(result, prevResult)
         )
         assertEquals(
-            ConversionSucceeded(stateContext, source, prevPoints),
+            ConversionFailed(
+                source,
+                resources.getString(R.string.conversion_failed_reason_no_points),
+            ),
             state.transition(),
         )
     }
@@ -151,10 +197,44 @@ class DataParsedTest {
         val prevPoints = persistentListOf(WGS84Point(name = "bar", source = Source.GENERATED))
         val prevResult = ParseResult(prevPoints)
         val state = DataParsed(
-            stateContext, source, match = source, input, result, permission = null, prevResult
+            stateContext, source, match = source, input, permission = null, listOf(result, prevResult)
         )
         assertEquals(
             ConversionSucceeded(stateContext, source, prevPoints),
+            state.transition(),
+        )
+    }
+
+    @Test
+    fun transition_whenPointsAreEmptyAndPrevResultHasNameOnlyAndNextStep_returnsConversionSucceededWithoutNextStep() =
+        runTest {
+            val points = persistentListOf<WGS84Point>()
+            val result = ParseResult(points)
+            val prevPoints = persistentListOf(WGS84Point(name = "bar", source = Source.GENERATED))
+            val prevResult = ParseResult(prevPoints, NextStep(FakeInputRepository.debugUriInput, source))
+            val state = DataParsed(
+                stateContext, source, match = source, input, permission = null, listOf(result, prevResult)
+            )
+            assertEquals(
+                ConversionSucceeded(stateContext, source, prevPoints),
+                state.transition(),
+            )
+        }
+
+    @Test
+    fun transition_whenPointsAreEmptyAndPrevResultHasZoomOnly_returnsConversionFailed() = runTest {
+        val points = persistentListOf<WGS84Point>()
+        val result = ParseResult(points)
+        val prevPoints = persistentListOf(WGS84Point(z = 3.14, source = Source.GENERATED))
+        val prevResult = ParseResult(prevPoints)
+        val state = DataParsed(
+            stateContext, source, match = source, input, permission = null, listOf(result, prevResult)
+        )
+        assertEquals(
+            ConversionFailed(
+                source,
+                resources.getString(R.string.conversion_failed_reason_no_points),
+            ),
             state.transition(),
         )
     }

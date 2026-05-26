@@ -28,7 +28,6 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 import kotlin.time.Duration.Companion.seconds
 
-@RunWith(AndroidJUnit4::class)
 class AutomationBehaviorTest : BehaviorTest {
     @Test
     fun copiesCoordinates() = uiAutomator {
