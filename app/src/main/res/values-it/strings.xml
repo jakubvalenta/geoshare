@@ -72,4 +72,7 @@
     <string name="conversion_succeeded_share">Condividi</string>
     <string name="conversion_succeeded_skip">Copia link originale</string>
     <string name="open_by_default">Apri come predefinito</string>
+    <string name="not_available">Non disponibile</string>
+    <string name="conversion_succeeded_check_experimental">La posizione potrebbe essere imprecisa a causa di un metodo di estrazione sperimentale.</string>
+    <string name="conversion_succeeded_check_map_center">La posizione dovrebbe essere un centro sulla mappa, non un segnaposto.</string>
 </resources>
