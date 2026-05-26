@@ -5,7 +5,7 @@ body:
   - type: input
     id: url
     attributes:
-      label: Map URL (Google Maps, Apple Maps etc.)
+      label: Map URL (Google Maps, Apple Maps, etc.)
       placeholder: |
           https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=abcdefg
     validations:
@@ -15,7 +15,7 @@ body:
     attributes:
       label: Current behaviour
       value: |
-          The app shows 'Failed to process map link.'
+          The app shows 'Error: No points'
     validations:
       required: true
   - type: input
@@ -24,7 +24,7 @@ body:
       label: Version
       description: What version of the app are you running?
       placeholder: |
-          Example: 4.0.0
+          Example: 6.4.0
     validations:
       required: true
   - type: input
@@ -32,7 +32,7 @@ body:
     attributes:
       label: Android
       description: What version of Android are you running?
-      placeholder: "15"
+      placeholder: "16"
     validations:
       required: true
   - type: textarea
