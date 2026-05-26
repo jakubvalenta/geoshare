@@ -36,7 +36,6 @@ class BodyAsTextInputTest {
         override suspend fun parse(
             data: String,
             match: String,
-            prevResult: ParseResult?,
         ) = throw NotImplementedError()
     }
     private val nextInput = FakeInputRepository.osmAndUriInput

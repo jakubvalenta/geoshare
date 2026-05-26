@@ -24,9 +24,9 @@ class PermissionGrantedTest {
     @Test
     fun transition_whenInputIsBasicInput_returnsPermissionGrantedBasicInput() = runTest {
         val input = FakeInputRepository.googleMapsShortLinkInput
-        val state = PermissionGranted(stateContext, source, match = source, input, permission, prevResult)
+        val state = PermissionGranted(stateContext, source, match = source, input, permission, listOf(prevResult))
         assertEquals(
-            PermissionGrantedBasicInput(stateContext, source, match = source, input, permission, prevResult),
+            PermissionGrantedBasicInput(stateContext, source, match = source, input, permission, listOf(prevResult)),
             state.transition(),
         )
     }
@@ -41,13 +41,12 @@ class PermissionGrantedTest {
             override suspend fun parse(
                 data: String,
                 match: String,
-                prevResult: ParseResult?,
             ) = throw NotImplementedError()
         }
-        val state = PermissionGranted(stateContext, source, match = source, input, permission, prevResult)
+        val state = PermissionGranted(stateContext, source, match = source, input, permission, listOf(prevResult))
         assertEquals(
             PermissionGrantedWebViewInput(
-                stateContext, source, match = source, input, permission, prevResult
+                stateContext, source, match = source, input, permission, listOf(prevResult)
             ),
             state.transition(),
         )
@@ -56,11 +55,10 @@ class PermissionGrantedTest {
     @Test
     fun transition_whenInputIsNoopInput_returnsDataParsed() = runTest {
         val input = object : NoopInput {}
-        val state = PermissionGranted(stateContext, source, match = source, input, permission, prevResult)
+        val state = PermissionGranted(stateContext, source, match = source, input, permission, listOf(prevResult))
         assertEquals(
-            DataParsed(stateContext, source, match = source, input, result = prevResult, permission),
+            DataParsed(stateContext, source, match = source, input, permission, listOf(ParseResult(), prevResult)),
             state.transition(),
         )
     }
-
 }

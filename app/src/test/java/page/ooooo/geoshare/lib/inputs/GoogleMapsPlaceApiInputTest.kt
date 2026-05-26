@@ -21,7 +21,6 @@ import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.network.ApiService
 import page.ooooo.geoshare.lib.network.SocketTimeoutNetworkException
 import page.ooooo.geoshare.lib.network.UnknownNetworkException
@@ -70,14 +69,11 @@ class GoogleMapsPlaceApiInputTest {
             uriQuote = uriQuote,
         )
         val match = "https://www.google.com/maps/search/?query_place_id=$placeId"
-        val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, z = 3.14, name = "prev", source = Source.URI))
-        val prevResult = ParseResult(prevPoints)
         assertEquals(
             ParseResult(
-                points = prevPoints,
                 nextStep = NextStep(FakeInputRepository.googleMapsHtmlInput, match),
             ),
-            input.fetch(match) { data -> input.parse(data, match, prevResult) },
+            input.fetch(match) { data -> input.parse(data, match) },
         )
     }
 
@@ -136,30 +132,6 @@ class GoogleMapsPlaceApiInputTest {
         assertEquals(
             ParseResult(),
             input.fetch(match) { data -> input.parse(data, match) },
-        )
-    }
-
-    @Test
-    fun parse_whenPrevResultHasPoint_returnsPointWithNameAndZoomAndSourceFromPrevResult() = runTest {
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(GoogleMapsApiPreference) } doReturn ApiConfig.WithAttestationAuth(baseUrl)
-        }
-        val input = GoogleMapsPlaceApiInput(
-            apiService = ApiService(engine, log, userPreferencesRepository),
-            googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
-            userPreferencesRepository = userPreferencesRepository,
-            uriQuote = uriQuote,
-        )
-        val match = "https://www.google.com/maps/search/?query_place_id=$placeId"
-        val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, z = 3.14, name = "prev", source = Source.URI))
-        val prevResult = ParseResult(prevPoints)
-        assertEquals(
-            ParseResult(
-                persistentListOf(
-                    GCJ02MainlandChinaPoint(50.123456, -11.123456, z = 3.14, name = "prev", source = Source.URI)
-                )
-            ),
-            input.fetch(match) { data -> input.parse(data, match, prevResult) },
         )
     }
 

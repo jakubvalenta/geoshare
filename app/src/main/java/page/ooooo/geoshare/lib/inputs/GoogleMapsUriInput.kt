@@ -45,7 +45,7 @@ class GoogleMapsUriInput @Inject constructor(
         ),
     )
 
-    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
+    override suspend fun parse(data: Uri, match: String) = parseResult {
         data.run {
             val z = Z_PATTERN.matchEntire(queryParams["zoom"])?.doubleGroupOrNull()
 
@@ -60,7 +60,7 @@ class GoogleMapsUriInput @Inject constructor(
                 }
                 .takeIf { it.isNotEmpty() }
                 ?.let { naivePoints ->
-                    points = naivePoints.map { GCJ02MainlandChinaPoint(it).copy(z = z) }.toImmutableList()
+                    points = naivePoints.map { GCJ02MainlandChinaPoint(it, z) }.toImmutableList()
                     if (points.any { !it.hasCoordinates() }) {
                         // Go to HTML parsing, unless coordinates have been extracted for all points
                         nextStep = NextStep(googleMapsAddressApiInput.get(), match)
@@ -80,7 +80,7 @@ class GoogleMapsUriInput @Inject constructor(
                 .firstNotNullOfOrNull { key ->
                     LAT_LON_PATTERN.matchEntire(queryParams[key])?.toLatLonPoint(Source.URI)
                 }?.let {
-                    points = persistentListOf(GCJ02MainlandChinaPoint(it).copy(z = z))
+                    points = persistentListOf(GCJ02MainlandChinaPoint(it, z))
                     return@run
                 }
 
@@ -93,7 +93,7 @@ class GoogleMapsUriInput @Inject constructor(
                 .firstNotNullOfOrNull { key ->
                     LAT_LON_PATTERN.matchEntire(queryParams[key])?.toLatLonPoint(Source.MAP_CENTER)
                 }?.let {
-                    points = persistentListOf(GCJ02MainlandChinaPoint(it).copy(z = z))
+                    points = persistentListOf(GCJ02MainlandChinaPoint(it, z))
                     return@run
                 }
 

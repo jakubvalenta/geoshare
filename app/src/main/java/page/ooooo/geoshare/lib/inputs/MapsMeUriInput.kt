@@ -25,7 +25,7 @@ class MapsMeUriInput @Inject constructor(
         ),
     )
 
-    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
+    override suspend fun parse(data: Uri, match: String) = parseResult {
         data.run {
             val name = (if (scheme == "ge0") pathParts.getOrNull(1) else pathParts.getOrNull(2))
                 ?.let { Q_PATH_PATTERN.matchEntire(it) }
@@ -37,10 +37,12 @@ class MapsMeUriInput @Inject constructor(
                 ?.let { hash -> decodeGe0Hash(hash) }
                 ?.let {
                     points = persistentListOf(
-                        WGS84Point(it).copy(
+                        WGS84Point(
                             lat = it.lat?.toScale(7),
                             lon = it.lon?.toScale(7),
-                            name = name
+                            z = it.z,
+                            name = name,
+                            source = it.source,
                         )
                     )
                     return@run

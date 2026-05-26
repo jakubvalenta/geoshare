@@ -46,7 +46,6 @@ class PlusCodeInput @Inject constructor() : TextInput, Input.HasRandomUri {
     override suspend fun parse(
         data: String,
         match: String,
-        prevResult: ParseResult?,
     ) = parseResult {
         // URL-decode code string if it was extracted from a URL
         val codeString = data.replace("%2B", "+")
@@ -55,7 +54,13 @@ class PlusCodeInput @Inject constructor() : TextInput, Input.HasRandomUri {
         // e.g. `796RWF8Q+WF`
         decodePlusCode(codeString)?.let {
             points = persistentListOf(
-                GCJ02MainlandChinaPoint(it).copy(lat = it.lat?.toScale(6), lon = it.lon?.toScale(6))
+                GCJ02MainlandChinaPoint(
+                    lat = it.lat?.toScale(6),
+                    lon = it.lon?.toScale(6),
+                    z = it.z,
+                    name = it.name,
+                    source = it.source,
+                )
             )
             return@parseResult
         }

@@ -1,15 +1,12 @@
 package page.ooooo.geoshare
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.uiautomator.uiAutomator
 import org.junit.Test
-import org.junit.runner.RunWith
 import page.ooooo.geoshare.inputs.InputBehaviorTest
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-@RunWith(AndroidJUnit4::class)
 class MainBehaviorTest : InputBehaviorTest {
     @Test
     fun whenTextIsEntered_showsPointAndAllowsOpeningGoogleMaps() = uiAutomator {
