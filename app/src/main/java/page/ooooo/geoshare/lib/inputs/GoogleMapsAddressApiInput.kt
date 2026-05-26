@@ -71,50 +71,49 @@ class GoogleMapsAddressApiInput @Inject constructor(
                 GCJ02MainlandChinaPoint(
                     result.location.latitude,
                     result.location.longitude,
-                    name = prevPoint?.name,
+                    name = query,
                     z = prevPoint?.z,
                     source = prevPoint?.source ?: Source.API,
                 )
             }.toImmutableList()
     }
 
-    private fun parseQuery(uri: Uri): String? =
-        uri.run {
-            // API directions
-            // https://www.google.com/maps/dir/?origin={name}&destination={name}
-            // API search
-            // https://maps.google.com/?q={name}
-            listOf(
-                "destination",
-                @Suppress("SpellCheckingInspection") "daddr",
-                "q",
-                "query",
-            )
-                .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull() }
-                ?.let {
-                    return it
-                }
-
-            val parts = pathParts.dropWhile { it.isEmpty() || it == "maps" }
-            val firstPart = parts.firstOrNull()
-            when (firstPart) {
-                // Directions
-                // https://www.google.com/maps/place/{point}/{point}/@{centerX},{centerY},{centerZ}
-                "dir" ->
-                    // Take as query the last path part that isn't a map center or data parameter
-                    parts.drop(1).lastOrNull { !it.startsWith('@') && !it.startsWith("data=") }
-
-                // Place
-                // https://www.google.com/maps/place/{name}/@{centerX},{centerY},{centerZ}
-                // Search
-                // https://www.google.com/maps/search/{query}
-                "place", "search" ->
-                    // Take as query the second path part
-                    parts.getOrNull(1)
-
-                else -> null
+    private fun parseQuery(uri: Uri): String? = uri.run {
+        // API directions
+        // https://www.google.com/maps/dir/?origin={name}&destination={name}
+        // API search
+        // https://maps.google.com/?q={name}
+        listOf(
+            "destination",
+            @Suppress("SpellCheckingInspection") "daddr",
+            "q",
+            "query",
+        )
+            .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull() }
+            ?.let {
+                return it
             }
+
+        val parts = pathParts.dropWhile { it.isEmpty() || it == "maps" }
+        val firstPart = parts.firstOrNull()
+        when (firstPart) {
+            // Directions
+            // https://www.google.com/maps/place/{point}/{point}/@{centerX},{centerY},{centerZ}
+            "dir" ->
+                // Take as query the last path part that isn't a map center or data parameter
+                parts.drop(1).lastOrNull { !it.startsWith('@') && !it.startsWith("data=") }
+
+            // Place
+            // https://www.google.com/maps/place/{name}/@{centerX},{centerY},{centerZ}
+            // Search
+            // https://www.google.com/maps/search/{query}
+            "place", "search" ->
+                // Take as query the second path part
+                parts.getOrNull(1)
+
+            else -> null
         }
+    }
 
     override fun toString() = "GoogleMapsAddressApiInput"
 }

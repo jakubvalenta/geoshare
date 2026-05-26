@@ -187,11 +187,14 @@ data class PermissionGranted(
 ) : ConversionState {
     override suspend fun transition(): State =
         when (input) {
-            is BasicInput<*> -> PermissionGrantedBasicInput(stateContext, source, match, input, permission, prevResult)
-            is WebViewInput -> PermissionGrantedWebViewInput(stateContext, source, match, input, permission, prevResult)
-            is NoopInput -> DataParsed(
-                stateContext, source, match, input, result = prevResult ?: ParseResult(), permission,
-            )
+            is BasicInput<*> ->
+                PermissionGrantedBasicInput(stateContext, source, match, input, permission, prevResult)
+
+            is WebViewInput ->
+                PermissionGrantedWebViewInput(stateContext, source, match, input, permission, prevResult)
+
+            is NoopInput ->
+                DataParsed(stateContext, source, match, input, result = prevResult ?: ParseResult(), permission)
         }
 
     override fun toString() = "PermissionGranted"
