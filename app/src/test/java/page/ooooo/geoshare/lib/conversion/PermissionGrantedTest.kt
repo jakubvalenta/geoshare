@@ -10,6 +10,7 @@ import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.inputs.NoopInput
 import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.inputs.WebViewInput
 
@@ -51,4 +52,15 @@ class PermissionGrantedTest {
             state.transition(),
         )
     }
+
+    @Test
+    fun transition_whenInputIsNoopInput_returnsDataParsed() = runTest {
+        val input = object : NoopInput {}
+        val state = PermissionGranted(stateContext, source, match = source, input, permission, prevResult)
+        assertEquals(
+            DataParsed(stateContext, source, match = source, input, result = prevResult, permission),
+            state.transition(),
+        )
+    }
+
 }

@@ -14,7 +14,6 @@ import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
 @RunWith(AndroidJUnit4::class)
 class LinksBehaviorTest : BehaviorTest {
-
     @Test
     fun whenLinkIsInserted_allowsCopyingIt() = uiAutomator {
         // Launch application and close intro

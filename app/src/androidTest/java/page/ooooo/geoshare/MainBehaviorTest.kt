@@ -11,7 +11,6 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 
 @RunWith(AndroidJUnit4::class)
 class MainBehaviorTest : InputBehaviorTest {
-
     @Test
     fun whenTextIsEntered_showsPointAndAllowsOpeningGoogleMaps() = uiAutomator {
         assumeAppInstalled(PackageNames.GOOGLE_MAPS)

@@ -8,5 +8,5 @@ import javax.inject.Singleton
  */
 @Singleton
 class GoogleMapsPlaceListInputImpl @Inject constructor() : GoogleMapsPlaceListInput, NoopInput {
-    override fun toString() = "GoogleMapsHtmlInput"
+    override fun toString() = "GoogleMapsPlaceListInput"
 }
