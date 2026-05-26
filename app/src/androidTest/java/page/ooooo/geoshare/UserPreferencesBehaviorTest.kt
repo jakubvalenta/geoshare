@@ -20,7 +20,6 @@ import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
-@RunWith(AndroidJUnit4::class)
 class UserPreferencesBehaviorTest : BehaviorTest {
     @Test
     fun whenCoordinateFormatIsSet_showsCoordinatesInThatFormat() = uiAutomator {

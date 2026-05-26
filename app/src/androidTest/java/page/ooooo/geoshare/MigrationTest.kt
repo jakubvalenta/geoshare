@@ -13,7 +13,6 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
-@RunWith(AndroidJUnit4::class)
 class MigrationTest {
     private val testDb = "migration-test"
 

@@ -18,14 +18,6 @@ import page.ooooo.geoshare.lib.network.setDefaultTimeouts
 import page.ooooo.geoshare.lib.network.setUserAgent
 import java.net.MalformedURLException
 
-interface NoopInput : BasicInput<Unit> {
-    override suspend fun fetch(match: String, block: suspend (Unit) -> ParseResult) =
-        parse(Unit, match)
-
-    override suspend fun parse(data: Unit, match: String) =
-        ParseResult()
-}
-
 interface TextInput : BasicInput<String> {
     val pattern: Regex
 

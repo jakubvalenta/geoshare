@@ -33,3 +33,8 @@ interface WebViewInput : Input, Input.HasPermission {
     fun extendWebSettings(settings: WebSettings) {}
     fun shouldInterceptRequest(requestUrlString: String): Boolean = false
 }
+
+interface NoopInput : Input {
+    suspend fun parse(data: Unit, match: String) =
+        ParseResult()
+}

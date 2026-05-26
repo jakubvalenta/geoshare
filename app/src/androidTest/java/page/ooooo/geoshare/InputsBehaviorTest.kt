@@ -9,7 +9,6 @@ import page.ooooo.geoshare.BehaviorTest.Companion.ELEMENT_DOES_NOT_EXIST_TIMEOUT
 import page.ooooo.geoshare.lib.inputs.InputDocumentationGroup
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
-@RunWith(AndroidJUnit4::class)
 class InputsBehaviorTest : BehaviorTest {
 
     @Test

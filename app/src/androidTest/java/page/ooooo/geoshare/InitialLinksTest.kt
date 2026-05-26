@@ -20,7 +20,6 @@ import page.ooooo.geoshare.lib.geo.Srs
 import java.io.IOException
 import java.util.UUID
 
-@RunWith(AndroidJUnit4::class)
 class InitialLinksTest {
     private lateinit var linkDao: LinkDao
     private lateinit var db: AppDatabase

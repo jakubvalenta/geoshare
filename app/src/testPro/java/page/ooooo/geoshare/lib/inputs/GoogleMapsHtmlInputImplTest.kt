@@ -9,6 +9,6 @@ class GoogleMapsHtmlInputImplTest : InputTest {
 
     @Test
     fun parse_returnsNoPoints() = runTest {
-        assertEquals(ParseResult(), input.parse("https://maps.google.com/foo"))
+        assertEquals(ParseResult(), input.parse(Unit, "https://maps.google.com/foo"))
     }
 }

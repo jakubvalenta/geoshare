@@ -29,6 +29,7 @@ import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.inputs.BasicInput
 import page.ooooo.geoshare.lib.inputs.Input
+import page.ooooo.geoshare.lib.inputs.NoopInput
 import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.inputs.WebViewInput
 import page.ooooo.geoshare.lib.inputs.merge
@@ -192,6 +193,9 @@ data class PermissionGranted(
 
             is WebViewInput ->
                 PermissionGrantedWebViewInput(stateContext, source, match, input, permission, results)
+
+            is NoopInput ->
+                DataParsed(stateContext, source, match, input, permission, listOf(ParseResult()) + results)
         }
 
     private companion object {
@@ -351,7 +355,6 @@ data class PermissionGrantedWebViewInput(
         "$TAG(source=$source, match=$match, input=$input, permission=$permission, results=$results)"
 }
 
-// TODO Test
 data class PermissionDenied(
     val stateContext: ConversionStateContext,
     val source: String,
