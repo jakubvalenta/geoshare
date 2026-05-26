@@ -8,7 +8,7 @@ class ConversionFailedTest {
     private val source = "https://maps.google.com/foo"
 
     @Test
-    fun returnsNull() = runTest {
+    fun transition_returnsNull() = runTest {
         val state = ConversionFailed(source, "Test message")
         assertNull(state.transition())
     }

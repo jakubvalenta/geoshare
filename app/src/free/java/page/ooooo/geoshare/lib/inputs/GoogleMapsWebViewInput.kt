@@ -22,7 +22,7 @@ class GoogleMapsWebViewInput @Inject constructor(
         () => window.location.href !== 'about:blank' ? window.location.href : undefined;
     """.trimIndent()
 
-    override suspend fun parse(data: String, match: String, prevResult: ParseResult?) = parseResult {
+    override suspend fun parse(data: String, match: String) = parseResult {
         nextStep = NextStep(googleMapsUriInput.get(), data)
     }
 

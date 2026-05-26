@@ -38,7 +38,7 @@ class WazeUriInput @Inject constructor(
         ),
     )
 
-    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
+    override suspend fun parse(data: Uri, match: String) = parseResult {
         data.run {
             // Short link
             // https://waze.com/ul/h{hash}
@@ -53,7 +53,13 @@ class WazeUriInput @Inject constructor(
                 ?.let { hash -> decodeWazeGeoHash(hash) }
                 ?.let {
                     points = persistentListOf(
-                        WGS84Point(it).copy(lat = it.lat?.toScale(6), lon = it.lon?.toScale(6))
+                        WGS84Point(
+                            lat = it.lat?.toScale(6),
+                            lon = it.lon?.toScale(6),
+                            z = it.z,
+                            name = it.name,
+                            source = it.source,
+                        )
                     )
                     return@run
                 }
@@ -68,7 +74,7 @@ class WazeUriInput @Inject constructor(
                 ?: LAT_LON_PATTERN.matchEntire(queryParams["ll"])
                 ?: LAT_LON_PATTERN.matchEntire(queryParams[@Suppress("SpellCheckingInspection") "latlng"])
                 )?.toLatLonPoint(Source.URI)?.let {
-                    points = persistentListOf(WGS84Point(it).copy(z = z, name = name))
+                    points = persistentListOf(WGS84Point(it, z, name))
                     return@run
                 }
 

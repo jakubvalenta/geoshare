@@ -31,7 +31,7 @@ class GoogleMapsFreeInputBehaviorTest : InputBehaviorTest {
             "https://www.google.com/maps/search/?api=1&query=Louisenstra%C3%9Fe%2060,%2001099%20Dresden",
         )
 
-        // Short link with coordinates in HTML
+        // Short links with coordinates in HTML
         testUri(
             WGS84Point(
                 51.1982447, 6.4389493,
@@ -40,11 +40,36 @@ class GoogleMapsFreeInputBehaviorTest : InputBehaviorTest {
             ),
             "https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8",
         )
+        testUri(
+            WGS84Point(
+                44.4490541, 26.0888398,
+                name = "RAI - Romantic & Intimate",
+                source = Source.URI,
+            ),
+            "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+        )
+        testUri(
+            WGS84Point(
+                52.4842015, 13.4167277,
+                name = @Suppress("SpellCheckingInspection") "Hasenheide Park",
+                source = Source.URI,
+            ),
+            "https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6",
+            WGS84Point(
+                52.4842015, 13.4167277,
+                name = @Suppress("SpellCheckingInspection") "Parc public Hasenheide",
+                source = Source.URI,
+            )
+        )
 
         // Place
         testUri(
-            WGS84Point(52.5200066, 13.404954, name = "Berlin", source = Source.URI),
-            "https://www.google.com/maps/place/Berlin,+Germany/",
+            WGS84Point(
+                52.4834254, 13.4245399,
+                name = @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin",
+                source = Source.URI,
+            ),
+            "https://www.google.com/maps/place/Hermannstr.+20,+Berlin/"
         )
 
         // Directions address

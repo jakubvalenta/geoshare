@@ -21,6 +21,8 @@ sealed interface Point {
     val cleanName: String?
         get() = name?.replace('+', ' ')
 
+    fun copy(z: Double? = null, name: String? = null): Point
+
     fun hasCoordinates(): Boolean = lat != null && lon != null
 
     fun hasName(): Boolean = !name.isNullOrEmpty()
@@ -41,12 +43,20 @@ data class WGS84Point(
     override val name: String? = null,
     override val source: Source,
 ) : Point {
-    constructor(naivePoint: NaivePoint) : this(
+    constructor(naivePoint: NaivePoint, z: Double? = null, name: String? = null) : this(
         naivePoint.lat,
         naivePoint.lon,
-        naivePoint.z,
-        naivePoint.name,
+        naivePoint.z ?: z,
+        naivePoint.name ?: name,
         naivePoint.source,
+    )
+
+    override fun copy(z: Double?, name: String?) = WGS84Point(
+        lat,
+        lon,
+        z = z ?: this@WGS84Point.z,
+        name = name ?: this@WGS84Point.name,
+        source = source,
     )
 
     override fun isAccurate() = true
@@ -66,12 +76,23 @@ data class GCJ02Point(
     override val name: String? = null,
     override val source: Source,
 ) : Point {
-    constructor(naivePoint: NaivePoint) : this(
+    constructor(naivePoint: NaivePoint, z: Double? = null, name: String? = null) : this(
         naivePoint.lat,
         naivePoint.lon,
-        naivePoint.z,
-        naivePoint.name,
+        naivePoint.z ?: z,
+        naivePoint.name ?: name,
         naivePoint.source,
+    )
+
+    override fun copy(
+        z: Double?,
+        name: String?,
+    ) = GCJ02Point(
+        lat,
+        lon,
+        z = z ?: this@GCJ02Point.z,
+        name = name ?: this@GCJ02Point.name,
+        source = source,
     )
 
     override fun isAccurate() = lat == null || lon == null || TransformUtil.outOfChina(lat, lon)
@@ -91,12 +112,23 @@ data class GCJ02MainlandChinaPoint(
     override val name: String? = null,
     override val source: Source,
 ) : Point {
-    constructor(naivePoint: NaivePoint) : this(
+    constructor(naivePoint: NaivePoint, z: Double? = null, name: String? = null) : this(
         naivePoint.lat,
         naivePoint.lon,
-        naivePoint.z,
-        naivePoint.name,
+        naivePoint.z ?: z,
+        naivePoint.name ?: name,
         naivePoint.source,
+    )
+
+    override fun copy(
+        z: Double?,
+        name: String?,
+    ) = GCJ02MainlandChinaPoint(
+        lat,
+        lon,
+        z = z ?: this@GCJ02MainlandChinaPoint.z,
+        name = name ?: this@GCJ02MainlandChinaPoint.name,
+        source = source,
     )
 
     override fun isAccurate() = lat == null || lon == null || TransformUtil.outOfChina(lat, lon)
@@ -116,12 +148,23 @@ data class GCJ02GreaterChinaAndTaiwanPoint(
     override val name: String? = null,
     override val source: Source,
 ) : Point {
-    constructor(naivePoint: NaivePoint) : this(
+    constructor(naivePoint: NaivePoint, z: Double? = null, name: String? = null) : this(
         naivePoint.lat,
         naivePoint.lon,
-        naivePoint.z,
-        naivePoint.name,
+        naivePoint.z ?: z,
+        naivePoint.name ?: name,
         naivePoint.source,
+    )
+
+    override fun copy(
+        z: Double?,
+        name: String?,
+    ) = GCJ02GreaterChinaAndTaiwanPoint(
+        lat,
+        lon,
+        z = z ?: this@GCJ02GreaterChinaAndTaiwanPoint.z,
+        name = name ?: this@GCJ02GreaterChinaAndTaiwanPoint.name,
+        source = source,
     )
 
     override fun isAccurate() = lat == null || lon == null || TransformUtil.outOfChina(lat, lon)
@@ -138,12 +181,23 @@ data class BD09MCPoint(
     override val name: String? = null,
     override val source: Source,
 ) : Point {
-    constructor(naivePoint: NaivePoint) : this(
+    constructor(naivePoint: NaivePoint, z: Double? = null, name: String? = null) : this(
         naivePoint.lat,
         naivePoint.lon,
-        naivePoint.z,
-        naivePoint.name,
+        naivePoint.z ?: z,
+        naivePoint.name ?: name,
         naivePoint.source,
+    )
+
+    override fun copy(
+        z: Double?,
+        name: String?,
+    ) = BD09MCPoint(
+        lat,
+        lon,
+        z = z ?: this@BD09MCPoint.z,
+        name = name ?: this@BD09MCPoint.name,
+        source = source,
     )
 
     override fun isAccurate() = lat == null || lon == null

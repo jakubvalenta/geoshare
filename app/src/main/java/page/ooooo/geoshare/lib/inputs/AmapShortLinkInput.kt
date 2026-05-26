@@ -30,7 +30,7 @@ class AmapShortLinkInput @Inject constructor(
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_amap_loading_indicator_title
 
-    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
+    override suspend fun parse(data: Uri, match: String) = parseResult {
         nextStep = NextStep(amapUriInput.get(), data.toString())
     }
 

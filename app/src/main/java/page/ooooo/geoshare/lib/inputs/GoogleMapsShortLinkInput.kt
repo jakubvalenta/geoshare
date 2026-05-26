@@ -39,7 +39,7 @@ class GoogleMapsShortLinkInput @Inject constructor(
     override val cookies = Companion.cookies
     override val userAgent = USER_AGENT
 
-    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
+    override suspend fun parse(data: Uri, match: String) = parseResult {
         data.run {
             // Google Maps Go
             // https://maps.app.goo.gl/?link={url}

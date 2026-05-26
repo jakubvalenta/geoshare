@@ -34,7 +34,7 @@ class OpenStreetMapUriInput @Inject constructor(
         ),
     )
 
-    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
+    override suspend fun parse(data: Uri, match: String) = parseResult {
         data.run {
             // Short link
             // https://osm.org/go/{hash}
