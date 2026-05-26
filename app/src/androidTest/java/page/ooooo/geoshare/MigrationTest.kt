@@ -2,11 +2,9 @@ package page.ooooo.geoshare
 
 import androidx.room.Room
 import androidx.room.testing.MigrationTestHelper
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 import page.ooooo.geoshare.data.local.database.AppDatabase
 import java.io.IOException
 import kotlin.uuid.ExperimentalUuidApi
