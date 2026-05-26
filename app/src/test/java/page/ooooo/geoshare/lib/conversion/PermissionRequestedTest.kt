@@ -29,7 +29,7 @@ class PermissionRequestedTest {
     fun transition_returnsNull() = runTest {
         val stateContext: ConversionStateContext = mock()
         val state = PermissionRequested(
-            stateContext, source, match = source, input, prevResult, input.permissionTitleResId
+            stateContext, source, match = source, input, listOf(prevResult), input.permissionTitleResId
         )
         assertNull(state.transition())
     }
@@ -43,10 +43,10 @@ class PermissionRequestedTest {
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = PermissionRequested(
-            stateContext, source, match = source, input, prevResult, input.permissionTitleResId
+            stateContext, source, match = source, input, listOf(prevResult), input.permissionTitleResId
         )
         assertEquals(
-            PermissionGranted(stateContext, source, match = source, input, Permission.ALWAYS, prevResult),
+            PermissionGranted(stateContext, source, match = source, input, Permission.ALWAYS, listOf(prevResult)),
             state.grant(false),
         )
         verify(userPreferencesRepository, never()).setValue(
@@ -64,9 +64,16 @@ class PermissionRequestedTest {
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state =
-            PermissionRequested(stateContext, source, match = source, input, prevResult, input.permissionTitleResId)
+            PermissionRequested(
+                stateContext,
+                source,
+                match = source,
+                input,
+                listOf(prevResult),
+                input.permissionTitleResId
+            )
         assertEquals(
-            PermissionGranted(stateContext, source, match = source, input, Permission.ALWAYS, prevResult),
+            PermissionGranted(stateContext, source, match = source, input, Permission.ALWAYS, listOf(prevResult)),
             state.grant(true),
         )
         verify(userPreferencesRepository).setValue(
@@ -84,10 +91,17 @@ class PermissionRequestedTest {
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state =
-            PermissionRequested(stateContext, source, match = source, input, prevResult, input.permissionTitleResId)
+            PermissionRequested(
+                stateContext,
+                source,
+                match = source,
+                input,
+                listOf(prevResult),
+                input.permissionTitleResId
+            )
         assertEquals(
             DataParsed(
-                stateContext, source, match = source, input, result = ParseResult(), Permission.NEVER, prevResult
+                stateContext, source, match = source, input, Permission.NEVER, listOf(ParseResult(), prevResult)
             ),
             state.deny(false),
         )
@@ -106,11 +120,11 @@ class PermissionRequestedTest {
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = PermissionRequested(
-            stateContext, source, match = source, input, prevResult, input.permissionTitleResId
+            stateContext, source, match = source, input, listOf(prevResult), input.permissionTitleResId
         )
         assertEquals(
             DataParsed(
-                stateContext, source, match = source, input, result = ParseResult(), Permission.NEVER, prevResult
+                stateContext, source, match = source, input, Permission.NEVER, listOf(ParseResult(), prevResult)
             ),
             state.deny(true),
         )

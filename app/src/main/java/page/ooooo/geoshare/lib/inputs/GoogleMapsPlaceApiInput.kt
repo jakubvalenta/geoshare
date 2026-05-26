@@ -39,12 +39,10 @@ class GoogleMapsPlaceApiInput @Inject constructor(
     override suspend fun fetch(match: String, block: suspend (Uri) -> ParseResult) =
         block(Uri.parse(match, uriQuote))
 
-    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
+    override suspend fun parse(data: Uri, match: String) = parseResult {
         val apiConfig = userPreferencesRepository.getValue(GoogleMapsApiPreference) ?: run {
             // Go to HTML parsing, if API is not configured
             nextStep = NextStep(googleMapsHtmlInput.get(), match)
-            // Copy point names from URI input
-            prevResult?.points?.let { points = it }
             return@parseResult
         }
         val client = apiService.createHttpClient(apiConfig)
@@ -63,14 +61,11 @@ class GoogleMapsPlaceApiInput @Inject constructor(
                     response.body<ApiService.GoogleMapsResult>()
                 }
         }
-        val prevPoint = prevResult?.points?.lastOrNull()
         points = persistentListOf(
             GCJ02MainlandChinaPoint(
                 res.location.latitude,
                 res.location.longitude,
-                name = prevPoint?.name,
-                z = prevPoint?.z,
-                source = prevPoint?.source ?: Source.API,
+                source = Source.API,
             )
         )
     }

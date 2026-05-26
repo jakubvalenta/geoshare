@@ -32,6 +32,7 @@ import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.NoopInput
 import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.inputs.WebViewInput
+import page.ooooo.geoshare.lib.inputs.merge
 import page.ooooo.geoshare.lib.network.MaxAttemptsReachedNetworkException
 import page.ooooo.geoshare.lib.network.RecoverableNetworkException
 import page.ooooo.geoshare.lib.network.UnrecoverableNetworkException
@@ -114,32 +115,26 @@ data class InputFound(
     val match: String,
     val input: Input,
     val permission: Permission? = null,
-    val prevResult: ParseResult? = null,
+    val results: List<ParseResult> = emptyList(),
 ) : ConversionState {
     override suspend fun transition(): State {
         stateContext.log.i(TAG, "Using input $input with match $match")
         return if (input is Input.HasPermission) {
             when (permission ?: stateContext.userPreferencesRepository.getValue(ConnectionPermissionPreference)) {
                 Permission.ALWAYS -> PermissionGranted(
-                    stateContext, source, match, input, Permission.ALWAYS, prevResult
+                    stateContext, source, match, input, Permission.ALWAYS, results
                 )
 
                 Permission.ASK -> PermissionRequested(
-                    stateContext, source, match, input, prevResult, input.permissionTitleResId
+                    stateContext, source, match, input, results, input.permissionTitleResId
                 )
 
-                Permission.NEVER -> DataParsed(
-                    stateContext,
-                    source,
-                    match,
-                    input,
-                    result = ParseResult(),
-                    permission = Permission.NEVER,
-                    prevResult,
+                Permission.NEVER -> PermissionDenied(
+                    stateContext, source, match, input, results
                 )
             }
         } else {
-            PermissionGranted(stateContext, source, match, input, permission, prevResult)
+            PermissionGranted(stateContext, source, match, input, permission, results)
         }
     }
 
@@ -155,23 +150,21 @@ data class PermissionRequested(
     val source: String,
     val match: String,
     val input: Input,
-    val prevResult: ParseResult? = null,
+    val results: List<ParseResult> = emptyList(),
     override val permissionTitleResId: Int,
 ) : ConversionState, ConversionState.HasPermission {
     override suspend fun grant(doNotAsk: Boolean): State {
         if (doNotAsk) {
             stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.ALWAYS)
         }
-        return PermissionGranted(stateContext, source, match, input, Permission.ALWAYS, prevResult)
+        return PermissionGranted(stateContext, source, match, input, Permission.ALWAYS, results)
     }
 
     override suspend fun deny(doNotAsk: Boolean): State {
         if (doNotAsk) {
             stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.NEVER)
         }
-        return DataParsed(
-            stateContext, source, match, input, result = ParseResult(), permission = Permission.NEVER, prevResult
-        )
+        return PermissionDenied(stateContext, source, match, input, results)
     }
 
     override fun toString() = "PermissionRequested"
@@ -183,18 +176,18 @@ data class PermissionGranted(
     val match: String,
     val input: Input,
     val permission: Permission?,
-    val prevResult: ParseResult? = null,
+    val results: List<ParseResult> = emptyList(),
 ) : ConversionState {
     override suspend fun transition(): State =
         when (input) {
             is BasicInput<*> ->
-                PermissionGrantedBasicInput(stateContext, source, match, input, permission, prevResult)
+                PermissionGrantedBasicInput(stateContext, source, match, input, permission, results)
 
             is WebViewInput ->
-                PermissionGrantedWebViewInput(stateContext, source, match, input, permission, prevResult)
+                PermissionGrantedWebViewInput(stateContext, source, match, input, permission, results)
 
             is NoopInput ->
-                DataParsed(stateContext, source, match, input, result = prevResult ?: ParseResult(), permission)
+                DataParsed(stateContext, source, match, input, permission, results + ParseResult())
         }
 
     override fun toString() = "PermissionGranted"
@@ -215,7 +208,7 @@ data class PermissionGrantedBasicInput<T>(
     val match: String,
     val input: BasicInput<T>,
     val permission: Permission?,
-    val prevResult: ParseResult? = null,
+    val results: List<ParseResult> = emptyList(),
     val lastAttempt: Attempt<RecoverableNetworkException>? = null,
     val maxAttempts: Int = 10,
     val dispatcher: CoroutineContext = Dispatchers.Default,
@@ -237,9 +230,9 @@ data class PermissionGrantedBasicInput<T>(
                     delay(delayMillis)
                 }
                 val result = input.fetch(match) { data ->
-                    input.parse(data, match, prevResult)
+                    input.parse(data, match)
                 }
-                DataParsed(stateContext, source, match, input, result, permission, prevResult)
+                DataParsed(stateContext, source, match, input, permission, listOf(result) + results)
             } catch (_: MalformedURLException) {
                 ConversionFailed(
                     source,
@@ -248,7 +241,7 @@ data class PermissionGrantedBasicInput<T>(
             } catch (tr: RecoverableNetworkException) {
                 val attempt = Attempt(attemptNumber, tr)
                 PermissionGrantedBasicInput(
-                    stateContext, source, match, input, permission, prevResult, attempt, maxAttempts
+                    stateContext, source, match, input, permission, results, attempt, maxAttempts
                 )
             } catch (tr: UnrecoverableNetworkException) {
                 ConversionFailed(
@@ -301,7 +294,7 @@ data class PermissionGrantedWebViewInput(
     val match: String,
     val input: WebViewInput,
     val permission: Permission?,
-    val prevResult: ParseResult? = null,
+    val results: List<ParseResult> = emptyList(),
     val timeout: Duration = 60.seconds,
     val dispatcher: CoroutineContext = Dispatchers.Default,
 ) : ConversionState, ConversionState.HasLargeLoadingIndicator {
@@ -319,8 +312,8 @@ data class PermissionGrantedWebViewInput(
                     .filterNotNull()
                     .timeout(timeout)
                     .first()
-                val result = input.parse(data, match, prevResult)
-                DataParsed(stateContext, source, match, input, result, permission, prevResult)
+                val result = input.parse(data, match)
+                DataParsed(stateContext, source, match, input, permission, listOf(result) + results)
             } catch (_: TimeoutCancellationException) {
                 stateContext.log.e(TAG, "Timed out")
                 ConversionFailed(
@@ -347,17 +340,28 @@ data class PermissionGrantedWebViewInput(
     override fun toString() = TAG
 }
 
+// TODO Test
+data class PermissionDenied(
+    val stateContext: ConversionStateContext,
+    val source: String,
+    val match: String,
+    val input: Input,
+    val results: List<ParseResult>,
+) : ConversionState {
+    override suspend fun transition() =
+        DataParsed(stateContext, source, match, input, Permission.NEVER, listOf(ParseResult()) + results)
+}
+
 data class DataParsed(
     val stateContext: ConversionStateContext,
     val source: String,
     val match: String,
     val input: Input,
-    val result: ParseResult,
     val permission: Permission?,
-    val prevResult: ParseResult? = null,
+    val results: List<ParseResult>,
 ) : ConversionState {
     override suspend fun transition(): State =
-        result.run {
+        results.merge().run {
             if (points.lastOrNull()?.hasCoordinates() == true) {
                 stateContext.log.i(
                     TAG, "Extracted point with coordinates $points from $match"
@@ -367,17 +371,12 @@ data class DataParsed(
                 stateContext.log.i(
                     TAG, "Failed to extract point with coordinates from $match, going to next step"
                 )
-                InputFound(stateContext, source, nextStep.match, nextStep.input, permission, prevResult = this)
+                InputFound(stateContext, source, nextStep.match, nextStep.input, permission, results)
             } else if (points.lastOrNull()?.hasName() == true) {
                 stateContext.log.i(
                     TAG, "Extracted point with name $points from $match"
                 )
                 ConversionSucceeded(stateContext, source, points)
-            } else if (prevResult?.points?.lastOrNull()?.run { hasCoordinates() || hasName() } == true) {
-                stateContext.log.i(
-                    TAG, "Failed to extract point from $match, using previous result ${prevResult.points}"
-                )
-                ConversionSucceeded(stateContext, source, prevResult.points)
             } else if (permission == Permission.NEVER) {
                 stateContext.log.i(
                     TAG, "Failed to extract point from $match, because permission was denied"

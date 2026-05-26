@@ -49,7 +49,7 @@ class YandexMapsUriInput @Inject constructor(
         ),
     )
 
-    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
+    override suspend fun parse(data: Uri, match: String) = parseResult {
         data.run {
             val z = listOf(@Suppress("SpellCheckingInspection") "whatshere[zoom]", "z")
                 .firstNotNullOfOrNull { key -> Z_PATTERN.matchEntire(queryParams[key])?.doubleGroupOrNull() }
@@ -72,7 +72,7 @@ class YandexMapsUriInput @Inject constructor(
                 .firstNotNullOfOrNull { key ->
                     LON_LAT_PATTERN.matchEntire(queryParams[key])?.toLonLatPoint(Source.URI)
                 }?.let {
-                    points = persistentListOf(WGS84Point(it).copy(z = z))
+                    points = persistentListOf(WGS84Point(it, z))
                     return@parseResult
                 }
 

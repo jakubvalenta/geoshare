@@ -33,9 +33,9 @@ class InputFoundTest {
             on { this@on.log } doReturn log
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = InputFound(stateContext, source, match = source, input, Permission.ALWAYS, prevResult)
+        val state = InputFound(stateContext, source, match = source, input, Permission.ALWAYS, listOf(prevResult))
         assertEquals(
-            PermissionGranted(stateContext, source, match = source, input, Permission.ALWAYS, prevResult),
+            PermissionGranted(stateContext, source, match = source, input, Permission.ALWAYS, listOf(prevResult)),
             state.transition(),
         )
     }
@@ -49,9 +49,16 @@ class InputFoundTest {
             on { this@on.log } doReturn log
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = InputFound(stateContext, source, match = source, input, Permission.ASK, prevResult)
+        val state = InputFound(stateContext, source, match = source, input, Permission.ASK, listOf(prevResult))
         assertEquals(
-            PermissionRequested(stateContext, source, match = source, input, prevResult, input.permissionTitleResId),
+            PermissionRequested(
+                stateContext,
+                source,
+                match = source,
+                input,
+                listOf(prevResult),
+                input.permissionTitleResId
+            ),
             state.transition(),
         )
     }
@@ -65,10 +72,10 @@ class InputFoundTest {
             on { this@on.log } doReturn log
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = InputFound(stateContext, source, match = source, input, Permission.NEVER, prevResult)
+        val state = InputFound(stateContext, source, match = source, input, Permission.NEVER, listOf(prevResult))
         assertEquals(
             DataParsed(
-                stateContext, source, match = source, input, result = ParseResult(), Permission.NEVER, prevResult
+                stateContext, source, match = source, input, Permission.NEVER, listOf(prevResult)
             ),
             state.transition(),
         )
@@ -84,9 +91,9 @@ class InputFoundTest {
                 on { this@on.log } doReturn log
                 on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
             }
-            val state = InputFound(stateContext, source, match = source, input, permission = null, prevResult)
+            val state = InputFound(stateContext, source, match = source, input, permission = null, listOf(prevResult))
             assertEquals(
-                PermissionGranted(stateContext, source, match = source, input, Permission.ALWAYS, prevResult),
+                PermissionGranted(stateContext, source, match = source, input, Permission.ALWAYS, listOf(prevResult)),
                 state.transition(),
             )
         }
@@ -100,9 +107,11 @@ class InputFoundTest {
             on { this@on.log } doReturn log
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = InputFound(stateContext, source, match = source, input, permission = null, prevResult)
+        val state = InputFound(stateContext, source, match = source, input, permission = null, listOf(prevResult))
         assertEquals(
-            PermissionRequested(stateContext, source, match = source, input, prevResult, input.permissionTitleResId),
+            PermissionRequested(
+                stateContext, source, match = source, input, listOf(prevResult), input.permissionTitleResId
+            ),
             state.transition(),
         )
     }
@@ -116,10 +125,10 @@ class InputFoundTest {
             on { this@on.log } doReturn log
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = InputFound(stateContext, source, match = source, input, permission = null, prevResult)
+        val state = InputFound(stateContext, source, match = source, input, permission = null, listOf(prevResult))
         assertEquals(
             DataParsed(
-                stateContext, source, match = source, input, result = ParseResult(), Permission.NEVER, prevResult
+                stateContext, source, match = source, input, Permission.NEVER, listOf(prevResult)
             ),
             state.transition(),
         )
@@ -131,9 +140,9 @@ class InputFoundTest {
         val stateContext: ConversionStateContext = mock {
             on { this@on.log } doReturn log
         }
-        val state = InputFound(stateContext, source, match = source, input, Permission.NEVER, prevResult)
+        val state = InputFound(stateContext, source, match = source, input, Permission.NEVER, listOf(prevResult))
         assertEquals(
-            PermissionGranted(stateContext, source, match = source, input, Permission.NEVER, prevResult),
+            PermissionGranted(stateContext, source, match = source, input, Permission.NEVER, listOf(prevResult)),
             state.transition(),
         )
     }

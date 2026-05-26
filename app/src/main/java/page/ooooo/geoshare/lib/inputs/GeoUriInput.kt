@@ -33,7 +33,7 @@ class GeoUriInput @Inject constructor(
         ),
     )
 
-    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
+    override suspend fun parse(data: Uri, match: String) = parseResult {
         data.run {
             val z = Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()
 
@@ -51,14 +51,14 @@ class GeoUriInput @Inject constructor(
             // Pin with name
             // ?q={lat},{lon}({name})
             Regex("""$LAT,$LON(?:$NAME_REGEX)?""").matchEntire(queryParams["q"])?.toLatLonNamePoint(Source.URI)?.let {
-                points = persistentListOf(WGS84Point(it).copy(z = z, name = it.name ?: name))
+                points = persistentListOf(WGS84Point(it, z, name))
                 return@run
             }
 
             // Coordinates
             // geo:{lat},{lon}
             LAT_LON_PATTERN.matchEntire(pathParts.firstOrNull())?.toLatLonPoint(Source.URI)?.let {
-                points = persistentListOf(WGS84Point(it).copy(z = z, name = name))
+                points = persistentListOf(WGS84Point(it, z, name))
                 return@run
             }
 

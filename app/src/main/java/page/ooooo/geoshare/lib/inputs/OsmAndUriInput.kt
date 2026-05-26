@@ -27,7 +27,7 @@ class OsmAndUriInput @Inject constructor(
         ),
     )
 
-    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
+    override suspend fun parse(data: Uri, match: String) = parseResult {
         data.run {
             val z = Regex("""$Z/.*""").matchEntire(fragment)?.doubleGroupOrNull()
 
@@ -37,7 +37,7 @@ class OsmAndUriInput @Inject constructor(
                 LAT_LON_PATTERN.matchEntire(queryParams["start"])?.toLatLonPoint(Source.URI).let { start ->
                     if (finish != null || start != null) {
                         points = listOfNotNull(start, finish)
-                            .map { WGS84Point(it).copy(z = z) }
+                            .map { WGS84Point(it, z) }
                             .toImmutableList()
                         return@run
                     }
@@ -47,14 +47,14 @@ class OsmAndUriInput @Inject constructor(
             // Pin
             // https://osmand.net/map?pin={lat},{lon}
             LAT_LON_PATTERN.matchEntire(queryParams["pin"])?.toLatLonPoint(Source.URI)?.let {
-                points = persistentListOf(WGS84Point(it).copy(z = z))
+                points = persistentListOf(WGS84Point(it, z))
                 return@run
             }
 
             // Map center
             // https://osmand.net/map#{z}/{lat}/{lon}
             Regex("""$Z/$LAT/$LON.*""").matchEntire(fragment)?.toZLatLonPoint(Source.MAP_CENTER)?.let {
-                points = persistentListOf(WGS84Point(it).copy(z = z))
+                points = persistentListOf(WGS84Point(it, z))
                 return@run
             }
         }

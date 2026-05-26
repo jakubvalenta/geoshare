@@ -56,7 +56,7 @@ class UrbiUriInput @Inject constructor(
         ),
     )
 
-    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
+    override suspend fun parse(data: Uri, match: String) = parseResult {
         data.run {
             // Marker
             // https://maps.urbi.ae/dubai/geo/{lon}%2C{lat}?m={lon},{lat}/{z}
@@ -70,7 +70,7 @@ class UrbiUriInput @Inject constructor(
             // Point
             // https://maps.urbi.ae/dubai/geo/{lon}%2C{lat}
             pathParts.firstNotNullOfOrNull { LON_LAT_PATTERN.matchEntire(it)?.toLonLatPoint(Source.URI) }?.let {
-                points = persistentListOf(WGS84Point(it).copy(z = z))
+                points = persistentListOf(WGS84Point(it, z))
                 return@run
             }
 
@@ -78,7 +78,8 @@ class UrbiUriInput @Inject constructor(
             // https://share.api.2gis.ru/getimage?...&zoom={z}&center={lon},{lat}&title={name}...
             LON_LAT_PATTERN.matchEntire(queryParams["center"])?.toLonLatPoint(Source.MAP_CENTER)?.let {
                 points = persistentListOf(
-                    WGS84Point(it).copy(
+                    WGS84Point(
+                        it,
                         z = z,
                         name = Q_PARAM_PATTERN.matchEntire(queryParams["title"])?.groupOrNull(),
                     )

@@ -28,7 +28,7 @@ class AppleMapsUriInput @Inject constructor(
         ),
     )
 
-    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
+    override suspend fun parse(data: Uri, match: String) = parseResult {
         data.run {
             val z = Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()
 
@@ -44,7 +44,7 @@ class AppleMapsUriInput @Inject constructor(
                 .firstNotNullOfOrNull { key ->
                     LAT_LON_PATTERN.matchEntire(queryParams[key])?.toLatLonPoint(Source.URI)
                 }?.let {
-                    points = persistentListOf(WGS84Point(it).copy(z = z, name = name))
+                    points = persistentListOf(WGS84Point(it, z, name))
                     return@run
                 }
 
@@ -54,7 +54,7 @@ class AppleMapsUriInput @Inject constructor(
                 .firstNotNullOfOrNull { key ->
                     LAT_LON_PATTERN.matchEntire(queryParams[key])?.toLatLonPoint(Source.MAP_CENTER)
                 }?.let {
-                    points = persistentListOf(WGS84Point(it).copy(z = z, name = name))
+                    points = persistentListOf(WGS84Point(it, z, name))
                     return@run
                 }
 

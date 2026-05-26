@@ -21,7 +21,7 @@ class DebugUriInput @Inject constructor(
         items = emptyList(),
     )
 
-    override suspend fun parse(data: Uri, match: String, prevResult: ParseResult?) = parseResult {
+    override suspend fun parse(data: Uri, match: String) = parseResult {
         nextStep = NextStep(debugWebViewInput.get(), match)
     }
 
