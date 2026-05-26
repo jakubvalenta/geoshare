@@ -3,6 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.geo.WGS84Point
 
 data class ParseResult(
     val points: Points = persistentListOf(),
@@ -28,32 +29,33 @@ suspend fun parseResult(block: suspend ParseResultScope.() -> Unit): ParseResult
  * Returns the latest result from a list sorted from latest to oldest. If the latest result doesn't have a zoom or name,
  * it tries to find a zoom and name in previous results, and copies them to the latest result.
  */
-// TODO Test
 fun List<ParseResult>.merge(): ParseResult {
     // Find points in latest result or previous results
-    val latestResult = first()
-    val lastPoint = latestResult.points.lastOrNull()
+    val latestResult = firstOrNull() ?: return ParseResult()
+    if (size <= 1) return latestResult
+    val latestPoint = latestResult.points.lastOrNull()
+    val anyPoint = latestPoint ?: firstNotNullOfOrNull { it.points.firstOrNull() } ?: return latestResult
+
     // Find zoom and name in previous results
-    val z = lastPoint?.z ?: drop(1).firstNotNullOfOrNull { parseResult -> parseResult.points.lastOrNull()?.z }
-    val name = lastPoint?.name ?: drop(1).firstNotNullOfOrNull { parseResult -> parseResult.points.lastOrNull()?.name }
+    val z = latestPoint?.z ?: drop(1).firstNotNullOfOrNull { it.points.lastOrNull()?.z }
+    val name = latestPoint?.name ?: drop(1).firstNotNullOfOrNull { it.points.lastOrNull()?.name }
     return if (
-        (z != null && z != lastPoint?.z) ||
-        (name != null && name != lastPoint?.name)
+        (z != null && z != latestPoint?.z) ||
+        (name != null && name != latestPoint?.name)
     ) {
-        if (lastPoint != null) {
+        if (latestPoint != null) {
             // Copy zoom and name from previous results to latest result
             latestResult.copy(
                 points = latestResult.points
                     .take(latestResult.points.size - 1)
-                    .plus(lastPoint.copy(z = z, name = name))
+                    .plus(latestPoint.copy(z = z, name = name))
                     .toImmutableList(),
             )
         } else {
             // Create new point with zoom and/or name from previous results
-            val templatePoint = firstNotNullOf { it.points.lastOrNull() }
             latestResult.copy(
                 points = persistentListOf(
-                    templatePoint.copy(z = z, name = name),
+                    WGS84Point(z = z, name = name, source = anyPoint.source),
                 ),
             )
         }
