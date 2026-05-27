@@ -121,39 +121,6 @@ object CoordinateFormatPreference : OptionsPreference<CoordinateFormat> {
     )
 }
 
-interface ApiConfigPreference : TextPreference<ApiConfig?>
-
-object GoogleMapsApiPreference : ApiConfigPreference {
-    override val key = stringPreferencesKey("google_maps_api_config")
-    override val default = null
-    val loading = default
-
-    override fun serialize(value: ApiConfig?, log: Log) =
-        try {
-            Json.encodeToString(value)
-        } catch (tr: SerializationException) {
-            // Silently ignore serialization errors, because the value should always serialize
-            log.e(TAG, "Serialization error", tr)
-            ""
-        }
-
-    override fun deserialize(value: String?, log: Log) =
-        if (value != null) {
-            try {
-                Json.decodeFromString<ApiConfig>(value)
-            } catch (tr: IllegalArgumentException) {
-                log.e(TAG, "Deserialization error", tr)
-                default
-            }
-        } else {
-            default
-        }
-
-    override fun getValue(values: UserPreferencesValues) = values.googleMapsApiConfig
-
-    private const val TAG = "GoogleMapsApiPreference"
-}
-
 object AutomationPreference : OptionsPreference<Automation> {
     private val key = stringPreferencesKey("automation")
     override val default = NoopAutomation
@@ -435,7 +402,6 @@ object ChangelogShownForVersionCodePreference : NullableIntPreference {
 }
 
 data class UserPreferencesValues(
-    val googleMapsApiConfig: ApiConfig? = GoogleMapsApiPreference.loading,
     val automation: Automation = AutomationPreference.loading,
     val automationDelay: Duration = AutomationDelayPreference.loading,
     val cachedApiToken: CachedApiToken? = CachedApiTokenPreference.loading,

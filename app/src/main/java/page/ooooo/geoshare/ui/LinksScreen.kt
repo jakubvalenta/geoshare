@@ -88,20 +88,29 @@ fun LinksScreen(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val resources = LocalResources.current
+    val all by viewModel.all.collectAsStateWithLifecycle()
     val billingAppNameResId = billingViewModel.billingAppNameResId
     val billingFeatures = billingViewModel.billingFeatures
     val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
-    val links by viewModel.all.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
 
     LinksScreen(
         destination = viewModel.destination,
+        all = all,
         billingAppNameResId = billingAppNameResId,
         billingFeatures = billingFeatures,
         billingStatus = billingStatus,
         coordinateConverter = outputViewModel.coordinateConverter,
-        links = links,
         message = message,
+        appEnabled = viewModel.appEnabled,
+        chipEnabled = viewModel.chipEnabled,
+        coordsUriTemplate = viewModel.coordsUriTemplate,
+        group = viewModel.group,
+        name = viewModel.name,
+        nameUriTemplate = viewModel.nameUriTemplate,
+        sheetEnabled = viewModel.sheetEnabled,
+        srs = viewModel.srs,
+        type = viewModel.type,
         onBack = onBack,
         onDelete = { viewModel.delete(resources) },
         onDisable = { viewModel.disable(it) },
@@ -115,15 +124,6 @@ fun LinksScreen(
         onNavigateToBillingScreen = onNavigateToBillingScreen,
         onRestoreInitialData = { viewModel.restoreInitialData(resources) },
         onSaveForm = { viewModel.saveForm(resources) },
-        appEnabled = viewModel.appEnabled,
-        chipEnabled = viewModel.chipEnabled,
-        coordsUriTemplate = viewModel.coordsUriTemplate,
-        group = viewModel.group,
-        name = viewModel.name,
-        nameUriTemplate = viewModel.nameUriTemplate,
-        sheetEnabled = viewModel.sheetEnabled,
-        srs = viewModel.srs,
-        type = viewModel.type,
         onSetAppEnabled = { viewModel.appEnabled = it },
         onSetChipEnabled = { viewModel.chipEnabled = it },
         onSetCoordsUriTemplate = { viewModel.coordsUriTemplate = it },
@@ -141,11 +141,11 @@ fun LinksScreen(
 @Composable
 private fun LinksScreen(
     destination: Int?,
+    all: List<Link>,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
     coordinateConverter: CoordinateConverter,
-    links: List<Link>,
     message: Message?,
     appEnabled: Boolean,
     chipEnabled: Boolean,
@@ -232,12 +232,12 @@ private fun LinksScreen(
                     billingFeatures = billingFeatures,
                     billingStatus = billingStatus,
                     containerColor = containerColor,
-                    links = links,
+                    all = all,
                     onBack = onBack,
                     onDisable = onDisable,
                     onEnable = onEnable,
                     onNavigateToContentKey = onNavigateTo,
-                    onRestoreInitialLinks = onRestoreInitialData,
+                    onRestoreInitialData = onRestoreInitialData,
                 )
             },
             detailPane = { wide ->
@@ -287,15 +287,15 @@ private fun LinksListPane(
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
     containerColor: Color,
-    links: List<Link>,
+    all: List<Link>,
     onBack: () -> Unit,
     onDisable: (uid: Int) -> Unit,
     onEnable: (uid: Int) -> Unit,
     onNavigateToContentKey: (Int?) -> Unit,
-    onRestoreInitialLinks: () -> Unit,
+    onRestoreInitialData: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
-    val (restoreInitialLinksDialogOpen, setRestoreInitialLinksDialogOpen) = retain { mutableStateOf(false) }
+    val (restoreInitialDataDialogOpen, setRestoreInitialDataDialogOpen) = retain { mutableStateOf(false) }
 
     ScrollablePane(
         title = {
@@ -335,7 +335,7 @@ private fun LinksListPane(
                 }
             }
         }
-        links
+        all
             .groupBy { it.groupOrName }
             .toSortedMap()
             .forEach { (group, links) ->
@@ -374,7 +374,7 @@ private fun LinksListPane(
             }
         item {
             TextButton(
-                onClick = { setRestoreInitialLinksDialogOpen(true) },
+                onClick = { setRestoreInitialDataDialogOpen(true) },
                 modifier = Modifier
                     .testTag("geoShareLinksRestoreInitialButton")
                     .padding(top = spacing.mediumAdaptive, bottom = spacing.tinyAdaptive),
@@ -385,16 +385,16 @@ private fun LinksListPane(
         }
     }
 
-    if (restoreInitialLinksDialogOpen) {
+    if (restoreInitialDataDialogOpen) {
         ConfirmationDialog(
             stringResource(R.string.links_restore_initial_data_title),
             stringResource(R.string.conversion_permission_common_grant),
             stringResource(R.string.conversion_permission_common_deny),
             onConfirmation = {
-                onRestoreInitialLinks()
-                setRestoreInitialLinksDialogOpen(false)
+                onRestoreInitialData()
+                setRestoreInitialDataDialogOpen(false)
             },
-            onDismissRequest = { setRestoreInitialLinksDialogOpen(false) },
+            onDismissRequest = { setRestoreInitialDataDialogOpen(false) },
             modifier = Modifier
                 .semantics { testTagsAsResourceId = true }
                 .testTag("geoShareLinksRestoreInitialDialog"),
@@ -535,7 +535,7 @@ private fun DefaultPreview() {
                 val coordinateConverter = CoordinateConverter(geometries)
                 LinksScreen(
                     destination = null,
-                    links = defaultFakeLinks,
+                    all = defaultFakeLinks,
                     message = null,
                     appEnabled = false,
                     billingAppNameResId = R.string.app_name_pro,
@@ -590,7 +590,7 @@ private fun DarkPreview() {
                 val coordinateConverter = CoordinateConverter(geometries)
                 LinksScreen(
                     destination = null,
-                    links = defaultFakeLinks,
+                    all = defaultFakeLinks,
                     message = null,
                     appEnabled = false,
                     billingAppNameResId = R.string.app_name_pro,
@@ -645,7 +645,7 @@ private fun TabletPreview() {
                 val coordinateConverter = CoordinateConverter(geometries)
                 LinksScreen(
                     destination = null,
-                    links = defaultFakeLinks,
+                    all = defaultFakeLinks,
                     message = null,
                     appEnabled = false,
                     billingAppNameResId = R.string.app_name_pro,
@@ -700,7 +700,7 @@ private fun InsertPreview() {
                 val coordinateConverter = CoordinateConverter(geometries)
                 LinksScreen(
                     destination = -1,
-                    links = defaultFakeLinks,
+                    all = defaultFakeLinks,
                     message = null,
                     appEnabled = false,
                     billingAppNameResId = R.string.app_name_pro,
@@ -755,7 +755,7 @@ private fun DarkInsertPreview() {
                 val coordinateConverter = CoordinateConverter(geometries)
                 LinksScreen(
                     destination = -1,
-                    links = defaultFakeLinks,
+                    all = defaultFakeLinks,
                     message = null,
                     appEnabled = false,
                     billingAppNameResId = R.string.app_name_pro,
@@ -811,7 +811,7 @@ private fun TabletInsertPreview() {
                 val coordinateConverter = CoordinateConverter(geometries)
                 LinksScreen(
                     destination = -1,
-                    links = defaultFakeLinks,
+                    all = defaultFakeLinks,
                     message = null,
                     appEnabled = false,
                     billingAppNameResId = R.string.app_name_pro,
@@ -866,7 +866,7 @@ private fun InsertNotPurchasedPreview() {
                 val coordinateConverter = CoordinateConverter(geometries)
                 LinksScreen(
                     destination = -1,
-                    links = defaultFakeLinks,
+                    all = defaultFakeLinks,
                     message = null,
                     appEnabled = false,
                     billingAppNameResId = R.string.app_name_pro,
@@ -916,7 +916,7 @@ private fun DarkInsertNotPurchasedPreview() {
                 val coordinateConverter = CoordinateConverter(geometries)
                 LinksScreen(
                     destination = -1,
-                    links = defaultFakeLinks,
+                    all = defaultFakeLinks,
                     message = null,
                     appEnabled = false,
                     billingAppNameResId = R.string.app_name_pro,
@@ -967,7 +967,7 @@ private fun TabletInsertNotPurchasedPreview() {
                 val coordinateConverter = CoordinateConverter(geometries)
                 LinksScreen(
                     destination = -1,
-                    links = defaultFakeLinks,
+                    all = defaultFakeLinks,
                     message = null,
                     appEnabled = false,
                     billingAppNameResId = R.string.app_name_pro,
@@ -1019,7 +1019,7 @@ private fun UpdatePreview() {
                 val link = FakeGoogleMapsStreetViewLink
                 LinksScreen(
                     destination = link.uid,
-                    links = defaultFakeLinks,
+                    all = defaultFakeLinks,
                     message = null,
                     appEnabled = link.appEnabled,
                     billingAppNameResId = R.string.app_name_pro,
@@ -1076,7 +1076,7 @@ private fun DarkUpdatePreview() {
                 val link = FakeGoogleMapsStreetViewLink
                 LinksScreen(
                     destination = link.uid,
-                    links = defaultFakeLinks,
+                    all = defaultFakeLinks,
                     message = null,
                     appEnabled = link.appEnabled,
                     billingAppNameResId = R.string.app_name_pro,
@@ -1133,7 +1133,7 @@ private fun TabletUpdatePreview() {
                 val link = FakeGoogleMapsStreetViewLink
                 LinksScreen(
                     destination = link.uid,
-                    links = defaultFakeLinks,
+                    all = defaultFakeLinks,
                     message = null,
                     appEnabled = link.appEnabled,
                     billingAppNameResId = R.string.app_name_pro,

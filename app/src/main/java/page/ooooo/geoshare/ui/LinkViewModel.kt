@@ -40,16 +40,16 @@ class LinkViewModel @Inject constructor(
     val message: StateFlow<Message?> = _message
 
     /**
-     * Dummy Link to read default form values from.
+     * Dummy object to read default form values from.
      */
-    private val defaultLink = Link()
+    private val default = Link()
 
     /**
      * Controls whether the list, insert, or update screen is displayed, so that the UI state survives process death.
      *
      * - null: list screen
      * - -1: insert screen
-     * - other number: update screen for this link uid
+     * - other number: update screen for this object uid
      */
     var destination by savedStateHandle.saveable { mutableStateOf<Int?>(null) }
 
@@ -57,21 +57,21 @@ class LinkViewModel @Inject constructor(
      * Navigate to the list, insert, or update screen; and reset or prefill the form.
      */
     suspend fun navigateTo(destination: Int?) {
-        Log.d("LinkViewModel", "navigateTo($destination)")
+        Log.d(TAG, "navigateTo($destination)")
         if (this.destination == destination) {
             // Do nothing, so that we don't overwrite values restored after process death for no reason
         } else if (destination == null || destination == -1) {
             withMutableSnapshot {
                 this.destination = destination
-                this.group = defaultLink.group
-                this.name = defaultLink.name
-                this.srs = defaultLink.srs
-                this.type = defaultLink.type
-                this.appEnabled = defaultLink.appEnabled
-                this.chipEnabled = defaultLink.chipEnabled
-                this.sheetEnabled = defaultLink.sheetEnabled
-                this.coordsUriTemplate = defaultLink.coordsUriTemplate
-                this.nameUriTemplate = defaultLink.nameUriTemplate
+                this.group = default.group
+                this.name = default.name
+                this.srs = default.srs
+                this.type = default.type
+                this.appEnabled = default.appEnabled
+                this.chipEnabled = default.chipEnabled
+                this.sheetEnabled = default.sheetEnabled
+                this.coordsUriTemplate = default.coordsUriTemplate
+                this.nameUriTemplate = default.nameUriTemplate
             }
         } else {
             val link = linkRepository.getByUid(destination)
@@ -94,15 +94,15 @@ class LinkViewModel @Inject constructor(
 
     // Form
 
-    var group by savedStateHandle.saveable { mutableStateOf(defaultLink.group) }
-    var name by savedStateHandle.saveable { mutableStateOf(defaultLink.name) }
-    var srs by savedStateHandle.saveable { mutableStateOf(defaultLink.srs) }
-    var type by savedStateHandle.saveable { mutableStateOf(defaultLink.type) }
-    var appEnabled by savedStateHandle.saveable { mutableStateOf(defaultLink.appEnabled) }
-    var chipEnabled by savedStateHandle.saveable { mutableStateOf(defaultLink.chipEnabled) }
-    var sheetEnabled by savedStateHandle.saveable { mutableStateOf(defaultLink.sheetEnabled) }
-    var coordsUriTemplate by savedStateHandle.saveable { mutableStateOf(defaultLink.coordsUriTemplate) }
-    var nameUriTemplate by savedStateHandle.saveable { mutableStateOf(defaultLink.nameUriTemplate) }
+    var group by savedStateHandle.saveable { mutableStateOf(default.group) }
+    var name by savedStateHandle.saveable { mutableStateOf(default.name) }
+    var srs by savedStateHandle.saveable { mutableStateOf(default.srs) }
+    var type by savedStateHandle.saveable { mutableStateOf(default.type) }
+    var appEnabled by savedStateHandle.saveable { mutableStateOf(default.appEnabled) }
+    var chipEnabled by savedStateHandle.saveable { mutableStateOf(default.chipEnabled) }
+    var sheetEnabled by savedStateHandle.saveable { mutableStateOf(default.sheetEnabled) }
+    var coordsUriTemplate by savedStateHandle.saveable { mutableStateOf(default.coordsUriTemplate) }
+    var nameUriTemplate by savedStateHandle.saveable { mutableStateOf(default.nameUriTemplate) }
 
     fun saveForm(resources: Resources) {
         destination?.let { destination ->
@@ -196,5 +196,9 @@ class LinkViewModel @Inject constructor(
 
     fun dismissMessage() {
         _message.value = null
+    }
+
+    private companion object {
+        private const val TAG = "LinkViewModel"
     }
 }

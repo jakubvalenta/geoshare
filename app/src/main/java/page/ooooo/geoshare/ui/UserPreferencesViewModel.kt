@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.ApiPresetRepository
 import page.ooooo.geoshare.data.AppsRepository
 import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
@@ -22,6 +23,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UserPreferencesViewModel @Inject constructor(
+    apiPresetRepository: ApiPresetRepository,
     appsRepository: AppsRepository,
     linkRepository: LinkRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
@@ -30,6 +32,12 @@ class UserPreferencesViewModel @Inject constructor(
     private val _message = MutableStateFlow<Message?>(null)
     val message: StateFlow<Message?> = _message
 
+    val apiPresets = apiPresetRepository.all
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            emptyList(),
+        )
     val apps = appsRepository.apps
         .stateIn(
             viewModelScope,

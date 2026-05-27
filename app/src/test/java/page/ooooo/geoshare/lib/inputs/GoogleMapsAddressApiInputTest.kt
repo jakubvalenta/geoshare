@@ -13,10 +13,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import page.ooooo.geoshare.data.di.FakeApiPresetRepository
+import page.ooooo.geoshare.data.di.FakeGeoShareApiPreset
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
-import page.ooooo.geoshare.data.local.preferences.ApiConfig
-import page.ooooo.geoshare.data.local.preferences.GoogleMapsApiPreference
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
@@ -73,16 +73,17 @@ class GoogleMapsAddressApiInputTest {
     }
     private val log = FakeLog
     private val uriQuote = FakeUriQuote
+    private val userPreferencesRepository = FakeUserPreferencesRepository()
 
     @Test
     fun parse_whenApiIsNotConfigured_returnsNextStep() = runTest {
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(GoogleMapsApiPreference) } doReturn null
+        val apiPresetRepository: FakeApiPresetRepository = mock {
+            on { getFirstEnabled() } doReturn null
         }
         val input = GoogleMapsAddressApiInput(
+            apiPresetRepository = apiPresetRepository,
             apiService = ApiService(engine, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
-            userPreferencesRepository = userPreferencesRepository,
             uriQuote = uriQuote,
         )
         val match = "https://maps.google.com/?q=$query"
@@ -96,13 +97,13 @@ class GoogleMapsAddressApiInputTest {
 
     @Test
     fun parse_whenQueryIsInQueryParamAndApiReturnsResults_returnsHighestRankedPoint() = runTest {
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(GoogleMapsApiPreference) } doReturn ApiConfig.WithAttestationAuth(baseUrl)
+        val apiPresetRepository: FakeApiPresetRepository = mock {
+            on { getFirstEnabled() } doReturn FakeGeoShareApiPreset
         }
         val input = GoogleMapsAddressApiInput(
+            apiPresetRepository = apiPresetRepository,
             apiService = ApiService(engine, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
-            userPreferencesRepository = userPreferencesRepository,
             uriQuote = uriQuote,
         )
         for (match in listOf(
@@ -124,13 +125,13 @@ class GoogleMapsAddressApiInputTest {
 
     @Test
     fun parse_whenQueryIsInPathAndApiReturnsResults_returnsHighestRankedPoint() = runTest {
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(GoogleMapsApiPreference) } doReturn ApiConfig.WithAttestationAuth(baseUrl)
+        val apiPresetRepository: FakeApiPresetRepository = mock {
+            on { getFirstEnabled() } doReturn FakeGeoShareApiPreset
         }
         val input = GoogleMapsAddressApiInput(
+            apiPresetRepository = apiPresetRepository,
             apiService = ApiService(engine, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
-            userPreferencesRepository = userPreferencesRepository,
             uriQuote = uriQuote,
         )
         for (match in listOf(
@@ -152,13 +153,13 @@ class GoogleMapsAddressApiInputTest {
 
     @Test
     fun parse_whenQueryIsNotFoundInUri_returnsNoPoints() = runTest {
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(GoogleMapsApiPreference) } doReturn ApiConfig.WithAttestationAuth(baseUrl)
+        val apiPresetRepository: FakeApiPresetRepository = mock {
+            on { getFirstEnabled() } doReturn FakeGeoShareApiPreset
         }
         val input = GoogleMapsAddressApiInput(
+            apiPresetRepository = apiPresetRepository,
             apiService = ApiService(engine, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
-            userPreferencesRepository = userPreferencesRepository,
             uriQuote = uriQuote,
         )
         val match = "https://www.google.com/spam"
@@ -170,13 +171,13 @@ class GoogleMapsAddressApiInputTest {
 
     @Test
     fun parse_whenQueryIsEmpty_returnsNoPoints() = runTest {
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(GoogleMapsApiPreference) } doReturn ApiConfig.WithAttestationAuth(baseUrl)
+        val apiPresetRepository: FakeApiPresetRepository = mock {
+            on { getFirstEnabled() } doReturn FakeGeoShareApiPreset
         }
         val input = GoogleMapsAddressApiInput(
+            apiPresetRepository = apiPresetRepository,
             apiService = ApiService(engine, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
-            userPreferencesRepository = userPreferencesRepository,
             uriQuote = uriQuote,
         )
         val match = "https://www.google.com/?q="
@@ -188,13 +189,13 @@ class GoogleMapsAddressApiInputTest {
 
     @Test
     fun parse_whenApiReturnsNoResults_returnsNoPoints() = runTest {
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(GoogleMapsApiPreference) } doReturn ApiConfig.WithAttestationAuth(baseUrl)
+        val apiPresetRepository: FakeApiPresetRepository = mock {
+            on { getFirstEnabled() } doReturn FakeGeoShareApiPreset
         }
         val input = GoogleMapsAddressApiInput(
+            apiPresetRepository = apiPresetRepository,
             apiService = ApiService(engine, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
-            userPreferencesRepository = userPreferencesRepository,
             uriQuote = uriQuote,
         )
         val match = "https://maps.google.com/?q=nothing"
@@ -206,13 +207,13 @@ class GoogleMapsAddressApiInputTest {
 
     @Test(expected = UnknownNetworkException::class)
     fun parse_whenApiReturnsInvalidResponse_throwsException() = runTest {
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(GoogleMapsApiPreference) } doReturn ApiConfig.WithAttestationAuth(baseUrl)
+        val apiPresetRepository: FakeApiPresetRepository = mock {
+            on { getFirstEnabled() } doReturn FakeGeoShareApiPreset
         }
         val input = GoogleMapsAddressApiInput(
+            apiPresetRepository = apiPresetRepository,
             apiService = ApiService(engine, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
-            userPreferencesRepository = userPreferencesRepository,
             uriQuote = uriQuote,
         )
         val match = "https://maps.google.com/?q=invalid"
@@ -221,13 +222,13 @@ class GoogleMapsAddressApiInputTest {
 
     @Test(expected = SocketTimeoutNetworkException::class)
     fun parse_whenApiThrowsException_throwsException() = runTest {
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(GoogleMapsApiPreference) } doReturn ApiConfig.WithAttestationAuth(baseUrl)
+        val apiPresetRepository: FakeApiPresetRepository = mock {
+            on { getFirstEnabled() } doReturn FakeGeoShareApiPreset
         }
         val input = GoogleMapsAddressApiInput(
+            apiPresetRepository = apiPresetRepository,
             apiService = ApiService(engine, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
-            userPreferencesRepository = userPreferencesRepository,
             uriQuote = uriQuote,
         )
         val match = "https://maps.google.com/?q=exception"

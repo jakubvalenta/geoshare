@@ -1,6 +1,18 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">GeoShare</string>
     <string name="app_name_pro" translatable="false">GeoShare Pro</string>
+    <string name="api_presets_api_key" translatable="false">API key</string>
+    <string name="api_presets_api_key_header" translatable="false">HTTP header</string>
+    <string name="api_presets_api_key_supporting_text" translatable="false">To avoid unexpected costs, set strict service restrictions and usage limits on the key.</string>
+    <string name="api_presets_auth_type_attestation" translatable="false">Hardware-backed key attestation</string>
+    <string name="api_presets_auth_type_authentication" translatable="false">Authentication</string>
+    <string name="api_presets_base_url" translatable="false">Base URL</string>
+    <string name="api_presets_description" translatable="false">To support a wider variety of Google Maps links, %1$s can connect to the paid Google Maps API or a compatible server.</string>
+    <string name="api_presets_title" translatable="false">Google Maps API</string>
+    <string name="api_presets_message_deleted">API configuration deleted</string>
+    <string name="api_presets_message_factory_reset">API configurations have been reset to factory defaults</string>
+    <string name="api_presets_message_inserted">API configuration added</string>
+    <string name="api_presets_message_updated">API configuration updated</string>
     <string name="not_available">Not available</string>
     <string name="not_configured" translatable="false">Not configured</string>
     <string name="billing_consume_purchases" translatable="false">consume purchases</string>
@@ -315,17 +327,9 @@
         <item quantity="one">%1$d app out of %2$d is visible</item>
         <item quantity="other">%1$d apps out of %2$d are visible</item>
     </plurals>
-    <string name="user_preferences_api_attestation" translatable="false">Hardware-backed key attestation</string>
-    <string name="user_preferences_api_authentication" translatable="false">Authentication</string>
-    <string name="user_preferences_api_base_url" translatable="false">Base URL</string>
-    <string name="user_preferences_api_header" translatable="false">HTTP header</string>
-    <string name="user_preferences_api_key" translatable="false">API key</string>
-    <string name="user_preferences_api_key_supporting_text" translatable="false">To avoid unexpected costs, set strict service restrictions and usage limits on the key.</string>
     <string name="user_preferences_apps_description">Choose which of your installed apps should be displayed after converting a map link to coordinates.</string>
     <string name="user_preferences_apps_message_hidden">The app has been hidden. You can show it again in preferences.</string>
     <string name="user_preferences_apps_title">Apps</string>
-    <string name="user_preferences_google_maps_api_description" translatable="false">To support a wider variety of Google Maps links, %1$s can connect to the paid Google Maps API or a compatible server.</string>
-    <string name="user_preferences_google_maps_api_title" translatable="false">Google Maps API</string>
     <string name="user_preferences_section_input">Input</string>
     <string name="user_preferences_section_output">Output</string>
     <string name="yes">Yes</string>

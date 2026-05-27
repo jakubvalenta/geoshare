@@ -17,6 +17,9 @@ import page.ooooo.geoshare.lib.inputs.InputDocumentationGroup
 object AboutRoute
 
 @Serializable
+object ApiPresetRoute
+
+@Serializable
 object FaqRoute
 
 @Serializable
@@ -66,6 +69,11 @@ fun MainNavigation(
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
                 onNavigateToLicensesScreen = { navController.navigate(LicensesRoute) },
                 billingViewModel = billingViewModel,
+            )
+        }
+        composable<ApiPresetRoute> {
+            ApiPresetScreen(
+                onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
             )
         }
         composable<FaqRoute> {
@@ -128,6 +136,7 @@ fun MainNavigation(
             UserPreferencesScreen(
                 initialGroupId = route.id,
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
+                onNavigateToApiPresetScreen = { navController.navigate(ApiPresetRoute) },
                 onNavigateToBillingScreen = { navController.navigate(BillingRoute) },
                 onNavigateToLinksScreen = { navController.navigate(LinksRoute) },
                 billingViewModel = billingViewModel,

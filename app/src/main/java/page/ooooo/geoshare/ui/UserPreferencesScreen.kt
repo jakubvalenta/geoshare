@@ -61,12 +61,12 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.di.defaultFakeApiPresets
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
+import page.ooooo.geoshare.data.local.database.ApiPreset
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.database.findByUUID
-import page.ooooo.geoshare.data.local.preferences.ApiConfig
-import page.ooooo.geoshare.data.local.preferences.ApiConfigPreference
 import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
 import page.ooooo.geoshare.data.local.preferences.AutomationPreference
@@ -75,7 +75,6 @@ import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePr
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormatPreference
-import page.ooooo.geoshare.data.local.preferences.GoogleMapsApiPreference
 import page.ooooo.geoshare.data.local.preferences.HiddenAppsPreference
 import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.OptionsPreference
@@ -98,7 +97,6 @@ import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.Output
-import page.ooooo.geoshare.ui.components.DropdownField
 import page.ooooo.geoshare.ui.components.FeatureBadgeSmall
 import page.ooooo.geoshare.ui.components.FeatureWall
 import page.ooooo.geoshare.ui.components.IconFromDescriptor
@@ -117,12 +115,12 @@ import kotlin.time.DurationUnit
 
 @Keep
 enum class UserPreferencesGroupId {
+    API_PRESETS,
     AUTOMATION,
     AUTOMATION_DELAY,
     CONNECTION_PERMISSION,
     COORDINATE_FORMAT,
     DEVELOPER_OPTIONS,
-    GOOGLE_MAPS_API,
     HIDDEN_APPS,
     LINKS,
 }
@@ -140,12 +138,14 @@ private data class UserPreferencesGroup(
 fun UserPreferencesScreen(
     initialGroupId: UserPreferencesGroupId?,
     onBack: () -> Unit,
+    onNavigateToApiPresetScreen: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     onNavigateToLinksScreen: () -> Unit,
     billingViewModel: BillingViewModel,
     viewModel: UserPreferencesViewModel = hiltViewModel(),
     outputViewModel: OutputViewModel = hiltViewModel(),
 ) {
+    val apiPresets by viewModel.apiPresets.collectAsStateWithLifecycle()
     val apps by viewModel.apps.collectAsStateWithLifecycle()
     val appDetails by viewModel.appDetails.collectAsStateWithLifecycle()
     val billingAppNameResId = billingViewModel.billingAppNameResId
@@ -156,6 +156,7 @@ fun UserPreferencesScreen(
 
     UserPreferencesScreen(
         initialGroupId = initialGroupId,
+        apiPresets = apiPresets,
         apps = apps,
         appDetails = appDetails,
         billingAppNameResId = billingAppNameResId,
@@ -167,6 +168,7 @@ fun UserPreferencesScreen(
         onGetAutomationOutput = { automation, getLinkByUUID ->
             outputViewModel.getAutomationOutput(automation, getLinkByUUID)
         },
+        onNavigateToApiPresetScreen = onNavigateToApiPresetScreen,
         onNavigateToBillingScreen = onNavigateToBillingScreen,
         onNavigateToLinksScreen = onNavigateToLinksScreen,
         onValueChange = { transform: (preferences: MutablePreferences) -> Unit ->
@@ -179,6 +181,7 @@ fun UserPreferencesScreen(
 @Composable
 private fun UserPreferencesScreen(
     initialGroupId: UserPreferencesGroupId?,
+    apiPresets: List<ApiPreset>,
     apps: DataTypes,
     appDetails: AppDetails,
     billingAppNameResId: Int,
@@ -188,6 +191,7 @@ private fun UserPreferencesScreen(
     userPreferencesValues: UserPreferencesValues,
     onBack: () -> Unit,
     onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
+    onNavigateToApiPresetScreen: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     onNavigateToLinksScreen: () -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
@@ -211,6 +215,7 @@ private fun UserPreferencesScreen(
         listPane = { _, containerColor ->
             UserPreferencesListPane(
                 currentGroupId = currentGroupId,
+                apiPresets = apiPresets,
                 apps = apps,
                 appDetails = appDetails,
                 billingStatus = billingStatus,
@@ -233,6 +238,7 @@ private fun UserPreferencesScreen(
                         navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, id)
                     }
                 },
+                onNavigateToApiPresetScreen = onNavigateToApiPresetScreen,
                 onNavigateToLinksScreen = onNavigateToLinksScreen,
             )
         },
@@ -273,6 +279,7 @@ private fun UserPreferencesListPane(
     currentGroupId: UserPreferencesGroupId?,
     values: UserPreferencesValues,
     apps: DataTypes,
+    apiPresets: List<ApiPreset>,
     appDetails: AppDetails,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
@@ -281,6 +288,7 @@ private fun UserPreferencesListPane(
     onBack: () -> Unit,
     onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
     onNavigateToGroup: (id: UserPreferencesGroupId) -> Unit,
+    onNavigateToApiPresetScreen: () -> Unit,
     onNavigateToLinksScreen: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -331,18 +339,18 @@ private fun UserPreferencesListPane(
                 UserPreferencesListSection(
                     groups = listOf(
                         UserPreferencesGroup(
-                            id = UserPreferencesGroupId.GOOGLE_MAPS_API,
-                            headline = { stringResource(R.string.user_preferences_google_maps_api_title) },
+                            id = UserPreferencesGroupId.API_PRESETS,
+                            headline = { stringResource(R.string.api_presets_title) },
                             enabled = ConnectionPermissionPreference.getValue(values) != Permission.NEVER,
                             supportingContent = {
                                 Text(
-                                    GoogleMapsApiPreference.getValue(values)?.baseUrl
+                                    apiPresets.firstOrNull { it.enabled }?.baseUrl
                                         ?: stringResource(R.string.not_configured),
                                     overflow = TextOverflow.Ellipsis,
                                     maxLines = 1,
                                 )
                             },
-                            onClick = { onNavigateToGroup(UserPreferencesGroupId.GOOGLE_MAPS_API) },
+                            onClick = { onNavigateToApiPresetScreen() },
                         ),
                     ),
                     currentGroupId = currentGroupId,
@@ -746,26 +754,7 @@ private fun UserPreferencesDetailPane(
                 )
             }
 
-        UserPreferencesGroupId.GOOGLE_MAPS_API ->
-            UserPreferencesControls(
-                titleResId = R.string.user_preferences_google_maps_api_title,
-                description = {
-                    stringResource(
-                        R.string.user_preferences_google_maps_api_description,
-                        stringResource(R.string.app_name),
-                    )
-                },
-                billingAppNameResId = billingAppNameResId,
-                wide = wide,
-                onBack = onBack,
-                onNavigateToBillingScreen = onNavigateToBillingScreen,
-            ) {
-                userPreferencesApiConfigControl(
-                    userPreference = GoogleMapsApiPreference,
-                    values = values,
-                    onValueChange = onValueChange,
-                )
-            }
+        UserPreferencesGroupId.API_PRESETS -> {}
 
         UserPreferencesGroupId.HIDDEN_APPS ->
             UserPreferencesControls(
@@ -1026,99 +1015,6 @@ private fun <T> LazyListScope.userPreferencesTextControl(
     }
 }
 
-private enum class AuthType { KEY, ATTESTATION }
-
-private fun LazyListScope.userPreferencesApiConfigControl(
-    userPreference: ApiConfigPreference,
-    values: UserPreferencesValues,
-    onValueChange: ((MutablePreferences) -> Unit) -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-) {
-    item {
-        val spacing = LocalSpacing.current
-        val value = userPreference.getValue(values)
-        var baseUrl by remember { mutableStateOf(value?.baseUrl ?: "") }
-        var authType by remember {
-            mutableStateOf(
-                when (value) {
-                    is ApiConfig.WithKeyAuth, null -> AuthType.KEY
-                    is ApiConfig.WithAttestationAuth -> AuthType.ATTESTATION
-                }
-            )
-        }
-        var header by remember { mutableStateOf((value as? ApiConfig.WithKeyAuth)?.header ?: "") }
-        var key by remember { mutableStateOf((value as? ApiConfig.WithKeyAuth)?.key ?: "") }
-
-        fun onFieldValueChange() {
-            val apiConfig = if (!baseUrl.isEmpty()) {
-                when (authType) {
-                    AuthType.KEY -> ApiConfig.WithKeyAuth(baseUrl, header, key)
-                    AuthType.ATTESTATION -> ApiConfig.WithAttestationAuth(baseUrl)
-                }
-            } else {
-                null
-            }
-            onValueChange { preferences ->
-                userPreference.setValue(preferences, apiConfig)
-            }
-        }
-
-        Column(modifier, verticalArrangement = Arrangement.spacedBy(spacing.small)) {
-            TextField(
-                value = baseUrl,
-                onValueChange = {
-                    baseUrl = it
-                    onFieldValueChange()
-                },
-                modifier = modifier.fillMaxWidth(),
-                enabled = enabled,
-                label = { Text(stringResource(R.string.user_preferences_api_base_url)) },
-                singleLine = true,
-            )
-            DropdownField(
-                value = authType,
-                options = AuthType.entries.associateWith { authType ->
-                    when (authType) {
-                        AuthType.KEY -> stringResource(R.string.user_preferences_api_key)
-                        AuthType.ATTESTATION -> stringResource(R.string.user_preferences_api_attestation)
-                    }
-                },
-                onValueChange = {
-                    authType = it
-                    onFieldValueChange()
-                },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = enabled,
-                label = { Text(stringResource(R.string.user_preferences_api_authentication)) },
-            )
-            TextField(
-                value = header,
-                onValueChange = {
-                    header = it
-                    onFieldValueChange()
-                },
-                modifier = modifier.fillMaxWidth(),
-                enabled = enabled && authType == AuthType.KEY,
-                label = { Text(stringResource(R.string.user_preferences_api_header)) },
-                singleLine = true,
-            )
-            TextField(
-                value = key,
-                onValueChange = {
-                    key = it
-                    onFieldValueChange()
-                },
-                modifier = modifier.fillMaxWidth(),
-                enabled = enabled && authType == AuthType.KEY,
-                label = { Text(stringResource(R.string.user_preferences_api_key)) },
-                supportingText = { Text(stringResource(R.string.user_preferences_api_key_supporting_text)) },
-                singleLine = true,
-            )
-        }
-    }
-}
-
 // Previews
 
 @Preview(showBackground = true)
@@ -1129,6 +1025,7 @@ private fun DefaultPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = null,
+                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
@@ -1138,6 +1035,7 @@ private fun DefaultPreview() {
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1155,6 +1053,7 @@ private fun DarkPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = null,
+                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
@@ -1164,6 +1063,7 @@ private fun DarkPreview() {
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1181,6 +1081,7 @@ private fun TabletPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = null,
+                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
@@ -1190,6 +1091,7 @@ private fun TabletPreview() {
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1207,6 +1109,7 @@ private fun ConnectionPermissionPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
+                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
@@ -1216,6 +1119,7 @@ private fun ConnectionPermissionPreview() {
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1233,6 +1137,7 @@ private fun DarkConnectionPermissionPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
+                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
@@ -1242,6 +1147,7 @@ private fun DarkConnectionPermissionPreview() {
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1259,6 +1165,7 @@ private fun TabletConnectionPermissionPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
+                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
@@ -1268,6 +1175,7 @@ private fun TabletConnectionPermissionPreview() {
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1285,6 +1193,7 @@ private fun CoordinateFormatPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.COORDINATE_FORMAT,
+                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
@@ -1294,6 +1203,7 @@ private fun CoordinateFormatPreview() {
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1311,6 +1221,7 @@ private fun DarkCoordinateFormatPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.COORDINATE_FORMAT,
+                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
@@ -1320,6 +1231,7 @@ private fun DarkCoordinateFormatPreview() {
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1337,6 +1249,7 @@ private fun TabletCoordinateFormatPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.COORDINATE_FORMAT,
+                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
@@ -1346,6 +1259,7 @@ private fun TabletCoordinateFormatPreview() {
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1365,6 +1279,7 @@ private fun AutomationPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION,
+                    apiPresets = defaultFakeApiPresets,
                     apps = mapOf(
                         PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                     ),
@@ -1389,6 +1304,7 @@ private fun AutomationPreview() {
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1408,6 +1324,7 @@ private fun DarkAutomationPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION,
+                    apiPresets = defaultFakeApiPresets,
                     apps = mapOf(
                         PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                     ),
@@ -1432,6 +1349,7 @@ private fun DarkAutomationPreview() {
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1451,6 +1369,7 @@ private fun TabletAutomationPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION,
+                    apiPresets = defaultFakeApiPresets,
                     apps = mapOf(
                         PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                     ),
@@ -1475,6 +1394,7 @@ private fun TabletAutomationPreview() {
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1494,6 +1414,7 @@ private fun AutomationFeatureNotAvailablePreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION,
+                    apiPresets = defaultFakeApiPresets,
                     apps = mapOf(
                         PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                     ),
@@ -1513,6 +1434,7 @@ private fun AutomationFeatureNotAvailablePreview() {
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1532,6 +1454,7 @@ private fun DarkAutomationFeatureNotAvailablePreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION,
+                    apiPresets = defaultFakeApiPresets,
                     apps = mapOf(
                         PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                     ),
@@ -1551,6 +1474,7 @@ private fun DarkAutomationFeatureNotAvailablePreview() {
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1570,6 +1494,7 @@ private fun TabletAutomationFeatureNotAvailablePreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION,
+                    apiPresets = defaultFakeApiPresets,
                     apps = mapOf(
                         PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                     ),
@@ -1589,6 +1514,7 @@ private fun TabletAutomationFeatureNotAvailablePreview() {
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1606,6 +1532,7 @@ private fun AutomationDelayPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION_DELAY,
+                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
@@ -1623,6 +1550,7 @@ private fun AutomationDelayPreview() {
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1640,6 +1568,7 @@ private fun DarkAutomationDelayPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION_DELAY,
+                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
@@ -1657,6 +1586,7 @@ private fun DarkAutomationDelayPreview() {
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1674,6 +1604,7 @@ private fun TableAutomationDelayPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION_DELAY,
+                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
@@ -1691,6 +1622,7 @@ private fun TableAutomationDelayPreview() {
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1707,7 +1639,8 @@ private fun GoogleMapsApiPreview() {
         Surface {
             Column {
                 UserPreferencesScreen(
-                    initialGroupId = UserPreferencesGroupId.GOOGLE_MAPS_API,
+                    initialGroupId = UserPreferencesGroupId.API_PRESETS,
+                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
@@ -1717,6 +1650,7 @@ private fun GoogleMapsApiPreview() {
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1733,7 +1667,8 @@ private fun DarkGoogleMapsApiPreview() {
         Surface {
             Column {
                 UserPreferencesScreen(
-                    initialGroupId = UserPreferencesGroupId.GOOGLE_MAPS_API,
+                    initialGroupId = UserPreferencesGroupId.API_PRESETS,
+                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
@@ -1743,6 +1678,7 @@ private fun DarkGoogleMapsApiPreview() {
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1759,7 +1695,8 @@ private fun TableGoogleMapsApiPreview() {
         Surface {
             Column {
                 UserPreferencesScreen(
-                    initialGroupId = UserPreferencesGroupId.GOOGLE_MAPS_API,
+                    initialGroupId = UserPreferencesGroupId.API_PRESETS,
+                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
@@ -1769,6 +1706,7 @@ private fun TableGoogleMapsApiPreview() {
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1788,6 +1726,7 @@ private fun HiddenAppsPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
+                    apiPresets = defaultFakeApiPresets,
                     apps = mapOf(
                         PackageNames.COMAPS_FDROID to emptySet(),
                         PackageNames.ORGANIC_MAPS to emptySet(),
@@ -1816,6 +1755,7 @@ private fun HiddenAppsPreview() {
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1835,6 +1775,7 @@ private fun DarkHiddenAppsPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
+                    apiPresets = defaultFakeApiPresets,
                     apps = mapOf(
                         PackageNames.COMAPS_FDROID to emptySet(),
                         PackageNames.ORGANIC_MAPS to emptySet(),
@@ -1863,6 +1804,7 @@ private fun DarkHiddenAppsPreview() {
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1882,6 +1824,7 @@ private fun TabletHiddenAppsPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
+                    apiPresets = defaultFakeApiPresets,
                     apps = mapOf(
                         PackageNames.COMAPS_FDROID to emptySet(),
                         PackageNames.ORGANIC_MAPS to emptySet(),
@@ -1910,6 +1853,7 @@ private fun TabletHiddenAppsPreview() {
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1929,6 +1873,7 @@ private fun HiddenAppsLoadingPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
+                    apiPresets = defaultFakeApiPresets,
                     apps = mapOf(
                         PackageNames.COMAPS_FDROID to emptySet(),
                         PackageNames.ORGANIC_MAPS to emptySet(),
@@ -1955,6 +1900,7 @@ private fun HiddenAppsLoadingPreview() {
                     userPreferencesValues = UserPreferencesValues(),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -1974,6 +1920,7 @@ private fun DarkHiddenAppsLoadingPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
+                    apiPresets = defaultFakeApiPresets,
                     apps = mapOf(
                         PackageNames.COMAPS_FDROID to emptySet(),
                         PackageNames.ORGANIC_MAPS to emptySet(),
@@ -2000,6 +1947,7 @@ private fun DarkHiddenAppsLoadingPreview() {
                     userPreferencesValues = UserPreferencesValues(),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -2019,6 +1967,7 @@ private fun TabletHiddenAppsLoadingPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
+                    apiPresets = defaultFakeApiPresets,
                     apps = mapOf(
                         PackageNames.COMAPS_FDROID to emptySet(),
                         PackageNames.ORGANIC_MAPS to emptySet(),
@@ -2045,6 +1994,7 @@ private fun TabletHiddenAppsLoadingPreview() {
                     userPreferencesValues = UserPreferencesValues(),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -2062,6 +2012,7 @@ private fun DeveloperOptionsPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.DEVELOPER_OPTIONS,
+                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
@@ -2075,6 +2026,7 @@ private fun DeveloperOptionsPreview() {
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -2092,6 +2044,7 @@ private fun DarkDeveloperOptionsPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.DEVELOPER_OPTIONS,
+                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
@@ -2105,6 +2058,7 @@ private fun DarkDeveloperOptionsPreview() {
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},
@@ -2122,6 +2076,7 @@ private fun TableDeveloperOptionsPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.DEVELOPER_OPTIONS,
+                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
@@ -2135,6 +2090,7 @@ private fun TableDeveloperOptionsPreview() {
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
+                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
                     onValueChange = {},

@@ -45,6 +45,9 @@ interface ApiPresetDao {
     @Query("SELECT * FROM apiPreset WHERE uuid = :uuid")
     suspend fun getByUUID(uuid: UUID): ApiPreset?
 
+    @Query("SELECT * FROM apiPreset WHERE enabled = 1 ORDER BY createdAt ASC LIMIT 1")
+    suspend fun getFirstEnabled(): ApiPreset?
+
     @Insert
     suspend fun insert(apiPreset: ApiPreset): Long
 

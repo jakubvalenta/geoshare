@@ -47,6 +47,9 @@ class FakeApiPresetRepository(
     override suspend fun getByUUID(uuid: UUID) =
         _fakeApiPresets.value.firstOrNull { it.uuid == uuid }
 
+    override suspend fun getFirstEnabled() =
+        _fakeApiPresets.value.firstOrNull { it.enabled }
+
     override suspend fun insert(apiPreset: ApiPreset) =
         (_fakeApiPresets.value + listOf(apiPreset)).also {
             _fakeApiPresets.value = it

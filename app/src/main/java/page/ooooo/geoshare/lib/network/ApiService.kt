@@ -23,7 +23,7 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.data.local.preferences.ApiConfig
+import page.ooooo.geoshare.data.local.database.ApiAuthType
 import page.ooooo.geoshare.data.local.preferences.CachedApiTokenPreference
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.Log
@@ -67,21 +67,21 @@ class ApiService @Inject constructor(
     @Serializable
     data class GoogleMapsResults(val results: List<GoogleMapsResult>)
 
-    fun createHttpClient(apiConfig: ApiConfig): HttpClient =
+    fun createHttpClient(baseUrl: String, authType: ApiAuthType, apiKey: String, apiKeyHeader: String): HttpClient =
         HttpClient(engine) {
             expectSuccess = true
             setDefaultTimeouts()
             rethrowExceptionsAsNetworkException(log)
 
-            when (apiConfig) {
-                is ApiConfig.WithKeyAuth -> with(apiConfig) {
+            when (authType) {
+                ApiAuthType.API_KEY -> {
                     install(DefaultRequest) {
                         url(baseUrl)
-                        header(header, key)
+                        header(apiKeyHeader, apiKey)
                     }
                 }
 
-                is ApiConfig.WithAttestationAuth -> with(apiConfig) {
+                ApiAuthType.ATTESTATION -> {
                     install(DefaultRequest) {
                         url(baseUrl)
                     }

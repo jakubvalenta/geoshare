@@ -20,6 +20,8 @@ interface ApiPresetRepository {
 
     suspend fun getByUUID(uuid: UUID): ApiPreset?
 
+    suspend fun getFirstEnabled(): ApiPreset?
+
     suspend fun insert(apiPreset: ApiPreset): Long
 
     suspend fun update(vararg apiPresets: ApiPreset)
@@ -52,6 +54,8 @@ class DefaultApiPresetRepository @Inject constructor(
     override suspend fun getByUid(uid: Int): ApiPreset? = apiPresetDao.getByUid(uid)
 
     override suspend fun getByUUID(uuid: UUID): ApiPreset? = apiPresetDao.getByUUID(uuid)
+
+    override suspend fun getFirstEnabled(): ApiPreset? = apiPresetDao.getFirstEnabled()
 
     override suspend fun insert(apiPreset: ApiPreset) = apiPresetDao.insert(apiPreset)
 
