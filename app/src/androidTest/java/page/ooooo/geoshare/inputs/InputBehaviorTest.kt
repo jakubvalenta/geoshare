@@ -21,7 +21,7 @@ interface InputBehaviorTest : BehaviorTest {
         onElementOrNull(3_000L) { viewIdResourceName == "geoShareConfirmationDialogConfirmButton" }?.click()
     }
 
-    private fun UiAutomatorTestScope.goToMainForm() {
+    fun UiAutomatorTestScope.goToMainForm() {
         // Make sure we leave the result screen, if we're there, so that we don't accidentally test the old result.
         onElementOrNull(1_000L) { viewIdResourceName == "geoShareMainBackButton" }?.click()
     }

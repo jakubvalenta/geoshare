@@ -317,8 +317,8 @@ interface BehaviorTest {
         onElement(20_000L) { packageName == PackageNames.GOOGLE_MAPS && this.block() }
     }
 
-    fun UiAutomatorTestScope.assertConversionFailed() {
-        onElement {
+    fun UiAutomatorTestScope.assertConversionFailed(timeoutMs: Long = NETWORK_TIMEOUT) {
+        onElement(timeoutMs) {
             viewIdResourceName == "geoShareConversionErrorMessage" && textAsString()?.lowercase() in setOf(
                 "no points found",
                 @Suppress("SpellCheckingInspection") "aucun point trouvé",

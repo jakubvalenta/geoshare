@@ -1,8 +1,10 @@
 package page.ooooo.geoshare.inputs
 
+import androidx.test.uiautomator.UiAutomatorTestScope
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
+import page.ooooo.geoshare.BehaviorTest.Companion.NETWORK_TIMEOUT
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
@@ -91,6 +93,6 @@ class GoogleMapsProInputBehaviorTest : InputBehaviorTest {
         shareUri(unsafeUriString)
         confirmDialogIfVisible()
 
-        assertConversionFailed()
+        assertConversionFailed(timeoutMs)
     }
 }
