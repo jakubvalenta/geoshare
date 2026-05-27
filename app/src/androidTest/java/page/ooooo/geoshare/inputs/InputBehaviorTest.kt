@@ -21,7 +21,7 @@ interface InputBehaviorTest : BehaviorTest {
         onElementOrNull(3_000L) { viewIdResourceName == "geoShareConfirmationDialogConfirmButton" }?.click()
     }
 
-    private fun UiAutomatorTestScope.goToMainForm() {
+    fun UiAutomatorTestScope.goToMainForm() {
         // Make sure we leave the result screen, if we're there, so that we don't accidentally test the old result.
         onElementOrNull(1_000L) { viewIdResourceName == "geoShareMainBackButton" }?.click()
     }
@@ -65,17 +65,6 @@ interface InputBehaviorTest : BehaviorTest {
             accurate,
             timeoutMs,
         )
-
-    fun UiAutomatorTestScope.testUriFailed(unsafeUriString: String, timeoutMs: Long = NETWORK_TIMEOUT) {
-        // Go to main form
-        goToMainForm()
-
-        // Share URI and confirm permission dialog
-        shareUri(unsafeUriString)
-        confirmDialogIfVisible()
-
-        assertConversionFailed()
-    }
 
     fun UiAutomatorTestScope.testText(expectedPoints: Points, unsafeText: String) {
         // It would be preferable to test sharing of the text with the app, but this shell command doesn't work when

@@ -24,7 +24,10 @@ interface UserPreference<T> {
 }
 
 interface TextPreference<T> : UserPreference<T> {
+    @Suppress("EmptyMethod")
     val key: Preferences.Key<String>
+
+    @Suppress("EmptyMethod")
     val default: T
 
     fun serialize(value: T, log: Log = DefaultLog): String
@@ -67,7 +70,7 @@ interface OptionsPreference<T> : UserPreference<T> {
 }
 
 object ConnectionPermissionPreference : OptionsPreference<Permission> {
-    private val key = stringPreferencesKey("connect_to_google_permission")
+    val key = stringPreferencesKey("connect_to_google_permission")
     override val default = Permission.ASK
     val loading = default
 
@@ -95,7 +98,7 @@ object ConnectionPermissionPreference : OptionsPreference<Permission> {
 }
 
 object CoordinateFormatPreference : OptionsPreference<CoordinateFormat> {
-    private val key = stringPreferencesKey("coordinate_format")
+    val key = stringPreferencesKey("coordinate_format")
     override val default = CoordinateFormat.DEC
     val loading = default
 
@@ -121,41 +124,8 @@ object CoordinateFormatPreference : OptionsPreference<CoordinateFormat> {
     )
 }
 
-interface ApiConfigPreference : TextPreference<ApiConfig?>
-
-object GoogleMapsApiPreference : ApiConfigPreference {
-    override val key = stringPreferencesKey("google_maps_api_config")
-    override val default = null
-    val loading = default
-
-    override fun serialize(value: ApiConfig?, log: Log) =
-        try {
-            Json.encodeToString(value)
-        } catch (tr: SerializationException) {
-            // Silently ignore serialization errors, because the value should always serialize
-            log.e(TAG, "Serialization error", tr)
-            ""
-        }
-
-    override fun deserialize(value: String?, log: Log) =
-        if (value != null) {
-            try {
-                Json.decodeFromString<ApiConfig>(value)
-            } catch (tr: IllegalArgumentException) {
-                log.e(TAG, "Deserialization error", tr)
-                default
-            }
-        } else {
-            default
-        }
-
-    override fun getValue(values: UserPreferencesValues) = values.googleMapsApiConfig
-
-    private const val TAG = "GoogleMapsApiPreference"
-}
-
 object AutomationPreference : OptionsPreference<Automation> {
-    private val key = stringPreferencesKey("automation")
+    val key = stringPreferencesKey("automation")
     override val default = NoopAutomation
     val loading = default
 
@@ -435,7 +405,6 @@ object ChangelogShownForVersionCodePreference : NullableIntPreference {
 }
 
 data class UserPreferencesValues(
-    val googleMapsApiConfig: ApiConfig? = GoogleMapsApiPreference.loading,
     val automation: Automation = AutomationPreference.loading,
     val automationDelay: Duration = AutomationDelayPreference.loading,
     val cachedApiToken: CachedApiToken? = CachedApiTokenPreference.loading,

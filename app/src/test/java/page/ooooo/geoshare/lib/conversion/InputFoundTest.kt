@@ -5,13 +5,11 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.doThrow
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
-import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.Permission
+import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
@@ -26,9 +24,9 @@ class InputFoundTest {
 
     @Test
     fun transition_whenPermissionIsAlways_returnsPermissionGrantedAndPassesPermissionParam() = runTest {
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(eq(ConnectionPermissionPreference)) } doThrow NotImplementedError()
-        }
+        val userPreferencesRepository = FakeUserPreferencesRepository(
+            UserPreferencesValues(connectionPermission = Permission.ASK)
+        )
         val stateContext: ConversionStateContext = mock {
             on { this@on.log } doReturn log
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
@@ -42,9 +40,9 @@ class InputFoundTest {
 
     @Test
     fun transition_whenPermissionIsAsk_returnsPermissionRequested() = runTest {
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(eq(ConnectionPermissionPreference)) } doThrow NotImplementedError()
-        }
+        val userPreferencesRepository = FakeUserPreferencesRepository(
+            UserPreferencesValues(connectionPermission = Permission.ASK)
+        )
         val stateContext: ConversionStateContext = mock {
             on { this@on.log } doReturn log
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
@@ -65,9 +63,9 @@ class InputFoundTest {
 
     @Test
     fun transition_whenPermissionIsNever_returnsPermissionDenied() = runTest {
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(eq(ConnectionPermissionPreference)) } doThrow NotImplementedError()
-        }
+        val userPreferencesRepository = FakeUserPreferencesRepository(
+            UserPreferencesValues(connectionPermission = Permission.ASK)
+        )
         val stateContext: ConversionStateContext = mock {
             on { this@on.log } doReturn log
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
@@ -82,9 +80,9 @@ class InputFoundTest {
     @Test
     fun transition_whenPermissionIsNullAndPreferencePermissionIsAlways_returnsPermissionGrantedAndSetsPermissionParam() =
         runTest {
-            val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-                on { getValue(eq(ConnectionPermissionPreference)) } doReturn Permission.ALWAYS
-            }
+            val userPreferencesRepository = FakeUserPreferencesRepository(
+                UserPreferencesValues(connectionPermission = Permission.ALWAYS)
+            )
             val stateContext: ConversionStateContext = mock {
                 on { this@on.log } doReturn log
                 on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
@@ -98,9 +96,9 @@ class InputFoundTest {
 
     @Test
     fun transition_whenPermissionIsNullAndPreferencePermissionIsAsk_returnsPermissionRequested() = runTest {
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(eq(ConnectionPermissionPreference)) } doReturn Permission.ASK
-        }
+        val userPreferencesRepository = FakeUserPreferencesRepository(
+            UserPreferencesValues(connectionPermission = Permission.ASK)
+        )
         val stateContext: ConversionStateContext = mock {
             on { this@on.log } doReturn log
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
@@ -116,9 +114,9 @@ class InputFoundTest {
 
     @Test
     fun transition_whenPermissionIsNullAndPreferencePermissionIsNever_returnsPermissionDenied() = runTest {
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(eq(ConnectionPermissionPreference)) } doReturn Permission.NEVER
-        }
+        val userPreferencesRepository = FakeUserPreferencesRepository(
+            UserPreferencesValues(connectionPermission = Permission.NEVER)
+        )
         val stateContext: ConversionStateContext = mock {
             on { this@on.log } doReturn log
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository

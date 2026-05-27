@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.shareIn
 import page.ooooo.geoshare.data.di.ApplicationScope
 import page.ooooo.geoshare.data.local.database.AppDatabase
+import page.ooooo.geoshare.data.local.database.InitialLinks
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.database.LinkDao
 import java.util.UUID
@@ -41,7 +42,7 @@ class DefaultLinkRepository @Inject constructor(
     private val linkDao: LinkDao,
 ) : LinkRepository {
     /**
-     * Flow of links that is shared between multiple view models, so we don't query the db multiple times.
+     * Flow of all objects, which is shared between multiple view models, so we don't query the db multiple times.
      */
     override val all: Flow<List<Link>> = linkDao.getAllFlow()
         .shareIn(applicationScope, SharingStarted.WhileSubscribed(5000), replay = 1)
@@ -70,7 +71,7 @@ class DefaultLinkRepository @Inject constructor(
     override suspend fun restoreInitialData() {
         appDatabase.openHelper.writableDatabase.let { db ->
             appDatabase.runInTransaction {
-                AppDatabase.restoreInitialData(db)
+                InitialLinks.restore(db)
             }
         }
     }

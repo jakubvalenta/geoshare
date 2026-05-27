@@ -224,7 +224,7 @@
     <string name="conversion_failed_reason_no_points">hiçbir nokta bulunamadı</string>
     <string name="conversion_failed_reason_timeout">zaman aşımı</string>
     <string name="inputs_list_text">Aşağıdaki harita servislerine ait bağlantıları %1$s ile paylaşabilir veya uygulamaya yapıştırabilirsiniz.</string>
-    <string name="links_delete">Sil</string>
+    <string name="delete">Sil</string>
     <string name="links_delete_text">“%1$s” web haritası kalıcı olarak silinecektir.</string>
     <string name="links_delete_title">Web haritası silinsin mi?</string>
     <string name="links_description">Web haritaları, koordinatları tarayıcıda açmanıza olanak tanır. Önceden yüklenmiş olanları etkinleştirin veya kendi koordinatlarınızı ekleyin.</string>
@@ -233,7 +233,7 @@
     <string name="links_form_enabled_option_sheet">Kopyala menüsünde göster</string>
     <string name="links_form_group">Grup</string>
     <string name="links_form_name">İsim</string>
-    <string name="links_form_save">Kaydet</string>
+    <string name="save">Kaydet</string>
     <string name="links_form_srs">Koordinat sistemi</string>
     <string name="links_form_type">Bağlam menüsü simgesi</string>
     <string name="links_form_uri_template_coords">URL şablonu</string>

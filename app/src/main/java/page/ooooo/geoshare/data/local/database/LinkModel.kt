@@ -75,7 +75,7 @@ interface LinkDao {
     suspend fun insert(link: Link): Long
 
     @Update
-    suspend fun update(vararg entries: Link)
+    suspend fun update(vararg links: Link)
 
     @Delete
     suspend fun delete(link: Link)
