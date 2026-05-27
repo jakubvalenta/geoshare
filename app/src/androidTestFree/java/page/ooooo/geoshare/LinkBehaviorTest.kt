@@ -64,7 +64,8 @@ class LinkBehaviorTest : BehaviorTest {
         onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.LINKS}" }.click()
 
         // Go to link detail
-        onElement { viewIdResourceName == "geoShareLinkListItem_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItemMenu_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItemMenuDetail_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
 
         // Update link
         onElement { viewIdResourceName == "geoShareLinkFormName" && textAsString() == "Apple Maps navigation" }
@@ -87,7 +88,8 @@ class LinkBehaviorTest : BehaviorTest {
         onElement { textAsString() == "Apple Maps navigation edited" }
 
         // Go to link detail
-        onElement { viewIdResourceName == "geoShareLinkListItem_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItemMenu_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItemMenuDetail_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
 
         // Shows updated values
         onElement { viewIdResourceName == "geoShareLinkFormName" && textAsString() == "Apple Maps navigation edited" }
@@ -141,8 +143,9 @@ class LinkBehaviorTest : BehaviorTest {
 
         // Go to link detail
         onElement { viewIdResourceName == "geoShareLinkListPane" }
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkListItem_b109970a-aef8-4482-9879-52e128fd0e07" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkListItemMenu_b109970a-aef8-4482-9879-52e128fd0e07" }
             .click()
+        onElement { viewIdResourceName == "geoShareLinkListItemMenuDetail_b109970a-aef8-4482-9879-52e128fd0e07" }.click()
 
         // Shows pre-installed values
         onElement { viewIdResourceName == "geoShareLinkFormName" && textAsString() == "Magic Earth" }
@@ -161,7 +164,8 @@ class LinkBehaviorTest : BehaviorTest {
         onElement { viewIdResourceName == "geoShareLinkListItemToggle_b109970a-aef8-4482-9879-52e128fd0e07" }.click()
 
         // Go to link detail
-        onElement { viewIdResourceName == "geoShareLinkListItem_b109970a-aef8-4482-9879-52e128fd0e07" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItemMenu_b109970a-aef8-4482-9879-52e128fd0e07" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItemMenuDetail_b109970a-aef8-4482-9879-52e128fd0e07" }.click()
 
         // Shows toggled values
         onElement { viewIdResourceName == "geoShareLinkFormName" && textAsString() == "Magic Earth" }
@@ -180,7 +184,8 @@ class LinkBehaviorTest : BehaviorTest {
         onElement { viewIdResourceName == "geoShareLinkListItemToggle_b109970a-aef8-4482-9879-52e128fd0e07" }.click()
 
         // Go to link detail
-        onElement { viewIdResourceName == "geoShareLinkListItem_b109970a-aef8-4482-9879-52e128fd0e07" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItemMenu_b109970a-aef8-4482-9879-52e128fd0e07" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItemMenuDetail_b109970a-aef8-4482-9879-52e128fd0e07" }.click()
 
         // Shows toggled values
         onElement { viewIdResourceName == "geoShareLinkFormName" && textAsString() == "Magic Earth" }

@@ -380,7 +380,7 @@ private fun LinkListPane(
                                 Box {
                                     IconButton(
                                         { expanded = true },
-                                        Modifier.testTag("geoShareLinkListItemMenu"),
+                                        Modifier.testTag("geoShareLinkListItemMenu_${it.uuid}"),
                                     ) {
                                         Icon(
                                             painterResource(R.drawable.more_vert_24px),
@@ -396,7 +396,7 @@ private fun LinkListPane(
                                     ) {
                                         DropdownMenuItem(
                                             text = { Text(stringResource(R.string.links_update)) },
-                                            modifier = Modifier.testTag("geoShareLinkListItemMenu_${it.uuid}"),
+                                            modifier = Modifier.testTag("geoShareLinkListItemMenuDetail_${it.uuid}"),
                                             onClick = {
                                                 expanded = false
                                                 onNavigateToContentKey(it.uid)
