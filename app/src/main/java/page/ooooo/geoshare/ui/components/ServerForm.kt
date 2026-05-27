@@ -75,6 +75,7 @@ fun ServerForm(
                 .padding(horizontal = spacing.windowPadding)
                 .padding(top = spacing.medium),
             label = { Text(stringResource(R.string.server_auth_type)) },
+            testTagPrefix = "geoShareServerFormAuthType"
         )
         TextField(
             value = apiKeyHeader,

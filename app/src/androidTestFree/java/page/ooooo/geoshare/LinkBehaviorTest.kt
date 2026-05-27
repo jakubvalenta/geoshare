@@ -137,7 +137,7 @@ class LinkBehaviorTest : BehaviorTest {
         waitForAppToBeVisible()
         closeIntro()
 
-        // Go to links list
+        // Go to link list
         goToUserPreferencesList()
         onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.LINKS}" }.click()
 

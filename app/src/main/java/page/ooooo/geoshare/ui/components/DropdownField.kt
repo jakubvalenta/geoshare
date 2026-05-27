@@ -22,6 +22,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -36,6 +39,7 @@ fun <T> DropdownField(
     label: (@Composable () -> Unit)? = null,
     enabled: Boolean = true,
     supportingText: (@Composable () -> Unit)? = null,
+    testTagPrefix: String? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -56,6 +60,11 @@ fun <T> DropdownField(
                     }
                 },
                 modifier = Modifier
+                    .run {
+                        testTagPrefix?.let {
+                            this.testTag("${it}_${value}")
+                        } ?: this
+                    }
                     .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true)
                     .fillMaxWidth(),
                 enabled = enabled,
@@ -64,7 +73,11 @@ fun <T> DropdownField(
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 colors = ExposedDropdownMenuDefaults.textFieldColors(),
             )
-            ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            ExposedDropdownMenu(
+                expanded = expanded,
+                modifier = Modifier.semantics { testTagsAsResourceId = true },
+                onDismissRequest = { expanded = false },
+            ) {
                 options.forEach { (value, text) ->
                     DropdownMenuItem(
                         text = { Text(text) },
@@ -72,6 +85,7 @@ fun <T> DropdownField(
                             onValueChange(value)
                             expanded = false
                         },
+                        modifier = Modifier.testTag("geoShareDropdownFieldMenuItem_$value")
                     )
                 }
             }

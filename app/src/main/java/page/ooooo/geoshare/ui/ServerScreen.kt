@@ -284,11 +284,12 @@ private fun ServerListPane(
                     shapes = ListItemDefaults.segmentedShapes(index = 0, count = all.size + 1),
                     modifier = Modifier.testTag("geoShareServerListItem_null"),
                     leadingContent = {
+                        val selected = selected == null
                         RadioButton(
-                            selected = selected == null,
+                            selected = selected,
                             // Null recommended for accessibility with screen readers
                             onClick = null,
-                            modifier = Modifier.testTag("geoShareServerListItemRadio_null")
+                            modifier = Modifier.testTag("geoShareServerListItemRadio_null_selected_${selected}"),
                         )
                     },
                     colors = colors,
@@ -305,11 +306,12 @@ private fun ServerListPane(
                         modifier = Modifier.testTag("geoShareServerListItem_${item.uuid}"),
                         enabled = valid,
                         leadingContent = {
+                            val selected = item.uid == selected?.uid
                             RadioButton(
-                                selected = item.uid == selected?.uid,
+                                selected = selected,
                                 // Null recommended for accessibility with screen readers
                                 onClick = null,
-                                modifier = Modifier.testTag("geoShareServerListItemRadio_${item.uuid}"),
+                                modifier = Modifier.testTag("geoShareServerListItemRadio_${item.uuid}_selected_${selected}"),
                                 enabled = valid,
                             )
                         },
@@ -319,7 +321,7 @@ private fun ServerListPane(
                             Box {
                                 IconButton(
                                     { expanded = true },
-                                    Modifier.testTag("geoShareServerListItemMenu"),
+                                    Modifier.testTag("geoShareServerListItemMenu_${item.uuid}"),
                                 ) {
                                     Icon(
                                         painterResource(R.drawable.more_vert_24px),
@@ -335,7 +337,7 @@ private fun ServerListPane(
                                 ) {
                                     DropdownMenuItem(
                                         text = { Text(stringResource(R.string.server_update)) },
-                                        modifier = Modifier.testTag("geoShareServerListItemMenu_${item.uuid}"),
+                                        modifier = Modifier.testTag("geoShareServerListItemMenuDetail_${item.uuid}"),
                                         onClick = {
                                             expanded = false
                                             onNavigateToContentKey(item.uid)
@@ -351,7 +353,11 @@ private fun ServerListPane(
                         },
                         colors = colors,
                     ) {
-                        Text(item.name, style = MaterialTheme.typography.bodyLarge)
+                        Text(
+                            item.name,
+                            Modifier.testTag("geoShareServerListItemContent"),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
                     }
                 }
             }
