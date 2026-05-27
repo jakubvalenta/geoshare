@@ -19,19 +19,21 @@ import kotlin.uuid.ExperimentalUuidApi
 @Entity
 @Serializable
 data class ApiPreset(
-    // Rename to Server
+    // TODO Rename to Server
     val baseUrl: String = "",
     val authType: ApiAuthType = ApiAuthType.API_KEY,
     val apiKey: String = "",
     val apiKeyHeader: String = "",
-    val enabled: Boolean = false, // Rename to selected
+    val enabled: Boolean = false, // TODO Rename to selected
     val createdAt: Long = System.currentTimeMillis(),
     @PrimaryKey(autoGenerate = true)
     val uid: Int = 0,
     @ColumnInfo(index = true, defaultValue = "(RANDOMBLOB(16))")
     @Serializable(with = UUIDSerializer::class)
     val uuid: UUID = UUID.randomUUID(),
-)
+) {
+    val name get() = baseUrl.removePrefix("https://")
+}
 
 @Dao
 interface ApiPresetDao {

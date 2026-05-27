@@ -14,6 +14,8 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedListItem
+import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -38,10 +41,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -279,10 +284,9 @@ private fun ApiPresetListPane(
                 verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
             ) {
                 val colors = segmentedListColors()
-                // TODO Call onSelect(null)
                 SegmentedListItem(
                     selected = selected == null,
-                    onClick = {},
+                    onClick = { onSelect(null) },
                     shapes = ListItemDefaults.segmentedShapes(index = 0, count = all.size + 1),
                     modifier = Modifier.testTag("geoShareApiPresetListItem_null"),
                     leadingContent = {
@@ -295,13 +299,13 @@ private fun ApiPresetListPane(
                     },
                     colors = colors,
                 ) {
-                    Text("Don't use API", style = MaterialTheme.typography.bodyLarge) // TODO Translate
+                    Text(stringResource(R.string.api_presets_none_selected), style = MaterialTheme.typography.bodyLarge)
                 }
                 all.forEachIndexed { i, item ->
-                    // TODO Call onSelect(item.uid)
+                    var expanded by remember { mutableStateOf(false) }
                     SegmentedListItem(
                         selected = item.uid == destination,
-                        onClick = { onNavigateToContentKey(item.uid) },
+                        onClick = { onSelect(item.uid) },
                         shapes = ListItemDefaults.segmentedShapes(index = i + 1, count = all.size + 1),
                         modifier = Modifier.testTag("geoShareApiPresetListItem_${item.uuid}"),
                         leadingContent = {
@@ -312,9 +316,38 @@ private fun ApiPresetListPane(
                                 modifier = Modifier.testTag("geoShareApiPresetListItemRadio_${item.uuid}")
                             )
                         },
+                        trailingContent = {
+                            Box {
+                                IconButton(
+                                    { expanded = true },
+                                    Modifier.testTag("geoShareMainMenuButton"),
+                                ) {
+                                    Icon(
+                                        painterResource(R.drawable.more_vert_24px),
+                                        contentDescription = stringResource(R.string.nav_menu_content_description),
+                                    )
+                                }
+                                DropdownMenu(
+                                    expanded = expanded,
+                                    onDismissRequest = { expanded = false },
+                                    modifier = Modifier.semantics { testTagsAsResourceId = true },
+                                    shape = ShapeDefaults.Large,
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                                ) {
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(R.string.edit)) },
+                                        modifier = Modifier.testTag("geoShareApiPresetListItemMenu_${item.uuid}"),
+                                        onClick = {
+                                            expanded = false
+                                            onNavigateToContentKey(item.uid)
+                                        },
+                                    )
+                                }
+                            }
+                        },
                         colors = colors,
                     ) {
-                        Text(item.baseUrl, style = MaterialTheme.typography.bodyLarge)
+                        Text(item.name, style = MaterialTheme.typography.bodyLarge)
                     }
                 }
             }
