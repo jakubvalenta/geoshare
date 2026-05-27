@@ -9,7 +9,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import page.ooooo.geoshare.data.local.database.ApiPresetDao
+import page.ooooo.geoshare.data.local.database.ServerDao
 import page.ooooo.geoshare.data.local.database.AppDatabase
 import page.ooooo.geoshare.data.local.database.AppDatabase.Companion.restoreInitialData
 import page.ooooo.geoshare.data.local.database.LinkDao
@@ -19,13 +19,13 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class DatabaseModule {
     @Provides
-    fun provideApiPresetDao(appDatabase: AppDatabase): ApiPresetDao {
-        return appDatabase.getApiPresetDao()
+    fun provideLinkDao(appDatabase: AppDatabase): LinkDao {
+        return appDatabase.getLinkDao()
     }
 
     @Provides
-    fun provideLinkDao(appDatabase: AppDatabase): LinkDao {
-        return appDatabase.getLinkDao()
+    fun provideServerDao(appDatabase: AppDatabase): ServerDao {
+        return appDatabase.getServerDao()
     }
 
     @Provides

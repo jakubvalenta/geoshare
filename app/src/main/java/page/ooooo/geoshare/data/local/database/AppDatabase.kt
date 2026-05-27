@@ -8,12 +8,12 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 @Database(
-    entities = [ApiPreset::class, Link::class],
+    entities = [Server::class, Link::class],
     version = 6, // TODO Increase database version
 )
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun getApiPresetDao(): ApiPresetDao
     abstract fun getLinkDao(): LinkDao
+    abstract fun getServerDao(): ServerDao
 
     @OptIn(ExperimentalUuidApi::class)
     companion object {
@@ -565,8 +565,9 @@ abstract class AppDatabase : RoomDatabase() {
 
         val MIGRATION_6_7 = object : Migration(6, 7) {
             override fun migrate(db: SupportSQLiteDatabase) {
+                // TODO Move GeoShare Server item to pro variant
                 db.execSQL(
-                    "INSERT OR REPLACE INTO ApiPreset(`baseUrl`,`authType`,`apiKey`,`apiKeyHeader`,`enabled`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT OR REPLACE INTO server (`baseUrl`,`authType`,`apiKey`,`apiKeyHeader`,`enabled`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "https://api.geoshare-app.net",
                         "ATTESTATION",
@@ -578,7 +579,7 @@ abstract class AppDatabase : RoomDatabase() {
                     )
                 )
                 db.execSQL(
-                    "INSERT OR REPLACE INTO ApiPreset(`baseUrl`,`authType`,`apiKey`,`apiKeyHeader`,`enabled`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT OR REPLACE INTO server (`baseUrl`,`authType`,`apiKey`,`apiKeyHeader`,`enabled`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "https://geocode.googleapis.com",
                         "API_KEY",

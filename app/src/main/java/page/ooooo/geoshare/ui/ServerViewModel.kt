@@ -17,25 +17,25 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.ApiPresetRepository
-import page.ooooo.geoshare.data.local.database.ApiPreset
+import page.ooooo.geoshare.data.ServerRepository
+import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.lib.Message
 import javax.inject.Inject
 
 @OptIn(SavedStateHandleSaveableApi::class)
 @HiltViewModel
-class ApiPresetViewModel @Inject constructor(
-    private val apiPresetRepository: ApiPresetRepository,
+class ServerViewModel @Inject constructor(
+    private val serverRepository: ServerRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    val all: StateFlow<List<ApiPreset>> = apiPresetRepository.all
+    val all: StateFlow<List<Server>> = serverRepository.all
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
             emptyList(),
         )
-    val selected: StateFlow<ApiPreset?> = apiPresetRepository.selected
+    val selected: StateFlow<Server?> = serverRepository.selected
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
@@ -48,7 +48,7 @@ class ApiPresetViewModel @Inject constructor(
     /**
      * Dummy object to read default form values from.
      */
-    private val default = ApiPreset()
+    private val default = Server()
 
     /**
      * Controls whether the list, insert, or update screen is displayed, so that the UI state survives process death.
@@ -75,7 +75,7 @@ class ApiPresetViewModel @Inject constructor(
                 this.apiKeyHeader = default.apiKeyHeader
             }
         } else {
-            val item = apiPresetRepository.getByUid(destination)
+            val item = serverRepository.getByUid(destination)
             if (item != null) {
                 withMutableSnapshot {
                     this.destination = destination
@@ -99,23 +99,23 @@ class ApiPresetViewModel @Inject constructor(
         destination?.let { destination ->
             if (destination == -1) {
                 viewModelScope.launch(Dispatchers.IO) {
-                    apiPresetRepository.insert(
-                        ApiPreset(
+                    serverRepository.insert(
+                        Server(
                             baseUrl = baseUrl,
                             authType = authType,
                             apiKey = apiKey,
                             apiKeyHeader = apiKeyHeader,
                         )
                     )
-                    _message.value = Message(resources.getString(R.string.api_presets_message_inserted))
+                    _message.value = Message(resources.getString(R.string.server_message_inserted))
                     // Navigate after saving, because we reset form fields during navigation
                     navigateTo(null)
                 }
             } else {
                 viewModelScope.launch(Dispatchers.IO) {
-                    val item = apiPresetRepository.getByUid(destination)
+                    val item = serverRepository.getByUid(destination)
                     if (item != null) {
-                        apiPresetRepository.update(
+                        serverRepository.update(
                             item.copy(
                                 baseUrl = baseUrl,
                                 authType = authType,
@@ -123,7 +123,7 @@ class ApiPresetViewModel @Inject constructor(
                                 apiKeyHeader = apiKeyHeader,
                             )
                         )
-                        _message.value = Message(resources.getString(R.string.api_presets_message_updated))
+                        _message.value = Message(resources.getString(R.string.server_message_updated))
                         // Navigate after saving, because we reset form fields during navigation
                         navigateTo(null)
                     }
@@ -140,8 +140,8 @@ class ApiPresetViewModel @Inject constructor(
                 val item = all.value.firstOrNull { it.uid == destination }
                 if (item != null) {
                     viewModelScope.launch(Dispatchers.IO) {
-                        apiPresetRepository.delete(item)
-                        _message.value = Message(resources.getString(R.string.api_presets_message_deleted))
+                        serverRepository.delete(item)
+                        _message.value = Message(resources.getString(R.string.server_message_deleted))
                         navigateTo(null)
                     }
                 }
@@ -151,14 +151,14 @@ class ApiPresetViewModel @Inject constructor(
 
     fun select(uid: Int?) {
         viewModelScope.launch(Dispatchers.IO) {
-            apiPresetRepository.select(uid)
+            serverRepository.unselectAllAndSelect(uid)
         }
     }
 
     fun restoreInitialData(resources: Resources) {
         viewModelScope.launch(Dispatchers.IO) {
-            apiPresetRepository.restoreInitialData()
-            _message.value = Message(resources.getString(R.string.api_presets_message_factory_reset))
+            serverRepository.restoreInitialData()
+            _message.value = Message(resources.getString(R.string.server_message_factory_reset))
         }
     }
 
@@ -167,6 +167,6 @@ class ApiPresetViewModel @Inject constructor(
     }
 
     private companion object {
-        private const val TAG = "ApiPresetViewModel"
+        private const val TAG = "ServerViewModel"
     }
 }

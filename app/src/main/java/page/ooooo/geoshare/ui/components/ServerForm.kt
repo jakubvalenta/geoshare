@@ -16,30 +16,30 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.di.FakeGeoShareApiPreset
-import page.ooooo.geoshare.data.di.FakeGoogleMapsApiPreset
-import page.ooooo.geoshare.data.local.database.ApiAuthType
-import page.ooooo.geoshare.data.local.database.ApiPreset
+import page.ooooo.geoshare.data.di.FakeGeoShareServer
+import page.ooooo.geoshare.data.di.FakeGoogleMapsServer
+import page.ooooo.geoshare.data.local.database.ServerAuthType
+import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ApiPresetForm(
+fun ServerForm(
     apiKey: String,
     apiKeyHeader: String,
-    authType: ApiAuthType,
+    authType: ServerAuthType,
     baseUrl: String,
     onSaveForm: () -> Unit,
     onSetApiKey: (String) -> Unit,
     onSetApiKeyHeader: (String) -> Unit,
-    onSetAuthType: (ApiAuthType) -> Unit,
+    onSetAuthType: (ServerAuthType) -> Unit,
     onSetBaseUrl: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val spacing = LocalSpacing.current
     val item = remember(baseUrl, authType, apiKey, apiKeyHeader) {
-        ApiPreset(
+        Server(
             baseUrl = baseUrl,
             authType = authType,
             apiKey = apiKey,
@@ -54,19 +54,19 @@ fun ApiPresetForm(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = spacing.windowPadding)
-                .testTag("geoShareApiPresetFormBaseUrl"),
+                .testTag("geoShareServerFormBaseUrl"),
             label = {
-                Text(stringResource(R.string.api_presets_base_url))
+                Text(stringResource(R.string.server_base_url))
             },
             isError = baseUrl.isEmpty(),
             singleLine = true,
         )
         DropdownField(
             value = authType,
-            options = ApiAuthType.entries.associateWith { authType ->
+            options = ServerAuthType.entries.associateWith { authType ->
                 when (authType) {
-                    ApiAuthType.API_KEY -> stringResource(R.string.api_presets_api_key)
-                    ApiAuthType.ATTESTATION -> stringResource(R.string.api_presets_attestation)
+                    ServerAuthType.API_KEY -> stringResource(R.string.server_api_key)
+                    ServerAuthType.ATTESTATION -> stringResource(R.string.server_attestation)
                 }
             },
             onValueChange = onSetAuthType,
@@ -74,7 +74,7 @@ fun ApiPresetForm(
                 .fillMaxWidth()
                 .padding(horizontal = spacing.windowPadding)
                 .padding(top = spacing.medium),
-            label = { Text(stringResource(R.string.api_presets_auth_type)) },
+            label = { Text(stringResource(R.string.server_auth_type)) },
         )
         TextField(
             value = apiKeyHeader,
@@ -83,10 +83,10 @@ fun ApiPresetForm(
                 .fillMaxWidth()
                 .padding(horizontal = spacing.windowPadding)
                 .padding(top = spacing.medium)
-                .testTag("geoShareApiPresetFormApiKeyHeader"),
-            enabled = authType == ApiAuthType.API_KEY,
+                .testTag("geoShareServerFormApiKeyHeader"),
+            enabled = authType == ServerAuthType.API_KEY,
             label = {
-                Text(stringResource(R.string.api_presets_api_key_header))
+                Text(stringResource(R.string.server_api_key_header))
             },
             isError = apiKeyHeader.isEmpty(),
             singleLine = true,
@@ -98,13 +98,13 @@ fun ApiPresetForm(
                 .fillMaxWidth()
                 .padding(horizontal = spacing.windowPadding)
                 .padding(top = spacing.medium)
-                .testTag("geoShareApiPresetFormApiKey"),
-            enabled = authType == ApiAuthType.API_KEY,
+                .testTag("geoShareServerFormApiKey"),
+            enabled = authType == ServerAuthType.API_KEY,
             label = {
-                Text(stringResource(R.string.api_presets_api_key))
+                Text(stringResource(R.string.server_api_key))
             },
             supportingText = {
-                Text(stringResource(R.string.api_presets_api_key_supporting_text))
+                Text(stringResource(R.string.server_api_key_supporting_text))
             },
             isError = apiKey.isEmpty(),
             singleLine = true,
@@ -112,7 +112,7 @@ fun ApiPresetForm(
         HorizontalDivider(Modifier.padding(vertical = spacing.medium))
         LargeButton(
             stringResource(R.string.save),
-            Modifier.testTag("geoShareApiPresetFormSave"),
+            Modifier.testTag("geoShareServerFormSave"),
             enabled = item.isValid(),
         ) {
             onSaveForm()
@@ -127,10 +127,10 @@ fun ApiPresetForm(
 private fun DefaultPreview() {
     AppTheme {
         Surface {
-            ApiPresetForm(
+            ServerForm(
                 apiKey = "",
                 apiKeyHeader = "",
-                authType = ApiAuthType.API_KEY,
+                authType = ServerAuthType.API_KEY,
                 baseUrl = "",
                 onSaveForm = {},
                 onSetApiKey = {},
@@ -147,10 +147,10 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         Surface {
-            ApiPresetForm(
+            ServerForm(
                 apiKey = "",
                 apiKeyHeader = "",
-                authType = ApiAuthType.API_KEY,
+                authType = ServerAuthType.API_KEY,
                 baseUrl = "",
                 onSaveForm = {},
                 onSetApiKey = {},
@@ -167,12 +167,12 @@ private fun DarkPreview() {
 private fun UpdateApiKeyPreview() {
     AppTheme {
         Surface {
-            val apiPreset = FakeGoogleMapsApiPreset
-            ApiPresetForm(
-                apiKey = apiPreset.apiKey,
-                apiKeyHeader = apiPreset.apiKeyHeader,
-                authType = apiPreset.authType,
-                baseUrl = apiPreset.baseUrl,
+            val item = FakeGoogleMapsServer
+            ServerForm(
+                apiKey = item.apiKey,
+                apiKeyHeader = item.apiKeyHeader,
+                authType = item.authType,
+                baseUrl = item.baseUrl,
                 onSaveForm = {},
                 onSetApiKey = {},
                 onSetApiKeyHeader = {},
@@ -188,12 +188,12 @@ private fun UpdateApiKeyPreview() {
 private fun DarkUpdateApiKeyPreview() {
     AppTheme {
         Surface {
-            val apiPreset = FakeGoogleMapsApiPreset
-            ApiPresetForm(
-                apiKey = apiPreset.apiKey,
-                apiKeyHeader = apiPreset.apiKeyHeader,
-                authType = apiPreset.authType,
-                baseUrl = apiPreset.baseUrl,
+            val item = FakeGoogleMapsServer
+            ServerForm(
+                apiKey = item.apiKey,
+                apiKeyHeader = item.apiKeyHeader,
+                authType = item.authType,
+                baseUrl = item.baseUrl,
                 onSaveForm = {},
                 onSetApiKey = {},
                 onSetApiKeyHeader = {},
@@ -209,12 +209,12 @@ private fun DarkUpdateApiKeyPreview() {
 private fun UpdateAttestationPreview() {
     AppTheme {
         Surface {
-            val apiPreset = FakeGeoShareApiPreset
-            ApiPresetForm(
-                apiKey = apiPreset.apiKey,
-                apiKeyHeader = apiPreset.apiKeyHeader,
-                authType = apiPreset.authType,
-                baseUrl = apiPreset.baseUrl,
+            val item = FakeGeoShareServer
+            ServerForm(
+                apiKey = item.apiKey,
+                apiKeyHeader = item.apiKeyHeader,
+                authType = item.authType,
+                baseUrl = item.baseUrl,
                 onSaveForm = {},
                 onSetApiKey = {},
                 onSetApiKeyHeader = {},
@@ -230,12 +230,12 @@ private fun UpdateAttestationPreview() {
 private fun DarkUpdateExpandedPreview() {
     AppTheme {
         Surface {
-            val apiPreset = FakeGeoShareApiPreset
-            ApiPresetForm(
-                apiKey = apiPreset.apiKey,
-                apiKeyHeader = apiPreset.apiKeyHeader,
-                authType = apiPreset.authType,
-                baseUrl = apiPreset.baseUrl,
+            val item = FakeGeoShareServer
+            ServerForm(
+                apiKey = item.apiKey,
+                apiKeyHeader = item.apiKeyHeader,
+                authType = item.authType,
+                baseUrl = item.baseUrl,
                 onSaveForm = {},
                 onSetApiKey = {},
                 onSetApiKeyHeader = {},

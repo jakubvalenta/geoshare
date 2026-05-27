@@ -13,8 +13,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import page.ooooo.geoshare.data.di.FakeApiPresetRepository
-import page.ooooo.geoshare.data.di.FakeGeoShareApiPreset
+import page.ooooo.geoshare.data.di.FakeServerRepository
+import page.ooooo.geoshare.data.di.FakeGeoShareServer
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.FakeLog
@@ -27,11 +27,11 @@ import page.ooooo.geoshare.lib.network.UnknownNetworkException
 import java.net.SocketTimeoutException
 
 class GoogleMapsPlaceApiInputTest {
-    private val apiPreset = FakeGeoShareApiPreset
+    private val server = FakeGeoShareServer
     private val placeId = @Suppress("SpellCheckingInspection") "ChIJKxjxuaNqkFQR3CK6O1HNNqY"
     private val engine = MockEngine { request ->
         when (request.url.toString()) {
-            "${apiPreset.baseUrl}/v1/google-maps/geocode/place/$placeId" -> respond(
+            "${server.baseUrl}/v1/google-maps/geocode/place/$placeId" -> respond(
                 // language=Json
                 """
                     {"location": {"latitude": 50.123456, "longitude": -11.123456}}
@@ -39,7 +39,7 @@ class GoogleMapsPlaceApiInputTest {
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
 
-            "${apiPreset.baseUrl}/v1/google-maps/geocode/place/invalid" -> respond(
+            "${server.baseUrl}/v1/google-maps/geocode/place/invalid" -> respond(
                 // language=Json
                 """
                     {"location": "invalid"}
@@ -47,9 +47,9 @@ class GoogleMapsPlaceApiInputTest {
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
 
-            "${apiPreset.baseUrl}/v1/google-maps/geocode/place/exception" -> throw SocketTimeoutException()
+            "${server.baseUrl}/v1/google-maps/geocode/place/exception" -> throw SocketTimeoutException()
 
-            "${apiPreset.baseUrl}/v1/google-maps/geocode/place/not-found" -> respondError(HttpStatusCode.NotFound)
+            "${server.baseUrl}/v1/google-maps/geocode/place/not-found" -> respondError(HttpStatusCode.NotFound)
 
             else -> throw NotImplementedError()
         }
@@ -60,11 +60,11 @@ class GoogleMapsPlaceApiInputTest {
 
     @Test
     fun parse_whenApiIsNotConfigured_returnsNextStep() = runTest {
-        val apiPresetRepository: FakeApiPresetRepository = mock {
+        val serverRepository: FakeServerRepository = mock {
             on { getSelected() } doReturn null
         }
         val input = GoogleMapsPlaceApiInput(
-            apiPresetRepository = apiPresetRepository,
+            serverRepository = serverRepository,
             apiService = ApiService(engine, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
             uriQuote = uriQuote,
@@ -80,11 +80,11 @@ class GoogleMapsPlaceApiInputTest {
 
     @Test
     fun parse_whenPlaceIdIsInQueryParamAndApiReturnsResult_returnsPoint() = runTest {
-        val apiPresetRepository: FakeApiPresetRepository = mock {
-            on { getSelected() } doReturn apiPreset
+        val serverRepository: FakeServerRepository = mock {
+            on { getSelected() } doReturn server
         }
         val input = GoogleMapsPlaceApiInput(
-            apiPresetRepository = apiPresetRepository,
+            serverRepository = serverRepository,
             apiService = ApiService(engine, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
             uriQuote = uriQuote,
@@ -102,11 +102,11 @@ class GoogleMapsPlaceApiInputTest {
 
     @Test
     fun parse_whenQueryIsNotFoundInUri_returnsNoPoints() = runTest {
-        val apiPresetRepository: FakeApiPresetRepository = mock {
-            on { getSelected() } doReturn apiPreset
+        val serverRepository: FakeServerRepository = mock {
+            on { getSelected() } doReturn server
         }
         val input = GoogleMapsPlaceApiInput(
-            apiPresetRepository = apiPresetRepository,
+            serverRepository = serverRepository,
             apiService = ApiService(engine, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
             uriQuote = uriQuote,
@@ -120,11 +120,11 @@ class GoogleMapsPlaceApiInputTest {
 
     @Test
     fun parse_whenQueryIsEmpty_returnsNoPoints() = runTest {
-        val apiPresetRepository: FakeApiPresetRepository = mock {
-            on { getSelected() } doReturn apiPreset
+        val serverRepository: FakeServerRepository = mock {
+            on { getSelected() } doReturn server
         }
         val input = GoogleMapsPlaceApiInput(
-            apiPresetRepository = apiPresetRepository,
+            serverRepository = serverRepository,
             apiService = ApiService(engine, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
             uriQuote = uriQuote,
@@ -138,11 +138,11 @@ class GoogleMapsPlaceApiInputTest {
 
     @Test(expected = UnknownNetworkException::class)
     fun parse_whenApiReturnsInvalidResponse_throwsException() = runTest {
-        val apiPresetRepository: FakeApiPresetRepository = mock {
-            on { getSelected() } doReturn apiPreset
+        val serverRepository: FakeServerRepository = mock {
+            on { getSelected() } doReturn server
         }
         val input = GoogleMapsPlaceApiInput(
-            apiPresetRepository = apiPresetRepository,
+            serverRepository = serverRepository,
             apiService = ApiService(engine, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
             uriQuote = uriQuote,
@@ -153,11 +153,11 @@ class GoogleMapsPlaceApiInputTest {
 
     @Test(expected = SocketTimeoutNetworkException::class)
     fun parse_whenApiThrowsException_throwsException() = runTest {
-        val apiPresetRepository: FakeApiPresetRepository = mock {
-            on { getSelected() } doReturn apiPreset
+        val serverRepository: FakeServerRepository = mock {
+            on { getSelected() } doReturn server
         }
         val input = GoogleMapsPlaceApiInput(
-            apiPresetRepository = apiPresetRepository,
+            serverRepository = serverRepository,
             apiService = ApiService(engine, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
             uriQuote = uriQuote,

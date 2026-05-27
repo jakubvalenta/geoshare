@@ -61,11 +61,11 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.di.defaultFakeApiPresets
+import page.ooooo.geoshare.data.di.FakeGeoShareServer
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
-import page.ooooo.geoshare.data.local.database.ApiPreset
 import page.ooooo.geoshare.data.local.database.Link
+import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.database.findByUUID
 import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
@@ -115,7 +115,6 @@ import kotlin.time.DurationUnit
 
 @Keep
 enum class UserPreferencesGroupId {
-    API_PRESETS,
     AUTOMATION,
     AUTOMATION_DELAY,
     CONNECTION_PERMISSION,
@@ -123,6 +122,7 @@ enum class UserPreferencesGroupId {
     DEVELOPER_OPTIONS,
     HIDDEN_APPS,
     LINKS,
+    SERVER,
 }
 
 private data class UserPreferencesGroup(
@@ -138,39 +138,39 @@ private data class UserPreferencesGroup(
 fun UserPreferencesScreen(
     initialGroupId: UserPreferencesGroupId?,
     onBack: () -> Unit,
-    onNavigateToApiPresetScreen: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     onNavigateToLinksScreen: () -> Unit,
+    onNavigateToServerScreen: () -> Unit,
     billingViewModel: BillingViewModel,
     viewModel: UserPreferencesViewModel = hiltViewModel(),
     outputViewModel: OutputViewModel = hiltViewModel(),
 ) {
-    val apiPresets by viewModel.apiPresets.collectAsStateWithLifecycle()
     val apps by viewModel.apps.collectAsStateWithLifecycle()
     val appDetails by viewModel.appDetails.collectAsStateWithLifecycle()
     val billingAppNameResId = billingViewModel.billingAppNameResId
     val billingFeatures = billingViewModel.billingFeatures
     val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
     val links by viewModel.links.collectAsStateWithLifecycle()
+    val selectedServer by viewModel.selectedServer.collectAsStateWithLifecycle()
     val userPreferencesValues by viewModel.values.collectAsStateWithLifecycle()
 
     UserPreferencesScreen(
         initialGroupId = initialGroupId,
-        apiPresets = apiPresets,
         apps = apps,
         appDetails = appDetails,
         billingAppNameResId = billingAppNameResId,
         billingFeatures = billingFeatures,
         billingStatus = billingStatus,
         links = links,
+        selectedServer = selectedServer,
         userPreferencesValues = userPreferencesValues,
         onBack = onBack,
         onGetAutomationOutput = { automation, getLinkByUUID ->
             outputViewModel.getAutomationOutput(automation, getLinkByUUID)
         },
-        onNavigateToApiPresetScreen = onNavigateToApiPresetScreen,
         onNavigateToBillingScreen = onNavigateToBillingScreen,
         onNavigateToLinksScreen = onNavigateToLinksScreen,
+        onNavigateToServerScreen = onNavigateToServerScreen,
         onValueChange = { transform: (preferences: MutablePreferences) -> Unit ->
             viewModel.editUserPreferences(transform)
         },
@@ -181,19 +181,19 @@ fun UserPreferencesScreen(
 @Composable
 private fun UserPreferencesScreen(
     initialGroupId: UserPreferencesGroupId?,
-    apiPresets: List<ApiPreset>,
     apps: DataTypes,
     appDetails: AppDetails,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
     links: List<Link>,
+    selectedServer: Server?,
     userPreferencesValues: UserPreferencesValues,
     onBack: () -> Unit,
     onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
-    onNavigateToApiPresetScreen: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     onNavigateToLinksScreen: () -> Unit,
+    onNavigateToServerScreen: () -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -215,13 +215,13 @@ private fun UserPreferencesScreen(
         listPane = { _, containerColor ->
             UserPreferencesListPane(
                 currentGroupId = currentGroupId,
-                apiPresets = apiPresets,
                 apps = apps,
                 appDetails = appDetails,
                 billingStatus = billingStatus,
                 billingFeatures = billingFeatures,
                 containerColor = containerColor,
                 links = links,
+                selectedServer = selectedServer,
                 values = userPreferencesValues,
                 onBack = {
                     coroutineScope.launch {
@@ -238,8 +238,8 @@ private fun UserPreferencesScreen(
                         navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, id)
                     }
                 },
-                onNavigateToApiPresetScreen = onNavigateToApiPresetScreen,
                 onNavigateToLinksScreen = onNavigateToLinksScreen,
+                onNavigateToServerScreen = onNavigateToServerScreen,
             )
         },
         detailPane = { wide ->
@@ -279,17 +279,17 @@ private fun UserPreferencesListPane(
     currentGroupId: UserPreferencesGroupId?,
     values: UserPreferencesValues,
     apps: DataTypes,
-    apiPresets: List<ApiPreset>,
     appDetails: AppDetails,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
     containerColor: Color,
     links: List<Link>,
+    selectedServer: Server?,
     onBack: () -> Unit,
     onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
     onNavigateToGroup: (id: UserPreferencesGroupId) -> Unit,
-    onNavigateToApiPresetScreen: () -> Unit,
     onNavigateToLinksScreen: () -> Unit,
+    onNavigateToServerScreen: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
     var automationDelayEnabled by retain { mutableStateOf(true) }
@@ -334,28 +334,25 @@ private fun UserPreferencesListPane(
                 currentGroupId = currentGroupId,
             )
         }
-        if (BuildConfig.DEBUG) {
-            item {
-                UserPreferencesListSection(
-                    groups = listOf(
-                        UserPreferencesGroup(
-                            id = UserPreferencesGroupId.API_PRESETS,
-                            headline = { stringResource(R.string.api_presets_title) },
-                            enabled = ConnectionPermissionPreference.getValue(values) != Permission.NEVER,
-                            supportingContent = {
-                                Text(
-                                    apiPresets.firstOrNull { it.enabled }?.baseUrl
-                                        ?: stringResource(R.string.not_configured),
-                                    overflow = TextOverflow.Ellipsis,
-                                    maxLines = 1,
-                                )
-                            },
-                            onClick = { onNavigateToApiPresetScreen() },
-                        ),
+        item {
+            UserPreferencesListSection(
+                groups = listOf(
+                    UserPreferencesGroup(
+                        id = UserPreferencesGroupId.SERVER,
+                        headline = { stringResource(R.string.server_title) },
+                        enabled = ConnectionPermissionPreference.getValue(values) != Permission.NEVER,
+                        supportingContent = {
+                            Text(
+                                selectedServer?.name ?: stringResource(R.string.server_none_selected),
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1,
+                            )
+                        },
+                        onClick = { onNavigateToServerScreen() },
                     ),
-                    currentGroupId = currentGroupId,
-                )
-            }
+                ),
+                currentGroupId = currentGroupId,
+            )
         }
         item {
             SegmentedListLabel(stringResource(R.string.user_preferences_automation_title))
@@ -754,8 +751,6 @@ private fun UserPreferencesDetailPane(
                 )
             }
 
-        UserPreferencesGroupId.API_PRESETS -> {}
-
         UserPreferencesGroupId.HIDDEN_APPS ->
             UserPreferencesControls(
                 titleResId = R.string.user_preferences_apps_title,
@@ -791,6 +786,8 @@ private fun UserPreferencesDetailPane(
             }
 
         UserPreferencesGroupId.LINKS -> {}
+
+        UserPreferencesGroupId.SERVER -> {}
     }
 }
 
@@ -1025,19 +1022,19 @@ private fun DefaultPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = null,
-                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1053,19 +1050,19 @@ private fun DarkPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = null,
-                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1081,19 +1078,19 @@ private fun TabletPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = null,
-                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1109,19 +1106,19 @@ private fun ConnectionPermissionPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
-                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1137,19 +1134,19 @@ private fun DarkConnectionPermissionPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
-                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1165,19 +1162,19 @@ private fun TabletConnectionPermissionPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
-                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1193,19 +1190,19 @@ private fun CoordinateFormatPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.COORDINATE_FORMAT,
-                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1221,19 +1218,19 @@ private fun DarkCoordinateFormatPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.COORDINATE_FORMAT,
-                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1249,19 +1246,19 @@ private fun TabletCoordinateFormatPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.COORDINATE_FORMAT,
-                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1279,7 +1276,6 @@ private fun AutomationPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION,
-                    apiPresets = defaultFakeApiPresets,
                     apps = mapOf(
                         PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                     ),
@@ -1298,15 +1294,16 @@ private fun AutomationPreview() {
                         token = "test_purchased",
                     ),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1324,7 +1321,6 @@ private fun DarkAutomationPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION,
-                    apiPresets = defaultFakeApiPresets,
                     apps = mapOf(
                         PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                     ),
@@ -1343,15 +1339,16 @@ private fun DarkAutomationPreview() {
                         token = "test_purchased",
                     ),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1369,7 +1366,6 @@ private fun TabletAutomationPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION,
-                    apiPresets = defaultFakeApiPresets,
                     apps = mapOf(
                         PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                     ),
@@ -1388,15 +1384,16 @@ private fun TabletAutomationPreview() {
                         token = "test_purchased",
                     ),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1414,7 +1411,6 @@ private fun AutomationFeatureNotAvailablePreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION,
-                    apiPresets = defaultFakeApiPresets,
                     apps = mapOf(
                         PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                     ),
@@ -1428,15 +1424,16 @@ private fun AutomationFeatureNotAvailablePreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.NotPurchased(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1454,7 +1451,6 @@ private fun DarkAutomationFeatureNotAvailablePreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION,
-                    apiPresets = defaultFakeApiPresets,
                     apps = mapOf(
                         PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                     ),
@@ -1468,15 +1464,16 @@ private fun DarkAutomationFeatureNotAvailablePreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.NotPurchased(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1494,7 +1491,6 @@ private fun TabletAutomationFeatureNotAvailablePreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION,
-                    apiPresets = defaultFakeApiPresets,
                     apps = mapOf(
                         PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                     ),
@@ -1508,15 +1504,16 @@ private fun TabletAutomationFeatureNotAvailablePreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.NotPurchased(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1532,7 +1529,6 @@ private fun AutomationDelayPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION_DELAY,
-                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
@@ -1544,15 +1540,16 @@ private fun AutomationDelayPreview() {
                         token = "test_purchased",
                     ),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1568,7 +1565,6 @@ private fun DarkAutomationDelayPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION_DELAY,
-                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
@@ -1580,15 +1576,16 @@ private fun DarkAutomationDelayPreview() {
                         token = "test_purchased",
                     ),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1604,7 +1601,6 @@ private fun TableAutomationDelayPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.AUTOMATION_DELAY,
-                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
@@ -1616,15 +1612,16 @@ private fun TableAutomationDelayPreview() {
                         token = "test_purchased",
                     ),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1642,7 +1639,6 @@ private fun HiddenAppsPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
-                    apiPresets = defaultFakeApiPresets,
                     apps = mapOf(
                         PackageNames.COMAPS_FDROID to emptySet(),
                         PackageNames.ORGANIC_MAPS to emptySet(),
@@ -1666,14 +1662,15 @@ private fun HiddenAppsPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         hiddenApps = setOf(PackageNames.ORGANIC_MAPS),
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1691,7 +1688,6 @@ private fun DarkHiddenAppsPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
-                    apiPresets = defaultFakeApiPresets,
                     apps = mapOf(
                         PackageNames.COMAPS_FDROID to emptySet(),
                         PackageNames.ORGANIC_MAPS to emptySet(),
@@ -1715,14 +1711,15 @@ private fun DarkHiddenAppsPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         hiddenApps = setOf(PackageNames.ORGANIC_MAPS),
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1740,7 +1737,6 @@ private fun TabletHiddenAppsPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
-                    apiPresets = defaultFakeApiPresets,
                     apps = mapOf(
                         PackageNames.COMAPS_FDROID to emptySet(),
                         PackageNames.ORGANIC_MAPS to emptySet(),
@@ -1764,14 +1760,15 @@ private fun TabletHiddenAppsPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         hiddenApps = setOf(PackageNames.ORGANIC_MAPS),
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1789,7 +1786,6 @@ private fun HiddenAppsLoadingPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
-                    apiPresets = defaultFakeApiPresets,
                     apps = mapOf(
                         PackageNames.COMAPS_FDROID to emptySet(),
                         PackageNames.ORGANIC_MAPS to emptySet(),
@@ -1813,12 +1809,13 @@ private fun HiddenAppsLoadingPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1836,7 +1833,6 @@ private fun DarkHiddenAppsLoadingPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
-                    apiPresets = defaultFakeApiPresets,
                     apps = mapOf(
                         PackageNames.COMAPS_FDROID to emptySet(),
                         PackageNames.ORGANIC_MAPS to emptySet(),
@@ -1860,12 +1856,13 @@ private fun DarkHiddenAppsLoadingPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1883,7 +1880,6 @@ private fun TabletHiddenAppsLoadingPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
-                    apiPresets = defaultFakeApiPresets,
                     apps = mapOf(
                         PackageNames.COMAPS_FDROID to emptySet(),
                         PackageNames.ORGANIC_MAPS to emptySet(),
@@ -1907,12 +1903,13 @@ private fun TabletHiddenAppsLoadingPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1928,13 +1925,13 @@ private fun DeveloperOptionsPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.DEVELOPER_OPTIONS,
-                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         connectionPermission = Permission.NEVER,
@@ -1942,9 +1939,9 @@ private fun DeveloperOptionsPreview() {
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1960,13 +1957,13 @@ private fun DarkDeveloperOptionsPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.DEVELOPER_OPTIONS,
-                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = null,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         connectionPermission = Permission.NEVER,
@@ -1974,9 +1971,9 @@ private fun DarkDeveloperOptionsPreview() {
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1992,13 +1989,13 @@ private fun TableDeveloperOptionsPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.DEVELOPER_OPTIONS,
-                    apiPresets = defaultFakeApiPresets,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = null,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         connectionPermission = Permission.NEVER,
@@ -2006,9 +2003,9 @@ private fun TableDeveloperOptionsPreview() {
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToApiPresetScreen = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }

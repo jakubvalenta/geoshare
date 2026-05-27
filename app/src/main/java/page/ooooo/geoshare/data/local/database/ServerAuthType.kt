@@ -1,6 +1,6 @@
 package page.ooooo.geoshare.data.local.database
 
-enum class ApiAuthType {
+enum class ServerAuthType {
     API_KEY,
     ATTESTATION,
 }

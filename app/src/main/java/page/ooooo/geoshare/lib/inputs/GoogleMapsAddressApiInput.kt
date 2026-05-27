@@ -10,7 +10,7 @@ import io.ktor.http.appendPathSegments
 import io.ktor.http.headers
 import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.ApiPresetRepository
+import page.ooooo.geoshare.data.ServerRepository
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
@@ -23,9 +23,9 @@ import javax.inject.Singleton
 
 @Singleton
 class GoogleMapsAddressApiInput @Inject constructor(
-    private val apiPresetRepository: ApiPresetRepository,
     private val apiService: ApiService,
     private val googleMapsHtmlInput: Lazy<GoogleMapsHtmlInput>,
+    private val serverRepository: ServerRepository,
     private val uriQuote: UriQuote,
 ) : BasicInput<Uri>, Input.HasPermission {
 
@@ -39,16 +39,16 @@ class GoogleMapsAddressApiInput @Inject constructor(
         block(Uri.parse(match, uriQuote))
 
     override suspend fun parse(data: Uri, match: String) = parseResult {
-        val apiPreset = apiPresetRepository.getSelected() ?: run {
+        val server = serverRepository.getSelected() ?: run {
             // Go to HTML parsing, if API is not configured
             nextStep = NextStep(googleMapsHtmlInput.get(), match)
             return@parseResult
         }
         val client = apiService.createHttpClient(
-            baseUrl = apiPreset.baseUrl,
-            authType = apiPreset.authType,
-            apiKey = apiPreset.apiKey,
-            apiKeyHeader = apiPreset.apiKeyHeader,
+            baseUrl = server.baseUrl,
+            authType = server.authType,
+            apiKey = server.apiKey,
+            apiKeyHeader = server.apiKeyHeader,
         )
         val query = parseQuery(data) ?: return@parseResult
         val res = client.use { client ->

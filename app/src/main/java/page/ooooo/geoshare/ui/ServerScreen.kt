@@ -57,12 +57,12 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.di.FakeGoogleMapsApiPreset
-import page.ooooo.geoshare.data.di.defaultFakeApiPresets
-import page.ooooo.geoshare.data.local.database.ApiAuthType
-import page.ooooo.geoshare.data.local.database.ApiPreset
+import page.ooooo.geoshare.data.di.FakeGoogleMapsServer
+import page.ooooo.geoshare.data.di.defaultFakeServers
+import page.ooooo.geoshare.data.local.database.ServerAuthType
+import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.lib.Message
-import page.ooooo.geoshare.ui.components.ApiPresetForm
+import page.ooooo.geoshare.ui.components.ServerForm
 import page.ooooo.geoshare.ui.components.BasicListDetailScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
@@ -74,9 +74,9 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
-fun ApiPresetScreen(
+fun ServerScreen(
     onBack: () -> Unit,
-    viewModel: ApiPresetViewModel = hiltViewModel(),
+    viewModel: ServerViewModel = hiltViewModel(),
 ) {
     val coroutineScope = rememberCoroutineScope()
     val resources = LocalResources.current
@@ -84,7 +84,7 @@ fun ApiPresetScreen(
     val selected by viewModel.selected.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
 
-    ApiPresetScreen(
+    ServerScreen(
         destination = viewModel.destination,
         all = all,
         selected = selected,
@@ -114,14 +114,14 @@ fun ApiPresetScreen(
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-private fun ApiPresetScreen(
+private fun ServerScreen(
     destination: Int?,
-    all: List<ApiPreset>,
-    selected: ApiPreset?,
+    all: List<Server>,
+    selected: Server?,
     message: Message?,
     apiKey: String,
     apiKeyHeader: String,
-    authType: ApiAuthType,
+    authType: ServerAuthType,
     baseUrl: String,
     onBack: () -> Unit,
     onDelete: () -> Unit,
@@ -132,7 +132,7 @@ private fun ApiPresetScreen(
     onSelect: (Int?) -> Unit,
     onSetApiKey: (String) -> Unit,
     onSetApiKeyHeader: (String) -> Unit,
-    onSetAuthType: (ApiAuthType) -> Unit,
+    onSetAuthType: (ServerAuthType) -> Unit,
     onSetBaseUrl: (String) -> Unit,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -187,7 +187,7 @@ private fun ApiPresetScreen(
             listPane = { _, containerColor ->
                 // Use destination coming from view model, because if we use navigator.currentDestination?.contentKey,
                 // fields get briefly rendered with empty values when switching from detail to list.
-                ApiPresetListPane(
+                ServerListPane(
                     destination = destination,
                     containerColor = containerColor,
                     all = all,
@@ -202,7 +202,7 @@ private fun ApiPresetScreen(
                 // Use destination coming from view model, because if we use navigator.currentDestination?.contentKey,
                 // fields get briefly rendered with empty values when switching from detail to list.
                 if (destination != null) {
-                    ApiPresetDetailPane(
+                    ServerDetailPane(
                         destination = destination,
                         wide = wide,
                         baseUrl = baseUrl,
@@ -226,11 +226,11 @@ private fun ApiPresetScreen(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun ApiPresetListPane(
+private fun ServerListPane(
     destination: Int?,
     containerColor: Color,
-    all: List<ApiPreset>,
-    selected: ApiPreset?,
+    all: List<Server>,
+    selected: Server?,
     onBack: () -> Unit,
     onSelect: (Int?) -> Unit,
     onNavigateToContentKey: (Int?) -> Unit,
@@ -241,18 +241,18 @@ private fun ApiPresetListPane(
 
     ScrollablePane(
         title = {
-            Text(stringResource(R.string.api_presets_title))
+            Text(stringResource(R.string.server_title))
         },
         onBack = onBack,
         modifier = Modifier
             .padding(horizontal = spacing.windowPadding)
-            .testTag("geoShareApiPresetListPane"),
+            .testTag("geoShareServerListPane"),
         containerColor = containerColor,
     ) {
         item {
             ParagraphText(
                 stringResource(
-                    R.string.api_presets_description,
+                    R.string.server_description,
                     stringResource(R.string.app_name),
                 ),
                 Modifier.padding(top = spacing.tinyAdaptive, bottom = spacing.smallAdaptive),
@@ -261,13 +261,13 @@ private fun ApiPresetListPane(
         item {
             Button(
                 { onNavigateToContentKey(-1) },
-                Modifier.testTag("geoShareApiPresetListInsert"),
+                Modifier.testTag("geoShareServerListInsert"),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.secondary,
                     contentColor = MaterialTheme.colorScheme.onSecondary,
                 ),
             ) {
-                Text(stringResource(R.string.api_presets_insert))
+                Text(stringResource(R.string.server_insert))
             }
         }
         item {
@@ -282,18 +282,18 @@ private fun ApiPresetListPane(
                     selected = selected == null,
                     onClick = { onSelect(null) },
                     shapes = ListItemDefaults.segmentedShapes(index = 0, count = all.size + 1),
-                    modifier = Modifier.testTag("geoShareApiPresetListItem_null"),
+                    modifier = Modifier.testTag("geoShareServerListItem_null"),
                     leadingContent = {
                         RadioButton(
                             selected = selected == null,
                             // Null recommended for accessibility with screen readers
                             onClick = null,
-                            modifier = Modifier.testTag("geoShareApiPresetListItemRadio_null")
+                            modifier = Modifier.testTag("geoShareServerListItemRadio_null")
                         )
                     },
                     colors = colors,
                 ) {
-                    Text(stringResource(R.string.api_presets_none_selected), style = MaterialTheme.typography.bodyLarge)
+                    Text(stringResource(R.string.server_none_selected), style = MaterialTheme.typography.bodyLarge)
                 }
                 all.forEachIndexed { i, item ->
                     var expanded by remember { mutableStateOf(false) }
@@ -303,14 +303,14 @@ private fun ApiPresetListPane(
                         selected = item.uid == destination,
                         onClick = { onSelect(item.uid) },
                         shapes = ListItemDefaults.segmentedShapes(index = i + 1, count = all.size + 1),
-                        modifier = Modifier.testTag("geoShareApiPresetListItem_${item.uuid}"),
+                        modifier = Modifier.testTag("geoShareServerListItem_${item.uuid}"),
                         enabled = valid,
                         leadingContent = {
                             RadioButton(
                                 selected = item.uid == selected?.uid,
                                 // Null recommended for accessibility with screen readers
                                 onClick = null,
-                                modifier = Modifier.testTag("geoShareApiPresetListItemRadio_${item.uuid}")
+                                modifier = Modifier.testTag("geoShareServerListItemRadio_${item.uuid}")
                             )
                         },
                         trailingContent = {
@@ -332,8 +332,8 @@ private fun ApiPresetListPane(
                                     containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                                 ) {
                                     DropdownMenuItem(
-                                        text = { Text(stringResource(R.string.edit)) },
-                                        modifier = Modifier.testTag("geoShareApiPresetListItemMenu_${item.uuid}"),
+                                        text = { Text(stringResource(R.string.server_update)) },
+                                        modifier = Modifier.testTag("geoShareServerListItemMenu_${item.uuid}"),
                                         onClick = {
                                             expanded = false
                                             onNavigateToContentKey(item.uid)
@@ -343,7 +343,7 @@ private fun ApiPresetListPane(
                             }
                         },
                         supportingContent = if (!valid) {
-                            { Text(stringResource(R.string.api_presets_invalid)) }
+                            { Text(stringResource(R.string.server_invalid)) }
                         } else {
                             null
                         },
@@ -358,18 +358,18 @@ private fun ApiPresetListPane(
             TextButton(
                 onClick = { setRestoreInitialDataDialogOpen(true) },
                 modifier = Modifier
-                    .testTag("geoShareApiPresetRestoreInitialButton")
+                    .testTag("geoShareServerRestoreInitialButton")
                     .padding(top = spacing.mediumAdaptive, bottom = spacing.tinyAdaptive),
                 colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
             ) {
-                Text(stringResource(R.string.api_presets_restore_initial_data))
+                Text(stringResource(R.string.server_restore_initial_data))
             }
         }
     }
 
     if (restoreInitialDataDialogOpen) {
         ConfirmationDialog(
-            stringResource(R.string.api_presets_restore_initial_data_title),
+            stringResource(R.string.server_restore_initial_data_title),
             stringResource(R.string.conversion_permission_common_grant),
             stringResource(R.string.conversion_permission_common_deny),
             onConfirmation = {
@@ -379,27 +379,27 @@ private fun ApiPresetListPane(
             onDismissRequest = { setRestoreInitialDataDialogOpen(false) },
             modifier = Modifier
                 .semantics { testTagsAsResourceId = true }
-                .testTag("geoShareApiPresetRestoreInitialDialog"),
+                .testTag("geoShareServerRestoreInitialDialog"),
         ) {
-            Text(stringResource(R.string.api_presets_restore_initial_data_text))
+            Text(stringResource(R.string.server_restore_initial_data_text))
         }
     }
 }
 
 @Composable
-private fun ApiPresetDetailPane(
+private fun ServerDetailPane(
     destination: Int,
     wide: Boolean,
     baseUrl: String,
     apiKey: String,
     apiKeyHeader: String,
-    authType: ApiAuthType,
+    authType: ServerAuthType,
     onBack: () -> Unit,
     onDelete: () -> Unit,
     onSaveForm: () -> Unit,
     onSetApiKey: (String) -> Unit,
     onSetApiKeyHeader: (String) -> Unit,
-    onSetAuthType: (ApiAuthType) -> Unit,
+    onSetAuthType: (ServerAuthType) -> Unit,
     onSetBaseUrl: (String) -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -410,17 +410,17 @@ private fun ApiPresetDetailPane(
             ScrollablePane(
                 title = {
                     Text(
-                        stringResource(if (destination == -1) R.string.api_presets_insert else R.string.api_presets_update),
+                        stringResource(if (destination == -1) R.string.server_insert else R.string.server_update),
                         Modifier.padding(horizontal = spacing.windowPadding),
                     )
                 },
                 onBack = onBack.takeUnless { wide },
-                modifier = Modifier.testTag("geoShareApiPresetDetailPane"),
+                modifier = Modifier.testTag("geoShareServerDetailPane"),
                 actions = {
                     if (destination != -1) {
                         IconButton(
                             onClick = { setDeleteDialogOpen(true) },
-                            modifier = Modifier.testTag("geoShareApiPresetDetailDelete"),
+                            modifier = Modifier.testTag("geoShareServerDetailDelete"),
                             colors = IconButtonDefaults.iconButtonColors(
                                 contentColor = MaterialTheme.colorScheme.error,
                             ),
@@ -432,7 +432,7 @@ private fun ApiPresetDetailPane(
                 navigationImageVector = Icons.Default.Close,
             ) {
                 item {
-                    ApiPresetForm(
+                    ServerForm(
                         apiKey = apiKey,
                         apiKeyHeader = apiKeyHeader,
                         authType = authType,
@@ -453,7 +453,7 @@ private fun ApiPresetDetailPane(
 
     if (deleteDialogOpen) {
         ConfirmationDialog(
-            title = stringResource(R.string.api_presets_delete_title),
+            title = stringResource(R.string.server_delete_title),
             confirmText = stringResource(R.string.conversion_permission_common_grant),
             dismissText = stringResource(R.string.conversion_permission_common_deny),
             onConfirmation = {
@@ -463,9 +463,9 @@ private fun ApiPresetDetailPane(
             onDismissRequest = { setDeleteDialogOpen(false) },
             modifier = Modifier
                 .semantics { testTagsAsResourceId = true }
-                .testTag("geoShareApiPresetDeleteDialog"),
+                .testTag("geoShareServerDeleteDialog"),
         ) {
-            Text(stringResource(R.string.api_presets_delete_text, baseUrl))
+            Text(stringResource(R.string.server_delete_text, baseUrl))
         }
     }
 }
@@ -478,14 +478,14 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             Column {
-                ApiPresetScreen(
+                ServerScreen(
                     destination = null,
-                    all = defaultFakeApiPresets,
+                    all = defaultFakeServers,
                     selected = null,
                     message = null,
                     apiKey = "",
                     apiKeyHeader = "",
-                    authType = ApiAuthType.API_KEY,
+                    authType = ServerAuthType.API_KEY,
                     baseUrl = "",
                     onBack = {},
                     onDelete = {},
@@ -510,14 +510,14 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             Column {
-                ApiPresetScreen(
+                ServerScreen(
                     destination = null,
-                    all = defaultFakeApiPresets,
+                    all = defaultFakeServers,
                     selected = null,
                     message = null,
                     apiKey = "",
                     apiKeyHeader = "",
-                    authType = ApiAuthType.API_KEY,
+                    authType = ServerAuthType.API_KEY,
                     baseUrl = "",
                     onBack = {},
                     onDelete = {},
@@ -542,14 +542,14 @@ private fun TabletPreview() {
     AppTheme {
         Surface {
             Column {
-                ApiPresetScreen(
+                ServerScreen(
                     destination = null,
-                    all = defaultFakeApiPresets,
+                    all = defaultFakeServers,
                     selected = null,
                     message = null,
                     apiKey = "",
                     apiKeyHeader = "",
-                    authType = ApiAuthType.API_KEY,
+                    authType = ServerAuthType.API_KEY,
                     baseUrl = "",
                     onBack = {},
                     onDelete = {},
@@ -574,14 +574,14 @@ private fun InsertPreview() {
     AppTheme {
         Surface {
             Column {
-                ApiPresetScreen(
+                ServerScreen(
                     destination = -1,
-                    all = defaultFakeApiPresets,
+                    all = defaultFakeServers,
                     selected = null,
                     message = null,
                     apiKey = "",
                     apiKeyHeader = "",
-                    authType = ApiAuthType.ATTESTATION,
+                    authType = ServerAuthType.ATTESTATION,
                     baseUrl = "",
                     onBack = {},
                     onDelete = {},
@@ -606,14 +606,14 @@ private fun DarkInsertPreview() {
     AppTheme {
         Surface {
             Column {
-                ApiPresetScreen(
+                ServerScreen(
                     destination = -1,
-                    all = defaultFakeApiPresets,
+                    all = defaultFakeServers,
                     selected = null,
                     message = null,
                     apiKey = "",
                     apiKeyHeader = "",
-                    authType = ApiAuthType.ATTESTATION,
+                    authType = ServerAuthType.ATTESTATION,
                     baseUrl = "",
                     onBack = {},
                     onDelete = {},
@@ -639,14 +639,14 @@ private fun TabletInsertPreview() {
     AppTheme {
         Surface {
             Column {
-                ApiPresetScreen(
+                ServerScreen(
                     destination = -1,
-                    all = defaultFakeApiPresets,
+                    all = defaultFakeServers,
                     selected = null,
                     message = null,
                     apiKey = "",
                     apiKeyHeader = "",
-                    authType = ApiAuthType.ATTESTATION,
+                    authType = ServerAuthType.ATTESTATION,
                     baseUrl = "",
                     onBack = {},
                     onDelete = {},
@@ -672,10 +672,10 @@ private fun UpdatePreview() {
     AppTheme {
         Surface {
             Column {
-                val item = FakeGoogleMapsApiPreset
-                ApiPresetScreen(
+                val item = FakeGoogleMapsServer
+                ServerScreen(
                     destination = item.uid,
-                    all = defaultFakeApiPresets,
+                    all = defaultFakeServers,
                     selected = null,
                     message = null,
                     apiKey = item.apiKey,
@@ -706,10 +706,10 @@ private fun DarkUpdatePreview() {
     AppTheme {
         Surface {
             Column {
-                val item = FakeGoogleMapsApiPreset
-                ApiPresetScreen(
+                val item = FakeGoogleMapsServer
+                ServerScreen(
                     destination = item.uid,
-                    all = defaultFakeApiPresets,
+                    all = defaultFakeServers,
                     selected = null,
                     message = null,
                     apiKey = item.apiKey,
@@ -740,10 +740,10 @@ private fun TabletUpdatePreview() {
     AppTheme {
         Surface {
             Column {
-                val item = FakeGoogleMapsApiPreset
-                ApiPresetScreen(
+                val item = FakeGoogleMapsServer
+                ServerScreen(
                     destination = item.uid,
-                    all = defaultFakeApiPresets,
+                    all = defaultFakeServers,
                     selected = null,
                     message = null,
                     apiKey = item.apiKey,

@@ -17,7 +17,7 @@ import page.ooooo.geoshare.lib.inputs.InputDocumentationGroup
 object AboutRoute
 
 @Serializable
-object ApiPresetRoute
+object BillingRoute
 
 @Serializable
 object FaqRoute
@@ -38,7 +38,7 @@ object LinksRoute
 object MainRoute
 
 @Serializable
-object BillingRoute
+object ServerRoute
 
 @Serializable
 data class UserPreferencesRoute(val id: UserPreferencesGroupId? = null)
@@ -69,11 +69,6 @@ fun MainNavigation(
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
                 onNavigateToLicensesScreen = { navController.navigate(LicensesRoute) },
                 billingViewModel = billingViewModel,
-            )
-        }
-        composable<ApiPresetRoute> {
-            ApiPresetScreen(
-                onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
             )
         }
         composable<FaqRoute> {
@@ -131,14 +126,19 @@ fun MainNavigation(
                 billingViewModel = billingViewModel,
             )
         }
+        composable<ServerRoute> {
+            ServerScreen(
+                onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
+            )
+        }
         composable<UserPreferencesRoute> { backStackEntry ->
             val route: UserPreferencesRoute = backStackEntry.toRoute()
             UserPreferencesScreen(
                 initialGroupId = route.id,
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
-                onNavigateToApiPresetScreen = { navController.navigate(ApiPresetRoute) },
                 onNavigateToBillingScreen = { navController.navigate(BillingRoute) },
                 onNavigateToLinksScreen = { navController.navigate(LinksRoute) },
+                onNavigateToServerScreen = { navController.navigate(ServerRoute) },
                 billingViewModel = billingViewModel,
             )
         }
