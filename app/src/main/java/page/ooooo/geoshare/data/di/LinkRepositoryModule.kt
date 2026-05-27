@@ -34,28 +34,28 @@ object LinkRepositoryModule {
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class FakeLinkRepository(
-    initialFakeLinks: List<Link> = defaultFakeLinks,
+    initialLinks: List<Link> = defaultFakeLinks,
 ) : LinkRepository {
-    private val _fakeLinks: MutableStateFlow<List<Link>> = MutableStateFlow(initialFakeLinks)
+    private val _links: MutableStateFlow<List<Link>> = MutableStateFlow(initialLinks)
 
-    override val all = _fakeLinks.mapLatest { it.sortedBy { entry -> entry.createdAt }.reversed() }
+    override val all = _links.mapLatest { it.sortedBy { entry -> entry.createdAt }.reversed() }
 
-    override suspend fun getAll() = _fakeLinks.value
+    override suspend fun getAll() = _links.value
 
     override suspend fun getByUid(uid: Int) =
-        _fakeLinks.value.firstOrNull { it.uid == uid }
+        _links.value.firstOrNull { it.uid == uid }
 
     override suspend fun getByUUID(uuid: UUID) =
-        _fakeLinks.value.firstOrNull { it.uuid == uuid }
+        _links.value.firstOrNull { it.uuid == uuid }
 
     override suspend fun insert(link: Link) =
-        (_fakeLinks.value + listOf(link)).also {
-            _fakeLinks.value = it
+        (_links.value + listOf(link)).also {
+            _links.value = it
         }.size.toLong()
 
     override suspend fun update(vararg links: Link) {
         for (link in links) {
-            _fakeLinks.value = _fakeLinks.value.map {
+            _links.value = _links.value.map {
                 if (it.uid == link.uid) {
                     link
                 } else {
@@ -66,11 +66,11 @@ class FakeLinkRepository(
     }
 
     override suspend fun delete(link: Link) {
-        _fakeLinks.value = _fakeLinks.value.filterNot { it.uid == link.uid }
+        _links.value = _links.value.filterNot { it.uid == link.uid }
     }
 
     override suspend fun enable(uid: Int) {
-        _fakeLinks.value = _fakeLinks.value.map {
+        _links.value = _links.value.map {
             if (it.uid == uid) {
                 it.copy(appEnabled = true)
             } else {
@@ -80,7 +80,7 @@ class FakeLinkRepository(
     }
 
     override suspend fun disable(uid: Int) {
-        _fakeLinks.value = _fakeLinks.value.map {
+        _links.value = _links.value.map {
             if (it.uid == uid) {
                 it.copy(appEnabled = false, chipEnabled = false, sheetEnabled = false)
             } else {
@@ -90,7 +90,7 @@ class FakeLinkRepository(
     }
 
     override suspend fun disableGroup(group: String?) {
-        _fakeLinks.value = _fakeLinks.value.map {
+        _links.value = _links.value.map {
             if (it.group == group) {
                 it.copy(appEnabled = false, chipEnabled = false, sheetEnabled = false)
             } else {
@@ -100,7 +100,7 @@ class FakeLinkRepository(
     }
 
     override suspend fun restoreInitialData() {
-        _fakeLinks.value = defaultFakeLinks
+        _links.value = defaultFakeLinks
     }
 }
 
@@ -185,8 +185,8 @@ val FakeMagicEarthNavigationLink = Link(
 )
 
 /**
- * Links for testing purposes. The actual links that the table is populated with are in
- * [page.ooooo.geoshare.data.local.database.AppDatabase.Companion.restoreInitialData].
+ * Items for testing purposes. The actual items that the table is populated with are in
+ * [page.ooooo.geoshare.data.local.database.InitialLinks].
  */
 val defaultFakeLinks = listOf(
     FakeOpenStreetMapDisplayLink,

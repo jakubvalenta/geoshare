@@ -236,7 +236,7 @@
     <string name="conversion_failed_reason_no_points">Не знайдено жодних результатів</string>
     <string name="conversion_failed_reason_timeout">Час очікування вичерпано</string>
     <string name="licenses">Ліцензії</string>
-    <string name="links_delete">Видалити</string>
+    <string name="delete">Видалити</string>
     <string name="links_delete_text">Вебмапа «%1$s» буде остаточно видалена.</string>
     <string name="links_delete_title">Видалити вебмапу?</string>
     <string name="links_description">Вебмапи дають змогу переглядати координати у браузері. Увімкніть вбудовані мапи або додайте власні.</string>
@@ -246,7 +246,7 @@
     <string name="links_form_enabled_option_sheet">Показати в меню копіювання</string>
     <string name="links_form_group">Група</string>
     <string name="links_form_name">Назва</string>
-    <string name="links_form_save">Зберегти</string>
+    <string name="save">Зберегти</string>
     <string name="links_form_srs">Система координат</string>
     <string name="links_form_type">Піктограма контекстного меню</string>
     <string name="links_form_uri_template_coords">Шаблон URL-адреси</string>

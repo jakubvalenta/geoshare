@@ -61,12 +61,12 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.di.FakeGeoShareServer
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.database.Link
+import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.database.findByUUID
-import page.ooooo.geoshare.data.local.preferences.ApiConfig
-import page.ooooo.geoshare.data.local.preferences.ApiConfigPreference
 import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
 import page.ooooo.geoshare.data.local.preferences.AutomationPreference
@@ -75,7 +75,6 @@ import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePr
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormatPreference
-import page.ooooo.geoshare.data.local.preferences.GoogleMapsApiPreference
 import page.ooooo.geoshare.data.local.preferences.HiddenAppsPreference
 import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.OptionsPreference
@@ -98,7 +97,6 @@ import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.Output
-import page.ooooo.geoshare.ui.components.DropdownField
 import page.ooooo.geoshare.ui.components.FeatureBadgeSmall
 import page.ooooo.geoshare.ui.components.FeatureWall
 import page.ooooo.geoshare.ui.components.IconFromDescriptor
@@ -122,9 +120,9 @@ enum class UserPreferencesGroupId {
     CONNECTION_PERMISSION,
     COORDINATE_FORMAT,
     DEVELOPER_OPTIONS,
-    GOOGLE_MAPS_API,
     HIDDEN_APPS,
     LINKS,
+    SERVER,
 }
 
 private data class UserPreferencesGroup(
@@ -142,6 +140,7 @@ fun UserPreferencesScreen(
     onBack: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     onNavigateToLinksScreen: () -> Unit,
+    onNavigateToServerScreen: () -> Unit,
     billingViewModel: BillingViewModel,
     viewModel: UserPreferencesViewModel = hiltViewModel(),
     outputViewModel: OutputViewModel = hiltViewModel(),
@@ -152,6 +151,7 @@ fun UserPreferencesScreen(
     val billingFeatures = billingViewModel.billingFeatures
     val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
     val links by viewModel.links.collectAsStateWithLifecycle()
+    val selectedServer by viewModel.selectedServer.collectAsStateWithLifecycle()
     val userPreferencesValues by viewModel.values.collectAsStateWithLifecycle()
 
     UserPreferencesScreen(
@@ -162,6 +162,7 @@ fun UserPreferencesScreen(
         billingFeatures = billingFeatures,
         billingStatus = billingStatus,
         links = links,
+        selectedServer = selectedServer,
         userPreferencesValues = userPreferencesValues,
         onBack = onBack,
         onGetAutomationOutput = { automation, getLinkByUUID ->
@@ -169,6 +170,7 @@ fun UserPreferencesScreen(
         },
         onNavigateToBillingScreen = onNavigateToBillingScreen,
         onNavigateToLinksScreen = onNavigateToLinksScreen,
+        onNavigateToServerScreen = onNavigateToServerScreen,
         onValueChange = { transform: (preferences: MutablePreferences) -> Unit ->
             viewModel.editUserPreferences(transform)
         },
@@ -185,11 +187,13 @@ private fun UserPreferencesScreen(
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
     links: List<Link>,
+    selectedServer: Server?,
     userPreferencesValues: UserPreferencesValues,
     onBack: () -> Unit,
     onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
     onNavigateToBillingScreen: () -> Unit,
     onNavigateToLinksScreen: () -> Unit,
+    onNavigateToServerScreen: () -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -217,6 +221,7 @@ private fun UserPreferencesScreen(
                 billingFeatures = billingFeatures,
                 containerColor = containerColor,
                 links = links,
+                selectedServer = selectedServer,
                 values = userPreferencesValues,
                 onBack = {
                     coroutineScope.launch {
@@ -234,6 +239,7 @@ private fun UserPreferencesScreen(
                     }
                 },
                 onNavigateToLinksScreen = onNavigateToLinksScreen,
+                onNavigateToServerScreen = onNavigateToServerScreen,
             )
         },
         detailPane = { wide ->
@@ -278,10 +284,12 @@ private fun UserPreferencesListPane(
     billingStatus: BillingStatus,
     containerColor: Color,
     links: List<Link>,
+    selectedServer: Server?,
     onBack: () -> Unit,
     onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
     onNavigateToGroup: (id: UserPreferencesGroupId) -> Unit,
     onNavigateToLinksScreen: () -> Unit,
+    onNavigateToServerScreen: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
     var automationDelayEnabled by retain { mutableStateOf(true) }
@@ -322,32 +330,22 @@ private fun UserPreferencesListPane(
                         },
                         onClick = { onNavigateToGroup(UserPreferencesGroupId.CONNECTION_PERMISSION) },
                     ),
+                    UserPreferencesGroup(
+                        id = UserPreferencesGroupId.SERVER,
+                        headline = { stringResource(R.string.server_title) },
+                        enabled = ConnectionPermissionPreference.getValue(values) != Permission.NEVER,
+                        supportingContent = {
+                            Text(
+                                selectedServer?.name ?: stringResource(R.string.server_none_selected),
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1,
+                            )
+                        },
+                        onClick = { onNavigateToServerScreen() },
+                    ),
                 ),
                 currentGroupId = currentGroupId,
             )
-        }
-        if (BuildConfig.DEBUG) {
-            item {
-                UserPreferencesListSection(
-                    groups = listOf(
-                        UserPreferencesGroup(
-                            id = UserPreferencesGroupId.GOOGLE_MAPS_API,
-                            headline = { stringResource(R.string.user_preferences_google_maps_api_title) },
-                            enabled = ConnectionPermissionPreference.getValue(values) != Permission.NEVER,
-                            supportingContent = {
-                                Text(
-                                    GoogleMapsApiPreference.getValue(values)?.baseUrl
-                                        ?: stringResource(R.string.not_configured),
-                                    overflow = TextOverflow.Ellipsis,
-                                    maxLines = 1,
-                                )
-                            },
-                            onClick = { onNavigateToGroup(UserPreferencesGroupId.GOOGLE_MAPS_API) },
-                        ),
-                    ),
-                    currentGroupId = currentGroupId,
-                )
-            }
         }
         item {
             SegmentedListLabel(stringResource(R.string.user_preferences_automation_title))
@@ -746,27 +744,6 @@ private fun UserPreferencesDetailPane(
                 )
             }
 
-        UserPreferencesGroupId.GOOGLE_MAPS_API ->
-            UserPreferencesControls(
-                titleResId = R.string.user_preferences_google_maps_api_title,
-                description = {
-                    stringResource(
-                        R.string.user_preferences_google_maps_api_description,
-                        stringResource(R.string.app_name),
-                    )
-                },
-                billingAppNameResId = billingAppNameResId,
-                wide = wide,
-                onBack = onBack,
-                onNavigateToBillingScreen = onNavigateToBillingScreen,
-            ) {
-                userPreferencesApiConfigControl(
-                    userPreference = GoogleMapsApiPreference,
-                    values = values,
-                    onValueChange = onValueChange,
-                )
-            }
-
         UserPreferencesGroupId.HIDDEN_APPS ->
             UserPreferencesControls(
                 titleResId = R.string.user_preferences_apps_title,
@@ -802,6 +779,8 @@ private fun UserPreferencesDetailPane(
             }
 
         UserPreferencesGroupId.LINKS -> {}
+
+        UserPreferencesGroupId.SERVER -> {}
     }
 }
 
@@ -1026,99 +1005,6 @@ private fun <T> LazyListScope.userPreferencesTextControl(
     }
 }
 
-private enum class AuthType { KEY, ATTESTATION }
-
-private fun LazyListScope.userPreferencesApiConfigControl(
-    userPreference: ApiConfigPreference,
-    values: UserPreferencesValues,
-    onValueChange: ((MutablePreferences) -> Unit) -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-) {
-    item {
-        val spacing = LocalSpacing.current
-        val value = userPreference.getValue(values)
-        var baseUrl by remember { mutableStateOf(value?.baseUrl ?: "") }
-        var authType by remember {
-            mutableStateOf(
-                when (value) {
-                    is ApiConfig.WithKeyAuth, null -> AuthType.KEY
-                    is ApiConfig.WithAttestationAuth -> AuthType.ATTESTATION
-                }
-            )
-        }
-        var header by remember { mutableStateOf((value as? ApiConfig.WithKeyAuth)?.header ?: "") }
-        var key by remember { mutableStateOf((value as? ApiConfig.WithKeyAuth)?.key ?: "") }
-
-        fun onFieldValueChange() {
-            val apiConfig = if (!baseUrl.isEmpty()) {
-                when (authType) {
-                    AuthType.KEY -> ApiConfig.WithKeyAuth(baseUrl, header, key)
-                    AuthType.ATTESTATION -> ApiConfig.WithAttestationAuth(baseUrl)
-                }
-            } else {
-                null
-            }
-            onValueChange { preferences ->
-                userPreference.setValue(preferences, apiConfig)
-            }
-        }
-
-        Column(modifier, verticalArrangement = Arrangement.spacedBy(spacing.small)) {
-            TextField(
-                value = baseUrl,
-                onValueChange = {
-                    baseUrl = it
-                    onFieldValueChange()
-                },
-                modifier = modifier.fillMaxWidth(),
-                enabled = enabled,
-                label = { Text(stringResource(R.string.user_preferences_api_base_url)) },
-                singleLine = true,
-            )
-            DropdownField(
-                value = authType,
-                options = AuthType.entries.associateWith { authType ->
-                    when (authType) {
-                        AuthType.KEY -> stringResource(R.string.user_preferences_api_key)
-                        AuthType.ATTESTATION -> stringResource(R.string.user_preferences_api_attestation)
-                    }
-                },
-                onValueChange = {
-                    authType = it
-                    onFieldValueChange()
-                },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = enabled,
-                label = { Text(stringResource(R.string.user_preferences_api_authentication)) },
-            )
-            TextField(
-                value = header,
-                onValueChange = {
-                    header = it
-                    onFieldValueChange()
-                },
-                modifier = modifier.fillMaxWidth(),
-                enabled = enabled && authType == AuthType.KEY,
-                label = { Text(stringResource(R.string.user_preferences_api_header)) },
-                singleLine = true,
-            )
-            TextField(
-                value = key,
-                onValueChange = {
-                    key = it
-                    onFieldValueChange()
-                },
-                modifier = modifier.fillMaxWidth(),
-                enabled = enabled && authType == AuthType.KEY,
-                label = { Text(stringResource(R.string.user_preferences_api_key)) },
-                supportingText = { Text(stringResource(R.string.user_preferences_api_key_supporting_text)) },
-                singleLine = true,
-            )
-        }
-    }
-}
-
 // Previews
 
 @Preview(showBackground = true)
@@ -1135,11 +1021,13 @@ private fun DefaultPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1161,11 +1049,13 @@ private fun DarkPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1187,11 +1077,13 @@ private fun TabletPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1213,11 +1105,13 @@ private fun ConnectionPermissionPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1239,11 +1133,13 @@ private fun DarkConnectionPermissionPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1265,11 +1161,13 @@ private fun TabletConnectionPermissionPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1291,11 +1189,13 @@ private fun CoordinateFormatPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1317,11 +1217,13 @@ private fun DarkCoordinateFormatPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1343,11 +1245,13 @@ private fun TabletCoordinateFormatPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1383,6 +1287,7 @@ private fun AutomationPreview() {
                         token = "test_purchased",
                     ),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
@@ -1391,6 +1296,7 @@ private fun AutomationPreview() {
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1426,6 +1332,7 @@ private fun DarkAutomationPreview() {
                         token = "test_purchased",
                     ),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
@@ -1434,6 +1341,7 @@ private fun DarkAutomationPreview() {
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1469,6 +1377,7 @@ private fun TabletAutomationPreview() {
                         token = "test_purchased",
                     ),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
@@ -1477,6 +1386,7 @@ private fun TabletAutomationPreview() {
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1507,6 +1417,7 @@ private fun AutomationFeatureNotAvailablePreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.NotPurchased(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
@@ -1515,6 +1426,7 @@ private fun AutomationFeatureNotAvailablePreview() {
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1545,6 +1457,7 @@ private fun DarkAutomationFeatureNotAvailablePreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.NotPurchased(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
@@ -1553,6 +1466,7 @@ private fun DarkAutomationFeatureNotAvailablePreview() {
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1583,6 +1497,7 @@ private fun TabletAutomationFeatureNotAvailablePreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.NotPurchased(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
@@ -1591,6 +1506,7 @@ private fun TabletAutomationFeatureNotAvailablePreview() {
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1617,6 +1533,7 @@ private fun AutomationDelayPreview() {
                         token = "test_purchased",
                     ),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
@@ -1625,6 +1542,7 @@ private fun AutomationDelayPreview() {
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1651,6 +1569,7 @@ private fun DarkAutomationDelayPreview() {
                         token = "test_purchased",
                     ),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
@@ -1659,6 +1578,7 @@ private fun DarkAutomationDelayPreview() {
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1685,6 +1605,7 @@ private fun TableAutomationDelayPreview() {
                         token = "test_purchased",
                     ),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
@@ -1693,84 +1614,7 @@ private fun TableAutomationDelayPreview() {
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
-                    onValueChange = {},
-                )
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun GoogleMapsApiPreview() {
-    AppTheme {
-        Surface {
-            Column {
-                UserPreferencesScreen(
-                    initialGroupId = UserPreferencesGroupId.GOOGLE_MAPS_API,
-                    apps = emptyMap(),
-                    appDetails = emptyMap(),
-                    billingAppNameResId = R.string.app_name_pro,
-                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-                    billingStatus = BillingStatus.Loading(),
-                    links = defaultFakeLinks,
-                    userPreferencesValues = defaultFakeUserPreferences,
-                    onBack = {},
-                    onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToBillingScreen = {},
-                    onNavigateToLinksScreen = {},
-                    onValueChange = {},
-                )
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkGoogleMapsApiPreview() {
-    AppTheme {
-        Surface {
-            Column {
-                UserPreferencesScreen(
-                    initialGroupId = UserPreferencesGroupId.GOOGLE_MAPS_API,
-                    apps = emptyMap(),
-                    appDetails = emptyMap(),
-                    billingAppNameResId = R.string.app_name_pro,
-                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-                    billingStatus = BillingStatus.Loading(),
-                    links = defaultFakeLinks,
-                    userPreferencesValues = defaultFakeUserPreferences,
-                    onBack = {},
-                    onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToBillingScreen = {},
-                    onNavigateToLinksScreen = {},
-                    onValueChange = {},
-                )
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true, device = Devices.TABLET)
-@Composable
-private fun TableGoogleMapsApiPreview() {
-    AppTheme {
-        Surface {
-            Column {
-                UserPreferencesScreen(
-                    initialGroupId = UserPreferencesGroupId.GOOGLE_MAPS_API,
-                    apps = emptyMap(),
-                    appDetails = emptyMap(),
-                    billingAppNameResId = R.string.app_name_pro,
-                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-                    billingStatus = BillingStatus.Loading(),
-                    links = defaultFakeLinks,
-                    userPreferencesValues = defaultFakeUserPreferences,
-                    onBack = {},
-                    onGetAutomationOutput = { _, _ -> null },
-                    onNavigateToBillingScreen = {},
-                    onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1811,6 +1655,7 @@ private fun HiddenAppsPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         hiddenApps = setOf(PackageNames.ORGANIC_MAPS),
                     ),
@@ -1818,6 +1663,7 @@ private fun HiddenAppsPreview() {
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1858,6 +1704,7 @@ private fun DarkHiddenAppsPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         hiddenApps = setOf(PackageNames.ORGANIC_MAPS),
                     ),
@@ -1865,6 +1712,7 @@ private fun DarkHiddenAppsPreview() {
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1905,6 +1753,7 @@ private fun TabletHiddenAppsPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         hiddenApps = setOf(PackageNames.ORGANIC_MAPS),
                     ),
@@ -1912,6 +1761,7 @@ private fun TabletHiddenAppsPreview() {
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1952,11 +1802,13 @@ private fun HiddenAppsLoadingPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -1997,11 +1849,13 @@ private fun DarkHiddenAppsLoadingPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -2042,11 +1896,13 @@ private fun TabletHiddenAppsLoadingPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -2068,6 +1924,7 @@ private fun DeveloperOptionsPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = FakeGeoShareServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         connectionPermission = Permission.NEVER,
@@ -2077,6 +1934,7 @@ private fun DeveloperOptionsPreview() {
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -2098,6 +1956,7 @@ private fun DarkDeveloperOptionsPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = null,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         connectionPermission = Permission.NEVER,
@@ -2107,6 +1966,7 @@ private fun DarkDeveloperOptionsPreview() {
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
@@ -2128,6 +1988,7 @@ private fun TableDeveloperOptionsPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
+                    selectedServer = null,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         connectionPermission = Permission.NEVER,
@@ -2137,6 +1998,7 @@ private fun TableDeveloperOptionsPreview() {
                     onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
+                    onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
             }
