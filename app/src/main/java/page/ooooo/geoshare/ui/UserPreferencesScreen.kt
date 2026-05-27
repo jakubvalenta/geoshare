@@ -330,13 +330,6 @@ private fun UserPreferencesListPane(
                         },
                         onClick = { onNavigateToGroup(UserPreferencesGroupId.CONNECTION_PERMISSION) },
                     ),
-                ),
-                currentGroupId = currentGroupId,
-            )
-        }
-        item {
-            UserPreferencesListSection(
-                groups = listOf(
                     UserPreferencesGroup(
                         id = UserPreferencesGroupId.SERVER,
                         headline = { stringResource(R.string.server_title) },

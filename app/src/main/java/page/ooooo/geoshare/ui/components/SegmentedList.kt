@@ -5,7 +5,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -17,7 +20,10 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -99,10 +105,10 @@ fun segmentedListColors() =
         trailingContentColor = MaterialTheme.colorScheme.onSurface,
         supportingContentColor = MaterialTheme.colorScheme.onSurface,
         disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-        disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-        disabledLeadingContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-        disabledTrailingContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-        disabledSupportingContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+        disabledLeadingContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+        disabledTrailingContentColor = MaterialTheme.colorScheme.onSurface,
+        disabledSupportingContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
         selectedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
         selectedContentColor = MaterialTheme.colorScheme.onSurface,
         selectedLeadingContentColor = MaterialTheme.colorScheme.onSurface,
@@ -120,10 +126,26 @@ private fun DefaultPreview() {
             Column {
                 SegmentedListLabel("My list")
                 SegmentedList(
-                    values = listOf("Apples", "Oranges", "Bananas"),
+                    values = listOf("Default", "Selected", "Disabled"),
                     itemHeadline = { it },
-                    itemIsSelected = { it == "Oranges" },
+                    itemIsSelected = { it == "Selected" },
+                    itemEnabled = { it != "Disabled" },
                     itemOnClick = {},
+                    itemLeadingContent = {
+                        {
+                            Checkbox(checked = true, onCheckedChange = null)
+                        }
+                    },
+                    itemTrailingContent = {
+                        {
+                            IconButton(onClick = {}) {
+                                Icon(
+                                    painterResource(R.drawable.more_vert_24px),
+                                    contentDescription = stringResource(R.string.nav_menu_content_description),
+                                )
+                            }
+                        }
+                    },
                     sort = true,
                 )
             }
@@ -139,10 +161,26 @@ private fun DarkPreview() {
             Column {
                 SegmentedListLabel("My list")
                 SegmentedList(
-                    values = listOf("Apples", "Oranges", "Bananas"),
+                    values = listOf("Default", "Selected", "Disabled"),
                     itemHeadline = { it },
-                    itemIsSelected = { it == "Oranges" },
+                    itemIsSelected = { it == "Selected" },
+                    itemEnabled = { it != "Disabled" },
                     itemOnClick = {},
+                    itemLeadingContent = {
+                        {
+                            Checkbox(checked = true, onCheckedChange = null, enabled = it != "Disabled")
+                        }
+                    },
+                    itemTrailingContent = {
+                        {
+                            IconButton(onClick = {}) {
+                                Icon(
+                                    painterResource(R.drawable.more_vert_24px),
+                                    contentDescription = stringResource(R.string.nav_menu_content_description),
+                                )
+                            }
+                        }
+                    },
                     sort = true,
                 )
             }

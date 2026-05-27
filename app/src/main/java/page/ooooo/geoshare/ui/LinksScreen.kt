@@ -14,14 +14,17 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
@@ -35,11 +38,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -229,10 +234,10 @@ private fun LinksScreen(
                 // fields get briefly rendered with empty values when switching from detail to list.
                 LinksListPane(
                     destination = destination,
+                    all = all,
                     billingFeatures = billingFeatures,
                     billingStatus = billingStatus,
                     containerColor = containerColor,
-                    all = all,
                     onBack = onBack,
                     onDisable = onDisable,
                     onEnable = onEnable,
@@ -284,10 +289,10 @@ private fun LinksScreen(
 @Composable
 private fun LinksListPane(
     destination: Int?,
+    all: List<Link>,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
     containerColor: Color,
-    all: List<Link>,
     onBack: () -> Unit,
     onDisable: (uid: Int) -> Unit,
     onEnable: (uid: Int) -> Unit,
@@ -351,20 +356,54 @@ private fun LinksListPane(
                         values = links,
                         itemHeadline = { it.name },
                         itemIsSelected = { it.uid == destination },
-                        itemOnClick = { onNavigateToContentKey(it.uid) },
+                        itemOnClick = {
+                            if (!it.enabled) {
+                                onEnable(it.uid)
+                            } else {
+                                onDisable(it.uid)
+                            }
+                        },
+                        itemLeadingContent = {
+                            {
+                                Checkbox(
+                                    checked = it.enabled,
+                                    // Null recommended for accessibility with screen readers
+                                    onCheckedChange = null,
+                                    modifier = Modifier.testTag("geoShareLinksListItemToggle_${it.uuid}"),
+                                )
+                            }
+                        },
                         itemTrailingContent = {
                             {
-                                Switch(
-                                    checked = it.enabled,
-                                    onCheckedChange = { enabled ->
-                                        if (enabled) {
-                                            onEnable(it.uid)
-                                        } else {
-                                            onDisable(it.uid)
-                                        }
-                                    },
-                                    modifier = Modifier.testTag("geoShareLinksListItemToggle_${it.uuid}")
-                                )
+                                var expanded by remember { mutableStateOf(false) }
+
+                                Box {
+                                    IconButton(
+                                        { expanded = true },
+                                        Modifier.testTag("geoShareLinksListItemMenu"),
+                                    ) {
+                                        Icon(
+                                            painterResource(R.drawable.more_vert_24px),
+                                            contentDescription = stringResource(R.string.nav_menu_content_description),
+                                        )
+                                    }
+                                    DropdownMenu(
+                                        expanded = expanded,
+                                        onDismissRequest = { expanded = false },
+                                        modifier = Modifier.semantics { testTagsAsResourceId = true },
+                                        shape = ShapeDefaults.Large,
+                                        containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                                    ) {
+                                        DropdownMenuItem(
+                                            text = { Text(stringResource(R.string.links_update)) },
+                                            modifier = Modifier.testTag("geoShareLinksListItemMenu_${it.uuid}"),
+                                            onClick = {
+                                                expanded = false
+                                                onNavigateToContentKey(it.uid)
+                                            },
+                                        )
+                                    }
+                                }
                             }
                         },
                         itemTestTag = { "geoShareLinksListItem_${it.uuid}" },

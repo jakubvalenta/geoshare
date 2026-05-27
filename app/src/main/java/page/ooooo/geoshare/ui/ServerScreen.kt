@@ -296,7 +296,6 @@ private fun ServerListPane(
                     Text(stringResource(R.string.server_none_selected), style = MaterialTheme.typography.bodyLarge)
                 }
                 all.forEachIndexed { i, item ->
-                    var expanded by remember { mutableStateOf(false) }
                     val valid = item.isValid()
 
                     SegmentedListItem(
@@ -310,14 +309,17 @@ private fun ServerListPane(
                                 selected = item.uid == selected?.uid,
                                 // Null recommended for accessibility with screen readers
                                 onClick = null,
-                                modifier = Modifier.testTag("geoShareServerListItemRadio_${item.uuid}")
+                                modifier = Modifier.testTag("geoShareServerListItemRadio_${item.uuid}"),
+                                enabled = valid,
                             )
                         },
                         trailingContent = {
+                            var expanded by remember { mutableStateOf(false) }
+
                             Box {
                                 IconButton(
                                     { expanded = true },
-                                    Modifier.testTag("geoShareMainMenuButton"),
+                                    Modifier.testTag("geoShareServerListItemMenu"),
                                 ) {
                                     Icon(
                                         painterResource(R.drawable.more_vert_24px),
