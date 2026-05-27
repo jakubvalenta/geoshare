@@ -66,17 +66,6 @@ interface InputBehaviorTest : BehaviorTest {
             timeoutMs,
         )
 
-    fun UiAutomatorTestScope.testUriFailed(unsafeUriString: String, timeoutMs: Long = NETWORK_TIMEOUT) {
-        // Go to main form
-        goToMainForm()
-
-        // Share URI and confirm permission dialog
-        shareUri(unsafeUriString)
-        confirmDialogIfVisible()
-
-        assertConversionFailed()
-    }
-
     fun UiAutomatorTestScope.testText(expectedPoints: Points, unsafeText: String) {
         // It would be preferable to test sharing of the text with the app, but this shell command doesn't work when
         // there are spaces in the text. So instead, we type the text in the main form of the app.

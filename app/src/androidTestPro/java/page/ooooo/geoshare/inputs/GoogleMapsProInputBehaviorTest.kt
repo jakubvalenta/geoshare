@@ -82,4 +82,15 @@ class GoogleMapsProInputBehaviorTest : InputBehaviorTest {
         // Place list
         testUriFailed("https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg")
     }
+
+    private fun UiAutomatorTestScope.testUriFailed(unsafeUriString: String, timeoutMs: Long = NETWORK_TIMEOUT) {
+        // Go to main form
+        goToMainForm()
+
+        // Share URI and confirm permission dialog
+        shareUri(unsafeUriString)
+        confirmDialogIfVisible()
+
+        assertConversionFailed()
+    }
 }

@@ -27,11 +27,11 @@ import page.ooooo.geoshare.lib.network.UnknownNetworkException
 import java.net.SocketTimeoutException
 
 class GoogleMapsPlaceApiInputTest {
-    private val baseUrl = "https://geocode.example.com"
+    private val apiPreset = FakeGeoShareApiPreset
     private val placeId = @Suppress("SpellCheckingInspection") "ChIJKxjxuaNqkFQR3CK6O1HNNqY"
     private val engine = MockEngine { request ->
         when (request.url.toString()) {
-            "$baseUrl/v1/google-maps/geocode/place/$placeId" -> respond(
+            "${apiPreset.baseUrl}/v1/google-maps/geocode/place/$placeId" -> respond(
                 // language=Json
                 """
                     {"location": {"latitude": 50.123456, "longitude": -11.123456}}
@@ -39,7 +39,7 @@ class GoogleMapsPlaceApiInputTest {
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
 
-            "$baseUrl/v1/google-maps/geocode/place/invalid" -> respond(
+            "${apiPreset.baseUrl}/v1/google-maps/geocode/place/invalid" -> respond(
                 // language=Json
                 """
                     {"location": "invalid"}
@@ -47,9 +47,9 @@ class GoogleMapsPlaceApiInputTest {
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
 
-            "$baseUrl/v1/google-maps/geocode/place/exception" -> throw SocketTimeoutException()
+            "${apiPreset.baseUrl}/v1/google-maps/geocode/place/exception" -> throw SocketTimeoutException()
 
-            "$baseUrl/v1/google-maps/geocode/place/not-found" -> respondError(HttpStatusCode.NotFound)
+            "${apiPreset.baseUrl}/v1/google-maps/geocode/place/not-found" -> respondError(HttpStatusCode.NotFound)
 
             else -> throw NotImplementedError()
         }
@@ -81,7 +81,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test
     fun parse_whenPlaceIdIsInQueryParamAndApiReturnsResult_returnsPoint() = runTest {
         val apiPresetRepository: FakeApiPresetRepository = mock {
-            on { getFirstEnabled() } doReturn FakeGeoShareApiPreset
+            on { getFirstEnabled() } doReturn apiPreset
         }
         val input = GoogleMapsPlaceApiInput(
             apiPresetRepository = apiPresetRepository,
@@ -103,7 +103,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test
     fun parse_whenQueryIsNotFoundInUri_returnsNoPoints() = runTest {
         val apiPresetRepository: FakeApiPresetRepository = mock {
-            on { getFirstEnabled() } doReturn FakeGeoShareApiPreset
+            on { getFirstEnabled() } doReturn apiPreset
         }
         val input = GoogleMapsPlaceApiInput(
             apiPresetRepository = apiPresetRepository,
@@ -121,7 +121,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test
     fun parse_whenQueryIsEmpty_returnsNoPoints() = runTest {
         val apiPresetRepository: FakeApiPresetRepository = mock {
-            on { getFirstEnabled() } doReturn FakeGeoShareApiPreset
+            on { getFirstEnabled() } doReturn apiPreset
         }
         val input = GoogleMapsPlaceApiInput(
             apiPresetRepository = apiPresetRepository,
@@ -139,7 +139,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test(expected = UnknownNetworkException::class)
     fun parse_whenApiReturnsInvalidResponse_throwsException() = runTest {
         val apiPresetRepository: FakeApiPresetRepository = mock {
-            on { getFirstEnabled() } doReturn FakeGeoShareApiPreset
+            on { getFirstEnabled() } doReturn apiPreset
         }
         val input = GoogleMapsPlaceApiInput(
             apiPresetRepository = apiPresetRepository,
@@ -154,7 +154,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test(expected = SocketTimeoutNetworkException::class)
     fun parse_whenApiThrowsException_throwsException() = runTest {
         val apiPresetRepository: FakeApiPresetRepository = mock {
-            on { getFirstEnabled() } doReturn FakeGeoShareApiPreset
+            on { getFirstEnabled() } doReturn apiPreset
         }
         val input = GoogleMapsPlaceApiInput(
             apiPresetRepository = apiPresetRepository,

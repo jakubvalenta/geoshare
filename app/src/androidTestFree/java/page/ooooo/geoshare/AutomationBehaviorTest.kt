@@ -1,6 +1,5 @@
 package page.ooooo.geoshare
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
@@ -12,7 +11,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertNull
 import org.junit.Test
-import org.junit.runner.RunWith
 import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation

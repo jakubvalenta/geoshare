@@ -1,6 +1,5 @@
 package page.ooooo.geoshare
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
@@ -9,7 +8,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertNull
 import org.junit.Test
-import org.junit.runner.RunWith
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
 class LinksBehaviorTest : BehaviorTest {

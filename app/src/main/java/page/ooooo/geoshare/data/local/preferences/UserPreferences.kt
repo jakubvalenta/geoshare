@@ -67,7 +67,7 @@ interface OptionsPreference<T> : UserPreference<T> {
 }
 
 object ConnectionPermissionPreference : OptionsPreference<Permission> {
-    private val key = stringPreferencesKey("connect_to_google_permission")
+    val key = stringPreferencesKey("connect_to_google_permission")
     override val default = Permission.ASK
     val loading = default
 
@@ -95,7 +95,7 @@ object ConnectionPermissionPreference : OptionsPreference<Permission> {
 }
 
 object CoordinateFormatPreference : OptionsPreference<CoordinateFormat> {
-    private val key = stringPreferencesKey("coordinate_format")
+    val key = stringPreferencesKey("coordinate_format")
     override val default = CoordinateFormat.DEC
     val loading = default
 
@@ -122,7 +122,7 @@ object CoordinateFormatPreference : OptionsPreference<CoordinateFormat> {
 }
 
 object AutomationPreference : OptionsPreference<Automation> {
-    private val key = stringPreferencesKey("automation")
+    val key = stringPreferencesKey("automation")
     override val default = NoopAutomation
     val loading = default
 
