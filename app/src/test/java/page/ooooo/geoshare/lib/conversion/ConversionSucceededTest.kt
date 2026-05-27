@@ -10,20 +10,14 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
 import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.FakeGoogleMapsDisplayLink
 import page.ooooo.geoshare.data.di.FakeLinkRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.local.database.Link
-import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
-import page.ooooo.geoshare.data.local.preferences.AutomationPreference
 import page.ooooo.geoshare.data.local.preferences.CachedPurchase
 import page.ooooo.geoshare.data.local.preferences.CachedPurchasePreference
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
@@ -31,6 +25,7 @@ import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareLinkUriAutomation
+import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.billing.AutomationFeature
@@ -60,9 +55,9 @@ class ConversionSucceededTest {
     fun transition_whenPointsAreEmpty_returnsNull() = runTest {
         val points = persistentListOf<WGS84Point>()
         val automation = CopyCoordsDecAutomation
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(AutomationPreference) } doReturn automation
-        }
+        val userPreferencesRepository = FakeUserPreferencesRepository(
+            UserPreferencesValues(automation = automation)
+        )
         val stateContext: ConversionStateContext = mock {
             on { this@on.linkRepository } doReturn linkRepository
             on { this@on.log } doReturn log
@@ -76,9 +71,9 @@ class ConversionSucceededTest {
     @Test
     fun transition_whenUserPreferenceAutomationIsNoop_returnsNull() = runTest {
         val automation = NoopAutomation
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(AutomationPreference) } doReturn automation
-        }
+        val userPreferencesRepository = FakeUserPreferencesRepository(
+            UserPreferencesValues(automation = automation)
+        )
         val stateContext: ConversionStateContext = mock {
             on { this@on.linkRepository } doReturn linkRepository
             on { this@on.log } doReturn log
@@ -97,10 +92,9 @@ class ConversionSucceededTest {
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
             on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(AutomationPreference) } doReturn automation
-            on { setValue(eq(CachedPurchasePreference), any()) } doReturn Unit
-        }
+        val userPreferencesRepository = FakeUserPreferencesRepository(
+            UserPreferencesValues(automation = automation)
+        )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
             on { this@on.linkRepository } doReturn linkRepository
@@ -110,10 +104,7 @@ class ConversionSucceededTest {
         }
         val state = ConversionSucceeded(stateContext, source, points)
         assertNull(state.transition())
-        verify(userPreferencesRepository, never()).setValue(
-            eq(CachedPurchasePreference),
-            any(),
-        )
+        assertNull(userPreferencesRepository.getValue(CachedPurchasePreference))
     }
 
     @Test
@@ -124,12 +115,12 @@ class ConversionSucceededTest {
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
             on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(AutomationPreference) } doReturn automation
-            on { getValue(CachedPurchasePreference) } doReturn
-                CachedPurchase(productId = "spam", token = "spam_purchased")
-            on { setValue(eq(CachedPurchasePreference), any()) } doReturn Unit
-        }
+        val userPreferencesRepository = FakeUserPreferencesRepository(
+            UserPreferencesValues(
+                automation = automation,
+                cachedPurchase = CachedPurchase(productId = "spam", token = "spam_purchased"),
+            )
+        )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
             on { this@on.linkRepository } doReturn linkRepository
@@ -139,9 +130,9 @@ class ConversionSucceededTest {
         }
         val state = ConversionSucceeded(stateContext, source, points)
         assertNull(state.transition())
-        verify(userPreferencesRepository, never()).setValue(
-            eq(CachedPurchasePreference),
-            any(),
+        assertEquals(
+            CachedPurchase(productId = "spam", token = "spam_purchased"),
+            userPreferencesRepository.getValue(CachedPurchasePreference),
         )
     }
 
@@ -154,12 +145,12 @@ class ConversionSucceededTest {
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
             on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(AutomationPreference) } doReturn automation
-            on { getValue(CachedPurchasePreference) } doReturn
-                CachedPurchase(productId = "test", token = "test_purchased")
-            on { setValue(eq(CachedPurchasePreference), any()) } doReturn Unit
-        }
+        val userPreferencesRepository = FakeUserPreferencesRepository(
+            UserPreferencesValues(
+                automation = automation,
+                cachedPurchase = CachedPurchase(productId = "test", token = "test_purchased"),
+            )
+        )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
             on { this@on.linkRepository } doReturn linkRepository
@@ -172,9 +163,9 @@ class ConversionSucceededTest {
             ActionReady(source, points, action, isAutomation = true),
             state.transition(),
         )
-        verify(userPreferencesRepository, never()).setValue(
-            eq(CachedPurchasePreference),
-            any(),
+        assertEquals(
+            CachedPurchase(productId = "test", token = "test_purchased"),
+            userPreferencesRepository.getValue(CachedPurchasePreference),
         )
     }
 
@@ -193,10 +184,9 @@ class ConversionSucceededTest {
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
             on { features } doReturn persistentListOf()
         }
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(AutomationPreference) } doReturn automation
-            on { setValue(eq(CachedPurchasePreference), any()) } doReturn Unit
-        }
+        val userPreferencesRepository = FakeUserPreferencesRepository(
+            UserPreferencesValues(automation = automation)
+        )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
             on { this@on.linkRepository } doReturn linkRepository
@@ -206,9 +196,9 @@ class ConversionSucceededTest {
         }
         val state = ConversionSucceeded(stateContext, source, points)
         assertNull(state.transition())
-        verify(userPreferencesRepository).setValue(
-            CachedPurchasePreference,
+        assertEquals(
             CachedPurchase(productId = "test", token = "test_purchased"),
+            userPreferencesRepository.getValue(CachedPurchasePreference),
         )
     }
 
@@ -228,9 +218,9 @@ class ConversionSucceededTest {
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
             on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(AutomationPreference) } doReturn automation
-        }
+        val userPreferencesRepository = FakeUserPreferencesRepository(
+            UserPreferencesValues(automation = automation)
+        )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
             on { this@on.linkRepository } doReturn linkRepository
@@ -243,9 +233,9 @@ class ConversionSucceededTest {
             ActionReady(source, points, action, isAutomation = true),
             state.transition(),
         )
-        verify(userPreferencesRepository).setValue(
-            CachedPurchasePreference,
+        assertEquals(
             CachedPurchase(productId = "test", token = "test_purchased"),
+            userPreferencesRepository.getValue(CachedPurchasePreference),
         )
     }
 
@@ -259,9 +249,9 @@ class ConversionSucceededTest {
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
             on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(AutomationPreference) } doReturn automation
-        }
+        val userPreferencesRepository = FakeUserPreferencesRepository(
+            UserPreferencesValues(automation = automation)
+        )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
             on { this@on.linkRepository } doReturn linkRepository
@@ -286,9 +276,9 @@ class ConversionSucceededTest {
             ActionReady(source, points, action, isAutomation = true),
             res,
         )
-        verify(userPreferencesRepository).setValue(
-            CachedPurchasePreference,
+        assertEquals(
             CachedPurchase(productId = "test", token = "test_purchased"),
+            userPreferencesRepository.getValue(CachedPurchasePreference),
         )
     }
 
@@ -301,9 +291,9 @@ class ConversionSucceededTest {
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
             on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(AutomationPreference) } doReturn automation
-        }
+        val userPreferencesRepository = FakeUserPreferencesRepository(
+            UserPreferencesValues(automation = automation)
+        )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
             on { this@on.linkRepository } doReturn linkRepository
@@ -325,10 +315,7 @@ class ConversionSucceededTest {
         )
         advanceUntilIdle()
         assertNull(res)
-        verify(userPreferencesRepository, never()).setValue(
-            eq(CachedPurchasePreference),
-            any(),
-        )
+        assertNull(userPreferencesRepository.getValue(CachedPurchasePreference))
     }
 
     @Test
@@ -340,9 +327,9 @@ class ConversionSucceededTest {
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
             on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(AutomationPreference) } doReturn automation
-        }
+        val userPreferencesRepository = FakeUserPreferencesRepository(
+            UserPreferencesValues(automation = automation)
+        )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
             on { this@on.linkRepository } doReturn linkRepository
@@ -364,10 +351,7 @@ class ConversionSucceededTest {
         )
         advanceUntilIdle()
         assertNull(res)
-        verify(userPreferencesRepository, never()).setValue(
-            eq(CachedPurchasePreference),
-            any(),
-        )
+        assertNull(userPreferencesRepository.getValue(CachedPurchasePreference))
     }
 
     @Test
@@ -386,9 +370,9 @@ class ConversionSucceededTest {
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
             on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(AutomationPreference) } doReturn automation
-        }
+        val userPreferencesRepository = FakeUserPreferencesRepository(
+            UserPreferencesValues(automation = automation)
+        )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
             on { this@on.linkRepository } doReturn linkRepository
@@ -421,10 +405,9 @@ class ConversionSucceededTest {
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
             on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(AutomationPreference) } doReturn automation
-            on { getValue(AutomationDelayPreference) } doReturn delay
-        }
+        val userPreferencesRepository = FakeUserPreferencesRepository(
+            UserPreferencesValues(automation = automation, automationDelay = delay)
+        )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
             on { this@on.linkRepository } doReturn linkRepository
@@ -457,10 +440,9 @@ class ConversionSucceededTest {
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
             on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(AutomationPreference) } doReturn automation
-            on { getValue(AutomationDelayPreference) } doReturn delay
-        }
+        val userPreferencesRepository = FakeUserPreferencesRepository(
+            UserPreferencesValues(automation = automation, automationDelay = delay)
+        )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
             on { this@on.linkRepository } doReturn linkRepository
@@ -491,10 +473,9 @@ class ConversionSucceededTest {
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
             on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(AutomationPreference) } doReturn automation
-            on { getValue(AutomationDelayPreference) } doReturn delay
-        }
+        val userPreferencesRepository = FakeUserPreferencesRepository(
+            UserPreferencesValues(automation = automation, automationDelay = delay)
+        )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
             on { this@on.linkRepository } doReturn linkRepository
@@ -524,10 +505,9 @@ class ConversionSucceededTest {
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
             on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(AutomationPreference) } doReturn automation
-            on { getValue(AutomationDelayPreference) } doReturn delay
-        }
+        val userPreferencesRepository = FakeUserPreferencesRepository(
+            UserPreferencesValues(automation = automation, automationDelay = delay)
+        )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
             on { this@on.linkRepository } doReturn linkRepository
@@ -560,10 +540,9 @@ class ConversionSucceededTest {
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
             on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
-        val userPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { getValue(AutomationPreference) } doReturn automation
-            on { getValue(AutomationDelayPreference) } doReturn delay
-        }
+        val userPreferencesRepository = FakeUserPreferencesRepository(
+            UserPreferencesValues(automation = automation, automationDelay = delay)
+        )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
             on { this@on.linkRepository } doReturn linkRepository

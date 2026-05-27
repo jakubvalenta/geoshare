@@ -17,6 +17,9 @@ import page.ooooo.geoshare.lib.inputs.InputDocumentationGroup
 object AboutRoute
 
 @Serializable
+object BillingRoute
+
+@Serializable
 object FaqRoute
 
 @Serializable
@@ -29,13 +32,13 @@ object IntroRoute
 object LicensesRoute
 
 @Serializable
-object LinksRoute
+object LinkRoute
 
 @Serializable
 object MainRoute
 
 @Serializable
-object BillingRoute
+object ServerRoute
 
 @Serializable
 data class UserPreferencesRoute(val id: UserPreferencesGroupId? = null)
@@ -90,7 +93,7 @@ fun MainNavigation(
                 onNavigateToFaqScreen = { navController.navigate(FaqRoute) },
                 onNavigateToInputsScreen = { navController.navigate(InputsRoute()) },
                 onNavigateToIntroScreen = { navController.navigate(IntroRoute) },
-                onNavigateToLinksScreen = { navController.navigate(LinksRoute) },
+                onNavigateToLinksScreen = { navController.navigate(LinkRoute) },
                 onNavigateToUserPreferencesAutomationScreen = {
                     navController.navigate(UserPreferencesRoute(UserPreferencesGroupId.AUTOMATION))
                 },
@@ -111,8 +114,8 @@ fun MainNavigation(
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
             )
         }
-        composable<LinksRoute> {
-            LinksScreen(
+        composable<LinkRoute> {
+            LinkScreen(
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
                 onNavigateToBillingScreen = { navController.navigate(BillingRoute) },
             )
@@ -123,13 +126,19 @@ fun MainNavigation(
                 billingViewModel = billingViewModel,
             )
         }
+        composable<ServerRoute> {
+            ServerScreen(
+                onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
+            )
+        }
         composable<UserPreferencesRoute> { backStackEntry ->
             val route: UserPreferencesRoute = backStackEntry.toRoute()
             UserPreferencesScreen(
                 initialGroupId = route.id,
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
                 onNavigateToBillingScreen = { navController.navigate(BillingRoute) },
-                onNavigateToLinksScreen = { navController.navigate(LinksRoute) },
+                onNavigateToLinksScreen = { navController.navigate(LinkRoute) },
+                onNavigateToServerScreen = { navController.navigate(ServerRoute) },
                 billingViewModel = billingViewModel,
             )
         }

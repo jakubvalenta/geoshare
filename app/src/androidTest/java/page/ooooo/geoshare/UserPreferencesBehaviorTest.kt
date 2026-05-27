@@ -158,8 +158,8 @@ class UserPreferencesBehaviorTest : BehaviorTest {
         // Make the link visible in preferences
         goToUserPreferencesList()
         goToUserPreferencesDetail(UserPreferencesGroupId.LINKS)
-        onElement { viewIdResourceName == "geoShareLinksListPane" }
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinksListItemToggle_ce900ea1-2c5d-4641-82f3-a5429a68d603" }
+        onElement { viewIdResourceName == "geoShareLinkListPane" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkListItemToggle_ce900ea1-2c5d-4641-82f3-a5429a68d603" }
             .click()
         goToMainScreenFromUserPreferencesDetail()
 

@@ -107,6 +107,7 @@ object InputRepositoryModule {
 object FakeInputRepository : InputRepository {
     private val engine = MockEngine { throw NotImplementedError() }
     private val log = FakeLog
+    private val serverRepository = FakeServerRepository()
     private val uriQuote = FakeUriQuote
     private val userPreferencesRepository = FakeUserPreferencesRepository()
     private val apiService = ApiService(
@@ -173,13 +174,13 @@ object FakeInputRepository : InputRepository {
     val googleMapsAddressApiInput = GoogleMapsAddressApiInput(
         apiService = apiService,
         googleMapsHtmlInput = { googleMapsHtmlInput },
-        userPreferencesRepository = userPreferencesRepository,
+        serverRepository = serverRepository,
         uriQuote = uriQuote,
     )
     val googleMapsPlaceApiInput = GoogleMapsPlaceApiInput(
         apiService = apiService,
         googleMapsHtmlInput = { googleMapsHtmlInput },
-        userPreferencesRepository = userPreferencesRepository,
+        serverRepository = serverRepository,
         uriQuote = uriQuote,
     )
     val googleMapsHtmlInput = object : GoogleMapsHtmlInput {}

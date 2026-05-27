@@ -2,7 +2,6 @@
     <string name="app_name" translatable="false">GeoShare</string>
     <string name="app_name_pro" translatable="false">GeoShare Pro</string>
     <string name="not_available">Not available</string>
-    <string name="not_configured" translatable="false">Not configured</string>
     <string name="billing_consume_purchases" translatable="false">consume purchases</string>
     <string name="billing_feature_all" translatable="false">All features of the basic version</string>
     <string name="billing_feature_automation_description" translatable="false">Save time by performing an action automatically when a map link is converted to coordinates: open map app, launch navigation (TomTom, Waze, etc.), copy to clipboard, save GPX.</string>
@@ -260,7 +259,7 @@
     <string name="inputs_settings">Go to Android settings to choose links that should always open in %1$s</string>
     <string name="inputs_title">Supported maps</string>
     <string name="licenses">Licenses</string>
-    <string name="links_delete">Delete</string>
+    <string name="delete">Delete</string>
     <string name="links_delete_text">The web map “%1$s” will be permanently deleted.</string>
     <string name="links_delete_title">Delete web map?</string>
     <string name="links_description">Web maps allow opening coordinates in the browser. Turn on the pre-installed ones or add your own.</string>
@@ -270,7 +269,6 @@
     <string name="links_form_enabled_option_sheet">Show in the copy menu</string>
     <string name="links_form_group">Group</string>
     <string name="links_form_name">Name</string>
-    <string name="links_form_save">Save</string>
     <string name="links_form_srs">Coordinate system</string>
     <string name="links_form_test_china" translatable="false">Test Forbidden City</string>
     <string name="links_form_test_world" translatable="false">Test Kilimanjaro</string>
@@ -299,11 +297,33 @@
     <string name="network_exception_unknown">Unknown error</string>
     <string name="network_exception_unresolved_address">Unresolved address</string>
     <string name="reset">reset</string>
+    <string name="save">Save</string>
     <string name="seconds_unit">seconds</string>
     <plurals name="seconds">
         <item quantity="one">%1$d second</item>
         <item quantity="other">%1$d seconds</item>
     </plurals>
+    <string name="server_api_key" translatable="false">API key</string>
+    <string name="server_api_key_header" translatable="false">HTTP header</string>
+    <string name="server_api_key_supporting_text" translatable="false">To avoid unexpected costs, set strict service restrictions and usage limits on the key.</string>
+    <string name="server_attestation" translatable="false">Hardware-backed key attestation</string>
+    <string name="server_auth_type" translatable="false">Authentication</string>
+    <string name="server_base_url" translatable="false">Base URL</string>
+    <string name="server_delete_text" translatable="false">The server “%1$s” will be permanently deleted.</string>
+    <string name="server_delete_title" translatable="false">Delete server?</string>
+    <string name="server_description" translatable="false">To support a wider variety of Google Maps links, %1$s can connect to the paid Google Maps API or a compatible server.</string>
+    <string name="server_insert" translatable="false">Add server</string>
+    <string name="server_invalid" translatable="false">Draft</string>
+    <string name="server_message_deleted" translatable="false">Server deleted</string>
+    <string name="server_message_factory_reset" translatable="false">Server have been reset to factory defaults</string>
+    <string name="server_message_inserted" translatable="false">Server added</string>
+    <string name="server_message_updated" translatable="false">Server updated</string>
+    <string name="server_none_selected" translatable="false">Turned off</string>
+    <string name="server_restore_initial_data" translatable="false">Reset servers to factory defaults</string>
+    <string name="server_restore_initial_data_text" translatable="false">All your servers will be deleted and replaced with the pre-installed ones.</string>
+    <string name="server_restore_initial_data_title" translatable="false">Reset servers to factory defaults?</string>
+    <string name="server_title" translatable="false">Google Maps API</string>
+    <string name="server_update" translatable="false">Edit server</string>
     <string name="srs_description" translatable="false">%1$s (%2$s)</string>
     <string name="srs_description_mainland_china">Mainland China</string>
     <string name="srs_description_greater_china_and_taiwan">Greater China and Taiwan</string>
@@ -315,17 +335,9 @@
         <item quantity="one">%1$d app out of %2$d is visible</item>
         <item quantity="other">%1$d apps out of %2$d are visible</item>
     </plurals>
-    <string name="user_preferences_api_attestation" translatable="false">Hardware-backed key attestation</string>
-    <string name="user_preferences_api_authentication" translatable="false">Authentication</string>
-    <string name="user_preferences_api_base_url" translatable="false">Base URL</string>
-    <string name="user_preferences_api_header" translatable="false">HTTP header</string>
-    <string name="user_preferences_api_key" translatable="false">API key</string>
-    <string name="user_preferences_api_key_supporting_text" translatable="false">To avoid unexpected costs, set strict service restrictions and usage limits on the key.</string>
     <string name="user_preferences_apps_description">Choose which of your installed apps should be displayed after converting a map link to coordinates.</string>
     <string name="user_preferences_apps_message_hidden">The app has been hidden. You can show it again in preferences.</string>
     <string name="user_preferences_apps_title">Apps</string>
-    <string name="user_preferences_google_maps_api_description" translatable="false">To support a wider variety of Google Maps links, %1$s can connect to the paid Google Maps API or a compatible server.</string>
-    <string name="user_preferences_google_maps_api_title" translatable="false">Google Maps API</string>
     <string name="user_preferences_section_input">Input</string>
     <string name="user_preferences_section_output">Output</string>
     <string name="yes">Yes</string>
