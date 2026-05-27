@@ -186,7 +186,7 @@ val FakeMagicEarthNavigationLink = Link(
 
 /**
  * Items for testing purposes. The actual items that the table is populated with are in
- * [page.ooooo.geoshare.data.local.database.AppDatabase.Companion.restoreInitialData].
+ * [page.ooooo.geoshare.data.local.database.AppDatabase.Companion.restoreInitialLinks].
  */
 val defaultFakeLinks = listOf(
     FakeOpenStreetMapDisplayLink,

@@ -11,7 +11,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import page.ooooo.geoshare.data.local.database.ServerDao
 import page.ooooo.geoshare.data.local.database.AppDatabase
-import page.ooooo.geoshare.data.local.database.AppDatabase.Companion.restoreInitialData
+import page.ooooo.geoshare.data.local.database.AppDatabase.Companion.restoreInitialLinks
+import page.ooooo.geoshare.data.local.database.AppDatabase.Companion.restoreInitialServers
 import page.ooooo.geoshare.data.local.database.LinkDao
 import javax.inject.Singleton
 
@@ -34,7 +35,8 @@ class DatabaseModule {
         return Room.databaseBuilder(appContext, AppDatabase::class.java, "Link")
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
-                    restoreInitialData(db)
+                    restoreInitialLinks(db)
+                    restoreInitialServers(db)
                 }
             })
             .addMigrations(

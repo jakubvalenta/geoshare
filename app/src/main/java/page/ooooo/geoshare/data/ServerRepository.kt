@@ -70,7 +70,7 @@ class DefaultServerRepository @Inject constructor(
     override suspend fun restoreInitialData() {
         appDatabase.openHelper.writableDatabase.let { db ->
             appDatabase.runInTransaction {
-                AppDatabase.restoreInitialData(db) // TODO Restore only Servers, not Links
+                AppDatabase.restoreInitialServers(db)
             }
         }
     }

@@ -29,7 +29,7 @@ class InitialLinksTest {
             .inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
-                    AppDatabase.restoreInitialData(db)
+                    AppDatabase.restoreInitialLinks(db)
                 }
             })
             .build()
@@ -45,7 +45,7 @@ class InitialLinksTest {
     @Test
     @Throws(Exception::class)
     fun initialLinksAreInserted() = runBlocking {
-        val expectedLinks = listOf(
+        val expectedItems = listOf(
             Link(
                 group = "OpenStreetMap",
                 name = "OpenStreetMap",
@@ -197,12 +197,12 @@ class InitialLinksTest {
                 uuid = UUID.fromString("b0f1715a-6645-4ae6-a4ec-36d6e5f08c34"),
             ),
         ).sortedBy { it.name }
-        val actualLinks = linkDao.getAll()
-        assertEquals(expectedLinks.size, actualLinks.size)
-        for ((expectedLink, actualLink) in expectedLinks.zip(actualLinks)) {
+        val actualItems = linkDao.getAll()
+        assertEquals(expectedItems.size, actualItems.size)
+        for ((expectedItem, actualItem) in expectedItems.zip(actualItems)) {
             assertEquals(
-                expectedLink.copy(createdAt = 0L, uid = 0),
-                actualLink.copy(createdAt = 0L, uid = 0),
+                expectedItem.copy(createdAt = 0L, uid = 0),
+                actualItem.copy(createdAt = 0L, uid = 0),
             )
         }
     }

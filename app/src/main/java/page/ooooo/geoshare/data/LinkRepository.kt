@@ -70,7 +70,7 @@ class DefaultLinkRepository @Inject constructor(
     override suspend fun restoreInitialData() {
         appDatabase.openHelper.writableDatabase.let { db ->
             appDatabase.runInTransaction {
-                AppDatabase.restoreInitialData(db)
+                AppDatabase.restoreInitialLinks(db)
             }
         }
     }
