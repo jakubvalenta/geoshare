@@ -93,7 +93,6 @@ fun ApiPresetScreen(
         apiKeyHeader = viewModel.apiKeyHeader,
         authType = viewModel.authType,
         baseUrl = viewModel.baseUrl,
-        enabled = viewModel.enabled,
         onBack = onBack,
         onDelete = { viewModel.delete(resources) },
         onDismissMessage = { viewModel.dismissMessage() },
@@ -109,7 +108,6 @@ fun ApiPresetScreen(
         onSetApiKeyHeader = { viewModel.apiKeyHeader = it },
         onSetAuthType = { viewModel.authType = it },
         onSetBaseUrl = { viewModel.baseUrl = it },
-        onSetEnabled = { viewModel.enabled = it },
     )
 }
 
@@ -125,7 +123,6 @@ private fun ApiPresetScreen(
     apiKeyHeader: String,
     authType: ApiAuthType,
     baseUrl: String,
-    enabled: Boolean,
     onBack: () -> Unit,
     onDelete: () -> Unit,
     onDismissMessage: () -> Unit,
@@ -137,7 +134,6 @@ private fun ApiPresetScreen(
     onSetApiKeyHeader: (String) -> Unit,
     onSetAuthType: (ApiAuthType) -> Unit,
     onSetBaseUrl: (String) -> Unit,
-    onSetEnabled: (Boolean) -> Unit,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -209,7 +205,6 @@ private fun ApiPresetScreen(
                     ApiPresetDetailPane(
                         destination = destination,
                         wide = wide,
-                        enabled = enabled,
                         baseUrl = baseUrl,
                         apiKey = apiKey,
                         apiKeyHeader = apiKeyHeader,
@@ -221,7 +216,6 @@ private fun ApiPresetScreen(
                         onSetApiKeyHeader = onSetApiKeyHeader,
                         onSetAuthType = onSetAuthType,
                         onSetBaseUrl = onSetBaseUrl,
-                        onSetEnabled = onSetEnabled,
                     )
                 }
             },
@@ -303,11 +297,14 @@ private fun ApiPresetListPane(
                 }
                 all.forEachIndexed { i, item ->
                     var expanded by remember { mutableStateOf(false) }
+                    val valid = item.isValid()
+
                     SegmentedListItem(
                         selected = item.uid == destination,
                         onClick = { onSelect(item.uid) },
                         shapes = ListItemDefaults.segmentedShapes(index = i + 1, count = all.size + 1),
                         modifier = Modifier.testTag("geoShareApiPresetListItem_${item.uuid}"),
+                        enabled = valid,
                         leadingContent = {
                             RadioButton(
                                 selected = item.uid == selected?.uid,
@@ -344,6 +341,11 @@ private fun ApiPresetListPane(
                                     )
                                 }
                             }
+                        },
+                        supportingContent = if (!valid) {
+                            { Text(stringResource(R.string.api_presets_invalid)) }
+                        } else {
+                            null
                         },
                         colors = colors,
                     ) {
@@ -392,7 +394,6 @@ private fun ApiPresetDetailPane(
     apiKey: String,
     apiKeyHeader: String,
     authType: ApiAuthType,
-    enabled: Boolean,
     onBack: () -> Unit,
     onDelete: () -> Unit,
     onSaveForm: () -> Unit,
@@ -400,7 +401,6 @@ private fun ApiPresetDetailPane(
     onSetApiKeyHeader: (String) -> Unit,
     onSetAuthType: (ApiAuthType) -> Unit,
     onSetBaseUrl: (String) -> Unit,
-    onSetEnabled: (Boolean) -> Unit,
 ) {
     val spacing = LocalSpacing.current
     val (deleteDialogOpen, setDeleteDialogOpen) = retain { mutableStateOf(false) }
@@ -437,13 +437,11 @@ private fun ApiPresetDetailPane(
                         apiKeyHeader = apiKeyHeader,
                         authType = authType,
                         baseUrl = baseUrl,
-                        enabled = enabled,
                         onSaveForm = onSaveForm,
                         onSetApiKey = onSetApiKey,
                         onSetApiKeyHeader = onSetApiKeyHeader,
                         onSetAuthType = onSetAuthType,
                         onSetBaseUrl = onSetBaseUrl,
-                        onSetEnabled = onSetEnabled,
                         modifier = Modifier
                             .width(600.dp)
                             .padding(top = spacing.smallAdaptive, bottom = spacing.tinyAdaptive),
@@ -489,7 +487,6 @@ private fun DefaultPreview() {
                     apiKeyHeader = "",
                     authType = ApiAuthType.API_KEY,
                     baseUrl = "",
-                    enabled = false,
                     onBack = {},
                     onDelete = {},
                     onDismissMessage = {},
@@ -501,7 +498,6 @@ private fun DefaultPreview() {
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetBaseUrl = {},
-                    onSetEnabled = {},
                 )
             }
         }
@@ -523,7 +519,6 @@ private fun DarkPreview() {
                     apiKeyHeader = "",
                     authType = ApiAuthType.API_KEY,
                     baseUrl = "",
-                    enabled = false,
                     onBack = {},
                     onDelete = {},
                     onDismissMessage = {},
@@ -535,7 +530,6 @@ private fun DarkPreview() {
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetBaseUrl = {},
-                    onSetEnabled = {},
                 )
             }
         }
@@ -557,7 +551,6 @@ private fun TabletPreview() {
                     apiKeyHeader = "",
                     authType = ApiAuthType.API_KEY,
                     baseUrl = "",
-                    enabled = false,
                     onBack = {},
                     onDelete = {},
                     onDismissMessage = {},
@@ -569,7 +562,6 @@ private fun TabletPreview() {
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetBaseUrl = {},
-                    onSetEnabled = {},
                 )
             }
         }
@@ -591,7 +583,6 @@ private fun InsertPreview() {
                     apiKeyHeader = "",
                     authType = ApiAuthType.ATTESTATION,
                     baseUrl = "",
-                    enabled = false,
                     onBack = {},
                     onDelete = {},
                     onDismissMessage = {},
@@ -603,7 +594,6 @@ private fun InsertPreview() {
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetBaseUrl = {},
-                    onSetEnabled = {},
                 )
             }
         }
@@ -625,7 +615,6 @@ private fun DarkInsertPreview() {
                     apiKeyHeader = "",
                     authType = ApiAuthType.ATTESTATION,
                     baseUrl = "",
-                    enabled = false,
                     onBack = {},
                     onDelete = {},
                     onDismissMessage = {},
@@ -637,7 +626,6 @@ private fun DarkInsertPreview() {
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetBaseUrl = {},
-                    onSetEnabled = {},
                 )
             }
         }
@@ -660,7 +648,6 @@ private fun TabletInsertPreview() {
                     apiKeyHeader = "",
                     authType = ApiAuthType.ATTESTATION,
                     baseUrl = "",
-                    enabled = false,
                     onBack = {},
                     onDelete = {},
                     onDismissMessage = {},
@@ -672,7 +659,6 @@ private fun TabletInsertPreview() {
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetBaseUrl = {},
-                    onSetEnabled = {},
                 )
             }
         }
@@ -686,17 +672,16 @@ private fun UpdatePreview() {
     AppTheme {
         Surface {
             Column {
-                val apiPreset = FakeGoogleMapsApiPreset
+                val item = FakeGoogleMapsApiPreset
                 ApiPresetScreen(
-                    destination = -1,
+                    destination = item.uid,
                     all = defaultFakeApiPresets,
                     selected = null,
                     message = null,
-                    apiKey = apiPreset.apiKey,
-                    apiKeyHeader = apiPreset.apiKeyHeader,
-                    authType = apiPreset.authType,
-                    baseUrl = apiPreset.baseUrl,
-                    enabled = apiPreset.enabled,
+                    apiKey = item.apiKey,
+                    apiKeyHeader = item.apiKeyHeader,
+                    authType = item.authType,
+                    baseUrl = item.baseUrl,
                     onBack = {},
                     onDelete = {},
                     onDismissMessage = {},
@@ -708,7 +693,6 @@ private fun UpdatePreview() {
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetBaseUrl = {},
-                    onSetEnabled = {},
                 )
             }
         }
@@ -722,17 +706,16 @@ private fun DarkUpdatePreview() {
     AppTheme {
         Surface {
             Column {
-                val apiPreset = FakeGoogleMapsApiPreset
+                val item = FakeGoogleMapsApiPreset
                 ApiPresetScreen(
-                    destination = -1,
+                    destination = item.uid,
                     all = defaultFakeApiPresets,
                     selected = null,
                     message = null,
-                    apiKey = apiPreset.apiKey,
-                    apiKeyHeader = apiPreset.apiKeyHeader,
-                    authType = apiPreset.authType,
-                    baseUrl = apiPreset.baseUrl,
-                    enabled = apiPreset.enabled,
+                    apiKey = item.apiKey,
+                    apiKeyHeader = item.apiKeyHeader,
+                    authType = item.authType,
+                    baseUrl = item.baseUrl,
                     onBack = {},
                     onDelete = {},
                     onDismissMessage = {},
@@ -744,7 +727,6 @@ private fun DarkUpdatePreview() {
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetBaseUrl = {},
-                    onSetEnabled = {},
                 )
             }
         }
@@ -758,17 +740,16 @@ private fun TabletUpdatePreview() {
     AppTheme {
         Surface {
             Column {
-                val apiPreset = FakeGoogleMapsApiPreset
+                val item = FakeGoogleMapsApiPreset
                 ApiPresetScreen(
-                    destination = -1,
+                    destination = item.uid,
                     all = defaultFakeApiPresets,
                     selected = null,
                     message = null,
-                    apiKey = apiPreset.apiKey,
-                    apiKeyHeader = apiPreset.apiKeyHeader,
-                    authType = apiPreset.authType,
-                    baseUrl = apiPreset.baseUrl,
-                    enabled = apiPreset.enabled,
+                    apiKey = item.apiKey,
+                    apiKeyHeader = item.apiKeyHeader,
+                    authType = item.authType,
+                    baseUrl = item.baseUrl,
                     onBack = {},
                     onDelete = {},
                     onDismissMessage = {},
@@ -780,7 +761,6 @@ private fun TabletUpdatePreview() {
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetBaseUrl = {},
-                    onSetEnabled = {},
                 )
             }
         }

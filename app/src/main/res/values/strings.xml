@@ -4,13 +4,14 @@
     <string name="api_presets_api_key" translatable="false">API key</string>
     <string name="api_presets_api_key_header" translatable="false">HTTP header</string>
     <string name="api_presets_api_key_supporting_text" translatable="false">To avoid unexpected costs, set strict service restrictions and usage limits on the key.</string>
-    <string name="api_presets_auth_type_attestation" translatable="false">Hardware-backed key attestation</string>
-    <string name="api_presets_auth_type_authentication" translatable="false">Authentication</string>
+    <string name="api_presets_attestation" translatable="false">Hardware-backed key attestation</string>
+    <string name="api_presets_auth_type" translatable="false">Authentication</string>
     <string name="api_presets_base_url" translatable="false">Base URL</string>
     <string name="api_presets_delete_text" translatable="false">The server “%1$s” will be permanently deleted.</string>
     <string name="api_presets_delete_title" translatable="false">Delete server?</string>
     <string name="api_presets_description" translatable="false">To support a wider variety of Google Maps links, %1$s can connect to the paid Google Maps API or a compatible server.</string>
     <string name="api_presets_insert" translatable="false">Add server</string>
+    <string name="api_presets_invalid" translatable="false">Draft</string>
     <string name="api_presets_message_deleted" translatable="false">Server deleted</string>
     <string name="api_presets_message_factory_reset" translatable="false">Server have been reset to factory defaults</string>
     <string name="api_presets_message_inserted" translatable="false">Server added</string>
@@ -291,7 +292,6 @@
     <string name="links_form_enabled_option_sheet">Show in the copy menu</string>
     <string name="links_form_group">Group</string>
     <string name="links_form_name">Name</string>
-    <string name="links_form_save">Save</string>
     <string name="links_form_srs">Coordinate system</string>
     <string name="links_form_test_china" translatable="false">Test Forbidden City</string>
     <string name="links_form_test_world" translatable="false">Test Kilimanjaro</string>
@@ -320,6 +320,7 @@
     <string name="network_exception_unknown">Unknown error</string>
     <string name="network_exception_unresolved_address">Unresolved address</string>
     <string name="reset">reset</string>
+    <string name="save">Save</string>
     <string name="seconds_unit">seconds</string>
     <plurals name="seconds">
         <item quantity="one">%1$d second</item>

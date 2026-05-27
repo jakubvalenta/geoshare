@@ -233,7 +233,7 @@
     <string name="links_form_enabled_option_sheet">Kopyala menüsünde göster</string>
     <string name="links_form_group">Grup</string>
     <string name="links_form_name">İsim</string>
-    <string name="links_form_save">Kaydet</string>
+    <string name="save">Kaydet</string>
     <string name="links_form_srs">Koordinat sistemi</string>
     <string name="links_form_type">Bağlam menüsü simgesi</string>
     <string name="links_form_uri_template_coords">URL şablonu</string>

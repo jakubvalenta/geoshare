@@ -240,7 +240,7 @@
     <string name="links_form_enabled_option_sheet">أظهر في قائمة النسخ</string>
     <string name="links_form_group">مجموعة</string>
     <string name="links_form_name">اسم</string>
-    <string name="links_form_save">احفظ</string>
+    <string name="save">احفظ</string>
     <string name="links_form_srs">نظام إحداثيات</string>
     <string name="links_form_type">أيقونة قائمة السياق</string>
     <string name="links_form_uri_template_coords">قالب الرابط</string>

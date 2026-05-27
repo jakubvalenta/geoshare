@@ -228,7 +228,7 @@
     <string name="links_form_enabled_option_sheet">Показывать в меню копирования</string>
     <string name="links_form_group">Группа</string>
     <string name="links_form_name">Имя</string>
-    <string name="links_form_save">Сохранить</string>
+    <string name="save">Сохранить</string>
     <string name="links_form_srs">Система координат</string>
     <string name="links_form_type">Значок контекстного меню</string>
     <string name="links_form_uri_template_coords">Шаблон URL</string>

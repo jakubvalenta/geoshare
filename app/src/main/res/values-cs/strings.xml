@@ -231,7 +231,7 @@
     <string name="links_form_enabled_option_sheet">Zobrazit v menu kopírování</string>
     <string name="links_form_group">Skupina</string>
     <string name="links_form_name">Název</string>
-    <string name="links_form_save">Uložit</string>
+    <string name="save">Uložit</string>
     <string name="links_form_srs">Systém souřadnic</string>
     <string name="links_form_type">Ikona v kontextovém menu</string>
     <string name="links_form_uri_template_coords">Šablona URL</string>

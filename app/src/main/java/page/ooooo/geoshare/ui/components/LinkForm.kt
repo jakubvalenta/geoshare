@@ -435,7 +435,7 @@ fun LinkForm(
         }
         HorizontalDivider()
         LargeButton(
-            stringResource(R.string.links_form_save),
+            stringResource(R.string.save),
             Modifier
                 .padding(top = spacing.medium)
                 .testTag("geoShareLinkFormSave"),

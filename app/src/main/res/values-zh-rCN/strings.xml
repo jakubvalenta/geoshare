@@ -210,7 +210,7 @@
     <string name="links_form_enabled_option_sheet">在复制菜单中显示</string>
     <string name="links_form_group">分组</string>
     <string name="links_form_name">名称</string>
-    <string name="links_form_save">保存</string>
+    <string name="save">保存</string>
     <string name="links_form_srs">坐标系</string>
     <string name="links_form_type">上下文菜单图标</string>
     <string name="links_form_uri_template_coords">URL 模板</string>

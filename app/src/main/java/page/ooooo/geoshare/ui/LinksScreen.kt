@@ -1016,12 +1016,12 @@ private fun UpdatePreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val link = FakeGoogleMapsStreetViewLink
+                val item = FakeGoogleMapsStreetViewLink
                 LinksScreen(
-                    destination = link.uid,
+                    destination = item.uid,
                     all = defaultFakeLinks,
                     message = null,
-                    appEnabled = link.appEnabled,
+                    appEnabled = item.appEnabled,
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Purchased(
@@ -1030,15 +1030,15 @@ private fun UpdatePreview() {
                         refundable = true,
                         token = "test_purchased",
                     ),
-                    chipEnabled = link.chipEnabled,
+                    chipEnabled = item.chipEnabled,
                     coordinateConverter = coordinateConverter,
-                    coordsUriTemplate = link.coordsUriTemplate,
-                    group = link.group,
-                    name = link.name,
-                    nameUriTemplate = link.nameUriTemplate,
-                    sheetEnabled = link.sheetEnabled,
-                    srs = link.srs,
-                    type = link.type,
+                    coordsUriTemplate = item.coordsUriTemplate,
+                    group = item.group,
+                    name = item.name,
+                    nameUriTemplate = item.nameUriTemplate,
+                    sheetEnabled = item.sheetEnabled,
+                    srs = item.srs,
+                    type = item.type,
                     onBack = {},
                     onDelete = {},
                     onDisable = {},
@@ -1073,12 +1073,12 @@ private fun DarkUpdatePreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val link = FakeGoogleMapsStreetViewLink
+                val item = FakeGoogleMapsStreetViewLink
                 LinksScreen(
-                    destination = link.uid,
+                    destination = item.uid,
                     all = defaultFakeLinks,
                     message = null,
-                    appEnabled = link.appEnabled,
+                    appEnabled = item.appEnabled,
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Purchased(
@@ -1087,15 +1087,15 @@ private fun DarkUpdatePreview() {
                         refundable = true,
                         token = "test_purchased",
                     ),
-                    chipEnabled = link.chipEnabled,
+                    chipEnabled = item.chipEnabled,
                     coordinateConverter = coordinateConverter,
-                    coordsUriTemplate = link.coordsUriTemplate,
-                    group = link.group,
-                    name = link.name,
-                    nameUriTemplate = link.nameUriTemplate,
-                    sheetEnabled = link.sheetEnabled,
-                    srs = link.srs,
-                    type = link.type,
+                    coordsUriTemplate = item.coordsUriTemplate,
+                    group = item.group,
+                    name = item.name,
+                    nameUriTemplate = item.nameUriTemplate,
+                    sheetEnabled = item.sheetEnabled,
+                    srs = item.srs,
+                    type = item.type,
                     onBack = {},
                     onDelete = {},
                     onDisable = {},
@@ -1130,12 +1130,12 @@ private fun TabletUpdatePreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val link = FakeGoogleMapsStreetViewLink
+                val item = FakeGoogleMapsStreetViewLink
                 LinksScreen(
-                    destination = link.uid,
+                    destination = item.uid,
                     all = defaultFakeLinks,
                     message = null,
-                    appEnabled = link.appEnabled,
+                    appEnabled = item.appEnabled,
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Purchased(
@@ -1144,15 +1144,15 @@ private fun TabletUpdatePreview() {
                         refundable = true,
                         token = "test_purchased",
                     ),
-                    chipEnabled = link.chipEnabled,
+                    chipEnabled = item.chipEnabled,
                     coordinateConverter = coordinateConverter,
-                    coordsUriTemplate = link.coordsUriTemplate,
-                    group = link.group,
-                    name = link.name,
-                    nameUriTemplate = link.nameUriTemplate,
-                    sheetEnabled = link.sheetEnabled,
-                    srs = link.srs,
-                    type = link.type,
+                    coordsUriTemplate = item.coordsUriTemplate,
+                    group = item.group,
+                    name = item.name,
+                    nameUriTemplate = item.nameUriTemplate,
+                    sheetEnabled = item.sheetEnabled,
+                    srs = item.srs,
+                    type = item.type,
                     onBack = {},
                     onDelete = {},
                     onDisable = {},

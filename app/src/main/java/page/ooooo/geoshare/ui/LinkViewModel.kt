@@ -74,19 +74,19 @@ class LinkViewModel @Inject constructor(
                 this.nameUriTemplate = default.nameUriTemplate
             }
         } else {
-            val link = linkRepository.getByUid(destination)
-            if (link != null) {
+            val item = linkRepository.getByUid(destination)
+            if (item != null) {
                 withMutableSnapshot {
                     this.destination = destination
-                    this.group = link.group
-                    this.name = link.name
-                    this.srs = link.srs
-                    this.type = link.type
-                    this.appEnabled = link.appEnabled
-                    this.chipEnabled = link.chipEnabled
-                    this.sheetEnabled = link.sheetEnabled
-                    this.coordsUriTemplate = link.coordsUriTemplate
-                    this.nameUriTemplate = link.nameUriTemplate
+                    this.group = item.group
+                    this.name = item.name
+                    this.srs = item.srs
+                    this.type = item.type
+                    this.appEnabled = item.appEnabled
+                    this.chipEnabled = item.chipEnabled
+                    this.sheetEnabled = item.sheetEnabled
+                    this.coordsUriTemplate = item.coordsUriTemplate
+                    this.nameUriTemplate = item.nameUriTemplate
                 }
             }
         }
@@ -127,10 +127,10 @@ class LinkViewModel @Inject constructor(
                 }
             } else {
                 viewModelScope.launch(Dispatchers.IO) {
-                    val link = linkRepository.getByUid(destination)
-                    if (link != null) {
+                    val item = linkRepository.getByUid(destination)
+                    if (item != null) {
                         linkRepository.update(
-                            link.copy(
+                            item.copy(
                                 group = group,
                                 name = name,
                                 srs = srs,
@@ -156,10 +156,10 @@ class LinkViewModel @Inject constructor(
     fun delete(resources: Resources) {
         destination?.let { destination ->
             if (destination != -1) {
-                val link = all.value.firstOrNull { it.uid == destination }
-                if (link != null) {
+                val item = all.value.firstOrNull { it.uid == destination }
+                if (item != null) {
                     viewModelScope.launch(Dispatchers.IO) {
-                        linkRepository.delete(link)
+                        linkRepository.delete(item)
                         _message.value = Message(resources.getString(R.string.links_message_deleted))
                         navigateTo(null)
                     }

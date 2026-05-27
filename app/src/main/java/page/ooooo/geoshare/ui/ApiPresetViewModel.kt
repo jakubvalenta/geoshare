@@ -73,18 +73,16 @@ class ApiPresetViewModel @Inject constructor(
                 this.authType = default.authType
                 this.apiKey = default.apiKey
                 this.apiKeyHeader = default.apiKeyHeader
-                this.enabled = default.enabled
             }
         } else {
-            val apiPreset = apiPresetRepository.getByUid(destination)
-            if (apiPreset != null) {
+            val item = apiPresetRepository.getByUid(destination)
+            if (item != null) {
                 withMutableSnapshot {
                     this.destination = destination
-                    this.baseUrl = apiPreset.baseUrl
-                    this.authType = apiPreset.authType
-                    this.apiKey = apiPreset.apiKey
-                    this.apiKeyHeader = apiPreset.apiKeyHeader
-                    this.enabled = apiPreset.enabled
+                    this.baseUrl = item.baseUrl
+                    this.authType = item.authType
+                    this.apiKey = item.apiKey
+                    this.apiKeyHeader = item.apiKeyHeader
                 }
             }
         }
@@ -96,7 +94,6 @@ class ApiPresetViewModel @Inject constructor(
     var authType by savedStateHandle.saveable { mutableStateOf(default.authType) }
     var apiKey by savedStateHandle.saveable { mutableStateOf(default.apiKey) }
     var apiKeyHeader by savedStateHandle.saveable { mutableStateOf(default.apiKeyHeader) }
-    var enabled by savedStateHandle.saveable { mutableStateOf(default.enabled) }
 
     fun saveForm(resources: Resources) {
         destination?.let { destination ->
@@ -108,7 +105,6 @@ class ApiPresetViewModel @Inject constructor(
                             authType = authType,
                             apiKey = apiKey,
                             apiKeyHeader = apiKeyHeader,
-                            enabled = enabled,
                         )
                     )
                     _message.value = Message(resources.getString(R.string.api_presets_message_inserted))
@@ -117,15 +113,14 @@ class ApiPresetViewModel @Inject constructor(
                 }
             } else {
                 viewModelScope.launch(Dispatchers.IO) {
-                    val apiPreset = apiPresetRepository.getByUid(destination)
-                    if (apiPreset != null) {
+                    val item = apiPresetRepository.getByUid(destination)
+                    if (item != null) {
                         apiPresetRepository.update(
-                            apiPreset.copy(
+                            item.copy(
                                 baseUrl = baseUrl,
                                 authType = authType,
                                 apiKey = apiKey,
                                 apiKeyHeader = apiKeyHeader,
-                                enabled = enabled,
                             )
                         )
                         _message.value = Message(resources.getString(R.string.api_presets_message_updated))
@@ -142,10 +137,10 @@ class ApiPresetViewModel @Inject constructor(
     fun delete(resources: Resources) {
         destination?.let { destination ->
             if (destination != -1) {
-                val apiPreset = all.value.firstOrNull { it.uid == destination }
-                if (apiPreset != null) {
+                val item = all.value.firstOrNull { it.uid == destination }
+                if (item != null) {
                     viewModelScope.launch(Dispatchers.IO) {
-                        apiPresetRepository.delete(apiPreset)
+                        apiPresetRepository.delete(item)
                         _message.value = Message(resources.getString(R.string.api_presets_message_deleted))
                         navigateTo(null)
                     }

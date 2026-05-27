@@ -222,7 +222,7 @@
     <string name="links_form_enabled_option_sheet">Afficher dans le menu Copier</string>
     <string name="links_form_group">Groupe</string>
     <string name="links_form_name">Nom</string>
-    <string name="links_form_save">Enregistrer</string>
+    <string name="save">Enregistrer</string>
     <string name="links_form_srs">Système de coordonnées</string>
     <string name="links_form_type">Icône du menu contextuel</string>
     <string name="links_form_uri_template_coords">Modèle d’URL</string>

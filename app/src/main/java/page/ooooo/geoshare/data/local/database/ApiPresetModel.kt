@@ -32,7 +32,13 @@ data class ApiPreset(
     @Serializable(with = UUIDSerializer::class)
     val uuid: UUID = UUID.randomUUID(),
 ) {
-    val name get() = baseUrl.removePrefix("https://")
+    val name: String get() = baseUrl.removePrefix("https://")
+
+    fun isValid(): Boolean =
+        when (authType) {
+            ApiAuthType.API_KEY -> baseUrl.isNotEmpty() && apiKey.isNotEmpty() && apiKeyHeader.isNotEmpty()
+            ApiAuthType.ATTESTATION -> baseUrl.isNotEmpty()
+        }
 }
 
 @Dao

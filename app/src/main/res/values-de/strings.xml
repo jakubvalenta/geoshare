@@ -240,7 +240,7 @@
     <string name="links_form_enabled_option_sheet">Im Kopiermenü anzeigen</string>
     <string name="links_form_group">Gruppe</string>
     <string name="links_form_name">Name</string>
-    <string name="links_form_save">Speichern</string>
+    <string name="save">Speichern</string>
     <string name="links_form_srs">Koordinatensystem</string>
     <string name="links_form_type">Kontextmenü-Symbol</string>
     <string name="links_form_uri_template_coords">URL-Vorlage</string>
