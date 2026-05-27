@@ -52,6 +52,7 @@ import page.ooooo.geoshare.data.di.defaultFakeApiPresets
 import page.ooooo.geoshare.data.local.database.ApiAuthType
 import page.ooooo.geoshare.data.local.database.ApiPreset
 import page.ooooo.geoshare.lib.Message
+import page.ooooo.geoshare.ui.components.ApiPresetForm
 import page.ooooo.geoshare.ui.components.BasicListDetailScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
@@ -366,7 +367,6 @@ private fun ApiPresetDetailPane(
             ) {
                 item {
                     ApiPresetForm(
-                        baseUrl = baseUrl,
                         apiKey = apiKey,
                         apiKeyHeader = apiKeyHeader,
                         authType = authType,
