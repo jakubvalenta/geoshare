@@ -377,7 +377,7 @@ interface BehaviorTest {
         onElement { viewIdResourceName == "geoShareBack" }.click()
         if (
             onElementOrNull(1_000L) {
-                viewIdResourceName == "geoShareLinksListPane" ||
+                viewIdResourceName == "geoShareLinkListPane" ||
                     viewIdResourceName == "geoShareUserPreferencesListPane"
             } != null
         ) {

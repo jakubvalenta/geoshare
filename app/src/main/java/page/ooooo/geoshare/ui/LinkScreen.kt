@@ -84,7 +84,7 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
-fun LinksScreen(
+fun LinkScreen(
     onBack: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     billingViewModel: BillingViewModel = hiltViewModel(),
@@ -99,7 +99,7 @@ fun LinksScreen(
     val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
 
-    LinksScreen(
+    LinkScreen(
         destination = viewModel.destination,
         all = all,
         billingAppNameResId = billingAppNameResId,
@@ -144,7 +144,7 @@ fun LinksScreen(
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-private fun LinksScreen(
+private fun LinkScreen(
     destination: Int?,
     all: List<Link>,
     billingAppNameResId: Int,
@@ -232,7 +232,7 @@ private fun LinksScreen(
             listPane = { _, containerColor ->
                 // Use destination coming from view model, because if we use navigator.currentDestination?.contentKey,
                 // fields get briefly rendered with empty values when switching from detail to list.
-                LinksListPane(
+                LinkListPane(
                     destination = destination,
                     all = all,
                     billingFeatures = billingFeatures,
@@ -249,7 +249,7 @@ private fun LinksScreen(
                 // Use destination coming from view model, because if we use navigator.currentDestination?.contentKey,
                 // fields get briefly rendered with empty values when switching from detail to list.
                 if (destination != null) {
-                    LinksDetailPane(
+                    LinkDetailPane(
                         destination = destination,
                         wide = wide,
                         appEnabled = appEnabled,
@@ -287,7 +287,7 @@ private fun LinksScreen(
 }
 
 @Composable
-private fun LinksListPane(
+private fun LinkListPane(
     destination: Int?,
     all: List<Link>,
     billingFeatures: List<Feature>,
@@ -309,7 +309,7 @@ private fun LinksListPane(
         onBack = onBack,
         modifier = Modifier
             .padding(horizontal = spacing.windowPadding)
-            .testTag("geoShareLinksListPane"),
+            .testTag("geoShareLinkListPane"),
         containerColor = containerColor,
     ) {
         item {
@@ -330,7 +330,7 @@ private fun LinksListPane(
             ) { modifier ->
                 Button(
                     { onNavigateToContentKey(-1) },
-                    modifier.testTag("geoShareLinksListInsert"),
+                    modifier.testTag("geoShareLinkListInsert"),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.secondary,
                         contentColor = MaterialTheme.colorScheme.onSecondary,
@@ -369,7 +369,7 @@ private fun LinksListPane(
                                     checked = it.enabled,
                                     // Null recommended for accessibility with screen readers
                                     onCheckedChange = null,
-                                    modifier = Modifier.testTag("geoShareLinksListItemToggle_${it.uuid}"),
+                                    modifier = Modifier.testTag("geoShareLinkListItemToggle_${it.uuid}"),
                                 )
                             }
                         },
@@ -380,7 +380,7 @@ private fun LinksListPane(
                                 Box {
                                     IconButton(
                                         { expanded = true },
-                                        Modifier.testTag("geoShareLinksListItemMenu"),
+                                        Modifier.testTag("geoShareLinkListItemMenu"),
                                     ) {
                                         Icon(
                                             painterResource(R.drawable.more_vert_24px),
@@ -396,7 +396,7 @@ private fun LinksListPane(
                                     ) {
                                         DropdownMenuItem(
                                             text = { Text(stringResource(R.string.links_update)) },
-                                            modifier = Modifier.testTag("geoShareLinksListItemMenu_${it.uuid}"),
+                                            modifier = Modifier.testTag("geoShareLinkListItemMenu_${it.uuid}"),
                                             onClick = {
                                                 expanded = false
                                                 onNavigateToContentKey(it.uid)
@@ -406,7 +406,7 @@ private fun LinksListPane(
                                 }
                             }
                         },
-                        itemTestTag = { "geoShareLinksListItem_${it.uuid}" },
+                        itemTestTag = { "geoShareLinkListItem_${it.uuid}" },
                         sort = true,
                     )
                 }
@@ -415,7 +415,7 @@ private fun LinksListPane(
             TextButton(
                 onClick = { setRestoreInitialDataDialogOpen(true) },
                 modifier = Modifier
-                    .testTag("geoShareLinksRestoreInitialButton")
+                    .testTag("geoShareLinkRestoreInitialButton")
                     .padding(top = spacing.mediumAdaptive, bottom = spacing.tinyAdaptive),
                 colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
             ) {
@@ -436,7 +436,7 @@ private fun LinksListPane(
             onDismissRequest = { setRestoreInitialDataDialogOpen(false) },
             modifier = Modifier
                 .semantics { testTagsAsResourceId = true }
-                .testTag("geoShareLinksRestoreInitialDialog"),
+                .testTag("geoShareLinkRestoreInitialDialog"),
         ) {
             Text(stringResource(R.string.links_restore_initial_data_text))
         }
@@ -444,7 +444,7 @@ private fun LinksListPane(
 }
 
 @Composable
-private fun LinksDetailPane(
+private fun LinkDetailPane(
     destination: Int,
     wide: Boolean,
     appEnabled: Boolean,
@@ -492,7 +492,7 @@ private fun LinksDetailPane(
                     if (destination != -1) {
                         IconButton(
                             onClick = { setDeleteDialogOpen(true) },
-                            modifier = Modifier.testTag("geoShareLinksDetailDelete"),
+                            modifier = Modifier.testTag("geoShareLinkDetailDelete"),
                             colors = IconButtonDefaults.iconButtonColors(
                                 contentColor = MaterialTheme.colorScheme.error,
                             ),
@@ -572,7 +572,7 @@ private fun DefaultPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                LinksScreen(
+                LinkScreen(
                     destination = null,
                     all = defaultFakeLinks,
                     message = null,
@@ -627,7 +627,7 @@ private fun DarkPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                LinksScreen(
+                LinkScreen(
                     destination = null,
                     all = defaultFakeLinks,
                     message = null,
@@ -682,7 +682,7 @@ private fun TabletPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                LinksScreen(
+                LinkScreen(
                     destination = null,
                     all = defaultFakeLinks,
                     message = null,
@@ -737,7 +737,7 @@ private fun InsertPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                LinksScreen(
+                LinkScreen(
                     destination = -1,
                     all = defaultFakeLinks,
                     message = null,
@@ -792,7 +792,7 @@ private fun DarkInsertPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                LinksScreen(
+                LinkScreen(
                     destination = -1,
                     all = defaultFakeLinks,
                     message = null,
@@ -848,7 +848,7 @@ private fun TabletInsertPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                LinksScreen(
+                LinkScreen(
                     destination = -1,
                     all = defaultFakeLinks,
                     message = null,
@@ -903,7 +903,7 @@ private fun InsertNotPurchasedPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                LinksScreen(
+                LinkScreen(
                     destination = -1,
                     all = defaultFakeLinks,
                     message = null,
@@ -953,7 +953,7 @@ private fun DarkInsertNotPurchasedPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                LinksScreen(
+                LinkScreen(
                     destination = -1,
                     all = defaultFakeLinks,
                     message = null,
@@ -1004,7 +1004,7 @@ private fun TabletInsertNotPurchasedPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                LinksScreen(
+                LinkScreen(
                     destination = -1,
                     all = defaultFakeLinks,
                     message = null,
@@ -1056,7 +1056,7 @@ private fun UpdatePreview() {
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
                 val item = FakeGoogleMapsStreetViewLink
-                LinksScreen(
+                LinkScreen(
                     destination = item.uid,
                     all = defaultFakeLinks,
                     message = null,
@@ -1113,7 +1113,7 @@ private fun DarkUpdatePreview() {
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
                 val item = FakeGoogleMapsStreetViewLink
-                LinksScreen(
+                LinkScreen(
                     destination = item.uid,
                     all = defaultFakeLinks,
                     message = null,
@@ -1170,7 +1170,7 @@ private fun TabletUpdatePreview() {
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
                 val item = FakeGoogleMapsStreetViewLink
-                LinksScreen(
+                LinkScreen(
                     destination = item.uid,
                     all = defaultFakeLinks,
                     message = null,

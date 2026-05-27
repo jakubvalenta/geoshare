@@ -10,7 +10,7 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
-class LinksBehaviorTest : BehaviorTest {
+class LinkBehaviorTest : BehaviorTest {
     @Test
     fun whenLinkIsInserted_allowsCopyingIt() = uiAutomator {
         // Launch application and close intro
@@ -23,7 +23,7 @@ class LinksBehaviorTest : BehaviorTest {
         onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.LINKS}" }.click()
 
         // Insert link
-        onElement { viewIdResourceName == "geoShareLinksListInsert" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListInsert" }.click()
         onElement { viewIdResourceName == "geoShareLinkFormName" }.setText("My New Maps")
         onElement { viewIdResourceName == "geoShareLinkFormCoordsUriTemplate" }.setText("https://www.example.com/?ll={lat}%2C{lon}")
         quickWaitForStableInActiveWindow() // Wait for IME to appear
@@ -64,12 +64,11 @@ class LinksBehaviorTest : BehaviorTest {
         onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.LINKS}" }.click()
 
         // Go to link detail
-        onElement { viewIdResourceName == "geoShareLinksListItem_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItem_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
 
         // Update link
-        onElement { viewIdResourceName == "geoShareLinkFormName" && textAsString() == "Apple Maps navigation" }.apply {
-            setText("$text edited")
-        }
+        onElement { viewIdResourceName == "geoShareLinkFormName" && textAsString() == "Apple Maps navigation" }
+            .apply { setText("$text edited") }
         onElement { viewIdResourceName == "geoShareLinkFormCoordsUriTemplate" && textAsString() == "https://maps.apple.com/?daddr={lat}%2C{lon}" }
             .apply { setText("$text&edited=1") }
         quickWaitForStableInActiveWindow() // Wait for IME to appear
@@ -84,11 +83,11 @@ class LinksBehaviorTest : BehaviorTest {
         }
 
         // Shows updated link
-        onElement { viewIdResourceName == "geoShareLinksListItem_a5092c63-cf5c-4225-9059-e888ae12e215" }
+        onElement { viewIdResourceName == "geoShareLinkListItem_a5092c63-cf5c-4225-9059-e888ae12e215" }
         onElement { textAsString() == "Apple Maps navigation edited" }
 
         // Go to link detail
-        onElement { viewIdResourceName == "geoShareLinksListItem_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItem_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
 
         // Shows updated values
         onElement { viewIdResourceName == "geoShareLinkFormName" && textAsString() == "Apple Maps navigation edited" }
@@ -100,13 +99,13 @@ class LinksBehaviorTest : BehaviorTest {
         }
 
         // Delete link
-        onElement { viewIdResourceName == "geoShareLinksDetailDelete" }.click()
+        onElement { viewIdResourceName == "geoShareLinkDetailDelete" }.click()
         onElement { viewIdResourceName == "geoShareLinkDeleteDialog" }.dismissDialog()
-        onElement { viewIdResourceName == "geoShareLinksDetailDelete" }.click()
+        onElement { viewIdResourceName == "geoShareLinkDetailDelete" }.click()
         onElement { viewIdResourceName == "geoShareLinkDeleteDialog" }.confirmDialog()
 
         // Does not show link
-        assertNull(onElementOrNull(BehaviorTest.ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareLinksListItem_a5092c63-cf5c-4225-9059-e888ae12e215" })
+        assertNull(onElementOrNull(BehaviorTest.ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareLinkListItem_a5092c63-cf5c-4225-9059-e888ae12e215" })
 
         // Wait for the delete toast to disappear, because it covers the restore button
         runBlocking {
@@ -114,19 +113,19 @@ class LinksBehaviorTest : BehaviorTest {
         }
 
         // Restore initial links
-        onElement { viewIdResourceName == "geoShareLinksListPane" }
+        onElement { viewIdResourceName == "geoShareLinkListPane" }
             .scroll(Direction.DOWN, 10f)
-        onElement { viewIdResourceName == "geoShareLinksListPane" }
+        onElement { viewIdResourceName == "geoShareLinkListPane" }
             // Scroll again, because only now can the lazy column pane scroll all the way to the bottom
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinksRestoreInitialButton" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkRestoreInitialButton" }
             .click()
-        onElement { viewIdResourceName == "geoShareLinksRestoreInitialDialog" }.dismissDialog()
-        onElement { viewIdResourceName == "geoShareLinksRestoreInitialButton" }.click()
-        onElement { viewIdResourceName == "geoShareLinksRestoreInitialDialog" }.confirmDialog()
+        onElement { viewIdResourceName == "geoShareLinkRestoreInitialDialog" }.dismissDialog()
+        onElement { viewIdResourceName == "geoShareLinkRestoreInitialButton" }.click()
+        onElement { viewIdResourceName == "geoShareLinkRestoreInitialDialog" }.confirmDialog()
 
         // Shows link
-        onElement { viewIdResourceName == "geoShareLinksListPane" }
-            .scrollToElement(Direction.UP) { viewIdResourceName == "geoShareLinksListItem_a5092c63-cf5c-4225-9059-e888ae12e215" }
+        onElement { viewIdResourceName == "geoShareLinkListPane" }
+            .scrollToElement(Direction.UP) { viewIdResourceName == "geoShareLinkListItem_a5092c63-cf5c-4225-9059-e888ae12e215" }
     }
 
     @Test
@@ -141,8 +140,8 @@ class LinksBehaviorTest : BehaviorTest {
         onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.LINKS}" }.click()
 
         // Go to link detail
-        onElement { viewIdResourceName == "geoShareLinksListPane" }
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinksListItem_b109970a-aef8-4482-9879-52e128fd0e07" }
+        onElement { viewIdResourceName == "geoShareLinkListPane" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkListItem_b109970a-aef8-4482-9879-52e128fd0e07" }
             .click()
 
         // Shows pre-installed values
@@ -159,10 +158,10 @@ class LinksBehaviorTest : BehaviorTest {
         pressBack()
 
         // Toggle link
-        onElement { viewIdResourceName == "geoShareLinksListItemToggle_b109970a-aef8-4482-9879-52e128fd0e07" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItemToggle_b109970a-aef8-4482-9879-52e128fd0e07" }.click()
 
         // Go to link detail
-        onElement { viewIdResourceName == "geoShareLinksListItem_b109970a-aef8-4482-9879-52e128fd0e07" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItem_b109970a-aef8-4482-9879-52e128fd0e07" }.click()
 
         // Shows toggled values
         onElement { viewIdResourceName == "geoShareLinkFormName" && textAsString() == "Magic Earth" }
@@ -178,10 +177,10 @@ class LinksBehaviorTest : BehaviorTest {
         pressBack()
 
         // Toggle link
-        onElement { viewIdResourceName == "geoShareLinksListItemToggle_b109970a-aef8-4482-9879-52e128fd0e07" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItemToggle_b109970a-aef8-4482-9879-52e128fd0e07" }.click()
 
         // Go to link detail
-        onElement { viewIdResourceName == "geoShareLinksListItem_b109970a-aef8-4482-9879-52e128fd0e07" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItem_b109970a-aef8-4482-9879-52e128fd0e07" }.click()
 
         // Shows toggled values
         onElement { viewIdResourceName == "geoShareLinkFormName" && textAsString() == "Magic Earth" }

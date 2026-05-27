@@ -32,7 +32,7 @@ object IntroRoute
 object LicensesRoute
 
 @Serializable
-object LinksRoute
+object LinkRoute
 
 @Serializable
 object MainRoute
@@ -93,7 +93,7 @@ fun MainNavigation(
                 onNavigateToFaqScreen = { navController.navigate(FaqRoute) },
                 onNavigateToInputsScreen = { navController.navigate(InputsRoute()) },
                 onNavigateToIntroScreen = { navController.navigate(IntroRoute) },
-                onNavigateToLinksScreen = { navController.navigate(LinksRoute) },
+                onNavigateToLinksScreen = { navController.navigate(LinkRoute) },
                 onNavigateToUserPreferencesAutomationScreen = {
                     navController.navigate(UserPreferencesRoute(UserPreferencesGroupId.AUTOMATION))
                 },
@@ -114,8 +114,8 @@ fun MainNavigation(
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
             )
         }
-        composable<LinksRoute> {
-            LinksScreen(
+        composable<LinkRoute> {
+            LinkScreen(
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
                 onNavigateToBillingScreen = { navController.navigate(BillingRoute) },
             )
@@ -137,7 +137,7 @@ fun MainNavigation(
                 initialGroupId = route.id,
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
                 onNavigateToBillingScreen = { navController.navigate(BillingRoute) },
-                onNavigateToLinksScreen = { navController.navigate(LinksRoute) },
+                onNavigateToLinksScreen = { navController.navigate(LinkRoute) },
                 onNavigateToServerScreen = { navController.navigate(ServerRoute) },
                 billingViewModel = billingViewModel,
             )
