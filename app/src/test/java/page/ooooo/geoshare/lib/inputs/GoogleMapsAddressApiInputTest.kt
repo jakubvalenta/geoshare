@@ -78,7 +78,7 @@ class GoogleMapsAddressApiInputTest {
     @Test
     fun parse_whenApiIsNotConfigured_returnsNextStep() = runTest {
         val apiPresetRepository: FakeApiPresetRepository = mock {
-            on { getFirstEnabled() } doReturn null
+            on { getSelected() } doReturn null
         }
         val input = GoogleMapsAddressApiInput(
             apiPresetRepository = apiPresetRepository,
@@ -98,7 +98,7 @@ class GoogleMapsAddressApiInputTest {
     @Test
     fun parse_whenQueryIsInQueryParamAndApiReturnsResults_returnsHighestRankedPoint() = runTest {
         val apiPresetRepository: FakeApiPresetRepository = mock {
-            on { getFirstEnabled() } doReturn apiPreset
+            on { getSelected() } doReturn apiPreset
         }
         val input = GoogleMapsAddressApiInput(
             apiPresetRepository = apiPresetRepository,
@@ -126,7 +126,7 @@ class GoogleMapsAddressApiInputTest {
     @Test
     fun parse_whenQueryIsInPathAndApiReturnsResults_returnsHighestRankedPoint() = runTest {
         val apiPresetRepository: FakeApiPresetRepository = mock {
-            on { getFirstEnabled() } doReturn apiPreset
+            on { getSelected() } doReturn apiPreset
         }
         val input = GoogleMapsAddressApiInput(
             apiPresetRepository = apiPresetRepository,
@@ -154,7 +154,7 @@ class GoogleMapsAddressApiInputTest {
     @Test
     fun parse_whenQueryIsNotFoundInUri_returnsNoPoints() = runTest {
         val apiPresetRepository: FakeApiPresetRepository = mock {
-            on { getFirstEnabled() } doReturn apiPreset
+            on { getSelected() } doReturn apiPreset
         }
         val input = GoogleMapsAddressApiInput(
             apiPresetRepository = apiPresetRepository,
@@ -172,7 +172,7 @@ class GoogleMapsAddressApiInputTest {
     @Test
     fun parse_whenQueryIsEmpty_returnsNoPoints() = runTest {
         val apiPresetRepository: FakeApiPresetRepository = mock {
-            on { getFirstEnabled() } doReturn apiPreset
+            on { getSelected() } doReturn apiPreset
         }
         val input = GoogleMapsAddressApiInput(
             apiPresetRepository = apiPresetRepository,
@@ -190,7 +190,7 @@ class GoogleMapsAddressApiInputTest {
     @Test
     fun parse_whenApiReturnsNoResults_returnsNoPoints() = runTest {
         val apiPresetRepository: FakeApiPresetRepository = mock {
-            on { getFirstEnabled() } doReturn apiPreset
+            on { getSelected() } doReturn apiPreset
         }
         val input = GoogleMapsAddressApiInput(
             apiPresetRepository = apiPresetRepository,
@@ -208,7 +208,7 @@ class GoogleMapsAddressApiInputTest {
     @Test(expected = UnknownNetworkException::class)
     fun parse_whenApiReturnsInvalidResponse_throwsException() = runTest {
         val apiPresetRepository: FakeApiPresetRepository = mock {
-            on { getFirstEnabled() } doReturn apiPreset
+            on { getSelected() } doReturn apiPreset
         }
         val input = GoogleMapsAddressApiInput(
             apiPresetRepository = apiPresetRepository,
@@ -223,7 +223,7 @@ class GoogleMapsAddressApiInputTest {
     @Test(expected = SocketTimeoutNetworkException::class)
     fun parse_whenApiThrowsException_throwsException() = runTest {
         val apiPresetRepository: FakeApiPresetRepository = mock {
-            on { getFirstEnabled() } doReturn apiPreset
+            on { getSelected() } doReturn apiPreset
         }
         val input = GoogleMapsAddressApiInput(
             apiPresetRepository = apiPresetRepository,

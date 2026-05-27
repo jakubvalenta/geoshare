@@ -7,6 +7,7 @@ import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
@@ -18,11 +19,12 @@ import kotlin.uuid.ExperimentalUuidApi
 @Entity
 @Serializable
 data class ApiPreset(
+    // Rename to Server
     val baseUrl: String = "",
     val authType: ApiAuthType = ApiAuthType.API_KEY,
     val apiKey: String = "",
     val apiKeyHeader: String = "",
-    val enabled: Boolean = false,
+    val enabled: Boolean = false, // Rename to selected
     val createdAt: Long = System.currentTimeMillis(),
     @PrimaryKey(autoGenerate = true)
     val uid: Int = 0,
@@ -46,7 +48,10 @@ interface ApiPresetDao {
     suspend fun getByUUID(uuid: UUID): ApiPreset?
 
     @Query("SELECT * FROM apiPreset WHERE enabled = 1 ORDER BY createdAt ASC LIMIT 1")
-    suspend fun getFirstEnabled(): ApiPreset?
+    suspend fun getSelected(): ApiPreset?
+
+    @Query("SELECT * FROM apiPreset WHERE enabled = 1 ORDER BY createdAt ASC LIMIT 1")
+    fun getSelectedFlow(): Flow<ApiPreset?>
 
     @Insert
     suspend fun insert(apiPreset: ApiPreset): Long
@@ -60,6 +65,12 @@ interface ApiPresetDao {
     @Query("UPDATE apiPreset SET enabled = 1 WHERE uid = :uid")
     suspend fun enable(uid: Int)
 
-    @Query("UPDATE apiPreset SET enabled = 0 WHERE uid = :uid")
-    suspend fun disable(uid: Int)
+    @Query("UPDATE apiPreset SET enabled = 0")
+    suspend fun disableAll()
+
+    @Transaction
+    suspend fun select(uid: Int) {
+        disableAll()
+        enable(uid)
+    }
 }

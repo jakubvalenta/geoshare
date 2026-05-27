@@ -216,7 +216,7 @@
     <string name="user_preferences_coordinate_format_option_dec">Graus decimais</string>
     <string name="user_preferences_coordinate_format_option_deg_min_sec">Graus, minutos, segundos</string>
     <string name="user_preferences_coordinate_format_title">Formato das coordenadas</string>
-    <string name="links_delete">Apagar</string>
+    <string name="delete">Apagar</string>
     <string name="links_delete_text">O mapa da web \"%1$s\" será apagado permanentemente.</string>
     <string name="links_delete_title">Apagar mapa da web?</string>
     <string name="links_description">Os mapas da web permitem abrir coordenadas no navegador. Ative os pré-instalados, ou adicione o seu.</string>

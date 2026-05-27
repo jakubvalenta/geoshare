@@ -230,7 +230,7 @@
     <string name="conversion_failed_reason_no_points">Keine Punkte gefunden</string>
     <string name="conversion_failed_reason_timeout">Zeitüberschreitung</string>
     <string name="licenses">Lizenzen</string>
-    <string name="links_delete">Löschen</string>
+    <string name="delete">Löschen</string>
     <string name="links_delete_text">Die Webkarte „%1$s“ wird endgültig gelöscht.</string>
     <string name="links_delete_title">Webkarte löschen?</string>
     <string name="links_description">Webkarten ermöglichen das Öffnen von Koordinaten im Webbrowser. Aktiviere die vorinstallierten Karten oder füge eigene hinzu.</string>

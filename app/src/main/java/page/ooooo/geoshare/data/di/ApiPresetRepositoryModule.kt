@@ -37,7 +37,9 @@ class FakeApiPresetRepository(
 ) : ApiPresetRepository {
     private val _fakeApiPresets: MutableStateFlow<List<ApiPreset>> = MutableStateFlow(initialFakeApiPresets)
 
-    override val all = _fakeApiPresets.mapLatest { it.sortedBy { entry -> entry.createdAt }.reversed() }
+    override val all = _fakeApiPresets.mapLatest { it.sortedBy { item -> item.createdAt }.reversed() }
+
+    override val selected = _fakeApiPresets.mapLatest { it.firstOrNull { item -> item.enabled } }
 
     override suspend fun getAll() = _fakeApiPresets.value
 
@@ -47,7 +49,7 @@ class FakeApiPresetRepository(
     override suspend fun getByUUID(uuid: UUID) =
         _fakeApiPresets.value.firstOrNull { it.uuid == uuid }
 
-    override suspend fun getFirstEnabled() =
+    override suspend fun getSelected() =
         _fakeApiPresets.value.firstOrNull { it.enabled }
 
     override suspend fun insert(apiPreset: ApiPreset) =
@@ -71,23 +73,9 @@ class FakeApiPresetRepository(
         _fakeApiPresets.value = _fakeApiPresets.value.filterNot { it.uid == apiPreset.uid }
     }
 
-    override suspend fun enable(uid: Int) {
+    override suspend fun select(uid: Int?) {
         _fakeApiPresets.value = _fakeApiPresets.value.map {
-            if (it.uid == uid) {
-                it.copy(enabled = false)
-            } else {
-                it
-            }
-        }
-    }
-
-    override suspend fun disable(uid: Int) {
-        _fakeApiPresets.value = _fakeApiPresets.value.map {
-            if (it.uid == uid) {
-                it.copy(enabled = false)
-            } else {
-                it
-            }
+            it.copy(enabled = it.uid == uid)
         }
     }
 

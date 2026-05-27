@@ -3,23 +3,28 @@ package page.ooooo.geoshare.ui
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
@@ -59,7 +64,7 @@ import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
 import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.ScrollablePane
-import page.ooooo.geoshare.ui.components.SegmentedList
+import page.ooooo.geoshare.ui.components.segmentedListColors
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -71,11 +76,13 @@ fun ApiPresetScreen(
     val coroutineScope = rememberCoroutineScope()
     val resources = LocalResources.current
     val all by viewModel.all.collectAsStateWithLifecycle()
+    val selected by viewModel.selected.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
 
     ApiPresetScreen(
         destination = viewModel.destination,
         all = all,
+        selected = selected,
         message = message,
         apiKey = viewModel.apiKey,
         apiKeyHeader = viewModel.apiKeyHeader,
@@ -84,9 +91,7 @@ fun ApiPresetScreen(
         enabled = viewModel.enabled,
         onBack = onBack,
         onDelete = { viewModel.delete(resources) },
-        onDisable = { viewModel.disable(it) },
         onDismissMessage = { viewModel.dismissMessage() },
-        onEnable = { viewModel.enable(it) },
         onNavigateTo = {
             coroutineScope.launch {
                 viewModel.navigateTo(it)
@@ -94,6 +99,7 @@ fun ApiPresetScreen(
         },
         onRestoreInitialData = { viewModel.restoreInitialData(resources) },
         onSaveForm = { viewModel.saveForm(resources) },
+        onSelect = { viewModel.select(it) },
         onSetApiKey = { viewModel.apiKey = it },
         onSetApiKeyHeader = { viewModel.apiKeyHeader = it },
         onSetAuthType = { viewModel.authType = it },
@@ -108,6 +114,7 @@ fun ApiPresetScreen(
 private fun ApiPresetScreen(
     destination: Int?,
     all: List<ApiPreset>,
+    selected: ApiPreset?,
     message: Message?,
     apiKey: String,
     apiKeyHeader: String,
@@ -116,12 +123,11 @@ private fun ApiPresetScreen(
     enabled: Boolean,
     onBack: () -> Unit,
     onDelete: () -> Unit,
-    onDisable: (uid: Int) -> Unit,
     onDismissMessage: () -> Unit,
-    onEnable: (uid: Int) -> Unit,
     onNavigateTo: (Int?) -> Unit,
     onRestoreInitialData: () -> Unit,
     onSaveForm: () -> Unit,
+    onSelect: (Int?) -> Unit,
     onSetApiKey: (String) -> Unit,
     onSetApiKeyHeader: (String) -> Unit,
     onSetAuthType: (ApiAuthType) -> Unit,
@@ -184,11 +190,11 @@ private fun ApiPresetScreen(
                     destination = destination,
                     containerColor = containerColor,
                     all = all,
+                    selected = selected,
                     onBack = onBack,
-                    onDisable = onDisable,
-                    onEnable = onEnable,
                     onNavigateToContentKey = onNavigateTo,
                     onRestoreInitialData = onRestoreInitialData,
+                    onSelect = onSelect,
                 )
             },
             detailPane = { wide ->
@@ -219,14 +225,15 @@ private fun ApiPresetScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ApiPresetListPane(
     destination: Int?,
     containerColor: Color,
     all: List<ApiPreset>,
+    selected: ApiPreset?,
     onBack: () -> Unit,
-    onDisable: (uid: Int) -> Unit,
-    onEnable: (uid: Int) -> Unit,
+    onSelect: (Int?) -> Unit,
     onNavigateToContentKey: (Int?) -> Unit,
     onRestoreInitialData: () -> Unit,
 ) {
@@ -245,7 +252,10 @@ private fun ApiPresetListPane(
     ) {
         item {
             ParagraphText(
-                stringResource(R.string.api_presets_description),
+                stringResource(
+                    R.string.api_presets_description,
+                    stringResource(R.string.app_name),
+                ),
                 Modifier.padding(top = spacing.tinyAdaptive, bottom = spacing.smallAdaptive),
             )
         }
@@ -258,33 +268,56 @@ private fun ApiPresetListPane(
                     contentColor = MaterialTheme.colorScheme.onSecondary,
                 ),
             ) {
-                Text(stringResource(R.string.links_insert))
+                Text(stringResource(R.string.api_presets_insert))
             }
         }
         item {
-            SegmentedList(
-                values = all,
-                itemHeadline = { it.baseUrl },
-                itemIsSelected = { it.uid == destination },
-                itemOnClick = { onNavigateToContentKey(it.uid) },
-                itemTrailingContent = {
-                    {
-                        Switch(
-                            checked = it.enabled,
-                            onCheckedChange = { enabled ->
-                                if (enabled) {
-                                    onEnable(it.uid)
-                                } else {
-                                    onDisable(it.uid)
-                                }
-                            },
-                            modifier = Modifier.testTag("geoShareApiPresetListItemToggle_${it.uuid}")
+            Column(
+                modifier = Modifier
+                    .padding(top = spacing.medium)
+                    .selectableGroup(),
+                verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+            ) {
+                val colors = segmentedListColors()
+                // TODO Call onSelect(null)
+                SegmentedListItem(
+                    selected = selected == null,
+                    onClick = {},
+                    shapes = ListItemDefaults.segmentedShapes(index = 0, count = all.size + 1),
+                    modifier = Modifier.testTag("geoShareApiPresetListItem_null"),
+                    leadingContent = {
+                        RadioButton(
+                            selected = selected == null,
+                            // Null recommended for accessibility with screen readers
+                            onClick = null,
+                            modifier = Modifier.testTag("geoShareApiPresetListItemRadio_null")
                         )
+                    },
+                    colors = colors,
+                ) {
+                    Text("Don't use API", style = MaterialTheme.typography.bodyLarge) // TODO Translate
+                }
+                all.forEachIndexed { i, item ->
+                    // TODO Call onSelect(item.uid)
+                    SegmentedListItem(
+                        selected = item.uid == destination,
+                        onClick = { onNavigateToContentKey(item.uid) },
+                        shapes = ListItemDefaults.segmentedShapes(index = i + 1, count = all.size + 1),
+                        modifier = Modifier.testTag("geoShareApiPresetListItem_${item.uuid}"),
+                        leadingContent = {
+                            RadioButton(
+                                selected = item.uid == selected?.uid,
+                                // Null recommended for accessibility with screen readers
+                                onClick = null,
+                                modifier = Modifier.testTag("geoShareApiPresetListItemRadio_${item.uuid}")
+                            )
+                        },
+                        colors = colors,
+                    ) {
+                        Text(item.baseUrl, style = MaterialTheme.typography.bodyLarge)
                     }
-                },
-                itemTestTag = { "geoShareApiPresetListItem_${it.uuid}" },
-                sort = true,
-            )
+                }
+            }
         }
         item {
             TextButton(
@@ -294,14 +327,14 @@ private fun ApiPresetListPane(
                     .padding(top = spacing.mediumAdaptive, bottom = spacing.tinyAdaptive),
                 colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
             ) {
-                Text(stringResource(R.string.links_restore_initial_data))
+                Text(stringResource(R.string.api_presets_restore_initial_data))
             }
         }
     }
 
     if (restoreInitialDataDialogOpen) {
         ConfirmationDialog(
-            stringResource(R.string.links_restore_initial_data_title),
+            stringResource(R.string.api_presets_restore_initial_data_title),
             stringResource(R.string.conversion_permission_common_grant),
             stringResource(R.string.conversion_permission_common_deny),
             onConfirmation = {
@@ -313,7 +346,7 @@ private fun ApiPresetListPane(
                 .semantics { testTagsAsResourceId = true }
                 .testTag("geoShareApiPresetRestoreInitialDialog"),
         ) {
-            Text(stringResource(R.string.links_restore_initial_data_text))
+            Text(stringResource(R.string.api_presets_restore_initial_data_text))
         }
     }
 }
@@ -344,7 +377,7 @@ private fun ApiPresetDetailPane(
             ScrollablePane(
                 title = {
                     Text(
-                        stringResource(if (destination == -1) R.string.links_insert else R.string.links_update),
+                        stringResource(if (destination == -1) R.string.api_presets_insert else R.string.api_presets_update),
                         Modifier.padding(horizontal = spacing.windowPadding),
                     )
                 },
@@ -359,7 +392,7 @@ private fun ApiPresetDetailPane(
                                 contentColor = MaterialTheme.colorScheme.error,
                             ),
                         ) {
-                            Icon(Icons.Outlined.Delete, stringResource(R.string.links_delete))
+                            Icon(Icons.Outlined.Delete, stringResource(R.string.delete))
                         }
                     }
                 },
@@ -389,7 +422,7 @@ private fun ApiPresetDetailPane(
 
     if (deleteDialogOpen) {
         ConfirmationDialog(
-            title = stringResource(R.string.links_delete_title),
+            title = stringResource(R.string.api_presets_delete_title),
             confirmText = stringResource(R.string.conversion_permission_common_grant),
             dismissText = stringResource(R.string.conversion_permission_common_deny),
             onConfirmation = {
@@ -401,7 +434,7 @@ private fun ApiPresetDetailPane(
                 .semantics { testTagsAsResourceId = true }
                 .testTag("geoShareApiPresetDeleteDialog"),
         ) {
-            Text(stringResource(R.string.links_delete_text, baseUrl))
+            Text(stringResource(R.string.api_presets_delete_text, baseUrl))
         }
     }
 }
@@ -417,6 +450,7 @@ private fun DefaultPreview() {
                 ApiPresetScreen(
                     destination = null,
                     all = defaultFakeApiPresets,
+                    selected = null,
                     message = null,
                     apiKey = "",
                     apiKeyHeader = "",
@@ -425,12 +459,11 @@ private fun DefaultPreview() {
                     enabled = false,
                     onBack = {},
                     onDelete = {},
-                    onDisable = {},
                     onDismissMessage = {},
-                    onEnable = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
+                    onSelect = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
@@ -451,6 +484,7 @@ private fun DarkPreview() {
                 ApiPresetScreen(
                     destination = null,
                     all = defaultFakeApiPresets,
+                    selected = null,
                     message = null,
                     apiKey = "",
                     apiKeyHeader = "",
@@ -459,12 +493,11 @@ private fun DarkPreview() {
                     enabled = false,
                     onBack = {},
                     onDelete = {},
-                    onDisable = {},
                     onDismissMessage = {},
-                    onEnable = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
+                    onSelect = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
@@ -485,6 +518,7 @@ private fun TabletPreview() {
                 ApiPresetScreen(
                     destination = null,
                     all = defaultFakeApiPresets,
+                    selected = null,
                     message = null,
                     apiKey = "",
                     apiKeyHeader = "",
@@ -493,12 +527,11 @@ private fun TabletPreview() {
                     enabled = false,
                     onBack = {},
                     onDelete = {},
-                    onDisable = {},
                     onDismissMessage = {},
-                    onEnable = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
+                    onSelect = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
@@ -519,6 +552,7 @@ private fun InsertPreview() {
                 ApiPresetScreen(
                     destination = -1,
                     all = defaultFakeApiPresets,
+                    selected = null,
                     message = null,
                     apiKey = "",
                     apiKeyHeader = "",
@@ -527,12 +561,11 @@ private fun InsertPreview() {
                     enabled = false,
                     onBack = {},
                     onDelete = {},
-                    onDisable = {},
                     onDismissMessage = {},
-                    onEnable = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
+                    onSelect = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
@@ -553,6 +586,7 @@ private fun DarkInsertPreview() {
                 ApiPresetScreen(
                     destination = -1,
                     all = defaultFakeApiPresets,
+                    selected = null,
                     message = null,
                     apiKey = "",
                     apiKeyHeader = "",
@@ -561,12 +595,11 @@ private fun DarkInsertPreview() {
                     enabled = false,
                     onBack = {},
                     onDelete = {},
-                    onDisable = {},
                     onDismissMessage = {},
-                    onEnable = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
+                    onSelect = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
@@ -588,6 +621,7 @@ private fun TabletInsertPreview() {
                 ApiPresetScreen(
                     destination = -1,
                     all = defaultFakeApiPresets,
+                    selected = null,
                     message = null,
                     apiKey = "",
                     apiKeyHeader = "",
@@ -596,12 +630,11 @@ private fun TabletInsertPreview() {
                     enabled = false,
                     onBack = {},
                     onDelete = {},
-                    onDisable = {},
                     onDismissMessage = {},
-                    onEnable = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
+                    onSelect = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
@@ -624,6 +657,7 @@ private fun UpdatePreview() {
                 ApiPresetScreen(
                     destination = -1,
                     all = defaultFakeApiPresets,
+                    selected = null,
                     message = null,
                     apiKey = apiPreset.apiKey,
                     apiKeyHeader = apiPreset.apiKeyHeader,
@@ -632,12 +666,11 @@ private fun UpdatePreview() {
                     enabled = apiPreset.enabled,
                     onBack = {},
                     onDelete = {},
-                    onDisable = {},
                     onDismissMessage = {},
-                    onEnable = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
+                    onSelect = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
@@ -660,6 +693,7 @@ private fun DarkUpdatePreview() {
                 ApiPresetScreen(
                     destination = -1,
                     all = defaultFakeApiPresets,
+                    selected = null,
                     message = null,
                     apiKey = apiPreset.apiKey,
                     apiKeyHeader = apiPreset.apiKeyHeader,
@@ -668,12 +702,11 @@ private fun DarkUpdatePreview() {
                     enabled = apiPreset.enabled,
                     onBack = {},
                     onDelete = {},
-                    onDisable = {},
                     onDismissMessage = {},
-                    onEnable = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
+                    onSelect = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
@@ -696,6 +729,7 @@ private fun TabletUpdatePreview() {
                 ApiPresetScreen(
                     destination = -1,
                     all = defaultFakeApiPresets,
+                    selected = null,
                     message = null,
                     apiKey = apiPreset.apiKey,
                     apiKeyHeader = apiPreset.apiKeyHeader,
@@ -704,12 +738,11 @@ private fun TabletUpdatePreview() {
                     enabled = apiPreset.enabled,
                     onBack = {},
                     onDelete = {},
-                    onDisable = {},
                     onDismissMessage = {},
-                    onEnable = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
+                    onSelect = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},

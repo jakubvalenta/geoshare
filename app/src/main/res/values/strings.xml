@@ -7,12 +7,19 @@
     <string name="api_presets_auth_type_attestation" translatable="false">Hardware-backed key attestation</string>
     <string name="api_presets_auth_type_authentication" translatable="false">Authentication</string>
     <string name="api_presets_base_url" translatable="false">Base URL</string>
+    <string name="api_presets_delete_text" translatable="false">The server “%1$s” will be permanently deleted.</string>
+    <string name="api_presets_delete_title" translatable="false">Delete server?</string>
     <string name="api_presets_description" translatable="false">To support a wider variety of Google Maps links, %1$s can connect to the paid Google Maps API or a compatible server.</string>
+    <string name="api_presets_insert" translatable="false">Add server</string>
+    <string name="api_presets_message_deleted" translatable="false">Server deleted</string>
+    <string name="api_presets_message_factory_reset" translatable="false">Server have been reset to factory defaults</string>
+    <string name="api_presets_message_inserted" translatable="false">Server added</string>
+    <string name="api_presets_message_updated" translatable="false">Server updated</string>
+    <string name="api_presets_restore_initial_data" translatable="false">Reset servers to factory defaults</string>
+    <string name="api_presets_restore_initial_data_text" translatable="false">All your servers will be deleted and replaced with the pre-installed ones.</string>
+    <string name="api_presets_restore_initial_data_title" translatable="false">Reset servers to factory defaults?</string>
     <string name="api_presets_title" translatable="false">Google Maps API</string>
-    <string name="api_presets_message_deleted">API configuration deleted</string>
-    <string name="api_presets_message_factory_reset">API configurations have been reset to factory defaults</string>
-    <string name="api_presets_message_inserted">API configuration added</string>
-    <string name="api_presets_message_updated">API configuration updated</string>
+    <string name="api_presets_update" translatable="false">Edit server</string>
     <string name="not_available">Not available</string>
     <string name="not_configured" translatable="false">Not configured</string>
     <string name="billing_consume_purchases" translatable="false">consume purchases</string>
@@ -272,7 +279,7 @@
     <string name="inputs_settings">Go to Android settings to choose links that should always open in %1$s</string>
     <string name="inputs_title">Supported maps</string>
     <string name="licenses">Licenses</string>
-    <string name="links_delete">Delete</string>
+    <string name="delete">Delete</string>
     <string name="links_delete_text">The web map “%1$s” will be permanently deleted.</string>
     <string name="links_delete_title">Delete web map?</string>
     <string name="links_description">Web maps allow opening coordinates in the browser. Turn on the pre-installed ones or add your own.</string>

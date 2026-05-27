@@ -35,6 +35,12 @@ class ApiPresetViewModel @Inject constructor(
             SharingStarted.WhileSubscribed(5000),
             emptyList(),
         )
+    val selected: StateFlow<ApiPreset?> = apiPresetRepository.selected
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            null,
+        )
 
     private val _message = MutableStateFlow<Message?>(null)
     val message: StateFlow<Message?> = _message
@@ -148,15 +154,9 @@ class ApiPresetViewModel @Inject constructor(
         }
     }
 
-    fun enable(uid: Int) {
+    fun select(uid: Int?) {
         viewModelScope.launch(Dispatchers.IO) {
-            apiPresetRepository.enable(uid)
-        }
-    }
-
-    fun disable(uid: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            apiPresetRepository.disable(uid)
+            apiPresetRepository.select(uid)
         }
     }
 

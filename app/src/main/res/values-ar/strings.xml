@@ -230,7 +230,7 @@
     <string name="output_open_navigation">تنقل</string>
     <string name="output_open_street_view">عرض الشارع</string>
     <string name="output_open_link">افتح رابط %1$s</string>
-    <string name="links_delete">احذف</string>
+    <string name="delete">احذف</string>
     <string name="links_delete_text">سيتم حذف خريطة الويب \"%1$s\" نهائيًا.</string>
     <string name="links_delete_title">حذف خريطة الويب؟</string>
     <string name="links_description">تسمح خرائط الويب بفتح الإحداثيات في المتصفح. فعِّل الخرائط المثبتة مسبقًا أو أضف خرائطك الخاصة.</string>

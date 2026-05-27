@@ -458,7 +458,7 @@ private fun LinksDetailPane(
                                 contentColor = MaterialTheme.colorScheme.error,
                             ),
                         ) {
-                            Icon(Icons.Outlined.Delete, stringResource(R.string.links_delete))
+                            Icon(Icons.Outlined.Delete, stringResource(R.string.delete))
                         }
                     }
                 },

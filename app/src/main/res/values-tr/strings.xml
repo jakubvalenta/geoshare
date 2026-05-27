@@ -224,7 +224,7 @@
     <string name="conversion_failed_reason_no_points">hiçbir nokta bulunamadı</string>
     <string name="conversion_failed_reason_timeout">zaman aşımı</string>
     <string name="inputs_list_text">Aşağıdaki harita servislerine ait bağlantıları %1$s ile paylaşabilir veya uygulamaya yapıştırabilirsiniz.</string>
-    <string name="links_delete">Sil</string>
+    <string name="delete">Sil</string>
     <string name="links_delete_text">“%1$s” web haritası kalıcı olarak silinecektir.</string>
     <string name="links_delete_title">Web haritası silinsin mi?</string>
     <string name="links_description">Web haritaları, koordinatları tarayıcıda açmanıza olanak tanır. Önceden yüklenmiş olanları etkinleştirin veya kendi koordinatlarınızı ekleyin.</string>

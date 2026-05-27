@@ -13,6 +13,7 @@ import javax.inject.Inject
 
 interface ApiPresetRepository {
     val all: Flow<List<ApiPreset>>
+    val selected: Flow<ApiPreset?>
 
     suspend fun getAll(): List<ApiPreset>
 
@@ -20,7 +21,7 @@ interface ApiPresetRepository {
 
     suspend fun getByUUID(uuid: UUID): ApiPreset?
 
-    suspend fun getFirstEnabled(): ApiPreset?
+    suspend fun getSelected(): ApiPreset?
 
     suspend fun insert(apiPreset: ApiPreset): Long
 
@@ -28,9 +29,7 @@ interface ApiPresetRepository {
 
     suspend fun delete(apiPreset: ApiPreset)
 
-    suspend fun enable(uid: Int)
-
-    suspend fun disable(uid: Int)
+    suspend fun select(uid: Int?)
 
     suspend fun restoreInitialData()
 }
@@ -46,6 +45,9 @@ class DefaultApiPresetRepository @Inject constructor(
     override val all: Flow<List<ApiPreset>> = apiPresetDao.getAllFlow()
         .shareIn(applicationScope, SharingStarted.WhileSubscribed(5000), replay = 1)
 
+    override val selected: Flow<ApiPreset?> = apiPresetDao.getSelectedFlow()
+        .shareIn(applicationScope, SharingStarted.WhileSubscribed(5000), replay = 1)
+
     /**
      * Used only in unit tests, because [all] is not practical, since it never finishes.
      */
@@ -55,15 +57,18 @@ class DefaultApiPresetRepository @Inject constructor(
 
     override suspend fun getByUUID(uuid: UUID): ApiPreset? = apiPresetDao.getByUUID(uuid)
 
-    override suspend fun getFirstEnabled(): ApiPreset? = apiPresetDao.getFirstEnabled()
+    override suspend fun getSelected(): ApiPreset? = apiPresetDao.getSelected()
 
     override suspend fun insert(apiPreset: ApiPreset) = apiPresetDao.insert(apiPreset)
 
     override suspend fun update(vararg apiPresets: ApiPreset) = apiPresetDao.update(*apiPresets)
 
-    override suspend fun enable(uid: Int) = apiPresetDao.enable(uid)
-
-    override suspend fun disable(uid: Int) = apiPresetDao.disable(uid)
+    override suspend fun select(uid: Int?) {
+        apiPresetDao.disableAll()
+        if (uid != null) {
+            apiPresetDao.enable(uid)
+        }
+    }
 
     override suspend fun delete(apiPreset: ApiPreset) = apiPresetDao.delete(apiPreset)
 

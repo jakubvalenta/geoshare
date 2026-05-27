@@ -61,7 +61,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test
     fun parse_whenApiIsNotConfigured_returnsNextStep() = runTest {
         val apiPresetRepository: FakeApiPresetRepository = mock {
-            on { getFirstEnabled() } doReturn null
+            on { getSelected() } doReturn null
         }
         val input = GoogleMapsPlaceApiInput(
             apiPresetRepository = apiPresetRepository,
@@ -81,7 +81,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test
     fun parse_whenPlaceIdIsInQueryParamAndApiReturnsResult_returnsPoint() = runTest {
         val apiPresetRepository: FakeApiPresetRepository = mock {
-            on { getFirstEnabled() } doReturn apiPreset
+            on { getSelected() } doReturn apiPreset
         }
         val input = GoogleMapsPlaceApiInput(
             apiPresetRepository = apiPresetRepository,
@@ -103,7 +103,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test
     fun parse_whenQueryIsNotFoundInUri_returnsNoPoints() = runTest {
         val apiPresetRepository: FakeApiPresetRepository = mock {
-            on { getFirstEnabled() } doReturn apiPreset
+            on { getSelected() } doReturn apiPreset
         }
         val input = GoogleMapsPlaceApiInput(
             apiPresetRepository = apiPresetRepository,
@@ -121,7 +121,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test
     fun parse_whenQueryIsEmpty_returnsNoPoints() = runTest {
         val apiPresetRepository: FakeApiPresetRepository = mock {
-            on { getFirstEnabled() } doReturn apiPreset
+            on { getSelected() } doReturn apiPreset
         }
         val input = GoogleMapsPlaceApiInput(
             apiPresetRepository = apiPresetRepository,
@@ -139,7 +139,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test(expected = UnknownNetworkException::class)
     fun parse_whenApiReturnsInvalidResponse_throwsException() = runTest {
         val apiPresetRepository: FakeApiPresetRepository = mock {
-            on { getFirstEnabled() } doReturn apiPreset
+            on { getSelected() } doReturn apiPreset
         }
         val input = GoogleMapsPlaceApiInput(
             apiPresetRepository = apiPresetRepository,
@@ -154,7 +154,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test(expected = SocketTimeoutNetworkException::class)
     fun parse_whenApiThrowsException_throwsException() = runTest {
         val apiPresetRepository: FakeApiPresetRepository = mock {
-            on { getFirstEnabled() } doReturn apiPreset
+            on { getSelected() } doReturn apiPreset
         }
         val input = GoogleMapsPlaceApiInput(
             apiPresetRepository = apiPresetRepository,

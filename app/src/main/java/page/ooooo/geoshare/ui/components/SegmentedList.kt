@@ -36,23 +36,8 @@ fun <T> SegmentedList(
     itemTestTag: ((value: T) -> String)? = null,
     sort: Boolean = false,
 ) {
-    val colors = ListItemDefaults.segmentedColors(
-        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-        contentColor = MaterialTheme.colorScheme.onSurface,
-        leadingContentColor = MaterialTheme.colorScheme.onSurface,
-        trailingContentColor = MaterialTheme.colorScheme.onSurface,
-        supportingContentColor = MaterialTheme.colorScheme.onSurface,
-        disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-        disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-        disabledLeadingContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-        disabledTrailingContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-        disabledSupportingContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-        selectedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-        selectedContentColor = MaterialTheme.colorScheme.onSurface,
-        selectedLeadingContentColor = MaterialTheme.colorScheme.onSurface,
-        selectedTrailingContentColor = MaterialTheme.colorScheme.onSurface,
-        selectedSupportingContentColor = MaterialTheme.colorScheme.onSurface,
-    )
+    val colors = segmentedListColors()
+
     Column(
         modifier = modifier.selectableGroup(),
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
@@ -103,6 +88,27 @@ fun SegmentedListLabel(text: String, color: Color = MaterialTheme.colorScheme.pr
         color = color,
     )
 }
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun segmentedListColors() =
+    ListItemDefaults.segmentedColors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        leadingContentColor = MaterialTheme.colorScheme.onSurface,
+        trailingContentColor = MaterialTheme.colorScheme.onSurface,
+        supportingContentColor = MaterialTheme.colorScheme.onSurface,
+        disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        disabledLeadingContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        disabledTrailingContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        disabledSupportingContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        selectedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+        selectedContentColor = MaterialTheme.colorScheme.onSurface,
+        selectedLeadingContentColor = MaterialTheme.colorScheme.onSurface,
+        selectedTrailingContentColor = MaterialTheme.colorScheme.onSurface,
+        selectedSupportingContentColor = MaterialTheme.colorScheme.onSurface,
+    )
 
 // Previews
 
