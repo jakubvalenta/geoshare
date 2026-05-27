@@ -9,11 +9,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import page.ooooo.geoshare.data.local.database.ServerDao
 import page.ooooo.geoshare.data.local.database.AppDatabase
-import page.ooooo.geoshare.data.local.database.AppDatabase.Companion.restoreInitialLinks
-import page.ooooo.geoshare.data.local.database.AppDatabase.Companion.restoreInitialServers
+import page.ooooo.geoshare.data.local.database.InitialLinks
+import page.ooooo.geoshare.data.local.database.InitialServersImpl
 import page.ooooo.geoshare.data.local.database.LinkDao
+import page.ooooo.geoshare.data.local.database.ServerDao
 import javax.inject.Singleton
 
 @Module
@@ -35,17 +35,13 @@ class DatabaseModule {
         return Room.databaseBuilder(appContext, AppDatabase::class.java, "Link")
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
-                    restoreInitialLinks(db)
-                    restoreInitialServers(db)
+                    InitialLinks.restore(db)
+                    InitialServersImpl.restore(db)
                 }
             })
             .addMigrations(
-                AppDatabase.MIGRATION_1_2,
-                AppDatabase.MIGRATION_2_3,
-                AppDatabase.MIGRATION_3_4,
-                AppDatabase.MIGRATION_4_5,
-                AppDatabase.MIGRATION_5_6,
-                AppDatabase.MIGRATION_6_7,
+                *InitialLinks.migrations.toTypedArray(),
+                *InitialServersImpl.migrations.toTypedArray(),
             )
             .build()
     }

@@ -1,49 +1,24 @@
 package page.ooooo.geoshare
 
-import android.content.Context
-import androidx.room.Room
-import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import androidx.test.core.app.ApplicationProvider
 import kotlinx.coroutines.runBlocking
-import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Before
+import org.junit.Assert
 import org.junit.Test
 import page.ooooo.geoshare.data.local.database.AppDatabase
+import page.ooooo.geoshare.data.local.database.InitialServersImpl
 import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.database.ServerAuthType
-import page.ooooo.geoshare.data.local.database.ServerDao
-import java.io.IOException
 import java.util.UUID
 
-class InitialServersTest {
-    private lateinit var serverDao: ServerDao
-    private lateinit var db: AppDatabase
+class InitialServersTest : InitialDataTest {
+    override lateinit var db: AppDatabase
 
-    @Before
-    fun createDb() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
-        db = Room
-            .inMemoryDatabaseBuilder(context, AppDatabase::class.java)
-            .addCallback(object : RoomDatabase.Callback() {
-                override fun onCreate(db: SupportSQLiteDatabase) {
-                    AppDatabase.restoreInitialServers(db)
-                }
-            })
-            .build()
-        serverDao = db.getServerDao()
-    }
-
-    @After
-    @Throws(IOException::class)
-    fun closeDb() {
-        db.close()
-    }
+    override fun restore(db: SupportSQLiteDatabase) = InitialServersImpl.restore(db)
 
     @Test
     @Throws(Exception::class)
     fun initialLinksAreInserted() = runBlocking {
+        val serverDao = db.getServerDao()
         val expectedItems = listOf(
             Server(
                 baseUrl = "https://api.geoshare-app.net",
@@ -58,9 +33,9 @@ class InitialServersTest {
             ),
         ).sortedBy { it.name }
         val actualItems = serverDao.getAll()
-        assertEquals(expectedItems.size, actualItems.size)
+        Assert.assertEquals(expectedItems.size, actualItems.size)
         for ((expectedItem, actualItem) in expectedItems.zip(actualItems)) {
-            assertEquals(
+            Assert.assertEquals(
                 expectedItem.copy(createdAt = 0L, uid = 0),
                 actualItem.copy(createdAt = 0L, uid = 0),
             )

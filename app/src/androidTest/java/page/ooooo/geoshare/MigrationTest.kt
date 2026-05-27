@@ -6,6 +6,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Rule
 import org.junit.Test
 import page.ooooo.geoshare.data.local.database.AppDatabase
+import page.ooooo.geoshare.data.local.database.InitialLinks
+import page.ooooo.geoshare.data.local.database.InitialServersImpl
 import java.io.IOException
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -23,7 +25,7 @@ class MigrationTest {
     @Test
     @Throws(IOException::class)
     fun migrateAll() {
-        // Create the earliest version of the database.
+        // Create the earliest version of the database with data that were present at the time.
         helper.createDatabase(testDb, 1).let { db ->
             db.execSQL(
                 "INSERT INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -294,12 +296,8 @@ class MigrationTest {
             testDb,
         )
             .addMigrations(
-                AppDatabase.MIGRATION_1_2,
-                AppDatabase.MIGRATION_2_3,
-                AppDatabase.MIGRATION_3_4,
-                AppDatabase.MIGRATION_4_5,
-                AppDatabase.MIGRATION_5_6,
-                AppDatabase.MIGRATION_6_7,
+                *InitialLinks.migrations.toTypedArray(),
+                *InitialServersImpl.migrations.toTypedArray(),
             )
             .build()
             .apply {

@@ -1,50 +1,25 @@
 package page.ooooo.geoshare
 
-import android.content.Context
-import androidx.room.Room
-import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import androidx.test.core.app.ApplicationProvider
 import kotlinx.coroutines.runBlocking
-import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Before
 import org.junit.Test
 import page.ooooo.geoshare.data.local.database.AppDatabase
+import page.ooooo.geoshare.data.local.database.InitialLinks
 import page.ooooo.geoshare.data.local.database.Link
-import page.ooooo.geoshare.data.local.database.LinkDao
 import page.ooooo.geoshare.data.local.database.LinkType
 import page.ooooo.geoshare.lib.geo.Srs
-import java.io.IOException
 import java.util.UUID
 
-class InitialLinksTest {
-    private lateinit var linkDao: LinkDao
-    private lateinit var db: AppDatabase
+class InitialLinksTest : InitialDataTest {
+    override lateinit var db: AppDatabase
 
-    @Before
-    fun createDb() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
-        db = Room
-            .inMemoryDatabaseBuilder(context, AppDatabase::class.java)
-            .addCallback(object : RoomDatabase.Callback() {
-                override fun onCreate(db: SupportSQLiteDatabase) {
-                    AppDatabase.restoreInitialLinks(db)
-                }
-            })
-            .build()
-        linkDao = db.getLinkDao()
-    }
-
-    @After
-    @Throws(IOException::class)
-    fun closeDb() {
-        db.close()
-    }
+    override fun restore(db: SupportSQLiteDatabase) = InitialLinks.restore(db)
 
     @Test
     @Throws(Exception::class)
     fun initialLinksAreInserted() = runBlocking {
+        val linkDao = db.getLinkDao()
         val expectedItems = listOf(
             Link(
                 group = "OpenStreetMap",

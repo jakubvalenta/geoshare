@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.shareIn
 import page.ooooo.geoshare.data.di.ApplicationScope
 import page.ooooo.geoshare.data.local.database.AppDatabase
+import page.ooooo.geoshare.data.local.database.InitialLinks
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.database.LinkDao
 import java.util.UUID
@@ -70,7 +71,7 @@ class DefaultLinkRepository @Inject constructor(
     override suspend fun restoreInitialData() {
         appDatabase.openHelper.writableDatabase.let { db ->
             appDatabase.runInTransaction {
-                AppDatabase.restoreInitialLinks(db)
+                InitialLinks.restore(db)
             }
         }
     }

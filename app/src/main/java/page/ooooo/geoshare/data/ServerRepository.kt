@@ -8,6 +8,7 @@ import page.ooooo.geoshare.data.di.ApplicationScope
 import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.database.ServerDao
 import page.ooooo.geoshare.data.local.database.AppDatabase
+import page.ooooo.geoshare.data.local.database.InitialServersImpl
 import java.util.UUID
 import javax.inject.Inject
 
@@ -70,7 +71,7 @@ class DefaultServerRepository @Inject constructor(
     override suspend fun restoreInitialData() {
         appDatabase.openHelper.writableDatabase.let { db ->
             appDatabase.runInTransaction {
-                AppDatabase.restoreInitialServers(db)
+                InitialServersImpl.restore(db)
             }
         }
     }

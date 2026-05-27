@@ -96,7 +96,7 @@ val FakeGoogleMapsServer = Server(
 
 /**
  * Items for testing purposes. The actual items that the table is populated with are in
- * [page.ooooo.geoshare.data.local.database.AppDatabase.Companion.restoreInitialServers].
+ * [page.ooooo.geoshare.data.local.database.InitialServers].
  */
 val defaultFakeServers = listOf(
     FakeGeoShareServer,
