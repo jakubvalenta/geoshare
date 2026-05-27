@@ -296,8 +296,8 @@ class MigrationTest {
             testDb,
         )
             .addMigrations(
-                *InitialLinks.migrations.toTypedArray(),
-                *InitialServersImpl.migrations.toTypedArray(),
+                *InitialLinks.migrations,
+                *InitialServersImpl.migrations,
             )
             .build()
             .apply {

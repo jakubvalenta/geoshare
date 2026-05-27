@@ -336,7 +336,7 @@ object InitialLinks : InitialData {
         )
     }
 
-    override val migrations = listOf(
+    override val migrations = arrayOf(
         object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
@@ -548,7 +548,6 @@ object InitialLinks : InitialData {
                     )
                 )
             }
-        }
+        },
     )
-
 }

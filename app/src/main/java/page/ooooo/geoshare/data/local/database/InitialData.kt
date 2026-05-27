@@ -5,5 +5,5 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 interface InitialData {
     fun restore(db: SupportSQLiteDatabase)
-    val migrations: List<Migration>
+    val migrations: Array<out Migration>
 }

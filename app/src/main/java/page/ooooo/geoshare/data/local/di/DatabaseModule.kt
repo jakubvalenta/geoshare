@@ -40,8 +40,8 @@ class DatabaseModule {
                 }
             })
             .addMigrations(
-                *InitialLinks.migrations.toTypedArray(),
-                *InitialServersImpl.migrations.toTypedArray(),
+                *InitialLinks.migrations,
+                *InitialServersImpl.migrations,
             )
             .build()
     }

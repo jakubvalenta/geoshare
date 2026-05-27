@@ -23,7 +23,7 @@ object InitialServersImpl : InitialServers {
     override fun restore(db: SupportSQLiteDatabase) {
         db.execSQL("DELETE FROM server")
         db.execSQL(
-            "INSERT INTO server (`baseUrl`,`authType`,`apiKey`,`apiKeyHeader`,`selected`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO server (`baseUrl`,`authType`,`apiKey`,`apiKeyHeader`,`selected`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?)",
             arrayOf<Any>(
                 "https://api.geoshare-app.net",
                 "ATTESTATION",
@@ -35,7 +35,7 @@ object InitialServersImpl : InitialServers {
             )
         )
         db.execSQL(
-            "INSERT INTO server (`baseUrl`,`authType`,`apiKey`,`apiKeyHeader`,`selected`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO server (`baseUrl`,`authType`,`apiKey`,`apiKeyHeader`,`selected`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?)",
             arrayOf<Any>(
                 "https://geocode.googleapis.com",
                 "API_KEY",
@@ -48,11 +48,11 @@ object InitialServersImpl : InitialServers {
         )
     }
 
-    override val migrations = listOf(
-        object : Migration(6, 7) {
+    override val migrations = arrayOf(
+        object : Migration(7, 8) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
-                    "INSERT OR REPLACE INTO server (`baseUrl`,`authType`,`apiKey`,`apiKeyHeader`,`selected`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT OR REPLACE INTO server (`baseUrl`,`authType`,`apiKey`,`apiKeyHeader`,`selected`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "https://api.geoshare-app.net",
                         "ATTESTATION",
@@ -64,7 +64,7 @@ object InitialServersImpl : InitialServers {
                     )
                 )
                 db.execSQL(
-                    "INSERT OR REPLACE INTO server (`baseUrl`,`authType`,`apiKey`,`apiKeyHeader`,`selected`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT OR REPLACE INTO server (`baseUrl`,`authType`,`apiKey`,`apiKeyHeader`,`selected`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "https://geocode.googleapis.com",
                         "API_KEY",
