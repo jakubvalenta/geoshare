@@ -8,10 +8,11 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 @Database(
-    entities = [Link::class],
-    version = 6,
+    entities = [ApiPreset::class, Link::class],
+    version = 6, // TODO Increase database version
 )
 abstract class AppDatabase : RoomDatabase() {
+    abstract fun getApiPresetDao(): ApiPresetDao
     abstract fun getLinkDao(): LinkDao
 
     @OptIn(ExperimentalUuidApi::class)
@@ -40,7 +41,7 @@ abstract class AppDatabase : RoomDatabase() {
         fun restoreInitialData(db: SupportSQLiteDatabase) {
             db.execSQL("DELETE FROM Link")
             db.execSQL(
-                "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "OpenStreetMap",
                     "OpenStreetMap",
@@ -51,12 +52,12 @@ abstract class AppDatabase : RoomDatabase() {
                     1,
                     @Suppress("SpellCheckingInspection") "https://www.openstreetmap.org/?mlat={lat}&mlon={lon}#map={z}/{lat}/{lon}",
                     "https://www.openstreetmap.org/search?query={q}",
-                    1772395295367L,
+                    1772395295367,
                     Uuid.parse("a771fd79-291e-4e55-9952-601f87b05bfe").toByteArray(),
                 )
             )
             db.execSQL(
-                "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "OpenStreetMap",
                     "OpenStreetMap navigation",
@@ -67,12 +68,12 @@ abstract class AppDatabase : RoomDatabase() {
                     1,
                     "https://www.openstreetmap.org/directions?to={lat}%2C{lon}",
                     "https://www.openstreetmap.org/directions?to={q}",
-                    1772395295367L,
+                    1772395295367,
                     Uuid.parse("dad7a723-eeb1-4f60-af5d-7813b3cc1926").toByteArray(),
                 )
             )
             db.execSQL(
-                "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "Google Maps",
                     "Google Maps",
@@ -83,12 +84,12 @@ abstract class AppDatabase : RoomDatabase() {
                     1,
                     "https://www.google.com/maps/search/?api=1&query={lat}%2C{lon}",
                     "https://www.google.com/maps/search/?api=1&query={q}",
-                    1772395295367L,
+                    1772395295367,
                     Uuid.parse("7bd96da4-beba-4a30-9dbd-b437a49a1dc0").toByteArray(),
                 )
             )
             db.execSQL(
-                "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "Google Maps",
                     "Google Maps navigation",
@@ -99,12 +100,12 @@ abstract class AppDatabase : RoomDatabase() {
                     1,
                     "https://www.google.com/maps/dir/?api=1&destination={lat}%2C{lon}",
                     "https://www.google.com/maps/dir/?api=1&destination={q}",
-                    1772395295367L,
+                    1772395295367,
                     Uuid.parse("64b0b360-24ec-4113-9056-314223c6e19a").toByteArray(),
                 )
             )
             db.execSQL(
-                "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "Google Maps",
                     "Google Street View",
@@ -115,12 +116,12 @@ abstract class AppDatabase : RoomDatabase() {
                     0,
                     "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint={lat}%2C{lon}",
                     "https://www.google.com/maps/search/?api=1&query={q}",
-                    1772395295367L,
+                    1772395295367,
                     Uuid.parse("9d7cd113-ce01-4b8b-82fe-856956b8b20a").toByteArray(),
                 )
             )
             db.execSQL(
-                "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "Google Maps",
                     "Google Maps Plus Code",
@@ -136,7 +137,7 @@ abstract class AppDatabase : RoomDatabase() {
                 )
             )
             db.execSQL(
-                "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "Apple Maps",
                     "Apple Maps",
@@ -147,12 +148,12 @@ abstract class AppDatabase : RoomDatabase() {
                     1,
                     "https://maps.apple.com/?ll={lat}%2C{lon}&z={z}&q={name}",
                     "https://maps.apple.com/?q={q}",
-                    1772395295367L,
+                    1772395295367,
                     Uuid.parse("ce900ea1-2c5d-4641-82f3-a5429a68d603").toByteArray(),
                 )
             )
             db.execSQL(
-                "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "Apple Maps",
                     "Apple Maps navigation",
@@ -163,12 +164,12 @@ abstract class AppDatabase : RoomDatabase() {
                     1,
                     "https://maps.apple.com/?daddr={lat}%2C{lon}",
                     "https://maps.apple.com/?daddr={q}",
-                    1772395295367L,
+                    1772395295367,
                     Uuid.parse("a5092c63-cf5c-4225-9059-e888ae12e215").toByteArray(),
                 )
             )
             db.execSQL(
-                "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "Magic Earth",
                     "Magic Earth",
@@ -179,12 +180,12 @@ abstract class AppDatabase : RoomDatabase() {
                     1,
                     "magicearth://?show_on_map&lat={lat}&lon={lon}&name={name}",
                     "magicearth://?open_search&q={q}",
-                    1772395295367L,
+                    1772395295367,
                     Uuid.parse("b109970a-aef8-4482-9879-52e128fd0e07").toByteArray(),
                 )
             )
             db.execSQL(
-                "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "Magic Earth",
                     "Magic Earth navigation",
@@ -195,12 +196,12 @@ abstract class AppDatabase : RoomDatabase() {
                     1,
                     "magicearth://?get_directions&lat={lat}&lon={lon}",
                     "magicearth://?get_directions&q={q}",
-                    1772395295367L,
+                    1772395295367,
                     Uuid.parse("ee4f961c-44b0-4cb6-baad-1ed28edb8ec7").toByteArray(),
                 )
             )
             db.execSQL(
-                "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "",
                     "GasBuddy",
@@ -211,12 +212,12 @@ abstract class AppDatabase : RoomDatabase() {
                     0,
                     "https://www.gasbuddy.com/gaspricemap?lat={lat}&lng={lon}&z={z}",
                     "",
-                    1772579164207L,
+                    1772579164207,
                     Uuid.parse("fd89f6f0-694e-4d96-b604-ed15e2530a2d").toByteArray(),
                 )
             )
             db.execSQL(
-                "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "",
                     @Suppress("SpellCheckingInspection") "KartaView",
@@ -227,12 +228,12 @@ abstract class AppDatabase : RoomDatabase() {
                     0,
                     @Suppress("SpellCheckingInspection") "https://kartaview.org/map/@{lat}%2C{lon},{z}z",
                     "",
-                    1772579164207L,
+                    1772579164207,
                     Uuid.parse("7e09855d-d29b-4c18-944f-7fa440db3528").toByteArray(),
                 )
             )
             db.execSQL(
-                "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "",
                     @Suppress("SpellCheckingInspection") "Mapilio",
@@ -243,12 +244,12 @@ abstract class AppDatabase : RoomDatabase() {
                     0,
                     "https://mapilio.com/app?lat={lat}&lng={lon}&zoom={z}",
                     "",
-                    1772579164207L,
+                    1772579164207,
                     Uuid.parse("c206d165-b2db-4030-a415-203e92cacb66").toByteArray(),
                 )
             )
             db.execSQL(
-                "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "",
                     @Suppress("SpellCheckingInspection") "Panoramax",
@@ -259,12 +260,12 @@ abstract class AppDatabase : RoomDatabase() {
                     0,
                     "https://panoramax.openstreetmap.fr/#background=streets&focus=map&map={z}/{lat}/{lon}&speed=250",
                     "",
-                    1772579164207L,
+                    1772579164207,
                     Uuid.parse("c80ccfa6-6d22-4290-b8f5-82119f87a570").toByteArray(),
                 )
             )
             db.execSQL(
-                "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "",
                     "PeakVisor",
@@ -275,12 +276,12 @@ abstract class AppDatabase : RoomDatabase() {
                     0,
                     "https://peakvisor.com/embed?lat={lat}&lng={lon}&alt=3000&yaw=160",
                     "",
-                    1772579164207L,
+                    1772579164207,
                     Uuid.parse("fe5de45b-ba0f-4d87-8ee9-979f1a701978").toByteArray(),
                 )
             )
             db.execSQL(
-                "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "",
                     "Refuges",
@@ -291,12 +292,12 @@ abstract class AppDatabase : RoomDatabase() {
                     0,
                     "https://www.refuges.info/nav?map={z}/{lon}/{lat}",
                     "",
-                    1772579164207L,
+                    1772579164207,
                     Uuid.parse("1aad2356-d900-45e5-91a0-d7ee2092641d").toByteArray(),
                 )
             )
             db.execSQL(
-                "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "",
                     "uMap",
@@ -307,12 +308,12 @@ abstract class AppDatabase : RoomDatabase() {
                     0,
                     "https://umap.openstreetmap.fr/en/map/test-mapy_626288#{z}/{lat}/{lon}",
                     "",
-                    1772579164207L,
+                    1772579164207,
                     Uuid.parse("94e1350a-3599-43b3-858b-59750a6f8680").toByteArray(),
                 )
             )
             db.execSQL(
-                "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "",
                     "Zoom Earth",
@@ -328,7 +329,7 @@ abstract class AppDatabase : RoomDatabase() {
                 )
             )
             db.execSQL(
-                "INSERT INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "",
                     "Géoportail",
@@ -348,7 +349,7 @@ abstract class AppDatabase : RoomDatabase() {
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
-                    "INSERT OR REPLACE INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "",
                         "GasBuddy",
@@ -359,12 +360,12 @@ abstract class AppDatabase : RoomDatabase() {
                         0,
                         "https://www.gasbuddy.com/gaspricemap?lat={lat}&lng={lon}&z={z}",
                         "",
-                        1772579164207L,
+                        1772579164207,
                         Uuid.parse("fd89f6f0-694e-4d96-b604-ed15e2530a2d").toByteArray(),
                     )
                 )
                 db.execSQL(
-                    "INSERT OR REPLACE INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "",
                         @Suppress("SpellCheckingInspection") "KartaView",
@@ -375,12 +376,12 @@ abstract class AppDatabase : RoomDatabase() {
                         0,
                         @Suppress("SpellCheckingInspection") "https://kartaview.org/map/@{lat}%2C{lon},{z}z",
                         "",
-                        1772579164207L,
+                        1772579164207,
                         Uuid.parse("7e09855d-d29b-4c18-944f-7fa440db3528").toByteArray(),
                     )
                 )
                 db.execSQL(
-                    "INSERT OR REPLACE INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "",
                         @Suppress("SpellCheckingInspection") "Mapilio",
@@ -391,12 +392,12 @@ abstract class AppDatabase : RoomDatabase() {
                         0,
                         "https://mapilio.com/app?lat={lat}&lng={lon}&zoom={z}",
                         "",
-                        1772579164207L,
+                        1772579164207,
                         Uuid.parse("c206d165-b2db-4030-a415-203e92cacb66").toByteArray(),
                     )
                 )
                 db.execSQL(
-                    "INSERT OR REPLACE INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "",
                         @Suppress("SpellCheckingInspection") "Panoramax",
@@ -407,12 +408,12 @@ abstract class AppDatabase : RoomDatabase() {
                         0,
                         "https://panoramax.openstreetmap.fr/#background=streets&focus=map&map={z}/{lat}/{lon}&speed=250",
                         "",
-                        1772579164207L,
+                        1772579164207,
                         Uuid.parse("c80ccfa6-6d22-4290-b8f5-82119f87a570").toByteArray(),
                     )
                 )
                 db.execSQL(
-                    "INSERT OR REPLACE INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "",
                         "PeakVisor",
@@ -423,12 +424,12 @@ abstract class AppDatabase : RoomDatabase() {
                         0,
                         "https://peakvisor.com/embed?lat={lat}&lng={lon}&alt=3000&yaw=160",
                         "",
-                        1772579164207L,
+                        1772579164207,
                         Uuid.parse("fe5de45b-ba0f-4d87-8ee9-979f1a701978").toByteArray(),
                     )
                 )
                 db.execSQL(
-                    "INSERT OR REPLACE INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "",
                         "Refuges",
@@ -439,12 +440,12 @@ abstract class AppDatabase : RoomDatabase() {
                         0,
                         "https://www.refuges.info/nav?map={z}/{lon}/{lat}",
                         "",
-                        1772579164207L,
+                        1772579164207,
                         Uuid.parse("1aad2356-d900-45e5-91a0-d7ee2092641d").toByteArray(),
                     )
                 )
                 db.execSQL(
-                    "INSERT OR REPLACE INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "",
                         "uMap",
@@ -455,7 +456,7 @@ abstract class AppDatabase : RoomDatabase() {
                         0,
                         "https://umap.openstreetmap.fr/en/map/test-mapy_626288#{z}/{lat}/{lon}",
                         "",
-                        1772579164207L,
+                        1772579164207,
                         Uuid.parse("94e1350a-3599-43b3-858b-59750a6f8680").toByteArray(),
                     )
                 )
@@ -502,7 +503,7 @@ abstract class AppDatabase : RoomDatabase() {
                     )
                 )
                 db.execSQL(
-                    "INSERT OR REPLACE INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "",
                         "Zoom Earth",
@@ -523,7 +524,7 @@ abstract class AppDatabase : RoomDatabase() {
         val MIGRATION_4_5 = object : Migration(4, 5) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
-                    "INSERT OR REPLACE INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "Google Maps",
                         "Google Maps Plus Code",
@@ -544,7 +545,7 @@ abstract class AppDatabase : RoomDatabase() {
         val MIGRATION_5_6 = object : Migration(5, 6) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
-                    "INSERT OR REPLACE INTO Link(`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "",
                         "Géoportail",
@@ -562,5 +563,33 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "INSERT OR REPLACE INTO ApiPreset(`baseUrl`,`authType`,`apiKey`,`apiKeyHeader`,`enabled`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                    arrayOf<Any>(
+                        "https://api.geoshare-app.net",
+                        "ATTESTATION",
+                        "",
+                        "",
+                        0,
+                        1779859233816,
+                        Uuid.parse("640f61e6-2bb4-41d3-9b4a-65e656564d03").toByteArray(),
+                    )
+                )
+                db.execSQL(
+                    "INSERT OR REPLACE INTO ApiPreset(`baseUrl`,`authType`,`apiKey`,`apiKeyHeader`,`enabled`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                    arrayOf<Any>(
+                        "https://geocode.googleapis.com",
+                        "API_KEY",
+                        "",
+                        "X-Goog-Api-Key",
+                        0,
+                        1779859252618,
+                        Uuid.parse("16b3bb06-3a3b-4853-ac06-c4bf1eb346f8").toByteArray(),
+                    )
+                )
+            }
+        }
     }
 }

@@ -9,6 +9,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import page.ooooo.geoshare.data.local.database.ApiPresetDao
 import page.ooooo.geoshare.data.local.database.AppDatabase
 import page.ooooo.geoshare.data.local.database.AppDatabase.Companion.restoreInitialData
 import page.ooooo.geoshare.data.local.database.LinkDao
@@ -17,6 +18,11 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class DatabaseModule {
+    @Provides
+    fun provideApiPresetDao(appDatabase: AppDatabase): ApiPresetDao {
+        return appDatabase.getApiPresetDao()
+    }
+
     @Provides
     fun provideLinkDao(appDatabase: AppDatabase): LinkDao {
         return appDatabase.getLinkDao()
@@ -37,6 +43,7 @@ class DatabaseModule {
                 AppDatabase.MIGRATION_3_4,
                 AppDatabase.MIGRATION_4_5,
                 AppDatabase.MIGRATION_5_6,
+                AppDatabase.MIGRATION_6_7,
             )
             .build()
     }
