@@ -24,7 +24,10 @@ interface UserPreference<T> {
 }
 
 interface TextPreference<T> : UserPreference<T> {
+    @Suppress("EmptyMethod")
     val key: Preferences.Key<String>
+
+    @Suppress("EmptyMethod")
     val default: T
 
     fun serialize(value: T, log: Log = DefaultLog): String
