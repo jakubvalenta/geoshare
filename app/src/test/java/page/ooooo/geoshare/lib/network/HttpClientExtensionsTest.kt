@@ -30,6 +30,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import page.ooooo.geoshare.lib.FakeLog
 import java.net.ConnectException
+import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.net.URL
 
@@ -496,8 +497,27 @@ class HttpClientExtensionsTest {
     }
 
     @Test
+    fun rethrowExceptionsAsNetworkException_whenRequestThrowsSocketException_throwsRecoverableException() = runTest {
+        val engine = MockEngine { throw SocketException("Software caused connection abort") }
+        val threw = HttpClient(engine) {
+            expectSuccess = true
+            rethrowExceptionsAsNetworkException(log)
+        }.use { client ->
+            try {
+                client.get(url)
+                null
+            } catch (tr: Exception) {
+                tr
+            }
+        }
+        assertTrue(threw is RecoverableNetworkException)
+        assertTrue(threw is ConnectionRefusedNetworkException)
+        assertTrue(threw?.cause is SocketException)
+    }
+
+    @Test
     fun rethrowExceptionsAsNetworkException_whenRequestThrowsEOFException_throwsRecoverableException() = runTest {
-        val engine = MockEngine { throw kotlinx.io.EOFException() }
+        val engine = MockEngine { throw EOFException() }
         val threw = HttpClient(engine) {
             expectSuccess = true
             rethrowExceptionsAsNetworkException(log)
