@@ -1,11 +1,17 @@
 package page.ooooo.geoshare.lib.extensions
 
-import android.util.Base64
+import android.os.Build
 
 fun ByteArray.base64Encode(): String =
-    // Use android.util.Base64, because java.util.Base64 is not available on API < 26
-    Base64.encodeToString(this, Base64.NO_WRAP)
+    if (Build.VERSION.SDK_INT in 1..Build.VERSION_CODES.O) {
+        android.util.Base64.encodeToString(this, android.util.Base64.NO_WRAP)
+    } else {
+        java.util.Base64.getEncoder().encodeToString(this)
+    }
 
 fun String.base64Decode(): ByteArray =
-    // Use android.util.Base64, because java.util.Base64 is not available on API < 26
-    Base64.decode(this, Base64.NO_WRAP)
+    if (Build.VERSION.SDK_INT in 1..Build.VERSION_CODES.O) {
+        android.util.Base64.decode(this, android.util.Base64.NO_WRAP)
+    } else {
+        java.util.Base64.getDecoder().decode(this)
+    }
