@@ -1,7 +1,5 @@
 package page.ooooo.geoshare.lib.network
 
-import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyProperties
 import io.ktor.client.HttpClient
 import io.ktor.client.call.DoubleReceiveException
 import io.ktor.client.call.NoTransformationFoundException
@@ -27,17 +25,15 @@ import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.data.local.preferences.CachedApiTokenPreference
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.Log
+import page.ooooo.geoshare.lib.android.KeyStoreService
 import page.ooooo.geoshare.lib.extensions.base64Decode
 import page.ooooo.geoshare.lib.extensions.base64Encode
 import page.ooooo.geoshare.lib.extensions.sign
-import java.security.GeneralSecurityException
-import java.security.KeyPairGenerator
-import java.security.KeyStore
-import java.security.spec.ECGenParameterSpec
 import javax.inject.Inject
 
 class ApiService @Inject constructor(
     private val engine: HttpClientEngine,
+    private val keyStoreService: KeyStoreService,
     private val log: Log = DefaultLog,
     private val userPreferencesRepository: UserPreferencesRepository,
 ) {
@@ -121,7 +117,7 @@ class ApiService @Inject constructor(
             }
         }.use { client ->
             // Get key
-            val privateKeyEntry = getKey() ?: return null
+            val privateKeyEntry = keyStoreService.getKey() ?: return null
             val privateKey = privateKeyEntry.privateKey
             val publicKey = privateKeyEntry.certificateChain.first().publicKey
             val publicKeyBase64 = publicKey.encoded.base64Encode()
@@ -193,7 +189,7 @@ class ApiService @Inject constructor(
             }
 
             // Generate key
-            val privateKeyEntry = generateKey(registrationChallenge)
+            val privateKeyEntry = keyStoreService.generateKey(registrationChallenge)
             val privateKey = privateKeyEntry.privateKey
             val publicKey = privateKeyEntry.certificateChain.first().publicKey
             val publicKeyBase64 = publicKey.encoded.base64Encode()
@@ -224,53 +220,6 @@ class ApiService @Inject constructor(
         }
     }
 
-    /**
-     * Try to get a key from the key store.
-     */
-    private fun getKey(): KeyStore.PrivateKeyEntry? {
-        val keyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
-        val entry = try {
-            keyStore.getEntry(KEYSTORE_ALIAS, null)
-        } catch (tr: GeneralSecurityException) {
-            log.e(TAG, "Error when getting key from the key store", tr)
-            return null
-        }
-        if (entry !is KeyStore.PrivateKeyEntry) {
-            log.e(TAG, "Got key from the key store but it's not a private key")
-            return null
-        }
-        return entry
-    }
-
-    /**
-     * Generate new key and save it in the key store.
-     *
-     * If there was a corrupt key in the key store, overwrite it.
-     */
-    private fun generateKey(challenge: ByteArray): KeyStore.PrivateKeyEntry {
-        val keyPairGenerator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore")
-        val params = KeyGenParameterSpec.Builder(
-            KEYSTORE_ALIAS,
-            KeyProperties.PURPOSE_SIGN or KeyProperties.PURPOSE_VERIFY
-        ).run {
-            setAlgorithmParameterSpec(
-                ECGenParameterSpec(@Suppress("SpellCheckingInspection") "secp256r1")
-            )
-            setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512)
-            // Setting attestation challenge triggers the signing of the certificate by the attestation certificate
-            setAttestationChallenge(challenge)
-            // Don't use StrongBox, because it's not available on all devices, and we probably don't need that level of
-            // security
-            build()
-        }
-        keyPairGenerator.initialize(params)
-        keyPairGenerator.generateKeyPair()
-
-        val keyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
-        return keyStore.getEntry(KEYSTORE_ALIAS, null) as? KeyStore.PrivateKeyEntry
-            ?: throw IllegalStateException("Key generation succeeded but key store entry not found")
-    }
-
     private suspend fun HttpResponse.bodyAsErrorMessage(): String = try {
         body<ErrorResponse>().message
     } catch (_: DoubleReceiveException) {
@@ -280,7 +229,6 @@ class ApiService @Inject constructor(
     }
 
     private companion object {
-        private const val KEYSTORE_ALIAS = "geoshare_api"
         private const val TAG = "ApiService"
     }
 }

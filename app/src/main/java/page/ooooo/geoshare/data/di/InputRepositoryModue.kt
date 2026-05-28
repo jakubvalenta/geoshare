@@ -9,6 +9,7 @@ import page.ooooo.geoshare.data.DefaultInputRepository
 import page.ooooo.geoshare.data.InputRepository
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
+import page.ooooo.geoshare.lib.android.KeyStoreService
 import page.ooooo.geoshare.lib.inputs.AmapShortLinkInput
 import page.ooooo.geoshare.lib.inputs.AmapUriInput
 import page.ooooo.geoshare.lib.inputs.AppleMapsHtmlInput
@@ -112,6 +113,7 @@ object FakeInputRepository : InputRepository {
     private val userPreferencesRepository = FakeUserPreferencesRepository()
     private val apiService = ApiService(
         engine = engine,
+        keyStoreService = KeyStoreService(log),
         log = log,
         userPreferencesRepository = userPreferencesRepository,
     )

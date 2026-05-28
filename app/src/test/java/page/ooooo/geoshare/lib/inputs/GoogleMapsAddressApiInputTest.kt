@@ -19,6 +19,7 @@ import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
+import page.ooooo.geoshare.lib.android.KeyStoreService
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.network.ApiService
@@ -71,6 +72,7 @@ class GoogleMapsAddressApiInputTest {
             else -> throw NotImplementedError()
         }
     }
+    private val keyStoreService = KeyStoreService()
     private val log = FakeLog
     private val uriQuote = FakeUriQuote
     private val userPreferencesRepository = FakeUserPreferencesRepository()
@@ -82,7 +84,7 @@ class GoogleMapsAddressApiInputTest {
         }
         val input = GoogleMapsAddressApiInput(
             serverRepository = serverRepository,
-            apiService = ApiService(engine, log, userPreferencesRepository),
+            apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
             uriQuote = uriQuote,
         )
@@ -102,7 +104,7 @@ class GoogleMapsAddressApiInputTest {
         }
         val input = GoogleMapsAddressApiInput(
             serverRepository = serverRepository,
-            apiService = ApiService(engine, log, userPreferencesRepository),
+            apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
             uriQuote = uriQuote,
         )
@@ -130,7 +132,7 @@ class GoogleMapsAddressApiInputTest {
         }
         val input = GoogleMapsAddressApiInput(
             serverRepository = serverRepository,
-            apiService = ApiService(engine, log, userPreferencesRepository),
+            apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
             uriQuote = uriQuote,
         )
@@ -158,7 +160,7 @@ class GoogleMapsAddressApiInputTest {
         }
         val input = GoogleMapsAddressApiInput(
             serverRepository = serverRepository,
-            apiService = ApiService(engine, log, userPreferencesRepository),
+            apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
             uriQuote = uriQuote,
         )
@@ -176,7 +178,7 @@ class GoogleMapsAddressApiInputTest {
         }
         val input = GoogleMapsAddressApiInput(
             serverRepository = serverRepository,
-            apiService = ApiService(engine, log, userPreferencesRepository),
+            apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
             uriQuote = uriQuote,
         )
@@ -194,7 +196,7 @@ class GoogleMapsAddressApiInputTest {
         }
         val input = GoogleMapsAddressApiInput(
             serverRepository = serverRepository,
-            apiService = ApiService(engine, log, userPreferencesRepository),
+            apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
             uriQuote = uriQuote,
         )
@@ -212,7 +214,7 @@ class GoogleMapsAddressApiInputTest {
         }
         val input = GoogleMapsAddressApiInput(
             serverRepository = serverRepository,
-            apiService = ApiService(engine, log, userPreferencesRepository),
+            apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
             uriQuote = uriQuote,
         )
@@ -227,7 +229,7 @@ class GoogleMapsAddressApiInputTest {
         }
         val input = GoogleMapsAddressApiInput(
             serverRepository = serverRepository,
-            apiService = ApiService(engine, log, userPreferencesRepository),
+            apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
             uriQuote = uriQuote,
         )
