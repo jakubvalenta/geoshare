@@ -4,7 +4,6 @@ import androidx.annotation.StringRes
 import dagger.Lazy
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.plugin
 import io.ktor.client.request.accept
 import io.ktor.client.request.prepareRequest
 import io.ktor.http.ContentType

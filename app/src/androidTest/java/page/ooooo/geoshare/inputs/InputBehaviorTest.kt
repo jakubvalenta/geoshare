@@ -65,6 +65,7 @@ interface InputBehaviorTest : BehaviorTest {
             timeoutMs,
         )
 
+    @Suppress("unused")
     fun UiAutomatorTestScope.testUriFailed(
         unsafeUriString: String,
         timeoutMs: Long = NETWORK_TIMEOUT,
