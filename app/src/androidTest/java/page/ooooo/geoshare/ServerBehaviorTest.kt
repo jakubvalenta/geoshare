@@ -20,10 +20,9 @@ class ServerBehaviorTest : BehaviorTest {
         closeIntro()
 
         // Go to server list
-        goToUserPreferencesList()
-        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.SERVER}" }.click()
+        goToUserPreferencesDetail(UserPreferencesGroupId.SERVER)
 
-        // Insert server
+        // Insert a new server
         onElement { viewIdResourceName == "geoShareServerListInsert" }.click()
         onElement { viewIdResourceName == "geoShareServerFormBaseUrl" }.setText("https://api.example.com")
         quickWaitForStableInActiveWindow() // Wait for IME to appear
@@ -34,7 +33,7 @@ class ServerBehaviorTest : BehaviorTest {
             scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerFormSave" }.click()
         }
 
-        // Shows inserted server
+        // Shows the new server
         onElement { viewIdResourceName == "geoShareServerListItemContent" && textAsString() == "api.example.com" }
     }
 
@@ -46,14 +45,13 @@ class ServerBehaviorTest : BehaviorTest {
         closeIntro()
 
         // Go to server list
-        goToUserPreferencesList()
-        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.SERVER}" }.click()
+        goToUserPreferencesDetail(UserPreferencesGroupId.SERVER)
 
         // Go to server detail
         onElement { viewIdResourceName == "geoShareServerListItemMenu_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" }.click()
         onElement { viewIdResourceName == "geoShareServerListItemMenuDetail_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" }.click()
 
-        // Update server
+        // Update the server
         onElement { viewIdResourceName == "geoShareServerFormBaseUrl" }.apply { setText("$text/edited") }
         quickWaitForStableInActiveWindow() // Wait for IME to appear
         pressBack() // Hide IME
@@ -63,27 +61,27 @@ class ServerBehaviorTest : BehaviorTest {
             scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerFormSave" }.click()
         }
 
-        // Shows updated server
+        // Shows the updated server
         onElement { viewIdResourceName == "geoShareServerListItemContent" && textAsString() == "geocode.googleapis.com/edited" }.click()
 
-        // Go to server detail
+        // Go to the server detail again
         onElement { viewIdResourceName == "geoShareServerListItemMenu_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" }.click()
         onElement { viewIdResourceName == "geoShareServerListItemMenuDetail_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" }.click()
 
-        // Shows updated values
+        // Shows the updated values
         onElement { viewIdResourceName == "geoShareServerFormBaseUrl" && textAsString() == "https://geocode.googleapis.com/edited" }
         onElement { viewIdResourceName == "geoShareServerDetailPane" }.apply {
             scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerFormApiKeyHeader" && textAsString() == "X-My-Header" }
             scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerFormApiKey" && textAsString() == "my_api_key" }
         }
 
-        // Delete server
+        // Delete the server
         onElement { viewIdResourceName == "geoShareServerDetailDelete" }.click()
         onElement { viewIdResourceName == "geoShareServerDeleteDialog" }.dismissDialog()
         onElement { viewIdResourceName == "geoShareServerDetailDelete" }.click()
         onElement { viewIdResourceName == "geoShareServerDeleteDialog" }.confirmDialog()
 
-        // Does not show server
+        // Does not show the server anymore
         assertNull(onElementOrNull(BehaviorTest.ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareServerListItem_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" })
 
         // Wait for the delete toast to disappear, because it covers the restore button
@@ -102,7 +100,7 @@ class ServerBehaviorTest : BehaviorTest {
         onElement { viewIdResourceName == "geoShareServerRestoreInitialButton" }.click()
         onElement { viewIdResourceName == "geoShareServerRestoreInitialDialog" }.confirmDialog()
 
-        // Shows server
+        // Shows the restored server
         onElement { viewIdResourceName == "geoShareServerListPane" }
             .scrollToElement(Direction.UP) { viewIdResourceName == "geoShareServerListItem_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" }
     }
@@ -115,18 +113,17 @@ class ServerBehaviorTest : BehaviorTest {
         closeIntro()
 
         // Go to server list
-        goToUserPreferencesList()
-        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.SERVER}" }.click()
+        goToUserPreferencesDetail(UserPreferencesGroupId.SERVER)
 
-        // Shows no server selected
+        // Shows "Turned off" as the selected server
         onElement { viewIdResourceName == "geoShareServerListItemRadio_null_selected_true" }
         onElement { viewIdResourceName == "geoShareServerListItemRadio_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8_selected_false" }
 
-        // Go to invalid server detail
+        // Go to the detail of the default invalid server
         onElement { viewIdResourceName == "geoShareServerListItemMenu_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" }.click()
         onElement { viewIdResourceName == "geoShareServerListItemMenuDetail_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" }.click()
 
-        // Update invalid server
+        // Update the invalid server
         onElement { viewIdResourceName == "geoShareServerDetailPane" }.apply {
             scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerFormApiKey" }.setText("my_api_key")
             quickWaitForStableInActiveWindow() // Wait for IME to appear
@@ -134,17 +131,17 @@ class ServerBehaviorTest : BehaviorTest {
             onElement { viewIdResourceName == "geoShareServerFormSave" }.click()
         }
 
-        // Select updated server
+        // Select the updated server
         onElement { viewIdResourceName == "geoShareServerListItemRadio_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8_selected_false" }.click()
 
-        // Shows server selected
+        // Shows the updated server as selected
         onElement { viewIdResourceName == "geoShareServerListItemRadio_null_selected_false" }
         onElement { viewIdResourceName == "geoShareServerListItemRadio_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8_selected_true" }
 
-        // Select no server again
+        // Select "Turned off" again
         onElement { viewIdResourceName == "geoShareServerListItemRadio_null_selected_false" }.click()
 
-        // Shows no server selected
+        // Shows "Turned off" as the selected server
         onElement { viewIdResourceName == "geoShareServerListItemRadio_null_selected_true" }
         onElement { viewIdResourceName == "geoShareServerListItemRadio_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8_selected_false" }
     }

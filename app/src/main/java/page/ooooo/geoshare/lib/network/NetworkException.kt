@@ -3,7 +3,6 @@ package page.ooooo.geoshare.lib.network
 import android.content.res.Resources
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.request
-import io.ktor.http.HttpStatusCode
 import page.ooooo.geoshare.R
 
 sealed class NetworkException(cause: Throwable) : Exception(cause) {

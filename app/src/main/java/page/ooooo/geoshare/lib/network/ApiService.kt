@@ -93,9 +93,6 @@ class ApiService @Inject constructor(
                     }
                 }
             }
-            install(ContentNegotiation) {
-                json()
-            }
         }
 
     suspend fun attestationLoadTokens(): BearerTokens? =
@@ -185,7 +182,7 @@ class ApiService @Inject constructor(
             }
 
             // Generate key
-            val key = keyStoreService.generateKey(registrationChallenge)
+            val key = keyStoreService.generateKey()
             val publicKeyBase64 = key.publicKey.encoded.base64Encode()
 
             // Register

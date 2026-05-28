@@ -52,7 +52,7 @@ class InputsBehaviorTest : BehaviorTest {
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareMainMenuBadge" })
 
         // Go to the inputs screen
-        goToInputsList()
+        goToInputList()
 
         // Does not show recently added documentations
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareInputsDocumentationRecent_${InputDocumentationGroup.MAPY_COM}" })
@@ -65,7 +65,6 @@ class InputsBehaviorTest : BehaviorTest {
         pressBack()
 
         // Set user preference changelogShowForVersionCode to version 19
-        goToUserPreferencesList()
         goToUserPreferencesDetail(UserPreferencesGroupId.DEVELOPER_OPTIONS)
         onElement { viewIdResourceName == "geoShareUserPreferenceChangelogShownForVersionCode" }
             .setText("19")
@@ -75,7 +74,7 @@ class InputsBehaviorTest : BehaviorTest {
         onElement { viewIdResourceName == "geoShareMainMenuBadge" }
 
         // Go to the inputs screen
-        goToInputsList()
+        goToInputList()
 
         // Shows documentations added since version 19
         onElement { viewIdResourceName == "geoShareInputsDocumentationRecent_${InputDocumentationGroup.HERE_WEGO}" }

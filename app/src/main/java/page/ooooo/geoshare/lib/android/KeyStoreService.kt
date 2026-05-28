@@ -21,8 +21,7 @@ data class Key(
 
 interface KeyStoreService {
     fun getKey(): Key?
-
-    fun generateKey(challenge: ByteArray): Key
+    fun generateKey(): Key
 }
 
 class DefaultKeyStoreService @Inject constructor(
@@ -55,7 +54,7 @@ class DefaultKeyStoreService @Inject constructor(
      *
      * If there was a corrupt key in the key store, overwrite it.
      */
-    override fun generateKey(challenge: ByteArray): Key {
+    override fun generateKey(): Key {
         val keyPairGenerator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore")
         val params = KeyGenParameterSpec.Builder(
             KEYSTORE_ALIAS,
@@ -66,7 +65,7 @@ class DefaultKeyStoreService @Inject constructor(
             )
             setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512)
             // Setting attestation challenge triggers the signing of the certificate by the attestation certificate
-            setAttestationChallenge(challenge)
+            setAttestationChallenge(byteArrayOf())
             // Don't use StrongBox, because it's not available on all devices, and we probably don't need that level of
             // security
             build()

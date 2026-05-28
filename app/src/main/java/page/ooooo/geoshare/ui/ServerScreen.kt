@@ -297,6 +297,7 @@ private fun ServerListPane(
                     Text(stringResource(R.string.server_none_selected), style = MaterialTheme.typography.bodyLarge)
                 }
                 all.forEachIndexed { i, item ->
+                    var expanded by remember { mutableStateOf(false) }
                     val valid = item.isValid()
 
                     SegmentedListItem(
@@ -316,8 +317,6 @@ private fun ServerListPane(
                             )
                         },
                         trailingContent = {
-                            var expanded by remember { mutableStateOf(false) }
-
                             Box {
                                 IconButton(
                                     { expanded = true },

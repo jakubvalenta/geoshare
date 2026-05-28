@@ -32,15 +32,15 @@ class GoogleMapsPlaceApiInputTest {
     private val placeId = @Suppress("SpellCheckingInspection") "ChIJKxjxuaNqkFQR3CK6O1HNNqY"
     private val engine = MockEngine { request ->
         when (request.url.toString()) {
-            "${server.baseUrl}/v1/google-maps/geocode/place/$placeId" -> respond(
+            "${server.baseUrl}/v4/geocode/place/$placeId" -> respond(
                 // language=Json
                 """
-                    {"location": {"latitude": 50.123456, "longitude": -11.123456}}
+                    {"place": "//places.googleapis.com/places/foo", "location": {"latitude": 50.123456, "longitude": -11.123456}}
                 """.trimIndent(),
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
 
-            "${server.baseUrl}/v1/google-maps/geocode/place/invalid" -> respond(
+            "${server.baseUrl}/v4/geocode/place/invalid" -> respond(
                 // language=Json
                 """
                     {"location": "invalid"}
@@ -48,9 +48,9 @@ class GoogleMapsPlaceApiInputTest {
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
 
-            "${server.baseUrl}/v1/google-maps/geocode/place/exception" -> throw SocketTimeoutException()
+            "${server.baseUrl}/v4/geocode/place/exception" -> throw SocketTimeoutException()
 
-            "${server.baseUrl}/v1/google-maps/geocode/place/not-found" -> respondError(HttpStatusCode.NotFound)
+            "${server.baseUrl}/v4/geocode/place/not-found" -> respondError(HttpStatusCode.NotFound)
 
             else -> throw NotImplementedError()
         }

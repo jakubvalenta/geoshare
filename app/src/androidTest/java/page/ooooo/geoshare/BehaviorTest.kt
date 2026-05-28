@@ -17,16 +17,19 @@ import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
-import io.ktor.client.request.head
-import io.ktor.http.isSuccess
+import io.ktor.client.request.get
+import io.ktor.http.HttpStatusCode
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Before
+import page.ooooo.geoshare.data.local.database.Server
+import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.calcExponentialBackoffMillis
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
@@ -34,7 +37,6 @@ import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.network.CONNECT_TIMEOUT
-import page.ooooo.geoshare.lib.calcExponentialBackoffMillis
 import page.ooooo.geoshare.lib.network.REQUEST_TIMEOUT
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 import java.net.InetAddress
@@ -167,20 +169,19 @@ interface BehaviorTest {
         assumeTrue("This test only works when DNS resolves the domain $domain", success)
     }
 
-    @Suppress("unused")
-    suspend fun assumeHttpHeadIsSuccess(@Suppress("SameParameterValue") url: String) {
-        val status = try {
+    suspend fun assumeHttpGetReturnsStatus(@Suppress("SameParameterValue") url: String, status: HttpStatusCode) {
+        val resStatus = try {
             withContext(Dispatchers.IO) {
                 HttpClient(CIO).use { client ->
-                    client.head(url).status
+                    client.get(url).status
                 }
             }
         } catch (_: SocketException) {
             null
         }
         assumeTrue(
-            "This test only works when HTTP HEAD request succeeds but it ${if (status != null) "was ${status.value}" else "timed out"} for $url",
-            status?.isSuccess() == true,
+            "This test only works when HTTP GET request returns 404 but it ${if (resStatus != null) "was ${resStatus.value}" else "timed out"} for $url",
+            resStatus == status,
         )
     }
 
@@ -354,20 +355,25 @@ interface BehaviorTest {
         )
     }
 
-    fun UiAutomatorTestScope.goToMenuItem(block: AccessibilityNodeInfo.() -> Boolean) {
-        onElement { viewIdResourceName == "geoShareMainMenuButton" }.click()
-        onElement(block = block).click()
-    }
-
-    fun UiAutomatorTestScope.goToInputsList() {
-        goToMenuItem { viewIdResourceName == "geoShareMainMenuInputs" }
-    }
-
-    fun UiAutomatorTestScope.goToUserPreferencesList() {
-        goToMenuItem { viewIdResourceName == "geoShareMainMenuUserPreferences" }
+    fun UiAutomatorTestScope.goToInputList() {
+        // If we're on the main screen, use the main menu
+        onElementOrNull(1_000) { viewIdResourceName == "geoShareMainMenuButton" }?.let { mainMenu ->
+            mainMenu.click()
+            onElement { viewIdResourceName == "geoShareMainMenuInputs" }.click()
+        }
     }
 
     fun UiAutomatorTestScope.goToUserPreferencesDetail(groupId: UserPreferencesGroupId) {
+        // If we're on the main screen, use the main menu
+        onElementOrNull(1_000) { viewIdResourceName == "geoShareMainMenuButton" }?.let { mainMenu ->
+            mainMenu.click()
+            onElement { viewIdResourceName == "geoShareMainMenuUserPreferences" }.click()
+        } ?: run {
+            // If we're on the detail screen, go back
+            onElementOrNull(1_000) { viewIdResourceName == "geoShareUserPreferencesControlsPane" }?.also {
+                onElement { viewIdResourceName == "geoShareBack" }.click()
+            }
+        }
         onElement { viewIdResourceName == "geoShareUserPreferencesListPane" }
             .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferencesGroup_${groupId}" }
             .click()
@@ -375,12 +381,9 @@ interface BehaviorTest {
 
     fun UiAutomatorTestScope.goToMainScreenFromUserPreferencesDetail() {
         onElement { viewIdResourceName == "geoShareBack" }.click()
-        if (
-            onElementOrNull(1_000L) {
-                viewIdResourceName == "geoShareLinkListPane" ||
-                    viewIdResourceName == "geoShareUserPreferencesListPane"
-            } != null
-        ) {
+        onElementOrNull(1_000L) {
+            viewIdResourceName == "geoShareLinkListPane" || viewIdResourceName == "geoShareUserPreferencesListPane"
+        }?.also {
             // On a non-tablet screen, we need to tap the back button one more time to get from the user preferences
             // list screen to the main screen
             onElement { viewIdResourceName == "geoShareBack" }.click()
@@ -388,7 +391,7 @@ interface BehaviorTest {
     }
 
     /**
-     * Return the main screen scrollable element that contains app icons. Works on phone as well as tablet.
+     * Returns the scrollable element that contains app icons. Works on phone as well as tablet.
      */
     fun UiAutomatorTestScope.onMainScrollablePane(): UiObject2 = onElement {
         // First try supporting pane, which is displayed only on wide screens
@@ -506,11 +509,43 @@ interface BehaviorTest {
         }
     }
 
+    fun UiAutomatorTestScope.configureServer(server: Server) {
+        // Go to server list
+        goToUserPreferencesDetail(UserPreferencesGroupId.SERVER)
+
+        // Edit the default draft server
+        onElement { viewIdResourceName == "geoShareServerListItemMenu_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" }.click()
+        onElement { viewIdResourceName == "geoShareServerListItemMenuDetail_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" }.click()
+        onElement { viewIdResourceName == "geoShareServerFormBaseUrl" }.setText(server.baseUrl)
+        quickWaitForStableInActiveWindow() // Wait for IME to appear
+        pressBack() // Hide IME
+        onElement { viewIdResourceName == "geoShareServerDetailPane" }.let { pane ->
+            when (server.authType) {
+                ServerAuthType.API_KEY -> {
+                    pane.scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerFormApiKeyHeader" }
+                        .setText(server.apiKeyHeader)
+                    pane.scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerFormApiKey" }
+                        .setText(server.apiKey)
+                }
+
+                ServerAuthType.ATTESTATION -> {
+                    onElement { viewIdResourceName == "geoShareServerFormAuthType_${ServerAuthType.API_KEY}" }.click()
+                    onElement { viewIdResourceName == "geoShareDropdownFieldMenuItem_${ServerAuthType.ATTESTATION}" }.click()
+                }
+            }
+            pane.scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerFormSave" }.click()
+        }
+
+        // Select the server
+        onElement { viewIdResourceName == "geoShareServerListItemContent" && textAsString() == server.name }.click()
+    }
+
     companion object {
         const val ELEMENT_DOES_NOT_EXIST_TIMEOUT = 500L
         const val MAX_ATTEMPTS = 10
         val NETWORK_TIMEOUT = (1..MAX_ATTEMPTS).fold(CONNECT_TIMEOUT + REQUEST_TIMEOUT) { acc, curr ->
             acc + calcExponentialBackoffMillis(curr) + CONNECT_TIMEOUT + REQUEST_TIMEOUT
         }
+        const val SERVER_API_KEY_ARG = "SERVER_API_KEY"
     }
 }
