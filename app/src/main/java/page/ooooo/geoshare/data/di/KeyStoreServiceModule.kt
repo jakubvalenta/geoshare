@@ -30,20 +30,22 @@ class FakeKeyStoreService(
     /**
      * Generate a key and certificate chain. The certificate chain is hard-coded and doesn't actually sign the new key.
      */
-    override fun generateKey(challenge: ByteArray): Key {
-        val keyPair = KeyPairGenerator.getInstance("EC").run {
-            initialize(ECGenParameterSpec(@Suppress("SpellCheckingInspection") "secp256r1"))
-            generateKeyPair()
-        }
-        val cert = CertificateFactory.getInstance("X.509").run {
-            generateCertificate(CERT_PEM.byteInputStream())
-        }
-        return Key(keyPair.private, listOf(cert))
-            .also { key = it }
-    }
+    override fun generateKey(challenge: ByteArray): Key =
+        generateKey().also { key = it }
 
-    private companion object {
-        const val CERT_PEM = @Suppress("SpellCheckingInspection") """
+    companion object {
+        fun generateKey(): Key {
+            val keyPair = KeyPairGenerator.getInstance("EC").run {
+                initialize(ECGenParameterSpec(@Suppress("SpellCheckingInspection") "secp256r1"))
+                generateKeyPair()
+            }
+            val cert = CertificateFactory.getInstance("X.509").run {
+                generateCertificate(CERT_PEM.byteInputStream())
+            }
+            return Key(keyPair.private, listOf(cert))
+        }
+
+        private const val CERT_PEM = @Suppress("SpellCheckingInspection") """
 -----BEGIN CERTIFICATE-----
 MIIBrzCCATagAwIBAgIUZPRFIKvljY6kBKRSwGF1Zr9eWnMwCgYIKoZIzj0EAwIw
 DzENMAsGA1UEAwwEdGVzdDAeFw0yNjA1MjgwOTA0MjFaFw0zNjA1MjUwOTA0MjFa

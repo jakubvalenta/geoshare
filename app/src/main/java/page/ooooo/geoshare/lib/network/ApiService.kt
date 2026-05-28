@@ -164,7 +164,6 @@ class ApiService @Inject constructor(
         HttpClient(engine) {
             expectSuccess = true
             setDefaultTimeouts()
-            rethrowExceptionsAsNetworkException(log)
 
             install(DefaultRequest.Plugin) {
                 url(baseUrl)
