@@ -25,7 +25,7 @@ class ServerBehaviorTest : BehaviorTest {
 
         // Insert server
         onElement { viewIdResourceName == "geoShareServerListInsert" }.click()
-        onElement { viewIdResourceName == "geoShareServerFormBaseUrl" }.setText("https://geocode.example.com")
+        onElement { viewIdResourceName == "geoShareServerFormBaseUrl" }.setText("https://api.example.com")
         quickWaitForStableInActiveWindow() // Wait for IME to appear
         pressBack() // Hide IME
         onElement { viewIdResourceName == "geoShareServerFormAuthType_${ServerAuthType.API_KEY}" }.click()
@@ -35,7 +35,7 @@ class ServerBehaviorTest : BehaviorTest {
         }
 
         // Shows inserted server
-        onElement { viewIdResourceName == "geoShareServerListItemContent" && textAsString() == "geocode.example.com" }
+        onElement { viewIdResourceName == "geoShareServerListItemContent" && textAsString() == "api.example.com" }
     }
 
     @Test
