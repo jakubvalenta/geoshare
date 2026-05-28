@@ -26,19 +26,17 @@ import page.ooooo.geoshare.data.local.preferences.CachedApiToken
 import page.ooooo.geoshare.data.local.preferences.CachedApiTokenPreference
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
+import page.ooooo.geoshare.lib.extensions.base64Decode
 import page.ooooo.geoshare.lib.extensions.base64Encode
-import page.ooooo.geoshare.lib.extensions.sign
+import page.ooooo.geoshare.lib.extensions.verifySignature
 
 class ApiServiceTest {
     private val apiKeyBaseUrl = "https://geocode.example.com"
     private val attestationBaseUrl = "https://api.example.com"
     private val challenge = "test challenge".toByteArray()
-    private val key = FakeKeyStoreService.generateKey()
-    private val keyStoreService = FakeKeyStoreService(key)
     private val log = FakeLog
     private val query = "Cherbourg, France"
     private val encodedQuery = FakeUriQuote.encode(query, allow = ",")
-    private val signature = key.privateKey.sign(challenge)
     private val correctToken = "correct token"
     private val incorrectToken = "incorrect token"
     private val newToken = "new token"
@@ -46,6 +44,7 @@ class ApiServiceTest {
 
     @Test
     fun createHttpClient_whenAuthTypeIsApiKeyAndCorrectKeyIsPassed_returnsResponse() = runTest {
+        val keyStoreService = FakeKeyStoreService()
         val engine = MockEngine { request ->
             when (request.url.toString()) {
                 "$apiKeyBaseUrl/v1/google-maps/geocode/address/$encodedQuery" ->
@@ -76,6 +75,7 @@ class ApiServiceTest {
 
     @Test(expected = UnauthorizedNetworkException::class)
     fun createHttpClient_whenAuthTypeIsApiKeyAndWrongKeyIsPassed_throwsNetworkException() = runTest {
+        val keyStoreService = FakeKeyStoreService()
         val engine = MockEngine { request ->
             when (request.url.toString()) {
                 "$apiKeyBaseUrl/v1/google-maps/geocode/address/$encodedQuery" ->
@@ -106,6 +106,7 @@ class ApiServiceTest {
     @Test(expected = UnauthorizedNetworkException::class)
     fun createHttpClient_whenAuthTypeIsAttestationAndNoTokenIsPassedAndChallengeEndpointReturns401_throwsNetworkException() =
         runTest {
+            val keyStoreService = FakeKeyStoreService(key = FakeKeyStoreService.generateKey())
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
                     "$attestationBaseUrl/v1/google-maps/geocode/address/$encodedQuery" ->
@@ -138,6 +139,7 @@ class ApiServiceTest {
     @Test(expected = ServerResponseNetworkException::class)
     fun createHttpClient_whenAuthTypeIsAttestationAndNoTokenIsPassedAndChallengeEndpointReturns5xx_throwsNetworkException() =
         runTest {
+            val keyStoreService = FakeKeyStoreService(key = FakeKeyStoreService.generateKey())
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
                     "$attestationBaseUrl/v1/google-maps/geocode/address/$encodedQuery" ->
@@ -170,6 +172,7 @@ class ApiServiceTest {
     @Test(expected = ResponseNetworkException::class)
     fun createHttpClient_whenAuthTypeIsAttestationAndNoTokenIsPassedAndLoginEndpointReturns400_throwsNetworkException() =
         runTest {
+            val keyStoreService = FakeKeyStoreService(key = FakeKeyStoreService.generateKey())
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
                     "$attestationBaseUrl/v1/google-maps/geocode/address/$encodedQuery" ->
@@ -209,6 +212,7 @@ class ApiServiceTest {
     @Test(expected = ServerResponseNetworkException::class)
     fun createHttpClient_whenAuthTypeIsAttestationAndNoTokenIsPassedAndLoginEndpointReturns5xx_throwsNetworkException() =
         runTest {
+            val keyStoreService = FakeKeyStoreService(key = FakeKeyStoreService.generateKey())
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
                     "$attestationBaseUrl/v1/google-maps/geocode/address/$encodedQuery" ->
@@ -248,6 +252,7 @@ class ApiServiceTest {
     @Test(expected = UnauthorizedNetworkException::class)
     fun createHttpClient_whenAuthTypeIsAttestationAndNoTokenIsPassedAndLoginEndpointReturns401AndRegisterEndpointReturns401_throwsNetworkException() =
         runTest {
+            val keyStoreService = FakeKeyStoreService(key = FakeKeyStoreService.generateKey())
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
                     "$attestationBaseUrl/v1/google-maps/geocode/address/$encodedQuery" ->
@@ -288,8 +293,9 @@ class ApiServiceTest {
         }
 
     @Test
-    fun createHttpClient_whenAuthTypeIsAttestationAndNoTokenIsPassedAndRegisterEndpointReturnsSuccess_returnsResponseAndStoresNewToken() =
+    fun createHttpClient_whenAuthTypeIsAttestationAndNoTokenIsPassedAndLoginEndpointReturns401AndRegisterEndpointReturnsSuccess_returnsResponseAndStoresNewToken() =
         runTest {
+            val keyStoreService = FakeKeyStoreService(key = FakeKeyStoreService.generateKey())
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
                     "$attestationBaseUrl/v1/google-maps/geocode/address/$encodedQuery" ->
@@ -306,34 +312,30 @@ class ApiServiceTest {
                             headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
                         )
 
-                    "$attestationBaseUrl/v1/auth/login" ->
-                        if (
-                            (request.body as TextContent).text ==
-                            Json.encodeToString(
-                                ApiService.LoginRequest(
-                                    challenge = challenge.base64Encode(),
-                                    signature = signature.base64Encode(),
-                                    publicKey = key.publicKey.encoded.base64Encode()
-                                )
-                            )
-                        ) {
-                            throw NotImplementedError()
-                        } else {
+                    "$attestationBaseUrl/v1/auth/login" -> {
+                        val key = keyStoreService.getKey() ?: throw NotImplementedError()
+                        val body = Json.decodeFromString<ApiService.LoginRequest>((request.body as TextContent).text)
+                        val signatureOk = key.publicKey.verifySignature(
+                            body.signature.base64Decode(),
+                            body.challenge.base64Decode(),
+                        )
+                        val publicKeyOk = key.publicKey.encoded.base64Encode() == body.publicKey
+                        if (signatureOk && publicKeyOk) {
                             respondError(HttpStatusCode.Unauthorized)
+                        } else {
+                            throw NotImplementedError()
                         }
+                    }
 
                     "$attestationBaseUrl/v1/auth/register" -> {
-                        val expected = Json.encodeToString(
-                            ApiService.RegisterRequest(
-                                challenge = challenge.base64Encode(),
-                                signature = signature.base64Encode(),
-                                certificateChain = key.certificateChain.map { it.encoded.base64Encode() },
-                            )
+                        val key = keyStoreService.getKey() ?: throw NotImplementedError()
+                        val body = Json.decodeFromString<ApiService.RegisterRequest>((request.body as TextContent).text)
+                        val signatureOk = key.publicKey.verifySignature(
+                            body.signature.base64Decode(),
+                            body.challenge.base64Decode(),
                         )
-                        val actual = (request.body as TextContent).text
-                        if (
-                            expected == actual
-                        ) {
+                        val chainOk = key.certificateChain.map { it.encoded.base64Encode() } == body.certificateChain
+                        if (signatureOk && chainOk) {
                             respond(
                                 Json.encodeToString(ApiService.TokenResponse(token = newToken)),
                                 HttpStatusCode.OK,
@@ -384,33 +386,30 @@ class ApiServiceTest {
                             headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
                         )
 
-                    "$attestationBaseUrl/v1/auth/login" ->
-                        if (
-                            (request.body as TextContent).text ==
-                            Json.encodeToString(
-                                ApiService.LoginRequest(
-                                    challenge = challenge.base64Encode(),
-                                    signature = signature.base64Encode(),
-                                    publicKey = key.publicKey.encoded.base64Encode()
-                                )
-                            )
-                        ) {
+                    "$attestationBaseUrl/v1/auth/login" -> {
+                        val key = keyStoreService.getKey() ?: throw NotImplementedError()
+                        val body = Json.decodeFromString<ApiService.LoginRequest>((request.body as TextContent).text)
+                        val signatureOk = key.publicKey.verifySignature(
+                            body.signature.base64Decode(),
+                            body.challenge.base64Decode(),
+                        )
+                        val publicKeyOk = key.publicKey.encoded.base64Encode() == body.publicKey
+                        if (signatureOk && publicKeyOk) {
                             throw NotImplementedError()
                         } else {
                             respondError(HttpStatusCode.Unauthorized)
                         }
+                    }
 
                     "$attestationBaseUrl/v1/auth/register" -> {
-                        if (
-                            (request.body as TextContent).text ==
-                            Json.encodeToString(
-                                ApiService.RegisterRequest(
-                                    challenge = challenge.base64Encode(),
-                                    signature = signature.base64Encode(),
-                                    certificateChain = key.certificateChain.map { it.encoded.base64Encode() },
-                                )
-                            )
-                        ) {
+                        val key = keyStoreService.getKey() ?: throw NotImplementedError()
+                        val body = Json.decodeFromString<ApiService.RegisterRequest>((request.body as TextContent).text)
+                        val signatureOk = key.publicKey.verifySignature(
+                            body.signature.base64Decode(),
+                            body.challenge.base64Decode(),
+                        )
+                        val chainOk = key.certificateChain.map { it.encoded.base64Encode() } == body.certificateChain
+                        if (signatureOk && chainOk) {
                             respond(
                                 Json.encodeToString(ApiService.TokenResponse(token = newToken)),
                                 HttpStatusCode.OK,
@@ -442,8 +441,9 @@ class ApiServiceTest {
         }
 
     @Test
-    fun createHttpClient_whenAuthTypeIsAttestationAndIncorrectTokenIsPassedAndIncorrectRefreshTokenIsPassedAndRegisterEndpointReturnsSuccess_returnsResponseAndStoresNewToken() =
+    fun createHttpClient_whenAuthTypeIsAttestationAndIncorrectTokenIsPassedAndIncorrectRefreshTokenIsPassedAndLoginEndpointReturns401AndRegisterEndpointReturnsSuccess_returnsResponseAndStoresNewToken() =
         runTest {
+            val keyStoreService = FakeKeyStoreService(key = FakeKeyStoreService.generateKey())
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
                     "$attestationBaseUrl/v1/google-maps/geocode/address/$encodedQuery" ->
@@ -460,33 +460,30 @@ class ApiServiceTest {
                             headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
                         )
 
-                    "$attestationBaseUrl/v1/auth/login" ->
-                        if (
-                            (request.body as TextContent).text ==
-                            Json.encodeToString(
-                                ApiService.LoginRequest(
-                                    challenge = challenge.base64Encode(),
-                                    signature = signature.base64Encode(),
-                                    publicKey = key.publicKey.encoded.base64Encode()
-                                )
-                            )
-                        ) {
-                            throw NotImplementedError()
-                        } else {
+                    "$attestationBaseUrl/v1/auth/login" -> {
+                        val key = keyStoreService.getKey() ?: throw NotImplementedError()
+                        val body = Json.decodeFromString<ApiService.LoginRequest>((request.body as TextContent).text)
+                        val signatureOk = key.publicKey.verifySignature(
+                            body.signature.base64Decode(),
+                            body.challenge.base64Decode(),
+                        )
+                        val publicKeyOk = key.publicKey.encoded.base64Encode() == body.publicKey
+                        if (signatureOk && publicKeyOk) {
                             respondError(HttpStatusCode.Unauthorized)
+                        } else {
+                            throw NotImplementedError()
                         }
+                    }
 
                     "$attestationBaseUrl/v1/auth/register" -> {
-                        if (
-                            (request.body as TextContent).text ==
-                            Json.encodeToString(
-                                ApiService.RegisterRequest(
-                                    challenge = challenge.base64Encode(),
-                                    signature = signature.base64Encode(),
-                                    certificateChain = key.certificateChain.map { it.encoded.base64Encode() },
-                                )
-                            )
-                        ) {
+                        val key = keyStoreService.getKey() ?: throw NotImplementedError()
+                        val body = Json.decodeFromString<ApiService.RegisterRequest>((request.body as TextContent).text)
+                        val signatureOk = key.publicKey.verifySignature(
+                            body.signature.base64Decode(),
+                            body.challenge.base64Decode(),
+                        )
+                        val chainOk = key.certificateChain.map { it.encoded.base64Encode() } == body.certificateChain
+                        if (signatureOk && chainOk) {
                             respond(
                                 Json.encodeToString(ApiService.TokenResponse(token = newToken)),
                                 HttpStatusCode.OK,
@@ -502,7 +499,10 @@ class ApiServiceTest {
             }
             val userPreferencesRepository: UserPreferencesRepository = mock {
                 on { getValue(CachedApiTokenPreference) } doReturn
-                    CachedApiToken(incorrectToken, "incorrect public key".toByteArray().base64Encode())
+                    CachedApiToken(
+                        token = incorrectToken,
+                        publicKey = "incorrect public key".toByteArray().base64Encode(),
+                    )
             }
             val apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository)
             val res = apiService.createHttpClient(
@@ -524,6 +524,7 @@ class ApiServiceTest {
     @Test
     fun createHttpClient_whenAuthTypeIsAttestationAndIncorrectTokenIsPassedAndCorrectRefreshTokenIsPassed_returnsResponseAndStoresNewToken() =
         runTest {
+            val keyStoreService = FakeKeyStoreService(key = FakeKeyStoreService.generateKey())
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
                     "$attestationBaseUrl/v1/google-maps/geocode/address/$encodedQuery" ->
@@ -540,17 +541,15 @@ class ApiServiceTest {
                             headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
                         )
 
-                    "$attestationBaseUrl/v1/auth/login" ->
-                        if (
-                            (request.body as TextContent).text ==
-                            Json.encodeToString(
-                                ApiService.LoginRequest(
-                                    challenge = challenge.base64Encode(),
-                                    signature = signature.base64Encode(),
-                                    publicKey = key.publicKey.encoded.base64Encode()
-                                )
-                            )
-                        ) {
+                    "$attestationBaseUrl/v1/auth/login" -> {
+                        val key = keyStoreService.getKey() ?: throw NotImplementedError()
+                        val body = Json.decodeFromString<ApiService.LoginRequest>((request.body as TextContent).text)
+                        val signatureOk = key.publicKey.verifySignature(
+                            body.signature.base64Decode(),
+                            body.challenge.base64Decode(),
+                        )
+                        val publicKeyOk = key.publicKey.encoded.base64Encode() == body.publicKey
+                        if (signatureOk && publicKeyOk) {
                             respond(
                                 Json.encodeToString(ApiService.TokenResponse(token = newToken)),
                                 HttpStatusCode.OK,
@@ -559,13 +558,18 @@ class ApiServiceTest {
                         } else {
                             throw NotImplementedError()
                         }
+                    }
 
                     else -> throw NotImplementedError()
                 }
             }
             val userPreferencesRepository: UserPreferencesRepository = mock {
                 on { getValue(CachedApiTokenPreference) } doReturn
-                    CachedApiToken(incorrectToken, key.publicKey.encoded.base64Encode())
+                    CachedApiToken(
+                        token = incorrectToken,
+                        publicKey = keyStoreService.getKey()?.publicKey?.encoded?.base64Encode()
+                            ?: throw NotImplementedError(),
+                    )
             }
             val apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository)
             val res = apiService.createHttpClient(
@@ -586,6 +590,7 @@ class ApiServiceTest {
 
     @Test
     fun createHttpClient_whenAuthTypeIsAttestationAndCorrectTokenIsPassed_returnsResponse() = runTest {
+        val keyStoreService = FakeKeyStoreService(key = FakeKeyStoreService.generateKey())
         val engine = MockEngine { request ->
             when (request.url.toString()) {
                 "$attestationBaseUrl/v1/google-maps/geocode/address/$encodedQuery" ->
@@ -599,7 +604,11 @@ class ApiServiceTest {
         }
         val userPreferencesRepository: UserPreferencesRepository = mock {
             on { getValue(CachedApiTokenPreference) } doReturn
-                CachedApiToken(correctToken, key.publicKey.encoded.base64Encode())
+                CachedApiToken(
+                    token = correctToken,
+                    publicKey = keyStoreService.getKey()?.publicKey?.encoded?.base64Encode()
+                        ?: throw NotImplementedError(),
+                )
         }
         val apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository)
         val res = apiService.createHttpClient(

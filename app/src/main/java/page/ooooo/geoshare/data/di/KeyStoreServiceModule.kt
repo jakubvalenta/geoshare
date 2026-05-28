@@ -42,7 +42,7 @@ class FakeKeyStoreService(
             val cert = CertificateFactory.getInstance("X.509").run {
                 generateCertificate(CERT_PEM.byteInputStream())
             }
-            return Key(keyPair.private, listOf(cert))
+            return Key(keyPair.private, keyPair.public, listOf(cert))
         }
 
         private const val CERT_PEM = @Suppress("SpellCheckingInspection") """

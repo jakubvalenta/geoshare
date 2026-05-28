@@ -13,9 +13,11 @@ import java.security.cert.Certificate
 import java.security.spec.ECGenParameterSpec
 import javax.inject.Inject
 
-data class Key(val privateKey: PrivateKey, val certificateChain: List<Certificate>) {
-    val publicKey: PublicKey get() = certificateChain.first().publicKey
-}
+data class Key(
+    val privateKey: PrivateKey,
+    val publicKey: PublicKey,
+    val certificateChain: List<Certificate>,
+)
 
 interface KeyStoreService {
     fun getKey(): Key?
@@ -41,7 +43,11 @@ class DefaultKeyStoreService @Inject constructor(
             log.e(TAG, "Got key from the key store but it's not a private key")
             return null
         }
-        return Key(entry.privateKey, entry.certificateChain.toList())
+        return Key(
+            entry.privateKey,
+            entry.certificateChain.first().publicKey,
+            entry.certificateChain.toList(),
+        )
     }
 
     /**
@@ -71,7 +77,11 @@ class DefaultKeyStoreService @Inject constructor(
         val keyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
         val entry = keyStore.getEntry(KEYSTORE_ALIAS, null) as? KeyStore.PrivateKeyEntry
             ?: throw IllegalStateException("Key generation succeeded but key store entry not found")
-        return Key(entry.privateKey, entry.certificateChain.toList())
+        return Key(
+            entry.privateKey,
+            entry.certificateChain.first().publicKey,
+            entry.certificateChain.toList(),
+        )
     }
 
     private companion object {
