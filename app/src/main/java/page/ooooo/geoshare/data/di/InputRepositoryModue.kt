@@ -112,6 +112,7 @@ object FakeInputRepository : InputRepository {
     private val userPreferencesRepository = FakeUserPreferencesRepository()
     private val apiService = ApiService(
         engine = engine,
+        keyStoreService = FakeKeyStoreService(),
         log = log,
         userPreferencesRepository = userPreferencesRepository,
     )
