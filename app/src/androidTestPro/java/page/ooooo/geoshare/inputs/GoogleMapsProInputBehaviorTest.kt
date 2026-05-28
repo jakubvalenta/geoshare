@@ -85,7 +85,10 @@ class GoogleMapsProInputBehaviorTest : InputBehaviorTest {
         testUriFailed("https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg")
     }
 
-    private fun UiAutomatorTestScope.testUriFailed(unsafeUriString: String, timeoutMs: Long = NETWORK_TIMEOUT) {
+    private fun UiAutomatorTestScope.testUriFailed(
+        @Suppress("SameParameterValue") unsafeUriString: String,
+        timeoutMs: Long = NETWORK_TIMEOUT,
+    ) {
         // Go to main form
         goToMainForm()
 

@@ -348,29 +348,83 @@ class HttpClientExtensionsTest {
         }
 
     @Test
-    fun rethrowExceptionsAsNetworkException_whenResponseIs4xx_throwsUnrecoverableException() = runTest {
-        for (status in listOf(
-            HttpStatusCode.BadRequest,
-            HttpStatusCode.NotFound,
-            HttpStatusCode.TooManyRequests,
-        )) {
-            val engine = MockEngine { respond("test content", status) }
-            val threw = HttpClient(engine) {
-                expectSuccess = true
-                rethrowExceptionsAsNetworkException(log)
-            }.use { client ->
-                try {
-                    client.get(url)
-                    null
-                } catch (tr: Exception) {
-                    tr
-                }
+    fun rethrowExceptionsAsNetworkException_whenResponseIs400_throwsUnrecoverableException() = runTest {
+        val engine = MockEngine { respond("test content", HttpStatusCode.BadRequest) }
+        val threw = HttpClient(engine) {
+            expectSuccess = true
+            rethrowExceptionsAsNetworkException(log)
+        }.use { client ->
+            try {
+                client.get(url)
+                null
+            } catch (tr: Exception) {
+                tr
             }
-            assertTrue(threw is UnrecoverableNetworkException)
-            assertTrue(threw is ResponseNetworkException)
-            assertTrue(threw?.cause is ResponseException)
-            assertFalse(threw?.cause is ServerResponseException)
         }
+        assertTrue(threw is UnrecoverableNetworkException)
+        assertTrue(threw is ResponseNetworkException)
+        assertTrue(threw?.cause is ResponseException)
+        assertFalse(threw?.cause is ServerResponseException)
+    }
+
+    @Test
+    fun rethrowExceptionsAsNetworkException_whenResponseIs401_throwsUnrecoverableException() = runTest {
+        val engine = MockEngine { respond("test content", HttpStatusCode.Unauthorized) }
+        val threw = HttpClient(engine) {
+            expectSuccess = true
+            rethrowExceptionsAsNetworkException(log)
+        }.use { client ->
+            try {
+                client.get(url)
+                null
+            } catch (tr: Exception) {
+                tr
+            }
+        }
+        assertTrue(threw is UnrecoverableNetworkException)
+        assertTrue(threw is UnauthorizedNetworkException)
+        assertTrue(threw?.cause is ResponseException)
+        assertFalse(threw?.cause is ServerResponseException)
+    }
+
+    @Test
+    fun rethrowExceptionsAsNetworkException_whenResponseIs404_throwsUnrecoverableException() = runTest {
+        val engine = MockEngine { respond("test content", HttpStatusCode.NotFound) }
+        val threw = HttpClient(engine) {
+            expectSuccess = true
+            rethrowExceptionsAsNetworkException(log)
+        }.use { client ->
+            try {
+                client.get(url)
+                null
+            } catch (tr: Exception) {
+                tr
+            }
+        }
+        assertTrue(threw is UnrecoverableNetworkException)
+        assertTrue(threw is ResponseNetworkException)
+        assertTrue(threw?.cause is ResponseException)
+        assertFalse(threw?.cause is ServerResponseException)
+    }
+
+    @Test
+    fun rethrowExceptionsAsNetworkException_whenResponseIs429_throwsUnrecoverableException() = runTest {
+        val engine = MockEngine { respond("test content", HttpStatusCode.TooManyRequests) }
+        val threw = HttpClient(engine) {
+            expectSuccess = true
+            rethrowExceptionsAsNetworkException(log)
+        }.use { client ->
+            try {
+                client.get(url)
+                null
+            } catch (tr: Exception) {
+                tr
+            }
+        }
+        assertTrue(threw is UnrecoverableNetworkException)
+        assertTrue(threw is TooManyRequestsNetworkException)
+        assertTrue(threw?.cause is ResponseException)
+        assertFalse(threw?.cause is ServerResponseException)
     }
 
     @Test

@@ -22,7 +22,7 @@ import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.PackageNames
 
-class UserPreferencesTest {
+class AutomationPreferenceTest {
     @Test
     fun getOptionGroups_returnsAllAutomations() = runTest {
         assertEquals(
@@ -141,7 +141,7 @@ class UserPreferencesTest {
     }
 
     @Test
-    fun automationPreference_getValue_serializedStringIsInvalid_returnsNoop() {
+    fun getValue_serializedStringIsInvalid_returnsNoop() {
         assertEquals(
             NoopAutomation,
             AutomationPreference.getValue(
@@ -155,7 +155,7 @@ class UserPreferencesTest {
     }
 
     @Test
-    fun automationPreference_getValue_forEachSerializedString_returnsAutomation() {
+    fun getValue_forEachSerializedString_returnsAutomation() {
         AutomationPreference.getOptionGroups(
             apps = mapOf(
                 PackageNames.TEST to setOf(DataType.GEO_URI),
@@ -180,7 +180,7 @@ class UserPreferencesTest {
     }
 
     @Test
-    fun automationPreference_getValue_serializedStringContainsUnknownProperties_returnsAutomation() {
+    fun getValue_serializedStringContainsUnknownProperties_returnsAutomation() {
         val preferences = mutablePreferencesOf(
             stringPreferencesKey("automation") to """{"type":"OPEN_APP","packageName":"${PackageNames.TEST}","spam":"spam"}""",
         )
@@ -191,7 +191,7 @@ class UserPreferencesTest {
     }
 
     @Test
-    fun automationPreference_getValue_oldTypeIsInvalid_returnsNoop() {
+    fun getValue_oldTypeIsInvalid_returnsNoop() {
         assertEquals(
             NoopAutomation,
             AutomationPreference.getValue(
@@ -205,7 +205,7 @@ class UserPreferencesTest {
     }
 
     @Test
-    fun automationPreference_getValue_forEachOldTypeAndPackageName_returnsAutomation() =
+    fun getValue_forEachOldTypeAndPackageName_returnsAutomation() =
         runTest {
             @Suppress("DEPRECATION", "SpellCheckingInspection")
             for ((testOldAutomationType, expectedAutomation) in mapOf(
