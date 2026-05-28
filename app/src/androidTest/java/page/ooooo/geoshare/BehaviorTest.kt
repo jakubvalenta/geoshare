@@ -357,8 +357,8 @@ interface BehaviorTest {
 
     fun UiAutomatorTestScope.goToInputList() {
         // If we're on the main screen, use the main menu
-        onElementOrNull(1_000) { viewIdResourceName == "geoShareMainMenuButton" }?.apply {
-            click()
+        onElementOrNull(1_000) { viewIdResourceName == "geoShareMainMenuButton" }?.let { mainMenu ->
+            mainMenu.click()
             onElement { viewIdResourceName == "geoShareMainMenuInputs" }.click()
         }
     }
