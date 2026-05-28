@@ -27,7 +27,6 @@ class BillingDemoBehaviorTest : BehaviorTest {
         onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "GeoShare" }
 
         // Go to automation preferences
-        goToUserPreferencesList()
         goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
 
         // Shows feature wall
@@ -53,7 +52,6 @@ class BillingDemoBehaviorTest : BehaviorTest {
 
         // Go to automation preferences
         pressBack()
-        goToUserPreferencesList()
         goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
 
         // Does not show feature wall
@@ -83,7 +81,6 @@ class BillingDemoBehaviorTest : BehaviorTest {
         onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "GeoShare" }
 
         // Go to automation preferences
-        goToUserPreferencesList()
         goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
 
         // Shows feature wall
@@ -101,7 +98,6 @@ class BillingDemoBehaviorTest : BehaviorTest {
         onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "GeoShare" }
 
         // Go to automation preferences
-        goToUserPreferencesList()
         goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
 
         // Shows feature wall
@@ -127,7 +123,6 @@ class BillingDemoBehaviorTest : BehaviorTest {
 
         // Go to automation preferences
         pressBack()
-        goToUserPreferencesList()
         goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
 
         // Does not show feature wall
@@ -163,7 +158,6 @@ class BillingDemoBehaviorTest : BehaviorTest {
         onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "GeoShare" }
 
         // Go to automation preferences
-        goToUserPreferencesList()
         goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
 
         // Shows feature wall

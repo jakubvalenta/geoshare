@@ -1,11 +1,17 @@
 package page.ooooo.geoshare.inputs
 
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.uiAutomator
+import io.ktor.http.HttpStatusCode
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Assume.assumeTrue
+import org.junit.AssumptionViolatedException
 import org.junit.Test
+import page.ooooo.geoshare.BehaviorTest.Companion.SERVER_API_KEY_ARG
 import page.ooooo.geoshare.NotEmulator
+import page.ooooo.geoshare.data.local.database.Server
+import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
@@ -118,7 +124,7 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
         launchApplication()
         waitForAppToBeVisible()
         closeIntro()
-        setUserPreferenceConnectionPermissionToAlways()
+        configureConnectionPermission()
 
         // Short link within western Japan
         testUri(
@@ -130,6 +136,127 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
         testUri(
             GCJ02Point(39.920439, 116.331538, source = Source.URI),
             "https://maps.app.goo.gl/FP3EV7tTUKYbmcVp7",
+        )
+    }
+
+    @Test
+    fun googleMapsApiOfficial() = uiAutomator {
+        val apiKey = InstrumentationRegistry.getArguments().getString(SERVER_API_KEY_ARG)
+            ?: throw AssumptionViolatedException("This test only works when the instrumentation extra argument $SERVER_API_KEY_ARG is set")
+        val server = Server(
+            baseUrl = "https://geocode.googleapis.com",
+            authType = ServerAuthType.API_KEY,
+            apiKey = apiKey,
+            apiKeyHeader = "X-Goog-Api-Key",
+        )
+        runBlocking {
+            assumeHttpGetReturnsStatus(server.baseUrl, HttpStatusCode.NotFound)
+        }
+        testGoogleMapsApi(server)
+    }
+
+    @Test
+    fun googleMapsApiRemote() = uiAutomator {
+        val server = Server(baseUrl = "https://api.geoshare-app.net", authType = ServerAuthType.ATTESTATION)
+        runBlocking {
+            assumeHttpGetReturnsStatus(server.baseUrl, HttpStatusCode.NotFound)
+        }
+        testGoogleMapsApi(server)
+    }
+
+    @Test
+    fun googleMapsApiLocal() = uiAutomator {
+        val server = Server(baseUrl = "https://127.0.0.1:8080", authType = ServerAuthType.ATTESTATION)
+        runBlocking {
+            assumeHttpGetReturnsStatus(server.baseUrl, HttpStatusCode.NotFound)
+        }
+        testGoogleMapsApi(server)
+    }
+
+    @Test
+    fun googleMapsApiEmulatorHost() = uiAutomator {
+        val server = Server(baseUrl = "http://10.0.2.2:8080", authType = ServerAuthType.ATTESTATION)
+        runBlocking {
+            assumeHttpGetReturnsStatus(server.baseUrl, HttpStatusCode.NotFound)
+        }
+        testGoogleMapsApi(server)
+    }
+
+    private fun testGoogleMapsApi(server: Server) = uiAutomator {
+        // Launch app and close intro
+        launchApplication()
+        waitForAppToBeVisible()
+        closeIntro()
+        configureConnectionPermission()
+        configureServer(server)
+
+        // Search
+        testUri(
+            WGS84Point(
+                51.0657922, 13.7555827,
+                name = @Suppress("SpellCheckingInspection") "Louisenstraße 60, 01099 Dresden",
+                source = Source.API,
+            ),
+            "https://www.google.com/maps/search/?api=1&query=Louisenstra%C3%9Fe%2060,%2001099%20Dresden",
+        )
+
+        // Short links with coordinates in HTML
+        testUri(
+            WGS84Point(
+                51.1982447, 6.4389493,
+                name = @Suppress("SpellCheckingInspection") "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
+                source = Source.API,
+            ),
+            "https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8",
+        )
+        testUri(
+            WGS84Point(
+                44.4490541, 26.0888398,
+                name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
+                source = Source.API,
+            ),
+            "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+        )
+        testUri(
+            WGS84Point(
+                52.4842015, 13.4167277,
+                name = @Suppress("SpellCheckingInspection") "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
+                source = Source.API,
+            ),
+            "https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6",
+        )
+
+        // Place
+        testUri(
+            WGS84Point(
+                52.4834254, 13.4245399,
+                name = @Suppress("SpellCheckingInspection") "Hermannstr. 20, Berlin",
+                source = Source.API,
+            ),
+            "https://www.google.com/maps/place/Hermannstr.+20,+Berlin/"
+        )
+
+        // Directions address
+        testUri(
+            WGS84Point(43.7481582, -79.6332316, name = "2088 Albion Rd @43.7481,-79.6332", source = Source.API),
+            @Suppress("SpellCheckingInspection") "https://maps.google.com/maps?f=d&daddr=2088%20Albion%20Rd+@43.7481,-79.6332&doflg=ptm&navigate=yes",
+        )
+
+        // Directions with geocode parameter, which can get stuck at intermediate URI with zero coordinates during web parsing
+        testUri(
+            WGS84Point(
+                40.6400258, 22.9589454,
+                z = 6.0,
+                name = @Suppress("SpellCheckingInspection") "Akropoleos 65, Thessaloniki 546 34, Greece",
+                source = Source.API,
+            ),
+            "https://maps.google.com/maps?oe=utf-8&client=firefox-b&um=1&ie=UTF-8&fb=1&gl=fr&sa=X&geocode=KWmqxjsAOagUMaSMgMRdOas1&daddr=Akropoleos+65,+Thessaloniki+546+34,+Gr%C3%A8ce",
+            fallbackPoint = WGS84Point(
+                40.6400258, 22.9589454,
+                z = 6.0,
+                name = @Suppress("SpellCheckingInspection") "Akropoleos 65, Thessaloniki 546 34, Grèce",
+                source = Source.API,
+            ),
         )
     }
 

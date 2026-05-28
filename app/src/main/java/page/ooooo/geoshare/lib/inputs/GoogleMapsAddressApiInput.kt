@@ -3,12 +3,15 @@ package page.ooooo.geoshare.lib.inputs
 import androidx.annotation.StringRes
 import dagger.Lazy
 import io.ktor.client.call.body
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.accept
 import io.ktor.client.request.prepareRequest
 import io.ktor.http.ContentType
 import io.ktor.http.appendPathSegments
 import io.ktor.http.headers
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.ServerRepository
 import page.ooooo.geoshare.lib.Uri
@@ -49,13 +52,19 @@ class GoogleMapsAddressApiInput @Inject constructor(
             authType = server.authType,
             apiKey = server.apiKey,
             apiKeyHeader = server.apiKeyHeader,
-        )
+        ).config {
+            install(ContentNegotiation) {
+                json(Json {
+                    ignoreUnknownKeys = true
+                })
+            }
+        }
         val query = parseQuery(data) ?: return@parseResult
         val res = client.use { client ->
             client
                 .prepareRequest {
                     url {
-                        appendPathSegments("v1", "google-maps", "geocode", "address", query)
+                        appendPathSegments("v4", "geocode", "address", query)
                     }
                     headers {
                         accept(ContentType.Application.Json)

@@ -51,7 +51,6 @@ class UserPreferencesBehaviorTest : BehaviorTest {
         }
 
         // Set coordinate format to degrees, minutes, seconds
-        goToUserPreferencesList()
         goToUserPreferencesDetail(UserPreferencesGroupId.COORDINATE_FORMAT)
         onElement { viewIdResourceName == "geoShareUserPreferenceCoordinateFormat_${CoordinateFormat.DEG_MIN_SEC}" }.click()
         goToMainScreenFromUserPreferencesDetail()
@@ -107,7 +106,6 @@ class UserPreferencesBehaviorTest : BehaviorTest {
         )
 
         // Make the app visible in preferences
-        goToUserPreferencesList()
         goToUserPreferencesDetail(UserPreferencesGroupId.HIDDEN_APPS)
         onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
             .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareVisibleAppToggle_${PackageNames.OSMAND_PLUS}" }
@@ -156,7 +154,6 @@ class UserPreferencesBehaviorTest : BehaviorTest {
         )
 
         // Make the link visible in preferences
-        goToUserPreferencesList()
         goToUserPreferencesDetail(UserPreferencesGroupId.LINKS)
         onElement { viewIdResourceName == "geoShareLinkListPane" }
             .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkListItemToggle_ce900ea1-2c5d-4641-82f3-a5429a68d603" }

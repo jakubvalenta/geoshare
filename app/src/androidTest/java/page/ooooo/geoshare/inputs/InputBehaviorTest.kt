@@ -11,10 +11,9 @@ import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
 interface InputBehaviorTest : BehaviorTest {
 
-    fun UiAutomatorTestScope.setUserPreferenceConnectionPermissionToAlways() {
-        goToUserPreferencesList()
+    fun UiAutomatorTestScope.configureConnectionPermission(permission: Permission = Permission.ALWAYS) {
         goToUserPreferencesDetail(UserPreferencesGroupId.CONNECTION_PERMISSION)
-        onElement { viewIdResourceName == "geoShareUserPreferenceConnectionPermission_${Permission.ALWAYS}" }.click()
+        onElement { viewIdResourceName == "geoShareUserPreferenceConnectionPermission_$permission" }.click()
     }
 
     fun UiAutomatorTestScope.confirmDialogIfVisible() {
@@ -65,6 +64,20 @@ interface InputBehaviorTest : BehaviorTest {
             accurate,
             timeoutMs,
         )
+
+    fun UiAutomatorTestScope.testUriFailed(
+        unsafeUriString: String,
+        timeoutMs: Long = NETWORK_TIMEOUT,
+    ) {
+        // Go to main form
+        goToMainForm()
+
+        // Share URI and confirm permission dialog
+        shareUri(unsafeUriString)
+        confirmDialogIfVisible()
+
+        assertConversionFailed(timeoutMs)
+    }
 
     fun UiAutomatorTestScope.testText(expectedPoints: Points, unsafeText: String) {
         // It would be preferable to test sharing of the text with the app, but this shell command doesn't work when

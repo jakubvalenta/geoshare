@@ -35,7 +35,6 @@ class AutomationBehaviorTest : BehaviorTest {
         closeIntro()
 
         // Configure automation
-        goToUserPreferencesList()
         goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
         val automation = CopyCoordsDecAutomation
         onElement { viewIdResourceName == "geoShareUserPreferenceAutomation_${Json.encodeToString<Automation>(automation)}" }.click()
@@ -60,7 +59,6 @@ class AutomationBehaviorTest : BehaviorTest {
         closeIntro()
 
         // Configure automation
-        goToUserPreferencesList()
         goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
         val automation = OpenDisplayGeoUriAutomation(PackageNames.GOOGLE_MAPS)
         val serializedString = Json.encodeToString<Automation>(automation)
@@ -100,7 +98,6 @@ class AutomationBehaviorTest : BehaviorTest {
             closeIntro()
 
             // Configure automation
-            goToUserPreferencesList()
             goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
             val automation = SendPointAutomation(messagingAppPackageName)
             val serializedString = Json.encodeToString<Automation>(automation)
@@ -130,7 +127,6 @@ class AutomationBehaviorTest : BehaviorTest {
             closeIntro()
 
             // Configure automation
-            goToUserPreferencesList()
             goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
             val automation = OpenRouteOnePointGpxAutomation(PackageNames.TOMTOM)
             val serializedString = Json.encodeToString<Automation>(automation)
@@ -172,7 +168,6 @@ class AutomationBehaviorTest : BehaviorTest {
         closeIntro()
 
         // Configure automation
-        goToUserPreferencesList()
         goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
         val automation = SavePointsGpxAutomation
         val serializedString = Json.encodeToString<Automation>(automation)
@@ -206,7 +201,6 @@ class AutomationBehaviorTest : BehaviorTest {
         closeIntro()
 
         // Configure automation
-        goToUserPreferencesList()
         goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
         val automation = SavePointToContactAutomation
         val serializedString = Json.encodeToString<Automation>(automation)

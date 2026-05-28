@@ -59,7 +59,7 @@ class AppleMapsInputBehaviorTest : InputBehaviorTest {
         launchApplication()
         waitForAppToBeVisible()
         closeIntro()
-        setUserPreferenceConnectionPermissionToAlways()
+        configureConnectionPermission()
 
         // Place id
         testUri(
