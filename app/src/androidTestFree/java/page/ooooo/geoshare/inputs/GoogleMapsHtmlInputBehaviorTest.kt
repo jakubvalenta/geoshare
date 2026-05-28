@@ -8,9 +8,9 @@ import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-class GoogleMapsFreeInputBehaviorTest : InputBehaviorTest {
+class GoogleMapsHtmlInputBehaviorTest : InputBehaviorTest {
     @Test
-    fun googleMapsHtmlFree() = uiAutomator {
+    fun googleMapsHtml() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("maps.google.com")
         }
@@ -19,7 +19,7 @@ class GoogleMapsFreeInputBehaviorTest : InputBehaviorTest {
         launchApplication()
         waitForAppToBeVisible()
         closeIntro()
-        setUserPreferenceConnectionPermissionToAlways()
+        configureConnectionPermission()
 
         // Search
         testUri(

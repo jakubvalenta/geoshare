@@ -45,7 +45,7 @@ class OpenStreetMapInputBehaviorTest : InputBehaviorTest {
         launchApplication()
         waitForAppToBeVisible()
         closeIntro()
-        setUserPreferenceConnectionPermissionToAlways()
+        configureConnectionPermission()
 
         // Node
         testUri(

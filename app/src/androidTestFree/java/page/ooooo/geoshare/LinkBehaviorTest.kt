@@ -19,8 +19,7 @@ class LinkBehaviorTest : BehaviorTest {
         closeIntro()
 
         // Go to link list
-        goToUserPreferencesList()
-        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.LINKS}" }.click()
+        goToUserPreferencesDetail(UserPreferencesGroupId.LINKS)
 
         // Insert link
         onElement { viewIdResourceName == "geoShareLinkListInsert" }.click()
@@ -60,8 +59,7 @@ class LinkBehaviorTest : BehaviorTest {
         closeIntro()
 
         // Go to link list
-        goToUserPreferencesList()
-        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.LINKS}" }.click()
+        goToUserPreferencesDetail(UserPreferencesGroupId.LINKS)
 
         // Go to link detail
         onElement { viewIdResourceName == "geoShareLinkListItemMenu_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
@@ -138,8 +136,7 @@ class LinkBehaviorTest : BehaviorTest {
         closeIntro()
 
         // Go to link list
-        goToUserPreferencesList()
-        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.LINKS}" }.click()
+        goToUserPreferencesDetail(UserPreferencesGroupId.LINKS)
 
         // Go to link detail
         onElement { viewIdResourceName == "geoShareLinkListPane" }

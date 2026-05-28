@@ -32,20 +32,20 @@ class GoogleMapsAddressApiInputTest {
     private val query = "Cherbourg, France"
     private val engine = MockEngine { request ->
         when (request.url.toString()) {
-            "${server.baseUrl}/v1/google-maps/geocode/address/Cherbourg,%20France" -> respond(
+            "${server.baseUrl}/v4/geocode/address/Cherbourg,%20France" -> respond(
                 // language=Json
                 """
                     {
                         "results": [
-                            {"location": {"latitude": 50.123456, "longitude": -11.123456}},
-                            {"location": {"latitude": 9, "longitude": -120}}
+                            {"place": "//places.googleapis.com/places/foo", "location": {"latitude": 50.123456, "longitude": -11.123456}},
+                            {"place": "//places.googleapis.com/places/bar", "location": {"latitude": 9, "longitude": -120}}
                         ]
                     }
                 """.trimIndent(),
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
 
-            "${server.baseUrl}/v1/google-maps/geocode/address/nothing" -> respond(
+            "${server.baseUrl}/v4/geocode/address/nothing" -> respond(
                 // language=Json
                 """
                     {
@@ -55,7 +55,7 @@ class GoogleMapsAddressApiInputTest {
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
 
-            "${server.baseUrl}/v1/google-maps/geocode/address/invalid" -> respond(
+            "${server.baseUrl}/v4/geocode/address/invalid" -> respond(
                 // language=Json
                 """
                     {
@@ -65,9 +65,9 @@ class GoogleMapsAddressApiInputTest {
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
 
-            "${server.baseUrl}/v1/google-maps/geocode/address/exception" -> throw SocketTimeoutException()
+            "${server.baseUrl}/v4/geocode/address/exception" -> throw SocketTimeoutException()
 
-            "${server.baseUrl}/v1/google-maps/geocode/address/not-found" -> respondError(HttpStatusCode.NotFound)
+            "${server.baseUrl}/v4/geocode/address/not-found" -> respondError(HttpStatusCode.NotFound)
 
             else -> throw NotImplementedError()
         }

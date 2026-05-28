@@ -98,8 +98,6 @@ class BaiduMapInputBehaviorTest : InputBehaviorTest {
     fun baiduMapHtml() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("map.baidu.com")
-            // TODO Remove the whole assumeHttpHeadIsSuccess function, because the HTTP HEAD check seems to always fail but the test works anyway
-            // assumeHttpHeadIsSuccess("https://maponline1.bdimg.com/tile/?qt=vtile&x=13490&y=6210&z=14&styles=pl&udt=20230101&scaler=1&p=1")
         }
 
         // Shared coordinates

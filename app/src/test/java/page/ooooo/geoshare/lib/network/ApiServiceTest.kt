@@ -47,7 +47,7 @@ class ApiServiceTest {
         val keyStoreService = FakeKeyStoreService()
         val engine = MockEngine { request ->
             when (request.url.toString()) {
-                "$apiKeyBaseUrl/v1/google-maps/geocode/address/$encodedQuery" ->
+                "$apiKeyBaseUrl/v4/geocode/address/$encodedQuery" ->
                     if (request.headers["X-My-Header"] == "test_api_key") {
                         respondOk("success")
                     } else {
@@ -66,7 +66,7 @@ class ApiServiceTest {
         ).use { client ->
             client.get {
                 url {
-                    appendPathSegments("v1", "google-maps", "geocode", "address", query)
+                    appendPathSegments("v4", "geocode", "address", query)
                 }
             }
         }
@@ -78,7 +78,7 @@ class ApiServiceTest {
         val keyStoreService = FakeKeyStoreService()
         val engine = MockEngine { request ->
             when (request.url.toString()) {
-                "$apiKeyBaseUrl/v1/google-maps/geocode/address/$encodedQuery" ->
+                "$apiKeyBaseUrl/v4/geocode/address/$encodedQuery" ->
                     if (request.headers["X-My-Header"] == "test_api_key") {
                         throw NotImplementedError()
                     } else {
@@ -97,7 +97,7 @@ class ApiServiceTest {
         ).use { client ->
             client.get {
                 url {
-                    appendPathSegments("v1", "google-maps", "geocode", "address", query)
+                    appendPathSegments("v4", "geocode", "address", query)
                 }
             }
         }
@@ -106,10 +106,10 @@ class ApiServiceTest {
     @Test(expected = UnauthorizedNetworkException::class)
     fun createHttpClient_whenAuthTypeIsAttestationAndNoTokenIsPassedAndChallengeEndpointReturns401_throwsNetworkException() =
         runTest {
-            val keyStoreService = FakeKeyStoreService(key = FakeKeyStoreService.generateKey())
+            val keyStoreService = FakeKeyStoreService().apply { generateKey() }
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
-                    "$attestationBaseUrl/v1/google-maps/geocode/address/$encodedQuery" ->
+                    "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
                         when (request.headers[HttpHeaders.Authorization]) {
                             null -> respondError(HttpStatusCode.Unauthorized)
                             else -> throw NotImplementedError()
@@ -130,7 +130,7 @@ class ApiServiceTest {
             ).use { client ->
                 client.get {
                     url {
-                        appendPathSegments("v1", "google-maps", "geocode", "address", query)
+                        appendPathSegments("v4", "geocode", "address", query)
                     }
                 }
             }
@@ -139,10 +139,10 @@ class ApiServiceTest {
     @Test(expected = ServerResponseNetworkException::class)
     fun createHttpClient_whenAuthTypeIsAttestationAndNoTokenIsPassedAndChallengeEndpointReturns5xx_throwsNetworkException() =
         runTest {
-            val keyStoreService = FakeKeyStoreService(key = FakeKeyStoreService.generateKey())
+            val keyStoreService = FakeKeyStoreService().apply { generateKey() }
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
-                    "$attestationBaseUrl/v1/google-maps/geocode/address/$encodedQuery" ->
+                    "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
                         when (request.headers[HttpHeaders.Authorization]) {
                             null -> respondError(HttpStatusCode.Unauthorized)
                             else -> throw NotImplementedError()
@@ -163,7 +163,7 @@ class ApiServiceTest {
             ).use { client ->
                 client.get {
                     url {
-                        appendPathSegments("v1", "google-maps", "geocode", "address", query)
+                        appendPathSegments("v4", "geocode", "address", query)
                     }
                 }
             }
@@ -172,10 +172,10 @@ class ApiServiceTest {
     @Test(expected = ResponseNetworkException::class)
     fun createHttpClient_whenAuthTypeIsAttestationAndNoTokenIsPassedAndLoginEndpointReturns400_throwsNetworkException() =
         runTest {
-            val keyStoreService = FakeKeyStoreService(key = FakeKeyStoreService.generateKey())
+            val keyStoreService = FakeKeyStoreService().apply { generateKey() }
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
-                    "$attestationBaseUrl/v1/google-maps/geocode/address/$encodedQuery" ->
+                    "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
                         when (request.headers[HttpHeaders.Authorization]) {
                             null -> respondError(HttpStatusCode.Unauthorized)
                             else -> throw NotImplementedError()
@@ -203,7 +203,7 @@ class ApiServiceTest {
             ).use { client ->
                 client.get {
                     url {
-                        appendPathSegments("v1", "google-maps", "geocode", "address", query)
+                        appendPathSegments("v4", "geocode", "address", query)
                     }
                 }
             }
@@ -212,10 +212,10 @@ class ApiServiceTest {
     @Test(expected = ServerResponseNetworkException::class)
     fun createHttpClient_whenAuthTypeIsAttestationAndNoTokenIsPassedAndLoginEndpointReturns5xx_throwsNetworkException() =
         runTest {
-            val keyStoreService = FakeKeyStoreService(key = FakeKeyStoreService.generateKey())
+            val keyStoreService = FakeKeyStoreService().apply { generateKey() }
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
-                    "$attestationBaseUrl/v1/google-maps/geocode/address/$encodedQuery" ->
+                    "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
                         when (request.headers[HttpHeaders.Authorization]) {
                             null -> respondError(HttpStatusCode.Unauthorized)
                             else -> throw NotImplementedError()
@@ -243,7 +243,7 @@ class ApiServiceTest {
             ).use { client ->
                 client.get {
                     url {
-                        appendPathSegments("v1", "google-maps", "geocode", "address", query)
+                        appendPathSegments("v4", "geocode", "address", query)
                     }
                 }
             }
@@ -252,10 +252,10 @@ class ApiServiceTest {
     @Test(expected = UnauthorizedNetworkException::class)
     fun createHttpClient_whenAuthTypeIsAttestationAndNoTokenIsPassedAndLoginEndpointReturns401AndRegisterEndpointReturns401_throwsNetworkException() =
         runTest {
-            val keyStoreService = FakeKeyStoreService(key = FakeKeyStoreService.generateKey())
+            val keyStoreService = FakeKeyStoreService().apply { generateKey() }
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
-                    "$attestationBaseUrl/v1/google-maps/geocode/address/$encodedQuery" ->
+                    "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
                         when (request.headers[HttpHeaders.Authorization]) {
                             null -> respondError(HttpStatusCode.Unauthorized)
                             else -> throw NotImplementedError()
@@ -286,7 +286,7 @@ class ApiServiceTest {
             ).use { client ->
                 client.get {
                     url {
-                        appendPathSegments("v1", "google-maps", "geocode", "address", query)
+                        appendPathSegments("v4", "geocode", "address", query)
                     }
                 }
             }
@@ -295,10 +295,10 @@ class ApiServiceTest {
     @Test
     fun createHttpClient_whenAuthTypeIsAttestationAndNoTokenIsPassedAndLoginEndpointReturns401AndRegisterEndpointReturnsSuccess_returnsResponseAndStoresNewToken() =
         runTest {
-            val keyStoreService = FakeKeyStoreService(key = FakeKeyStoreService.generateKey())
+            val keyStoreService = FakeKeyStoreService().apply { generateKey() }
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
-                    "$attestationBaseUrl/v1/google-maps/geocode/address/$encodedQuery" ->
+                    "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
                         when (request.headers[HttpHeaders.Authorization]) {
                             null -> respondError(HttpStatusCode.Unauthorized)
                             "Bearer $newToken" -> respondOk("success")
@@ -358,7 +358,7 @@ class ApiServiceTest {
             ).use { client ->
                 client.get {
                     url {
-                        appendPathSegments("v1", "google-maps", "geocode", "address", query)
+                        appendPathSegments("v4", "geocode", "address", query)
                     }
                 }
             }
@@ -372,7 +372,7 @@ class ApiServiceTest {
             val keyStoreService = FakeKeyStoreService()
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
-                    "$attestationBaseUrl/v1/google-maps/geocode/address/$encodedQuery" ->
+                    "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
                         when (request.headers[HttpHeaders.Authorization]) {
                             null -> respondError(HttpStatusCode.Unauthorized)
                             "Bearer $newToken" -> respondOk("success")
@@ -432,7 +432,7 @@ class ApiServiceTest {
             ).use { client ->
                 client.get {
                     url {
-                        appendPathSegments("v1", "google-maps", "geocode", "address", query)
+                        appendPathSegments("v4", "geocode", "address", query)
                     }
                 }
             }
@@ -443,10 +443,10 @@ class ApiServiceTest {
     @Test
     fun createHttpClient_whenAuthTypeIsAttestationAndIncorrectTokenIsPassedAndIncorrectRefreshTokenIsPassedAndLoginEndpointReturns401AndRegisterEndpointReturnsSuccess_returnsResponseAndStoresNewToken() =
         runTest {
-            val keyStoreService = FakeKeyStoreService(key = FakeKeyStoreService.generateKey())
+            val keyStoreService = FakeKeyStoreService().apply { generateKey() }
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
-                    "$attestationBaseUrl/v1/google-maps/geocode/address/$encodedQuery" ->
+                    "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
                         when (request.headers[HttpHeaders.Authorization]) {
                             "Bearer $incorrectToken" -> respondError(HttpStatusCode.Unauthorized)
                             "Bearer $newToken" -> respondOk("success")
@@ -513,7 +513,7 @@ class ApiServiceTest {
             ).use { client ->
                 client.get {
                     url {
-                        appendPathSegments("v1", "google-maps", "geocode", "address", query)
+                        appendPathSegments("v4", "geocode", "address", query)
                     }
                 }
             }
@@ -524,10 +524,10 @@ class ApiServiceTest {
     @Test
     fun createHttpClient_whenAuthTypeIsAttestationAndIncorrectTokenIsPassedAndCorrectRefreshTokenIsPassed_returnsResponseAndStoresNewToken() =
         runTest {
-            val keyStoreService = FakeKeyStoreService(key = FakeKeyStoreService.generateKey())
+            val keyStoreService = FakeKeyStoreService().apply { generateKey() }
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
-                    "$attestationBaseUrl/v1/google-maps/geocode/address/$encodedQuery" ->
+                    "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
                         when (request.headers[HttpHeaders.Authorization]) {
                             "Bearer $incorrectToken" -> respondError(HttpStatusCode.Unauthorized)
                             "Bearer $newToken" -> respondOk("success")
@@ -580,7 +580,7 @@ class ApiServiceTest {
             ).use { client ->
                 client.get {
                     url {
-                        appendPathSegments("v1", "google-maps", "geocode", "address", query)
+                        appendPathSegments("v4", "geocode", "address", query)
                     }
                 }
             }
@@ -590,10 +590,10 @@ class ApiServiceTest {
 
     @Test
     fun createHttpClient_whenAuthTypeIsAttestationAndCorrectTokenIsPassed_returnsResponse() = runTest {
-        val keyStoreService = FakeKeyStoreService(key = FakeKeyStoreService.generateKey())
+        val keyStoreService = FakeKeyStoreService().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
-                "$attestationBaseUrl/v1/google-maps/geocode/address/$encodedQuery" ->
+                "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
                     when (request.headers[HttpHeaders.Authorization]) {
                         "Bearer $correctToken" -> respondOk("success")
                         else -> throw NotImplementedError()
@@ -619,7 +619,7 @@ class ApiServiceTest {
         ).use { client ->
             client.get {
                 url {
-                    appendPathSegments("v1", "google-maps", "geocode", "address", query)
+                    appendPathSegments("v4", "geocode", "address", query)
                 }
             }
         }

@@ -1,16 +1,14 @@
 package page.ooooo.geoshare.inputs
 
-import androidx.test.uiautomator.UiAutomatorTestScope
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import page.ooooo.geoshare.BehaviorTest.Companion.NETWORK_TIMEOUT
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-class GoogleMapsProInputBehaviorTest : InputBehaviorTest {
+class GoogleMapsHtmlInputBehaviorTest : InputBehaviorTest {
     @Test
-    fun googleMapsHtmlPro() = uiAutomator {
+    fun googleMapsHtml() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("maps.google.com")
         }
@@ -19,7 +17,7 @@ class GoogleMapsProInputBehaviorTest : InputBehaviorTest {
         launchApplication()
         waitForAppToBeVisible()
         closeIntro()
-        setUserPreferenceConnectionPermissionToAlways()
+        configureConnectionPermission()
 
         // Search
         testUri(
@@ -83,19 +81,5 @@ class GoogleMapsProInputBehaviorTest : InputBehaviorTest {
 
         // Place list
         testUriFailed("https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg")
-    }
-
-    private fun UiAutomatorTestScope.testUriFailed(
-        @Suppress("SameParameterValue") unsafeUriString: String,
-        timeoutMs: Long = NETWORK_TIMEOUT,
-    ) {
-        // Go to main form
-        goToMainForm()
-
-        // Share URI and confirm permission dialog
-        shareUri(unsafeUriString)
-        confirmDialogIfVisible()
-
-        assertConversionFailed(timeoutMs)
     }
 }
