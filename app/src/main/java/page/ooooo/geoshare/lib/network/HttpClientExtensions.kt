@@ -16,6 +16,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.head
 import io.ktor.client.statement.request
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.ktor.network.sockets.SocketTimeoutException
 import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.io.EOFException
@@ -140,7 +141,12 @@ fun HttpClientConfig<*>.rethrowExceptionsAsNetworkException(log: Log = DefaultLo
                 is ResponseException -> {
                     // Catches also subclasses such as RedirectResponseException and ClientRequestException
                     log.w(TAG, "Unexpected response code ${cause.response.status} for ${request.url}", cause)
-                    throw ResponseNetworkException(cause.response, cause)
+                    throw when (cause.response.status) {
+                        // TODO Test
+                        HttpStatusCode.TooManyRequests -> TooManyRequestsNetworkException(cause.response, cause)
+                        HttpStatusCode.Unauthorized -> UnauthorizedNetworkException(cause.response, cause)
+                        else -> ResponseNetworkException(cause.response, cause)
+                    }
                 }
 
                 else -> {

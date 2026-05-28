@@ -56,6 +56,25 @@ class ResponseNetworkException(val response: HttpResponse, cause: Throwable) : U
     override fun getDetails() = "Request URL: ${response.request.url}"
 }
 
+class TooManyRequestsNetworkException(val response: HttpResponse, cause: Throwable) :
+    UnrecoverableNetworkException(cause) {
+    override fun getMessage(resources: Resources) =
+        when (response.status) {
+            HttpStatusCode.TooManyRequests -> resources.getString(R.string.network_exception_too_many_requests)
+            else -> resources.getString(R.string.network_exception_response_error, response.status.value)
+        }
+
+    override fun getDetails() = "Request URL: ${response.request.url}"
+}
+
+class UnauthorizedNetworkException(val response: HttpResponse, cause: Throwable) :
+    UnrecoverableNetworkException(cause) {
+    override fun getMessage(resources: Resources) =
+        resources.getString(R.string.network_exception_unauthorized)
+
+    override fun getDetails() = "Request URL: ${response.request.url}"
+}
+
 class UnknownNetworkException(cause: Throwable) : UnrecoverableNetworkException(cause) {
     override fun getMessage(resources: Resources) = resources.getString(R.string.network_exception_unknown)
 
