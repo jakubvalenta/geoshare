@@ -11,11 +11,10 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assume.assumeTrue
 import org.junit.Test
-import org.mockito.kotlin.mock
+import page.ooooo.geoshare.data.di.FakeKeyStoreService
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.lib.FakeLog
-import page.ooooo.geoshare.lib.android.KeyStoreService
 
 class ApiServiceTest {
     private val engine = MockEngine { request ->
@@ -30,7 +29,9 @@ class ApiServiceTest {
             else -> throw NotImplementedError()
         }
     }
-    private val keyStoreService = KeyStoreService()
+    private val keyStoreService = FakeKeyStoreService().apply {
+        generateKey("".toByteArray())
+    }
     private val log = FakeLog
     private val query = "Cherbourg, France"
     private val userPreferencesRepository = FakeUserPreferencesRepository()
@@ -84,7 +85,6 @@ class ApiServiceTest {
                     else -> throw NotImplementedError()
                 }
             }
-            val keyStoreService: KeyStoreService = mock {}
             val apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository)
             val res = apiService.createHttpClient(
                 baseUrl = "https://api.example.com",
@@ -118,7 +118,6 @@ class ApiServiceTest {
                     else -> throw NotImplementedError()
                 }
             }
-            val keyStoreService: KeyStoreService = mock {}
             val apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository)
             val res = apiService.createHttpClient(
                 baseUrl = "https://api.example.com",
@@ -148,7 +147,6 @@ class ApiServiceTest {
                     else -> throw NotImplementedError()
                 }
             }
-            val keyStoreService: KeyStoreService = mock {}
             val apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository)
             val res = apiService.createHttpClient(
                 baseUrl = "https://api.example.com",

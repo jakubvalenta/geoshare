@@ -142,7 +142,6 @@ fun HttpClientConfig<*>.rethrowExceptionsAsNetworkException(log: Log = DefaultLo
                     // Catches also subclasses such as RedirectResponseException and ClientRequestException
                     log.w(TAG, "Unexpected response code ${cause.response.status} for ${request.url}", cause)
                     throw when (cause.response.status) {
-                        // TODO Test
                         HttpStatusCode.TooManyRequests -> TooManyRequestsNetworkException(cause.response, cause)
                         HttpStatusCode.Unauthorized -> UnauthorizedNetworkException(cause.response, cause)
                         else -> ResponseNetworkException(cause.response, cause)

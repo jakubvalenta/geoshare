@@ -7,17 +7,29 @@ import page.ooooo.geoshare.lib.Log
 import java.security.GeneralSecurityException
 import java.security.KeyPairGenerator
 import java.security.KeyStore
+import java.security.PrivateKey
+import java.security.PublicKey
+import java.security.cert.Certificate
 import java.security.spec.ECGenParameterSpec
 import javax.inject.Inject
 
-class KeyStoreService @Inject constructor(
-    private val log: Log = FakeLog,
-) {
+data class Key(val privateKey: PrivateKey, val certificateChain: List<Certificate>) {
+    val publicKey: PublicKey get() = certificateChain.first().publicKey
+}
 
+interface KeyStoreService {
+    fun getKey(): Key?
+
+    fun generateKey(challenge: ByteArray): Key
+}
+
+class DefaultKeyStoreService @Inject constructor(
+    private val log: Log = FakeLog,
+) : KeyStoreService {
     /**
      * Try to get a key from the key store.
      */
-    fun getKey(): KeyStore.PrivateKeyEntry? {
+    override fun getKey(): Key? {
         val keyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
         val entry = try {
             keyStore.getEntry(KEYSTORE_ALIAS, null)
@@ -29,7 +41,7 @@ class KeyStoreService @Inject constructor(
             log.e(TAG, "Got key from the key store but it's not a private key")
             return null
         }
-        return entry
+        return Key(entry.privateKey, entry.certificateChain.toList())
     }
 
     /**
@@ -37,7 +49,7 @@ class KeyStoreService @Inject constructor(
      *
      * If there was a corrupt key in the key store, overwrite it.
      */
-    fun generateKey(challenge: ByteArray): KeyStore.PrivateKeyEntry {
+    override fun generateKey(challenge: ByteArray): Key {
         val keyPairGenerator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore")
         val params = KeyGenParameterSpec.Builder(
             KEYSTORE_ALIAS,
@@ -57,8 +69,9 @@ class KeyStoreService @Inject constructor(
         keyPairGenerator.generateKeyPair()
 
         val keyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
-        return keyStore.getEntry(KEYSTORE_ALIAS, null) as? KeyStore.PrivateKeyEntry
+        val entry = keyStore.getEntry(KEYSTORE_ALIAS, null) as? KeyStore.PrivateKeyEntry
             ?: throw IllegalStateException("Key generation succeeded but key store entry not found")
+        return Key(entry.privateKey, entry.certificateChain.toList())
     }
 
     private companion object {

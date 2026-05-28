@@ -13,13 +13,13 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import page.ooooo.geoshare.data.di.FakeServerRepository
 import page.ooooo.geoshare.data.di.FakeGeoShareServer
 import page.ooooo.geoshare.data.di.FakeInputRepository
+import page.ooooo.geoshare.data.di.FakeKeyStoreService
+import page.ooooo.geoshare.data.di.FakeServerRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
-import page.ooooo.geoshare.lib.android.KeyStoreService
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.network.ApiService
@@ -72,7 +72,7 @@ class GoogleMapsAddressApiInputTest {
             else -> throw NotImplementedError()
         }
     }
-    private val keyStoreService = KeyStoreService()
+    private val keyStoreService = FakeKeyStoreService()
     private val log = FakeLog
     private val uriQuote = FakeUriQuote
     private val userPreferencesRepository = FakeUserPreferencesRepository()

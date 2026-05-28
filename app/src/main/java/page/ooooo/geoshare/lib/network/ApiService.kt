@@ -107,7 +107,6 @@ class ApiService @Inject constructor(
         HttpClient(engine) {
             expectSuccess = true
             setDefaultTimeouts()
-            rethrowExceptionsAsNetworkException(log)
 
             install(DefaultRequest.Plugin) {
                 url(baseUrl)
@@ -117,10 +116,8 @@ class ApiService @Inject constructor(
             }
         }.use { client ->
             // Get key
-            val privateKeyEntry = keyStoreService.getKey() ?: return null
-            val privateKey = privateKeyEntry.privateKey
-            val publicKey = privateKeyEntry.certificateChain.first().publicKey
-            val publicKeyBase64 = publicKey.encoded.base64Encode()
+            val key = keyStoreService.getKey() ?: return null
+            val publicKeyBase64 = key.publicKey.encoded.base64Encode()
 
             // Login challenge
             val loginChallenge = try {
@@ -135,7 +132,7 @@ class ApiService @Inject constructor(
             }
 
             // Login
-            val loginSignature = privateKey.sign(loginChallenge)
+            val loginSignature = key.privateKey.sign(loginChallenge)
             val token = try {
                 client
                     .post("/v1/auth/login") {
@@ -189,13 +186,11 @@ class ApiService @Inject constructor(
             }
 
             // Generate key
-            val privateKeyEntry = keyStoreService.generateKey(registrationChallenge)
-            val privateKey = privateKeyEntry.privateKey
-            val publicKey = privateKeyEntry.certificateChain.first().publicKey
-            val publicKeyBase64 = publicKey.encoded.base64Encode()
+            val key = keyStoreService.generateKey(registrationChallenge)
+            val publicKeyBase64 = key.publicKey.encoded.base64Encode()
 
             // Register
-            val registrationSignature = privateKey.sign(registrationChallenge)
+            val registrationSignature = key.privateKey.sign(registrationChallenge)
             val token = try {
                 client
                     .post("/v1/auth/register") {
@@ -204,7 +199,7 @@ class ApiService @Inject constructor(
                             RegisterRequest(
                                 challenge = registrationChallenge.base64Encode(),
                                 signature = registrationSignature.base64Encode(),
-                                certificateChain = privateKeyEntry.certificateChain.map { it.encoded.base64Encode() },
+                                certificateChain = key.certificateChain.map { it.encoded.base64Encode() },
                             )
                         )
                     }
