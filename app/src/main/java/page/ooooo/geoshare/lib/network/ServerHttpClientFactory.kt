@@ -22,7 +22,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.database.ServerAuthType
-import page.ooooo.geoshare.data.local.preferences.CachedApiTokenPreference
+import page.ooooo.geoshare.data.local.preferences.CachedServerTokenPreference
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.android.KeyStoreTools
@@ -96,7 +96,7 @@ class ServerHttpClientFactory @Inject constructor(
         }
 
     suspend fun attestationLoadTokens(): BearerTokens? =
-        userPreferencesRepository.getValue(CachedApiTokenPreference)?.let {
+        userPreferencesRepository.getValue(CachedServerTokenPreference)?.let {
             BearerTokens(it.token, it.publicKey)
         }
 

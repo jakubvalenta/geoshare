@@ -283,37 +283,6 @@ object AutomationDelayPreference : DurationPreference {
     override fun getValue(values: UserPreferencesValues) = values.automationDelay
 }
 
-object CachedApiTokenPreference : TextPreference<CachedApiToken?> {
-    override val key = stringPreferencesKey("cached_api_token")
-    override val default = null
-    val loading = default
-
-    override fun serialize(value: CachedApiToken?, log: Log) =
-        try {
-            Json.encodeToString(value)
-        } catch (tr: SerializationException) {
-            // Silently ignore serialization errors, because the value should always serialize
-            log.e(TAG, "Serialization error", tr)
-            ""
-        }
-
-    override fun deserialize(value: String?, log: Log) =
-        if (value != null) {
-            try {
-                Json.decodeFromString<CachedApiToken?>(value)
-            } catch (tr: IllegalArgumentException) {
-                log.e(TAG, "Deserialization error", tr)
-                default
-            }
-        } else {
-            default
-        }
-
-    override fun getValue(values: UserPreferencesValues) = values.cachedApiToken
-
-    private const val TAG = "CachedApiTokenPreference"
-}
-
 object CachedPurchasePreference : TextPreference<CachedPurchase?> {
     override val key = stringPreferencesKey("cached_purchase")
     override val default = null
@@ -343,6 +312,37 @@ object CachedPurchasePreference : TextPreference<CachedPurchase?> {
     override fun getValue(values: UserPreferencesValues) = values.cachedPurchase
 
     private const val TAG = "CachedPurchasePreference"
+}
+
+object CachedServerTokenPreference : TextPreference<CachedServerToken?> {
+    override val key = stringPreferencesKey("cached_server_token")
+    override val default = null
+    val loading = default
+
+    override fun serialize(value: CachedServerToken?, log: Log) =
+        try {
+            Json.encodeToString(value)
+        } catch (tr: SerializationException) {
+            // Silently ignore serialization errors, because the value should always serialize
+            log.e(TAG, "Serialization error", tr)
+            ""
+        }
+
+    override fun deserialize(value: String?, log: Log) =
+        if (value != null) {
+            try {
+                Json.decodeFromString<CachedServerToken?>(value)
+            } catch (tr: IllegalArgumentException) {
+                log.e(TAG, "Deserialization error", tr)
+                default
+            }
+        } else {
+            default
+        }
+
+    override fun getValue(values: UserPreferencesValues) = values.cachedServerToken
+
+    private const val TAG = "CachedServerTokenPreference"
 }
 
 /**
@@ -407,7 +407,7 @@ object ChangelogShownForVersionCodePreference : NullableIntPreference {
 data class UserPreferencesValues(
     val automation: Automation = AutomationPreference.loading,
     val automationDelay: Duration = AutomationDelayPreference.loading,
-    val cachedApiToken: CachedApiToken? = CachedApiTokenPreference.loading,
+    val cachedServerToken: CachedServerToken? = CachedServerTokenPreference.loading,
     val cachedPurchase: CachedPurchase? = CachedPurchasePreference.loading,
     val changelogShownForVersionCode: Int? = ChangelogShownForVersionCodePreference.loading,
     val connectionPermission: Permission = ConnectionPermissionPreference.loading,

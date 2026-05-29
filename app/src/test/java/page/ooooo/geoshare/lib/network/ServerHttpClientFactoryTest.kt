@@ -22,8 +22,8 @@ import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.di.FakeKeyStoreTools
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.local.database.ServerAuthType
-import page.ooooo.geoshare.data.local.preferences.CachedApiToken
-import page.ooooo.geoshare.data.local.preferences.CachedApiTokenPreference
+import page.ooooo.geoshare.data.local.preferences.CachedServerToken
+import page.ooooo.geoshare.data.local.preferences.CachedServerTokenPreference
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.extensions.base64Decode
@@ -118,8 +118,8 @@ class ServerHttpClientFactoryTest {
             }
         }
         val userPreferencesRepository: UserPreferencesRepository = mock {
-            on { getValue(CachedApiTokenPreference) } doReturn
-                CachedApiToken(
+            on { getValue(CachedServerTokenPreference) } doReturn
+                CachedServerToken(
                     token = correctToken,
                     publicKey = keyStoreService.getKey()?.publicKey?.encoded?.base64Encode()
                         ?: throw NotImplementedError(),
@@ -537,8 +537,8 @@ class ServerHttpClientFactoryTest {
                 }
             }
             val userPreferencesRepository: UserPreferencesRepository = mock {
-                on { getValue(CachedApiTokenPreference) } doReturn
-                    CachedApiToken(
+                on { getValue(CachedServerTokenPreference) } doReturn
+                    CachedServerToken(
                         token = incorrectToken,
                         publicKey = "incorrect public key".toByteArray().base64Encode(),
                     )
@@ -603,8 +603,8 @@ class ServerHttpClientFactoryTest {
             }
         }
         val userPreferencesRepository: UserPreferencesRepository = mock {
-            on { getValue(CachedApiTokenPreference) } doReturn
-                CachedApiToken(
+            on { getValue(CachedServerTokenPreference) } doReturn
+                CachedServerToken(
                     token = incorrectToken,
                     publicKey = keyStoreService.getKey()?.publicKey?.encoded?.base64Encode()
                         ?: throw NotImplementedError(),

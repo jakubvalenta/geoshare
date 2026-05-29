@@ -78,7 +78,7 @@ class GoogleMapsAddressApiInputTest {
     private val userPreferencesRepository = FakeUserPreferencesRepository()
 
     @Test
-    fun parse_whenApiIsNotConfigured_returnsNextStep() = runTest {
+    fun parse_whenServerIsNotConfigured_returnsNextStep() = runTest {
         val serverRepository: FakeServerRepository = mock {
             on { getSelected() } doReturn null
         }
