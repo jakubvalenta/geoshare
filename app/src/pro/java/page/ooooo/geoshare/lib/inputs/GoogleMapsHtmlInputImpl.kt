@@ -10,8 +10,8 @@ import javax.inject.Singleton
  */
 @Singleton
 class GoogleMapsHtmlInputImpl @Inject constructor() : GoogleMapsHtmlInput, NoopInput {
-    override fun getMessage(resources: Resources) =
-        resources.getString(R.string.conversion_failed_unsupported_source) // TODO Test
+    override fun getErrorMessage(resources: Resources) =
+        resources.getString(R.string.conversion_failed_unsupported_source)
 
     override fun toString() = "GoogleMapsHtmlInput"
 }

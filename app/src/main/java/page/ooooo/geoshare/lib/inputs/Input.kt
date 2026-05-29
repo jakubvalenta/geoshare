@@ -2,6 +2,7 @@ package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
 import android.webkit.WebSettings
+import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.geo.Point
 
 sealed interface Input {
@@ -9,6 +10,9 @@ sealed interface Input {
     val documentation: InputDocumentation? get() = null
 
     fun match(source: String): String? = null
+
+    fun getErrorMessage(resources: Resources): String =
+        resources.getString(R.string.conversion_failed_reason_no_points)
 
     interface HasPermission {
         val permissionTitleResId: Int
@@ -35,6 +39,4 @@ interface WebViewInput : Input, Input.HasPermission {
     fun shouldInterceptRequest(requestUrlString: String): Boolean = false
 }
 
-interface NoopInput : Input {
-    fun getMessage(resources: Resources): String
-}
+interface NoopInput : Input
