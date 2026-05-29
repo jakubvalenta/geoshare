@@ -43,6 +43,7 @@ import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.android.AndroidTools
+import page.ooooo.geoshare.lib.extensions.trimUrl
 import page.ooooo.geoshare.lib.inputs.InputDocumentation
 import page.ooooo.geoshare.lib.inputs.InputDocumentationGroup
 import page.ooooo.geoshare.lib.inputs.InputDocumentationItem
@@ -315,9 +316,7 @@ private fun InputsDetailPane(
                                     documentationInputDetails.documentationInput.text()
 
                                 is InputDocumentationItem.Url ->
-                                    documentationInputDetails.documentationInput.urlString
-                                        .removePrefix("https://")
-                                        .trimEnd('/')
+                                    documentationInputDetails.documentationInput.urlString.trimUrl()
                             },
                             Modifier.padding(end = spacing.tiny),
                             style = MaterialTheme.typography.bodyMedium,

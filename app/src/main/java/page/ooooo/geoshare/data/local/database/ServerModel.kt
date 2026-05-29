@@ -11,6 +11,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
+import page.ooooo.geoshare.lib.extensions.trimUrl
 import java.util.UUID
 import kotlin.uuid.ExperimentalUuidApi
 
@@ -31,7 +32,7 @@ data class Server(
     @Serializable(with = UUIDSerializer::class)
     val uuid: UUID = UUID.randomUUID(),
 ) {
-    val name: String get() = baseUrl.removePrefix("https://")
+    val name: String get() = baseUrl.trimUrl()
 
     fun isValid(): Boolean =
         when (authType) {
