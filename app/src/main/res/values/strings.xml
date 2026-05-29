@@ -249,6 +249,8 @@
     <string name="copying_finished">Copied to clipboard</string>
     <string name="conversion_failed_connection_permission_denied">This link is not supported without connecting to the map service</string>
     <string name="conversion_failed_unsupported_service">Unsupported map service</string>
+    <string name="conversion_failed_unsupported_source">This link is not supported</string>
+    <string name="conversion_failed_unsupported_source_place_list">Place lists are not supported</string>
     <string name="conversion_failed_cancelled">Cancelled</string>
     <string name="inputs_all">All map services</string>
     <string name="inputs_default_handler">Opens by default in %1$s</string>

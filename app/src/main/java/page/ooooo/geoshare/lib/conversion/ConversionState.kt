@@ -397,6 +397,12 @@ data class DataParsed(
                     TAG, "Extracted point with name $points from $match"
                 )
                 ConversionSucceeded(stateContext, source, points)
+            } else if (input is NoopInput) {
+                // TODO Test
+                stateContext.log.i(
+                    TAG, "Failed to extract point from $match, because the input is no-op"
+                )
+                ConversionFailed(source, input.getMessage(stateContext.resources))
             } else if (permission == Permission.NEVER) {
                 stateContext.log.i(
                     TAG, "Failed to extract point from $match, because permission was denied"

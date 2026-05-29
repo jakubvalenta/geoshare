@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import android.webkit.WebSettings
 import page.ooooo.geoshare.lib.geo.Point
 
@@ -35,6 +36,5 @@ interface WebViewInput : Input, Input.HasPermission {
 }
 
 interface NoopInput : Input {
-    suspend fun parse(data: Unit, match: String) =
-        ParseResult()
+    fun getMessage(resources: Resources): String
 }
