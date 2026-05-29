@@ -8,16 +8,16 @@ import kotlin.uuid.Uuid
 @OptIn(ExperimentalUuidApi::class)
 object InitialServersImpl : InitialServers {
     /**
-     * Delete all servers and populate the table with initial servers.
+     * Delete all servers and populate the table with initial ones.
      *
      * When you change these servers, you must:
      *
      * 1. Increase the version of [AppDatabase].
-     * 2. Add new migration similar to [migrations].
-     * 3. Update InitialServersImpl in both the free and pro variants.
-     * 4. Update InitialServersImplTest in both the free and pro variants.
+     * 2. Add new migration to [migrations].
+     * 3. Update InitialServersImpl in both the free and pro variant.
+     * 4. Update InitialServersImplTest in both the free and pro variant.
      *
-     * Optionally, you can add the new links to [page.ooooo.geoshare.data.di.defaultFakeServers], which is used for
+     * Optionally, you can add the new servers to [page.ooooo.geoshare.data.di.defaultFakeServers], which is used for
      * testing.
      */
     override fun restore(db: SupportSQLiteDatabase) {
