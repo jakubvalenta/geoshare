@@ -43,7 +43,7 @@ import page.ooooo.geoshare.lib.inputs.WazeUriInput
 import page.ooooo.geoshare.lib.inputs.YandexMapsHtmlInput
 import page.ooooo.geoshare.lib.inputs.YandexMapsShortLinkInput
 import page.ooooo.geoshare.lib.inputs.YandexMapsUriInput
-import page.ooooo.geoshare.lib.network.ApiService
+import page.ooooo.geoshare.lib.network.ServerHttpClientFactory
 import javax.inject.Singleton
 
 @Module
@@ -110,7 +110,7 @@ object FakeInputRepository : InputRepository {
     private val serverRepository = FakeServerRepository()
     private val uriQuote = FakeUriQuote
     private val userPreferencesRepository = FakeUserPreferencesRepository()
-    private val apiService = ApiService(
+    private val serverHttpClientFactory = ServerHttpClientFactory(
         engine = engine,
         keyStoreService = FakeKeyStoreService(),
         log = log,
@@ -173,13 +173,13 @@ object FakeInputRepository : InputRepository {
         uriQuote = uriQuote,
     )
     val googleMapsAddressApiInput = GoogleMapsAddressApiInput(
-        apiService = apiService,
+        serverHttpClientFactory = serverHttpClientFactory,
         googleMapsHtmlInput = { googleMapsHtmlInput },
         serverRepository = serverRepository,
         uriQuote = uriQuote,
     )
     val googleMapsPlaceApiInput = GoogleMapsPlaceApiInput(
-        apiService = apiService,
+        serverHttpClientFactory = serverHttpClientFactory,
         googleMapsHtmlInput = { googleMapsHtmlInput },
         serverRepository = serverRepository,
         uriQuote = uriQuote,

@@ -20,13 +20,13 @@ import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.network.ApiService
+import page.ooooo.geoshare.lib.network.ServerHttpClientFactory
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class GoogleMapsAddressApiInput @Inject constructor(
-    private val apiService: ApiService,
+    private val serverHttpClientFactory: ServerHttpClientFactory,
     private val googleMapsHtmlInput: Lazy<GoogleMapsHtmlInput>,
     private val serverRepository: ServerRepository,
     private val uriQuote: UriQuote,
@@ -47,7 +47,7 @@ class GoogleMapsAddressApiInput @Inject constructor(
             nextStep = NextStep(googleMapsHtmlInput.get(), match)
             return@parseResult
         }
-        val client = apiService.createHttpClient(
+        val client = serverHttpClientFactory.createHttpClient(
             baseUrl = server.baseUrl,
             authType = server.authType,
             apiKey = server.apiKey,
@@ -71,7 +71,7 @@ class GoogleMapsAddressApiInput @Inject constructor(
                     }
                 }
                 .execute { response ->
-                    response.body<ApiService.GoogleMapsResults>()
+                    response.body<ServerHttpClientFactory.GoogleMapsResults>()
                 }
         }
         points = res.results

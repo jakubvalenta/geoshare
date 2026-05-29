@@ -31,7 +31,7 @@ import page.ooooo.geoshare.lib.extensions.base64Encode
 import page.ooooo.geoshare.lib.extensions.sign
 import javax.inject.Inject
 
-class ApiService @Inject constructor(
+class ServerHttpClientFactory @Inject constructor(
     private val engine: HttpClientEngine,
     private val keyStoreService: KeyStoreService,
     private val log: Log = DefaultLog,
@@ -220,6 +220,6 @@ class ApiService @Inject constructor(
     }
 
     private companion object {
-        private const val TAG = "ApiService"
+        private const val TAG = "ServerHttpClientFactory"
     }
 }

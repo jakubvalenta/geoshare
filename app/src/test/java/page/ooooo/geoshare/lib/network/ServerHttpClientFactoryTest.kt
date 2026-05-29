@@ -30,7 +30,7 @@ import page.ooooo.geoshare.lib.extensions.base64Decode
 import page.ooooo.geoshare.lib.extensions.base64Encode
 import page.ooooo.geoshare.lib.extensions.verifySignature
 
-class ApiServiceTest {
+class ServerHttpClientFactoryTest {
     private val apiKeyBaseUrl = "https://geocode.example.com"
     private val attestationBaseUrl = "https://api.example.com"
     private val challenge = "test challenge".toByteArray()
@@ -57,8 +57,8 @@ class ApiServiceTest {
                 else -> throw NotImplementedError()
             }
         }
-        val apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository)
-        val res = apiService.createHttpClient(
+        val serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+        val res = serverHttpClientFactory.createHttpClient(
             baseUrl = apiKeyBaseUrl,
             authType = ServerAuthType.API_KEY,
             apiKey = "test_api_key",
@@ -88,8 +88,8 @@ class ApiServiceTest {
                 else -> throw NotImplementedError()
             }
         }
-        val apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository)
-        apiService.createHttpClient(
+        val serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+        serverHttpClientFactory.createHttpClient(
             baseUrl = apiKeyBaseUrl,
             authType = ServerAuthType.API_KEY,
             apiKey = "spam",
@@ -121,8 +121,9 @@ class ApiServiceTest {
                     else -> throw NotImplementedError()
                 }
             }
-            val apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository)
-            apiService.createHttpClient(
+            val serverHttpClientFactory =
+                ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+            serverHttpClientFactory.createHttpClient(
                 baseUrl = attestationBaseUrl,
                 authType = ServerAuthType.ATTESTATION,
                 apiKey = "",
@@ -154,8 +155,9 @@ class ApiServiceTest {
                     else -> throw NotImplementedError()
                 }
             }
-            val apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository)
-            apiService.createHttpClient(
+            val serverHttpClientFactory =
+                ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+            serverHttpClientFactory.createHttpClient(
                 baseUrl = attestationBaseUrl,
                 authType = ServerAuthType.ATTESTATION,
                 apiKey = "",
@@ -183,7 +185,7 @@ class ApiServiceTest {
 
                     "$attestationBaseUrl/v1/auth/challenge" ->
                         respond(
-                            Json.encodeToString(ApiService.ChallengeResponse(challenge = challenge.base64Encode())),
+                            Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
                             HttpStatusCode.OK,
                             headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
                         )
@@ -194,8 +196,9 @@ class ApiServiceTest {
                     else -> throw NotImplementedError()
                 }
             }
-            val apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository)
-            apiService.createHttpClient(
+            val serverHttpClientFactory =
+                ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+            serverHttpClientFactory.createHttpClient(
                 baseUrl = attestationBaseUrl,
                 authType = ServerAuthType.ATTESTATION,
                 apiKey = "",
@@ -223,7 +226,7 @@ class ApiServiceTest {
 
                     "$attestationBaseUrl/v1/auth/challenge" ->
                         respond(
-                            Json.encodeToString(ApiService.ChallengeResponse(challenge = challenge.base64Encode())),
+                            Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
                             HttpStatusCode.OK,
                             headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
                         )
@@ -234,8 +237,9 @@ class ApiServiceTest {
                     else -> throw NotImplementedError()
                 }
             }
-            val apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository)
-            apiService.createHttpClient(
+            val serverHttpClientFactory =
+                ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+            serverHttpClientFactory.createHttpClient(
                 baseUrl = attestationBaseUrl,
                 authType = ServerAuthType.ATTESTATION,
                 apiKey = "",
@@ -263,7 +267,7 @@ class ApiServiceTest {
 
                     "$attestationBaseUrl/v1/auth/challenge" ->
                         respond(
-                            Json.encodeToString(ApiService.ChallengeResponse(challenge = challenge.base64Encode())),
+                            Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
                             HttpStatusCode.OK,
                             headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
                         )
@@ -277,8 +281,9 @@ class ApiServiceTest {
                     else -> throw NotImplementedError()
                 }
             }
-            val apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository)
-            apiService.createHttpClient(
+            val serverHttpClientFactory =
+                ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+            serverHttpClientFactory.createHttpClient(
                 baseUrl = attestationBaseUrl,
                 authType = ServerAuthType.ATTESTATION,
                 apiKey = "",
@@ -307,14 +312,15 @@ class ApiServiceTest {
 
                     "$attestationBaseUrl/v1/auth/challenge" ->
                         respond(
-                            Json.encodeToString(ApiService.ChallengeResponse(challenge = challenge.base64Encode())),
+                            Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
                             HttpStatusCode.OK,
                             headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
                         )
 
                     "$attestationBaseUrl/v1/auth/login" -> {
                         val key = keyStoreService.getKey() ?: throw NotImplementedError()
-                        val body = Json.decodeFromString<ApiService.LoginRequest>((request.body as TextContent).text)
+                        val body =
+                            Json.decodeFromString<ServerHttpClientFactory.LoginRequest>((request.body as TextContent).text)
                         val signatureOk = key.publicKey.verifySignature(
                             body.signature.base64Decode(),
                             body.challenge.base64Decode(),
@@ -329,7 +335,8 @@ class ApiServiceTest {
 
                     "$attestationBaseUrl/v1/auth/register" -> {
                         val key = keyStoreService.getKey() ?: throw NotImplementedError()
-                        val body = Json.decodeFromString<ApiService.RegisterRequest>((request.body as TextContent).text)
+                        val body =
+                            Json.decodeFromString<ServerHttpClientFactory.RegisterRequest>((request.body as TextContent).text)
                         val signatureOk = key.publicKey.verifySignature(
                             body.signature.base64Decode(),
                             body.challenge.base64Decode(),
@@ -337,7 +344,7 @@ class ApiServiceTest {
                         val chainOk = key.certificateChain.map { it.encoded.base64Encode() } == body.certificateChain
                         if (signatureOk && chainOk) {
                             respond(
-                                Json.encodeToString(ApiService.TokenResponse(token = newToken)),
+                                Json.encodeToString(ServerHttpClientFactory.TokenResponse(token = newToken)),
                                 HttpStatusCode.OK,
                                 headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
                             )
@@ -349,8 +356,9 @@ class ApiServiceTest {
                     else -> throw NotImplementedError()
                 }
             }
-            val apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository)
-            val res = apiService.createHttpClient(
+            val serverHttpClientFactory =
+                ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+            val res = serverHttpClientFactory.createHttpClient(
                 baseUrl = attestationBaseUrl,
                 authType = ServerAuthType.ATTESTATION,
                 apiKey = "",
@@ -381,14 +389,15 @@ class ApiServiceTest {
 
                     "$attestationBaseUrl/v1/auth/challenge" ->
                         respond(
-                            Json.encodeToString(ApiService.ChallengeResponse(challenge = challenge.base64Encode())),
+                            Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
                             HttpStatusCode.OK,
                             headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
                         )
 
                     "$attestationBaseUrl/v1/auth/login" -> {
                         val key = keyStoreService.getKey() ?: throw NotImplementedError()
-                        val body = Json.decodeFromString<ApiService.LoginRequest>((request.body as TextContent).text)
+                        val body =
+                            Json.decodeFromString<ServerHttpClientFactory.LoginRequest>((request.body as TextContent).text)
                         val signatureOk = key.publicKey.verifySignature(
                             body.signature.base64Decode(),
                             body.challenge.base64Decode(),
@@ -403,7 +412,8 @@ class ApiServiceTest {
 
                     "$attestationBaseUrl/v1/auth/register" -> {
                         val key = keyStoreService.getKey() ?: throw NotImplementedError()
-                        val body = Json.decodeFromString<ApiService.RegisterRequest>((request.body as TextContent).text)
+                        val body =
+                            Json.decodeFromString<ServerHttpClientFactory.RegisterRequest>((request.body as TextContent).text)
                         val signatureOk = key.publicKey.verifySignature(
                             body.signature.base64Decode(),
                             body.challenge.base64Decode(),
@@ -411,7 +421,7 @@ class ApiServiceTest {
                         val chainOk = key.certificateChain.map { it.encoded.base64Encode() } == body.certificateChain
                         if (signatureOk && chainOk) {
                             respond(
-                                Json.encodeToString(ApiService.TokenResponse(token = newToken)),
+                                Json.encodeToString(ServerHttpClientFactory.TokenResponse(token = newToken)),
                                 HttpStatusCode.OK,
                                 headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
                             )
@@ -423,8 +433,9 @@ class ApiServiceTest {
                     else -> throw NotImplementedError()
                 }
             }
-            val apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository)
-            val res = apiService.createHttpClient(
+            val serverHttpClientFactory =
+                ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+            val res = serverHttpClientFactory.createHttpClient(
                 baseUrl = attestationBaseUrl,
                 authType = ServerAuthType.ATTESTATION,
                 apiKey = "",
@@ -455,14 +466,15 @@ class ApiServiceTest {
 
                     "$attestationBaseUrl/v1/auth/challenge" ->
                         respond(
-                            Json.encodeToString(ApiService.ChallengeResponse(challenge = challenge.base64Encode())),
+                            Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
                             HttpStatusCode.OK,
                             headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
                         )
 
                     "$attestationBaseUrl/v1/auth/login" -> {
                         val key = keyStoreService.getKey() ?: throw NotImplementedError()
-                        val body = Json.decodeFromString<ApiService.LoginRequest>((request.body as TextContent).text)
+                        val body =
+                            Json.decodeFromString<ServerHttpClientFactory.LoginRequest>((request.body as TextContent).text)
                         val signatureOk = key.publicKey.verifySignature(
                             body.signature.base64Decode(),
                             body.challenge.base64Decode(),
@@ -477,7 +489,8 @@ class ApiServiceTest {
 
                     "$attestationBaseUrl/v1/auth/register" -> {
                         val key = keyStoreService.getKey() ?: throw NotImplementedError()
-                        val body = Json.decodeFromString<ApiService.RegisterRequest>((request.body as TextContent).text)
+                        val body =
+                            Json.decodeFromString<ServerHttpClientFactory.RegisterRequest>((request.body as TextContent).text)
                         val signatureOk = key.publicKey.verifySignature(
                             body.signature.base64Decode(),
                             body.challenge.base64Decode(),
@@ -485,7 +498,7 @@ class ApiServiceTest {
                         val chainOk = key.certificateChain.map { it.encoded.base64Encode() } == body.certificateChain
                         if (signatureOk && chainOk) {
                             respond(
-                                Json.encodeToString(ApiService.TokenResponse(token = newToken)),
+                                Json.encodeToString(ServerHttpClientFactory.TokenResponse(token = newToken)),
                                 HttpStatusCode.OK,
                                 headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
                             )
@@ -504,8 +517,9 @@ class ApiServiceTest {
                         publicKey = "incorrect public key".toByteArray().base64Encode(),
                     )
             }
-            val apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository)
-            val res = apiService.createHttpClient(
+            val serverHttpClientFactory =
+                ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+            val res = serverHttpClientFactory.createHttpClient(
                 baseUrl = attestationBaseUrl,
                 authType = ServerAuthType.ATTESTATION,
                 apiKey = "",
@@ -536,14 +550,15 @@ class ApiServiceTest {
 
                     "$attestationBaseUrl/v1/auth/challenge" ->
                         respond(
-                            Json.encodeToString(ApiService.ChallengeResponse(challenge = challenge.base64Encode())),
+                            Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
                             HttpStatusCode.OK,
                             headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
                         )
 
                     "$attestationBaseUrl/v1/auth/login" -> {
                         val key = keyStoreService.getKey() ?: throw NotImplementedError()
-                        val body = Json.decodeFromString<ApiService.LoginRequest>((request.body as TextContent).text)
+                        val body =
+                            Json.decodeFromString<ServerHttpClientFactory.LoginRequest>((request.body as TextContent).text)
                         val signatureOk = key.publicKey.verifySignature(
                             body.signature.base64Decode(),
                             body.challenge.base64Decode(),
@@ -551,7 +566,7 @@ class ApiServiceTest {
                         val publicKeyOk = key.publicKey.encoded.base64Encode() == body.publicKey
                         if (signatureOk && publicKeyOk) {
                             respond(
-                                Json.encodeToString(ApiService.TokenResponse(token = newToken)),
+                                Json.encodeToString(ServerHttpClientFactory.TokenResponse(token = newToken)),
                                 HttpStatusCode.OK,
                                 headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
                             )
@@ -571,8 +586,9 @@ class ApiServiceTest {
                             ?: throw NotImplementedError(),
                     )
             }
-            val apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository)
-            val res = apiService.createHttpClient(
+            val serverHttpClientFactory =
+                ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+            val res = serverHttpClientFactory.createHttpClient(
                 baseUrl = attestationBaseUrl,
                 authType = ServerAuthType.ATTESTATION,
                 apiKey = "",
@@ -610,8 +626,8 @@ class ApiServiceTest {
                         ?: throw NotImplementedError(),
                 )
         }
-        val apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository)
-        val res = apiService.createHttpClient(
+        val serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+        val res = serverHttpClientFactory.createHttpClient(
             baseUrl = attestationBaseUrl,
             authType = ServerAuthType.ATTESTATION,
             apiKey = "",
