@@ -43,7 +43,7 @@ class ServerHttpClientFactoryTest {
     private val userPreferencesRepository = FakeUserPreferencesRepository()
 
     @Test
-    fun createHttpClient_whenAuthTypeIsApiKeyAndCorrectKeyIsPassed_returnsResponse() = runTest {
+    fun createHttpClient_apiKey_whenKeyIsCorrect_returnsResponse() = runTest {
         val keyStoreService = FakeKeyStoreService()
         val engine = MockEngine { request ->
             when (request.url.toString()) {
@@ -57,8 +57,8 @@ class ServerHttpClientFactoryTest {
                 else -> throw NotImplementedError()
             }
         }
-        val serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
-        val res = serverHttpClientFactory.createHttpClient(
+        val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+        val res = factory.createHttpClient(
             baseUrl = apiKeyBaseUrl,
             authType = ServerAuthType.API_KEY,
             apiKey = "test_api_key",
@@ -74,7 +74,7 @@ class ServerHttpClientFactoryTest {
     }
 
     @Test(expected = UnauthorizedNetworkException::class)
-    fun createHttpClient_whenAuthTypeIsApiKeyAndWrongKeyIsPassed_throwsNetworkException() = runTest {
+    fun createHttpClient_apiKey_whenKeyIsIncorrect_throwsException() = runTest {
         val keyStoreService = FakeKeyStoreService()
         val engine = MockEngine { request ->
             when (request.url.toString()) {
@@ -88,8 +88,8 @@ class ServerHttpClientFactoryTest {
                 else -> throw NotImplementedError()
             }
         }
-        val serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
-        serverHttpClientFactory.createHttpClient(
+        val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+        factory.createHttpClient(
             baseUrl = apiKeyBaseUrl,
             authType = ServerAuthType.API_KEY,
             apiKey = "spam",
@@ -103,202 +103,230 @@ class ServerHttpClientFactoryTest {
         }
     }
 
-    @Test(expected = UnauthorizedNetworkException::class)
-    fun createHttpClient_whenAuthTypeIsAttestationAndNoTokenIsPassedAndChallengeEndpointReturns401_throwsNetworkException() =
-        runTest {
-            val keyStoreService = FakeKeyStoreService().apply { generateKey() }
-            val engine = MockEngine { request ->
-                when (request.url.toString()) {
-                    "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
-                        when (request.headers[HttpHeaders.Authorization]) {
-                            null -> respondError(HttpStatusCode.Unauthorized)
-                            else -> throw NotImplementedError()
-                        }
-
-                    "$attestationBaseUrl/v1/auth/challenge" ->
-                        respondError(HttpStatusCode.Unauthorized)
-
-                    else -> throw NotImplementedError()
-                }
-            }
-            val serverHttpClientFactory =
-                ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
-            serverHttpClientFactory.createHttpClient(
-                baseUrl = attestationBaseUrl,
-                authType = ServerAuthType.ATTESTATION,
-                apiKey = "",
-                apiKeyHeader = "",
-            ).use { client ->
-                client.get {
-                    url {
-                        appendPathSegments("v4", "geocode", "address", query)
+    @Test
+    fun createHttpClient_attestation_whenTokenIsCorrect_returnsResponse() = runTest {
+        val keyStoreService = FakeKeyStoreService().apply { generateKey() }
+        val engine = MockEngine { request ->
+            when (request.url.toString()) {
+                "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
+                    when (request.headers[HttpHeaders.Authorization]) {
+                        "Bearer $correctToken" -> respondOk("success")
+                        else -> throw NotImplementedError()
                     }
+
+                else -> throw NotImplementedError()
+            }
+        }
+        val userPreferencesRepository: UserPreferencesRepository = mock {
+            on { getValue(CachedApiTokenPreference) } doReturn
+                CachedApiToken(
+                    token = correctToken,
+                    publicKey = keyStoreService.getKey()?.publicKey?.encoded?.base64Encode()
+                        ?: throw NotImplementedError(),
+                )
+        }
+        val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+        val res = factory.createHttpClient(
+            baseUrl = attestationBaseUrl,
+            authType = ServerAuthType.ATTESTATION,
+            apiKey = "",
+            apiKeyHeader = "",
+        ).use { client ->
+            client.get {
+                url {
+                    appendPathSegments("v4", "geocode", "address", query)
                 }
             }
         }
+        assertEquals("success", res.bodyAsText())
+    }
+
+    @Test(expected = UnauthorizedNetworkException::class)
+    fun createHttpClient_attestation_whenTokenIsMissingAndChallengeFails_throwsException() = runTest {
+        val keyStoreService = FakeKeyStoreService().apply { generateKey() }
+        val engine = MockEngine { request ->
+            when (request.url.toString()) {
+                "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
+                    when (request.headers[HttpHeaders.Authorization]) {
+                        null -> respondError(HttpStatusCode.Unauthorized)
+                        else -> throw NotImplementedError()
+                    }
+
+                "$attestationBaseUrl/v1/auth/challenge" ->
+                    respondError(HttpStatusCode.Unauthorized)
+
+                else -> throw NotImplementedError()
+            }
+        }
+        val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+        factory.createHttpClient(
+            baseUrl = attestationBaseUrl,
+            authType = ServerAuthType.ATTESTATION,
+            apiKey = "",
+            apiKeyHeader = "",
+        ).use { client ->
+            client.get {
+                url {
+                    appendPathSegments("v4", "geocode", "address", query)
+                }
+            }
+        }
+    }
 
     @Test(expected = ServerResponseNetworkException::class)
-    fun createHttpClient_whenAuthTypeIsAttestationAndNoTokenIsPassedAndChallengeEndpointReturns5xx_throwsNetworkException() =
-        runTest {
-            val keyStoreService = FakeKeyStoreService().apply { generateKey() }
-            val engine = MockEngine { request ->
-                when (request.url.toString()) {
-                    "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
-                        when (request.headers[HttpHeaders.Authorization]) {
-                            null -> respondError(HttpStatusCode.Unauthorized)
-                            else -> throw NotImplementedError()
-                        }
-
-                    "$attestationBaseUrl/v1/auth/challenge" ->
-                        respondError(HttpStatusCode.InternalServerError)
-
-                    else -> throw NotImplementedError()
-                }
-            }
-            val serverHttpClientFactory =
-                ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
-            serverHttpClientFactory.createHttpClient(
-                baseUrl = attestationBaseUrl,
-                authType = ServerAuthType.ATTESTATION,
-                apiKey = "",
-                apiKeyHeader = "",
-            ).use { client ->
-                client.get {
-                    url {
-                        appendPathSegments("v4", "geocode", "address", query)
+    fun createHttpClient_attestation_whenTokenIsMissingAndChallengeReturns5xx_throwsException() = runTest {
+        val keyStoreService = FakeKeyStoreService().apply { generateKey() }
+        val engine = MockEngine { request ->
+            when (request.url.toString()) {
+                "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
+                    when (request.headers[HttpHeaders.Authorization]) {
+                        null -> respondError(HttpStatusCode.Unauthorized)
+                        else -> throw NotImplementedError()
                     }
+
+                "$attestationBaseUrl/v1/auth/challenge" ->
+                    respondError(HttpStatusCode.InternalServerError)
+
+                else -> throw NotImplementedError()
+            }
+        }
+        val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+        factory.createHttpClient(
+            baseUrl = attestationBaseUrl,
+            authType = ServerAuthType.ATTESTATION,
+            apiKey = "",
+            apiKeyHeader = "",
+        ).use { client ->
+            client.get {
+                url {
+                    appendPathSegments("v4", "geocode", "address", query)
                 }
             }
         }
+    }
 
     @Test(expected = ResponseNetworkException::class)
-    fun createHttpClient_whenAuthTypeIsAttestationAndNoTokenIsPassedAndLoginEndpointReturns400_throwsNetworkException() =
-        runTest {
-            val keyStoreService = FakeKeyStoreService().apply { generateKey() }
-            val engine = MockEngine { request ->
-                when (request.url.toString()) {
-                    "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
-                        when (request.headers[HttpHeaders.Authorization]) {
-                            null -> respondError(HttpStatusCode.Unauthorized)
-                            else -> throw NotImplementedError()
-                        }
-
-                    "$attestationBaseUrl/v1/auth/challenge" ->
-                        respond(
-                            Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
-                            HttpStatusCode.OK,
-                            headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
-                        )
-
-                    "$attestationBaseUrl/v1/auth/login" ->
-                        respondError(HttpStatusCode.BadRequest)
-
-                    else -> throw NotImplementedError()
-                }
-            }
-            val serverHttpClientFactory =
-                ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
-            serverHttpClientFactory.createHttpClient(
-                baseUrl = attestationBaseUrl,
-                authType = ServerAuthType.ATTESTATION,
-                apiKey = "",
-                apiKeyHeader = "",
-            ).use { client ->
-                client.get {
-                    url {
-                        appendPathSegments("v4", "geocode", "address", query)
+    fun createHttpClient_attestation_whenTokenIsMissingAndLoginReturns400_throwsException() = runTest {
+        val keyStoreService = FakeKeyStoreService().apply { generateKey() }
+        val engine = MockEngine { request ->
+            when (request.url.toString()) {
+                "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
+                    when (request.headers[HttpHeaders.Authorization]) {
+                        null -> respondError(HttpStatusCode.Unauthorized)
+                        else -> throw NotImplementedError()
                     }
+
+                "$attestationBaseUrl/v1/auth/challenge" ->
+                    respond(
+                        Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
+                        HttpStatusCode.OK,
+                        headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
+                    )
+
+                "$attestationBaseUrl/v1/auth/login" ->
+                    respondError(HttpStatusCode.BadRequest)
+
+                else -> throw NotImplementedError()
+            }
+        }
+        val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+        factory.createHttpClient(
+            baseUrl = attestationBaseUrl,
+            authType = ServerAuthType.ATTESTATION,
+            apiKey = "",
+            apiKeyHeader = "",
+        ).use { client ->
+            client.get {
+                url {
+                    appendPathSegments("v4", "geocode", "address", query)
                 }
             }
         }
+    }
 
     @Test(expected = ServerResponseNetworkException::class)
-    fun createHttpClient_whenAuthTypeIsAttestationAndNoTokenIsPassedAndLoginEndpointReturns5xx_throwsNetworkException() =
-        runTest {
-            val keyStoreService = FakeKeyStoreService().apply { generateKey() }
-            val engine = MockEngine { request ->
-                when (request.url.toString()) {
-                    "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
-                        when (request.headers[HttpHeaders.Authorization]) {
-                            null -> respondError(HttpStatusCode.Unauthorized)
-                            else -> throw NotImplementedError()
-                        }
-
-                    "$attestationBaseUrl/v1/auth/challenge" ->
-                        respond(
-                            Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
-                            HttpStatusCode.OK,
-                            headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
-                        )
-
-                    "$attestationBaseUrl/v1/auth/login" ->
-                        respondError(HttpStatusCode.InternalServerError)
-
-                    else -> throw NotImplementedError()
-                }
-            }
-            val serverHttpClientFactory =
-                ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
-            serverHttpClientFactory.createHttpClient(
-                baseUrl = attestationBaseUrl,
-                authType = ServerAuthType.ATTESTATION,
-                apiKey = "",
-                apiKeyHeader = "",
-            ).use { client ->
-                client.get {
-                    url {
-                        appendPathSegments("v4", "geocode", "address", query)
+    fun createHttpClient_attestation_whenTokenIsMissingAndLoginReturns5xx_throwsException() = runTest {
+        val keyStoreService = FakeKeyStoreService().apply { generateKey() }
+        val engine = MockEngine { request ->
+            when (request.url.toString()) {
+                "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
+                    when (request.headers[HttpHeaders.Authorization]) {
+                        null -> respondError(HttpStatusCode.Unauthorized)
+                        else -> throw NotImplementedError()
                     }
+
+                "$attestationBaseUrl/v1/auth/challenge" ->
+                    respond(
+                        Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
+                        HttpStatusCode.OK,
+                        headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
+                    )
+
+                "$attestationBaseUrl/v1/auth/login" ->
+                    respondError(HttpStatusCode.InternalServerError)
+
+                else -> throw NotImplementedError()
+            }
+        }
+        val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+        factory.createHttpClient(
+            baseUrl = attestationBaseUrl,
+            authType = ServerAuthType.ATTESTATION,
+            apiKey = "",
+            apiKeyHeader = "",
+        ).use { client ->
+            client.get {
+                url {
+                    appendPathSegments("v4", "geocode", "address", query)
                 }
             }
         }
+    }
 
     @Test(expected = UnauthorizedNetworkException::class)
-    fun createHttpClient_whenAuthTypeIsAttestationAndNoTokenIsPassedAndLoginEndpointReturns401AndRegisterEndpointReturns401_throwsNetworkException() =
-        runTest {
-            val keyStoreService = FakeKeyStoreService().apply { generateKey() }
-            val engine = MockEngine { request ->
-                when (request.url.toString()) {
-                    "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
-                        when (request.headers[HttpHeaders.Authorization]) {
-                            null -> respondError(HttpStatusCode.Unauthorized)
-                            else -> throw NotImplementedError()
-                        }
-
-                    "$attestationBaseUrl/v1/auth/challenge" ->
-                        respond(
-                            Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
-                            HttpStatusCode.OK,
-                            headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
-                        )
-
-                    "$attestationBaseUrl/v1/auth/login" ->
-                        respondError(HttpStatusCode.Unauthorized)
-
-                    "$attestationBaseUrl/v1/auth/register" ->
-                        respondError(HttpStatusCode.Unauthorized)
-
-                    else -> throw NotImplementedError()
-                }
-            }
-            val serverHttpClientFactory =
-                ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
-            serverHttpClientFactory.createHttpClient(
-                baseUrl = attestationBaseUrl,
-                authType = ServerAuthType.ATTESTATION,
-                apiKey = "",
-                apiKeyHeader = "",
-            ).use { client ->
-                client.get {
-                    url {
-                        appendPathSegments("v4", "geocode", "address", query)
+    fun createHttpClient_attestation_whenTokenIsMissingAndLoginFailsAndRegistrationFails_throwsException() = runTest {
+        val keyStoreService = FakeKeyStoreService().apply { generateKey() }
+        val engine = MockEngine { request ->
+            when (request.url.toString()) {
+                "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
+                    when (request.headers[HttpHeaders.Authorization]) {
+                        null -> respondError(HttpStatusCode.Unauthorized)
+                        else -> throw NotImplementedError()
                     }
+
+                "$attestationBaseUrl/v1/auth/challenge" ->
+                    respond(
+                        Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
+                        HttpStatusCode.OK,
+                        headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
+                    )
+
+                "$attestationBaseUrl/v1/auth/login" ->
+                    respondError(HttpStatusCode.Unauthorized)
+
+                "$attestationBaseUrl/v1/auth/register" ->
+                    respondError(HttpStatusCode.Unauthorized)
+
+                else -> throw NotImplementedError()
+            }
+        }
+        val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+        factory.createHttpClient(
+            baseUrl = attestationBaseUrl,
+            authType = ServerAuthType.ATTESTATION,
+            apiKey = "",
+            apiKeyHeader = "",
+        ).use { client ->
+            client.get {
+                url {
+                    appendPathSegments("v4", "geocode", "address", query)
                 }
             }
         }
+    }
 
     @Test
-    fun createHttpClient_whenAuthTypeIsAttestationAndNoTokenIsPassedAndLoginEndpointReturns401AndRegisterEndpointReturnsSuccess_returnsResponseAndStoresNewToken() =
+    fun createHttpClient_attestation_whenTokenIsMissingAndLoginFailsAndRegistrationSucceeds_returnsResponse() =
         runTest {
             val keyStoreService = FakeKeyStoreService().apply { generateKey() }
             val engine = MockEngine { request ->
@@ -356,9 +384,8 @@ class ServerHttpClientFactoryTest {
                     else -> throw NotImplementedError()
                 }
             }
-            val serverHttpClientFactory =
-                ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
-            val res = serverHttpClientFactory.createHttpClient(
+            val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+            val res = factory.createHttpClient(
                 baseUrl = attestationBaseUrl,
                 authType = ServerAuthType.ATTESTATION,
                 apiKey = "",
@@ -375,7 +402,7 @@ class ServerHttpClientFactoryTest {
         }
 
     @Test
-    fun createHttpClient_whenAuthTypeIsAttestationAndNoTokenIsPassedAndKeyStoreDoesNotContainPrivateKeyAndRegisterEndpointReturnsSuccess_returnsResponseAndStoresNewToken() =
+    fun createHttpClient_attestation_whenTokenIsMissingAndPrivateKeyIsNotGeneratedAndRegistrationSucceeds_returnsResponse() =
         runTest {
             val keyStoreService = FakeKeyStoreService()
             val engine = MockEngine { request ->
@@ -433,9 +460,8 @@ class ServerHttpClientFactoryTest {
                     else -> throw NotImplementedError()
                 }
             }
-            val serverHttpClientFactory =
-                ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
-            val res = serverHttpClientFactory.createHttpClient(
+            val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+            val res = factory.createHttpClient(
                 baseUrl = attestationBaseUrl,
                 authType = ServerAuthType.ATTESTATION,
                 apiKey = "",
@@ -452,7 +478,7 @@ class ServerHttpClientFactoryTest {
         }
 
     @Test
-    fun createHttpClient_whenAuthTypeIsAttestationAndIncorrectTokenIsPassedAndIncorrectRefreshTokenIsPassedAndLoginEndpointReturns401AndRegisterEndpointReturnsSuccess_returnsResponseAndStoresNewToken() =
+    fun createHttpClient_attestation_whenTokenIsIncorrectAndRefreshTokenIsIncorrectAndLoginFailsAndRegistrationSucceeds_returnsResponse() =
         runTest {
             val keyStoreService = FakeKeyStoreService().apply { generateKey() }
             val engine = MockEngine { request ->
@@ -517,9 +543,8 @@ class ServerHttpClientFactoryTest {
                         publicKey = "incorrect public key".toByteArray().base64Encode(),
                     )
             }
-            val serverHttpClientFactory =
-                ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
-            val res = serverHttpClientFactory.createHttpClient(
+            val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+            val res = factory.createHttpClient(
                 baseUrl = attestationBaseUrl,
                 authType = ServerAuthType.ATTESTATION,
                 apiKey = "",
@@ -536,84 +561,43 @@ class ServerHttpClientFactoryTest {
         }
 
     @Test
-    fun createHttpClient_whenAuthTypeIsAttestationAndIncorrectTokenIsPassedAndCorrectRefreshTokenIsPassed_returnsResponseAndStoresNewToken() =
-        runTest {
-            val keyStoreService = FakeKeyStoreService().apply { generateKey() }
-            val engine = MockEngine { request ->
-                when (request.url.toString()) {
-                    "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
-                        when (request.headers[HttpHeaders.Authorization]) {
-                            "Bearer $incorrectToken" -> respondError(HttpStatusCode.Unauthorized)
-                            "Bearer $newToken" -> respondOk("success")
-                            else -> throw NotImplementedError()
-                        }
-
-                    "$attestationBaseUrl/v1/auth/challenge" ->
-                        respond(
-                            Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
-                            HttpStatusCode.OK,
-                            headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
-                        )
-
-                    "$attestationBaseUrl/v1/auth/login" -> {
-                        val key = keyStoreService.getKey() ?: throw NotImplementedError()
-                        val body =
-                            Json.decodeFromString<ServerHttpClientFactory.LoginRequest>((request.body as TextContent).text)
-                        val signatureOk = key.publicKey.verifySignature(
-                            body.signature.base64Decode(),
-                            body.challenge.base64Decode(),
-                        )
-                        val publicKeyOk = key.publicKey.encoded.base64Encode() == body.publicKey
-                        if (signatureOk && publicKeyOk) {
-                            respond(
-                                Json.encodeToString(ServerHttpClientFactory.TokenResponse(token = newToken)),
-                                HttpStatusCode.OK,
-                                headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
-                            )
-                        } else {
-                            throw NotImplementedError()
-                        }
-                    }
-
-                    else -> throw NotImplementedError()
-                }
-            }
-            val userPreferencesRepository: UserPreferencesRepository = mock {
-                on { getValue(CachedApiTokenPreference) } doReturn
-                    CachedApiToken(
-                        token = incorrectToken,
-                        publicKey = keyStoreService.getKey()?.publicKey?.encoded?.base64Encode()
-                            ?: throw NotImplementedError(),
-                    )
-            }
-            val serverHttpClientFactory =
-                ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
-            val res = serverHttpClientFactory.createHttpClient(
-                baseUrl = attestationBaseUrl,
-                authType = ServerAuthType.ATTESTATION,
-                apiKey = "",
-                apiKeyHeader = "",
-            ).use { client ->
-                client.get {
-                    url {
-                        appendPathSegments("v4", "geocode", "address", query)
-                    }
-                }
-            }
-            assertEquals("success", res.bodyAsText())
-            // TODO Test saves new token
-        }
-
-    @Test
-    fun createHttpClient_whenAuthTypeIsAttestationAndCorrectTokenIsPassed_returnsResponse() = runTest {
+    fun createHttpClient_attestation_whenTokenIsIncorrectAndRefreshTokenIsCorrect_returnsResponse() = runTest {
         val keyStoreService = FakeKeyStoreService().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
                 "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
                     when (request.headers[HttpHeaders.Authorization]) {
-                        "Bearer $correctToken" -> respondOk("success")
+                        "Bearer $incorrectToken" -> respondError(HttpStatusCode.Unauthorized)
+                        "Bearer $newToken" -> respondOk("success")
                         else -> throw NotImplementedError()
                     }
+
+                "$attestationBaseUrl/v1/auth/challenge" ->
+                    respond(
+                        Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
+                        HttpStatusCode.OK,
+                        headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
+                    )
+
+                "$attestationBaseUrl/v1/auth/login" -> {
+                    val key = keyStoreService.getKey() ?: throw NotImplementedError()
+                    val body =
+                        Json.decodeFromString<ServerHttpClientFactory.LoginRequest>((request.body as TextContent).text)
+                    val signatureOk = key.publicKey.verifySignature(
+                        body.signature.base64Decode(),
+                        body.challenge.base64Decode(),
+                    )
+                    val publicKeyOk = key.publicKey.encoded.base64Encode() == body.publicKey
+                    if (signatureOk && publicKeyOk) {
+                        respond(
+                            Json.encodeToString(ServerHttpClientFactory.TokenResponse(token = newToken)),
+                            HttpStatusCode.OK,
+                            headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
+                        )
+                    } else {
+                        throw NotImplementedError()
+                    }
+                }
 
                 else -> throw NotImplementedError()
             }
@@ -621,13 +605,13 @@ class ServerHttpClientFactoryTest {
         val userPreferencesRepository: UserPreferencesRepository = mock {
             on { getValue(CachedApiTokenPreference) } doReturn
                 CachedApiToken(
-                    token = correctToken,
+                    token = incorrectToken,
                     publicKey = keyStoreService.getKey()?.publicKey?.encoded?.base64Encode()
                         ?: throw NotImplementedError(),
                 )
         }
-        val serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
-        val res = serverHttpClientFactory.createHttpClient(
+        val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+        val res = factory.createHttpClient(
             baseUrl = attestationBaseUrl,
             authType = ServerAuthType.ATTESTATION,
             apiKey = "",
@@ -640,5 +624,6 @@ class ServerHttpClientFactoryTest {
             }
         }
         assertEquals("success", res.bodyAsText())
+        // TODO Test saves new token
     }
 }
