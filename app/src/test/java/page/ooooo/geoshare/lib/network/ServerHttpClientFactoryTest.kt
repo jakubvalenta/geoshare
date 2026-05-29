@@ -19,7 +19,7 @@ import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.data.di.FakeKeyStoreService
+import page.ooooo.geoshare.data.di.FakeKeyStoreTools
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.data.local.preferences.CachedApiToken
@@ -44,7 +44,7 @@ class ServerHttpClientFactoryTest {
 
     @Test
     fun createHttpClient_apiKey_whenKeyIsCorrect_returnsResponse() = runTest {
-        val keyStoreService = FakeKeyStoreService()
+        val keyStoreService = FakeKeyStoreTools()
         val engine = MockEngine { request ->
             when (request.url.toString()) {
                 "$apiKeyBaseUrl/v4/geocode/address/$encodedQuery" ->
@@ -75,7 +75,7 @@ class ServerHttpClientFactoryTest {
 
     @Test(expected = UnauthorizedNetworkException::class)
     fun createHttpClient_apiKey_whenKeyIsIncorrect_throwsException() = runTest {
-        val keyStoreService = FakeKeyStoreService()
+        val keyStoreService = FakeKeyStoreTools()
         val engine = MockEngine { request ->
             when (request.url.toString()) {
                 "$apiKeyBaseUrl/v4/geocode/address/$encodedQuery" ->
@@ -105,7 +105,7 @@ class ServerHttpClientFactoryTest {
 
     @Test
     fun createHttpClient_attestation_whenTokenIsCorrect_returnsResponse() = runTest {
-        val keyStoreService = FakeKeyStoreService().apply { generateKey() }
+        val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
                 "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
@@ -143,7 +143,7 @@ class ServerHttpClientFactoryTest {
 
     @Test(expected = UnauthorizedNetworkException::class)
     fun createHttpClient_attestation_whenTokenIsMissingAndChallengeFails_throwsException() = runTest {
-        val keyStoreService = FakeKeyStoreService().apply { generateKey() }
+        val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
                 "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
@@ -175,7 +175,7 @@ class ServerHttpClientFactoryTest {
 
     @Test(expected = ServerResponseNetworkException::class)
     fun createHttpClient_attestation_whenTokenIsMissingAndChallengeReturns5xx_throwsException() = runTest {
-        val keyStoreService = FakeKeyStoreService().apply { generateKey() }
+        val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
                 "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
@@ -207,7 +207,7 @@ class ServerHttpClientFactoryTest {
 
     @Test(expected = ResponseNetworkException::class)
     fun createHttpClient_attestation_whenTokenIsMissingAndLoginReturns400_throwsException() = runTest {
-        val keyStoreService = FakeKeyStoreService().apply { generateKey() }
+        val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
                 "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
@@ -246,7 +246,7 @@ class ServerHttpClientFactoryTest {
 
     @Test(expected = ServerResponseNetworkException::class)
     fun createHttpClient_attestation_whenTokenIsMissingAndLoginReturns5xx_throwsException() = runTest {
-        val keyStoreService = FakeKeyStoreService().apply { generateKey() }
+        val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
                 "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
@@ -285,7 +285,7 @@ class ServerHttpClientFactoryTest {
 
     @Test(expected = UnauthorizedNetworkException::class)
     fun createHttpClient_attestation_whenTokenIsMissingAndLoginFailsAndRegistrationFails_throwsException() = runTest {
-        val keyStoreService = FakeKeyStoreService().apply { generateKey() }
+        val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
                 "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
@@ -328,7 +328,7 @@ class ServerHttpClientFactoryTest {
     @Test
     fun createHttpClient_attestation_whenTokenIsMissingAndLoginFailsAndRegistrationSucceeds_returnsResponse() =
         runTest {
-            val keyStoreService = FakeKeyStoreService().apply { generateKey() }
+            val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
                     "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
@@ -404,7 +404,7 @@ class ServerHttpClientFactoryTest {
     @Test
     fun createHttpClient_attestation_whenTokenIsMissingAndPrivateKeyIsNotGeneratedAndRegistrationSucceeds_returnsResponse() =
         runTest {
-            val keyStoreService = FakeKeyStoreService()
+            val keyStoreService = FakeKeyStoreTools()
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
                     "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
@@ -480,7 +480,7 @@ class ServerHttpClientFactoryTest {
     @Test
     fun createHttpClient_attestation_whenTokenIsIncorrectAndRefreshTokenIsIncorrectAndLoginFailsAndRegistrationSucceeds_returnsResponse() =
         runTest {
-            val keyStoreService = FakeKeyStoreService().apply { generateKey() }
+            val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
                     "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
@@ -562,7 +562,7 @@ class ServerHttpClientFactoryTest {
 
     @Test
     fun createHttpClient_attestation_whenTokenIsIncorrectAndRefreshTokenIsCorrect_returnsResponse() = runTest {
-        val keyStoreService = FakeKeyStoreService().apply { generateKey() }
+        val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
                 "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->

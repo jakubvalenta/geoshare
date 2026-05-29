@@ -4,9 +4,9 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import page.ooooo.geoshare.lib.android.DefaultKeyStoreService
+import page.ooooo.geoshare.lib.android.DefaultKeyStoreTools
 import page.ooooo.geoshare.lib.android.Key
-import page.ooooo.geoshare.lib.android.KeyStoreService
+import page.ooooo.geoshare.lib.android.KeyStoreTools
 import java.security.KeyPairGenerator
 import java.security.cert.CertificateFactory
 import java.security.spec.ECGenParameterSpec
@@ -18,11 +18,11 @@ object KeyStoreServiceModule {
 
     @Singleton
     @Provides
-    fun provideKeyStoreService(): KeyStoreService =
-        DefaultKeyStoreService()
+    fun provideKeyStoreService(): KeyStoreTools =
+        DefaultKeyStoreTools()
 }
 
-class FakeKeyStoreService : KeyStoreService {
+class FakeKeyStoreTools : KeyStoreTools {
     private var key: Key? = null
 
     override fun getKey() = key

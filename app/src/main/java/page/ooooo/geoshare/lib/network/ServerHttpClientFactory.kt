@@ -25,7 +25,7 @@ import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.data.local.preferences.CachedApiTokenPreference
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.android.KeyStoreService
+import page.ooooo.geoshare.lib.android.KeyStoreTools
 import page.ooooo.geoshare.lib.extensions.base64Decode
 import page.ooooo.geoshare.lib.extensions.base64Encode
 import page.ooooo.geoshare.lib.extensions.sign
@@ -33,7 +33,7 @@ import javax.inject.Inject
 
 class ServerHttpClientFactory @Inject constructor(
     private val engine: HttpClientEngine,
-    private val keyStoreService: KeyStoreService,
+    private val keyStoreTools: KeyStoreTools,
     private val log: Log = DefaultLog,
     private val userPreferencesRepository: UserPreferencesRepository,
 ) {
@@ -113,7 +113,7 @@ class ServerHttpClientFactory @Inject constructor(
             }
         }.use { client ->
             // Get key
-            val key = keyStoreService.getKey() ?: return null
+            val key = keyStoreTools.getKey() ?: return null
             val publicKeyBase64 = key.publicKey.encoded.base64Encode()
 
             // Login challenge
@@ -182,7 +182,7 @@ class ServerHttpClientFactory @Inject constructor(
             }
 
             // Generate key
-            val key = keyStoreService.generateKey()
+            val key = keyStoreTools.generateKey()
             val publicKeyBase64 = key.publicKey.encoded.base64Encode()
 
             // Register
