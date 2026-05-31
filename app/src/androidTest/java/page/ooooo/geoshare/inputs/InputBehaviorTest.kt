@@ -11,9 +11,13 @@ import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
 interface InputBehaviorTest : BehaviorTest {
 
-    fun UiAutomatorTestScope.configureConnectionPermission(permission: Permission = Permission.ALWAYS) {
+    fun UiAutomatorTestScope.configureConnectionPermissionPreference(permission: Permission) {
         goToUserPreferencesDetail(UserPreferencesGroupId.CONNECTION_PERMISSION)
         onElement { viewIdResourceName == "geoShareUserPreferenceConnectionPermission_$permission" }.click()
+    }
+
+    fun UiAutomatorTestScope.configureGoogleMapsApiPreference(enabled: Boolean) {
+        // TODO
     }
 
     fun UiAutomatorTestScope.confirmDialogIfVisible() {
@@ -65,8 +69,7 @@ interface InputBehaviorTest : BehaviorTest {
             timeoutMs,
         )
 
-    @Suppress("unused")
-    fun UiAutomatorTestScope.testUriFailed(
+    fun UiAutomatorTestScope.testUriFails(
         unsafeUriString: String,
         timeoutMs: Long = NETWORK_TIMEOUT,
     ) {
