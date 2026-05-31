@@ -18,6 +18,7 @@ import page.ooooo.geoshare.data.local.preferences.CachedServerTokenPreference
 import page.ooooo.geoshare.data.local.preferences.CachedPurchasePreference
 import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
+import page.ooooo.geoshare.data.local.preferences.GoogleMapsApiPreference
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormatPreference
 import page.ooooo.geoshare.data.local.preferences.HiddenAppsPreference
@@ -58,6 +59,7 @@ class FakeUserPreferencesRepository(
             changelogShownForVersionCode = ChangelogShownForVersionCodePreference.getValue(it),
             connectionPermission = ConnectionPermissionPreference.getValue(it),
             coordinateFormat = CoordinateFormatPreference.getValue(it),
+            googleMapsApi = GoogleMapsApiPreference.getValue(it),
             hiddenApps = HiddenAppsPreference.getValue(it),
             introShownForVersionCode = IntroShowForVersionCodePreference.getValue(it),
         )
@@ -72,6 +74,7 @@ class FakeUserPreferencesRepository(
             ChangelogShownForVersionCodePreference.setValue(this, initialValues.changelogShownForVersionCode)
             ConnectionPermissionPreference.setValue(this, initialValues.connectionPermission)
             CoordinateFormatPreference.setValue(this, initialValues.coordinateFormat)
+            GoogleMapsApiPreference.setValue(this, initialValues.googleMapsApi)
             HiddenAppsPreference.setValue(this, initialValues.hiddenApps)
             IntroShowForVersionCodePreference.setValue(this, initialValues.introShownForVersionCode)
         }
@@ -99,6 +102,7 @@ val defaultFakeUserPreferences = UserPreferencesValues(
     changelogShownForVersionCode = 22,
     connectionPermission = Permission.ALWAYS,
     coordinateFormat = CoordinateFormat.DEC,
+    googleMapsApi = true,
     hiddenApps = emptySet(),
     introShownForVersionCode = 0,
 )

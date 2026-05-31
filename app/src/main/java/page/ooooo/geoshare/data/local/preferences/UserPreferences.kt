@@ -124,6 +124,27 @@ object CoordinateFormatPreference : OptionsPreference<CoordinateFormat> {
     )
 }
 
+object GoogleMapsApiPreference : OptionsPreference<Boolean> {
+    val key = stringPreferencesKey("google_maps_api")
+    override val default = true
+    val loading = default
+
+    override fun getValue(values: UserPreferencesValues) = values.googleMapsApi
+
+    override fun getValue(preferences: Preferences, log: Log) = preferences[key]?.toBooleanStrictOrNull() ?: default
+
+    override fun setValue(preferences: MutablePreferences, value: Boolean, log: Log) {
+        preferences[key] = value.toString()
+    }
+
+    fun getOptionGroups(): List<List<Boolean>> = listOf(
+        listOf(
+            true,
+            false,
+        ),
+    )
+}
+
 object AutomationPreference : OptionsPreference<Automation> {
     val key = stringPreferencesKey("automation")
     override val default = NoopAutomation
@@ -412,6 +433,7 @@ data class UserPreferencesValues(
     val changelogShownForVersionCode: Int? = ChangelogShownForVersionCodePreference.loading,
     val connectionPermission: Permission = ConnectionPermissionPreference.loading,
     val coordinateFormat: CoordinateFormat = CoordinateFormatPreference.loading,
+    val googleMapsApi: Boolean = GoogleMapsApiPreference.loading,
     val hiddenApps: Set<String>? = HiddenAppsPreference.loading,
     val introShownForVersionCode: Int? = IntroShowForVersionCodePreference.loading,
 )
