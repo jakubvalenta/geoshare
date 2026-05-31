@@ -11,7 +11,8 @@ import androidx.room.Transaction
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
-import page.ooooo.geoshare.lib.extensions.trimUrl
+import page.ooooo.geoshare.lib.DefaultUriQuote
+import page.ooooo.geoshare.lib.UriQuote
 import java.util.UUID
 import kotlin.uuid.ExperimentalUuidApi
 
@@ -20,11 +21,17 @@ import kotlin.uuid.ExperimentalUuidApi
 @Entity
 @Serializable
 data class Server(
-    val baseUrl: String = "",
+    val name: String = "",
+    val urlTemplate: String = "",
     val authType: ServerAuthType = ServerAuthType.API_KEY,
     val apiKey: String = "",
     val apiKeyHeader: String = "",
-    val selected: Boolean = false,
+    val challengeUrl: String = "",
+    val loginUrl: String = "",
+    val registerUrl: String = "",
+    val selectedGoogleMaps: Boolean = false,
+    // TODO Add selectedGoogleMapsPlace?
+    val selectedSearch: Boolean = false,
     val createdAt: Long = System.currentTimeMillis(),
     @PrimaryKey(autoGenerate = true)
     val uid: Int = 0,
@@ -32,12 +39,13 @@ data class Server(
     @Serializable(with = UUIDSerializer::class)
     val uuid: UUID = UUID.randomUUID(),
 ) {
-    val name: String get() = baseUrl.trimUrl()
+    fun getUrl(query: String, uriQuote: UriQuote = DefaultUriQuote): String =
+        urlTemplate.replace("{q}", uriQuote.encode(query))
 
     fun isValid(): Boolean =
         when (authType) {
-            ServerAuthType.API_KEY -> baseUrl.isNotEmpty() && apiKey.isNotEmpty() && apiKeyHeader.isNotEmpty()
-            ServerAuthType.ATTESTATION -> baseUrl.isNotEmpty()
+            ServerAuthType.API_KEY -> urlTemplate.isNotEmpty() && apiKey.isNotEmpty() && apiKeyHeader.isNotEmpty()
+            ServerAuthType.ATTESTATION -> urlTemplate.isNotEmpty()
         }
 }
 
@@ -55,11 +63,11 @@ interface ServerDao {
     @Query("SELECT * FROM server WHERE uuid = :uuid")
     suspend fun getByUUID(uuid: UUID): Server?
 
-    @Query("SELECT * FROM server WHERE selected = 1 ORDER BY createdAt ASC LIMIT 1")
-    suspend fun getSelected(): Server?
+    @Query("SELECT * FROM server WHERE selectedGoogleMaps = 1 ORDER BY createdAt ASC LIMIT 1")
+    suspend fun getSelectedGoogleMaps(): Server?
 
-    @Query("SELECT * FROM server WHERE selected = 1 ORDER BY createdAt ASC LIMIT 1")
-    fun getSelectedFlow(): Flow<Server?>
+    @Query("SELECT * FROM server WHERE selectedSearch = 1 ORDER BY createdAt ASC LIMIT 1")
+    suspend fun getSelectedSearch(): Server?
 
     @Insert
     suspend fun insert(server: Server): Long
@@ -70,17 +78,31 @@ interface ServerDao {
     @Delete
     suspend fun delete(server: Server)
 
-    @Query("UPDATE server SET selected = 1 WHERE uid = :uid")
-    suspend fun select(uid: Int)
+    @Query("UPDATE server SET selectedGoogleMaps = 1 WHERE uid = :uid")
+    suspend fun selectGoogleMaps(uid: Int)
 
-    @Query("UPDATE server SET selected = 0")
-    suspend fun unselectAll()
+    @Query("UPDATE server SET selectedGoogleMaps = 0")
+    suspend fun unselectAllGoogleMaps()
 
     @Transaction
-    suspend fun unselectAllAndSelect(uid: Int?) {
-        unselectAll()
+    suspend fun unselectAllGoogleMapsAndSelect(uid: Int?) {
+        unselectAllGoogleMaps()
         if (uid != null) {
-            select(uid)
+            selectGoogleMaps(uid)
+        }
+    }
+
+    @Query("UPDATE server SET selectedSearch = 1 WHERE uid = :uid")
+    suspend fun selectSearch(uid: Int)
+
+    @Query("UPDATE server SET selectedSearch = 0")
+    suspend fun unselectAllSearch()
+
+    @Transaction
+    suspend fun unselectAllSearchAndSelect(uid: Int?) {
+        unselectAllSearch()
+        if (uid != null) {
+            selectSearch(uid)
         }
     }
 }

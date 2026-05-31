@@ -23,24 +23,26 @@ object InitialServersImpl : InitialServers {
     override fun restore(db: SupportSQLiteDatabase) {
         db.execSQL("DELETE FROM server")
         db.execSQL(
-            "INSERT INTO server (`baseUrl`,`authType`,`apiKey`,`apiKeyHeader`,`selected`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO server (`baseUrl`,`authType`,`apiKey`,`apiKeyHeader`,`selectedGoogleMaps`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?)",
             arrayOf<Any>(
                 "https://api.geoshare-app.net",
                 "ATTESTATION",
                 "",
                 "",
                 1,
+                1,
                 1779859233816,
                 Uuid.parse("640f61e6-2bb4-41d3-9b4a-65e656564d03").toByteArray(),
             )
         )
         db.execSQL(
-            "INSERT INTO server (`baseUrl`,`authType`,`apiKey`,`apiKeyHeader`,`selected`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO server (`baseUrl`,`authType`,`apiKey`,`apiKeyHeader`,`selectedGoogleMaps`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?)",
             arrayOf<Any>(
                 "https://geocode.googleapis.com",
                 "API_KEY",
                 "",
                 "X-Goog-Api-Key",
+                0,
                 0,
                 1779859252618,
                 Uuid.parse("16b3bb06-3a3b-4853-ac06-c4bf1eb346f8").toByteArray(),
@@ -52,24 +54,26 @@ object InitialServersImpl : InitialServers {
         object : Migration(7, 8) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
-                    "INSERT OR REPLACE INTO server (`baseUrl`,`authType`,`apiKey`,`apiKeyHeader`,`selected`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT OR REPLACE INTO server (`baseUrl`,`authType`,`apiKey`,`apiKeyHeader`,`selectedGoogleMaps`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "https://api.geoshare-app.net",
                         "ATTESTATION",
                         "",
                         "",
-                        0,
+                        1,
+                        1,
                         1779859233816,
                         Uuid.parse("640f61e6-2bb4-41d3-9b4a-65e656564d03").toByteArray(),
                     )
                 )
                 db.execSQL(
-                    "INSERT OR REPLACE INTO server (`baseUrl`,`authType`,`apiKey`,`apiKeyHeader`,`selected`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT OR REPLACE INTO server (`baseUrl`,`authType`,`apiKey`,`apiKeyHeader`,`selectedGoogleMaps`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "https://geocode.googleapis.com",
                         "API_KEY",
                         "",
                         "X-Goog-Api-Key",
+                        0,
                         0,
                         1779859252618,
                         Uuid.parse("16b3bb06-3a3b-4853-ac06-c4bf1eb346f8").toByteArray(),

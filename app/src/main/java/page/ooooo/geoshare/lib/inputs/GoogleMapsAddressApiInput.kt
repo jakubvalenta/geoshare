@@ -6,8 +6,8 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.accept
 import io.ktor.client.request.prepareRequest
+import io.ktor.client.request.url
 import io.ktor.http.ContentType
-import io.ktor.http.appendPathSegments
 import io.ktor.http.headers
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.collections.immutable.toImmutableList
@@ -42,16 +42,18 @@ class GoogleMapsAddressApiInput @Inject constructor(
         block(Uri.parse(match, uriQuote))
 
     override suspend fun parse(data: Uri, match: String) = parseResult {
-        val server = serverRepository.getSelected() ?: run {
+        val server = serverRepository.getSelectedGoogleMaps() ?: run {
             // Go to HTML parsing, if server is not configured
             nextStep = NextStep(googleMapsHtmlInput.get(), match)
             return@parseResult
         }
         val client = serverHttpClientFactory.createHttpClient(
-            baseUrl = server.baseUrl,
             authType = server.authType,
             apiKey = server.apiKey,
             apiKeyHeader = server.apiKeyHeader,
+            challengeUrl = server.challengeUrl,
+            loginUrl = server.loginUrl,
+            registerUrl = server.registerUrl,
         ).config {
             install(ContentNegotiation) {
                 json(Json {
@@ -63,9 +65,7 @@ class GoogleMapsAddressApiInput @Inject constructor(
         val res = client.use { client ->
             client
                 .prepareRequest {
-                    url {
-                        appendPathSegments("v4", "geocode", "address", query)
-                    }
+                    url(server.getUrl(query, uriQuote))
                     headers {
                         accept(ContentType.Application.Json)
                     }

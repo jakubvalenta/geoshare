@@ -16,8 +16,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.di.FakeGeoShareServer
-import page.ooooo.geoshare.data.di.FakeGoogleMapsServer
+import page.ooooo.geoshare.data.di.FakeGeoShareGoogleMapsAddressServer
+import page.ooooo.geoshare.data.di.FakeGoogleMapsAddressServer
 import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -29,36 +29,101 @@ fun ServerForm(
     apiKey: String,
     apiKeyHeader: String,
     authType: ServerAuthType,
-    baseUrl: String,
+    challengeUrl: String,
+    loginUrl: String,
+    name: String,
+    registerUrl: String,
+    urlTemplate: String,
     onSaveForm: () -> Unit,
     onSetApiKey: (String) -> Unit,
     onSetApiKeyHeader: (String) -> Unit,
     onSetAuthType: (ServerAuthType) -> Unit,
-    onSetBaseUrl: (String) -> Unit,
+    onSetChallengeUrl: (String) -> Unit,
+    onSetLoginUrl: (String) -> Unit,
+    onSetName: (String) -> Unit,
+    onSetRegisterUrl: (String) -> Unit,
+    onSetUrlTemplate: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val spacing = LocalSpacing.current
-    val item = remember(baseUrl, authType, apiKey, apiKeyHeader) {
+    val item = remember(apiKey, apiKeyHeader, authType, challengeUrl, loginUrl, name, registerUrl, urlTemplate) {
         Server(
-            baseUrl = baseUrl,
+            name = name,
+            urlTemplate = urlTemplate,
             authType = authType,
             apiKey = apiKey,
             apiKeyHeader = apiKeyHeader,
+            challengeUrl = challengeUrl,
+            loginUrl = loginUrl,
+            registerUrl = registerUrl,
         )
     }
 
     Column(modifier) {
         TextField(
-            value = baseUrl,
-            onValueChange = onSetBaseUrl,
+            value = name,
+            onValueChange = onSetName,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = spacing.windowPadding)
-                .testTag("geoShareServerFormBaseUrl"),
+                .testTag("geoShareServerFormName"),
             label = {
-                Text(stringResource(R.string.server_base_url))
+                Text(stringResource(R.string.server_name))
+                // TODO Add supporting text
             },
-            isError = baseUrl.isEmpty(),
+            isError = name.isEmpty(),
+            singleLine = true,
+        )
+        TextField(
+            value = challengeUrl,
+            onValueChange = onSetChallengeUrl,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = spacing.windowPadding)
+                .testTag("geoShareServerFormChallengeUrl"),
+            label = {
+                Text(stringResource(R.string.server_challenge_url))
+            },
+            isError = challengeUrl.isEmpty(),
+            singleLine = true,
+        )
+        TextField(
+            value = loginUrl,
+            onValueChange = onSetLoginUrl,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = spacing.windowPadding)
+                .testTag("geoShareServerFormLoginUrl"),
+            label = {
+                Text(stringResource(R.string.server_login_url))
+            },
+            isError = loginUrl.isEmpty(),
+            singleLine = true,
+        )
+        TextField(
+            value = registerUrl,
+            onValueChange = onSetRegisterUrl,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = spacing.windowPadding)
+                .testTag("geoShareServerFormRegisterUrl"),
+            label = {
+                Text(stringResource(R.string.server_register_url))
+            },
+            isError = registerUrl.isEmpty(),
+            singleLine = true,
+        )
+        TextField(
+            value = urlTemplate,
+            onValueChange = onSetUrlTemplate,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = spacing.windowPadding)
+                .testTag("geoShareServerFormUrlTemplate"),
+            label = {
+                Text(stringResource(R.string.server_url_template))
+            },
+            isError = urlTemplate.isEmpty(),
             singleLine = true,
         )
         DropdownField(
@@ -131,13 +196,21 @@ private fun DefaultPreview() {
             ServerForm(
                 apiKey = "",
                 apiKeyHeader = "",
-                authType = ServerAuthType.API_KEY,
-                baseUrl = "",
+                authType = ServerAuthType.ATTESTATION,
+                challengeUrl = "",
+                loginUrl = "",
+                name = "",
+                registerUrl = "",
+                urlTemplate = "",
                 onSaveForm = {},
                 onSetApiKey = {},
                 onSetApiKeyHeader = {},
                 onSetAuthType = {},
-                onSetBaseUrl = {},
+                onSetChallengeUrl = {},
+                onSetLoginUrl = {},
+                onSetName = {},
+                onSetRegisterUrl = {},
+                onSetUrlTemplate = {},
             )
         }
     }
@@ -151,13 +224,21 @@ private fun DarkPreview() {
             ServerForm(
                 apiKey = "",
                 apiKeyHeader = "",
-                authType = ServerAuthType.API_KEY,
-                baseUrl = "",
+                authType = ServerAuthType.ATTESTATION,
+                challengeUrl = "",
+                loginUrl = "",
+                name = "",
+                registerUrl = "",
+                urlTemplate = "",
                 onSaveForm = {},
                 onSetApiKey = {},
                 onSetApiKeyHeader = {},
                 onSetAuthType = {},
-                onSetBaseUrl = {},
+                onSetChallengeUrl = {},
+                onSetLoginUrl = {},
+                onSetName = {},
+                onSetRegisterUrl = {},
+                onSetUrlTemplate = {},
             )
         }
     }
@@ -168,17 +249,25 @@ private fun DarkPreview() {
 private fun UpdateApiKeyPreview() {
     AppTheme {
         Surface {
-            val item = FakeGoogleMapsServer
+            val item = FakeGoogleMapsAddressServer
             ServerForm(
                 apiKey = item.apiKey,
                 apiKeyHeader = item.apiKeyHeader,
                 authType = item.authType,
-                baseUrl = item.baseUrl,
+                challengeUrl = item.challengeUrl,
+                loginUrl = item.loginUrl,
+                name = item.name,
+                registerUrl = item.registerUrl,
+                urlTemplate = item.urlTemplate,
                 onSaveForm = {},
                 onSetApiKey = {},
                 onSetApiKeyHeader = {},
                 onSetAuthType = {},
-                onSetBaseUrl = {},
+                onSetChallengeUrl = {},
+                onSetLoginUrl = {},
+                onSetName = {},
+                onSetRegisterUrl = {},
+                onSetUrlTemplate = {},
             )
         }
     }
@@ -189,17 +278,25 @@ private fun UpdateApiKeyPreview() {
 private fun DarkUpdateApiKeyPreview() {
     AppTheme {
         Surface {
-            val item = FakeGoogleMapsServer
+            val item = FakeGoogleMapsAddressServer
             ServerForm(
                 apiKey = item.apiKey,
                 apiKeyHeader = item.apiKeyHeader,
                 authType = item.authType,
-                baseUrl = item.baseUrl,
+                challengeUrl = item.challengeUrl,
+                loginUrl = item.loginUrl,
+                name = item.name,
+                registerUrl = item.registerUrl,
+                urlTemplate = item.urlTemplate,
                 onSaveForm = {},
                 onSetApiKey = {},
                 onSetApiKeyHeader = {},
                 onSetAuthType = {},
-                onSetBaseUrl = {},
+                onSetChallengeUrl = {},
+                onSetLoginUrl = {},
+                onSetName = {},
+                onSetRegisterUrl = {},
+                onSetUrlTemplate = {},
             )
         }
     }
@@ -210,17 +307,25 @@ private fun DarkUpdateApiKeyPreview() {
 private fun UpdateAttestationPreview() {
     AppTheme {
         Surface {
-            val item = FakeGeoShareServer
+            val item = FakeGeoShareGoogleMapsAddressServer
             ServerForm(
                 apiKey = item.apiKey,
                 apiKeyHeader = item.apiKeyHeader,
                 authType = item.authType,
-                baseUrl = item.baseUrl,
+                challengeUrl = item.challengeUrl,
+                loginUrl = item.loginUrl,
+                name = item.name,
+                registerUrl = item.registerUrl,
+                urlTemplate = item.urlTemplate,
                 onSaveForm = {},
                 onSetApiKey = {},
                 onSetApiKeyHeader = {},
                 onSetAuthType = {},
-                onSetBaseUrl = {},
+                onSetChallengeUrl = {},
+                onSetLoginUrl = {},
+                onSetName = {},
+                onSetRegisterUrl = {},
+                onSetUrlTemplate = {},
             )
         }
     }
@@ -231,17 +336,25 @@ private fun UpdateAttestationPreview() {
 private fun DarkUpdateExpandedPreview() {
     AppTheme {
         Surface {
-            val item = FakeGeoShareServer
+            val item = FakeGeoShareGoogleMapsAddressServer
             ServerForm(
                 apiKey = item.apiKey,
                 apiKeyHeader = item.apiKeyHeader,
                 authType = item.authType,
-                baseUrl = item.baseUrl,
+                challengeUrl = item.challengeUrl,
+                loginUrl = item.loginUrl,
+                name = item.name,
+                registerUrl = item.registerUrl,
+                urlTemplate = item.urlTemplate,
                 onSaveForm = {},
                 onSetApiKey = {},
                 onSetApiKeyHeader = {},
                 onSetAuthType = {},
-                onSetBaseUrl = {},
+                onSetChallengeUrl = {},
+                onSetLoginUrl = {},
+                onSetName = {},
+                onSetRegisterUrl = {},
+                onSetUrlTemplate = {},
             )
         }
     }

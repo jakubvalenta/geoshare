@@ -63,7 +63,14 @@ class ServerHttpClientFactory @Inject constructor(
     @Serializable
     data class GoogleMapsResults(val results: List<GoogleMapsResult>)
 
-    fun createHttpClient(baseUrl: String, authType: ServerAuthType, apiKey: String, apiKeyHeader: String): HttpClient =
+    fun createHttpClient(
+        authType: ServerAuthType,
+        apiKey: String,
+        apiKeyHeader: String,
+        challengeUrl: String,
+        loginUrl: String,
+        registerUrl: String,
+    ): HttpClient =
         HttpClient(engine) {
             expectSuccess = true
             setDefaultTimeouts()
@@ -72,22 +79,19 @@ class ServerHttpClientFactory @Inject constructor(
             when (authType) {
                 ServerAuthType.API_KEY -> {
                     install(DefaultRequest) {
-                        url(baseUrl)
                         header(apiKeyHeader, apiKey)
                     }
                 }
 
                 ServerAuthType.ATTESTATION -> {
-                    install(DefaultRequest) {
-                        url(baseUrl)
-                    }
                     install(Auth) {
                         bearer {
                             loadTokens {
                                 attestationLoadTokens()
                             }
                             refreshTokens {
-                                attestationLogin(baseUrl) ?: attestationRegister(baseUrl)
+                                attestationLogin(challengeUrl, loginUrl)
+                                    ?: attestationRegister(challengeUrl, registerUrl)
                             }
                         }
                     }
@@ -100,14 +104,11 @@ class ServerHttpClientFactory @Inject constructor(
             BearerTokens(it.token, it.publicKey)
         }
 
-    private suspend fun attestationLogin(baseUrl: String): BearerTokens? {
+    private suspend fun attestationLogin(challengeUrl: String, loginUrl: String): BearerTokens? {
         HttpClient(engine) {
             expectSuccess = true
             setDefaultTimeouts()
 
-            install(DefaultRequest.Plugin) {
-                url(baseUrl)
-            }
             install(ContentNegotiation) {
                 json()
             }
@@ -119,7 +120,7 @@ class ServerHttpClientFactory @Inject constructor(
             // Login challenge
             val loginChallenge = try {
                 client
-                    .post("/v1/auth/challenge")
+                    .post(challengeUrl)
                     .body<ChallengeResponse>().challenge.base64Decode()
             } catch (e: ClientRequestException) {
                 with(e.response) {
@@ -132,7 +133,7 @@ class ServerHttpClientFactory @Inject constructor(
             val loginSignature = key.privateKey.sign(loginChallenge)
             val token = try {
                 client
-                    .post("/v1/auth/login") {
+                    .post(loginUrl) {
                         contentType(ContentType.Application.Json)
                         setBody(
                             LoginRequest(
@@ -157,14 +158,11 @@ class ServerHttpClientFactory @Inject constructor(
         }
     }
 
-    private suspend fun attestationRegister(baseUrl: String): BearerTokens {
+    private suspend fun attestationRegister(challengeUrl: String, registerUrl: String): BearerTokens {
         HttpClient(engine) {
             expectSuccess = true
             setDefaultTimeouts()
 
-            install(DefaultRequest.Plugin) {
-                url(baseUrl)
-            }
             install(ContentNegotiation) {
                 json()
             }
@@ -172,7 +170,7 @@ class ServerHttpClientFactory @Inject constructor(
             // Registration challenge
             val registrationChallenge = try {
                 client
-                    .post("/v1/auth/challenge")
+                    .post(challengeUrl)
                     .body<ChallengeResponse>().challenge.base64Decode()
             } catch (e: ClientRequestException) {
                 with(e.response) {
@@ -189,7 +187,7 @@ class ServerHttpClientFactory @Inject constructor(
             val registrationSignature = key.privateKey.sign(registrationChallenge)
             val token = try {
                 client
-                    .post("/v1/auth/register") {
+                    .post(registerUrl) {
                         contentType(ContentType.Application.Json)
                         setBody(
                             RegisterRequest(

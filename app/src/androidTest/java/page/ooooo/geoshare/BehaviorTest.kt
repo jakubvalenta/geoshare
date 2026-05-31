@@ -514,7 +514,7 @@ interface BehaviorTest {
 
     fun UiAutomatorTestScope.configureServer(server: Server) {
         // Go to server list
-        goToUserPreferencesDetail(UserPreferencesGroupId.SERVER)
+        goToUserPreferencesDetail(UserPreferencesGroupId.GOOGLE_MAPS_SERVER)
 
         // Edit the default draft server
         onElement { viewIdResourceName == "geoShareServerListItemMenu_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" }.click()

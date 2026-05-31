@@ -20,7 +20,7 @@ class ServerBehaviorTest : BehaviorTest {
         closeIntro()
 
         // Go to server list
-        goToUserPreferencesDetail(UserPreferencesGroupId.SERVER)
+        goToUserPreferencesDetail(UserPreferencesGroupId.GOOGLE_MAPS_SERVER)
 
         // Insert a new server
         onElement { viewIdResourceName == "geoShareServerListInsert" }.click()
@@ -45,7 +45,7 @@ class ServerBehaviorTest : BehaviorTest {
         closeIntro()
 
         // Go to server list
-        goToUserPreferencesDetail(UserPreferencesGroupId.SERVER)
+        goToUserPreferencesDetail(UserPreferencesGroupId.GOOGLE_MAPS_SERVER)
 
         // Go to server detail
         onElement { viewIdResourceName == "geoShareServerListItemMenu_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" }.click()
@@ -113,7 +113,7 @@ class ServerBehaviorTest : BehaviorTest {
         closeIntro()
 
         // Go to server list
-        goToUserPreferencesDetail(UserPreferencesGroupId.SERVER)
+        goToUserPreferencesDetail(UserPreferencesGroupId.GOOGLE_MAPS_SERVER)
 
         // Shows "Turned off" as the selected server
         onElement { viewIdResourceName == "geoShareServerListItemRadio_null_selected_true" }

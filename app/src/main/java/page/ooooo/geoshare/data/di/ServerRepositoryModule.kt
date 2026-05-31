@@ -39,8 +39,6 @@ class FakeServerRepository(
 
     override val all = _fakeServers.mapLatest { it.sortedBy { item -> item.createdAt }.reversed() }
 
-    override val selected = _fakeServers.mapLatest { it.firstOrNull { item -> item.selected } }
-
     override suspend fun getAll() = _fakeServers.value
 
     override suspend fun getByUid(uid: Int) =
@@ -49,8 +47,11 @@ class FakeServerRepository(
     override suspend fun getByUUID(uuid: UUID) =
         _fakeServers.value.firstOrNull { it.uuid == uuid }
 
-    override suspend fun getSelected() =
-        _fakeServers.value.firstOrNull { it.selected }
+    override suspend fun getSelectedGoogleMaps() =
+        _fakeServers.value.firstOrNull { it.selectedGoogleMaps }
+
+    override suspend fun getSelectedSearch() =
+        _fakeServers.value.firstOrNull { it.selectedSearch }
 
     override suspend fun insert(server: Server) =
         (_fakeServers.value + listOf(server)).also {
@@ -73,9 +74,15 @@ class FakeServerRepository(
         _fakeServers.value = _fakeServers.value.filterNot { it.uid == server.uid }
     }
 
-    override suspend fun unselectAllAndSelect(uid: Int?) {
+    override suspend fun unselectAllGoogleMapsAndSelect(uid: Int?) {
         _fakeServers.value = _fakeServers.value.map {
-            it.copy(selected = it.uid == uid)
+            it.copy(selectedGoogleMaps = it.uid == uid)
+        }
+    }
+
+    override suspend fun unselectAllSearchAndSelect(uid: Int?) {
+        _fakeServers.value = _fakeServers.value.map {
+            it.copy(selectedSearch = it.uid == uid)
         }
     }
 
@@ -84,12 +91,14 @@ class FakeServerRepository(
     }
 }
 
-val FakeGeoShareServer = Server(
-    baseUrl = "https://api.geoshare-app.net",
+val FakeGeoShareGoogleMapsAddressServer = Server(
+    name = "Google Maps Geocode Address via GeoShare proxy",
+    urlTemplate = "https://api.geoshare-app.net/v1/google-maps/geocode/address/{q}",
     authType = ServerAuthType.ATTESTATION,
 )
-val FakeGoogleMapsServer = Server(
-    baseUrl = "https://geocode.googleapis.com",
+val FakeGoogleMapsAddressServer = Server(
+    name = "Google Maps Geocode Address",
+    urlTemplate = "https://geocode.googleapis.com/v4/geocode/address/{q}",
     authType = ServerAuthType.API_KEY,
     apiKeyHeader = "X-Goog-Api-Key",
 )
@@ -99,6 +108,6 @@ val FakeGoogleMapsServer = Server(
  * [page.ooooo.geoshare.data.local.database.InitialServers].
  */
 val defaultFakeServers = listOf(
-    FakeGeoShareServer,
-    FakeGoogleMapsServer,
+    FakeGeoShareGoogleMapsAddressServer,
+    FakeGoogleMapsAddressServer,
 )
