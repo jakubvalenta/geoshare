@@ -401,7 +401,13 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
                 "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg",
             )
         } else {
-            testUriFails("https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg")
+            testUriFails(
+                setOf(
+                    "Place lists are not supported",
+                    // TODO Add French translation
+                ),
+                "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg",
+            )
         }
     }
 

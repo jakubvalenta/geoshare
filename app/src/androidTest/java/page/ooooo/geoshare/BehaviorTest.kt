@@ -255,7 +255,7 @@ interface BehaviorTest {
                 onElement {
                     if (viewIdResourceName == "geoShareResultSuccessLastPointCoordinates") {
                         assertTrue(
-                            """Expected "${textAsString()} to equal one of ${expectedCoordinatesOptions.joinToString()}""",
+                            """Expected "${textAsString()}" to equal one of ${expectedCoordinatesOptions.joinToString()}""",
                             textAsString() in expectedCoordinatesOptions,
                         )
                         true
@@ -318,14 +318,17 @@ interface BehaviorTest {
         onElement(20_000L) { packageName == PackageNames.GOOGLE_MAPS && this.block() }
     }
 
-    fun UiAutomatorTestScope.assertConversionFailed(timeoutMs: Long = NETWORK_TIMEOUT) {
+    fun UiAutomatorTestScope.assertConversionFails(expectedMessage: Set<String>, timeoutMs: Long = NETWORK_TIMEOUT) {
         onElement(timeoutMs) {
-            viewIdResourceName == "geoShareConversionErrorMessage" && textAsString()?.lowercase() in setOf(
-                "no points found",
-                @Suppress("SpellCheckingInspection") "aucun point trouvé",
-                "response error 404",
-                @Suppress("SpellCheckingInspection") "erreur de réponse 404",
-            )
+            if (viewIdResourceName == "geoShareConversionErrorMessage") {
+                assertTrue(
+                    """Expected "${textAsString()}" to equal one of ${expectedMessage.joinToString()}""",
+                    textAsString() in expectedMessage,
+                )
+                true
+            } else {
+                false
+            }
         }
     }
 

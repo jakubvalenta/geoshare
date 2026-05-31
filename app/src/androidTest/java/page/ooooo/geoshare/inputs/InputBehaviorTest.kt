@@ -70,6 +70,7 @@ interface InputBehaviorTest : BehaviorTest {
         )
 
     fun UiAutomatorTestScope.testUriFails(
+        expectedMessage: Set<String>,
         unsafeUriString: String,
         timeoutMs: Long = NETWORK_TIMEOUT,
     ) {
@@ -80,7 +81,7 @@ interface InputBehaviorTest : BehaviorTest {
         shareUri(unsafeUriString)
         confirmDialogIfVisible()
 
-        assertConversionFailed(timeoutMs)
+        assertConversionFails(expectedMessage, timeoutMs)
     }
 
     fun UiAutomatorTestScope.testText(expectedPoints: Points, unsafeText: String) {

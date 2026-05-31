@@ -189,7 +189,12 @@ class ConversionBehaviorTest : BehaviorTest {
         onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
 
         // Error is visible
-        assertConversionFailed()
+        assertConversionFails(
+            setOf(
+                "Response error 404",
+                @Suppress("SpellCheckingInspection") "Erreur de réponse 404",
+            ),
+        )
     }
 
     @Test
