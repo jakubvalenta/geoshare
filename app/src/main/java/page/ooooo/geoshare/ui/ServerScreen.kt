@@ -40,6 +40,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -284,7 +285,7 @@ private fun ServerListPane(
                 itemOnClick = { onNavigateToContentKey(it.uid) },
                 itemSupportingContent = {
                     if (!it.isValid()) {
-                        { Text(stringResource(R.string.server_invalid)) }
+                        { Text(stringResource(R.string.server_invalid), fontStyle = FontStyle.Italic) }
                     } else {
                         null
                     }

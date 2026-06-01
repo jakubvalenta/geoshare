@@ -178,7 +178,8 @@ fun LinkForm(
                         withStyle(SpanStyle(fontWeight = FontWeight.ExtraBold)) {
                             append("{name}")
                         }
-                    })
+                    }
+                )
             },
             isError = coordsUriTemplate.isEmpty(),
         )

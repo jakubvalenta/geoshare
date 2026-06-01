@@ -172,7 +172,7 @@ fun MainScreen(
     inputViewModel: InputViewModel = hiltViewModel(),
     outputViewModel: OutputViewModel = hiltViewModel(),
     linkViewModel: LinkViewModel = hiltViewModel(),
-    userPreferencesViewModel: UserPreferencesViewModel = hiltViewModel(),
+    userPreferenceViewModel: UserPreferenceViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     val clipboard = LocalClipboard.current
@@ -194,8 +194,8 @@ fun MainScreen(
     val outputsForPoints by outputViewModel.outputsForPoints.collectAsStateWithLifecycle()
     val outputsForPointsChips by outputViewModel.outputsForPointsChips.collectAsStateWithLifecycle()
     val outputsForSharing by outputViewModel.outputsForSharing.collectAsStateWithLifecycle()
-    val userPreferencesMessage by userPreferencesViewModel.message.collectAsStateWithLifecycle()
-    val userPreferencesValues by userPreferencesViewModel.values.collectAsStateWithLifecycle()
+    val userPreferencesMessage by userPreferenceViewModel.message.collectAsStateWithLifecycle()
+    val userPreferencesValues by userPreferenceViewModel.values.collectAsStateWithLifecycle()
 
     // Action
 
@@ -342,13 +342,13 @@ fun MainScreen(
         onDeny = { doNotAsk -> conversionViewModel.deny(doNotAsk) },
         onDisableLinkGroup = { group -> linkViewModel.disableGroup(resources, group) },
         onDismissLinkMessage = { linkViewModel.dismissMessage() },
-        onDismissUserPreferenceMessage = { userPreferencesViewModel.dismissMessage() },
+        onDismissUserPreferenceMessage = { userPreferenceViewModel.dismissMessage() },
         onGrant = { doNotAsk -> conversionViewModel.grant(doNotAsk) },
         onExecute = { action ->
             conversionViewModel.cancel()
             conversionViewModel.startAction(action)
         },
-        onHideApp = { packageName -> userPreferencesViewModel.hideApp(resources, packageName) },
+        onHideApp = { packageName -> userPreferenceViewModel.hideApp(resources, packageName) },
         onNavigateToAboutScreen = {
             conversionViewModel.cancel()
             onNavigateToAboutScreen()

@@ -313,7 +313,7 @@
     <string name="server_auth_type" translatable="false">Authentication</string>
     <string name="server_challenge_url" translatable="false">Challenge URL</string>
     <string name="server_login_url" translatable="false">Login URL</string>
-    <string name="server_name" translatable="false">URL template</string>
+    <string name="server_name" translatable="false">Name</string>
     <string name="server_register_url" translatable="false">Registration URL</string>
     <string name="server_url_template" translatable="false">URL template</string>
     <string name="server_delete_text" translatable="false">The server “%1$s” will be permanently deleted.</string>

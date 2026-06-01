@@ -12,7 +12,7 @@ import org.junit.Before
 import org.junit.Test
 import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.database.ServerAuthType
-import page.ooooo.geoshare.ui.UserPreferencesGroupId
+import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
 class ServerBehaviorTest {
     @Before
@@ -29,7 +29,7 @@ class ServerBehaviorTest {
         closeIntro()
 
         // Go to server list
-        goToUserPreferencesDetail(UserPreferencesGroupId.GOOGLE_MAPS_SERVER)
+        goToUserPreferencesDetail(UserPreferenceGroupId.SERVER_GOOGLE_MAPS)
 
         // Insert a new server
         val server = Server(
@@ -55,7 +55,7 @@ class ServerBehaviorTest {
         closeIntro()
 
         // Go to server list
-        goToUserPreferencesDetail(UserPreferencesGroupId.GOOGLE_MAPS_SERVER)
+        goToUserPreferencesDetail(UserPreferenceGroupId.SERVER_GOOGLE_MAPS)
 
         // Go to server detail
         onElement { viewIdResourceName == "geoShareServerListItemMenu_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" }.click()

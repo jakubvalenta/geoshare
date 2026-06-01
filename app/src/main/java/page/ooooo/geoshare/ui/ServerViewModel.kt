@@ -35,6 +35,18 @@ class ServerViewModel @Inject constructor(
             SharingStarted.WhileSubscribed(5000),
             emptyList(),
         )
+    val selectedGoogleMaps: StateFlow<Server?> = serverRepository.selectedGoogleMaps
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            null,
+        )
+    val selectedSearch: StateFlow<Server?> = serverRepository.selectedSearch
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            null,
+        )
 
     private val _message = MutableStateFlow<Message?>(null)
     val message: StateFlow<Message?> = _message

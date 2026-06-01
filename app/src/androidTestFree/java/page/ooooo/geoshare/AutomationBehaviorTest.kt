@@ -24,7 +24,7 @@ import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import page.ooooo.geoshare.ui.UserPreferencesGroupId
+import page.ooooo.geoshare.ui.UserPreferenceGroupId
 import kotlin.time.Duration.Companion.seconds
 
 class AutomationBehaviorTest {
@@ -42,7 +42,7 @@ class AutomationBehaviorTest {
         closeIntro()
 
         // Configure automation
-        goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
+        goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
         val automation = CopyCoordsDecAutomation
         onElement { viewIdResourceName == "geoShareUserPreferenceAutomation_${Json.encodeToString<Automation>(automation)}" }.click()
 
@@ -66,7 +66,7 @@ class AutomationBehaviorTest {
         closeIntro()
 
         // Configure automation
-        goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
+        goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
         val automation = OpenDisplayGeoUriAutomation(PackageNames.GOOGLE_MAPS)
         val serializedString = Json.encodeToString<Automation>(automation)
         onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
@@ -105,7 +105,7 @@ class AutomationBehaviorTest {
             closeIntro()
 
             // Configure automation
-            goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
+            goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
             val automation = SendPointAutomation(messagingAppPackageName)
             val serializedString = Json.encodeToString<Automation>(automation)
             onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
@@ -134,7 +134,7 @@ class AutomationBehaviorTest {
             closeIntro()
 
             // Configure automation
-            goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
+            goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
             val automation = OpenRouteOnePointGpxAutomation(PackageNames.TOMTOM)
             val serializedString = Json.encodeToString<Automation>(automation)
             onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
@@ -175,7 +175,7 @@ class AutomationBehaviorTest {
         closeIntro()
 
         // Configure automation
-        goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
+        goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
         val automation = SavePointsGpxAutomation
         val serializedString = Json.encodeToString<Automation>(automation)
         onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
@@ -208,7 +208,7 @@ class AutomationBehaviorTest {
         closeIntro()
 
         // Configure automation
-        goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
+        goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
         val automation = SavePointToContactAutomation
         val serializedString = Json.encodeToString<Automation>(automation)
         onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }

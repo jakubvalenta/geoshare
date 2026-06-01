@@ -11,10 +11,10 @@ import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.quickWaitForStableInActiveWindow
 import page.ooooo.geoshare.shareUri
-import page.ooooo.geoshare.ui.UserPreferencesGroupId
+import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
 fun UiAutomatorTestScope.configureConnectionPermissionPreference(permission: Permission) {
-    goToUserPreferencesDetail(UserPreferencesGroupId.CONNECTION_PERMISSION)
+    goToUserPreferencesDetail(UserPreferenceGroupId.CONNECTION_PERMISSION)
     onElement { viewIdResourceName == "geoShareUserPreferenceConnectionPermission_$permission" }.click()
 }
 

@@ -12,9 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.ServerRepository
 import page.ooooo.geoshare.data.AppsRepository
-import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.HiddenAppsPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
@@ -22,10 +20,8 @@ import page.ooooo.geoshare.lib.Message
 import javax.inject.Inject
 
 @HiltViewModel
-class UserPreferencesViewModel @Inject constructor(
-    serverRepository: ServerRepository,
+class UserPreferenceViewModel @Inject constructor(
     appsRepository: AppsRepository,
-    linkRepository: LinkRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
 ) : ViewModel() {
 
@@ -43,24 +39,6 @@ class UserPreferencesViewModel @Inject constructor(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
             emptyMap(),
-        )
-    val links = linkRepository.all
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            emptyList(),
-        )
-    val selectedGoogleMapsServer = serverRepository.selectedGoogleMaps
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            null,
-        )
-    val selectedSearchServer = serverRepository.selectedSearch
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            null,
         )
     val values: StateFlow<UserPreferencesValues> = userPreferencesRepository.values
         .stateIn(

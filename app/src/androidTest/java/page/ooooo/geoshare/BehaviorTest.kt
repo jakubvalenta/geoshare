@@ -36,7 +36,7 @@ import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.network.CONNECT_TIMEOUT
 import page.ooooo.geoshare.lib.network.REQUEST_TIMEOUT
-import page.ooooo.geoshare.ui.UserPreferencesGroupId
+import page.ooooo.geoshare.ui.UserPreferenceGroupId
 import java.net.InetAddress
 import java.net.SocketException
 import java.net.UnknownHostException
@@ -363,7 +363,7 @@ fun UiAutomatorTestScope.goToInputList() {
     }
 }
 
-fun UiAutomatorTestScope.goToUserPreferencesDetail(groupId: UserPreferencesGroupId) {
+fun UiAutomatorTestScope.goToUserPreferencesDetail(groupId: UserPreferenceGroupId) {
     // If we're on the main screen, use the main menu
     onElementOrNull(1_000) { viewIdResourceName == "geoShareMainMenuButton" }?.let { mainMenu ->
         mainMenu.click()
@@ -511,7 +511,7 @@ fun UiAutomatorTestScope.mockLocation(block: MockLocationScope.() -> Unit) {
 
 fun UiAutomatorTestScope.configureGoogleMapsServer(server: Server) {
     // Go to server list
-    goToUserPreferencesDetail(UserPreferencesGroupId.GOOGLE_MAPS_SERVER)
+    goToUserPreferencesDetail(UserPreferenceGroupId.SERVER_GOOGLE_MAPS)
 
     // Insert a new server
     onElement { viewIdResourceName == "geoShareServerListInsert" }.click()

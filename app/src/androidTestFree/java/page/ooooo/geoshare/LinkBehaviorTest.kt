@@ -9,7 +9,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
-import page.ooooo.geoshare.ui.UserPreferencesGroupId
+import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
 class LinkBehaviorTest {
     @Before
@@ -26,7 +26,7 @@ class LinkBehaviorTest {
         closeIntro()
 
         // Go to link list
-        goToUserPreferencesDetail(UserPreferencesGroupId.LINKS)
+        goToUserPreferencesDetail(UserPreferenceGroupId.LINKS)
 
         // Insert link
         onElement { viewIdResourceName == "geoShareLinkListInsert" }.click()
@@ -66,7 +66,7 @@ class LinkBehaviorTest {
         closeIntro()
 
         // Go to link list
-        goToUserPreferencesDetail(UserPreferencesGroupId.LINKS)
+        goToUserPreferencesDetail(UserPreferenceGroupId.LINKS)
 
         // Go to link detail
         onElement { viewIdResourceName == "geoShareLinkListItemMenu_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
@@ -143,7 +143,7 @@ class LinkBehaviorTest {
         closeIntro()
 
         // Go to link list
-        goToUserPreferencesDetail(UserPreferencesGroupId.LINKS)
+        goToUserPreferencesDetail(UserPreferenceGroupId.LINKS)
 
         // Go to link detail
         onElement { viewIdResourceName == "geoShareLinkListPane" }

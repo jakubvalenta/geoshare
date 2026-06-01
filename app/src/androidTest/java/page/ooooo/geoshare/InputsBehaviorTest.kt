@@ -5,7 +5,7 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import page.ooooo.geoshare.lib.inputs.InputDocumentationGroup
-import page.ooooo.geoshare.ui.UserPreferencesGroupId
+import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
 class InputsBehaviorTest {
     @Before
@@ -71,7 +71,7 @@ class InputsBehaviorTest {
         pressBack()
 
         // Set user preference changelogShowForVersionCode to version 19
-        goToUserPreferencesDetail(UserPreferencesGroupId.DEVELOPER_OPTIONS)
+        goToUserPreferencesDetail(UserPreferenceGroupId.DEVELOPER_OPTIONS)
         onElement { viewIdResourceName == "geoShareUserPreferenceChangelogShownForVersionCode" }
             .setText("19")
         goToMainScreenFromUserPreferencesDetail()

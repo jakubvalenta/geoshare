@@ -14,6 +14,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeGeoShareGoogleMapsAddressServer
@@ -69,48 +73,8 @@ fun ServerForm(
                 .testTag("geoShareServerFormName"),
             label = {
                 Text(stringResource(R.string.server_name))
-                // TODO Add supporting text
             },
             isError = name.isEmpty(),
-            singleLine = true,
-        )
-        TextField(
-            value = challengeUrl,
-            onValueChange = onSetChallengeUrl,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = spacing.windowPadding)
-                .testTag("geoShareServerFormChallengeUrl"),
-            label = {
-                Text(stringResource(R.string.server_challenge_url))
-            },
-            isError = challengeUrl.isEmpty(),
-            singleLine = true,
-        )
-        TextField(
-            value = loginUrl,
-            onValueChange = onSetLoginUrl,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = spacing.windowPadding)
-                .testTag("geoShareServerFormLoginUrl"),
-            label = {
-                Text(stringResource(R.string.server_login_url))
-            },
-            isError = loginUrl.isEmpty(),
-            singleLine = true,
-        )
-        TextField(
-            value = registerUrl,
-            onValueChange = onSetRegisterUrl,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = spacing.windowPadding)
-                .testTag("geoShareServerFormRegisterUrl"),
-            label = {
-                Text(stringResource(R.string.server_register_url))
-            },
-            isError = registerUrl.isEmpty(),
             singleLine = true,
         )
         TextField(
@@ -119,10 +83,23 @@ fun ServerForm(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = spacing.windowPadding)
+                .padding(top = spacing.medium)
                 .testTag("geoShareServerFormUrlTemplate"),
             label = {
                 Text(stringResource(R.string.server_url_template))
             },
+            supportingText = {
+                Text(
+                    buildAnnotatedString {
+                        append(stringResource(R.string.example, ""))
+                        append("https://api.geoshare-app.net/v1/google-maps/geocode/address/")
+                        withStyle(SpanStyle(fontWeight = FontWeight.ExtraBold)) {
+                            append("{q}")
+                        }
+                    }
+                )
+            },
+            // TODO Add supporting text
             isError = urlTemplate.isEmpty(),
             singleLine = true,
         )
@@ -142,39 +119,86 @@ fun ServerForm(
             label = { Text(stringResource(R.string.server_auth_type)) },
             testTagPrefix = "geoShareServerFormAuthType"
         )
-        TextField(
-            value = apiKeyHeader,
-            onValueChange = onSetApiKeyHeader,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = spacing.windowPadding)
-                .padding(top = spacing.medium)
-                .testTag("geoShareServerFormApiKeyHeader"),
-            enabled = authType == ServerAuthType.API_KEY,
-            label = {
-                Text(stringResource(R.string.server_api_key_header))
-            },
-            isError = apiKeyHeader.isEmpty(),
-            singleLine = true,
-        )
-        TextField(
-            value = apiKey,
-            onValueChange = onSetApiKey,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = spacing.windowPadding)
-                .padding(top = spacing.medium)
-                .testTag("geoShareServerFormApiKey"),
-            enabled = authType == ServerAuthType.API_KEY,
-            label = {
-                Text(stringResource(R.string.server_api_key))
-            },
-            supportingText = {
-                Text(stringResource(R.string.server_api_key_supporting_text))
-            },
-            isError = apiKey.isEmpty(),
-            singleLine = true,
-        )
+        when (authType) {
+            ServerAuthType.API_KEY -> {
+                TextField(
+                    value = apiKeyHeader,
+                    onValueChange = onSetApiKeyHeader,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = spacing.windowPadding)
+                        .padding(top = spacing.medium)
+                        .testTag("geoShareServerFormApiKeyHeader"),
+                    label = {
+                        Text(stringResource(R.string.server_api_key_header))
+                    },
+                    isError = apiKeyHeader.isEmpty(),
+                    singleLine = true,
+                )
+                TextField(
+                    value = apiKey,
+                    onValueChange = onSetApiKey,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = spacing.windowPadding)
+                        .padding(top = spacing.medium)
+                        .testTag("geoShareServerFormApiKey"),
+                    label = {
+                        Text(stringResource(R.string.server_api_key))
+                    },
+                    supportingText = {
+                        Text(stringResource(R.string.server_api_key_supporting_text))
+                    },
+                    isError = apiKey.isEmpty(),
+                    singleLine = true,
+                )
+            }
+
+            ServerAuthType.ATTESTATION -> {
+                TextField(
+                    value = challengeUrl,
+                    onValueChange = onSetChallengeUrl,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = spacing.windowPadding)
+                        .padding(top = spacing.medium)
+                        .testTag("geoShareServerFormChallengeUrl"),
+                    label = {
+                        Text(stringResource(R.string.server_challenge_url))
+                    },
+                    isError = challengeUrl.isEmpty(),
+                    singleLine = true,
+                )
+                TextField(
+                    value = loginUrl,
+                    onValueChange = onSetLoginUrl,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = spacing.windowPadding)
+                        .padding(top = spacing.medium)
+                        .testTag("geoShareServerFormLoginUrl"),
+                    label = {
+                        Text(stringResource(R.string.server_login_url))
+                    },
+                    isError = loginUrl.isEmpty(),
+                    singleLine = true,
+                )
+                TextField(
+                    value = registerUrl,
+                    onValueChange = onSetRegisterUrl,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = spacing.windowPadding)
+                        .padding(top = spacing.medium)
+                        .testTag("geoShareServerFormRegisterUrl"),
+                    label = {
+                        Text(stringResource(R.string.server_register_url))
+                    },
+                    isError = registerUrl.isEmpty(),
+                    singleLine = true,
+                )
+            }
+        }
         HorizontalDivider(Modifier.padding(vertical = spacing.medium))
         LargeButton(
             stringResource(R.string.save),
