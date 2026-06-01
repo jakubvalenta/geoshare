@@ -249,7 +249,6 @@
     <string name="copying_finished">Copied to clipboard</string>
     <string name="conversion_failed_connection_permission_denied">This link is not supported without connecting to the map service</string>
     <string name="conversion_failed_unsupported_service">Unsupported map service</string>
-    <string name="conversion_failed_unsupported_source">This link is not supported</string>
     <string name="conversion_failed_unsupported_source_place_list">Place lists are not supported</string>
     <string name="conversion_failed_cancelled">Cancelled</string>
     <string name="inputs_all">All map services</string>
@@ -306,31 +305,31 @@
         <item quantity="one">%1$d second</item>
         <item quantity="other">%1$d seconds</item>
     </plurals>
-    <string name="server_api_key" translatable="false">API key</string>
-    <string name="server_api_key_header" translatable="false">HTTP header</string>
-    <string name="server_api_key_supporting_text" translatable="false">To avoid unexpected costs, set strict service restrictions and usage limits on the key.</string>
-    <string name="server_attestation" translatable="false">Hardware-backed key attestation</string>
-    <string name="server_auth_type" translatable="false">Authentication</string>
-    <string name="server_challenge_url" translatable="false">Challenge URL</string>
-    <string name="server_login_url" translatable="false">Login URL</string>
-    <string name="server_name" translatable="false">Name</string>
-    <string name="server_register_url" translatable="false">Registration URL</string>
-    <string name="server_url_template" translatable="false">URL template</string>
-    <string name="server_delete_text" translatable="false">The server “%1$s” will be permanently deleted.</string>
-    <string name="server_delete_title" translatable="false">Delete server?</string>
-    <string name="server_description" translatable="false">To support a wider variety of Google Maps links, %1$s can connect to the paid Google Maps API or a compatible server.</string>
-    <string name="server_insert" translatable="false">Add server</string>
-    <string name="server_invalid" translatable="false">Draft</string>
-    <string name="server_message_deleted" translatable="false">Server deleted</string>
-    <string name="server_message_factory_reset" translatable="false">Server have been reset to factory defaults</string>
-    <string name="server_message_inserted" translatable="false">Server added</string>
-    <string name="server_message_updated" translatable="false">Server updated</string>
-    <string name="server_none" translatable="false">None</string>
-    <string name="server_restore_initial_data" translatable="false">Reset servers to factory defaults</string>
-    <string name="server_restore_initial_data_text" translatable="false">All your servers will be deleted and replaced with the pre-installed ones.</string>
-    <string name="server_restore_initial_data_title" translatable="false">Reset servers to factory defaults?</string>
-    <string name="server_title" translatable="false">Servers</string>
-    <string name="server_update" translatable="false">Edit server</string>
+    <string name="server_api_key">API key</string>
+    <string name="server_api_key_header">HTTP header</string>
+    <string name="server_api_key_supporting_text">To avoid unexpected costs, set strict service restrictions and usage limits on the key.</string>
+    <string name="server_attestation">Hardware-backed key attestation</string>
+    <string name="server_auth_type">Authentication</string>
+    <string name="server_challenge_url">Challenge URL</string>
+    <string name="server_login_url">Login URL</string>
+    <string name="server_name">Name</string>
+    <string name="server_register_url">Registration URL</string>
+    <string name="server_url_template">URL template</string>
+    <string name="server_delete_text">The server “%1$s” will be permanently deleted.</string>
+    <string name="server_delete_title">Delete server?</string>
+    <string name="server_description">To support a wider variety of Google Maps links, %1$s can connect to the paid Google Maps API or a compatible server.</string>
+    <string name="server_insert">Add server</string>
+    <string name="server_invalid">Draft</string>
+    <string name="server_message_deleted">Server deleted</string>
+    <string name="server_message_factory_reset">Server have been reset to factory defaults</string>
+    <string name="server_message_inserted">Server added</string>
+    <string name="server_message_updated">Server updated</string>
+    <string name="server_none">None</string>
+    <string name="server_restore_initial_data">Reset servers to factory defaults</string>
+    <string name="server_restore_initial_data_text">All your servers will be deleted and replaced with the pre-installed ones.</string>
+    <string name="server_restore_initial_data_title">Reset servers to factory defaults?</string>
+    <string name="server_title">Servers</string>
+    <string name="server_update">Edit server</string>
     <string name="srs_description" translatable="false">%1$s (%2$s)</string>
     <string name="srs_description_mainland_china">Mainland China</string>
     <string name="srs_description_greater_china_and_taiwan">Greater China and Taiwan</string>
@@ -345,14 +344,14 @@
     <string name="user_preferences_apps_description">Choose which of your installed apps should be displayed after converting a map link to coordinates.</string>
     <string name="user_preferences_apps_message_hidden">The app has been hidden. You can show it again in preferences.</string>
     <string name="user_preferences_apps_title">Apps</string>
-    <string name="user_preferences_navigate_to_server_screen" translatable="false">Configure servers</string>
+    <string name="user_preferences_navigate_to_server_screen">Configure servers</string>
     <string name="user_preferences_section_input">Input</string>
     <string name="user_preferences_section_output">Output</string>
-    <string name="user_preferences_server_google_maps_description" translatable="false">Choose a server to provide the conversion of Google Maps links that don’t contain coordinates.</string>
-    <string name="user_preferences_server_google_maps_none_description" translatable="false">Use experimental extraction of coordinates from HTML</string>
-    <string name="user_preferences_server_google_maps_title" translatable="false">Google Maps Server</string>
-    <string name="user_preferences_server_search_description" translatable="false">Choose a server to provide the conversion of addresses and place names to coordinates, also known as geocoding.</string>
-    <string name="user_preferences_server_search_none_description" translatable="false">Search will not be available</string>
-    <string name="user_preferences_server_search_title" translatable="false">Search Server</string>
+    <string name="user_preferences_server_google_maps_description">Choose a server to provide the conversion of Google Maps links that don’t contain coordinates.</string>
+    <string name="user_preferences_server_google_maps_none_description">Use experimental extraction of coordinates from HTML</string>
+    <string name="user_preferences_server_google_maps_title">Google Maps Server</string>
+    <string name="user_preferences_server_search_description">Choose a server to provide the conversion of addresses and place names to coordinates, also known as geocoding.</string>
+    <string name="user_preferences_server_search_none_description">Search will not be available</string>
+    <string name="user_preferences_server_search_title">Search Server</string>
     <string name="yes">Yes</string>
 </resources>

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="user_preferences_server_google_maps_none_description" translatable="false">Create geo: links with search term instead of coordinates</string>
+    <string name="conversion_failed_unsupported_source">This link is not supported</string>
+    <string name="user_preferences_server_google_maps_none_description">Create geo: links with search term instead of coordinates</string>
 </resources>
