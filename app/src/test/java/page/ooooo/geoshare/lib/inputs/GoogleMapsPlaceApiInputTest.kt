@@ -69,6 +69,7 @@ class GoogleMapsPlaceApiInputTest {
             serverRepository = serverRepository,
             serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
+            log = log,
             uriQuote = uriQuote,
         )
         val match = "https://www.google.com/maps/search/?query_place_id=$placeId"
@@ -89,6 +90,7 @@ class GoogleMapsPlaceApiInputTest {
             serverRepository = serverRepository,
             serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
+            log = log,
             uriQuote = uriQuote,
         )
         val match = "https://www.google.com/maps/search/?query_place_id=$placeId&query=47.5951518,-122.3316393&api=1"
@@ -111,6 +113,7 @@ class GoogleMapsPlaceApiInputTest {
             serverRepository = serverRepository,
             serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
+            log = log,
             uriQuote = uriQuote,
         )
         val match = "https://www.google.com/spam"
@@ -129,6 +132,7 @@ class GoogleMapsPlaceApiInputTest {
             serverRepository = serverRepository,
             serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
+            log = log,
             uriQuote = uriQuote,
         )
         val match = "https://www.google.com/maps/search/?query_place_id="
@@ -147,6 +151,7 @@ class GoogleMapsPlaceApiInputTest {
             serverRepository = serverRepository,
             serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
+            log = log,
             uriQuote = uriQuote,
         )
         val match = "https://www.google.com/maps/search/?query_place_id=invalid"
@@ -162,6 +167,7 @@ class GoogleMapsPlaceApiInputTest {
             serverRepository = serverRepository,
             serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
+            log = log,
             uriQuote = uriQuote,
         )
         val match = "https://www.google.com/maps/search/?query_place_id=exception"

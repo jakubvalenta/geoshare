@@ -9,11 +9,13 @@ import io.ktor.client.request.prepareRequest
 import io.ktor.client.request.url
 import io.ktor.http.ContentType
 import io.ktor.http.headers
+import io.ktor.serialization.JsonConvertException
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.ServerRepository
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
@@ -21,6 +23,7 @@ import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.network.ServerHttpClientFactory
+import page.ooooo.geoshare.lib.network.UnknownNetworkException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -28,6 +31,7 @@ import javax.inject.Singleton
 class GoogleMapsAddressApiInput @Inject constructor(
     private val serverHttpClientFactory: ServerHttpClientFactory,
     private val googleMapsHtmlInput: Lazy<GoogleMapsHtmlInput>,
+    private val log: Log,
     private val serverRepository: ServerRepository,
     private val uriQuote: UriQuote,
 ) : BasicInput<Uri>, Input.HasPermission {
@@ -54,18 +58,31 @@ class GoogleMapsAddressApiInput @Inject constructor(
                 })
             }
         }
-        val query = parseQuery(data) ?: return@parseResult
-        val res = client.use { client ->
-            client
-                .prepareRequest {
-                    url(server.getUrl(query, uriQuote))
-                    headers {
-                        accept(ContentType.Application.Json)
+        val query = parseQuery(data)
+            ?.let { cleanQuery(it) }
+            ?: return@parseResult
+        val res = try {
+            client.use { client ->
+                client
+                    .prepareRequest {
+                        url(server.getUrl(query, uriQuote))
+                        headers {
+                            accept(ContentType.Application.Json)
+                        }
                     }
-                }
-                .execute { response ->
-                    response.body<ServerHttpClientFactory.GoogleMapsResults>()
-                }
+                    .execute { response ->
+                        response.body<ServerHttpClientFactory.GoogleMapsResults>()
+                    }
+            }
+        } catch (tr: UnknownNetworkException) {
+            if (tr.cause is JsonConvertException) {
+                // Google returns a JSON without the 'results' property when no coordinates are found, so let's do
+                // nothing in this case
+                // TODO Test GoogleMapsAddressApiInput empty JSON response
+                log.i(TAG, "API returned no results")
+                return@parseResult
+            }
+            throw tr
         }
         points = res.results
             // Take only the highest ranked result
@@ -117,5 +134,12 @@ class GoogleMapsAddressApiInput @Inject constructor(
         }
     }
 
-    override fun toString() = "GoogleMapsAddressApiInput"
+    private fun cleanQuery(query: String): String =
+        query.replace(Regex("""\s*@$LAT,$LON\s*$"""), "")
+
+    private companion object {
+        private const val TAG = "GoogleMapsAddressApiInput"
+    }
+
+    override fun toString() = TAG
 }

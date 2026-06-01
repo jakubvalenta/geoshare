@@ -146,7 +146,7 @@ object FakeInputRepository : InputRepository {
         uriQuote = uriQuote,
     )
     val baiduMapWebViewInput = BaiduMapWebViewInput(
-        log = FakeLog,
+        log = log,
     )
     override val cartesIGNUriInput = CartesIGNUriInput(
         uriQuote = uriQuote,
@@ -175,12 +175,14 @@ object FakeInputRepository : InputRepository {
     val googleMapsAddressApiInput = GoogleMapsAddressApiInput(
         serverHttpClientFactory = serverHttpClientFactory,
         googleMapsHtmlInput = { googleMapsHtmlInput },
+        log = log,
         serverRepository = serverRepository,
         uriQuote = uriQuote,
     )
     val googleMapsPlaceApiInput = GoogleMapsPlaceApiInput(
         serverHttpClientFactory = serverHttpClientFactory,
         googleMapsHtmlInput = { googleMapsHtmlInput },
+        log = log,
         serverRepository = serverRepository,
         uriQuote = uriQuote,
     )

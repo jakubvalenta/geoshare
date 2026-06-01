@@ -8,18 +8,21 @@ import io.ktor.client.request.accept
 import io.ktor.client.request.prepareRequest
 import io.ktor.client.request.url
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.headers
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.ServerRepository
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.network.ResponseNetworkException
 import page.ooooo.geoshare.lib.network.ServerHttpClientFactory
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -28,6 +31,7 @@ import javax.inject.Singleton
 class GoogleMapsPlaceApiInput @Inject constructor(
     private val serverHttpClientFactory: ServerHttpClientFactory,
     private val googleMapsHtmlInput: Lazy<GoogleMapsHtmlInput>,
+    private val log: Log,
     private val serverRepository: ServerRepository,
     private val uriQuote: UriQuote,
 ) : BasicInput<Uri>, Input.HasPermission {
@@ -55,17 +59,27 @@ class GoogleMapsPlaceApiInput @Inject constructor(
             }
         }
         val placeId = parsePlaceId(data) ?: return@parseResult
-        val res = client.use { client ->
-            client
-                .prepareRequest {
-                    url(server.getUrl(placeId, uriQuote))
-                    headers {
-                        accept(ContentType.Application.Json)
+        val res = try {
+            client.use { client ->
+                client
+                    .prepareRequest {
+                        url(server.getUrl(placeId, uriQuote))
+                        headers {
+                            accept(ContentType.Application.Json)
+                        }
                     }
-                }
-                .execute { response ->
-                    response.body<ServerHttpClientFactory.GoogleMapsResult>()
-                }
+                    .execute { response ->
+                        response.body<ServerHttpClientFactory.GoogleMapsResult>()
+                    }
+            }
+        } catch (tr: ResponseNetworkException) {
+            if (tr.response.status == HttpStatusCode.BadRequest) {
+                // Google returns error 400 when the place id is incorrect, so let's do nothing in this case
+                // TODO Test GoogleMapsPlaceApiInput response 400
+                log.i(TAG, "API returned no results")
+                return@parseResult
+            }
+            throw tr
         }
         points = persistentListOf(
             GCJ02MainlandChinaPoint(
@@ -80,5 +94,9 @@ class GoogleMapsPlaceApiInput @Inject constructor(
         Q_PARAM_PATTERN.matchEntire(queryParams["query_place_id"])?.groupOrNull()
     }
 
-    override fun toString() = "GoogleMapsPlaceApiInput"
+    private companion object {
+        private const val TAG = "GoogleMapsPlaceApiInput"
+    }
+
+    override fun toString() = TAG
 }

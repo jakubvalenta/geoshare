@@ -270,7 +270,7 @@ class GoogleMapsInputBehaviorTest {
         testUri(
             if (server != null) {
                 WGS84Point(
-                    44.4490541, 26.0888398,
+                    44.4490666, 26.0888873,
                     name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
                     source = Source.API,
                 )
