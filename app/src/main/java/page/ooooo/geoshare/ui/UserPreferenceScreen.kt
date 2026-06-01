@@ -39,6 +39,7 @@ import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.preferences.Automation
+import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.DataTypes
@@ -527,7 +528,9 @@ private fun DefaultPreview() {
                     selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
                     selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     servers = defaultFakeServers,
-                    userPreferencesValues = defaultFakeUserPreferences,
+                    userPreferencesValues = defaultFakeUserPreferences.copy(
+                        connectionPermission = Permission.NEVER,
+                    ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
                     onSelectGoogleMapsServer = {},
@@ -559,7 +562,9 @@ private fun DarkPreview() {
                     selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
                     selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     servers = defaultFakeServers,
-                    userPreferencesValues = defaultFakeUserPreferences,
+                    userPreferencesValues = defaultFakeUserPreferences.copy(
+                        connectionPermission = Permission.NEVER,
+                    ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
                     onSelectGoogleMapsServer = {},
@@ -591,7 +596,9 @@ private fun TabletPreview() {
                     selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
                     selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     servers = defaultFakeServers,
-                    userPreferencesValues = defaultFakeUserPreferences,
+                    userPreferencesValues = defaultFakeUserPreferences.copy(
+                        connectionPermission = Permission.NEVER,
+                    ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
                     onSelectGoogleMapsServer = {},

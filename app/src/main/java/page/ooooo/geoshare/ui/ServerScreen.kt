@@ -280,14 +280,27 @@ private fun ServerListPane(
             SegmentedList(
                 values = all,
                 modifier = Modifier.padding(top = spacing.medium),
-                itemHeadline = { it.name },
-                itemIsSelected = { it.uid == destination },
-                itemOnClick = { onNavigateToContentKey(it.uid) },
-                itemSupportingContent = {
-                    if (!it.isValid()) {
-                        { Text(stringResource(R.string.server_invalid), fontStyle = FontStyle.Italic) }
+                itemHeadline = { item -> item.name },
+                itemIsSelected = { item -> item.uid == destination },
+                itemOnClick = { item -> onNavigateToContentKey(item.uid) },
+                itemSupportingContent = { item ->
+                    if (item.isValid()) {
+                        item.description.takeIf { it.isNotEmpty() }?.let { description ->
+                            {
+                                Text(
+                                    description,
+                                    style = MaterialTheme.typography.bodySmall,
+                                )
+                            }
+                        }
                     } else {
-                        null
+                        {
+                            Text(
+                                stringResource(R.string.server_invalid),
+                                fontStyle = FontStyle.Italic,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
                     }
                 },
                 itemTestTag = { "geoShareServerListItem_${it.uuid}" },

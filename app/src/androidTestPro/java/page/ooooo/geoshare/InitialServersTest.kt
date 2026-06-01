@@ -21,7 +21,8 @@ class InitialServersTest : InitialDataTest {
         val serverDao = db.getServerDao()
         val expectedItems = listOf(
             Server(
-                name = "Google Maps Geocode Address via GeoShare proxy",
+                name = "GeoShare Proxy",
+                description = "With Google Maps backend"
                 urlTemplate = "https://api.geoshare-app.net/v1/google-maps/geocode/address/{q}",
                 authType = ServerAuthType.ATTESTATION,
                 challengeUrl = "https://api.geoshare-app.net/v1/auth/challenge",
@@ -30,7 +31,7 @@ class InitialServersTest : InitialDataTest {
                 uuid = UUID.fromString("640f61e6-2bb4-41d3-9b4a-65e656564d03"),
             ),
             Server(
-                name = "Google Maps Geocode Address",
+                name = "Google Maps",
                 urlTemplate = "https://geocode.googleapis.com/v4/geocode/address/{q}",
                 authType = ServerAuthType.API_KEY,
                 apiKeyHeader = "X-Goog-Api-Key",

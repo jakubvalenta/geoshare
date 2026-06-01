@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="user_preferences_server_none" translatable="false">No server, create a geo: link with search term instead of coordinates</string>
+    <string name="user_preferences_server_google_maps_none_description" translatable="false">Create geo: links with search term instead of coordinates</string>
 </resources>

@@ -199,6 +199,114 @@ private fun DarkListItemPreview() {
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Preview(showBackground = true)
+@Composable
+private fun AllListItemPreview() {
+    AppTheme {
+        Surface {
+            Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
+                UserPreferenceHiddenAppsListItem(
+                    index = 0,
+                    count = 1,
+                    apps = mapOf(
+                        PackageNames.COMAPS_FDROID to emptySet(),
+                        PackageNames.ORGANIC_MAPS to emptySet(),
+                        PackageNames.OSMAND_PLUS to emptySet(),
+                    ),
+                    selected = false,
+                    values = UserPreferencesValues(
+                        hiddenApps = setOf(
+                            PackageNames.COMAPS_FDROID,
+                            PackageNames.ORGANIC_MAPS,
+                            PackageNames.OSMAND_PLUS,
+                        )
+                    ),
+                    onClick = {},
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkAllListItemPreview() {
+    AppTheme {
+        Surface {
+            Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
+                UserPreferenceHiddenAppsListItem(
+                    index = 0,
+                    count = 1,
+                    apps = mapOf(
+                        PackageNames.COMAPS_FDROID to emptySet(),
+                        PackageNames.ORGANIC_MAPS to emptySet(),
+                        PackageNames.OSMAND_PLUS to emptySet(),
+                    ),
+                    selected = false,
+                    values = UserPreferencesValues(
+                        hiddenApps = setOf(
+                            PackageNames.COMAPS_FDROID,
+                            PackageNames.ORGANIC_MAPS,
+                            PackageNames.OSMAND_PLUS,
+                        )
+                    ),
+                    onClick = {},
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Preview(showBackground = true)
+@Composable
+private fun NoneListItemPreview() {
+    AppTheme {
+        Surface {
+            Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
+                UserPreferenceHiddenAppsListItem(
+                    index = 0,
+                    count = 1,
+                    apps = mapOf(
+                        PackageNames.COMAPS_FDROID to emptySet(),
+                        PackageNames.ORGANIC_MAPS to emptySet(),
+                        PackageNames.OSMAND_PLUS to emptySet(),
+                    ),
+                    selected = false,
+                    values = defaultFakeUserPreferences,
+                    onClick = {},
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkNoneListItemPreview() {
+    AppTheme {
+        Surface {
+            Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
+                UserPreferenceHiddenAppsListItem(
+                    index = 0,
+                    count = 1,
+                    apps = mapOf(
+                        PackageNames.COMAPS_FDROID to emptySet(),
+                        PackageNames.ORGANIC_MAPS to emptySet(),
+                        PackageNames.OSMAND_PLUS to emptySet(),
+                    ),
+                    selected = false,
+                    values = defaultFakeUserPreferences,
+                    onClick = {},
+                )
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun ControlsPreview() {
@@ -227,7 +335,7 @@ private fun ControlsPreview() {
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
-                values = defaultFakeUserPreferences,
+                values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
                 wide = true,
                 onBack = {},
                 onNavigateToBillingScreen = {},
@@ -265,7 +373,7 @@ private fun DarkControlsPreview() {
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
-                values = defaultFakeUserPreferences,
+                values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
                 wide = true,
                 onBack = {},
                 onNavigateToBillingScreen = {},
@@ -303,7 +411,7 @@ private fun TabletControlsPreview() {
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
-                values = defaultFakeUserPreferences,
+                values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
                 wide = false,
                 onBack = {},
                 onNavigateToBillingScreen = {},
@@ -341,7 +449,7 @@ private fun LoadingPreview() {
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
-                values = UserPreferencesValues(),
+                values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
                 wide = false,
                 onBack = {},
                 onNavigateToBillingScreen = {},
@@ -379,7 +487,7 @@ private fun DarkLoadingPreview() {
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
-                values = UserPreferencesValues(),
+                values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
                 wide = false,
                 onBack = {},
                 onNavigateToBillingScreen = {},
@@ -417,7 +525,7 @@ private fun TabletHiddenAppsLoadingPreview() {
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
-                values = UserPreferencesValues(),
+                values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
                 wide = false,
                 onBack = {},
                 onNavigateToBillingScreen = {},

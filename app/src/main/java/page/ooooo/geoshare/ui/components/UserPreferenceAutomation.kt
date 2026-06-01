@@ -28,7 +28,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.datastore.preferences.core.MutablePreferences
 import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
+import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.database.findByUUID
 import page.ooooo.geoshare.data.local.preferences.Automation
@@ -47,7 +49,6 @@ import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.outputs.Output
-import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import java.util.UUID
@@ -203,6 +204,7 @@ private fun ListItemPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
+                val outputRepository = OutputRepository(coordinateConverter)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferenceAutomationListItem(
                     index = 0,
@@ -224,7 +226,9 @@ private fun ListItemPreview() {
                     selected = false,
                     values = UserPreferencesValues(automation = SavePointsGpxAutomation),
                     onClick = {},
-                    onGetAutomationOutput = { _, _ -> SavePointsGpxOutput(coordinateConverter) },
+                    onGetAutomationOutput = { automation, getLinkByUUID ->
+                        outputRepository.getAutomationOutput(automation, getLinkByUUID)
+                    },
                 )
             }
         }
@@ -241,6 +245,7 @@ private fun DarkListItemPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
+                val outputRepository = OutputRepository(coordinateConverter)
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferenceAutomationListItem(
                     index = 0,
@@ -262,7 +267,91 @@ private fun DarkListItemPreview() {
                     selected = false,
                     values = UserPreferencesValues(automation = SavePointsGpxAutomation),
                     onClick = {},
-                    onGetAutomationOutput = { _, _ -> SavePointsGpxOutput(coordinateConverter) },
+                    onGetAutomationOutput = { automation, getLinkByUUID ->
+                        outputRepository.getAutomationOutput(automation, getLinkByUUID)
+                    },
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Preview(showBackground = true)
+@Composable
+private fun NoneListItemPreview() {
+    AppTheme {
+        Surface {
+            Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
+                val outputRepository = OutputRepository(coordinateConverter)
+                @SuppressLint("LocalContextGetResourceValueCall")
+                UserPreferenceAutomationListItem(
+                    index = 0,
+                    count = 1,
+                    billingFeatures = listOf(AutomationFeature),
+                    billingStatus = BillingStatus.Purchased(
+                        product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                        expired = false,
+                        refundable = true,
+                        token = "test_purchased",
+                    ),
+                    appDetails = mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            "OsmAnd",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
+                    links = emptyList(),
+                    selected = false,
+                    values = defaultFakeUserPreferences,
+                    onClick = {},
+                    onGetAutomationOutput = { automation, getLinkByUUID ->
+                        outputRepository.getAutomationOutput(automation, getLinkByUUID)
+                    },
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkNoneListItemPreview() {
+    AppTheme {
+        Surface {
+            Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
+                val outputRepository = OutputRepository(coordinateConverter)
+                @SuppressLint("LocalContextGetResourceValueCall")
+                UserPreferenceAutomationListItem(
+                    index = 0,
+                    count = 1,
+                    billingFeatures = listOf(AutomationFeature),
+                    billingStatus = BillingStatus.Purchased(
+                        product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                        expired = false,
+                        refundable = true,
+                        token = "test_purchased",
+                    ),
+                    appDetails = mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            "OsmAnd",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
+                    links = emptyList(),
+                    selected = false,
+                    values = defaultFakeUserPreferences,
+                    onClick = {},
+                    onGetAutomationOutput = { automation, getLinkByUUID ->
+                        outputRepository.getAutomationOutput(automation, getLinkByUUID)
+                    },
                 )
             }
         }
@@ -277,6 +366,7 @@ private fun ControlsPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val outputRepository = OutputRepository(coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
@@ -302,7 +392,9 @@ private fun ControlsPreview() {
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onValueChange = {},
-                onGetAutomationOutput = { _, _ -> SavePointsGpxOutput(coordinateConverter) },
+                onGetAutomationOutput = { automation, getLinkByUUID ->
+                    outputRepository.getAutomationOutput(automation, getLinkByUUID)
+                },
             )
         }
     }
@@ -316,6 +408,7 @@ private fun DarkControlsPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val outputRepository = OutputRepository(coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
@@ -341,7 +434,9 @@ private fun DarkControlsPreview() {
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onValueChange = {},
-                onGetAutomationOutput = { _, _ -> SavePointsGpxOutput(coordinateConverter) },
+                onGetAutomationOutput = { automation, getLinkByUUID ->
+                    outputRepository.getAutomationOutput(automation, getLinkByUUID)
+                },
             )
         }
     }
@@ -355,6 +450,7 @@ private fun TabletControlsPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val outputRepository = OutputRepository(coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
@@ -380,7 +476,9 @@ private fun TabletControlsPreview() {
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onValueChange = {},
-                onGetAutomationOutput = { _, _ -> SavePointsGpxOutput(coordinateConverter) },
+                onGetAutomationOutput = { automation, getLinkByUUID ->
+                    outputRepository.getAutomationOutput(automation, getLinkByUUID)
+                },
             )
         }
     }
@@ -394,6 +492,7 @@ private fun NotPurchasedControlsPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val outputRepository = OutputRepository(coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
@@ -414,7 +513,9 @@ private fun NotPurchasedControlsPreview() {
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onValueChange = {},
-                onGetAutomationOutput = { _, _ -> SavePointsGpxOutput(coordinateConverter) },
+                onGetAutomationOutput = { automation, getLinkByUUID ->
+                    outputRepository.getAutomationOutput(automation, getLinkByUUID)
+                },
             )
         }
     }
@@ -428,6 +529,7 @@ private fun DarkNotPurchasedControlsPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val outputRepository = OutputRepository(coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
@@ -448,7 +550,9 @@ private fun DarkNotPurchasedControlsPreview() {
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onValueChange = {},
-                onGetAutomationOutput = { _, _ -> SavePointsGpxOutput(coordinateConverter) },
+                onGetAutomationOutput = { automation, getLinkByUUID ->
+                    outputRepository.getAutomationOutput(automation, getLinkByUUID)
+                },
             )
         }
     }
@@ -462,6 +566,7 @@ private fun TabletNotPurchasedControlsPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val outputRepository = OutputRepository(coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
@@ -482,7 +587,9 @@ private fun TabletNotPurchasedControlsPreview() {
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onValueChange = {},
-                onGetAutomationOutput = { _, _ -> SavePointsGpxOutput(coordinateConverter) },
+                onGetAutomationOutput = { automation, getLinkByUUID ->
+                    outputRepository.getAutomationOutput(automation, getLinkByUUID)
+                },
             )
         }
     }

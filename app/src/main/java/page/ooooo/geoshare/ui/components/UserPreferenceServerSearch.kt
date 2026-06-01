@@ -13,9 +13,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeGeoShareGoogleMapsAddressServer
+import page.ooooo.geoshare.data.di.defaultFakeServers
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
@@ -42,7 +44,7 @@ fun UserPreferenceServerSearchListItem(
         enabled = ConnectionPermissionPreference.getValue(values) != Permission.NEVER,
         supportingContent = {
             Text(
-                selectedServer?.name ?: stringResource(R.string.user_preferences_search_server_none),
+                selectedServer?.name ?: stringResource(R.string.server_none),
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
             )
@@ -50,7 +52,7 @@ fun UserPreferenceServerSearchListItem(
         colors = segmentedListColors(),
     ) {
         Text(
-            stringResource(R.string.user_preferences_search_server_title),
+            stringResource(R.string.user_preferences_server_search_title),
             style = MaterialTheme.typography.bodyLarge,
         )
     }
@@ -68,9 +70,9 @@ fun UserPreferenceServerSearchControls(
     onSelect: (Server?) -> Unit,
 ) {
     UserPreferenceControls(
-        titleResId = R.string.user_preferences_search_server_title,
+        titleResId = R.string.user_preferences_server_search_title,
         description = {
-            stringResource(R.string.user_preferences_search_server_description)
+            stringResource(R.string.user_preferences_server_search_description)
         },
         billingAppNameResId = billingAppNameResId,
         wide = wide,
@@ -80,7 +82,7 @@ fun UserPreferenceServerSearchControls(
         userPreferenceServerControls(
             selected = selected,
             servers = servers,
-            itemNoneHeadline = { stringResource(R.string.user_preferences_search_server_none) },
+            itemNoneDescription = { stringResource(R.string.user_preferences_server_search_none_description) },
             itemTestTag = { item, selected -> "geoShareUserPreferenceServer_${item?.name}_selected_${selected}" },
             onNavigateToServerScreen = onNavigateToServerScreen,
             onSelect = onSelect,
@@ -164,6 +166,120 @@ private fun DarkNoneSelectedListItemPreview() {
                     onClick = {},
                 )
             }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ControlsPreview() {
+    AppTheme {
+        Surface {
+            UserPreferenceServerSearchControls(
+                billingAppNameResId = R.string.app_name_pro,
+                selected = null,
+                servers = defaultFakeServers,
+                wide = true,
+                onBack = {},
+                onNavigateToBillingScreen = {},
+                onNavigateToServerScreen = {},
+                onSelect = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkControlsPreview() {
+    AppTheme {
+        Surface {
+            UserPreferenceServerSearchControls(
+                billingAppNameResId = R.string.app_name_pro,
+                selected = FakeGeoShareGoogleMapsAddressServer,
+                servers = defaultFakeServers,
+                wide = true,
+                onBack = {},
+                onNavigateToBillingScreen = {},
+                onNavigateToServerScreen = {},
+                onSelect = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, device = Devices.TABLET)
+@Composable
+private fun TabletControlsPreview() {
+    AppTheme {
+        Surface {
+            UserPreferenceServerSearchControls(
+                billingAppNameResId = R.string.app_name_pro,
+                selected = FakeGeoShareGoogleMapsAddressServer,
+                servers = defaultFakeServers,
+                wide = true,
+                onBack = {},
+                onNavigateToBillingScreen = {},
+                onNavigateToServerScreen = {},
+                onSelect = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ControlsNoneSelectedPreview() {
+    AppTheme {
+        Surface {
+            UserPreferenceServerSearchControls(
+                billingAppNameResId = R.string.app_name_pro,
+                selected = null,
+                servers = defaultFakeServers,
+                wide = true,
+                onBack = {},
+                onNavigateToBillingScreen = {},
+                onNavigateToServerScreen = {},
+                onSelect = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkNoneSelectedControlsPreview() {
+    AppTheme {
+        Surface {
+            UserPreferenceServerSearchControls(
+                billingAppNameResId = R.string.app_name_pro,
+                selected = null,
+                servers = defaultFakeServers,
+                wide = true,
+                onBack = {},
+                onNavigateToBillingScreen = {},
+                onNavigateToServerScreen = {},
+                onSelect = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, device = Devices.TABLET)
+@Composable
+private fun TabletNoneSelectedControlsPreview() {
+    AppTheme {
+        Surface {
+            UserPreferenceServerSearchControls(
+                billingAppNameResId = R.string.app_name_pro,
+                selected = null,
+                servers = defaultFakeServers,
+                wide = true,
+                onBack = {},
+                onNavigateToBillingScreen = {},
+                onNavigateToServerScreen = {},
+                onSelect = {},
+            )
         }
     }
 }

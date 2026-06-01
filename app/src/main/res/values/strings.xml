@@ -325,6 +325,7 @@
     <string name="server_message_factory_reset" translatable="false">Server have been reset to factory defaults</string>
     <string name="server_message_inserted" translatable="false">Server added</string>
     <string name="server_message_updated" translatable="false">Server updated</string>
+    <string name="server_none" translatable="false">None</string>
     <string name="server_restore_initial_data" translatable="false">Reset servers to factory defaults</string>
     <string name="server_restore_initial_data_text" translatable="false">All your servers will be deleted and replaced with the pre-installed ones.</string>
     <string name="server_restore_initial_data_title" translatable="false">Reset servers to factory defaults?</string>
@@ -344,15 +345,14 @@
     <string name="user_preferences_apps_description">Choose which of your installed apps should be displayed after converting a map link to coordinates.</string>
     <string name="user_preferences_apps_message_hidden">The app has been hidden. You can show it again in preferences.</string>
     <string name="user_preferences_apps_title">Apps</string>
+    <string name="user_preferences_navigate_to_server_screen" translatable="false">Configure servers</string>
     <string name="user_preferences_section_input">Input</string>
     <string name="user_preferences_section_output">Output</string>
+    <string name="user_preferences_server_google_maps_description" translatable="false">Choose a server to provide the conversion of Google Maps links that don’t contain coordinates.</string>
+    <string name="user_preferences_server_google_maps_none_description" translatable="false">Use experimental extraction of coordinates from HTML</string>
+    <string name="user_preferences_server_google_maps_title" translatable="false">Google Maps Server</string>
+    <string name="user_preferences_server_search_description" translatable="false">Choose a server to provide the conversion of addresses and place names to coordinates, also known as geocoding.</string>
+    <string name="user_preferences_server_search_none_description" translatable="false">Search will not be available</string>
+    <string name="user_preferences_server_search_title" translatable="false">Search Server</string>
     <string name="yes">Yes</string>
-
-    <string name="user_preferences_search_server_description" translatable="false">Choose a server to provide the conversion of addresses and place names to coordinates, also known as geocoding.</string>
-    <string name="user_preferences_search_server_none" translatable="false">No server, search will not be available</string>
-    <string name="user_preferences_search_server_title" translatable="false">Search Server</string>
-    <string name="user_preferences_google_maps_server_description" translatable="false">Choose a server to provide the conversion of Google Maps links that don’t contain coordinates.</string>
-    <string name="user_preferences_google_maps_server_none" translatable="false">No server, use experimental extraction of coordinates from HTML</string>
-    <string name="user_preferences_google_maps_server_title" translatable="false">Google Maps Server</string>
-    <string name="user_preferences_navigate_to_server_screen" translatable="false">Configure servers</string>
 </resources>

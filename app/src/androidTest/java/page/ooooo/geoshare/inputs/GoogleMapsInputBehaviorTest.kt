@@ -164,7 +164,8 @@ class GoogleMapsInputBehaviorTest {
             assumeHttpGetReturnsStatus("https://api.geoshare-app.net/", HttpStatusCode.NotFound)
         }
         val server = Server(
-            name = "Google Maps Geocode Address via GeoShare proxy",
+            name = "GeoShare Proxy",
+            description = "With Google Maps backend",
             urlTemplate = "https://api.geoshare-app.net/v1/google-maps/geocode/address/{q}",
             authType = ServerAuthType.ATTESTATION,
             challengeUrl = "https://api.geoshare-app.net/v1/auth/challenge",
@@ -181,7 +182,7 @@ class GoogleMapsInputBehaviorTest {
             assumeHttpGetReturnsStatus("http://127.0.0.1:8080", HttpStatusCode.NotFound)
         }
         val server = Server(
-            name = "Google Maps Geocode Address via local GeoShare proxy",
+            name = "Google Maps",
             urlTemplate = "http://127.0.0.1:8080/v1/google-maps/geocode/address/{q}",
             authType = ServerAuthType.ATTESTATION,
             challengeUrl = "http://127.0.0.1:8080/v1/auth/challenge",
@@ -199,7 +200,7 @@ class GoogleMapsInputBehaviorTest {
             assumeHttpGetReturnsStatus("https://geocode.googleapis.com", HttpStatusCode.NotFound)
         }
         val server = Server(
-            name = "Google Maps Geocode Address",
+            name = "Google Maps",
             urlTemplate = "https://geocode.googleapis.com/v4/geocode/address/{q}",
             authType = ServerAuthType.API_KEY,
             apiKey = apiKey,

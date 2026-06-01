@@ -32,7 +32,8 @@ fun <T> RadioButtonGroup(
     values: List<T>,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    getTestTag: ((value: T) -> String)? = null,
+    itemEnabled: (value: T) -> Boolean = { true },
+    itemTestTag: ((value: T) -> String)? = null,
     option: @Composable (value: T) -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -41,18 +42,19 @@ fun <T> RadioButtonGroup(
         // Note that Modifier.selectableGroup() is essential to ensure correct accessibility behavior
         Column(modifier.selectableGroup()) {
             values.forEach { value ->
+                val itemEnabled = enabled && itemEnabled(value)
                 Row(
                     Modifier
                         .fillMaxWidth()
                         .padding(vertical = spacing.tinyAdaptive)
                         .selectable(
                             selected = value == selectedValue,
-                            enabled = enabled,
+                            enabled = itemEnabled,
                             role = Role.RadioButton,
                             onClick = { onSelect(value) },
                         )
                         .run {
-                            getTestTag?.invoke(value)?.let {
+                            itemTestTag?.invoke(value)?.let {
                                 testTag(it)
                             } ?: this
                         },
@@ -63,9 +65,9 @@ fun <T> RadioButtonGroup(
                         selected = value == selectedValue,
                         // Null recommended for accessibility with screen readers
                         onClick = null,
-                        enabled = enabled,
+                        enabled = itemEnabled,
                     )
-                    if (enabled) {
+                    if (itemEnabled) {
                         option(value)
                     } else {
                         Box(Modifier.alpha(0.7f)) {
@@ -128,6 +130,27 @@ private fun DisabledPreview() {
                 onSelect = {},
                 values = listOf(1, 2),
                 enabled = false,
+            ) { value ->
+                when (value) {
+                    1 -> Text("Foo bar")
+                    2 -> Text("Kotlin is a modern but already mature programming language designed to make developers happier.")
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ItemDisabledPreview() {
+    AppTheme {
+        Surface {
+            RadioButtonGroup(
+                selectedValue = 2,
+                onSelect = {},
+                values = listOf(1, 2),
+                enabled = true,
+                itemEnabled = { it == 2 }
             ) { value ->
                 when (value) {
                     1 -> Text("Foo bar")

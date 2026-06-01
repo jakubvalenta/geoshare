@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.ui.components
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,7 +14,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -120,7 +120,7 @@ fun <T> LazyListScope.userPreferenceOptionsControl(
                         this
                     }
                 },
-                getTestTag = itemTestTag,
+                itemTestTag = itemTestTag,
                 option = option,
             )
         }
@@ -138,44 +138,48 @@ fun <T> LazyListScope.userPreferenceOptionsControl(
 fun LazyListScope.userPreferenceServerControls(
     selected: Server?,
     servers: List<Server>,
-    itemNoneHeadline: @Composable () -> String,
+    itemNoneDescription: @Composable () -> String,
     itemTestTag: ((item: Server?, selected: Boolean) -> String)? = null,
     onNavigateToServerScreen: () -> Unit,
     onSelect: (Server?) -> Unit,
 ) {
     item {
-        SegmentedList(
+        RadioButtonGroup(
+            selectedValue = selected,
+            onSelect = onSelect,
             values = listOf(null) + servers,
-            itemHeadline = { item -> item?.name ?: itemNoneHeadline() },
-            itemIsSelected = { item -> item?.uid == selected?.uid },
-            itemOnClick = { item -> onSelect(item) },
+            modifier = Modifier.padding(top = LocalSpacing.current.tinyAdaptive),
             itemEnabled = { item -> item?.isValid() != false },
-            itemLeadingContent = { item ->
-                {
-                    RadioButton(
-                        selected = item?.uid == selected?.uid,
-                        // Null recommended for accessibility with screen readers
-                        onClick = null,
-                        modifier = Modifier.run {
-                            itemTestTag?.invoke(item, item?.uid == selected?.uid)?.let {
-                                testTag(it)
-                            } ?: this
-                        },
-                        enabled = item?.isValid() != false,
-                    )
-                }
-            },
-            itemSupportingContent = { item ->
-                if (item?.isValid() != false) {
-                    { Text(stringResource(R.string.server_invalid), fontStyle = FontStyle.Italic) }
-                } else {
-                    null
-                }
-            },
             itemTestTag = itemTestTag?.let { itemTestTag ->
                 { item -> itemTestTag(item, item?.uid == selected?.uid) }
             },
-        )
+        ) { item ->
+            Column {
+                if (item == null) {
+                    Text(stringResource(R.string.server_none))
+                    Text(
+                        itemNoneDescription(),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                } else {
+                    Text(item.name)
+                    if (item.isValid()) {
+                        item.description.takeIf { it.isNotEmpty() }?.let { description ->
+                            Text(
+                                description,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
+                    } else {
+                        Text(
+                            stringResource(R.string.server_invalid),
+                            fontStyle = FontStyle.Italic,
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                }
+            }
+        }
     }
     item {
         val spacing = LocalSpacing.current

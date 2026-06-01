@@ -22,6 +22,7 @@ import kotlin.uuid.ExperimentalUuidApi
 @Serializable
 data class Server(
     val name: String = "",
+    val description: String = "",
     val urlTemplate: String = "",
     val authType: ServerAuthType = ServerAuthType.API_KEY,
     val apiKey: String = "",
