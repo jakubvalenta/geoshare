@@ -200,7 +200,7 @@ fun UiAutomatorTestScope.assertConversionSucceeded(
     onElement(timeoutMs) {
         when (viewIdResourceName) {
             "geoShareResultSuccessLastPointName" -> true
-            "geoShareConversionErrorMessage" -> throw AssertionError("Conversion failed")
+            "geoShareConversionErrorMessage" -> throw AssertionError("Conversion failed: ${textAsString()}")
             else -> false
         }
     }
