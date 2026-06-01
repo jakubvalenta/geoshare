@@ -15,15 +15,13 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
-import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.di.FakeKeyStoreTools
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.data.local.preferences.CachedServerToken
 import page.ooooo.geoshare.data.local.preferences.CachedServerTokenPreference
+import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.extensions.base64Decode
@@ -113,10 +111,14 @@ class ServerHttpClientFactoryTest {
                 else -> throw NotImplementedError()
             }
         }
-        val userPreferencesRepository: UserPreferencesRepository = mock {
-            on { getValue(CachedServerTokenPreference) } doReturn
-                CachedServerToken(correctToken, keyStoreTools.getKey()!!.publicKey.encoded.base64Encode())
-        }
+        val userPreferencesRepository = FakeUserPreferencesRepository(
+            UserPreferencesValues(
+                cachedServerToken = CachedServerToken(
+                    correctToken,
+                    keyStoreTools.getKey()!!.publicKey.encoded.base64Encode(),
+                ),
+            )
+        )
         val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
         val res = factory.createHttpClient(attestationServer).use { client ->
             client.get(attestationServer.getUrl(query, uriQuote))
@@ -469,10 +471,15 @@ class ServerHttpClientFactoryTest {
                     else -> throw NotImplementedError()
                 }
             }
-            val userPreferencesRepository: UserPreferencesRepository = mock {
-                on { getValue(CachedServerTokenPreference) } doReturn
-                    CachedServerToken(incorrectToken, "incorrect public key".toByteArray().base64Encode())
-            }
+
+            val userPreferencesRepository = FakeUserPreferencesRepository(
+                UserPreferencesValues(
+                    cachedServerToken = CachedServerToken(
+                        incorrectToken,
+                        "incorrect public key".toByteArray().base64Encode(),
+                    ),
+                )
+            )
             val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
             val res = factory.createHttpClient(attestationServer).use { client ->
                 client.get(attestationServer.getUrl(query, uriQuote))
@@ -526,10 +533,14 @@ class ServerHttpClientFactoryTest {
                 else -> throw NotImplementedError()
             }
         }
-        val userPreferencesRepository: UserPreferencesRepository = mock {
-            on { getValue(CachedServerTokenPreference) } doReturn
-                CachedServerToken(incorrectToken, keyStoreTools.getKey()!!.publicKey.encoded.base64Encode())
-        }
+        val userPreferencesRepository = FakeUserPreferencesRepository(
+            UserPreferencesValues(
+                cachedServerToken = CachedServerToken(
+                    incorrectToken,
+                    keyStoreTools.getKey()!!.publicKey.encoded.base64Encode(),
+                ),
+            )
+        )
         val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
         val res = factory.createHttpClient(attestationServer).use { client ->
             client.get(attestationServer.getUrl(query, uriQuote))

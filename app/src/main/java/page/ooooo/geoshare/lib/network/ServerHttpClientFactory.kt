@@ -23,6 +23,7 @@ import kotlinx.serialization.Serializable
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.database.ServerAuthType
+import page.ooooo.geoshare.data.local.preferences.CachedServerToken
 import page.ooooo.geoshare.data.local.preferences.CachedServerTokenPreference
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.Log
@@ -148,6 +149,10 @@ class ServerHttpClientFactory @Inject constructor(
                 throw e
             }
             log.i(TAG, "Login succeeded")
+            userPreferencesRepository.setValue(
+                CachedServerTokenPreference,
+                CachedServerToken(token, publicKeyBase64),
+            )
             return BearerTokens(token, publicKeyBase64)
         }
 
@@ -198,6 +203,10 @@ class ServerHttpClientFactory @Inject constructor(
                 throw e
             }
             log.i(TAG, "Registration succeeded")
+            userPreferencesRepository.setValue(
+                CachedServerTokenPreference,
+                CachedServerToken(token, publicKeyBase64),
+            )
             return BearerTokens(token, publicKeyBase64)
         }
 
