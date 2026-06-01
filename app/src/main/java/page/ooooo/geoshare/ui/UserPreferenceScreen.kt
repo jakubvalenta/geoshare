@@ -301,15 +301,17 @@ private fun UserPreferenceListPane(
                     modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.SERVER_GOOGLE_MAPS}"),
                     onClick = { onNavigateToGroup(UserPreferenceGroupId.SERVER_GOOGLE_MAPS) },
                 )
-                UserPreferenceServerSearchListItem(
-                    index = 2,
-                    count = 3,
-                    selected = currentGroupId == UserPreferenceGroupId.SERVER_SEARCH,
-                    selectedServer = selectedSearchServer,
-                    values = values,
-                    modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.SERVER_SEARCH}"),
-                    onClick = { onNavigateToGroup(UserPreferenceGroupId.SERVER_SEARCH) },
-                )
+                if (BuildConfig.DEBUG) {
+                    UserPreferenceServerSearchListItem(
+                        index = 2,
+                        count = 3,
+                        selected = currentGroupId == UserPreferenceGroupId.SERVER_SEARCH,
+                        selectedServer = selectedSearchServer,
+                        values = values,
+                        modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.SERVER_SEARCH}"),
+                        onClick = { onNavigateToGroup(UserPreferenceGroupId.SERVER_SEARCH) },
+                    )
+                }
             }
         }
         item {
