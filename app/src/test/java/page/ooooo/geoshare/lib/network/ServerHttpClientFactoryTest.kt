@@ -10,7 +10,6 @@ import io.ktor.content.TextContent
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.appendPathSegments
 import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
@@ -21,6 +20,7 @@ import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.di.FakeKeyStoreTools
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
+import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.data.local.preferences.CachedServerToken
 import page.ooooo.geoshare.data.local.preferences.CachedServerTokenPreference
@@ -31,15 +31,28 @@ import page.ooooo.geoshare.lib.extensions.base64Encode
 import page.ooooo.geoshare.lib.extensions.verifySignature
 
 class ServerHttpClientFactoryTest {
-    private val apiKeyBaseUrl = "https://geocode.example.com"
-    private val attestationBaseUrl = "https://api.example.com"
+    private val apiKeyServer = Server(
+        name = "Test Server",
+        urlTemplate = "https://api.example.com/{q}",
+        authType = ServerAuthType.API_KEY,
+        apiKey = "test_api_key",
+        apiKeyHeader = "X-My-Header",
+    )
+    private val attestationServer = Server(
+        name = "Test Server",
+        urlTemplate = "https://api.example.com/{q}",
+        authType = ServerAuthType.ATTESTATION,
+        challengeUrl = "https://api.example.com/auth/challenge",
+        loginUrl = "https://api.example.com/auth/login",
+        registerUrl = "https://api.example.com/auth/register",
+    )
     private val challenge = "test challenge".toByteArray()
     private val log = FakeLog
     private val query = "Cherbourg, France"
-    private val encodedQuery = FakeUriQuote.encode(query, allow = ",")
     private val correctToken = "correct token"
     private val incorrectToken = "incorrect token"
     private val newToken = "new token"
+    private val uriQuote = FakeUriQuote
     private val userPreferencesRepository = FakeUserPreferencesRepository()
 
     @Test
@@ -47,7 +60,7 @@ class ServerHttpClientFactoryTest {
         val keyStoreService = FakeKeyStoreTools()
         val engine = MockEngine { request ->
             when (request.url.toString()) {
-                "$apiKeyBaseUrl/v4/geocode/address/$encodedQuery" ->
+                apiKeyServer.getUrl(query, uriQuote) ->
                     if (request.headers["X-My-Header"] == "test_api_key") {
                         respondOk("success")
                     } else {
@@ -58,17 +71,8 @@ class ServerHttpClientFactoryTest {
             }
         }
         val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
-        val res = factory.createHttpClient(
-            baseUrl = apiKeyBaseUrl,
-            authType = ServerAuthType.API_KEY,
-            apiKey = "test_api_key",
-            apiKeyHeader = "X-My-Header",
-        ).use { client ->
-            client.get {
-                url {
-                    appendPathSegments("v4", "geocode", "address", query)
-                }
-            }
+        val res = factory.createHttpClient(apiKeyServer).use { client ->
+            client.get(attestationServer.getUrl(query, uriQuote))
         }
         assertEquals("success", res.bodyAsText())
     }
@@ -78,7 +82,7 @@ class ServerHttpClientFactoryTest {
         val keyStoreService = FakeKeyStoreTools()
         val engine = MockEngine { request ->
             when (request.url.toString()) {
-                "$apiKeyBaseUrl/v4/geocode/address/$encodedQuery" ->
+                apiKeyServer.getUrl(query, uriQuote) ->
                     if (request.headers["X-My-Header"] == "test_api_key") {
                         throw NotImplementedError()
                     } else {
@@ -89,17 +93,8 @@ class ServerHttpClientFactoryTest {
             }
         }
         val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
-        factory.createHttpClient(
-            baseUrl = apiKeyBaseUrl,
-            authType = ServerAuthType.API_KEY,
-            apiKey = "spam",
-            apiKeyHeader = "X-My-Header",
-        ).use { client ->
-            client.get {
-                url {
-                    appendPathSegments("v4", "geocode", "address", query)
-                }
-            }
+        factory.createHttpClient(apiKeyServer.copy(apiKey = "spam")).use { client ->
+            client.get(apiKeyServer.getUrl(query, uriQuote))
         }
     }
 
@@ -108,7 +103,7 @@ class ServerHttpClientFactoryTest {
         val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
-                "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
+                attestationServer.getUrl(query, uriQuote) ->
                     when (request.headers[HttpHeaders.Authorization]) {
                         "Bearer $correctToken" -> respondOk("success")
                         else -> throw NotImplementedError()
@@ -126,17 +121,8 @@ class ServerHttpClientFactoryTest {
                 )
         }
         val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
-        val res = factory.createHttpClient(
-            baseUrl = attestationBaseUrl,
-            authType = ServerAuthType.ATTESTATION,
-            apiKey = "",
-            apiKeyHeader = "",
-        ).use { client ->
-            client.get {
-                url {
-                    appendPathSegments("v4", "geocode", "address", query)
-                }
-            }
+        val res = factory.createHttpClient(attestationServer).use { client ->
+            client.get(attestationServer.getUrl(query, uriQuote))
         }
         assertEquals("success", res.bodyAsText())
     }
@@ -146,30 +132,21 @@ class ServerHttpClientFactoryTest {
         val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
-                "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
+                attestationServer.getUrl(query, uriQuote) ->
                     when (request.headers[HttpHeaders.Authorization]) {
                         null -> respondError(HttpStatusCode.Unauthorized)
                         else -> throw NotImplementedError()
                     }
 
-                "$attestationBaseUrl/v1/auth/challenge" ->
+                attestationServer.challengeUrl ->
                     respondError(HttpStatusCode.Unauthorized)
 
                 else -> throw NotImplementedError()
             }
         }
         val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
-        factory.createHttpClient(
-            baseUrl = attestationBaseUrl,
-            authType = ServerAuthType.ATTESTATION,
-            apiKey = "",
-            apiKeyHeader = "",
-        ).use { client ->
-            client.get {
-                url {
-                    appendPathSegments("v4", "geocode", "address", query)
-                }
-            }
+        factory.createHttpClient(attestationServer).use { client ->
+            client.get(attestationServer.getUrl(query, uriQuote))
         }
     }
 
@@ -178,30 +155,21 @@ class ServerHttpClientFactoryTest {
         val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
-                "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
+                attestationServer.getUrl(query, uriQuote) ->
                     when (request.headers[HttpHeaders.Authorization]) {
                         null -> respondError(HttpStatusCode.Unauthorized)
                         else -> throw NotImplementedError()
                     }
 
-                "$attestationBaseUrl/v1/auth/challenge" ->
+                attestationServer.challengeUrl ->
                     respondError(HttpStatusCode.InternalServerError)
 
                 else -> throw NotImplementedError()
             }
         }
         val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
-        factory.createHttpClient(
-            baseUrl = attestationBaseUrl,
-            authType = ServerAuthType.ATTESTATION,
-            apiKey = "",
-            apiKeyHeader = "",
-        ).use { client ->
-            client.get {
-                url {
-                    appendPathSegments("v4", "geocode", "address", query)
-                }
-            }
+        factory.createHttpClient(attestationServer).use { client ->
+            client.get(attestationServer.getUrl(query, uriQuote))
         }
     }
 
@@ -210,37 +178,28 @@ class ServerHttpClientFactoryTest {
         val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
-                "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
+                attestationServer.getUrl(query, uriQuote) ->
                     when (request.headers[HttpHeaders.Authorization]) {
                         null -> respondError(HttpStatusCode.Unauthorized)
                         else -> throw NotImplementedError()
                     }
 
-                "$attestationBaseUrl/v1/auth/challenge" ->
+                attestationServer.challengeUrl ->
                     respond(
                         Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
                         HttpStatusCode.OK,
                         headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
                     )
 
-                "$attestationBaseUrl/v1/auth/login" ->
+                attestationServer.loginUrl ->
                     respondError(HttpStatusCode.BadRequest)
 
                 else -> throw NotImplementedError()
             }
         }
         val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
-        factory.createHttpClient(
-            baseUrl = attestationBaseUrl,
-            authType = ServerAuthType.ATTESTATION,
-            apiKey = "",
-            apiKeyHeader = "",
-        ).use { client ->
-            client.get {
-                url {
-                    appendPathSegments("v4", "geocode", "address", query)
-                }
-            }
+        factory.createHttpClient(attestationServer).use { client ->
+            client.get(attestationServer.getUrl(query, uriQuote))
         }
     }
 
@@ -249,37 +208,28 @@ class ServerHttpClientFactoryTest {
         val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
-                "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
+                attestationServer.getUrl(query, uriQuote) ->
                     when (request.headers[HttpHeaders.Authorization]) {
                         null -> respondError(HttpStatusCode.Unauthorized)
                         else -> throw NotImplementedError()
                     }
 
-                "$attestationBaseUrl/v1/auth/challenge" ->
+                attestationServer.challengeUrl ->
                     respond(
                         Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
                         HttpStatusCode.OK,
                         headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
                     )
 
-                "$attestationBaseUrl/v1/auth/login" ->
+                attestationServer.loginUrl ->
                     respondError(HttpStatusCode.InternalServerError)
 
                 else -> throw NotImplementedError()
             }
         }
         val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
-        factory.createHttpClient(
-            baseUrl = attestationBaseUrl,
-            authType = ServerAuthType.ATTESTATION,
-            apiKey = "",
-            apiKeyHeader = "",
-        ).use { client ->
-            client.get {
-                url {
-                    appendPathSegments("v4", "geocode", "address", query)
-                }
-            }
+        factory.createHttpClient(attestationServer).use { client ->
+            client.get(attestationServer.getUrl(query, uriQuote))
         }
     }
 
@@ -288,40 +238,31 @@ class ServerHttpClientFactoryTest {
         val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
-                "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
+                attestationServer.getUrl(query, uriQuote) ->
                     when (request.headers[HttpHeaders.Authorization]) {
                         null -> respondError(HttpStatusCode.Unauthorized)
                         else -> throw NotImplementedError()
                     }
 
-                "$attestationBaseUrl/v1/auth/challenge" ->
+                attestationServer.challengeUrl ->
                     respond(
                         Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
                         HttpStatusCode.OK,
                         headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
                     )
 
-                "$attestationBaseUrl/v1/auth/login" ->
+                attestationServer.loginUrl ->
                     respondError(HttpStatusCode.Unauthorized)
 
-                "$attestationBaseUrl/v1/auth/register" ->
+                attestationServer.registerUrl ->
                     respondError(HttpStatusCode.Unauthorized)
 
                 else -> throw NotImplementedError()
             }
         }
         val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
-        factory.createHttpClient(
-            baseUrl = attestationBaseUrl,
-            authType = ServerAuthType.ATTESTATION,
-            apiKey = "",
-            apiKeyHeader = "",
-        ).use { client ->
-            client.get {
-                url {
-                    appendPathSegments("v4", "geocode", "address", query)
-                }
-            }
+        factory.createHttpClient(attestationServer).use { client ->
+            client.get(attestationServer.getUrl(query, uriQuote))
         }
     }
 
@@ -331,21 +272,21 @@ class ServerHttpClientFactoryTest {
             val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
-                    "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
+                    attestationServer.getUrl(query, uriQuote) ->
                         when (request.headers[HttpHeaders.Authorization]) {
                             null -> respondError(HttpStatusCode.Unauthorized)
                             "Bearer $newToken" -> respondOk("success")
                             else -> throw NotImplementedError()
                         }
 
-                    "$attestationBaseUrl/v1/auth/challenge" ->
+                    attestationServer.challengeUrl ->
                         respond(
                             Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
                             HttpStatusCode.OK,
                             headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
                         )
 
-                    "$attestationBaseUrl/v1/auth/login" -> {
+                    attestationServer.loginUrl -> {
                         val key = keyStoreService.getKey() ?: throw NotImplementedError()
                         val body =
                             Json.decodeFromString<ServerHttpClientFactory.LoginRequest>((request.body as TextContent).text)
@@ -361,7 +302,7 @@ class ServerHttpClientFactoryTest {
                         }
                     }
 
-                    "$attestationBaseUrl/v1/auth/register" -> {
+                    attestationServer.registerUrl -> {
                         val key = keyStoreService.getKey() ?: throw NotImplementedError()
                         val body =
                             Json.decodeFromString<ServerHttpClientFactory.RegisterRequest>((request.body as TextContent).text)
@@ -385,17 +326,8 @@ class ServerHttpClientFactoryTest {
                 }
             }
             val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
-            val res = factory.createHttpClient(
-                baseUrl = attestationBaseUrl,
-                authType = ServerAuthType.ATTESTATION,
-                apiKey = "",
-                apiKeyHeader = "",
-            ).use { client ->
-                client.get {
-                    url {
-                        appendPathSegments("v4", "geocode", "address", query)
-                    }
-                }
+            val res = factory.createHttpClient(attestationServer).use { client ->
+                client.get(attestationServer.getUrl(query, uriQuote))
             }
             assertEquals("success", res.bodyAsText())
             // TODO Test saves new token
@@ -407,21 +339,21 @@ class ServerHttpClientFactoryTest {
             val keyStoreService = FakeKeyStoreTools()
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
-                    "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
+                    attestationServer.getUrl(query, uriQuote) ->
                         when (request.headers[HttpHeaders.Authorization]) {
                             null -> respondError(HttpStatusCode.Unauthorized)
                             "Bearer $newToken" -> respondOk("success")
                             else -> throw NotImplementedError()
                         }
 
-                    "$attestationBaseUrl/v1/auth/challenge" ->
+                    attestationServer.challengeUrl ->
                         respond(
                             Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
                             HttpStatusCode.OK,
                             headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
                         )
 
-                    "$attestationBaseUrl/v1/auth/login" -> {
+                    attestationServer.loginUrl -> {
                         val key = keyStoreService.getKey() ?: throw NotImplementedError()
                         val body =
                             Json.decodeFromString<ServerHttpClientFactory.LoginRequest>((request.body as TextContent).text)
@@ -437,7 +369,7 @@ class ServerHttpClientFactoryTest {
                         }
                     }
 
-                    "$attestationBaseUrl/v1/auth/register" -> {
+                    attestationServer.registerUrl -> {
                         val key = keyStoreService.getKey() ?: throw NotImplementedError()
                         val body =
                             Json.decodeFromString<ServerHttpClientFactory.RegisterRequest>((request.body as TextContent).text)
@@ -461,17 +393,8 @@ class ServerHttpClientFactoryTest {
                 }
             }
             val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
-            val res = factory.createHttpClient(
-                baseUrl = attestationBaseUrl,
-                authType = ServerAuthType.ATTESTATION,
-                apiKey = "",
-                apiKeyHeader = "",
-            ).use { client ->
-                client.get {
-                    url {
-                        appendPathSegments("v4", "geocode", "address", query)
-                    }
-                }
+            val res = factory.createHttpClient(attestationServer).use { client ->
+                client.get(attestationServer.getUrl(query, uriQuote))
             }
             assertEquals("success", res.bodyAsText())
             // TODO Test saves new token
@@ -483,21 +406,21 @@ class ServerHttpClientFactoryTest {
             val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
-                    "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
+                    attestationServer.getUrl(query, uriQuote) ->
                         when (request.headers[HttpHeaders.Authorization]) {
                             "Bearer $incorrectToken" -> respondError(HttpStatusCode.Unauthorized)
                             "Bearer $newToken" -> respondOk("success")
                             else -> throw NotImplementedError()
                         }
 
-                    "$attestationBaseUrl/v1/auth/challenge" ->
+                    attestationServer.challengeUrl ->
                         respond(
                             Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
                             HttpStatusCode.OK,
                             headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
                         )
 
-                    "$attestationBaseUrl/v1/auth/login" -> {
+                    attestationServer.loginUrl -> {
                         val key = keyStoreService.getKey() ?: throw NotImplementedError()
                         val body =
                             Json.decodeFromString<ServerHttpClientFactory.LoginRequest>((request.body as TextContent).text)
@@ -513,7 +436,7 @@ class ServerHttpClientFactoryTest {
                         }
                     }
 
-                    "$attestationBaseUrl/v1/auth/register" -> {
+                    attestationServer.registerUrl -> {
                         val key = keyStoreService.getKey() ?: throw NotImplementedError()
                         val body =
                             Json.decodeFromString<ServerHttpClientFactory.RegisterRequest>((request.body as TextContent).text)
@@ -544,17 +467,8 @@ class ServerHttpClientFactoryTest {
                     )
             }
             val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
-            val res = factory.createHttpClient(
-                baseUrl = attestationBaseUrl,
-                authType = ServerAuthType.ATTESTATION,
-                apiKey = "",
-                apiKeyHeader = "",
-            ).use { client ->
-                client.get {
-                    url {
-                        appendPathSegments("v4", "geocode", "address", query)
-                    }
-                }
+            val res = factory.createHttpClient(attestationServer).use { client ->
+                client.get(attestationServer.getUrl(query, uriQuote))
             }
             assertEquals("success", res.bodyAsText())
             // TODO Test saves new token
@@ -565,21 +479,21 @@ class ServerHttpClientFactoryTest {
         val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
-                "$attestationBaseUrl/v4/geocode/address/$encodedQuery" ->
+                attestationServer.getUrl(query, uriQuote) ->
                     when (request.headers[HttpHeaders.Authorization]) {
                         "Bearer $incorrectToken" -> respondError(HttpStatusCode.Unauthorized)
                         "Bearer $newToken" -> respondOk("success")
                         else -> throw NotImplementedError()
                     }
 
-                "$attestationBaseUrl/v1/auth/challenge" ->
+                attestationServer.challengeUrl ->
                     respond(
                         Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
                         HttpStatusCode.OK,
                         headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
                     )
 
-                "$attestationBaseUrl/v1/auth/login" -> {
+                attestationServer.loginUrl -> {
                     val key = keyStoreService.getKey() ?: throw NotImplementedError()
                     val body =
                         Json.decodeFromString<ServerHttpClientFactory.LoginRequest>((request.body as TextContent).text)
@@ -611,17 +525,8 @@ class ServerHttpClientFactoryTest {
                 )
         }
         val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
-        val res = factory.createHttpClient(
-            baseUrl = attestationBaseUrl,
-            authType = ServerAuthType.ATTESTATION,
-            apiKey = "",
-            apiKeyHeader = "",
-        ).use { client ->
-            client.get {
-                url {
-                    appendPathSegments("v4", "geocode", "address", query)
-                }
-            }
+        val res = factory.createHttpClient(attestationServer).use { client ->
+            client.get(attestationServer.getUrl(query, uriQuote))
         }
         assertEquals("success", res.bodyAsText())
         // TODO Test saves new token

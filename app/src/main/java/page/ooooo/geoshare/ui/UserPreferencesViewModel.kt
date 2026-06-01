@@ -50,7 +50,13 @@ class UserPreferencesViewModel @Inject constructor(
             SharingStarted.WhileSubscribed(5000),
             emptyList(),
         )
-    val selectedServer = serverRepository.selected
+    val selectedGoogleMapsServer = serverRepository.selectedGoogleMaps
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            null,
+        )
+    val selectedSearchServer = serverRepository.selectedSearch
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),

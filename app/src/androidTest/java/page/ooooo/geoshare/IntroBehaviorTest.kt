@@ -1,9 +1,16 @@
 package page.ooooo.geoshare
 
 import androidx.test.uiautomator.uiAutomator
+import org.junit.Before
 import org.junit.Test
 
-class IntroBehaviorTest : BehaviorTest {
+class IntroBehaviorTest {
+    @Before
+    fun goToLauncher() = uiAutomator {
+        // Start from the home screen
+        pressHome()
+    }
+
     @Test
     fun whenAppIsOpenTwice_isVisibleOnlyFirstTime() = uiAutomator {
         // Launch app

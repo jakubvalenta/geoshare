@@ -10,6 +10,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.junit.Before
 import org.junit.Test
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
@@ -20,7 +21,13 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import kotlin.time.Duration.Companion.seconds
 
-class ConversionBehaviorTest : BehaviorTest {
+class ConversionBehaviorTest {
+    @Before
+    fun goToLauncher() = uiAutomator {
+        // Start from the home screen
+        pressHome()
+    }
+
     @Test
     fun whenFullUriIsShared_showsPointAndAllowsOpeningGoogleMaps() = uiAutomator {
         assumeAppInstalled(PackageNames.GOOGLE_MAPS)

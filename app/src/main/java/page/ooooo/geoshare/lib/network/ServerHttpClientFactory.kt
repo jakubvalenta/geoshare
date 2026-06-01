@@ -21,6 +21,7 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 import page.ooooo.geoshare.data.UserPreferencesRepository
+import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.data.local.preferences.CachedServerTokenPreference
 import page.ooooo.geoshare.lib.DefaultLog
@@ -63,23 +64,16 @@ class ServerHttpClientFactory @Inject constructor(
     @Serializable
     data class GoogleMapsResults(val results: List<GoogleMapsResult>)
 
-    fun createHttpClient(
-        authType: ServerAuthType,
-        apiKey: String,
-        apiKeyHeader: String,
-        challengeUrl: String,
-        loginUrl: String,
-        registerUrl: String,
-    ): HttpClient =
+    fun createHttpClient(server: Server): HttpClient =
         HttpClient(engine) {
             expectSuccess = true
             setDefaultTimeouts()
             rethrowExceptionsAsNetworkException(log)
 
-            when (authType) {
+            when (server.authType) {
                 ServerAuthType.API_KEY -> {
                     install(DefaultRequest) {
-                        header(apiKeyHeader, apiKey)
+                        header(server.apiKeyHeader, server.apiKey)
                     }
                 }
 
@@ -90,8 +84,8 @@ class ServerHttpClientFactory @Inject constructor(
                                 attestationLoadTokens()
                             }
                             refreshTokens {
-                                attestationLogin(challengeUrl, loginUrl)
-                                    ?: attestationRegister(challengeUrl, registerUrl)
+                                attestationLogin(server.challengeUrl, server.loginUrl)
+                                    ?: attestationRegister(server.challengeUrl, server.registerUrl)
                             }
                         }
                     }

@@ -66,8 +66,14 @@ interface ServerDao {
     @Query("SELECT * FROM server WHERE selectedGoogleMaps = 1 ORDER BY createdAt ASC LIMIT 1")
     suspend fun getSelectedGoogleMaps(): Server?
 
+    @Query("SELECT * FROM server WHERE selectedGoogleMaps = 1 ORDER BY createdAt ASC LIMIT 1")
+    fun getSelectedGoogleMapsFlow(): Flow<Server?>
+
     @Query("SELECT * FROM server WHERE selectedSearch = 1 ORDER BY createdAt ASC LIMIT 1")
     suspend fun getSelectedSearch(): Server?
+
+    @Query("SELECT * FROM server WHERE selectedSearch = 1 ORDER BY createdAt ASC LIMIT 1")
+    fun getSelectedSearchFlow(): Flow<Server?>
 
     @Insert
     suspend fun insert(server: Server): Long

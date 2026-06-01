@@ -2,12 +2,18 @@ package page.ooooo.geoshare
 
 import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert.assertNull
+import org.junit.Before
 import org.junit.Test
-import page.ooooo.geoshare.BehaviorTest.Companion.ELEMENT_DOES_NOT_EXIST_TIMEOUT
 import page.ooooo.geoshare.lib.inputs.InputDocumentationGroup
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
-class InputsBehaviorTest : BehaviorTest {
+class InputsBehaviorTest {
+    @Before
+    fun goToLauncher() = uiAutomator {
+        // Start from the home screen
+        pressHome()
+    }
+
     @Test
     fun whenAppIsOpenTwice_isVisibleOnlyFirstTime() = uiAutomator {
         // Launch app

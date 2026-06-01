@@ -153,7 +153,8 @@ fun UserPreferencesScreen(
     val billingFeatures = billingViewModel.billingFeatures
     val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
     val links by viewModel.links.collectAsStateWithLifecycle()
-    val selectedServer by viewModel.selectedServer.collectAsStateWithLifecycle()
+    val selectedGoogleMapsServer by viewModel.selectedGoogleMapsServer.collectAsStateWithLifecycle()
+    val selectedSearchServer by viewModel.selectedSearchServer.collectAsStateWithLifecycle()
     val userPreferencesValues by viewModel.values.collectAsStateWithLifecycle()
 
     UserPreferencesScreen(
@@ -164,7 +165,8 @@ fun UserPreferencesScreen(
         billingFeatures = billingFeatures,
         billingStatus = billingStatus,
         links = links,
-        selectedServer = selectedServer,
+        selectedGoogleMapsServer = selectedGoogleMapsServer,
+        selectedSearchServer = selectedSearchServer,
         userPreferencesValues = userPreferencesValues,
         onBack = onBack,
         onGetAutomationOutput = { automation, getLinkByUUID ->
@@ -189,7 +191,8 @@ private fun UserPreferencesScreen(
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
     links: List<Link>,
-    selectedServer: Server?,
+    selectedGoogleMapsServer: Server?,
+    selectedSearchServer: Server?,
     userPreferencesValues: UserPreferencesValues,
     onBack: () -> Unit,
     onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
@@ -223,7 +226,8 @@ private fun UserPreferencesScreen(
                 billingFeatures = billingFeatures,
                 containerColor = containerColor,
                 links = links,
-                selectedServer = selectedServer,
+                selectedGoogleMapsServer = selectedGoogleMapsServer,
+                selectedSearchServer = selectedSearchServer,
                 values = userPreferencesValues,
                 onBack = {
                     coroutineScope.launch {
@@ -286,7 +290,8 @@ private fun UserPreferencesListPane(
     billingStatus: BillingStatus,
     containerColor: Color,
     links: List<Link>,
-    selectedServer: Server?,
+    selectedGoogleMapsServer: Server?,
+    selectedSearchServer: Server?,
     onBack: () -> Unit,
     onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
     onNavigateToGroup: (id: UserPreferencesGroupId) -> Unit,
@@ -332,32 +337,32 @@ private fun UserPreferencesListPane(
                         onClick = { onNavigateToGroup(UserPreferencesGroupId.CONNECTION_PERMISSION) },
                     ),
                     UserPreferencesGroup(
-                        id = UserPreferencesGroupId.SEARCH_SERVER,
-                        headline = { stringResource(R.string.user_preferences_search_server_title) },
-                        enabled = ConnectionPermissionPreference.getValue(values) != Permission.NEVER,
-                        supportingContent = {
-                            Text(
-                                selectedServer?.name
-                                    ?: stringResource(R.string.user_preferences_search_server_none),
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
-                            )
-                        },
-                        onClick = { onNavigateToGroup(UserPreferencesGroupId.SEARCH_SERVER) },
-                    ),
-                    UserPreferencesGroup(
                         id = UserPreferencesGroupId.GOOGLE_MAPS_SERVER,
                         headline = { stringResource(R.string.user_preferences_google_maps_server_title) },
                         enabled = ConnectionPermissionPreference.getValue(values) != Permission.NEVER,
                         supportingContent = {
                             Text(
-                                selectedServer?.name
+                                selectedGoogleMapsServer?.name
                                     ?: stringResource(R.string.user_preferences_google_maps_server_none),
                                 overflow = TextOverflow.Ellipsis,
                                 maxLines = 1,
                             )
                         },
                         onClick = { onNavigateToGroup(UserPreferencesGroupId.GOOGLE_MAPS_SERVER) },
+                    ),
+                    UserPreferencesGroup(
+                        id = UserPreferencesGroupId.SEARCH_SERVER,
+                        headline = { stringResource(R.string.user_preferences_search_server_title) },
+                        enabled = ConnectionPermissionPreference.getValue(values) != Permission.NEVER,
+                        supportingContent = {
+                            Text(
+                                selectedSearchServer?.name
+                                    ?: stringResource(R.string.user_preferences_search_server_none),
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1,
+                            )
+                        },
+                        onClick = { onNavigateToGroup(UserPreferencesGroupId.SEARCH_SERVER) },
                     ),
                 ),
                 currentGroupId = currentGroupId,
@@ -1076,7 +1081,8 @@ private fun DefaultPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
@@ -1104,7 +1110,8 @@ private fun DarkPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
@@ -1132,7 +1139,8 @@ private fun TabletPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
@@ -1160,7 +1168,8 @@ private fun ConnectionPermissionPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
@@ -1188,7 +1197,8 @@ private fun DarkConnectionPermissionPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
@@ -1216,7 +1226,8 @@ private fun TabletConnectionPermissionPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
@@ -1244,7 +1255,8 @@ private fun CoordinateFormatPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
@@ -1272,7 +1284,8 @@ private fun DarkCoordinateFormatPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
@@ -1300,7 +1313,8 @@ private fun TabletCoordinateFormatPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
@@ -1342,7 +1356,8 @@ private fun AutomationPreview() {
                         token = "test_purchased",
                     ),
                     links = defaultFakeLinks,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
@@ -1387,7 +1402,8 @@ private fun DarkAutomationPreview() {
                         token = "test_purchased",
                     ),
                     links = defaultFakeLinks,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
@@ -1432,7 +1448,8 @@ private fun TabletAutomationPreview() {
                         token = "test_purchased",
                     ),
                     links = defaultFakeLinks,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
@@ -1472,7 +1489,8 @@ private fun AutomationFeatureNotAvailablePreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.NotPurchased(),
                     links = defaultFakeLinks,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
@@ -1512,7 +1530,8 @@ private fun DarkAutomationFeatureNotAvailablePreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.NotPurchased(),
                     links = defaultFakeLinks,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
@@ -1552,7 +1571,8 @@ private fun TabletAutomationFeatureNotAvailablePreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.NotPurchased(),
                     links = defaultFakeLinks,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
@@ -1588,7 +1608,8 @@ private fun AutomationDelayPreview() {
                         token = "test_purchased",
                     ),
                     links = defaultFakeLinks,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
@@ -1624,7 +1645,8 @@ private fun DarkAutomationDelayPreview() {
                         token = "test_purchased",
                     ),
                     links = defaultFakeLinks,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
@@ -1660,7 +1682,8 @@ private fun TableAutomationDelayPreview() {
                         token = "test_purchased",
                     ),
                     links = defaultFakeLinks,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         hiddenApps = emptySet(),
@@ -1710,7 +1733,8 @@ private fun HiddenAppsPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     userPreferencesValues = UserPreferencesValues(
                         hiddenApps = setOf(PackageNames.ORGANIC_MAPS),
                     ),
@@ -1759,7 +1783,8 @@ private fun DarkHiddenAppsPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     userPreferencesValues = UserPreferencesValues(
                         hiddenApps = setOf(PackageNames.ORGANIC_MAPS),
                     ),
@@ -1808,7 +1833,8 @@ private fun TabletHiddenAppsPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     userPreferencesValues = UserPreferencesValues(
                         hiddenApps = setOf(PackageNames.ORGANIC_MAPS),
                     ),
@@ -1857,7 +1883,8 @@ private fun HiddenAppsLoadingPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     userPreferencesValues = UserPreferencesValues(),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
@@ -1904,7 +1931,8 @@ private fun DarkHiddenAppsLoadingPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     userPreferencesValues = UserPreferencesValues(),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
@@ -1951,7 +1979,8 @@ private fun TabletHiddenAppsLoadingPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     userPreferencesValues = UserPreferencesValues(),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
@@ -1979,7 +2008,8 @@ private fun DeveloperOptionsPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedGoogleMapsServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedSearchServer = FakeGeoShareGoogleMapsAddressServer,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         connectionPermission = Permission.NEVER,
@@ -2011,7 +2041,8 @@ private fun DarkDeveloperOptionsPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
-                    selectedServer = null,
+                    selectedGoogleMapsServer = null,
+                    selectedSearchServer = null,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         connectionPermission = Permission.NEVER,
@@ -2043,7 +2074,8 @@ private fun TableDeveloperOptionsPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
-                    selectedServer = null,
+                    selectedGoogleMapsServer = null,
+                    selectedSearchServer = null,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
                         connectionPermission = Permission.NEVER,

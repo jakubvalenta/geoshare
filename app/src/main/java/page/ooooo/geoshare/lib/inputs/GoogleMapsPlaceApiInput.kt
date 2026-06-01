@@ -47,14 +47,7 @@ class GoogleMapsPlaceApiInput @Inject constructor(
             nextStep = NextStep(googleMapsHtmlInput.get(), match)
             return@parseResult
         }
-        val client = serverHttpClientFactory.createHttpClient(
-            authType = server.authType,
-            apiKey = server.apiKey,
-            apiKeyHeader = server.apiKeyHeader,
-            challengeUrl = server.challengeUrl,
-            loginUrl = server.loginUrl,
-            registerUrl = server.registerUrl,
-        ).config {
+        val client = serverHttpClientFactory.createHttpClient(server).config {
             install(ContentNegotiation) {
                 json(Json {
                     ignoreUnknownKeys = true

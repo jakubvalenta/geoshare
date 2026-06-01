@@ -32,7 +32,7 @@ class GoogleMapsPlaceApiInputTest {
     private val placeId = @Suppress("SpellCheckingInspection") "ChIJKxjxuaNqkFQR3CK6O1HNNqY"
     private val engine = MockEngine { request ->
         when (request.url.toString()) {
-            "${server.baseUrl}/v4/geocode/place/$placeId" -> respond(
+            server.getUrl(placeId, uriQuote) -> respond(
                 // language=Json
                 """
                     {"place": "//places.googleapis.com/places/foo", "location": {"latitude": 50.123456, "longitude": -11.123456}}
@@ -40,7 +40,7 @@ class GoogleMapsPlaceApiInputTest {
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
 
-            "${server.baseUrl}/v4/geocode/place/invalid" -> respond(
+            server.getUrl("invalid", uriQuote) -> respond(
                 // language=Json
                 """
                     {"location": "invalid"}
@@ -48,9 +48,9 @@ class GoogleMapsPlaceApiInputTest {
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
 
-            "${server.baseUrl}/v4/geocode/place/exception" -> throw SocketTimeoutException()
+            server.getUrl("exception", uriQuote) -> throw SocketTimeoutException()
 
-            "${server.baseUrl}/v4/geocode/place/not-found" -> respondError(HttpStatusCode.NotFound)
+            server.getUrl("not-found", uriQuote) -> respondError(HttpStatusCode.NotFound)
 
             else -> throw NotImplementedError()
         }
@@ -63,7 +63,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test
     fun parse_whenServerIsNotConfigured_returnsNextStep() = runTest {
         val serverRepository: FakeServerRepository = mock {
-            on { getSelected() } doReturn null
+            on { getSelectedGoogleMaps() } doReturn null
         }
         val input = GoogleMapsPlaceApiInput(
             serverRepository = serverRepository,
@@ -83,7 +83,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test
     fun parse_whenPlaceIdIsInQueryParamAndApiReturnsResult_returnsPoint() = runTest {
         val serverRepository: FakeServerRepository = mock {
-            on { getSelected() } doReturn server
+            on { getSelectedGoogleMaps() } doReturn server
         }
         val input = GoogleMapsPlaceApiInput(
             serverRepository = serverRepository,
@@ -105,7 +105,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test
     fun parse_whenQueryIsNotFoundInUri_returnsNoPoints() = runTest {
         val serverRepository: FakeServerRepository = mock {
-            on { getSelected() } doReturn server
+            on { getSelectedGoogleMaps() } doReturn server
         }
         val input = GoogleMapsPlaceApiInput(
             serverRepository = serverRepository,
@@ -123,7 +123,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test
     fun parse_whenQueryIsEmpty_returnsNoPoints() = runTest {
         val serverRepository: FakeServerRepository = mock {
-            on { getSelected() } doReturn server
+            on { getSelectedGoogleMaps() } doReturn server
         }
         val input = GoogleMapsPlaceApiInput(
             serverRepository = serverRepository,
@@ -141,7 +141,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test(expected = UnknownNetworkException::class)
     fun parse_whenApiReturnsInvalidResponse_throwsException() = runTest {
         val serverRepository: FakeServerRepository = mock {
-            on { getSelected() } doReturn server
+            on { getSelectedGoogleMaps() } doReturn server
         }
         val input = GoogleMapsPlaceApiInput(
             serverRepository = serverRepository,
@@ -156,7 +156,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test(expected = SocketTimeoutNetworkException::class)
     fun parse_whenApiThrowsException_throwsException() = runTest {
         val serverRepository: FakeServerRepository = mock {
-            on { getSelected() } doReturn server
+            on { getSelectedGoogleMaps() } doReturn server
         }
         val input = GoogleMapsPlaceApiInput(
             serverRepository = serverRepository,

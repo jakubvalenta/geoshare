@@ -15,7 +15,13 @@ import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.lib.billing.Offer
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
-class BillingDemoBehaviorTest : BehaviorTest {
+class BillingDemoBehaviorTest {
+    @Before
+    fun goToLauncher() = uiAutomator {
+        // Start from the home screen
+        pressHome()
+    }
+
     @Test
     fun allowsPurchasingAndRefundingOneTimeProduct() = uiAutomator {
         // Launch application and close intro

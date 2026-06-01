@@ -8,15 +8,20 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assume.assumeTrue
 import org.junit.AssumptionViolatedException
 import org.junit.Test
-import page.ooooo.geoshare.BehaviorTest.Companion.SERVER_API_KEY_ARG
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.NotEmulator
+import page.ooooo.geoshare.assumeDomainResolvable
+import page.ooooo.geoshare.assumeHttpGetReturnsStatus
+import page.ooooo.geoshare.closeIntro
+import page.ooooo.geoshare.configureGoogleMapsServer
 import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.data.local.preferences.Permission
+import page.ooooo.geoshare.launchApplication
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.waitForAppToBeVisible
 
 /**
  * Tests the Google Maps input.
@@ -26,7 +31,7 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
  * property like that, we could split the test in the androidTestFree and androidTestPro source sets, but it's easier to
  * maintain the test when all the tested links are in one place.
  */
-class GoogleMapsInputBehaviorTest : InputBehaviorTest {
+class GoogleMapsInputBehaviorTest {
     @Suppress("KotlinConstantConditions", "SimplifyBooleanWithConstants")
     private val htmlParsingSupported = BuildConfig.FLAVOR == "free"
 
@@ -155,20 +160,34 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
     @Test
     @NotEmulator
     fun googleMapsAddressApiInput_serverGeoShare() = uiAutomator {
-        val server = Server(baseUrl = "https://api.geoshare-app.net", authType = ServerAuthType.ATTESTATION)
         runBlocking {
-            assumeHttpGetReturnsStatus(server.baseUrl, HttpStatusCode.NotFound)
+            assumeHttpGetReturnsStatus("https://api.geoshare-app.net/", HttpStatusCode.NotFound)
         }
+        val server = Server(
+            name = "Google Maps Geocode Address via GeoShare proxy",
+            urlTemplate = "https://api.geoshare-app.net/v1/google-maps/geocode/address/{q}",
+            authType = ServerAuthType.ATTESTATION,
+            challengeUrl = "https://api.geoshare-app.net/v1/auth/challenge",
+            loginUrl = "https://api.geoshare-app.net/v1/auth/login",
+            registerUrl = "https://api.geoshare-app.net/v1/auth/register",
+        )
         testGoogleMapsAddressApiInput(apiEnabled = true, server = server)
     }
 
     @Test
     @NotEmulator
     fun googleMapsAddressApiInput_serverGeoShareLocal() = uiAutomator {
-        val server = Server(baseUrl = "http://127.0.0.1:8080", authType = ServerAuthType.ATTESTATION)
         runBlocking {
-            assumeHttpGetReturnsStatus(server.baseUrl, HttpStatusCode.NotFound)
+            assumeHttpGetReturnsStatus("http://127.0.0.1:8080", HttpStatusCode.NotFound)
         }
+        val server = Server(
+            name = "Google Maps Geocode Address via local GeoShare proxy",
+            urlTemplate = "http://127.0.0.1:8080/v1/google-maps/geocode/address/{q}",
+            authType = ServerAuthType.ATTESTATION,
+            challengeUrl = "http://127.0.0.1:8080/v1/auth/challenge",
+            loginUrl = "http://127.0.0.1:8080/v1/auth/login",
+            registerUrl = "http://127.0.0.1:8080/v1/auth/register",
+        )
         testGoogleMapsAddressApiInput(apiEnabled = true, server = server)
     }
 
@@ -176,15 +195,16 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
     fun googleMapsAddressApiInput_serverGoogleApis() = uiAutomator {
         val apiKey = InstrumentationRegistry.getArguments().getString(SERVER_API_KEY_ARG)
             ?: throw AssumptionViolatedException("This test only works when the instrumentation extra argument $SERVER_API_KEY_ARG is set")
+        runBlocking {
+            assumeHttpGetReturnsStatus("https://geocode.googleapis.com", HttpStatusCode.NotFound)
+        }
         val server = Server(
-            baseUrl = "https://geocode.googleapis.com",
+            name = "Google Maps Geocode Address",
+            urlTemplate = "https://geocode.googleapis.com/v4/geocode/address/{q}",
             authType = ServerAuthType.API_KEY,
             apiKey = apiKey,
             apiKeyHeader = "X-Goog-Api-Key",
         )
-        runBlocking {
-            assumeHttpGetReturnsStatus(server.baseUrl, HttpStatusCode.NotFound)
-        }
         testGoogleMapsAddressApiInput(apiEnabled = true, server = server)
     }
 
@@ -201,7 +221,7 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
         configureConnectionPermissionPreference(Permission.ALWAYS)
         configureGoogleMapsApiPreference(apiEnabled)
         if (server != null) {
-            configureServer(server)
+            configureGoogleMapsServer(server)
         }
 
         // Search
@@ -424,5 +444,9 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
             GCJ02Point(27.765028, -15.600889, source = Source.JAVASCRIPT),
             "https://g.co/kgs/91UYXud",
         )
+    }
+
+    private companion object {
+        private const val SERVER_API_KEY_ARG = "SERVER_API_KEY"
     }
 }

@@ -39,6 +39,10 @@ class FakeServerRepository(
 
     override val all = _fakeServers.mapLatest { it.sortedBy { item -> item.createdAt }.reversed() }
 
+    override val selectedGoogleMaps = _fakeServers.mapLatest { it.firstOrNull { item -> item.selectedGoogleMaps } }
+
+    override val selectedSearch = _fakeServers.mapLatest { it.firstOrNull { item -> item.selectedSearch } }
+
     override suspend fun getAll() = _fakeServers.value
 
     override suspend fun getByUid(uid: Int) =
@@ -95,6 +99,9 @@ val FakeGeoShareGoogleMapsAddressServer = Server(
     name = "Google Maps Geocode Address via GeoShare proxy",
     urlTemplate = "https://api.geoshare-app.net/v1/google-maps/geocode/address/{q}",
     authType = ServerAuthType.ATTESTATION,
+    challengeUrl = "https://api.geoshare-app.net/v1/auth/challenge",
+    loginUrl = "https://api.geoshare-app.net/v1/auth/login",
+    registerUrl = "https://api.geoshare-app.net/v1/auth/register",
 )
 val FakeGoogleMapsAddressServer = Server(
     name = "Google Maps Geocode Address",

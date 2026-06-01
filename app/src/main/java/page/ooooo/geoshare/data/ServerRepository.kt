@@ -14,6 +14,8 @@ import javax.inject.Inject
 
 interface ServerRepository {
     val all: Flow<List<Server>>
+    val selectedGoogleMaps: Flow<Server?>
+    val selectedSearch: Flow<Server?>
 
     suspend fun getAll(): List<Server>
 
@@ -47,6 +49,12 @@ class DefaultServerRepository @Inject constructor(
      * Flow of all objects, which is shared between multiple view models, so we don't query the db multiple times.
      */
     override val all: Flow<List<Server>> = serverDao.getAllFlow()
+        .shareIn(applicationScope, SharingStarted.WhileSubscribed(5000), replay = 1)
+
+    override val selectedGoogleMaps: Flow<Server?> = serverDao.getSelectedGoogleMapsFlow()
+        .shareIn(applicationScope, SharingStarted.WhileSubscribed(5000), replay = 1)
+
+    override val selectedSearch: Flow<Server?> = serverDao.getSelectedSearchFlow()
         .shareIn(applicationScope, SharingStarted.WhileSubscribed(5000), replay = 1)
 
     /**
