@@ -34,6 +34,7 @@ class ServerBehaviorTest {
         // Insert a new server
         val server = Server(
             name = "Test Server",
+            description = "Test description",
             urlTemplate = "https://api.example.com/{q}",
             authType = ServerAuthType.ATTESTATION,
             challengeUrl = "https://api.example.com/auth/challenge",

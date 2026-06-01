@@ -21,15 +21,19 @@ object InitialServersImpl : InitialServers {
      * testing.
      */
     override fun restore(db: SupportSQLiteDatabase) {
-        // FIXME
         db.execSQL("DELETE FROM server")
         db.execSQL(
-            "INSERT INTO server (`baseUrl`,`authType`,`apiKey`,`apiKeyHeader`,`selectedGoogleMaps`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO server (`name`,`description`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMaps`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             arrayOf<Any>(
-                "https://geocode.googleapis.com",
+                "Google Maps",
+                "",
+                "https://geocode.googleapis.com/v4/geocode/address/{q}",
                 "API_KEY",
                 "",
                 "X-Goog-Api-Key",
+                "",
+                "",
+                "",
                 0,
                 0,
                 1779859252618,
@@ -38,17 +42,21 @@ object InitialServersImpl : InitialServers {
         )
     }
 
-    // FIXME
     override val migrations = arrayOf(
         object : Migration(7, 8) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
-                    "INSERT OR REPLACE INTO server (`baseUrl`,`authType`,`apiKey`,`apiKeyHeader`,`selectedGoogleMaps`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT OR REPLACE INTO server (`name`,`description`,`urlTemplate`,`baseUrl`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMaps`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
-                        "https://geocode.googleapis.com",
+                        "Google Maps",
+                        "",
+                        "https://geocode.googleapis.com/v4/geocode/address/{q}",
                         "API_KEY",
                         "",
                         "X-Goog-Api-Key",
+                        "",
+                        "",
+                        "",
                         0,
                         0,
                         1779859252618,

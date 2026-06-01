@@ -22,7 +22,7 @@ class InitialServersTest : InitialDataTest {
         val expectedItems = listOf(
             Server(
                 name = "GeoShare Proxy",
-                description = "With Google Maps backend"
+                description = "With Google Maps backend",
                 urlTemplate = "https://api.geoshare-app.net/v1/google-maps/geocode/address/{q}",
                 authType = ServerAuthType.ATTESTATION,
                 challengeUrl = "https://api.geoshare-app.net/v1/auth/challenge",
