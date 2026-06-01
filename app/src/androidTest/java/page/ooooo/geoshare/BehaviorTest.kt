@@ -521,6 +521,7 @@ fun UiAutomatorTestScope.configureGoogleMapsServer(server: Server?) {
         fillAndSaveServerForm(server)
 
         // Go back to Google Maps Server preferences
+        quickWaitForStableInActiveWindow() // Wait for the new server to get saved
         pressBack()
     }
 
