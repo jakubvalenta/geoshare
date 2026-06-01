@@ -23,7 +23,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
-import page.ooooo.geoshare.ServerBehaviorTest.Companion.fillAndSaveServerForm
 import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.lib.android.PackageNames
@@ -509,14 +508,22 @@ fun UiAutomatorTestScope.mockLocation(block: MockLocationScope.() -> Unit) {
     }
 }
 
-fun UiAutomatorTestScope.configureGoogleMapsServer(server: Server) {
-    // Go to server list
+fun UiAutomatorTestScope.configureGoogleMapsServer(server: Server?) {
+    // Go to Google Maps Server preferences
     goToUserPreferencesDetail(UserPreferenceGroupId.SERVER_GOOGLE_MAPS)
 
-    // Insert a new server
-    onElement { viewIdResourceName == "geoShareServerListInsert" }.click()
-    fillAndSaveServerForm(server)
+    if (server != null) {
+        // Go to server list
+        onElement { viewIdResourceName == "geoShareUserPreferenceNavigateToServerList" }.click()
+
+        // Insert a new server
+        onElement { viewIdResourceName == "geoShareServerListInsert" }.click()
+        fillAndSaveServerForm(server)
+
+        // Go back to Google Maps Server preferences
+        pressBack()
+    }
 
     // Select the server
-    onElement { viewIdResourceName == "geoShareServerListItemContent" && textAsString() == server.name }.click()
+    onElement { viewIdResourceName == "geoShareUserPreferenceServer_${server?.name}" }.click()
 }

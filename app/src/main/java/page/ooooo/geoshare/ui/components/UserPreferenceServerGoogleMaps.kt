@@ -83,7 +83,7 @@ fun UserPreferenceServerGoogleMapsControls(
             selected = selected,
             servers = servers,
             itemNoneDescription = { stringResource(R.string.user_preferences_server_google_maps_none_description) },
-            itemTestTag = { item, selected -> "geoShareUserPreferenceServer_${item?.name}_selected_${selected}" },
+            itemTestTag = { item -> "geoShareUserPreferenceServer_${item?.name}" },
             onNavigateToServerScreen = onNavigateToServerScreen,
             onSelect = onSelect,
         )

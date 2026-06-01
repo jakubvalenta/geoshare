@@ -164,7 +164,7 @@ class GoogleMapsInputBehaviorTest {
             assumeHttpGetReturnsStatus("https://api.geoshare-app.net/", HttpStatusCode.NotFound)
         }
         val server = Server(
-            name = "GeoShare Proxy",
+            name = "Test GeoShare Proxy",
             description = "With Google Maps backend",
             urlTemplate = "https://api.geoshare-app.net/v1/google-maps/geocode/address/{q}",
             authType = ServerAuthType.ATTESTATION,
@@ -172,7 +172,7 @@ class GoogleMapsInputBehaviorTest {
             loginUrl = "https://api.geoshare-app.net/v1/auth/login",
             registerUrl = "https://api.geoshare-app.net/v1/auth/register",
         )
-        testGoogleMapsAddressApiInput(apiEnabled = true, server = server)
+        testGoogleMapsAddressApiInput(server)
     }
 
     @Test
@@ -182,14 +182,14 @@ class GoogleMapsInputBehaviorTest {
             assumeHttpGetReturnsStatus("http://127.0.0.1:8080", HttpStatusCode.NotFound)
         }
         val server = Server(
-            name = "Google Maps",
+            name = "Test Google Maps",
             urlTemplate = "http://127.0.0.1:8080/v1/google-maps/geocode/address/{q}",
             authType = ServerAuthType.ATTESTATION,
             challengeUrl = "http://127.0.0.1:8080/v1/auth/challenge",
             loginUrl = "http://127.0.0.1:8080/v1/auth/login",
             registerUrl = "http://127.0.0.1:8080/v1/auth/register",
         )
-        testGoogleMapsAddressApiInput(apiEnabled = true, server = server)
+        testGoogleMapsAddressApiInput(server)
     }
 
     @Test
@@ -200,34 +200,31 @@ class GoogleMapsInputBehaviorTest {
             assumeHttpGetReturnsStatus("https://geocode.googleapis.com", HttpStatusCode.NotFound)
         }
         val server = Server(
-            name = "Google Maps",
+            name = "Test Google Maps",
             urlTemplate = "https://geocode.googleapis.com/v4/geocode/address/{q}",
             authType = ServerAuthType.API_KEY,
             apiKey = apiKey,
             apiKeyHeader = "X-Goog-Api-Key",
         )
-        testGoogleMapsAddressApiInput(apiEnabled = true, server = server)
+        testGoogleMapsAddressApiInput(server)
     }
 
     @Test
-    fun googleMapsAddressApiInput_serverOff() = uiAutomator {
-        testGoogleMapsAddressApiInput(apiEnabled = false, server = null)
+    fun googleMapsAddressApiInput_serverNone() = uiAutomator {
+        testGoogleMapsAddressApiInput(server = null)
     }
 
-    private fun testGoogleMapsAddressApiInput(apiEnabled: Boolean, server: Server?) = uiAutomator {
+    private fun testGoogleMapsAddressApiInput(server: Server?) = uiAutomator {
         // Launch app and close intro
         launchApplication()
         waitForAppToBeVisible()
         closeIntro()
         configureConnectionPermissionPreference(Permission.ALWAYS)
-        configureGoogleMapsApiPreference(apiEnabled)
-        if (server != null) {
-            configureGoogleMapsServer(server)
-        }
+        configureGoogleMapsServer(server)
 
         // Search
         testUri(
-            if (apiEnabled) {
+            if (server != null) {
                 WGS84Point(
                     51.0657922, 13.7555827,
                     name = @Suppress("SpellCheckingInspection") "Louisenstraße 60, 01099 Dresden",
@@ -250,7 +247,7 @@ class GoogleMapsInputBehaviorTest {
 
         // Short links with coordinates in HTML
         testUri(
-            if (apiEnabled) {
+            if (server != null) {
                 WGS84Point(
                     51.1982447, 6.4389493,
                     name = @Suppress("SpellCheckingInspection") "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
@@ -271,7 +268,7 @@ class GoogleMapsInputBehaviorTest {
             "https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8",
         )
         testUri(
-            if (apiEnabled) {
+            if (server != null) {
                 WGS84Point(
                     44.4490541, 26.0888398,
                     name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
@@ -292,7 +289,7 @@ class GoogleMapsInputBehaviorTest {
             "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
         )
         testUri(
-            if (apiEnabled) {
+            if (server != null) {
                 WGS84Point(
                     52.4842015, 13.4167277,
                     name = @Suppress("SpellCheckingInspection") "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
@@ -311,7 +308,7 @@ class GoogleMapsInputBehaviorTest {
                 )
             },
             "https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6",
-            fallbackPoint = if (apiEnabled) {
+            fallbackPoint = if (server != null) {
                 null
             } else if (htmlParsingSupported) {
                 WGS84Point(
@@ -326,7 +323,7 @@ class GoogleMapsInputBehaviorTest {
 
         // Place
         testUri(
-            if (apiEnabled) {
+            if (server != null) {
                 WGS84Point(
                     52.4834254, 13.4245399,
                     name = @Suppress("SpellCheckingInspection") "Hermannstr. 20, Berlin",
@@ -349,7 +346,7 @@ class GoogleMapsInputBehaviorTest {
 
         // Directions address
         testUri(
-            if (apiEnabled) {
+            if (server != null) {
                 WGS84Point(43.7481582, -79.6332316, name = "2088 Albion Rd @43.7481,-79.6332", source = Source.API)
             } else if (htmlParsingSupported) {
                 WGS84Point(43.7481, -79.6332, name = "2088 Albion Rd @43.7481,-79.6332", source = Source.HTML)
@@ -361,7 +358,7 @@ class GoogleMapsInputBehaviorTest {
 
         // Directions with geocode parameter, which can get stuck at intermediate URI with zero coordinates during web parsing
         testUri(
-            if (apiEnabled) {
+            if (server != null) {
                 WGS84Point(
                     40.6400258, 22.9589454,
                     z = 6.0,
@@ -382,7 +379,7 @@ class GoogleMapsInputBehaviorTest {
                 )
             },
             "https://maps.google.com/maps?oe=utf-8&client=firefox-b&um=1&ie=UTF-8&fb=1&gl=fr&sa=X&geocode=KWmqxjsAOagUMaSMgMRdOas1&daddr=Akropoleos+65,+Thessaloniki+546+34,+Gr%C3%A8ce",
-            fallbackPoint = if (apiEnabled) {
+            fallbackPoint = if (server != null) {
                 WGS84Point(
                     40.6400258, 22.9589454,
                     z = 6.0,

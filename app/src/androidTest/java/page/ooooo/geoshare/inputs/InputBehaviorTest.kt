@@ -18,10 +18,6 @@ fun UiAutomatorTestScope.configureConnectionPermissionPreference(permission: Per
     onElement { viewIdResourceName == "geoShareUserPreferenceConnectionPermission_$permission" }.click()
 }
 
-fun UiAutomatorTestScope.configureGoogleMapsApiPreference(enabled: Boolean) {
-    // TODO
-}
-
 fun UiAutomatorTestScope.confirmDialogIfVisible() {
     onElementOrNull(3_000L) { viewIdResourceName == "geoShareConfirmationDialogConfirmButton" }?.click()
 }

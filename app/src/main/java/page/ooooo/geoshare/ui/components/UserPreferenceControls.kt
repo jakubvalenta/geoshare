@@ -139,7 +139,7 @@ fun LazyListScope.userPreferenceServerControls(
     selected: Server?,
     servers: List<Server>,
     itemNoneDescription: @Composable () -> String,
-    itemTestTag: ((item: Server?, selected: Boolean) -> String)? = null,
+    itemTestTag: ((item: Server?) -> String)? = null,
     onNavigateToServerScreen: () -> Unit,
     onSelect: (Server?) -> Unit,
 ) {
@@ -150,9 +150,7 @@ fun LazyListScope.userPreferenceServerControls(
             values = listOf(null) + servers,
             modifier = Modifier.padding(top = LocalSpacing.current.tinyAdaptive),
             itemEnabled = { item -> item?.isValid() != false },
-            itemTestTag = itemTestTag?.let { itemTestTag ->
-                { item -> itemTestTag(item, item?.uid == selected?.uid) }
-            },
+            itemTestTag = itemTestTag,
         ) { item ->
             Column {
                 if (item == null) {
@@ -185,7 +183,9 @@ fun LazyListScope.userPreferenceServerControls(
         val spacing = LocalSpacing.current
         TextButton(
             onClick = { onNavigateToServerScreen() },
-            modifier = Modifier.padding(top = spacing.mediumAdaptive, bottom = spacing.tinyAdaptive),
+            modifier = Modifier
+                .padding(top = spacing.mediumAdaptive, bottom = spacing.tinyAdaptive)
+                .testTag("geoShareUserPreferenceNavigateToServerList"),
         ) {
             Text(stringResource(R.string.user_preferences_navigate_to_server_screen))
         }

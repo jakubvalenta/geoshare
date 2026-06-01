@@ -71,7 +71,11 @@ fun <T> SegmentedList(
                     supportingContent = itemSupportingContent?.invoke(value),
                     colors = colors,
                 ) {
-                    Text(headline, style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        headline,
+                        Modifier.testTag("geoShareSegmentedListItemContent"),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                 }
             }
     }
