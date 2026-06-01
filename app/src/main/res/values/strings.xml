@@ -317,9 +317,10 @@
     <string name="server_url_template">URL template</string>
     <string name="server_delete_text">The server “%1$s” will be permanently deleted.</string>
     <string name="server_delete_title">Delete server?</string>
-    <string name="server_description">To support a wider variety of Google Maps links, %1$s can connect to the paid Google Maps API or a compatible server.</string>
+    <string name="server_description">Description</string>
     <string name="server_insert">Add server</string>
     <string name="server_invalid">Draft</string>
+    <string name="server_list_title">Servers</string>
     <string name="server_message_deleted">Server deleted</string>
     <string name="server_message_factory_reset">Server have been reset to factory defaults</string>
     <string name="server_message_inserted">Server added</string>
@@ -328,7 +329,6 @@
     <string name="server_restore_initial_data">Reset servers to factory defaults</string>
     <string name="server_restore_initial_data_text">All your servers will be deleted and replaced with the pre-installed ones.</string>
     <string name="server_restore_initial_data_title">Reset servers to factory defaults?</string>
-    <string name="server_title">Servers</string>
     <string name="server_update">Edit server</string>
     <string name="srs_description" translatable="false">%1$s (%2$s)</string>
     <string name="srs_description_mainland_china">Mainland China</string>
