@@ -53,11 +53,10 @@ class ServerHttpClientFactoryTest {
     private val incorrectToken = "incorrect token"
     private val newToken = "new token"
     private val uriQuote = FakeUriQuote
-    private val userPreferencesRepository = FakeUserPreferencesRepository()
 
     @Test
     fun createHttpClient_apiKey_whenKeyIsCorrect_returnsResponse() = runTest {
-        val keyStoreService = FakeKeyStoreTools()
+        val keyStoreTools = FakeKeyStoreTools()
         val engine = MockEngine { request ->
             when (request.url.toString()) {
                 apiKeyServer.getUrl(query, uriQuote) ->
@@ -70,7 +69,8 @@ class ServerHttpClientFactoryTest {
                 else -> throw NotImplementedError()
             }
         }
-        val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+        val userPreferencesRepository = FakeUserPreferencesRepository()
+        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
         val res = factory.createHttpClient(apiKeyServer).use { client ->
             client.get(attestationServer.getUrl(query, uriQuote))
         }
@@ -79,7 +79,7 @@ class ServerHttpClientFactoryTest {
 
     @Test(expected = UnauthorizedNetworkException::class)
     fun createHttpClient_apiKey_whenKeyIsIncorrect_throwsException() = runTest {
-        val keyStoreService = FakeKeyStoreTools()
+        val keyStoreTools = FakeKeyStoreTools()
         val engine = MockEngine { request ->
             when (request.url.toString()) {
                 apiKeyServer.getUrl(query, uriQuote) ->
@@ -92,7 +92,8 @@ class ServerHttpClientFactoryTest {
                 else -> throw NotImplementedError()
             }
         }
-        val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+        val userPreferencesRepository = FakeUserPreferencesRepository()
+        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
         factory.createHttpClient(apiKeyServer.copy(apiKey = "spam")).use { client ->
             client.get(apiKeyServer.getUrl(query, uriQuote))
         }
@@ -100,7 +101,7 @@ class ServerHttpClientFactoryTest {
 
     @Test
     fun createHttpClient_attestation_whenTokenIsCorrect_returnsResponse() = runTest {
-        val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
+        val keyStoreTools = FakeKeyStoreTools().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
                 attestationServer.getUrl(query, uriQuote) ->
@@ -114,13 +115,9 @@ class ServerHttpClientFactoryTest {
         }
         val userPreferencesRepository: UserPreferencesRepository = mock {
             on { getValue(CachedServerTokenPreference) } doReturn
-                CachedServerToken(
-                    token = correctToken,
-                    publicKey = keyStoreService.getKey()?.publicKey?.encoded?.base64Encode()
-                        ?: throw NotImplementedError(),
-                )
+                CachedServerToken(correctToken, keyStoreTools.getKey()!!.publicKey.encoded.base64Encode())
         }
-        val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
         val res = factory.createHttpClient(attestationServer).use { client ->
             client.get(attestationServer.getUrl(query, uriQuote))
         }
@@ -129,7 +126,7 @@ class ServerHttpClientFactoryTest {
 
     @Test(expected = UnauthorizedNetworkException::class)
     fun createHttpClient_attestation_whenTokenIsMissingAndChallengeFails_throwsException() = runTest {
-        val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
+        val keyStoreTools = FakeKeyStoreTools().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
                 attestationServer.getUrl(query, uriQuote) ->
@@ -144,7 +141,8 @@ class ServerHttpClientFactoryTest {
                 else -> throw NotImplementedError()
             }
         }
-        val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+        val userPreferencesRepository = FakeUserPreferencesRepository()
+        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
         factory.createHttpClient(attestationServer).use { client ->
             client.get(attestationServer.getUrl(query, uriQuote))
         }
@@ -152,7 +150,7 @@ class ServerHttpClientFactoryTest {
 
     @Test(expected = ServerResponseNetworkException::class)
     fun createHttpClient_attestation_whenTokenIsMissingAndChallengeReturns5xx_throwsException() = runTest {
-        val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
+        val keyStoreTools = FakeKeyStoreTools().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
                 attestationServer.getUrl(query, uriQuote) ->
@@ -167,7 +165,8 @@ class ServerHttpClientFactoryTest {
                 else -> throw NotImplementedError()
             }
         }
-        val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+        val userPreferencesRepository = FakeUserPreferencesRepository()
+        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
         factory.createHttpClient(attestationServer).use { client ->
             client.get(attestationServer.getUrl(query, uriQuote))
         }
@@ -175,7 +174,7 @@ class ServerHttpClientFactoryTest {
 
     @Test(expected = ResponseNetworkException::class)
     fun createHttpClient_attestation_whenTokenIsMissingAndLoginReturns400_throwsException() = runTest {
-        val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
+        val keyStoreTools = FakeKeyStoreTools().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
                 attestationServer.getUrl(query, uriQuote) ->
@@ -197,7 +196,8 @@ class ServerHttpClientFactoryTest {
                 else -> throw NotImplementedError()
             }
         }
-        val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+        val userPreferencesRepository = FakeUserPreferencesRepository()
+        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
         factory.createHttpClient(attestationServer).use { client ->
             client.get(attestationServer.getUrl(query, uriQuote))
         }
@@ -205,7 +205,7 @@ class ServerHttpClientFactoryTest {
 
     @Test(expected = ServerResponseNetworkException::class)
     fun createHttpClient_attestation_whenTokenIsMissingAndLoginReturns5xx_throwsException() = runTest {
-        val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
+        val keyStoreTools = FakeKeyStoreTools().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
                 attestationServer.getUrl(query, uriQuote) ->
@@ -227,7 +227,8 @@ class ServerHttpClientFactoryTest {
                 else -> throw NotImplementedError()
             }
         }
-        val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+        val userPreferencesRepository = FakeUserPreferencesRepository()
+        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
         factory.createHttpClient(attestationServer).use { client ->
             client.get(attestationServer.getUrl(query, uriQuote))
         }
@@ -235,7 +236,7 @@ class ServerHttpClientFactoryTest {
 
     @Test(expected = UnauthorizedNetworkException::class)
     fun createHttpClient_attestation_whenTokenIsMissingAndLoginFailsAndRegistrationFails_throwsException() = runTest {
-        val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
+        val keyStoreTools = FakeKeyStoreTools().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
                 attestationServer.getUrl(query, uriQuote) ->
@@ -260,7 +261,8 @@ class ServerHttpClientFactoryTest {
                 else -> throw NotImplementedError()
             }
         }
-        val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+        val userPreferencesRepository = FakeUserPreferencesRepository()
+        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
         factory.createHttpClient(attestationServer).use { client ->
             client.get(attestationServer.getUrl(query, uriQuote))
         }
@@ -269,7 +271,7 @@ class ServerHttpClientFactoryTest {
     @Test
     fun createHttpClient_attestation_whenTokenIsMissingAndLoginFailsAndRegistrationSucceeds_returnsResponse() =
         runTest {
-            val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
+            val keyStoreTools = FakeKeyStoreTools().apply { generateKey() }
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
                     attestationServer.getUrl(query, uriQuote) ->
@@ -287,7 +289,7 @@ class ServerHttpClientFactoryTest {
                         )
 
                     attestationServer.loginUrl -> {
-                        val key = keyStoreService.getKey() ?: throw NotImplementedError()
+                        val key = keyStoreTools.getKey() ?: throw NotImplementedError()
                         val body =
                             Json.decodeFromString<ServerHttpClientFactory.LoginRequest>((request.body as TextContent).text)
                         val signatureOk = key.publicKey.verifySignature(
@@ -303,7 +305,7 @@ class ServerHttpClientFactoryTest {
                     }
 
                     attestationServer.registerUrl -> {
-                        val key = keyStoreService.getKey() ?: throw NotImplementedError()
+                        val key = keyStoreTools.getKey() ?: throw NotImplementedError()
                         val body =
                             Json.decodeFromString<ServerHttpClientFactory.RegisterRequest>((request.body as TextContent).text)
                         val signatureOk = key.publicKey.verifySignature(
@@ -325,18 +327,22 @@ class ServerHttpClientFactoryTest {
                     else -> throw NotImplementedError()
                 }
             }
-            val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+            val userPreferencesRepository = FakeUserPreferencesRepository()
+            val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
             val res = factory.createHttpClient(attestationServer).use { client ->
                 client.get(attestationServer.getUrl(query, uriQuote))
             }
             assertEquals("success", res.bodyAsText())
-            // TODO Test saves new token
+            assertEquals(
+                CachedServerToken(newToken, keyStoreTools.getKey()!!.publicKey.encoded.base64Encode()),
+                userPreferencesRepository.getValue(CachedServerTokenPreference),
+            )
         }
 
     @Test
     fun createHttpClient_attestation_whenTokenIsMissingAndPrivateKeyIsNotGeneratedAndRegistrationSucceeds_returnsResponse() =
         runTest {
-            val keyStoreService = FakeKeyStoreTools()
+            val keyStoreTools = FakeKeyStoreTools()
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
                     attestationServer.getUrl(query, uriQuote) ->
@@ -354,7 +360,7 @@ class ServerHttpClientFactoryTest {
                         )
 
                     attestationServer.loginUrl -> {
-                        val key = keyStoreService.getKey() ?: throw NotImplementedError()
+                        val key = keyStoreTools.getKey() ?: throw NotImplementedError()
                         val body =
                             Json.decodeFromString<ServerHttpClientFactory.LoginRequest>((request.body as TextContent).text)
                         val signatureOk = key.publicKey.verifySignature(
@@ -370,7 +376,7 @@ class ServerHttpClientFactoryTest {
                     }
 
                     attestationServer.registerUrl -> {
-                        val key = keyStoreService.getKey() ?: throw NotImplementedError()
+                        val key = keyStoreTools.getKey() ?: throw NotImplementedError()
                         val body =
                             Json.decodeFromString<ServerHttpClientFactory.RegisterRequest>((request.body as TextContent).text)
                         val signatureOk = key.publicKey.verifySignature(
@@ -392,18 +398,22 @@ class ServerHttpClientFactoryTest {
                     else -> throw NotImplementedError()
                 }
             }
-            val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+            val userPreferencesRepository = FakeUserPreferencesRepository()
+            val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
             val res = factory.createHttpClient(attestationServer).use { client ->
                 client.get(attestationServer.getUrl(query, uriQuote))
             }
             assertEquals("success", res.bodyAsText())
-            // TODO Test saves new token
+            assertEquals(
+                CachedServerToken(newToken, keyStoreTools.getKey()!!.publicKey.encoded.base64Encode()),
+                userPreferencesRepository.getValue(CachedServerTokenPreference),
+            )
         }
 
     @Test
     fun createHttpClient_attestation_whenTokenIsIncorrectAndRefreshTokenIsIncorrectAndLoginFailsAndRegistrationSucceeds_returnsResponse() =
         runTest {
-            val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
+            val keyStoreTools = FakeKeyStoreTools().apply { generateKey() }
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
                     attestationServer.getUrl(query, uriQuote) ->
@@ -421,7 +431,7 @@ class ServerHttpClientFactoryTest {
                         )
 
                     attestationServer.loginUrl -> {
-                        val key = keyStoreService.getKey() ?: throw NotImplementedError()
+                        val key = keyStoreTools.getKey() ?: throw NotImplementedError()
                         val body =
                             Json.decodeFromString<ServerHttpClientFactory.LoginRequest>((request.body as TextContent).text)
                         val signatureOk = key.publicKey.verifySignature(
@@ -437,7 +447,7 @@ class ServerHttpClientFactoryTest {
                     }
 
                     attestationServer.registerUrl -> {
-                        val key = keyStoreService.getKey() ?: throw NotImplementedError()
+                        val key = keyStoreTools.getKey() ?: throw NotImplementedError()
                         val body =
                             Json.decodeFromString<ServerHttpClientFactory.RegisterRequest>((request.body as TextContent).text)
                         val signatureOk = key.publicKey.verifySignature(
@@ -461,22 +471,22 @@ class ServerHttpClientFactoryTest {
             }
             val userPreferencesRepository: UserPreferencesRepository = mock {
                 on { getValue(CachedServerTokenPreference) } doReturn
-                    CachedServerToken(
-                        token = incorrectToken,
-                        publicKey = "incorrect public key".toByteArray().base64Encode(),
-                    )
+                    CachedServerToken(incorrectToken, "incorrect public key".toByteArray().base64Encode())
             }
-            val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+            val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
             val res = factory.createHttpClient(attestationServer).use { client ->
                 client.get(attestationServer.getUrl(query, uriQuote))
             }
             assertEquals("success", res.bodyAsText())
-            // TODO Test saves new token
+            assertEquals(
+                CachedServerToken(newToken, keyStoreTools.getKey()!!.publicKey.encoded.base64Encode()),
+                userPreferencesRepository.getValue(CachedServerTokenPreference),
+            )
         }
 
     @Test
     fun createHttpClient_attestation_whenTokenIsIncorrectAndRefreshTokenIsCorrect_returnsResponse() = runTest {
-        val keyStoreService = FakeKeyStoreTools().apply { generateKey() }
+        val keyStoreTools = FakeKeyStoreTools().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
                 attestationServer.getUrl(query, uriQuote) ->
@@ -494,7 +504,7 @@ class ServerHttpClientFactoryTest {
                     )
 
                 attestationServer.loginUrl -> {
-                    val key = keyStoreService.getKey() ?: throw NotImplementedError()
+                    val key = keyStoreTools.getKey() ?: throw NotImplementedError()
                     val body =
                         Json.decodeFromString<ServerHttpClientFactory.LoginRequest>((request.body as TextContent).text)
                     val signatureOk = key.publicKey.verifySignature(
@@ -518,17 +528,16 @@ class ServerHttpClientFactoryTest {
         }
         val userPreferencesRepository: UserPreferencesRepository = mock {
             on { getValue(CachedServerTokenPreference) } doReturn
-                CachedServerToken(
-                    token = incorrectToken,
-                    publicKey = keyStoreService.getKey()?.publicKey?.encoded?.base64Encode()
-                        ?: throw NotImplementedError(),
-                )
+                CachedServerToken(incorrectToken, keyStoreTools.getKey()!!.publicKey.encoded.base64Encode())
         }
-        val factory = ServerHttpClientFactory(engine, keyStoreService, log, userPreferencesRepository)
+        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
         val res = factory.createHttpClient(attestationServer).use { client ->
             client.get(attestationServer.getUrl(query, uriQuote))
         }
         assertEquals("success", res.bodyAsText())
-        // TODO Test saves new token
+        assertEquals(
+            CachedServerToken(newToken, keyStoreTools.getKey()!!.publicKey.encoded.base64Encode()),
+            userPreferencesRepository.getValue(CachedServerTokenPreference),
+        )
     }
 }

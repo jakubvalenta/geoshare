@@ -98,7 +98,7 @@ class ServerHttpClientFactory @Inject constructor(
             BearerTokens(it.token, it.publicKey)
         }
 
-    private suspend fun attestationLogin(challengeUrl: String, loginUrl: String): BearerTokens? {
+    private suspend fun attestationLogin(challengeUrl: String, loginUrl: String): BearerTokens? =
         HttpClient(engine) {
             expectSuccess = true
             setDefaultTimeouts()
@@ -150,9 +150,8 @@ class ServerHttpClientFactory @Inject constructor(
             log.i(TAG, "Login succeeded")
             return BearerTokens(token, publicKeyBase64)
         }
-    }
 
-    private suspend fun attestationRegister(challengeUrl: String, registerUrl: String): BearerTokens {
+    private suspend fun attestationRegister(challengeUrl: String, registerUrl: String): BearerTokens =
         HttpClient(engine) {
             expectSuccess = true
             setDefaultTimeouts()
@@ -201,7 +200,6 @@ class ServerHttpClientFactory @Inject constructor(
             log.i(TAG, "Registration succeeded")
             return BearerTokens(token, publicKeyBase64)
         }
-    }
 
     private suspend fun HttpResponse.bodyAsErrorMessage(): String = try {
         body<ErrorResponse>().message
