@@ -153,7 +153,11 @@ fun LazyListScope.userPreferenceServerControls(
         ) { item, modifier ->
             Column(modifier.weight(1f)) {
                 Text(item?.name ?: stringResource(R.string.server_none))
-                Text(item?.description ?: itemNoneDescription(), style = MaterialTheme.typography.bodySmall)
+                if (item == null) {
+                    Text(itemNoneDescription(), style = MaterialTheme.typography.bodySmall)
+                } else if (item.description.isNotEmpty()) {
+                    Text(item.description, style = MaterialTheme.typography.bodySmall)
+                }
             }
             if (item?.isValid() == false) {
                 Text(
