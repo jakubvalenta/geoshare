@@ -10,7 +10,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertNull
-import org.junit.Before
 import org.junit.Test
 import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
@@ -28,12 +27,6 @@ import page.ooooo.geoshare.ui.UserPreferenceGroupId
 import kotlin.time.Duration.Companion.seconds
 
 class AutomationBehaviorTest {
-    @Before
-    fun goToLauncher() = uiAutomator {
-        // Start from the home screen
-        pressHome()
-    }
-
     @Test
     fun copiesCoordinates() = uiAutomator {
         // Launch application and close intro

@@ -30,8 +30,8 @@ data class Server(
     val challengeUrl: String = "",
     val loginUrl: String = "",
     val registerUrl: String = "",
-    val selectedGoogleMaps: Boolean = false,
-    // TODO Add selectedGoogleMapsPlace?
+    val selectedGoogleMapsAddress: Boolean = false,
+    val selectedGoogleMapsPlace: Boolean = false,
     val selectedSearch: Boolean = false,
     val createdAt: Long = System.currentTimeMillis(),
     @PrimaryKey(autoGenerate = true)
@@ -64,11 +64,17 @@ interface ServerDao {
     @Query("SELECT * FROM server WHERE uuid = :uuid")
     suspend fun getByUUID(uuid: UUID): Server?
 
-    @Query("SELECT * FROM server WHERE selectedGoogleMaps = 1 ORDER BY createdAt ASC LIMIT 1")
-    suspend fun getSelectedGoogleMaps(): Server?
+    @Query("SELECT * FROM server WHERE selectedGoogleMapsAddress = 1 ORDER BY createdAt ASC LIMIT 1")
+    suspend fun getSelectedGoogleMapsAddress(): Server?
 
-    @Query("SELECT * FROM server WHERE selectedGoogleMaps = 1 ORDER BY createdAt ASC LIMIT 1")
-    fun getSelectedGoogleMapsFlow(): Flow<Server?>
+    @Query("SELECT * FROM server WHERE selectedGoogleMapsAddress = 1 ORDER BY createdAt ASC LIMIT 1")
+    fun getSelectedGoogleMapsAddressFlow(): Flow<Server?>
+
+    @Query("SELECT * FROM server WHERE selectedGoogleMapsPlace = 1 ORDER BY createdAt ASC LIMIT 1")
+    suspend fun getSelectedGoogleMapsPlace(): Server?
+
+    @Query("SELECT * FROM server WHERE selectedGoogleMapsPlace = 1 ORDER BY createdAt ASC LIMIT 1")
+    fun getSelectedGoogleMapsPlaceFlow(): Flow<Server?>
 
     @Query("SELECT * FROM server WHERE selectedSearch = 1 ORDER BY createdAt ASC LIMIT 1")
     suspend fun getSelectedSearch(): Server?
@@ -85,17 +91,31 @@ interface ServerDao {
     @Delete
     suspend fun delete(server: Server)
 
-    @Query("UPDATE server SET selectedGoogleMaps = 1 WHERE uid = :uid")
-    suspend fun selectGoogleMaps(uid: Int)
+    @Query("UPDATE server SET selectedGoogleMapsAddress = 1 WHERE uid = :uid")
+    suspend fun selectGoogleMapsAddress(uid: Int)
 
-    @Query("UPDATE server SET selectedGoogleMaps = 0")
-    suspend fun unselectAllGoogleMaps()
+    @Query("UPDATE server SET selectedGoogleMapsAddress = 0")
+    suspend fun unselectAllGoogleMapsAddress()
 
     @Transaction
-    suspend fun unselectAllGoogleMapsAndSelect(uid: Int?) {
-        unselectAllGoogleMaps()
+    suspend fun unselectAllGoogleMapsAddressAndSelect(uid: Int?) {
+        unselectAllGoogleMapsAddress()
         if (uid != null) {
-            selectGoogleMaps(uid)
+            selectGoogleMapsAddress(uid)
+        }
+    }
+
+    @Query("UPDATE server SET selectedGoogleMapsPlace = 1 WHERE uid = :uid")
+    suspend fun selectGoogleMapsPlace(uid: Int)
+
+    @Query("UPDATE server SET selectedGoogleMapsPlace = 0")
+    suspend fun unselectAllGoogleMapsPlace()
+
+    @Transaction
+    suspend fun unselectAllGoogleMapsPlaceAndSelect(uid: Int?) {
+        unselectAllGoogleMapsPlace()
+        if (uid != null) {
+            selectGoogleMapsPlace(uid)
         }
     }
 

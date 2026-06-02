@@ -57,6 +57,7 @@ import page.ooooo.geoshare.ui.components.BasicListDetailScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
+import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.ScrollablePane
 import page.ooooo.geoshare.ui.components.SegmentedList
 import page.ooooo.geoshare.ui.components.ServerForm
@@ -261,6 +262,12 @@ private fun ServerListPane(
         containerColor = containerColor,
     ) {
         item {
+            ParagraphText(
+                stringResource(R.string.server_list_description),
+                Modifier.padding(top = spacing.tinyAdaptive, bottom = spacing.smallAdaptive),
+            )
+        }
+        item {
             Button(
                 { onNavigateToContentKey(-1) },
                 Modifier
@@ -282,16 +289,17 @@ private fun ServerListPane(
                 itemIsSelected = { item -> item.uid == destination },
                 itemOnClick = { item -> onNavigateToContentKey(item.uid) },
                 itemSupportingContent = { item ->
-                    if (item.isValid()) {
-                        item.description.takeIf { it.isNotEmpty() }?.let { description ->
-                            {
-                                Text(
-                                    description,
-                                    style = MaterialTheme.typography.bodySmall,
-                                )
-                            }
+                    item.description.takeIf { it.isNotEmpty() }?.let { description ->
+                        {
+                            Text(
+                                description,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
                         }
-                    } else {
+                    }
+                },
+                itemTrailingContent = { item ->
+                    if (!item.isValid()) {
                         {
                             Text(
                                 stringResource(R.string.server_invalid),
@@ -299,6 +307,8 @@ private fun ServerListPane(
                                 style = MaterialTheme.typography.bodySmall,
                             )
                         }
+                    } else {
+                        null
                     }
                 },
                 itemTestTag = { "geoShareServerListItem_${it.uuid}" },
@@ -310,7 +320,7 @@ private fun ServerListPane(
                 modifier = Modifier
                     .testTag("geoShareServerRestoreInitialButton")
                     .padding(top = spacing.mediumAdaptive, bottom = spacing.tinyAdaptive),
-                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
             ) {
                 Text(stringResource(R.string.server_restore_initial_data))
             }

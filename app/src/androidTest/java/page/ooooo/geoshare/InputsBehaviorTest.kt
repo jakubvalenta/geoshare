@@ -2,18 +2,11 @@ package page.ooooo.geoshare
 
 import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert.assertNull
-import org.junit.Before
 import org.junit.Test
 import page.ooooo.geoshare.lib.inputs.InputDocumentationGroup
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
 class InputsBehaviorTest {
-    @Before
-    fun goToLauncher() = uiAutomator {
-        // Start from the home screen
-        pressHome()
-    }
-
     @Test
     fun whenAppIsOpenTwice_isVisibleOnlyFirstTime() = uiAutomator {
         // Launch app

@@ -7,17 +7,10 @@ import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertNull
-import org.junit.Before
 import org.junit.Test
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
 class LinkBehaviorTest {
-    @Before
-    fun goToLauncher() = uiAutomator {
-        // Start from the home screen
-        pressHome()
-    }
-
     @Test
     fun whenLinkIsInserted_allowsCopyingIt() = uiAutomator {
         // Launch application and close intro

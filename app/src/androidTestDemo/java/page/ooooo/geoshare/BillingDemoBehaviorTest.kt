@@ -1,6 +1,5 @@
 package page.ooooo.geoshare
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
@@ -8,20 +7,12 @@ import androidx.test.uiautomator.uiAutomator
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertNull
 import org.junit.Test
-import org.junit.runner.RunWith
-import page.ooooo.geoshare.BehaviorTest.Companion.ELEMENT_DOES_NOT_EXIST_TIMEOUT
 import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.lib.billing.Offer
-import page.ooooo.geoshare.ui.UserPreferencesGroupId
+import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
 class BillingDemoBehaviorTest {
-    @Before
-    fun goToLauncher() = uiAutomator {
-        // Start from the home screen
-        pressHome()
-    }
-
     @Test
     fun allowsPurchasingAndRefundingOneTimeProduct() = uiAutomator {
         // Launch application and close intro
@@ -33,7 +24,7 @@ class BillingDemoBehaviorTest {
         onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "GeoShare" }
 
         // Go to automation preferences
-        goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
+        goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
 
         // Shows feature wall
         onElement { viewIdResourceName == "geoShareAutomationFeatureWall" }
@@ -58,7 +49,7 @@ class BillingDemoBehaviorTest {
 
         // Go to automation preferences
         pressBack()
-        goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
+        goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
 
         // Does not show feature wall
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareAutomationFeatureWall" })
@@ -87,7 +78,7 @@ class BillingDemoBehaviorTest {
         onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "GeoShare" }
 
         // Go to automation preferences
-        goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
+        goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
 
         // Shows feature wall
         onElement { viewIdResourceName == "geoShareAutomationFeatureWall" }
@@ -104,7 +95,7 @@ class BillingDemoBehaviorTest {
         onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "GeoShare" }
 
         // Go to automation preferences
-        goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
+        goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
 
         // Shows feature wall
         onElement { viewIdResourceName == "geoShareAutomationFeatureWall" }
@@ -129,7 +120,7 @@ class BillingDemoBehaviorTest {
 
         // Go to automation preferences
         pressBack()
-        goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
+        goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
 
         // Does not show feature wall
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareAutomationFeatureWall" })
@@ -164,7 +155,7 @@ class BillingDemoBehaviorTest {
         onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "GeoShare" }
 
         // Go to automation preferences
-        goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
+        goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
 
         // Shows feature wall
         onElement { viewIdResourceName == "geoShareAutomationFeatureWall" }
@@ -227,14 +218,14 @@ class BillingDemoBehaviorTest {
         closeIntro()
 
         // Go to link list
-        goToUserPreferencesList()
-        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.LINKS}" }.click()
+        goToUserPreferencesDetail(UserPreferenceGroupId.LINKS)
 
         // Shows feature badge
         onElement { viewIdResourceName == "geoShareCustomLinkFeatureBadge" }
 
         // Go to link detail
-        onElement { viewIdResourceName == "geoShareLinkListItem_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItemMenu_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItemMenuDetail_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
 
         // Go to billing screen using the feature wall
         onElement { viewIdResourceName == "geoShareCustomLinkFeatureWall" }.click()
@@ -269,6 +260,7 @@ class BillingDemoBehaviorTest {
     }
 
     private fun goToBillingScreen() = uiAutomator {
-        goToMenuItem { viewIdResourceName == "geoShareMainMenuBilling" }
+        onElement { viewIdResourceName == "geoShareMainMenuButton" }.click()
+        onElement { viewIdResourceName == "geoShareMainMenuBilling" }.click()
     }
 }

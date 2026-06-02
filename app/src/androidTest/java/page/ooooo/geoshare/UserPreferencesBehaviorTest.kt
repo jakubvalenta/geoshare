@@ -7,7 +7,6 @@ import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
-import org.junit.Before
 import org.junit.Test
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.lib.android.PackageNames
@@ -19,12 +18,6 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
 class UserPreferencesBehaviorTest {
-    @Before
-    fun goToLauncher() = uiAutomator {
-        // Start from the home screen
-        pressHome()
-    }
-
     @Test
     fun whenCoordinateFormatIsSet_showsCoordinatesInThatFormat() = uiAutomator {
         val context = InstrumentationRegistry.getInstrumentation().targetContext

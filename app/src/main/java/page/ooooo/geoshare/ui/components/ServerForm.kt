@@ -118,7 +118,7 @@ fun ServerForm(
                 Text(
                     buildAnnotatedString {
                         append(stringResource(R.string.example, ""))
-                        append("https://api.geoshare-app.net/v1/google-maps/geocode/address/")
+                        append("https://geocode.googleapis.com/v4/geocode/address/")
                         withStyle(SpanStyle(fontWeight = FontWeight.ExtraBold)) {
                             append("{q}")
                         }

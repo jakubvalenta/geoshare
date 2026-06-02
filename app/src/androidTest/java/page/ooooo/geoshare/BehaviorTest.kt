@@ -5,6 +5,7 @@ import android.content.Context
 import android.location.Location
 import android.location.LocationManager
 import android.location.provider.ProviderProperties
+import android.os.Build
 import android.os.SystemClock
 import android.view.accessibility.AccessibilityNodeInfo
 import androidx.test.platform.app.InstrumentationRegistry
@@ -20,10 +21,13 @@ import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
+import org.junit.AssumptionViolatedException
 import page.ooooo.geoshare.data.local.database.Server
+import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.calcExponentialBackoffMillis
@@ -179,6 +183,10 @@ suspend fun assumeHttpGetReturnsStatus(@Suppress("SameParameterValue") url: Stri
         "This test only works when HTTP GET request returns 404 but it ${if (resStatus != null) "was ${resStatus.value}" else "timed out"} for $url",
         resStatus == status,
     )
+}
+
+fun assumeNotEmulator() {
+    assumeTrue("This test only works on a physical device, not an emulator", Build.HARDWARE != "ranchu")
 }
 
 /**
@@ -508,23 +516,105 @@ fun UiAutomatorTestScope.mockLocation(block: MockLocationScope.() -> Unit) {
     }
 }
 
-fun UiAutomatorTestScope.configureGoogleMapsServer(server: Server?) {
-    // Go to Google Maps Server preferences
-    goToUserPreferencesDetail(UserPreferenceGroupId.SERVER_GOOGLE_MAPS)
+sealed interface TestServer {
+    data class Configured(val server: Server) : TestServer
+    object None : TestServer
+}
 
-    if (server != null) {
-        // Go to server list
-        onElement { viewIdResourceName == "geoShareUserPreferenceNavigateToServerList" }.click()
-
-        // Insert a new server
-        onElement { viewIdResourceName == "geoShareServerListInsert" }.click()
-        fillAndSaveServerForm(server)
-
-        // Go back to Google Maps Server preferences
-        quickWaitForStableInActiveWindow() // Wait for the new server to get saved
-        pressBack()
+sealed interface TestServerParams {
+    data class Configured(
+        val baseUrl: String,
+        val name: String = "",
+        val urlTemplate: String = "",
+        val authType: ServerAuthType = ServerAuthType.API_KEY,
+        val apiKeyHeader: String = "",
+        val challengeUrl: String = "",
+        val loginUrl: String = "",
+        val registerUrl: String = "",
+    ) : TestServerParams {
+        override fun toString() = name
     }
 
-    // Select the server
-    onElement { viewIdResourceName == "geoShareUserPreferenceServer_${server?.name}" }.click()
+    object None : TestServerParams {
+        override fun toString() = "No server"
+    }
 }
+
+fun TestServerParams.getAndAssumeTestServer(): TestServer = when (this) {
+    is TestServerParams.Configured ->
+        when (authType) {
+            ServerAuthType.API_KEY -> {
+                val apiKey = InstrumentationRegistry.getArguments().getString(SERVER_API_KEY_ARG)
+                    ?: throw AssumptionViolatedException("This test only works when the instrumentation extra argument $SERVER_API_KEY_ARG is set")
+                runBlocking {
+                    assumeHttpGetReturnsStatus(baseUrl, HttpStatusCode.NotFound)
+                }
+                TestServer.Configured(
+                    Server(
+                        name = name,
+                        urlTemplate = urlTemplate,
+                        authType = authType,
+                        apiKey = apiKey,
+                        apiKeyHeader = apiKeyHeader,
+                    )
+                )
+            }
+
+            ServerAuthType.ATTESTATION -> {
+                assumeNotEmulator()
+                runBlocking {
+                    assumeHttpGetReturnsStatus(baseUrl, HttpStatusCode.NotFound)
+                }
+                TestServer.Configured(
+                    Server(
+                        name = name,
+                        urlTemplate = urlTemplate,
+                        authType = authType,
+                        challengeUrl = challengeUrl,
+                        loginUrl = loginUrl,
+                        registerUrl = registerUrl,
+                    )
+                )
+            }
+        }
+
+    is TestServerParams.None -> TestServer.None
+}
+
+fun UiAutomatorTestScope.configureServer(testServer: TestServer) {
+    // Go to Google Maps Server preferences
+    goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
+
+    when (testServer) {
+        is TestServer.Configured -> {
+            // Go to server list
+            onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }.apply {
+                scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceNavigateToServerList" }.click()
+            }
+
+            // Insert a new server
+            onElement { viewIdResourceName == "geoShareServerListInsert" }.click()
+            fillAndSaveServerForm(testServer.server)
+
+            // Go back to Google Maps Server preferences
+            quickWaitForStableInActiveWindow() // Wait for the new server to get saved
+            pressBack()
+
+            // Select the server
+            onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }.apply {
+                scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServerGoogleMapsAddress_${testServer.server.name}" }.click()
+                scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServerGoogleMapsPlace_${testServer.server.name}" }.click()
+            }
+        }
+
+        is TestServer.None -> {
+            // Select no server
+            onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }.apply {
+                scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServerGoogleMapsAddress_null" }.click()
+                scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServerGoogleMapsPlace_null" }.click()
+            }
+        }
+    }
+}
+
+private const val SERVER_API_KEY_ARG = "SERVER_API_KEY"

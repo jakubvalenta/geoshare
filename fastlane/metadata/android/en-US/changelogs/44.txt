@@ -1,1 +1,3 @@
-- Added support for Yandex Maps directions links.
+- Added the option to use Google Maps API to convert map links.
+- Added support for Yandex Maps direction links.
+- Improved error message details.

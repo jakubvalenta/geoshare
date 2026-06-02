@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 7,
-    "identityHash": "205a6c81696cfd84ba9f2e6c51102fbf",
+    "identityHash": "ac8e2d6486b04ddb72bab3ab94f0e6aa",
     "entities": [
       {
         "tableName": "Server",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `description` TEXT NOT NULL, `urlTemplate` TEXT NOT NULL, `authType` TEXT NOT NULL, `apiKey` TEXT NOT NULL, `apiKeyHeader` TEXT NOT NULL, `challengeUrl` TEXT NOT NULL, `loginUrl` TEXT NOT NULL, `registerUrl` TEXT NOT NULL, `selectedGoogleMaps` INTEGER NOT NULL, `selectedSearch` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL, `uid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `uuid` BLOB NOT NULL DEFAULT (RANDOMBLOB(16)))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `description` TEXT NOT NULL, `urlTemplate` TEXT NOT NULL, `authType` TEXT NOT NULL, `apiKey` TEXT NOT NULL, `apiKeyHeader` TEXT NOT NULL, `challengeUrl` TEXT NOT NULL, `loginUrl` TEXT NOT NULL, `registerUrl` TEXT NOT NULL, `selectedGoogleMapsAddress` INTEGER NOT NULL, `selectedGoogleMapsPlace` INTEGER NOT NULL, `selectedSearch` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL, `uid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `uuid` BLOB NOT NULL DEFAULT (RANDOMBLOB(16)))",
         "fields": [
           {
             "fieldPath": "name",
@@ -63,8 +63,14 @@
             "notNull": true
           },
           {
-            "fieldPath": "selectedGoogleMaps",
-            "columnName": "selectedGoogleMaps",
+            "fieldPath": "selectedGoogleMapsAddress",
+            "columnName": "selectedGoogleMapsAddress",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "selectedGoogleMapsPlace",
+            "columnName": "selectedGoogleMapsPlace",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -211,7 +217,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '205a6c81696cfd84ba9f2e6c51102fbf')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ac8e2d6486b04ddb72bab3ab94f0e6aa')"
     ]
   }
 }

@@ -1,7 +1,6 @@
 package page.ooooo.geoshare
 
 import androidx.test.uiautomator.uiAutomator
-import org.junit.Before
 import org.junit.Test
 import page.ooooo.geoshare.inputs.testText
 import page.ooooo.geoshare.lib.android.PackageNames
@@ -9,12 +8,6 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class MainBehaviorTest {
-    @Before
-    fun goToLauncher() = uiAutomator {
-        // Start from the home screen
-        pressHome()
-    }
-
     @Test
     fun whenTextIsEntered_showsPointAndAllowsOpeningGoogleMaps() = uiAutomator {
         assumeAppInstalled(PackageNames.GOOGLE_MAPS)

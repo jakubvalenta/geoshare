@@ -8,19 +8,12 @@ import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertNull
-import org.junit.Before
 import org.junit.Test
 import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
 class ServerBehaviorTest {
-    @Before
-    fun goToLauncher() = uiAutomator {
-        // Start from the home screen
-        pressHome()
-    }
-
     @Test
     fun allowsInsertingServer() = uiAutomator {
         // Launch application and close intro
@@ -28,11 +21,13 @@ class ServerBehaviorTest {
         waitForAppToBeVisible()
         closeIntro()
 
-        // Go to Google Maps Server preferences
-        goToUserPreferencesDetail(UserPreferenceGroupId.SERVER_GOOGLE_MAPS)
+        // Go to server preferences
+        goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
 
         // Go to server list
-        onElement { viewIdResourceName == "geoShareUserPreferenceNavigateToServerList" }.click()
+        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }.apply {
+            scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceNavigateToServerList" }.click()
+        }
 
         // Insert a new server
         val server = Server(
@@ -58,11 +53,13 @@ class ServerBehaviorTest {
         waitForAppToBeVisible()
         closeIntro()
 
-        // Go to Google Maps Server preferences
-        goToUserPreferencesDetail(UserPreferenceGroupId.SERVER_GOOGLE_MAPS)
+        // Go to server preferences
+        goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
 
         // Go to server list
-        onElement { viewIdResourceName == "geoShareUserPreferenceNavigateToServerList" }.click()
+        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }.apply {
+            scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceNavigateToServerList" }.click()
+        }
 
         // Go to server detail
         onElement { viewIdResourceName == "geoShareServerListItem_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" }.click()

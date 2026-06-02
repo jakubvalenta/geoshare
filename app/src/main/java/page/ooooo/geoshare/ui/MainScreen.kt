@@ -969,7 +969,7 @@ private fun MainSkipButton(
                 .padding(top = spacing.tinyAdaptive),
             colors = ButtonDefaults.textButtonColors(
                 contentColor = contentColor,
-            )
+            ),
         ) {
             Text(stringResource(R.string.conversion_succeeded_skip))
         }

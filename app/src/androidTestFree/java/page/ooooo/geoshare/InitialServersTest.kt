@@ -21,11 +21,20 @@ class InitialServersTest : InitialDataTest {
         val serverDao = db.getServerDao()
         val expectedItems = listOf(
             Server(
-                name = "Google Maps Geocode Address",
+                name = "Google Maps",
+                description = "Geocode Address",
                 urlTemplate = "https://geocode.googleapis.com/v4/geocode/address/{q}",
                 authType = ServerAuthType.API_KEY,
                 apiKeyHeader = "X-Goog-Api-Key",
                 uuid = UUID.fromString("16b3bb06-3a3b-4853-ac06-c4bf1eb346f8"),
+            ),
+            Server(
+                name = "Google Maps",
+                description = "Geocode Place",
+                urlTemplate = "https://geocode.googleapis.com/v4/geocode/places/{q}",
+                authType = ServerAuthType.API_KEY,
+                apiKeyHeader = "X-Goog-Api-Key",
+                uuid = UUID.fromString("c5c215a1-c453-4de9-adb3-daecbd7dc876"),
             ),
         ).sortedBy { it.name }
         val actualItems = serverDao.getAll()
