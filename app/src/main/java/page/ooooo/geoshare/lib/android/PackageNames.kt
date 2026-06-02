@@ -6,6 +6,7 @@ import page.ooooo.geoshare.lib.formatters.GeoUriFlavor
 import page.ooooo.geoshare.lib.geo.Srs
 
 object PackageNames {
+    const val ALL_IN_ONE = "net.psyberia.offlinemaps"
     const val AMAP = "com.autonavi.minimap"
     const val BAIDU_MAP = "com.baidu.BaiduMap"
     const val CARTES_IGN = "fr.ign.geoportail"
@@ -46,7 +47,8 @@ object PackageNames {
 
     fun getGeoUriFlavor(packageName: String?): GeoUriFlavor =
         when {
-            packageName == AMAP ||
+            packageName == ALL_IN_ONE ||
+                packageName == AMAP ||
                 packageName == HERE_WEGO ||
                 packageName == GOOGLE_MAPS ||
                 packageName == GMAPS_WV ||
@@ -66,7 +68,7 @@ object PackageNames {
             packageName?.startsWith(GARMIN_PREFIX) == true ->
                 GeoUriFlavor(
                     pin = GeoUriFlavor.PinFlavor.COORDS_AND_NAME_IN_Q,
-                    zoom = GeoUriFlavor.ZoomFlavor.NOT_AVAILABLE
+                    zoom = GeoUriFlavor.ZoomFlavor.NOT_AVAILABLE,
                 )
 
             packageName == KOMOOT ->
