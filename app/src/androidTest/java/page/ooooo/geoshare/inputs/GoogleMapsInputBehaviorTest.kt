@@ -165,7 +165,7 @@ class GoogleMapsInputBehaviorTest {
         }
         val server = Server(
             name = "Test GeoShare Proxy",
-            description = "With Google Maps backend",
+            description = "Google Maps Geocode Address backend",
             urlTemplate = "https://api.geoshare-app.net/v1/google-maps/geocode/address/{q}",
             authType = ServerAuthType.ATTESTATION,
             challengeUrl = "https://api.geoshare-app.net/v1/auth/challenge",
@@ -414,18 +414,95 @@ class GoogleMapsInputBehaviorTest {
     }
 
     @Test
+    @NotEmulator
+    fun googleMapsPlaceApiInput_serverGeoShare() = uiAutomator {
+        runBlocking {
+            assumeHttpGetReturnsStatus("https://api.geoshare-app.net/", HttpStatusCode.NotFound)
+        }
+        val server = Server(
+            name = "Test GeoShare Proxy",
+            description = "Google Maps Geocode Place backend",
+            urlTemplate = "https://api.geoshare-app.net/v1/google-maps/geocode/places/{q}",
+            authType = ServerAuthType.ATTESTATION,
+            challengeUrl = "https://api.geoshare-app.net/v1/auth/challenge",
+            loginUrl = "https://api.geoshare-app.net/v1/auth/login",
+            registerUrl = "https://api.geoshare-app.net/v1/auth/register",
+        )
+        testGoogleMapsPlaceApiInput(server)
+    }
+
+    @Test
+    @NotEmulator
+    fun googleMapsPlaceApiInput_serverGeoShareLocal() = uiAutomator {
+        runBlocking {
+            assumeHttpGetReturnsStatus("http://127.0.0.1:8080", HttpStatusCode.NotFound)
+        }
+        val server = Server(
+            name = "Test Google Maps",
+            urlTemplate = "http://127.0.0.1:8080/v1/google-maps/geocode/places/{q}",
+            authType = ServerAuthType.ATTESTATION,
+            challengeUrl = "http://127.0.0.1:8080/v1/auth/challenge",
+            loginUrl = "http://127.0.0.1:8080/v1/auth/login",
+            registerUrl = "http://127.0.0.1:8080/v1/auth/register",
+        )
+        testGoogleMapsPlaceApiInput(server)
+    }
+
+    @Test
+    fun googleMapsPlaceApiInput_serverGoogleApis() = uiAutomator {
+        val apiKey = InstrumentationRegistry.getArguments().getString(SERVER_API_KEY_ARG)
+            ?: throw AssumptionViolatedException("This test only works when the instrumentation extra argument $SERVER_API_KEY_ARG is set")
+        runBlocking {
+            assumeHttpGetReturnsStatus("https://geocode.googleapis.com", HttpStatusCode.NotFound)
+        }
+        val server = Server(
+            name = "Test Google Maps",
+            urlTemplate = "https://geocode.googleapis.com/v4/geocode/places/{q}",
+            authType = ServerAuthType.API_KEY,
+            apiKey = apiKey,
+            apiKeyHeader = "X-Goog-Api-Key",
+        )
+        testGoogleMapsPlaceApiInput(server)
+    }
+
+    @Test
+    fun googleMapsPlaceApiInput_serverNone() = uiAutomator {
+        testGoogleMapsPlaceApiInput(server = null)
+    }
+
+    private fun testGoogleMapsPlaceApiInput(server: Server?) = uiAutomator {
+        // Launch app and close intro
+        launchApplication()
+        waitForAppToBeVisible()
+        closeIntro()
+        configureConnectionPermissionPreference(Permission.ALWAYS)
+        configureServer(server)
+
+        testUri(
+            if (server != null) {
+                persistentListOf(WGS84Point(47.5951518, -122.3316394, name = "Lumen Field", source = Source.API))
+            } else if (htmlParsingSupported) {
+                persistentListOf(WGS84Point(47.5951518, -122.3316394, name = "Seattle Stadium", source = Source.URI))
+            } else {
+                persistentListOf(WGS84Point(name = "Lumen Field", source = Source.URI))
+            },
+            "https://www.google.com/maps/search/?query_place_id=ChIJKxjxuaNqkFQR3CK6O1HNNqY&query=Lumen%20Field&api=1",
+        )
+    }
+
+    @Test
     fun googleMapsPlaceListInput() = uiAutomator {
         if (htmlParsingSupported) {
             testUri(
                 persistentListOf(
-                    GCJ02Point(59.1293656, 11.4585672, source = Source.JAVASCRIPT),
-                    GCJ02Point(59.4154007, 11.659710599999999, source = Source.JAVASCRIPT),
-                    GCJ02Point(59.3443991, 11.672637, source = Source.JAVASCRIPT),
-                    GCJ02Point(59.2557409, 11.5857853, source = Source.JAVASCRIPT),
-                    GCJ02Point(59.1579458, 11.7337507, source = Source.JAVASCRIPT),
-                    GCJ02Point(59.229344899999994, 11.6892173, source = Source.JAVASCRIPT),
-                    GCJ02Point(59.2999243, 11.6587237, source = Source.JAVASCRIPT),
-                    GCJ02Point(59.147731699999994, 11.550661199999999, source = Source.JAVASCRIPT),
+                    WGS84Point(59.1293656, 11.4585672, source = Source.JAVASCRIPT),
+                    WGS84Point(59.4154007, 11.659710599999999, source = Source.JAVASCRIPT),
+                    WGS84Point(59.3443991, 11.672637, source = Source.JAVASCRIPT),
+                    WGS84Point(59.2557409, 11.5857853, source = Source.JAVASCRIPT),
+                    WGS84Point(59.1579458, 11.7337507, source = Source.JAVASCRIPT),
+                    WGS84Point(59.229344899999994, 11.6892173, source = Source.JAVASCRIPT),
+                    WGS84Point(59.2999243, 11.6587237, source = Source.JAVASCRIPT),
+                    WGS84Point(59.147731699999994, 11.550661199999999, source = Source.JAVASCRIPT),
                 ),
                 "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg",
             )
@@ -450,7 +527,7 @@ class GoogleMapsInputBehaviorTest {
 
         // Google Search
         testUri(
-            GCJ02Point(27.765028, -15.600889, source = Source.JAVASCRIPT),
+            WGS84Point(27.765028, -15.600889, source = Source.JAVASCRIPT),
             "https://g.co/kgs/91UYXud",
         )
     }
