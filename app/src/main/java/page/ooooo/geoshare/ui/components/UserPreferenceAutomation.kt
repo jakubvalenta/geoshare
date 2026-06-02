@@ -143,11 +143,12 @@ fun UserPreferenceAutomationControls(
                     .let { serializedString -> "geoShareUserPreferenceAutomation_$serializedString" }
             },
             onValueChange = onValueChange,
-        ) { value ->
+        ) { value, modifier ->
             AutomationPreferenceValue(
                 value = value,
                 appDetails = appDetails,
                 links = links,
+                modifier = modifier,
                 onGetAutomationOutput = onGetAutomationOutput,
             )
         }
@@ -159,6 +160,7 @@ private fun AutomationPreferenceValue(
     value: Automation,
     appDetails: AppDetails,
     links: List<Link>,
+    modifier: Modifier = Modifier,
     descriptionEnabled: Boolean = true,
     onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
 ) {
@@ -170,6 +172,7 @@ private fun AutomationPreferenceValue(
         val label = output.automationLabel(appDetails)
         val description = output.takeIf { descriptionEnabled }?.getAutomationDescription()
         Row(
+            modifier,
             horizontalArrangement = Arrangement.spacedBy(LocalSpacing.current.tiny),
             verticalAlignment = Alignment.CenterVertically,
         ) {

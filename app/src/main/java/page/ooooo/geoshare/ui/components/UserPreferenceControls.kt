@@ -2,6 +2,7 @@ package page.ooooo.geoshare.ui.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -94,7 +95,7 @@ fun <T> LazyListScope.userPreferenceOptionsControl(
     enabled: Boolean = true,
     itemTestTag: ((option: T) -> String)? = null,
     onValueChange: ((MutablePreferences) -> Unit) -> Unit,
-    option: @Composable (option: T) -> Unit,
+    option: @Composable RowScope.(option: T, modifier: Modifier) -> Unit,
 ) {
     val value = if (enabled) {
         userPreference.getValue(values)
@@ -149,31 +150,18 @@ fun LazyListScope.userPreferenceServerControls(
             modifier = Modifier.padding(top = LocalSpacing.current.tinyAdaptive),
             itemEnabled = { item -> item?.isValid() != false },
             itemTestTag = itemTestTag,
-        ) { item ->
-            Column {
-                if (item == null) {
-                    Text(stringResource(R.string.server_none))
-                    Text(
-                        itemNoneDescription(),
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                } else {
-                    Text(item.name)
-                    if (item.isValid()) {
-                        item.description.takeIf { it.isNotEmpty() }?.let { description ->
-                            Text(
-                                description,
-                                style = MaterialTheme.typography.bodySmall,
-                            )
-                        }
-                    } else {
-                        Text(
-                            stringResource(R.string.server_invalid),
-                            fontStyle = FontStyle.Italic,
-                            style = MaterialTheme.typography.bodySmall,
-                        )
-                    }
-                }
+        ) { item, modifier ->
+            Column(modifier.weight(1f)) {
+                Text(item?.name ?: stringResource(R.string.server_none))
+                Text(item?.description ?: itemNoneDescription(), style = MaterialTheme.typography.bodySmall)
+            }
+            if (item?.isValid() == false) {
+                Text(
+                    stringResource(R.string.server_invalid),
+                    modifier,
+                    fontStyle = FontStyle.Italic,
+                    style = MaterialTheme.typography.bodySmall,
+                )
             }
         }
     }

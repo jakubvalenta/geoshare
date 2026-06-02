@@ -289,16 +289,17 @@ private fun ServerListPane(
                 itemIsSelected = { item -> item.uid == destination },
                 itemOnClick = { item -> onNavigateToContentKey(item.uid) },
                 itemSupportingContent = { item ->
-                    if (item.isValid()) {
-                        item.description.takeIf { it.isNotEmpty() }?.let { description ->
-                            {
-                                Text(
-                                    description,
-                                    style = MaterialTheme.typography.bodySmall,
-                                )
-                            }
+                    item.description.takeIf { it.isNotEmpty() }?.let { description ->
+                        {
+                            Text(
+                                description,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
                         }
-                    } else {
+                    }
+                },
+                itemTrailingContent = { item ->
+                    if (!item.isValid()) {
                         {
                             Text(
                                 stringResource(R.string.server_invalid),
@@ -306,6 +307,8 @@ private fun ServerListPane(
                                 style = MaterialTheme.typography.bodySmall,
                             )
                         }
+                    } else {
+                        null
                     }
                 },
                 itemTestTag = { "geoShareServerListItem_${it.uuid}" },

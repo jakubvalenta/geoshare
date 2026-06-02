@@ -2,9 +2,9 @@ package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
@@ -34,7 +34,7 @@ fun <T> RadioButtonGroup(
     enabled: Boolean = true,
     itemEnabled: (value: T) -> Boolean = { true },
     itemTestTag: ((value: T) -> String)? = null,
-    option: @Composable (value: T) -> Unit,
+    option: @Composable RowScope.(value: T, modifier: Modifier) -> Unit,
 ) {
     val spacing = LocalSpacing.current
 
@@ -67,13 +67,7 @@ fun <T> RadioButtonGroup(
                         onClick = null,
                         enabled = itemEnabled,
                     )
-                    if (itemEnabled) {
-                        option(value)
-                    } else {
-                        Box(Modifier.alpha(0.7f)) {
-                            option(value)
-                        }
-                    }
+                    option(value, Modifier.run { if (!itemEnabled) alpha(0.7f) else this })
                 }
             }
         }
@@ -91,10 +85,10 @@ private fun DefaultPreview() {
                 selectedValue = 2,
                 onSelect = {},
                 values = listOf(1, 2),
-            ) { value ->
+            ) { value, modifier ->
                 when (value) {
-                    1 -> Text("Foo bar")
-                    2 -> Text("Kotlin is a modern but already mature programming language designed to make developers happier.")
+                    1 -> Text("Foo bar", modifier)
+                    2 -> Text("Kotlin is a modern but already mature programming language designed to make developers happier.", modifier)
                 }
             }
         }
@@ -110,10 +104,10 @@ private fun DarkPreview() {
                 selectedValue = 2,
                 onSelect = {},
                 values = listOf(1, 2),
-            ) { value ->
+            ) { value, modifier ->
                 when (value) {
-                    1 -> Text("Foo bar")
-                    2 -> Text("Kotlin is a modern but already mature programming language designed to make developers happier.")
+                    1 -> Text("Foo bar", modifier)
+                    2 -> Text("Kotlin is a modern but already mature programming language designed to make developers happier.", modifier)
                 }
             }
         }
@@ -130,10 +124,10 @@ private fun DisabledPreview() {
                 onSelect = {},
                 values = listOf(1, 2),
                 enabled = false,
-            ) { value ->
+            ) { value, modifier ->
                 when (value) {
-                    1 -> Text("Foo bar")
-                    2 -> Text("Kotlin is a modern but already mature programming language designed to make developers happier.")
+                    1 -> Text("Foo bar", modifier)
+                    2 -> Text("Kotlin is a modern but already mature programming language designed to make developers happier.", modifier)
                 }
             }
         }
@@ -151,10 +145,10 @@ private fun ItemDisabledPreview() {
                 values = listOf(1, 2),
                 enabled = true,
                 itemEnabled = { it == 2 }
-            ) { value ->
+            ) { value, modifier ->
                 when (value) {
-                    1 -> Text("Foo bar")
-                    2 -> Text("Kotlin is a modern but already mature programming language designed to make developers happier.")
+                    1 -> Text("Foo bar", modifier)
+                    2 -> Text("Kotlin is a modern but already mature programming language designed to make developers happier.", modifier)
                 }
             }
         }

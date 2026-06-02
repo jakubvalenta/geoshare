@@ -79,14 +79,14 @@ fun UserPreferenceConnectionPermissionControls(
             onValueChange = onValueChange,
             optionGroups = ConnectionPermissionPreference.getOptionGroups(),
             itemTestTag = { option -> "geoShareUserPreferenceConnectionPermission_${option}" },
-        ) { option ->
-            ConnectionPermissionPreferenceValue(option)
+        ) { option, modifier ->
+            ConnectionPermissionPreferenceValue(option, modifier)
         }
     }
 }
 
 @Composable
-private fun ConnectionPermissionPreferenceValue(value: Permission) {
+private fun ConnectionPermissionPreferenceValue(value: Permission, modifier: Modifier = Modifier) {
     Text(
         stringResource(
             when (value) {
@@ -94,7 +94,8 @@ private fun ConnectionPermissionPreferenceValue(value: Permission) {
                 Permission.ASK -> R.string.user_preferences_connection_option_ask
                 Permission.NEVER -> R.string.user_preferences_connection_option_never
             }
-        )
+        ),
+        modifier,
     )
 }
 

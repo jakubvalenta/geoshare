@@ -79,8 +79,8 @@ fun UserPreferenceCoordinateFormatControls(
             onValueChange = onValueChange,
             optionGroups = CoordinateFormatPreference.getOptionGroups(),
             itemTestTag = { option -> "geoShareUserPreferenceCoordinateFormat_${option}" },
-        ) { option ->
-            Column {
+        ) { option, modifier ->
+            Column(modifier) {
                 CoordinateFormatPreferenceValue(option)
                 Text(
                     when (option) {

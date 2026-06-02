@@ -412,9 +412,9 @@ fun LinkForm(
                         onSelect = onSetType,
                         values = listOf(LinkType.DISPLAY, LinkType.NAVIGATION, LinkType.STREET_VIEW),
                         enabled = enabled,
-                    ) { value ->
+                    ) { value, modifier ->
                         Surface(
-                            Modifier.fillMaxWidth(),
+                            modifier.fillMaxWidth(),
                             shape = ShapeDefaults.Large,
                             color = MaterialTheme.colorScheme.surfaceContainerHighest,
                         ) {
