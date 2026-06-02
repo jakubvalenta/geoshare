@@ -5,7 +5,7 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-class MagicEarthInputBehaviorTest : InputBehaviorTest {
+class MagicEarthInputBehaviorTest {
     @Test
     fun magicEarth() = uiAutomator {
         // Coordinates

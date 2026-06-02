@@ -35,7 +35,13 @@ class ServerViewModel @Inject constructor(
             SharingStarted.WhileSubscribed(5000),
             emptyList(),
         )
-    val selected: StateFlow<Server?> = serverRepository.selected
+    val selectedGoogleMaps: StateFlow<Server?> = serverRepository.selectedGoogleMaps
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            null,
+        )
+    val selectedSearch: StateFlow<Server?> = serverRepository.selectedSearch
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
@@ -69,20 +75,30 @@ class ServerViewModel @Inject constructor(
         } else if (destination == null || destination == -1) {
             withMutableSnapshot {
                 this.destination = destination
-                this.baseUrl = default.baseUrl
+                this.name = default.name
+                this.description = default.description
+                this.urlTemplate = default.urlTemplate
                 this.authType = default.authType
                 this.apiKey = default.apiKey
                 this.apiKeyHeader = default.apiKeyHeader
+                this.challengeUrl = default.challengeUrl
+                this.loginUrl = default.loginUrl
+                this.registerUrl = default.registerUrl
             }
         } else {
             val item = serverRepository.getByUid(destination)
             if (item != null) {
                 withMutableSnapshot {
                     this.destination = destination
-                    this.baseUrl = item.baseUrl
+                    this.name = item.name
+                    this.description = item.description
+                    this.urlTemplate = item.urlTemplate
                     this.authType = item.authType
                     this.apiKey = item.apiKey
                     this.apiKeyHeader = item.apiKeyHeader
+                    this.challengeUrl = item.challengeUrl
+                    this.loginUrl = item.loginUrl
+                    this.registerUrl = item.registerUrl
                 }
             }
         }
@@ -90,10 +106,15 @@ class ServerViewModel @Inject constructor(
 
     // Form
 
-    var baseUrl by savedStateHandle.saveable { mutableStateOf(default.baseUrl) }
+    var name by savedStateHandle.saveable { mutableStateOf(default.name) }
+    var description by savedStateHandle.saveable { mutableStateOf(default.description) }
+    var urlTemplate by savedStateHandle.saveable { mutableStateOf(default.urlTemplate) }
     var authType by savedStateHandle.saveable { mutableStateOf(default.authType) }
     var apiKey by savedStateHandle.saveable { mutableStateOf(default.apiKey) }
     var apiKeyHeader by savedStateHandle.saveable { mutableStateOf(default.apiKeyHeader) }
+    var challengeUrl by savedStateHandle.saveable { mutableStateOf(default.challengeUrl) }
+    var loginUrl by savedStateHandle.saveable { mutableStateOf(default.loginUrl) }
+    var registerUrl by savedStateHandle.saveable { mutableStateOf(default.registerUrl) }
 
     fun saveForm(resources: Resources) {
         destination?.let { destination ->
@@ -101,10 +122,15 @@ class ServerViewModel @Inject constructor(
                 viewModelScope.launch(Dispatchers.IO) {
                     serverRepository.insert(
                         Server(
-                            baseUrl = baseUrl,
+                            name = name,
+                            description = description,
+                            urlTemplate = urlTemplate,
                             authType = authType,
                             apiKey = apiKey,
                             apiKeyHeader = apiKeyHeader,
+                            challengeUrl = challengeUrl,
+                            loginUrl = loginUrl,
+                            registerUrl = registerUrl,
                         )
                     )
                     _message.value = Message(resources.getString(R.string.server_message_inserted))
@@ -117,10 +143,15 @@ class ServerViewModel @Inject constructor(
                     if (item != null) {
                         serverRepository.update(
                             item.copy(
-                                baseUrl = baseUrl,
+                                name = name,
+                                description = description,
+                                urlTemplate = urlTemplate,
                                 authType = authType,
                                 apiKey = apiKey,
                                 apiKeyHeader = apiKeyHeader,
+                                challengeUrl = challengeUrl,
+                                loginUrl = loginUrl,
+                                registerUrl = registerUrl,
                             )
                         )
                         _message.value = Message(resources.getString(R.string.server_message_updated))
@@ -149,9 +180,15 @@ class ServerViewModel @Inject constructor(
         }
     }
 
-    fun select(uid: Int?) {
+    fun selectGoogleMaps(uid: Int?) {
         viewModelScope.launch(Dispatchers.IO) {
-            serverRepository.unselectAllAndSelect(uid)
+            serverRepository.unselectAllGoogleMapsAndSelect(uid)
+        }
+    }
+
+    fun selectSearch(uid: Int?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            serverRepository.unselectAllSearchAndSelect(uid)
         }
     }
 

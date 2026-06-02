@@ -32,3 +32,6 @@ fun String.truncateMiddle(maxLength: Int = 60, ellipsis: String = "\u2026"): Str
     } else {
         this
     }
+
+fun String.trimUrl(): String =
+    replace(Regex("""^https?://"""), "").trimEnd('/')

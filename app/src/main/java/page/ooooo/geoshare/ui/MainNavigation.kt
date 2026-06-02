@@ -41,7 +41,7 @@ object MainRoute
 object ServerRoute
 
 @Serializable
-data class UserPreferencesRoute(val id: UserPreferencesGroupId? = null)
+data class UserPreferencesRoute(val id: UserPreferenceGroupId? = null)
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
@@ -75,7 +75,7 @@ fun MainNavigation(
             FaqScreen(
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
                 onNavigateToUserPreferencesConnectionPermissionScreen = {
-                    navController.navigate(UserPreferencesRoute(UserPreferencesGroupId.CONNECTION_PERMISSION))
+                    navController.navigate(UserPreferencesRoute(UserPreferenceGroupId.CONNECTION_PERMISSION))
                 },
             )
         }
@@ -95,7 +95,7 @@ fun MainNavigation(
                 onNavigateToIntroScreen = { navController.navigate(IntroRoute) },
                 onNavigateToLinksScreen = { navController.navigate(LinkRoute) },
                 onNavigateToUserPreferencesAutomationScreen = {
-                    navController.navigate(UserPreferencesRoute(UserPreferencesGroupId.AUTOMATION))
+                    navController.navigate(UserPreferencesRoute(UserPreferenceGroupId.AUTOMATION))
                 },
                 onNavigateToUserPreferencesScreen = { navController.navigate(UserPreferencesRoute()) },
                 billingViewModel = billingViewModel,
@@ -133,7 +133,7 @@ fun MainNavigation(
         }
         composable<UserPreferencesRoute> { backStackEntry ->
             val route: UserPreferencesRoute = backStackEntry.toRoute()
-            UserPreferencesScreen(
+            UserPreferenceScreen(
                 initialGroupId = route.id,
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
                 onNavigateToBillingScreen = { navController.navigate(BillingRoute) },

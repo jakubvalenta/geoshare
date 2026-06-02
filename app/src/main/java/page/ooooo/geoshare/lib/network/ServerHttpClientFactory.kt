@@ -21,19 +21,21 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 import page.ooooo.geoshare.data.UserPreferencesRepository
+import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.database.ServerAuthType
-import page.ooooo.geoshare.data.local.preferences.CachedApiTokenPreference
+import page.ooooo.geoshare.data.local.preferences.CachedServerToken
+import page.ooooo.geoshare.data.local.preferences.CachedServerTokenPreference
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.android.KeyStoreService
+import page.ooooo.geoshare.lib.android.KeyStoreTools
 import page.ooooo.geoshare.lib.extensions.base64Decode
 import page.ooooo.geoshare.lib.extensions.base64Encode
 import page.ooooo.geoshare.lib.extensions.sign
 import javax.inject.Inject
 
-class ApiService @Inject constructor(
+class ServerHttpClientFactory @Inject constructor(
     private val engine: HttpClientEngine,
-    private val keyStoreService: KeyStoreService,
+    private val keyStoreTools: KeyStoreTools,
     private val log: Log = DefaultLog,
     private val userPreferencesRepository: UserPreferencesRepository,
 ) {
@@ -63,31 +65,28 @@ class ApiService @Inject constructor(
     @Serializable
     data class GoogleMapsResults(val results: List<GoogleMapsResult>)
 
-    fun createHttpClient(baseUrl: String, authType: ServerAuthType, apiKey: String, apiKeyHeader: String): HttpClient =
+    fun createHttpClient(server: Server): HttpClient =
         HttpClient(engine) {
             expectSuccess = true
             setDefaultTimeouts()
             rethrowExceptionsAsNetworkException(log)
 
-            when (authType) {
+            when (server.authType) {
                 ServerAuthType.API_KEY -> {
                     install(DefaultRequest) {
-                        url(baseUrl)
-                        header(apiKeyHeader, apiKey)
+                        header(server.apiKeyHeader, server.apiKey)
                     }
                 }
 
                 ServerAuthType.ATTESTATION -> {
-                    install(DefaultRequest) {
-                        url(baseUrl)
-                    }
                     install(Auth) {
                         bearer {
                             loadTokens {
                                 attestationLoadTokens()
                             }
                             refreshTokens {
-                                attestationLogin(baseUrl) ?: attestationRegister(baseUrl)
+                                attestationLogin(server.challengeUrl, server.loginUrl)
+                                    ?: attestationRegister(server.challengeUrl, server.registerUrl)
                             }
                         }
                     }
@@ -96,30 +95,27 @@ class ApiService @Inject constructor(
         }
 
     suspend fun attestationLoadTokens(): BearerTokens? =
-        userPreferencesRepository.getValue(CachedApiTokenPreference)?.let {
+        userPreferencesRepository.getValue(CachedServerTokenPreference)?.let {
             BearerTokens(it.token, it.publicKey)
         }
 
-    private suspend fun attestationLogin(baseUrl: String): BearerTokens? {
+    private suspend fun attestationLogin(challengeUrl: String, loginUrl: String): BearerTokens? =
         HttpClient(engine) {
             expectSuccess = true
             setDefaultTimeouts()
 
-            install(DefaultRequest.Plugin) {
-                url(baseUrl)
-            }
             install(ContentNegotiation) {
                 json()
             }
         }.use { client ->
             // Get key
-            val key = keyStoreService.getKey() ?: return null
+            val key = keyStoreTools.getKey() ?: return null
             val publicKeyBase64 = key.publicKey.encoded.base64Encode()
 
             // Login challenge
             val loginChallenge = try {
                 client
-                    .post("/v1/auth/challenge")
+                    .post(challengeUrl)
                     .body<ChallengeResponse>().challenge.base64Decode()
             } catch (e: ClientRequestException) {
                 with(e.response) {
@@ -132,7 +128,7 @@ class ApiService @Inject constructor(
             val loginSignature = key.privateKey.sign(loginChallenge)
             val token = try {
                 client
-                    .post("/v1/auth/login") {
+                    .post(loginUrl) {
                         contentType(ContentType.Application.Json)
                         setBody(
                             LoginRequest(
@@ -153,18 +149,18 @@ class ApiService @Inject constructor(
                 throw e
             }
             log.i(TAG, "Login succeeded")
+            userPreferencesRepository.setValue(
+                CachedServerTokenPreference,
+                CachedServerToken(token, publicKeyBase64),
+            )
             return BearerTokens(token, publicKeyBase64)
         }
-    }
 
-    private suspend fun attestationRegister(baseUrl: String): BearerTokens {
+    private suspend fun attestationRegister(challengeUrl: String, registerUrl: String): BearerTokens =
         HttpClient(engine) {
             expectSuccess = true
             setDefaultTimeouts()
 
-            install(DefaultRequest.Plugin) {
-                url(baseUrl)
-            }
             install(ContentNegotiation) {
                 json()
             }
@@ -172,7 +168,7 @@ class ApiService @Inject constructor(
             // Registration challenge
             val registrationChallenge = try {
                 client
-                    .post("/v1/auth/challenge")
+                    .post(challengeUrl)
                     .body<ChallengeResponse>().challenge.base64Decode()
             } catch (e: ClientRequestException) {
                 with(e.response) {
@@ -182,14 +178,14 @@ class ApiService @Inject constructor(
             }
 
             // Generate key
-            val key = keyStoreService.generateKey()
+            val key = keyStoreTools.generateKey()
             val publicKeyBase64 = key.publicKey.encoded.base64Encode()
 
             // Register
             val registrationSignature = key.privateKey.sign(registrationChallenge)
             val token = try {
                 client
-                    .post("/v1/auth/register") {
+                    .post(registerUrl) {
                         contentType(ContentType.Application.Json)
                         setBody(
                             RegisterRequest(
@@ -207,9 +203,12 @@ class ApiService @Inject constructor(
                 throw e
             }
             log.i(TAG, "Registration succeeded")
+            userPreferencesRepository.setValue(
+                CachedServerTokenPreference,
+                CachedServerToken(token, publicKeyBase64),
+            )
             return BearerTokens(token, publicKeyBase64)
         }
-    }
 
     private suspend fun HttpResponse.bodyAsErrorMessage(): String = try {
         body<ErrorResponse>().message
@@ -220,6 +219,6 @@ class ApiService @Inject constructor(
     }
 
     private companion object {
-        private const val TAG = "ApiService"
+        private const val TAG = "ServerHttpClientFactory"
     }
 }

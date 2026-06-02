@@ -7,8 +7,8 @@ import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Before
 import org.junit.Test
-import page.ooooo.geoshare.BehaviorTest.Companion.ELEMENT_DOES_NOT_EXIST_TIMEOUT
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
@@ -16,9 +16,15 @@ import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.ui.UserPreferencesGroupId
+import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
-class UserPreferencesBehaviorTest : BehaviorTest {
+class UserPreferencesBehaviorTest {
+    @Before
+    fun goToLauncher() = uiAutomator {
+        // Start from the home screen
+        pressHome()
+    }
+
     @Test
     fun whenCoordinateFormatIsSet_showsCoordinatesInThatFormat() = uiAutomator {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -51,7 +57,7 @@ class UserPreferencesBehaviorTest : BehaviorTest {
         }
 
         // Set coordinate format to degrees, minutes, seconds
-        goToUserPreferencesDetail(UserPreferencesGroupId.COORDINATE_FORMAT)
+        goToUserPreferencesDetail(UserPreferenceGroupId.COORDINATE_FORMAT)
         onElement { viewIdResourceName == "geoShareUserPreferenceCoordinateFormat_${CoordinateFormat.DEG_MIN_SEC}" }.click()
         goToMainScreenFromUserPreferencesDetail()
 
@@ -106,7 +112,7 @@ class UserPreferencesBehaviorTest : BehaviorTest {
         )
 
         // Make the app visible in preferences
-        goToUserPreferencesDetail(UserPreferencesGroupId.HIDDEN_APPS)
+        goToUserPreferencesDetail(UserPreferenceGroupId.HIDDEN_APPS)
         onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
             .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareVisibleAppToggle_${PackageNames.OSMAND_PLUS}" }
             .click()
@@ -154,7 +160,7 @@ class UserPreferencesBehaviorTest : BehaviorTest {
         )
 
         // Make the link visible in preferences
-        goToUserPreferencesDetail(UserPreferencesGroupId.LINKS)
+        goToUserPreferencesDetail(UserPreferenceGroupId.LINKS)
         onElement { viewIdResourceName == "geoShareLinkListPane" }
             .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkListItemToggle_ce900ea1-2c5d-4641-82f3-a5429a68d603" }
             .click()

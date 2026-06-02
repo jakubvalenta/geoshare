@@ -6,28 +6,32 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.accept
 import io.ktor.client.request.prepareRequest
+import io.ktor.client.request.url
 import io.ktor.http.ContentType
-import io.ktor.http.appendPathSegments
 import io.ktor.http.headers
+import io.ktor.serialization.JsonConvertException
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.ServerRepository
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.network.ApiService
+import page.ooooo.geoshare.lib.network.ServerHttpClientFactory
+import page.ooooo.geoshare.lib.network.UnknownNetworkException
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class GoogleMapsAddressApiInput @Inject constructor(
-    private val apiService: ApiService,
+    private val serverHttpClientFactory: ServerHttpClientFactory,
     private val googleMapsHtmlInput: Lazy<GoogleMapsHtmlInput>,
+    private val log: Log,
     private val serverRepository: ServerRepository,
     private val uriQuote: UriQuote,
 ) : BasicInput<Uri>, Input.HasPermission {
@@ -42,17 +46,12 @@ class GoogleMapsAddressApiInput @Inject constructor(
         block(Uri.parse(match, uriQuote))
 
     override suspend fun parse(data: Uri, match: String) = parseResult {
-        val server = serverRepository.getSelected() ?: run {
-            // Go to HTML parsing, if API is not configured
+        val server = serverRepository.getSelectedGoogleMaps() ?: run {
+            // Go to HTML parsing, if server is not configured
             nextStep = NextStep(googleMapsHtmlInput.get(), match)
             return@parseResult
         }
-        val client = apiService.createHttpClient(
-            baseUrl = server.baseUrl,
-            authType = server.authType,
-            apiKey = server.apiKey,
-            apiKeyHeader = server.apiKeyHeader,
-        ).config {
+        val client = serverHttpClientFactory.createHttpClient(server).config {
             install(ContentNegotiation) {
                 json(Json {
                     ignoreUnknownKeys = true
@@ -60,19 +59,27 @@ class GoogleMapsAddressApiInput @Inject constructor(
             }
         }
         val query = parseQuery(data) ?: return@parseResult
-        val res = client.use { client ->
-            client
-                .prepareRequest {
-                    url {
-                        appendPathSegments("v4", "geocode", "address", query)
+        val res = try {
+            client.use { client ->
+                client
+                    .prepareRequest {
+                        url(server.getUrl(query, uriQuote))
+                        headers {
+                            accept(ContentType.Application.Json)
+                        }
                     }
-                    headers {
-                        accept(ContentType.Application.Json)
+                    .execute { response ->
+                        response.body<ServerHttpClientFactory.GoogleMapsResults>()
                     }
-                }
-                .execute { response ->
-                    response.body<ApiService.GoogleMapsResults>()
-                }
+            }
+        } catch (tr: UnknownNetworkException) {
+            if (tr.cause is JsonConvertException) {
+                // Google returns a JSON without the 'results' property when no coordinates are found, so let's do
+                // nothing in this case
+                log.i(TAG, "API returned no results")
+                return@parseResult
+            }
+            throw tr
         }
         points = res.results
             // Take only the highest ranked result
@@ -88,6 +95,8 @@ class GoogleMapsAddressApiInput @Inject constructor(
     }
 
     private fun parseQuery(uri: Uri): String? = uri.run {
+        val qWithoutCoordsPattern = Regex("""(.+?)(?:[\s+]*@$LAT,$LON\s*)?""")
+
         // API directions
         // https://www.google.com/maps/dir/?origin={name}&destination={name}
         // API search
@@ -98,7 +107,7 @@ class GoogleMapsAddressApiInput @Inject constructor(
             "q",
             "query",
         )
-            .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull() }
+            .firstNotNullOfOrNull { key -> qWithoutCoordsPattern.matchEntire(queryParams[key])?.groupOrNull() }
             ?.let {
                 return it
             }
@@ -124,5 +133,9 @@ class GoogleMapsAddressApiInput @Inject constructor(
         }
     }
 
-    override fun toString() = "GoogleMapsAddressApiInput"
+    private companion object {
+        private const val TAG = "GoogleMapsAddressApiInput"
+    }
+
+    override fun toString() = TAG
 }

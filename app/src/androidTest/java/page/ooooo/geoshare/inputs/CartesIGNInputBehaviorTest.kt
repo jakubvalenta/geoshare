@@ -5,7 +5,7 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-class CartesIGNInputBehaviorTest : InputBehaviorTest {
+class CartesIGNInputBehaviorTest {
     @Test
     fun cartesIGN() = uiAutomator {
         // Coordinates

@@ -21,7 +21,8 @@ class InitialServersTest : InitialDataTest {
         val serverDao = db.getServerDao()
         val expectedItems = listOf(
             Server(
-                baseUrl = "https://geocode.googleapis.com",
+                name = "Google Maps Geocode Address",
+                urlTemplate = "https://geocode.googleapis.com/v4/geocode/address/{q}",
                 authType = ServerAuthType.API_KEY,
                 apiKeyHeader = "X-Goog-Api-Key",
                 uuid = UUID.fromString("16b3bb06-3a3b-4853-ac06-c4bf1eb346f8"),

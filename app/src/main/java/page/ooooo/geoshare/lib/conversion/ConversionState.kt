@@ -409,10 +409,7 @@ data class DataParsed(
                 stateContext.log.i(
                     TAG, "Failed to extract point from $match"
                 )
-                ConversionFailed(
-                    source,
-                    stateContext.resources.getString(R.string.conversion_failed_reason_no_points),
-                )
+                ConversionFailed(source, input.getErrorMessage(stateContext.resources))
             }
         }
 

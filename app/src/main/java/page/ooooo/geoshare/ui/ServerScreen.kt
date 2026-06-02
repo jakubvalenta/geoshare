@@ -3,29 +3,21 @@ package page.ooooo.geoshare.ui
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SegmentedListItem
-import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -41,15 +33,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -57,19 +48,18 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.di.FakeGoogleMapsServer
+import page.ooooo.geoshare.data.di.FakeGoogleMapsAddressServer
 import page.ooooo.geoshare.data.di.defaultFakeServers
-import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.data.local.database.Server
+import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.lib.Message
-import page.ooooo.geoshare.ui.components.ServerForm
 import page.ooooo.geoshare.ui.components.BasicListDetailScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
-import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.ScrollablePane
-import page.ooooo.geoshare.ui.components.segmentedListColors
+import page.ooooo.geoshare.ui.components.SegmentedList
+import page.ooooo.geoshare.ui.components.ServerForm
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -81,18 +71,21 @@ fun ServerScreen(
     val coroutineScope = rememberCoroutineScope()
     val resources = LocalResources.current
     val all by viewModel.all.collectAsStateWithLifecycle()
-    val selected by viewModel.selected.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
 
     ServerScreen(
         destination = viewModel.destination,
         all = all,
-        selected = selected,
         message = message,
         apiKey = viewModel.apiKey,
         apiKeyHeader = viewModel.apiKeyHeader,
         authType = viewModel.authType,
-        baseUrl = viewModel.baseUrl,
+        challengeUrl = viewModel.challengeUrl,
+        description = viewModel.description,
+        name = viewModel.name,
+        loginUrl = viewModel.loginUrl,
+        registerUrl = viewModel.registerUrl,
+        urlTemplate = viewModel.urlTemplate,
         onBack = onBack,
         onDelete = { viewModel.delete(resources) },
         onDismissMessage = { viewModel.dismissMessage() },
@@ -103,11 +96,15 @@ fun ServerScreen(
         },
         onRestoreInitialData = { viewModel.restoreInitialData(resources) },
         onSaveForm = { viewModel.saveForm(resources) },
-        onSelect = { viewModel.select(it) },
         onSetApiKey = { viewModel.apiKey = it },
         onSetApiKeyHeader = { viewModel.apiKeyHeader = it },
         onSetAuthType = { viewModel.authType = it },
-        onSetBaseUrl = { viewModel.baseUrl = it },
+        onSetChallengeUrl = { viewModel.challengeUrl = it },
+        onSetDescription = { viewModel.description = it },
+        onSetLoginUrl = { viewModel.loginUrl = it },
+        onSetName = { viewModel.name = it },
+        onSetRegisterUrl = { viewModel.registerUrl = it },
+        onSetUrlTemplate = { viewModel.urlTemplate = it },
     )
 }
 
@@ -117,23 +114,31 @@ fun ServerScreen(
 private fun ServerScreen(
     destination: Int?,
     all: List<Server>,
-    selected: Server?,
     message: Message?,
     apiKey: String,
     apiKeyHeader: String,
     authType: ServerAuthType,
-    baseUrl: String,
+    challengeUrl: String,
+    description: String,
+    loginUrl: String,
+    name: String,
+    registerUrl: String,
+    urlTemplate: String,
     onBack: () -> Unit,
     onDelete: () -> Unit,
     onDismissMessage: () -> Unit,
     onNavigateTo: (Int?) -> Unit,
     onRestoreInitialData: () -> Unit,
     onSaveForm: () -> Unit,
-    onSelect: (Int?) -> Unit,
     onSetApiKey: (String) -> Unit,
     onSetApiKeyHeader: (String) -> Unit,
     onSetAuthType: (ServerAuthType) -> Unit,
-    onSetBaseUrl: (String) -> Unit,
+    onSetChallengeUrl: (String) -> Unit,
+    onSetDescription: (String) -> Unit,
+    onSetLoginUrl: (String) -> Unit,
+    onSetName: (String) -> Unit,
+    onSetRegisterUrl: (String) -> Unit,
+    onSetUrlTemplate: (String) -> Unit,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -191,11 +196,9 @@ private fun ServerScreen(
                     destination = destination,
                     containerColor = containerColor,
                     all = all,
-                    selected = selected,
                     onBack = onBack,
                     onNavigateToContentKey = onNavigateTo,
                     onRestoreInitialData = onRestoreInitialData,
-                    onSelect = onSelect,
                 )
             },
             detailPane = { wide ->
@@ -205,17 +208,27 @@ private fun ServerScreen(
                     ServerDetailPane(
                         destination = destination,
                         wide = wide,
-                        baseUrl = baseUrl,
                         apiKey = apiKey,
                         apiKeyHeader = apiKeyHeader,
                         authType = authType,
+                        challengeUrl = challengeUrl,
+                        description = description,
+                        loginUrl = loginUrl,
                         onBack = { onNavigateTo(null) },
                         onDelete = onDelete,
+                        name = name,
+                        registerUrl = registerUrl,
+                        urlTemplate = urlTemplate,
                         onSaveForm = onSaveForm,
                         onSetApiKey = onSetApiKey,
                         onSetApiKeyHeader = onSetApiKeyHeader,
                         onSetAuthType = onSetAuthType,
-                        onSetBaseUrl = onSetBaseUrl,
+                        onSetChallengeUrl = onSetChallengeUrl,
+                        onSetDescription = onSetDescription,
+                        onSetLoginUrl = onSetLoginUrl,
+                        onSetName = onSetName,
+                        onSetRegisterUrl = onSetRegisterUrl,
+                        onSetUrlTemplate = onSetUrlTemplate,
                     )
                 }
             },
@@ -230,9 +243,7 @@ private fun ServerListPane(
     destination: Int?,
     containerColor: Color,
     all: List<Server>,
-    selected: Server?,
     onBack: () -> Unit,
-    onSelect: (Int?) -> Unit,
     onNavigateToContentKey: (Int?) -> Unit,
     onRestoreInitialData: () -> Unit,
 ) {
@@ -241,7 +252,7 @@ private fun ServerListPane(
 
     ScrollablePane(
         title = {
-            Text(stringResource(R.string.server_title))
+            Text(stringResource(R.string.server_list_title))
         },
         onBack = onBack,
         modifier = Modifier
@@ -250,18 +261,11 @@ private fun ServerListPane(
         containerColor = containerColor,
     ) {
         item {
-            ParagraphText(
-                stringResource(
-                    R.string.server_description,
-                    stringResource(R.string.app_name),
-                ),
-                Modifier.padding(top = spacing.tinyAdaptive, bottom = spacing.smallAdaptive),
-            )
-        }
-        item {
             Button(
                 { onNavigateToContentKey(-1) },
-                Modifier.testTag("geoShareServerListInsert"),
+                Modifier
+                    .padding(top = spacing.smallAdaptive)
+                    .testTag("geoShareServerListInsert"),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.secondary,
                     contentColor = MaterialTheme.colorScheme.onSecondary,
@@ -271,95 +275,34 @@ private fun ServerListPane(
             }
         }
         item {
-            Column(
-                modifier = Modifier
-                    .padding(top = spacing.medium)
-                    .selectableGroup(),
-                verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
-            ) {
-                val colors = segmentedListColors()
-                SegmentedListItem(
-                    selected = selected == null,
-                    onClick = { onSelect(null) },
-                    shapes = ListItemDefaults.segmentedShapes(index = 0, count = all.size + 1),
-                    modifier = Modifier.testTag("geoShareServerListItem_null"),
-                    leadingContent = {
-                        val selected = selected == null
-                        RadioButton(
-                            selected = selected,
-                            // Null recommended for accessibility with screen readers
-                            onClick = null,
-                            modifier = Modifier.testTag("geoShareServerListItemRadio_null_selected_${selected}"),
-                        )
-                    },
-                    colors = colors,
-                ) {
-                    Text(stringResource(R.string.server_none_selected), style = MaterialTheme.typography.bodyLarge)
-                }
-                all.forEachIndexed { i, item ->
-                    var expanded by remember { mutableStateOf(false) }
-                    val valid = item.isValid()
-
-                    SegmentedListItem(
-                        selected = item.uid == destination,
-                        onClick = { onSelect(item.uid) },
-                        shapes = ListItemDefaults.segmentedShapes(index = i + 1, count = all.size + 1),
-                        modifier = Modifier.testTag("geoShareServerListItem_${item.uuid}"),
-                        enabled = valid,
-                        leadingContent = {
-                            val selected = item.uid == selected?.uid
-                            RadioButton(
-                                selected = selected,
-                                // Null recommended for accessibility with screen readers
-                                onClick = null,
-                                modifier = Modifier.testTag("geoShareServerListItemRadio_${item.uuid}_selected_${selected}"),
-                                enabled = valid,
-                            )
-                        },
-                        trailingContent = {
-                            Box {
-                                IconButton(
-                                    { expanded = true },
-                                    Modifier.testTag("geoShareServerListItemMenu_${item.uuid}"),
-                                ) {
-                                    Icon(
-                                        painterResource(R.drawable.more_vert_24px),
-                                        contentDescription = stringResource(R.string.nav_menu_content_description),
-                                    )
-                                }
-                                DropdownMenu(
-                                    expanded = expanded,
-                                    onDismissRequest = { expanded = false },
-                                    modifier = Modifier.semantics { testTagsAsResourceId = true },
-                                    shape = ShapeDefaults.Large,
-                                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                                ) {
-                                    DropdownMenuItem(
-                                        text = { Text(stringResource(R.string.server_update)) },
-                                        modifier = Modifier.testTag("geoShareServerListItemMenuDetail_${item.uuid}"),
-                                        onClick = {
-                                            expanded = false
-                                            onNavigateToContentKey(item.uid)
-                                        },
-                                    )
-                                }
+            SegmentedList(
+                values = all,
+                modifier = Modifier.padding(top = spacing.medium),
+                itemHeadline = { item -> item.name },
+                itemIsSelected = { item -> item.uid == destination },
+                itemOnClick = { item -> onNavigateToContentKey(item.uid) },
+                itemSupportingContent = { item ->
+                    if (item.isValid()) {
+                        item.description.takeIf { it.isNotEmpty() }?.let { description ->
+                            {
+                                Text(
+                                    description,
+                                    style = MaterialTheme.typography.bodySmall,
+                                )
                             }
-                        },
-                        supportingContent = if (!valid) {
-                            { Text(stringResource(R.string.server_invalid)) }
-                        } else {
-                            null
-                        },
-                        colors = colors,
-                    ) {
-                        Text(
-                            item.name,
-                            Modifier.testTag("geoShareServerListItemContent"),
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
+                        }
+                    } else {
+                        {
+                            Text(
+                                stringResource(R.string.server_invalid),
+                                fontStyle = FontStyle.Italic,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
                     }
-                }
-            }
+                },
+                itemTestTag = { "geoShareServerListItem_${it.uuid}" },
+            )
         }
         item {
             TextButton(
@@ -397,17 +340,27 @@ private fun ServerListPane(
 private fun ServerDetailPane(
     destination: Int,
     wide: Boolean,
-    baseUrl: String,
     apiKey: String,
     apiKeyHeader: String,
     authType: ServerAuthType,
+    challengeUrl: String,
+    loginUrl: String,
+    name: String,
+    description: String,
+    registerUrl: String,
+    urlTemplate: String,
     onBack: () -> Unit,
     onDelete: () -> Unit,
     onSaveForm: () -> Unit,
     onSetApiKey: (String) -> Unit,
     onSetApiKeyHeader: (String) -> Unit,
     onSetAuthType: (ServerAuthType) -> Unit,
-    onSetBaseUrl: (String) -> Unit,
+    onSetChallengeUrl: (String) -> Unit,
+    onSetDescription: (String) -> Unit,
+    onSetLoginUrl: (String) -> Unit,
+    onSetName: (String) -> Unit,
+    onSetRegisterUrl: (String) -> Unit,
+    onSetUrlTemplate: (String) -> Unit,
 ) {
     val spacing = LocalSpacing.current
     val (deleteDialogOpen, setDeleteDialogOpen) = retain { mutableStateOf(false) }
@@ -443,12 +396,22 @@ private fun ServerDetailPane(
                         apiKey = apiKey,
                         apiKeyHeader = apiKeyHeader,
                         authType = authType,
-                        baseUrl = baseUrl,
+                        challengeUrl = challengeUrl,
+                        description = description,
+                        loginUrl = loginUrl,
+                        name = name,
+                        registerUrl = registerUrl,
+                        urlTemplate = urlTemplate,
                         onSaveForm = onSaveForm,
                         onSetApiKey = onSetApiKey,
                         onSetApiKeyHeader = onSetApiKeyHeader,
                         onSetAuthType = onSetAuthType,
-                        onSetBaseUrl = onSetBaseUrl,
+                        onSetChallengeUrl = onSetChallengeUrl,
+                        onSetLoginUrl = onSetLoginUrl,
+                        onSetName = onSetName,
+                        onSetDescription = onSetDescription,
+                        onSetRegisterUrl = onSetRegisterUrl,
+                        onSetUrlTemplate = onSetUrlTemplate,
                         modifier = Modifier
                             .width(600.dp)
                             .padding(top = spacing.smallAdaptive, bottom = spacing.tinyAdaptive),
@@ -472,7 +435,7 @@ private fun ServerDetailPane(
                 .semantics { testTagsAsResourceId = true }
                 .testTag("geoShareServerDeleteDialog"),
         ) {
-            Text(stringResource(R.string.server_delete_text, baseUrl))
+            Text(stringResource(R.string.server_delete_text, name))
         }
     }
 }
@@ -488,23 +451,31 @@ private fun DefaultPreview() {
                 ServerScreen(
                     destination = null,
                     all = defaultFakeServers,
-                    selected = null,
                     message = null,
                     apiKey = "",
                     apiKeyHeader = "",
                     authType = ServerAuthType.API_KEY,
-                    baseUrl = "",
+                    challengeUrl = "",
+                    description = "",
+                    loginUrl = "",
+                    name = "",
+                    registerUrl = "",
+                    urlTemplate = "",
                     onBack = {},
                     onDelete = {},
                     onDismissMessage = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
-                    onSelect = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
-                    onSetBaseUrl = {},
+                    onSetChallengeUrl = {},
+                    onSetDescription = {},
+                    onSetLoginUrl = {},
+                    onSetName = {},
+                    onSetRegisterUrl = {},
+                    onSetUrlTemplate = {},
                 )
             }
         }
@@ -520,23 +491,31 @@ private fun DarkPreview() {
                 ServerScreen(
                     destination = null,
                     all = defaultFakeServers,
-                    selected = null,
                     message = null,
                     apiKey = "",
                     apiKeyHeader = "",
                     authType = ServerAuthType.API_KEY,
-                    baseUrl = "",
+                    challengeUrl = "",
+                    description = "",
+                    loginUrl = "",
+                    name = "",
+                    registerUrl = "",
+                    urlTemplate = "",
                     onBack = {},
                     onDelete = {},
                     onDismissMessage = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
-                    onSelect = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
-                    onSetBaseUrl = {},
+                    onSetChallengeUrl = {},
+                    onSetDescription = {},
+                    onSetLoginUrl = {},
+                    onSetName = {},
+                    onSetRegisterUrl = {},
+                    onSetUrlTemplate = {},
                 )
             }
         }
@@ -552,23 +531,31 @@ private fun TabletPreview() {
                 ServerScreen(
                     destination = null,
                     all = defaultFakeServers,
-                    selected = null,
                     message = null,
                     apiKey = "",
                     apiKeyHeader = "",
                     authType = ServerAuthType.API_KEY,
-                    baseUrl = "",
+                    challengeUrl = "",
+                    description = "",
+                    loginUrl = "",
+                    name = "",
+                    registerUrl = "",
+                    urlTemplate = "",
                     onBack = {},
                     onDelete = {},
                     onDismissMessage = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
-                    onSelect = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
-                    onSetBaseUrl = {},
+                    onSetChallengeUrl = {},
+                    onSetDescription = {},
+                    onSetLoginUrl = {},
+                    onSetName = {},
+                    onSetRegisterUrl = {},
+                    onSetUrlTemplate = {},
                 )
             }
         }
@@ -584,23 +571,31 @@ private fun InsertPreview() {
                 ServerScreen(
                     destination = -1,
                     all = defaultFakeServers,
-                    selected = null,
                     message = null,
                     apiKey = "",
                     apiKeyHeader = "",
-                    authType = ServerAuthType.ATTESTATION,
-                    baseUrl = "",
+                    authType = ServerAuthType.API_KEY,
+                    challengeUrl = "",
+                    description = "",
+                    loginUrl = "",
+                    name = "",
+                    registerUrl = "",
+                    urlTemplate = "",
                     onBack = {},
                     onDelete = {},
                     onDismissMessage = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
-                    onSelect = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
-                    onSetBaseUrl = {},
+                    onSetChallengeUrl = {},
+                    onSetDescription = {},
+                    onSetLoginUrl = {},
+                    onSetName = {},
+                    onSetRegisterUrl = {},
+                    onSetUrlTemplate = {},
                 )
             }
         }
@@ -616,23 +611,31 @@ private fun DarkInsertPreview() {
                 ServerScreen(
                     destination = -1,
                     all = defaultFakeServers,
-                    selected = null,
                     message = null,
                     apiKey = "",
                     apiKeyHeader = "",
                     authType = ServerAuthType.ATTESTATION,
-                    baseUrl = "",
+                    challengeUrl = "",
+                    description = "",
+                    loginUrl = "",
+                    name = "",
+                    registerUrl = "",
+                    urlTemplate = "",
                     onBack = {},
                     onDelete = {},
                     onDismissMessage = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
-                    onSelect = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
-                    onSetBaseUrl = {},
+                    onSetChallengeUrl = {},
+                    onSetDescription = {},
+                    onSetLoginUrl = {},
+                    onSetName = {},
+                    onSetRegisterUrl = {},
+                    onSetUrlTemplate = {},
                 )
             }
         }
@@ -649,23 +652,31 @@ private fun TabletInsertPreview() {
                 ServerScreen(
                     destination = -1,
                     all = defaultFakeServers,
-                    selected = null,
                     message = null,
                     apiKey = "",
                     apiKeyHeader = "",
                     authType = ServerAuthType.ATTESTATION,
-                    baseUrl = "",
+                    challengeUrl = "",
+                    description = "",
+                    loginUrl = "",
+                    name = "",
+                    registerUrl = "",
+                    urlTemplate = "",
                     onBack = {},
                     onDelete = {},
                     onDismissMessage = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
-                    onSelect = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
-                    onSetBaseUrl = {},
+                    onSetChallengeUrl = {},
+                    onSetDescription = {},
+                    onSetLoginUrl = {},
+                    onSetName = {},
+                    onSetRegisterUrl = {},
+                    onSetUrlTemplate = {},
                 )
             }
         }
@@ -679,27 +690,35 @@ private fun UpdatePreview() {
     AppTheme {
         Surface {
             Column {
-                val item = FakeGoogleMapsServer
+                val item = FakeGoogleMapsAddressServer
                 ServerScreen(
                     destination = item.uid,
                     all = defaultFakeServers,
-                    selected = null,
                     message = null,
                     apiKey = item.apiKey,
                     apiKeyHeader = item.apiKeyHeader,
                     authType = item.authType,
-                    baseUrl = item.baseUrl,
+                    challengeUrl = item.challengeUrl,
+                    description = item.description,
+                    loginUrl = item.loginUrl,
+                    name = item.name,
+                    registerUrl = item.registerUrl,
+                    urlTemplate = item.urlTemplate,
                     onBack = {},
                     onDelete = {},
                     onDismissMessage = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
-                    onSelect = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
-                    onSetBaseUrl = {},
+                    onSetChallengeUrl = {},
+                    onSetDescription = {},
+                    onSetLoginUrl = {},
+                    onSetName = {},
+                    onSetRegisterUrl = {},
+                    onSetUrlTemplate = {},
                 )
             }
         }
@@ -713,27 +732,35 @@ private fun DarkUpdatePreview() {
     AppTheme {
         Surface {
             Column {
-                val item = FakeGoogleMapsServer
+                val item = FakeGoogleMapsAddressServer
                 ServerScreen(
                     destination = item.uid,
                     all = defaultFakeServers,
-                    selected = null,
                     message = null,
                     apiKey = item.apiKey,
                     apiKeyHeader = item.apiKeyHeader,
                     authType = item.authType,
-                    baseUrl = item.baseUrl,
+                    challengeUrl = item.challengeUrl,
+                    description = item.description,
+                    loginUrl = item.loginUrl,
+                    name = item.name,
+                    registerUrl = item.registerUrl,
+                    urlTemplate = item.urlTemplate,
                     onBack = {},
                     onDelete = {},
                     onDismissMessage = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
-                    onSelect = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
-                    onSetBaseUrl = {},
+                    onSetChallengeUrl = {},
+                    onSetDescription = {},
+                    onSetLoginUrl = {},
+                    onSetName = {},
+                    onSetRegisterUrl = {},
+                    onSetUrlTemplate = {},
                 )
             }
         }
@@ -747,27 +774,35 @@ private fun TabletUpdatePreview() {
     AppTheme {
         Surface {
             Column {
-                val item = FakeGoogleMapsServer
+                val item = FakeGoogleMapsAddressServer
                 ServerScreen(
                     destination = item.uid,
                     all = defaultFakeServers,
-                    selected = null,
                     message = null,
                     apiKey = item.apiKey,
                     apiKeyHeader = item.apiKeyHeader,
                     authType = item.authType,
-                    baseUrl = item.baseUrl,
+                    challengeUrl = item.challengeUrl,
+                    description = item.description,
+                    loginUrl = item.loginUrl,
+                    name = item.name,
+                    registerUrl = item.registerUrl,
+                    urlTemplate = item.urlTemplate,
                     onBack = {},
                     onDelete = {},
                     onDismissMessage = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
-                    onSelect = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
-                    onSetBaseUrl = {},
+                    onSetChallengeUrl = {},
+                    onSetDescription = {},
+                    onSetLoginUrl = {},
+                    onSetName = {},
+                    onSetRegisterUrl = {},
+                    onSetUrlTemplate = {},
                 )
             }
         }

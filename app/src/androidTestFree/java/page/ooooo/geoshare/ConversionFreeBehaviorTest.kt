@@ -2,11 +2,18 @@ package page.ooooo.geoshare
 
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.runBlocking
+import org.junit.Before
 import org.junit.Test
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
 
-class ConversionFreeBehaviorTest : BehaviorTest {
+class ConversionFreeBehaviorTest {
+    @Before
+    fun goToLauncher() = uiAutomator {
+        // Start from the home screen
+        pressHome()
+    }
+
     @Test
     fun whenLinkWithNameOnlyIsSharedAndPermissionIsGrantedWithoutDoNotAsk_showsPointAndShowsDialogAgain() =
         uiAutomator {

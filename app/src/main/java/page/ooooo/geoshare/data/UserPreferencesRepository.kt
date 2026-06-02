@@ -37,8 +37,8 @@ class DefaultUserPreferencesRepository @Inject constructor(
             UserPreferencesValues(
                 automation = AutomationPreference.getValue(it),
                 automationDelay = AutomationDelayPreference.getValue(it),
-                cachedApiToken = CachedApiTokenPreference.getValue(it),
                 cachedPurchase = CachedPurchasePreference.getValue(it),
+                cachedServerToken = CachedServerTokenPreference.getValue(it),
                 changelogShownForVersionCode = ChangelogShownForVersionCodePreference.getValue(it),
                 connectionPermission = ConnectionPermissionPreference.getValue(it),
                 coordinateFormat = CoordinateFormatPreference.getValue(it),

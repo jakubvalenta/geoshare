@@ -10,13 +10,11 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
@@ -70,16 +68,14 @@ fun <T> SegmentedList(
                     enabled = itemEnabled?.invoke(value) ?: true,
                     leadingContent = itemLeadingContent?.invoke(value),
                     trailingContent = itemTrailingContent?.invoke(value),
-                    supportingContent = itemSupportingContent?.invoke(value)?.let { supportingContent ->
-                        {
-                            CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
-                                supportingContent()
-                            }
-                        }
-                    },
+                    supportingContent = itemSupportingContent?.invoke(value),
                     colors = colors,
                 ) {
-                    Text(headline, style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        headline,
+                        Modifier.testTag("geoShareSegmentedListItemContent"),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                 }
             }
     }

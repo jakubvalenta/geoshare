@@ -4,12 +4,13 @@ import androidx.test.uiautomator.uiAutomator
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import page.ooooo.geoshare.BehaviorTest.Companion.NETWORK_TIMEOUT
+import page.ooooo.geoshare.NETWORK_TIMEOUT
+import page.ooooo.geoshare.assumeDomainResolvable
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
 
-class BaiduMapInputBehaviorTest : InputBehaviorTest {
+class BaiduMapInputBehaviorTest {
     @Test
     fun baiduMap() = uiAutomator {
         // Map center

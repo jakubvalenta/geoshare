@@ -3,10 +3,11 @@ package page.ooooo.geoshare.inputs
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
+import page.ooooo.geoshare.assumeDomainResolvable
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-class YandexMapsInputBehaviorTest : InputBehaviorTest {
+class YandexMapsInputBehaviorTest {
     @Test
     fun yandexMaps() = uiAutomator {
         // Coordinates

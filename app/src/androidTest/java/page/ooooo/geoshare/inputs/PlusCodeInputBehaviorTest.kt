@@ -6,7 +6,7 @@ import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-class PlusCodeInputBehaviorTest : InputBehaviorTest {
+class PlusCodeInputBehaviorTest {
     @Test
     fun plusCode() = uiAutomator {
         // Global code as URL https://plus.codes
