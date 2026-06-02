@@ -88,7 +88,7 @@ class GoogleMapsPlaceApiInputBehaviorTest(private val testServerParams: TestServ
             fallbackPoint = if (testServer is TestServer.Configured) {
                 null
             } else if (htmlParsingSupported) {
-                WGS84Point(47.5951518, -122.3316394, name = "Lumen Field", source = Source.API)
+                WGS84Point(47.5951518, -122.3316394, name = "Lumen Field", source = Source.URI)
             } else {
                 null
             },
