@@ -1,0 +1,2 @@
+- Fixed web browsers appearing on the conversion result screen.
+- Fixed the opening of All-In-One Maps.
