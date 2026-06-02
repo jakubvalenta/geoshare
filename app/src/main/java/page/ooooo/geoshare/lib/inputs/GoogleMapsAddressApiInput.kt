@@ -58,9 +58,7 @@ class GoogleMapsAddressApiInput @Inject constructor(
                 })
             }
         }
-        val query = parseQuery(data)
-            ?.let { cleanQuery(it) }
-            ?: return@parseResult
+        val query = parseQuery(data) ?: return@parseResult
         val res = try {
             client.use { client ->
                 client
@@ -98,6 +96,8 @@ class GoogleMapsAddressApiInput @Inject constructor(
     }
 
     private fun parseQuery(uri: Uri): String? = uri.run {
+        val qWithoutCoordsPattern = Regex("""(.+?)(?:[\s+]*@$LAT,$LON\s*)?""")
+
         // API directions
         // https://www.google.com/maps/dir/?origin={name}&destination={name}
         // API search
@@ -108,7 +108,7 @@ class GoogleMapsAddressApiInput @Inject constructor(
             "q",
             "query",
         )
-            .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull() }
+            .firstNotNullOfOrNull { key -> qWithoutCoordsPattern.matchEntire(queryParams[key])?.groupOrNull() }
             ?.let {
                 return it
             }
@@ -133,9 +133,6 @@ class GoogleMapsAddressApiInput @Inject constructor(
             else -> null
         }
     }
-
-    private fun cleanQuery(query: String): String =
-        query.replace(Regex("""\s*@$LAT,$LON\s*$"""), "")
 
     private companion object {
         private const val TAG = "GoogleMapsAddressApiInput"

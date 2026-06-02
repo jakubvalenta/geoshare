@@ -24,7 +24,6 @@ import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.network.ServerHttpClientFactory
 import page.ooooo.geoshare.lib.network.SocketTimeoutNetworkException
-import page.ooooo.geoshare.lib.network.UnknownNetworkException
 import java.net.SocketTimeoutException
 
 class GoogleMapsAddressApiInputTest {
@@ -129,7 +128,7 @@ class GoogleMapsAddressApiInputTest {
 
     @Test
     fun parse_whenQueryHasAppendedCoordinates_removesTheCoordinatesAndReturnsHighestRankedPoint() = runTest {
-        val query = "2088 Albion Rd @43.7481,-79.6332"
+        val query = "2088 Albion Rd+@43.7481,-79.6332"
         val cleanQuery = "2088 Albion Rd"
         val engine = MockEngine { request ->
             when (request.url.toString()) {
@@ -255,8 +254,8 @@ class GoogleMapsAddressApiInputTest {
         )
     }
 
-    @Test(expected = UnknownNetworkException::class)
-    fun parse_whenApiReturnsInvalidResponse_throwsException() = runTest {
+    @Test
+    fun parse_whenApiReturnsInvalidResponse_returnsNoPoints() = runTest {
         val serverRepository: FakeServerRepository = mock {
             on { getSelectedGoogleMaps() } doReturn server
         }
@@ -268,7 +267,10 @@ class GoogleMapsAddressApiInputTest {
             uriQuote = uriQuote,
         )
         val match = "https://maps.google.com/?q=invalid"
-        input.fetch(match) { data -> input.parse(data, match) }
+        assertEquals(
+            ParseResult(),
+            input.fetch(match) { data -> input.parse(data, match) },
+        )
     }
 
     @Test(expected = SocketTimeoutNetworkException::class)
