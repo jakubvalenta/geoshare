@@ -4,23 +4,18 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.LinkAnnotation
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextLinkStyles
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.BuildConfig
@@ -132,33 +127,15 @@ fun UserPreferenceServersControls(
         }
         item {
             val spacing = LocalSpacing.current
-            HorizontalDivider(Modifier.padding(vertical = spacing.mediumAdaptive))
-        }
-        item {
-            val spacing = LocalSpacing.current
-            Text(
-                buildAnnotatedString {
-                    withLink(
-                        LinkAnnotation.Clickable(
-                            "servers",
-                            styles = TextLinkStyles(
-                                SpanStyle(
-                                    color = MaterialTheme.colorScheme.tertiary,
-                                    textDecoration = TextDecoration.Underline
-                                )
-                            ),
-                        ) {
-                            onNavigateToServerScreen()
-                        }
-                    ) {
-                        append(stringResource(R.string.user_preferences_navigate_to_server_screen))
-                    }
-                },
-                Modifier
-                    .padding(bottom = spacing.tinyAdaptive)
-                    .testTag("geoShareUserPreferenceNavigateToServerList"),
-                style = MaterialTheme.typography.bodyMedium,
-            )
+            TextButton(
+                onClick = onNavigateToServerScreen,
+                modifier = Modifier
+                    .testTag("geoShareUserPreferenceNavigateToServerList")
+                    .padding(top = spacing.mediumAdaptive, bottom = spacing.tinyAdaptive),
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.tertiary),
+            ) {
+                Text(stringResource(R.string.user_preferences_navigate_to_server_screen))
+            }
         }
     }
 }
@@ -201,7 +178,7 @@ private fun DarkListItemPreview() {
     }
 }
 
-@Preview(showBackground = true, device = "spec:width=1080px,height=3200px,dpi=440")
+@Preview(showBackground = true, device = "spec:width=1080px,height=3500px,dpi=440")
 @Composable
 private fun ControlsPreview() {
     AppTheme {
@@ -226,7 +203,7 @@ private fun ControlsPreview() {
 
 @Preview(
     showBackground = true,
-    device = "spec:width=1080px,height=3200px,dpi=440",
+    device = "spec:width=1080px,height=3500px,dpi=440",
     uiMode = Configuration.UI_MODE_NIGHT_YES,
 )
 @Composable

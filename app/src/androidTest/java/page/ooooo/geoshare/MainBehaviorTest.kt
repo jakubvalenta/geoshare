@@ -1,7 +1,6 @@
 package page.ooooo.geoshare
 
 import androidx.test.uiautomator.uiAutomator
-import org.junit.Before
 import org.junit.Test
 import page.ooooo.geoshare.inputs.testText
 import page.ooooo.geoshare.lib.android.PackageNames

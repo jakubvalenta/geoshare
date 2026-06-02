@@ -2,7 +2,6 @@ package page.ooooo.geoshare
 
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.runBlocking
-import org.junit.Before
 import org.junit.Test
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source

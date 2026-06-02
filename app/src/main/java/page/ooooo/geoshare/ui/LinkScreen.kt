@@ -417,7 +417,7 @@ private fun LinkListPane(
                 modifier = Modifier
                     .testTag("geoShareLinkRestoreInitialButton")
                     .padding(top = spacing.mediumAdaptive, bottom = spacing.tinyAdaptive),
-                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
             ) {
                 Text(stringResource(R.string.links_restore_initial_data))
             }

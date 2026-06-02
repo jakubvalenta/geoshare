@@ -317,7 +317,7 @@ private fun ServerListPane(
                 modifier = Modifier
                     .testTag("geoShareServerRestoreInitialButton")
                     .padding(top = spacing.mediumAdaptive, bottom = spacing.tinyAdaptive),
-                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
             ) {
                 Text(stringResource(R.string.server_restore_initial_data))
             }
