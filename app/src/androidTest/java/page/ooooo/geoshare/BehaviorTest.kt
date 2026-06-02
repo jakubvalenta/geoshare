@@ -508,13 +508,15 @@ fun UiAutomatorTestScope.mockLocation(block: MockLocationScope.() -> Unit) {
     }
 }
 
-fun UiAutomatorTestScope.configureGoogleMapsServer(server: Server?) {
+fun UiAutomatorTestScope.configureServer(server: Server?) {
     // Go to Google Maps Server preferences
-    goToUserPreferencesDetail(UserPreferenceGroupId.SERVER_GOOGLE_MAPS)
+    goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
 
     if (server != null) {
         // Go to server list
-        onElement { viewIdResourceName == "geoShareUserPreferenceNavigateToServerList" }.click()
+        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }.apply {
+            scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceNavigateToServerList" }.click()
+        }
 
         // Insert a new server
         onElement { viewIdResourceName == "geoShareServerListInsert" }.click()
@@ -526,5 +528,8 @@ fun UiAutomatorTestScope.configureGoogleMapsServer(server: Server?) {
     }
 
     // Select the server
-    onElement { viewIdResourceName == "geoShareUserPreferenceServer_${server?.name}" }.click()
+    onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }.apply {
+        scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServerGoogleMapsAddress_${server?.name}" }.click()
+        scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServerGoogleMapsPlace_${server?.name}" }.click()
+    }
 }

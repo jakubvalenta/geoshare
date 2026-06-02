@@ -5,12 +5,6 @@ import org.junit.Before
 import org.junit.Test
 
 class IntroBehaviorTest {
-    @Before
-    fun goToLauncher() = uiAutomator {
-        // Start from the home screen
-        pressHome()
-    }
-
     @Test
     fun whenAppIsOpenTwice_isVisibleOnlyFirstTime() = uiAutomator {
         // Launch app

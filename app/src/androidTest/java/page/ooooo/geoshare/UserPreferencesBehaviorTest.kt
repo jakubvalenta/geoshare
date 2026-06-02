@@ -19,12 +19,6 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
 class UserPreferencesBehaviorTest {
-    @Before
-    fun goToLauncher() = uiAutomator {
-        // Start from the home screen
-        pressHome()
-    }
-
     @Test
     fun whenCoordinateFormatIsSet_showsCoordinatesInThatFormat() = uiAutomator {
         val context = InstrumentationRegistry.getInstrumentation().targetContext

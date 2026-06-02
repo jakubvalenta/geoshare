@@ -22,12 +22,6 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 import kotlin.time.Duration.Companion.seconds
 
 class ConversionBehaviorTest {
-    @Before
-    fun goToLauncher() = uiAutomator {
-        // Start from the home screen
-        pressHome()
-    }
-
     @Test
     fun whenFullUriIsShared_showsPointAndAllowsOpeningGoogleMaps() = uiAutomator {
         assumeAppInstalled(PackageNames.GOOGLE_MAPS)

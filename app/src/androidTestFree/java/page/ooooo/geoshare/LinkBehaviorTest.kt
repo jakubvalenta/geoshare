@@ -12,12 +12,6 @@ import org.junit.Test
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
 class LinkBehaviorTest {
-    @Before
-    fun goToLauncher() = uiAutomator {
-        // Start from the home screen
-        pressHome()
-    }
-
     @Test
     fun whenLinkIsInserted_allowsCopyingIt() = uiAutomator {
         // Launch application and close intro

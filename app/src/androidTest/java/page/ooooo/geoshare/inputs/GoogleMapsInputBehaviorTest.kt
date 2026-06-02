@@ -13,7 +13,7 @@ import page.ooooo.geoshare.NotEmulator
 import page.ooooo.geoshare.assumeDomainResolvable
 import page.ooooo.geoshare.assumeHttpGetReturnsStatus
 import page.ooooo.geoshare.closeIntro
-import page.ooooo.geoshare.configureGoogleMapsServer
+import page.ooooo.geoshare.configureServer
 import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.data.local.preferences.Permission
@@ -220,7 +220,7 @@ class GoogleMapsInputBehaviorTest {
         waitForAppToBeVisible()
         closeIntro()
         configureConnectionPermissionPreference(Permission.ALWAYS)
-        configureGoogleMapsServer(server)
+        configureServer(server)
 
         // Search
         testUri(

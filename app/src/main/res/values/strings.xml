@@ -320,7 +320,8 @@
     <string name="server_description">Description</string>
     <string name="server_insert">Add server</string>
     <string name="server_invalid">Draft</string>
-    <string name="server_list_title">Servers</string>
+    <string name="server_list_description">Configure URLs and authentication of remote servers, which provide map link conversion.</string>
+    <string name="server_list_title">Server details</string>
     <string name="server_message_deleted">Server deleted</string>
     <string name="server_message_factory_reset">Server have been reset to factory defaults</string>
     <string name="server_message_inserted">Server added</string>
@@ -344,14 +345,15 @@
     <string name="user_preferences_apps_description">Choose which of your installed apps should be displayed after converting a map link to coordinates.</string>
     <string name="user_preferences_apps_message_hidden">The app has been hidden. You can show it again in preferences.</string>
     <string name="user_preferences_apps_title">Apps</string>
-    <string name="user_preferences_navigate_to_server_screen">Configure servers</string>
+    <string name="user_preferences_navigate_to_server_screen">Configure server details</string>
     <string name="user_preferences_section_input">Input</string>
     <string name="user_preferences_section_output">Output</string>
-    <string name="user_preferences_server_google_maps_description">Choose a server to provide the conversion of Google Maps links that don’t contain coordinates.</string>
-    <string name="user_preferences_server_google_maps_none_description">Use experimental extraction of coordinates from HTML</string>
-    <string name="user_preferences_server_google_maps_title">Google Maps Server</string>
-    <string name="user_preferences_server_search_description">Choose a server to provide the conversion of addresses and place names to coordinates, also known as geocoding.</string>
-    <string name="user_preferences_server_search_none_description">Search will not be available</string>
-    <string name="user_preferences_server_search_title">Search Server</string>
+    <string name="user_preferences_servers_description">Certain map links can’t be converted on your device but require a remote server. Choose which servers provide this functionality.</string>
+    <string name="user_preferences_servers_google_maps_address_title">Google Maps addresses</string>
+    <string name="user_preferences_servers_google_maps_none_description">Use experimental extraction of coordinates from HTML</string>
+    <string name="user_preferences_servers_google_maps_place_title">Google Maps place ids</string>
+    <string name="user_preferences_servers_search_none_description">Search will not be available</string>
+    <string name="user_preferences_servers_search_title">Search</string>
+    <string name="user_preferences_servers_title">API Servers</string>
     <string name="yes">Yes</string>
 </resources>

@@ -57,6 +57,7 @@ import page.ooooo.geoshare.ui.components.BasicListDetailScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
+import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.ScrollablePane
 import page.ooooo.geoshare.ui.components.SegmentedList
 import page.ooooo.geoshare.ui.components.ServerForm
@@ -260,6 +261,12 @@ private fun ServerListPane(
             .testTag("geoShareServerListPane"),
         containerColor = containerColor,
     ) {
+        item {
+            ParagraphText(
+                stringResource(R.string.server_list_description),
+                Modifier.padding(top = spacing.tinyAdaptive, bottom = spacing.smallAdaptive),
+            )
+        }
         item {
             Button(
                 { onNavigateToContentKey(-1) },

@@ -134,6 +134,13 @@ val FakeGoogleMapsAddressServer = Server(
     authType = ServerAuthType.API_KEY,
     apiKeyHeader = "X-Goog-Api-Key",
 )
+val FakeGoogleMapsPlaceServer = Server(
+    name = "Google Maps",
+    description = "Geocode Place",
+    urlTemplate = "https://geocode.googleapis.com/v4/geocode/places/{q}",
+    authType = ServerAuthType.API_KEY,
+    apiKeyHeader = "X-Goog-Api-Key",
+)
 
 /**
  * Items for testing purposes. The actual items that the table is populated with are in
@@ -141,5 +148,7 @@ val FakeGoogleMapsAddressServer = Server(
  */
 val defaultFakeServers = listOf(
     FakeGeoShareGoogleMapsAddressServer,
+    FakeGeoShareGoogleMapsPlaceServer,
     FakeGoogleMapsAddressServer,
+    FakeGoogleMapsPlaceServer,
 )

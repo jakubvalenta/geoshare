@@ -15,7 +15,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -140,7 +139,6 @@ fun LazyListScope.userPreferenceServerControls(
     servers: List<Server>,
     itemNoneDescription: @Composable () -> String,
     itemTestTag: ((item: Server?) -> String)? = null,
-    onNavigateToServerScreen: () -> Unit,
     onSelect: (Server?) -> Unit,
 ) {
     item {
@@ -177,17 +175,6 @@ fun LazyListScope.userPreferenceServerControls(
                     }
                 }
             }
-        }
-    }
-    item {
-        val spacing = LocalSpacing.current
-        TextButton(
-            onClick = { onNavigateToServerScreen() },
-            modifier = Modifier
-                .padding(top = spacing.mediumAdaptive, bottom = spacing.tinyAdaptive)
-                .testTag("geoShareUserPreferenceNavigateToServerList"),
-        ) {
-            Text(stringResource(R.string.user_preferences_navigate_to_server_screen))
         }
     }
 }

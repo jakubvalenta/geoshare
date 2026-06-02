@@ -60,6 +60,7 @@ import page.ooooo.geoshare.ui.components.UserPreferenceAutomationListItem
 import page.ooooo.geoshare.ui.components.UserPreferenceConnectionPermissionControls
 import page.ooooo.geoshare.ui.components.UserPreferenceConnectionPermissionListItem
 import page.ooooo.geoshare.ui.components.UserPreferenceCoordinateFormatControls
+import page.ooooo.geoshare.ui.components.UserPreferenceCoordinateFormatListItem
 import page.ooooo.geoshare.ui.components.UserPreferenceDeveloperOptionsControls
 import page.ooooo.geoshare.ui.components.UserPreferenceDeveloperOptionsListItem
 import page.ooooo.geoshare.ui.components.UserPreferenceHiddenAppsControls
@@ -187,9 +188,6 @@ private fun UserPreferenceScreen(
                 billingFeatures = billingFeatures,
                 containerColor = containerColor,
                 links = links,
-                selectedServerGoogleMapsAddress = selectedServerGoogleMapsAddress,
-                selectedServerGoogleMapsPlace = selectedServerGoogleMapsPlace,
-                selectedServerSearch = selectedServerSearch,
                 values = userPreferencesValues,
                 onBack = {
                     coroutineScope.launch {
@@ -259,9 +257,6 @@ private fun UserPreferenceListPane(
     billingStatus: BillingStatus,
     containerColor: Color,
     links: List<Link>,
-    selectedServerGoogleMapsAddress: Server?,
-    selectedServerGoogleMapsPlace: Server?,
-    selectedServerSearch: Server?,
     onBack: () -> Unit,
     onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
     onNavigateToGroup: (id: UserPreferenceGroupId) -> Unit,
@@ -293,7 +288,7 @@ private fun UserPreferenceListPane(
             ) {
                 UserPreferenceConnectionPermissionListItem(
                     index = 0,
-                    count = 3,
+                    count = 2,
                     selected = currentGroupId == UserPreferenceGroupId.CONNECTION_PERMISSION,
                     values = values,
                     modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.CONNECTION_PERMISSION}"),
@@ -303,9 +298,6 @@ private fun UserPreferenceListPane(
                     index = 1,
                     count = 2,
                     selected = currentGroupId == UserPreferenceGroupId.SERVERS,
-                    selectedServerGoogleMapsAddress = selectedServerGoogleMapsAddress,
-                    selectedServerGoogleMapsPlace = selectedServerGoogleMapsPlace,
-                    selectedServerSearch = selectedServerSearch,
                     values = values,
                     modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.SERVERS}"),
                     onClick = { onNavigateToGroup(UserPreferenceGroupId.SERVERS) },
@@ -357,7 +349,7 @@ private fun UserPreferenceListPane(
             ) {
                 UserPreferenceHiddenAppsListItem(
                     index = 0,
-                    count = 2,
+                    count = 3,
                     apps = apps,
                     selected = currentGroupId == UserPreferenceGroupId.HIDDEN_APPS,
                     values = values,
@@ -366,11 +358,19 @@ private fun UserPreferenceListPane(
                 )
                 UserPreferenceLinksListItem(
                     index = 1,
-                    count = 2,
+                    count = 3,
                     links = links,
                     selected = currentGroupId == UserPreferenceGroupId.LINKS,
                     modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.LINKS}"),
                     onClick = onNavigateToLinksScreen,
+                )
+                UserPreferenceCoordinateFormatListItem(
+                    index = 1,
+                    count = 2,
+                    selected = currentGroupId == UserPreferenceGroupId.COORDINATE_FORMAT,
+                    values = values,
+                    modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.COORDINATE_FORMAT}"),
+                    onClick = { onNavigateToGroup(UserPreferenceGroupId.COORDINATE_FORMAT) },
                 )
             }
         }

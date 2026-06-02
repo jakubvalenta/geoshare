@@ -28,6 +28,8 @@ class InitialServersTest : InitialDataTest {
                 challengeUrl = "https://api.geoshare-app.net/v1/auth/challenge",
                 loginUrl = "https://api.geoshare-app.net/v1/auth/login",
                 registerUrl = "https://api.geoshare-app.net/v1/auth/register",
+                selectedGoogleMapsAddress = true,
+                selectedSearch = true,
                 uuid = UUID.fromString("640f61e6-2bb4-41d3-9b4a-65e656564d03"),
             ),
             Server(
@@ -38,6 +40,7 @@ class InitialServersTest : InitialDataTest {
                 challengeUrl = "https://api.geoshare-app.net/v1/auth/challenge",
                 loginUrl = "https://api.geoshare-app.net/v1/auth/login",
                 registerUrl = "https://api.geoshare-app.net/v1/auth/register",
+                selectedGoogleMapsPlace = true,
                 uuid = UUID.fromString("e6f6ace9-0f52-42bd-86c4-f42cdebea60c"),
             ),
             Server(
