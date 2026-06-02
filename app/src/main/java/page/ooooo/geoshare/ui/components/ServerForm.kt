@@ -101,7 +101,6 @@ fun ServerForm(
             label = {
                 Text(stringResource(R.string.server_description))
             },
-            isError = description.isEmpty(),
             singleLine = true,
         )
         TextField(
