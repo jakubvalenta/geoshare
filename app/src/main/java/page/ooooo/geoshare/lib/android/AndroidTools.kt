@@ -134,7 +134,6 @@ object AndroidTools {
         PackageNames.SIGNAL,
         PackageNames.TELEGRAM,
         PackageNames.TELEGRAM_FORK,
-        PackageNames.SIGNAL,
         PackageNames.WHATSAPP,
     )
 
@@ -144,7 +143,12 @@ object AndroidTools {
                 packageManager,
                 Intent(Intent.ACTION_VIEW, "geo:".toUri()),
             )) {
-                getOrPut(packageName) { mutableSetOf() }.add(DataType.GEO_URI)
+                if (packageName != PackageNames.CARTES_IGN) {
+                    getOrPut(packageName) { mutableSetOf() }.add(DataType.GEO_URI)
+                } else {
+                    // Replace geo: URIs with HTTPs URLs for Cartes IGN, because it doesn't support geo: URIs well
+                    getOrPut(packageName) { mutableSetOf() }.add(DataType.CARTES_IGN_URL)
+                }
             }
             for (packageName in queryPackageNames(
                 packageManager,
@@ -157,16 +161,6 @@ object AndroidTools {
                 Intent(Intent.ACTION_VIEW, "google.streetview:".toUri()),
             )) {
                 getOrPut(packageName) { mutableSetOf() }.add(DataType.GOOGLE_STREET_VIEW_URI)
-            }
-            for (packageName in queryPackageNames(
-                packageManager,
-                Intent(Intent.ACTION_VIEW, "https://cartes-ign.ign.fr".toUri()),
-            )) {
-                getOrPut(packageName) { mutableSetOf() }.apply {
-                    add(DataType.CARTES_IGN_URL)
-                    // Remove support for geo: URIs from the Cartes IGN app, because it doesn't support these URIs well
-                    remove(DataType.GEO_URI)
-                }
             }
             for (packageName in queryPackageNames(
                 packageManager,
