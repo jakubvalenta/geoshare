@@ -76,7 +76,6 @@ class GoogleMapsAddressApiInput @Inject constructor(
             if (tr.cause is JsonConvertException) {
                 // Google returns a JSON without the 'results' property when no coordinates are found, so let's do
                 // nothing in this case
-                // TODO Test GoogleMapsAddressApiInput empty JSON response
                 log.i(TAG, "API returned no results")
                 return@parseResult
             }

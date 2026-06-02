@@ -347,7 +347,7 @@ class GoogleMapsInputBehaviorTest {
         // Directions address
         testUri(
             if (server != null) {
-                WGS84Point(43.7481582, -79.6332316, name = "2088 Albion Rd @43.7481,-79.6332", source = Source.API)
+                WGS84Point(43.7481582, -79.6332316, name = "2088 Albion Rd", source = Source.API)
             } else if (htmlParsingSupported) {
                 WGS84Point(43.7481, -79.6332, name = "2088 Albion Rd @43.7481,-79.6332", source = Source.HTML)
             } else {

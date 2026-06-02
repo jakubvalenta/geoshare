@@ -22,8 +22,10 @@ import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.network.ResponseNetworkException
 import page.ooooo.geoshare.lib.network.ServerHttpClientFactory
 import page.ooooo.geoshare.lib.network.SocketTimeoutNetworkException
+import page.ooooo.geoshare.lib.network.UnknownNetworkException
 import java.net.SocketTimeoutException
 
 class GoogleMapsAddressApiInputTest {
@@ -44,27 +46,27 @@ class GoogleMapsAddressApiInputTest {
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
 
-            server.getUrl("nothing", uriQuote) -> respond(
+            server.getUrl("empty-results", uriQuote) -> respond(
                 // language=Json
-                """
-                    {
-                        "results": []
-                    }
-                """.trimIndent(),
+                """{"results": []}""",
+                headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
+            )
+
+            server.getUrl("empty-object", uriQuote) -> respond(
+                // language=Json
+                """{}""",
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
 
             server.getUrl("invalid", uriQuote) -> respond(
                 // language=Json
-                """
-                    {
-                        "results": "invalid"
-                    }
-                """.trimIndent(),
+                """{"results": "invalid"}""",
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
 
             server.getUrl("exception", uriQuote) -> throw SocketTimeoutException()
+
+            server.getUrl("unknown-exception", uriQuote) -> throw IllegalArgumentException()
 
             server.getUrl("not-found", uriQuote) -> respondError(HttpStatusCode.NotFound)
 
@@ -236,7 +238,7 @@ class GoogleMapsAddressApiInputTest {
     }
 
     @Test
-    fun parse_whenApiReturnsNoResults_returnsNoPoints() = runTest {
+    fun parse_whenApiReturnsEmptyResults_returnsNoPoints() = runTest {
         val serverRepository: FakeServerRepository = mock {
             on { getSelectedGoogleMaps() } doReturn server
         }
@@ -247,7 +249,26 @@ class GoogleMapsAddressApiInputTest {
             log = log,
             uriQuote = uriQuote,
         )
-        val match = "https://maps.google.com/?q=nothing"
+        val match = "https://maps.google.com/?q=empty-results"
+        assertEquals(
+            ParseResult(),
+            input.fetch(match) { data -> input.parse(data, match) },
+        )
+    }
+
+    @Test
+    fun parse_whenApiReturnsEmptyObject_returnsNoPoints() = runTest {
+        val serverRepository: FakeServerRepository = mock {
+            on { getSelectedGoogleMaps() } doReturn server
+        }
+        val input = GoogleMapsAddressApiInput(
+            serverRepository = serverRepository,
+            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
+            googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
+            log = log,
+            uriQuote = uriQuote,
+        )
+        val match = "https://maps.google.com/?q=empty-object"
         assertEquals(
             ParseResult(),
             input.fetch(match) { data -> input.parse(data, match) },
@@ -273,8 +294,24 @@ class GoogleMapsAddressApiInputTest {
         )
     }
 
+    @Test(expected = ResponseNetworkException::class)
+    fun parse_whenApiReturns404_throwException() = runTest {
+        val serverRepository: FakeServerRepository = mock {
+            on { getSelectedGoogleMaps() } doReturn server
+        }
+        val input = GoogleMapsAddressApiInput(
+            serverRepository = serverRepository,
+            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
+            googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
+            log = log,
+            uriQuote = uriQuote,
+        )
+        val match = "https://maps.google.com/?q=not-found"
+        input.fetch(match) { data -> input.parse(data, match) }
+    }
+
     @Test(expected = SocketTimeoutNetworkException::class)
-    fun parse_whenApiThrowsException_throwsException() = runTest {
+    fun parse_whenApiThrowsKnownException_throwsNetworkException() = runTest {
         val serverRepository: FakeServerRepository = mock {
             on { getSelectedGoogleMaps() } doReturn server
         }
@@ -286,6 +323,22 @@ class GoogleMapsAddressApiInputTest {
             uriQuote = uriQuote,
         )
         val match = "https://maps.google.com/?q=exception"
+        input.fetch(match) { data -> input.parse(data, match) }
+    }
+
+    @Test(expected = UnknownNetworkException::class)
+    fun parse_whenApiThrowsUnknownException_throwsUnknownNetworkException() = runTest {
+        val serverRepository: FakeServerRepository = mock {
+            on { getSelectedGoogleMaps() } doReturn server
+        }
+        val input = GoogleMapsAddressApiInput(
+            serverRepository = serverRepository,
+            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
+            googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
+            log = log,
+            uriQuote = uriQuote,
+        )
+        val match = "https://maps.google.com/?q=unknown-exception"
         input.fetch(match) { data -> input.parse(data, match) }
     }
 }

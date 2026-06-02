@@ -75,7 +75,6 @@ class GoogleMapsPlaceApiInput @Inject constructor(
         } catch (tr: ResponseNetworkException) {
             if (tr.response.status == HttpStatusCode.BadRequest) {
                 // Google returns error 400 when the place id is incorrect, so let's do nothing in this case
-                // TODO Test GoogleMapsPlaceApiInput response 400
                 log.i(TAG, "API returned no results")
                 return@parseResult
             }
