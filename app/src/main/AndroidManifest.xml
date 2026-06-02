@@ -17,12 +17,6 @@
         </intent>
         <intent>
             <action android:name="android.intent.action.VIEW" />
-            <data
-                android:scheme="https"
-                android:host="osmand.net" />
-        </intent>
-        <intent>
-            <action android:name="android.intent.action.VIEW" />
             <data android:scheme="magicearth" />
         </intent>
         <intent>
