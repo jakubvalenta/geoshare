@@ -35,13 +35,19 @@ class ServerViewModel @Inject constructor(
             SharingStarted.WhileSubscribed(5000),
             emptyList(),
         )
-    val selectedGoogleMaps: StateFlow<Server?> = serverRepository.selectedGoogleMapsAddress
+    val selectedServerGoogleMapsAddress: StateFlow<Server?> = serverRepository.selectedGoogleMapsAddress
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
             null,
         )
-    val selectedSearch: StateFlow<Server?> = serverRepository.selectedSearch
+    val selectedServerGoogleMapsPlace: StateFlow<Server?> = serverRepository.selectedGoogleMapsPlace
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            null,
+        )
+    val selectedServerSearch: StateFlow<Server?> = serverRepository.selectedSearch
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
@@ -180,13 +186,19 @@ class ServerViewModel @Inject constructor(
         }
     }
 
-    fun selectGoogleMaps(uid: Int?) {
+    fun selectServerGoogleMapsAddress(uid: Int?) {
         viewModelScope.launch(Dispatchers.IO) {
             serverRepository.unselectAllGoogleMapsAddressAndSelect(uid)
         }
     }
 
-    fun selectSearch(uid: Int?) {
+    fun selectServerGoogleMapsPlace(uid: Int?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            serverRepository.unselectAllGoogleMapsPlaceAndSelect(uid)
+        }
+    }
+
+    fun selectServerSearch(uid: Int?) {
         viewModelScope.launch(Dispatchers.IO) {
             serverRepository.unselectAllSearchAndSelect(uid)
         }

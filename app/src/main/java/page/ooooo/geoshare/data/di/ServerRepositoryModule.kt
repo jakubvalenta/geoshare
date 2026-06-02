@@ -111,8 +111,17 @@ class FakeServerRepository(
 
 val FakeGeoShareGoogleMapsAddressServer = Server(
     name = "GeoShare Proxy",
-    description = "With Google Maps backend",
+    description = "Google Maps Geocode Address backend",
     urlTemplate = "https://api.geoshare-app.net/v1/google-maps/geocode/address/{q}",
+    authType = ServerAuthType.ATTESTATION,
+    challengeUrl = "https://api.geoshare-app.net/v1/auth/challenge",
+    loginUrl = "https://api.geoshare-app.net/v1/auth/login",
+    registerUrl = "https://api.geoshare-app.net/v1/auth/register",
+)
+val FakeGeoShareGoogleMapsPlaceServer = Server(
+    name = "GeoShare Proxy",
+    description = "Google Maps Geocode Place backend",
+    urlTemplate = "https://api.geoshare-app.net/v1/google-maps/geocode/places/{q}",
     authType = ServerAuthType.ATTESTATION,
     challengeUrl = "https://api.geoshare-app.net/v1/auth/challenge",
     loginUrl = "https://api.geoshare-app.net/v1/auth/login",
@@ -120,6 +129,7 @@ val FakeGeoShareGoogleMapsAddressServer = Server(
 )
 val FakeGoogleMapsAddressServer = Server(
     name = "Google Maps",
+    description = "Geocode Address",
     urlTemplate = "https://geocode.googleapis.com/v4/geocode/address/{q}",
     authType = ServerAuthType.API_KEY,
     apiKeyHeader = "X-Goog-Api-Key",

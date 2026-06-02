@@ -12,11 +12,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeGeoShareGoogleMapsAddressServer
+import page.ooooo.geoshare.data.di.FakeGeoShareGoogleMapsPlaceServer
 import page.ooooo.geoshare.data.di.defaultFakeServers
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.database.Server
@@ -27,11 +27,13 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun UserPreferenceServerGoogleMapsListItem(
+fun UserPreferenceServersListItem(
     index: Int,
     count: Int,
     selected: Boolean,
-    selectedServer: Server?,
+    selectedServerGoogleMapsAddress: Server?,
+    selectedServerGoogleMapsPlace: Server?,
+    selectedServerSearch: Server?,
     values: UserPreferencesValues,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
@@ -42,13 +44,6 @@ fun UserPreferenceServerGoogleMapsListItem(
         shapes = ListItemDefaults.segmentedShapes(index, count),
         modifier = modifier,
         enabled = ConnectionPermissionPreference.getValue(values) != Permission.NEVER,
-        supportingContent = {
-            Text(
-                selectedServer?.name ?: stringResource(R.string.server_none),
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 1,
-            )
-        },
         colors = segmentedListColors(),
     ) {
         Text(
@@ -59,15 +54,19 @@ fun UserPreferenceServerGoogleMapsListItem(
 }
 
 @Composable
-fun UserPreferenceServerGoogleMapsControls(
-    selected: Server?,
+fun UserPreferenceServersControls(
+    selectedServerGoogleMapsAddress: Server?,
+    selectedServerGoogleMapsPlace: Server?,
+    selectedServerSearch: Server?,
     servers: List<Server>,
     wide: Boolean,
     billingAppNameResId: Int,
     onBack: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     onNavigateToServerScreen: () -> Unit,
-    onSelect: (Server?) -> Unit,
+    onSelectServerGoogleMapsAddress: (Server?) -> Unit,
+    onSelectServerGoogleMapsPlace: (Server?) -> Unit,
+    onSelectServerSearch: (Server?) -> Unit,
 ) {
     UserPreferenceControls(
         titleResId = R.string.user_preferences_server_google_maps_title,
@@ -80,12 +79,34 @@ fun UserPreferenceServerGoogleMapsControls(
         onNavigateToBillingScreen = onNavigateToBillingScreen,
     ) {
         userPreferenceServerControls(
-            selected = selected,
+            selected = selectedServerGoogleMapsAddress,
             servers = servers,
             itemNoneDescription = { stringResource(R.string.user_preferences_server_google_maps_none_description) },
             itemTestTag = { item -> "geoShareUserPreferenceServer_${item?.name}" },
             onNavigateToServerScreen = onNavigateToServerScreen,
-            onSelect = onSelect,
+            onSelect = onSelectServerGoogleMapsAddress,
+        )
+        userPreferenceServerControls(
+            selected = selectedServerGoogleMapsPlace,
+            servers = servers,
+            itemNoneDescription = { "" }, // TODO
+            itemTestTag = { item -> "geoShareUserPreferenceServer_${item?.name}" },
+            onNavigateToServerScreen = onNavigateToServerScreen,
+            onSelect = onSelectServerGoogleMapsPlace,
+        )
+        item {
+            Text(stringResource(R.string.user_preferences_server_search_title))
+        }
+        item {
+            Text(stringResource(R.string.user_preferences_server_search_description))
+        }
+        userPreferenceServerControls(
+            selected = selectedServerSearch,
+            servers = servers,
+            itemNoneDescription = { stringResource(R.string.user_preferences_server_search_none_description) }, // TODO
+            itemTestTag = { item -> "geoShareUserPreferenceServer_${item?.name}" },
+            onNavigateToServerScreen = onNavigateToServerScreen,
+            onSelect = onSelectServerSearch,
         )
     }
 }
@@ -97,11 +118,13 @@ private fun ListItemPreview() {
     AppTheme {
         Surface {
             Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
-                UserPreferenceServerGoogleMapsListItem(
+                UserPreferenceServersListItem(
                     index = 0,
                     count = 1,
                     selected = false,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
+                    selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
+                    selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
                     values = defaultFakeUserPreferences,
                     onClick = {},
                 )
@@ -117,11 +140,13 @@ private fun DarkListItemPreview() {
     AppTheme {
         Surface {
             Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
-                UserPreferenceServerGoogleMapsListItem(
+                UserPreferenceServersListItem(
                     index = 0,
                     count = 1,
                     selected = false,
-                    selectedServer = FakeGeoShareGoogleMapsAddressServer,
+                    selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
+                    selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
+                    selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
                     values = defaultFakeUserPreferences,
                     onClick = {},
                 )
@@ -137,11 +162,13 @@ private fun NoneSelectedListItemPreview() {
     AppTheme {
         Surface {
             Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
-                UserPreferenceServerGoogleMapsListItem(
+                UserPreferenceServersListItem(
                     index = 0,
                     count = 1,
                     selected = false,
-                    selectedServer = null,
+                    selectedServerGoogleMapsAddress = null,
+                    selectedServerGoogleMapsPlace = null,
+                    selectedServerSearch = null,
                     values = defaultFakeUserPreferences,
                     onClick = {},
                 )
@@ -157,11 +184,13 @@ private fun DarkNoneSelectedListItemPreview() {
     AppTheme {
         Surface {
             Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
-                UserPreferenceServerGoogleMapsListItem(
+                UserPreferenceServersListItem(
                     index = 0,
                     count = 1,
                     selected = false,
-                    selectedServer = null,
+                    selectedServerGoogleMapsAddress = null,
+                    selectedServerGoogleMapsPlace = null,
+                    selectedServerSearch = null,
                     values = defaultFakeUserPreferences,
                     onClick = {},
                 )
@@ -175,15 +204,19 @@ private fun DarkNoneSelectedListItemPreview() {
 private fun ControlsPreview() {
     AppTheme {
         Surface {
-            UserPreferenceServerGoogleMapsControls(
+            UserPreferenceServersControls(
                 billingAppNameResId = R.string.app_name_pro,
-                selected = null,
+                selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
+                selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
+                selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
                 servers = defaultFakeServers,
                 wide = true,
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onNavigateToServerScreen = {},
-                onSelect = {},
+                onSelectServerGoogleMapsAddress = {},
+                onSelectServerGoogleMapsPlace = {},
+                onSelectServerSearch = {},
             )
         }
     }
@@ -194,15 +227,19 @@ private fun ControlsPreview() {
 private fun DarkControlsPreview() {
     AppTheme {
         Surface {
-            UserPreferenceServerGoogleMapsControls(
+            UserPreferenceServersControls(
                 billingAppNameResId = R.string.app_name_pro,
-                selected = FakeGeoShareGoogleMapsAddressServer,
+                selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
+                selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
+                selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
                 servers = defaultFakeServers,
                 wide = true,
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onNavigateToServerScreen = {},
-                onSelect = {},
+                onSelectServerGoogleMapsAddress = {},
+                onSelectServerGoogleMapsPlace = {},
+                onSelectServerSearch = {},
             )
         }
     }
@@ -213,15 +250,19 @@ private fun DarkControlsPreview() {
 private fun TabletControlsPreview() {
     AppTheme {
         Surface {
-            UserPreferenceServerGoogleMapsControls(
+            UserPreferenceServersControls(
                 billingAppNameResId = R.string.app_name_pro,
-                selected = FakeGeoShareGoogleMapsAddressServer,
+                selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
+                selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
+                selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
                 servers = defaultFakeServers,
                 wide = true,
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onNavigateToServerScreen = {},
-                onSelect = {},
+                onSelectServerGoogleMapsAddress = {},
+                onSelectServerGoogleMapsPlace = {},
+                onSelectServerSearch = {},
             )
         }
     }
@@ -232,15 +273,19 @@ private fun TabletControlsPreview() {
 private fun ControlsNoneSelectedPreview() {
     AppTheme {
         Surface {
-            UserPreferenceServerGoogleMapsControls(
+            UserPreferenceServersControls(
                 billingAppNameResId = R.string.app_name_pro,
-                selected = null,
+                selectedServerGoogleMapsAddress = null,
+                selectedServerGoogleMapsPlace = null,
+                selectedServerSearch = null,
                 servers = defaultFakeServers,
                 wide = true,
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onNavigateToServerScreen = {},
-                onSelect = {},
+                onSelectServerGoogleMapsAddress = {},
+                onSelectServerGoogleMapsPlace = {},
+                onSelectServerSearch = {},
             )
         }
     }
@@ -251,15 +296,19 @@ private fun ControlsNoneSelectedPreview() {
 private fun DarkNoneSelectedControlsPreview() {
     AppTheme {
         Surface {
-            UserPreferenceServerGoogleMapsControls(
+            UserPreferenceServersControls(
                 billingAppNameResId = R.string.app_name_pro,
-                selected = null,
+                selectedServerGoogleMapsAddress = null,
+                selectedServerGoogleMapsPlace = null,
+                selectedServerSearch = null,
                 servers = defaultFakeServers,
                 wide = true,
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onNavigateToServerScreen = {},
-                onSelect = {},
+                onSelectServerGoogleMapsAddress = {},
+                onSelectServerGoogleMapsPlace = {},
+                onSelectServerSearch = {},
             )
         }
     }
@@ -270,15 +319,19 @@ private fun DarkNoneSelectedControlsPreview() {
 private fun TabletNoneSelectedControlsPreview() {
     AppTheme {
         Surface {
-            UserPreferenceServerGoogleMapsControls(
+            UserPreferenceServersControls(
                 billingAppNameResId = R.string.app_name_pro,
-                selected = null,
+                selectedServerGoogleMapsAddress = null,
+                selectedServerGoogleMapsPlace = null,
+                selectedServerSearch = null,
                 servers = defaultFakeServers,
                 wide = true,
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onNavigateToServerScreen = {},
-                onSelect = {},
+                onSelectServerGoogleMapsAddress = {},
+                onSelectServerGoogleMapsPlace = {},
+                onSelectServerSearch = {},
             )
         }
     }
