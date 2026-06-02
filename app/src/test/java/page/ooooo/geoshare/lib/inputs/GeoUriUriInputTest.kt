@@ -17,6 +17,10 @@ class GeoUriUriInputTest : InputTest {
             "geo:50.123456,-11.123456?q=foo%20bar&z=3.4",
             input.match("geo:50.123456,-11.123456?q=foo%20bar&z=3.4")
         )
+        assertEquals(
+            "geo:52.47254,13.4345?q=52.47254,13.4345(My%20place)",
+            input.match("geo:52.47254,13.4345?q=52.47254,13.4345(My%20place)")
+        )
     }
 
     @Test

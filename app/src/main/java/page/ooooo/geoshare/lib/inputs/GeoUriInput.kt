@@ -21,7 +21,7 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 object GeoUriInput : UriInput, Input.HasRandomUri {
     private const val NAME_REGEX = """\((.+)\)"""
 
-    override val pattern = Regex("""(geo:$LAT_NUM,$LON_NUM\?q=$LAT_NUM,\s*$LON_NUM|geo:$URI_REST)""")
+    override val pattern = Regex("""(geo:$URI_REST)""")
     override val documentation = InputDocumentation(
         group = InputDocumentationGroup.GEO_URI,
         items = listOf(
