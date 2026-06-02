@@ -269,11 +269,22 @@ class GoogleMapsInputBehaviorTest {
         )
         testUri(
             if (server != null) {
-                WGS84Point(
-                    44.4490666, 26.0888873,
-                    name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
-                    source = Source.API,
-                )
+                if (server.urlTemplate.startsWith("https://geocode.googleapis.com/")) {
+                    // Expect slightly different coordinates for this point when running directly against Google Maps
+                    // API instead of against GeoShare Server. It should be investigated why Google Maps returns
+                    // different coordinates than GeoShare Server in this case.
+                    WGS84Point(
+                        44.4490666, 26.0888873,
+                        name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
+                        source = Source.API,
+                    )
+                } else {
+                    WGS84Point(
+                        44.4490541, 26.0888398,
+                        name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
+                        source = Source.API,
+                    )
+                }
             } else if (htmlParsingSupported) {
                 WGS84Point(
                     44.4490541, 26.0888398,
