@@ -2,15 +2,27 @@
   "formatVersion": 1,
   "database": {
     "version": 8,
-    "identityHash": "991a0dfa9e07e0e962fc06dbf294aa89",
+    "identityHash": "205a6c81696cfd84ba9f2e6c51102fbf",
     "entities": [
       {
         "tableName": "Server",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`baseUrl` TEXT NOT NULL, `authType` TEXT NOT NULL, `apiKey` TEXT NOT NULL, `apiKeyHeader` TEXT NOT NULL, `selected` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL, `uid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `uuid` BLOB NOT NULL DEFAULT (RANDOMBLOB(16)))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `description` TEXT NOT NULL, `urlTemplate` TEXT NOT NULL, `authType` TEXT NOT NULL, `apiKey` TEXT NOT NULL, `apiKeyHeader` TEXT NOT NULL, `challengeUrl` TEXT NOT NULL, `loginUrl` TEXT NOT NULL, `registerUrl` TEXT NOT NULL, `selectedGoogleMaps` INTEGER NOT NULL, `selectedSearch` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL, `uid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `uuid` BLOB NOT NULL DEFAULT (RANDOMBLOB(16)))",
         "fields": [
           {
-            "fieldPath": "baseUrl",
-            "columnName": "baseUrl",
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "urlTemplate",
+            "columnName": "urlTemplate",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -33,8 +45,32 @@
             "notNull": true
           },
           {
-            "fieldPath": "selected",
-            "columnName": "selected",
+            "fieldPath": "challengeUrl",
+            "columnName": "challengeUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "loginUrl",
+            "columnName": "loginUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "registerUrl",
+            "columnName": "registerUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "selectedGoogleMaps",
+            "columnName": "selectedGoogleMaps",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "selectedSearch",
+            "columnName": "selectedSearch",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -175,7 +211,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '991a0dfa9e07e0e962fc06dbf294aa89')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '205a6c81696cfd84ba9f2e6c51102fbf')"
     ]
   }
 }

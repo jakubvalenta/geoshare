@@ -8,7 +8,7 @@ import kotlin.uuid.Uuid
 @OptIn(ExperimentalUuidApi::class)
 object InitialLinks : InitialData {
     /**
-     * Delete all links and populate the table with initial links.
+     * Delete all links and populate the table with initial ones.
      *
      * When you change these links, you must:
      *

@@ -14,7 +14,8 @@ import javax.inject.Inject
 
 interface ServerRepository {
     val all: Flow<List<Server>>
-    val selected: Flow<Server?>
+    val selectedGoogleMaps: Flow<Server?>
+    val selectedSearch: Flow<Server?>
 
     suspend fun getAll(): List<Server>
 
@@ -22,7 +23,9 @@ interface ServerRepository {
 
     suspend fun getByUUID(uuid: UUID): Server?
 
-    suspend fun getSelected(): Server?
+    suspend fun getSelectedGoogleMaps(): Server?
+
+    suspend fun getSelectedSearch(): Server?
 
     suspend fun insert(server: Server): Long
 
@@ -30,7 +33,9 @@ interface ServerRepository {
 
     suspend fun delete(server: Server)
 
-    suspend fun unselectAllAndSelect(uid: Int?)
+    suspend fun unselectAllGoogleMapsAndSelect(uid: Int?)
+
+    suspend fun unselectAllSearchAndSelect(uid: Int?)
 
     suspend fun restoreInitialData()
 }
@@ -46,7 +51,10 @@ class DefaultServerRepository @Inject constructor(
     override val all: Flow<List<Server>> = serverDao.getAllFlow()
         .shareIn(applicationScope, SharingStarted.WhileSubscribed(5000), replay = 1)
 
-    override val selected: Flow<Server?> = serverDao.getSelectedFlow()
+    override val selectedGoogleMaps: Flow<Server?> = serverDao.getSelectedGoogleMapsFlow()
+        .shareIn(applicationScope, SharingStarted.WhileSubscribed(5000), replay = 1)
+
+    override val selectedSearch: Flow<Server?> = serverDao.getSelectedSearchFlow()
         .shareIn(applicationScope, SharingStarted.WhileSubscribed(5000), replay = 1)
 
     /**
@@ -58,7 +66,9 @@ class DefaultServerRepository @Inject constructor(
 
     override suspend fun getByUUID(uuid: UUID): Server? = serverDao.getByUUID(uuid)
 
-    override suspend fun getSelected(): Server? = serverDao.getSelected()
+    override suspend fun getSelectedGoogleMaps(): Server? = serverDao.getSelectedGoogleMaps()
+
+    override suspend fun getSelectedSearch(): Server? = serverDao.getSelectedSearch()
 
     override suspend fun insert(server: Server) = serverDao.insert(server)
 
@@ -66,7 +76,9 @@ class DefaultServerRepository @Inject constructor(
 
     override suspend fun delete(server: Server) = serverDao.delete(server)
 
-    override suspend fun unselectAllAndSelect(uid: Int?) = serverDao.unselectAllAndSelect(uid)
+    override suspend fun unselectAllGoogleMapsAndSelect(uid: Int?) = serverDao.unselectAllGoogleMapsAndSelect(uid)
+
+    override suspend fun unselectAllSearchAndSelect(uid: Int?) = serverDao.unselectAllSearchAndSelect(uid)
 
     override suspend fun restoreInitialData() {
         appDatabase.openHelper.writableDatabase.let { db ->

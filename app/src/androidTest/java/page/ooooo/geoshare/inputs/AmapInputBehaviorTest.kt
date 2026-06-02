@@ -3,11 +3,12 @@ package page.ooooo.geoshare.inputs
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
+import page.ooooo.geoshare.assumeDomainResolvable
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-class AmapInputBehaviorTest : InputBehaviorTest {
+class AmapInputBehaviorTest {
     @Test
     fun amap() = uiAutomator {
         // Coordinates within mainland China

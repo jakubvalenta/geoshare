@@ -4,10 +4,15 @@ import androidx.test.uiautomator.uiAutomator
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
+import page.ooooo.geoshare.assumeDomainResolvable
+import page.ooooo.geoshare.closeIntro
+import page.ooooo.geoshare.data.local.preferences.Permission
+import page.ooooo.geoshare.launchApplication
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.waitForAppToBeVisible
 
-class OpenStreetMapInputBehaviorTest : InputBehaviorTest {
+class OpenStreetMapInputBehaviorTest {
     @Test
     fun openStreetMap() = uiAutomator {
         // Map center
@@ -45,7 +50,7 @@ class OpenStreetMapInputBehaviorTest : InputBehaviorTest {
         launchApplication()
         waitForAppToBeVisible()
         closeIntro()
-        configureConnectionPermission()
+        configureConnectionPermissionPreference(Permission.ALWAYS)
 
         // Node
         testUri(

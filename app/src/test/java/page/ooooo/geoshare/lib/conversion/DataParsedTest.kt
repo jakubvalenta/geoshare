@@ -14,6 +14,7 @@ import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.NextStep
+import page.ooooo.geoshare.lib.inputs.NoopInput
 import page.ooooo.geoshare.lib.inputs.ParseResult
 
 class DataParsedTest {
@@ -21,6 +22,7 @@ class DataParsedTest {
     private val resources: Resources = mock {
         on { getString(R.string.conversion_failed_connection_permission_denied) } doReturn "This link is not supported without connecting to the map service"
         on { getString(R.string.conversion_failed_reason_no_points) } doReturn "no points found"
+        on { getString(R.string.conversion_failed_unsupported_source_place_list) } doReturn "Place lists are not supported"
     }
     private val source = "https://maps.google.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
@@ -238,4 +240,23 @@ class DataParsedTest {
             state.transition(),
         )
     }
+
+    @Test
+    fun transition_whenLastPointIsEmptyAndInputHasCustomErrorMessage_returnsConversionFailedWithCustomErrorMessage() =
+        runTest {
+            val input = object : NoopInput {
+                override fun getErrorMessage(resources: Resources) =
+                    resources.getString(R.string.conversion_failed_unsupported_source_place_list)
+            }
+            val points = persistentListOf(WGS84Point(source = Source.GENERATED))
+            val result = ParseResult(points)
+            val state = DataParsed(stateContext, source, match = source, input, permission = null, listOf(result))
+            assertEquals(
+                ConversionFailed(
+                    source,
+                    resources.getString(R.string.conversion_failed_unsupported_source_place_list),
+                ),
+                state.transition(),
+            )
+        }
 }

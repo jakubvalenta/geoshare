@@ -7,10 +7,17 @@ import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertNull
+import org.junit.Before
 import org.junit.Test
-import page.ooooo.geoshare.ui.UserPreferencesGroupId
+import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
-class LinkBehaviorTest : BehaviorTest {
+class LinkBehaviorTest {
+    @Before
+    fun goToLauncher() = uiAutomator {
+        // Start from the home screen
+        pressHome()
+    }
+
     @Test
     fun whenLinkIsInserted_allowsCopyingIt() = uiAutomator {
         // Launch application and close intro
@@ -19,7 +26,7 @@ class LinkBehaviorTest : BehaviorTest {
         closeIntro()
 
         // Go to link list
-        goToUserPreferencesDetail(UserPreferencesGroupId.LINKS)
+        goToUserPreferencesDetail(UserPreferenceGroupId.LINKS)
 
         // Insert link
         onElement { viewIdResourceName == "geoShareLinkListInsert" }.click()
@@ -59,7 +66,7 @@ class LinkBehaviorTest : BehaviorTest {
         closeIntro()
 
         // Go to link list
-        goToUserPreferencesDetail(UserPreferencesGroupId.LINKS)
+        goToUserPreferencesDetail(UserPreferenceGroupId.LINKS)
 
         // Go to link detail
         onElement { viewIdResourceName == "geoShareLinkListItemMenu_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
@@ -105,7 +112,7 @@ class LinkBehaviorTest : BehaviorTest {
         onElement { viewIdResourceName == "geoShareLinkDeleteDialog" }.confirmDialog()
 
         // Does not show link
-        assertNull(onElementOrNull(BehaviorTest.ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareLinkListItem_a5092c63-cf5c-4225-9059-e888ae12e215" })
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareLinkListItem_a5092c63-cf5c-4225-9059-e888ae12e215" })
 
         // Wait for the delete toast to disappear, because it covers the restore button
         runBlocking {
@@ -136,7 +143,7 @@ class LinkBehaviorTest : BehaviorTest {
         closeIntro()
 
         // Go to link list
-        goToUserPreferencesDetail(UserPreferencesGroupId.LINKS)
+        goToUserPreferencesDetail(UserPreferenceGroupId.LINKS)
 
         // Go to link detail
         onElement { viewIdResourceName == "geoShareLinkListPane" }

@@ -13,26 +13,27 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import page.ooooo.geoshare.data.di.FakeGeoShareServer
+import page.ooooo.geoshare.data.di.FakeGeoShareGoogleMapsAddressServer
 import page.ooooo.geoshare.data.di.FakeInputRepository
-import page.ooooo.geoshare.data.di.FakeKeyStoreService
+import page.ooooo.geoshare.data.di.FakeKeyStoreTools
 import page.ooooo.geoshare.data.di.FakeServerRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.network.ApiService
+import page.ooooo.geoshare.lib.network.ResponseNetworkException
+import page.ooooo.geoshare.lib.network.ServerHttpClientFactory
 import page.ooooo.geoshare.lib.network.SocketTimeoutNetworkException
 import page.ooooo.geoshare.lib.network.UnknownNetworkException
 import java.net.SocketTimeoutException
 
 class GoogleMapsAddressApiInputTest {
-    private val server = FakeGeoShareServer
+    private val server = FakeGeoShareGoogleMapsAddressServer
     private val query = "Cherbourg, France"
     private val engine = MockEngine { request ->
         when (request.url.toString()) {
-            "${server.baseUrl}/v4/geocode/address/Cherbourg,%20France" -> respond(
+            server.getUrl("Cherbourg, France", uriQuote) -> respond(
                 // language=Json
                 """
                     {
@@ -45,47 +46,48 @@ class GoogleMapsAddressApiInputTest {
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
 
-            "${server.baseUrl}/v4/geocode/address/nothing" -> respond(
+            server.getUrl("empty-results", uriQuote) -> respond(
                 // language=Json
-                """
-                    {
-                        "results": []
-                    }
-                """.trimIndent(),
+                """{"results": []}""",
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
 
-            "${server.baseUrl}/v4/geocode/address/invalid" -> respond(
+            server.getUrl("empty-object", uriQuote) -> respond(
                 // language=Json
-                """
-                    {
-                        "results": "invalid"
-                    }
-                """.trimIndent(),
+                """{}""",
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
 
-            "${server.baseUrl}/v4/geocode/address/exception" -> throw SocketTimeoutException()
+            server.getUrl("invalid", uriQuote) -> respond(
+                // language=Json
+                """{"results": "invalid"}""",
+                headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
+            )
 
-            "${server.baseUrl}/v4/geocode/address/not-found" -> respondError(HttpStatusCode.NotFound)
+            server.getUrl("exception", uriQuote) -> throw SocketTimeoutException()
+
+            server.getUrl("unknown-exception", uriQuote) -> throw IllegalArgumentException()
+
+            server.getUrl("not-found", uriQuote) -> respondError(HttpStatusCode.NotFound)
 
             else -> throw NotImplementedError()
         }
     }
-    private val keyStoreService = FakeKeyStoreService()
+    private val keyStoreTools = FakeKeyStoreTools()
     private val log = FakeLog
     private val uriQuote = FakeUriQuote
     private val userPreferencesRepository = FakeUserPreferencesRepository()
 
     @Test
-    fun parse_whenApiIsNotConfigured_returnsNextStep() = runTest {
+    fun parse_whenServerIsNotConfigured_returnsNextStep() = runTest {
         val serverRepository: FakeServerRepository = mock {
-            on { getSelected() } doReturn null
+            on { getSelectedGoogleMaps() } doReturn null
         }
         val input = GoogleMapsAddressApiInput(
             serverRepository = serverRepository,
-            apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository),
+            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
+            log = log,
             uriQuote = uriQuote,
         )
         val match = "https://maps.google.com/?q=$query"
@@ -100,12 +102,13 @@ class GoogleMapsAddressApiInputTest {
     @Test
     fun parse_whenQueryIsInQueryParamAndApiReturnsResults_returnsHighestRankedPoint() = runTest {
         val serverRepository: FakeServerRepository = mock {
-            on { getSelected() } doReturn server
+            on { getSelectedGoogleMaps() } doReturn server
         }
         val input = GoogleMapsAddressApiInput(
             serverRepository = serverRepository,
-            apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository),
+            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
+            log = log,
             uriQuote = uriQuote,
         )
         for (match in listOf(
@@ -126,14 +129,57 @@ class GoogleMapsAddressApiInputTest {
     }
 
     @Test
-    fun parse_whenQueryIsInPathAndApiReturnsResults_returnsHighestRankedPoint() = runTest {
+    fun parse_whenQueryHasAppendedCoordinates_removesTheCoordinatesAndReturnsHighestRankedPoint() = runTest {
+        val query = "2088 Albion Rd+@43.7481,-79.6332"
+        val cleanQuery = "2088 Albion Rd"
+        val engine = MockEngine { request ->
+            when (request.url.toString()) {
+                server.getUrl(cleanQuery, uriQuote) -> respond(
+                    // language=Json
+                    """
+                        {
+                            "results": [
+                                {"place": "//places.googleapis.com/places/foo", "location": {"latitude": 50.123456, "longitude": -11.123456}}
+                            ]
+                        }
+                    """.trimIndent(),
+                    headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
+                )
+
+                else -> throw NotImplementedError()
+            }
+        }
         val serverRepository: FakeServerRepository = mock {
-            on { getSelected() } doReturn server
+            on { getSelectedGoogleMaps() } doReturn server
         }
         val input = GoogleMapsAddressApiInput(
             serverRepository = serverRepository,
-            apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository),
+            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
+            log = log,
+            uriQuote = uriQuote,
+        )
+        val match = "https://maps.google.com/maps?f=d&daddr=${uriQuote.encode(query)}"
+        assertEquals(
+            ParseResult(
+                persistentListOf(
+                    GCJ02MainlandChinaPoint(50.123456, -11.123456, name = cleanQuery, source = Source.API)
+                )
+            ),
+            input.fetch(match) { data -> input.parse(data, match) },
+        )
+    }
+
+    @Test
+    fun parse_whenQueryIsInPathAndApiReturnsResults_returnsHighestRankedPoint() = runTest {
+        val serverRepository: FakeServerRepository = mock {
+            on { getSelectedGoogleMaps() } doReturn server
+        }
+        val input = GoogleMapsAddressApiInput(
+            serverRepository = serverRepository,
+            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
+            googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
+            log = log,
             uriQuote = uriQuote,
         )
         for (match in listOf(
@@ -156,12 +202,13 @@ class GoogleMapsAddressApiInputTest {
     @Test
     fun parse_whenQueryIsNotFoundInUri_returnsNoPoints() = runTest {
         val serverRepository: FakeServerRepository = mock {
-            on { getSelected() } doReturn server
+            on { getSelectedGoogleMaps() } doReturn server
         }
         val input = GoogleMapsAddressApiInput(
             serverRepository = serverRepository,
-            apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository),
+            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
+            log = log,
             uriQuote = uriQuote,
         )
         val match = "https://www.google.com/spam"
@@ -174,12 +221,13 @@ class GoogleMapsAddressApiInputTest {
     @Test
     fun parse_whenQueryIsEmpty_returnsNoPoints() = runTest {
         val serverRepository: FakeServerRepository = mock {
-            on { getSelected() } doReturn server
+            on { getSelectedGoogleMaps() } doReturn server
         }
         val input = GoogleMapsAddressApiInput(
             serverRepository = serverRepository,
-            apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository),
+            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
+            log = log,
             uriQuote = uriQuote,
         )
         val match = "https://www.google.com/?q="
@@ -190,50 +238,107 @@ class GoogleMapsAddressApiInputTest {
     }
 
     @Test
-    fun parse_whenApiReturnsNoResults_returnsNoPoints() = runTest {
+    fun parse_whenApiReturnsEmptyResults_returnsNoPoints() = runTest {
         val serverRepository: FakeServerRepository = mock {
-            on { getSelected() } doReturn server
+            on { getSelectedGoogleMaps() } doReturn server
         }
         val input = GoogleMapsAddressApiInput(
             serverRepository = serverRepository,
-            apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository),
+            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
+            log = log,
             uriQuote = uriQuote,
         )
-        val match = "https://maps.google.com/?q=nothing"
+        val match = "https://maps.google.com/?q=empty-results"
         assertEquals(
             ParseResult(),
             input.fetch(match) { data -> input.parse(data, match) },
         )
     }
 
-    @Test(expected = UnknownNetworkException::class)
-    fun parse_whenApiReturnsInvalidResponse_throwsException() = runTest {
+    @Test
+    fun parse_whenApiReturnsEmptyObject_returnsNoPoints() = runTest {
         val serverRepository: FakeServerRepository = mock {
-            on { getSelected() } doReturn server
+            on { getSelectedGoogleMaps() } doReturn server
         }
         val input = GoogleMapsAddressApiInput(
             serverRepository = serverRepository,
-            apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository),
+            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
+            log = log,
+            uriQuote = uriQuote,
+        )
+        val match = "https://maps.google.com/?q=empty-object"
+        assertEquals(
+            ParseResult(),
+            input.fetch(match) { data -> input.parse(data, match) },
+        )
+    }
+
+    @Test
+    fun parse_whenApiReturnsInvalidResponse_returnsNoPoints() = runTest {
+        val serverRepository: FakeServerRepository = mock {
+            on { getSelectedGoogleMaps() } doReturn server
+        }
+        val input = GoogleMapsAddressApiInput(
+            serverRepository = serverRepository,
+            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
+            googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
+            log = log,
             uriQuote = uriQuote,
         )
         val match = "https://maps.google.com/?q=invalid"
+        assertEquals(
+            ParseResult(),
+            input.fetch(match) { data -> input.parse(data, match) },
+        )
+    }
+
+    @Test(expected = ResponseNetworkException::class)
+    fun parse_whenApiReturns404_throwException() = runTest {
+        val serverRepository: FakeServerRepository = mock {
+            on { getSelectedGoogleMaps() } doReturn server
+        }
+        val input = GoogleMapsAddressApiInput(
+            serverRepository = serverRepository,
+            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
+            googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
+            log = log,
+            uriQuote = uriQuote,
+        )
+        val match = "https://maps.google.com/?q=not-found"
         input.fetch(match) { data -> input.parse(data, match) }
     }
 
     @Test(expected = SocketTimeoutNetworkException::class)
-    fun parse_whenApiThrowsException_throwsException() = runTest {
+    fun parse_whenApiThrowsKnownException_throwsNetworkException() = runTest {
         val serverRepository: FakeServerRepository = mock {
-            on { getSelected() } doReturn server
+            on { getSelectedGoogleMaps() } doReturn server
         }
         val input = GoogleMapsAddressApiInput(
             serverRepository = serverRepository,
-            apiService = ApiService(engine, keyStoreService, log, userPreferencesRepository),
+            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
+            log = log,
             uriQuote = uriQuote,
         )
         val match = "https://maps.google.com/?q=exception"
+        input.fetch(match) { data -> input.parse(data, match) }
+    }
+
+    @Test(expected = UnknownNetworkException::class)
+    fun parse_whenApiThrowsUnknownException_throwsUnknownNetworkException() = runTest {
+        val serverRepository: FakeServerRepository = mock {
+            on { getSelectedGoogleMaps() } doReturn server
+        }
+        val input = GoogleMapsAddressApiInput(
+            serverRepository = serverRepository,
+            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
+            googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
+            log = log,
+            uriQuote = uriQuote,
+        )
+        val match = "https://maps.google.com/?q=unknown-exception"
         input.fetch(match) { data -> input.parse(data, match) }
     }
 }

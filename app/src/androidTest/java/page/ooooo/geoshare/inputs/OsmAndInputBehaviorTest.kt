@@ -5,7 +5,7 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-class OsmAndInputBehaviorTest : InputBehaviorTest {
+class OsmAndInputBehaviorTest {
     @Test
     fun osmAnd() = uiAutomator {
         // Coordinates

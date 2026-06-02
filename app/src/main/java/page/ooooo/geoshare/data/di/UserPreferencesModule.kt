@@ -14,7 +14,7 @@ import page.ooooo.geoshare.data.DefaultUserPreferencesRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
 import page.ooooo.geoshare.data.local.preferences.AutomationPreference
-import page.ooooo.geoshare.data.local.preferences.CachedApiTokenPreference
+import page.ooooo.geoshare.data.local.preferences.CachedServerTokenPreference
 import page.ooooo.geoshare.data.local.preferences.CachedPurchasePreference
 import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
@@ -53,7 +53,7 @@ class FakeUserPreferencesRepository(
         UserPreferencesValues(
             automation = AutomationPreference.getValue(it),
             automationDelay = AutomationDelayPreference.getValue(it),
-            cachedApiToken = CachedApiTokenPreference.getValue(it),
+            cachedServerToken = CachedServerTokenPreference.getValue(it),
             cachedPurchase = CachedPurchasePreference.getValue(it),
             changelogShownForVersionCode = ChangelogShownForVersionCodePreference.getValue(it),
             connectionPermission = ConnectionPermissionPreference.getValue(it),
@@ -67,7 +67,7 @@ class FakeUserPreferencesRepository(
         _preferences.value = _preferences.value.toMutablePreferences().apply {
             AutomationPreference.setValue(this, initialValues.automation)
             AutomationDelayPreference.setValue(this, initialValues.automationDelay)
-            CachedApiTokenPreference.setValue(this, initialValues.cachedApiToken)
+            CachedServerTokenPreference.setValue(this, initialValues.cachedServerToken)
             CachedPurchasePreference.setValue(this, initialValues.cachedPurchase)
             ChangelogShownForVersionCodePreference.setValue(this, initialValues.changelogShownForVersionCode)
             ConnectionPermissionPreference.setValue(this, initialValues.connectionPermission)
@@ -94,7 +94,7 @@ class FakeUserPreferencesRepository(
 val defaultFakeUserPreferences = UserPreferencesValues(
     automation = NoopAutomation,
     automationDelay = 5.seconds,
-    cachedApiToken = null,
+    cachedServerToken = null,
     cachedPurchase = null,
     changelogShownForVersionCode = 22,
     connectionPermission = Permission.ALWAYS,

@@ -19,14 +19,14 @@ data class Key(
     val certificateChain: List<Certificate>,
 )
 
-interface KeyStoreService {
+interface KeyStoreTools {
     fun getKey(): Key?
     fun generateKey(): Key
 }
 
-class DefaultKeyStoreService @Inject constructor(
+class DefaultKeyStoreTools @Inject constructor(
     private val log: Log = FakeLog,
-) : KeyStoreService {
+) : KeyStoreTools {
     /**
      * Try to get a key from the key store.
      */

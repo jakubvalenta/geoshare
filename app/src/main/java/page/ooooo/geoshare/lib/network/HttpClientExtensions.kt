@@ -149,7 +149,7 @@ fun HttpClientConfig<*>.rethrowExceptionsAsNetworkException(log: Log = DefaultLo
                 }
 
                 else -> {
-                    log.e(TAG, "Unknown network exception for ${request.url}", cause)
+                    log.w(TAG, "Unknown network exception for ${request.url}", cause)
                     throw UnknownNetworkException(cause)
                 }
             }
