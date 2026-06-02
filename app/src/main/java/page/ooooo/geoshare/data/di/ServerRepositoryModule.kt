@@ -39,9 +39,14 @@ class FakeServerRepository(
 
     override val all = _fakeServers.mapLatest { it.sortedBy { item -> item.createdAt }.reversed() }
 
-    override val selectedGoogleMaps = _fakeServers.mapLatest { it.firstOrNull { item -> item.selectedGoogleMaps } }
+    override val selectedGoogleMapsAddress =
+        _fakeServers.mapLatest { it.firstOrNull { item -> item.selectedGoogleMapsAddress } }
 
-    override val selectedSearch = _fakeServers.mapLatest { it.firstOrNull { item -> item.selectedSearch } }
+    override val selectedGoogleMapsPlace =
+        _fakeServers.mapLatest { it.firstOrNull { item -> item.selectedGoogleMapsPlace } }
+
+    override val selectedSearch =
+        _fakeServers.mapLatest { it.firstOrNull { item -> item.selectedSearch } }
 
     override suspend fun getAll() = _fakeServers.value
 
@@ -51,8 +56,11 @@ class FakeServerRepository(
     override suspend fun getByUUID(uuid: UUID) =
         _fakeServers.value.firstOrNull { it.uuid == uuid }
 
-    override suspend fun getSelectedGoogleMaps() =
-        _fakeServers.value.firstOrNull { it.selectedGoogleMaps }
+    override suspend fun getSelectedGoogleMapsAddress() =
+        _fakeServers.value.firstOrNull { it.selectedGoogleMapsAddress }
+
+    override suspend fun getSelectedGoogleMapsPlace() =
+        _fakeServers.value.firstOrNull { it.selectedGoogleMapsPlace }
 
     override suspend fun getSelectedSearch() =
         _fakeServers.value.firstOrNull { it.selectedSearch }
@@ -78,9 +86,15 @@ class FakeServerRepository(
         _fakeServers.value = _fakeServers.value.filterNot { it.uid == server.uid }
     }
 
-    override suspend fun unselectAllGoogleMapsAndSelect(uid: Int?) {
+    override suspend fun unselectAllGoogleMapsAddressAndSelect(uid: Int?) {
         _fakeServers.value = _fakeServers.value.map {
-            it.copy(selectedGoogleMaps = it.uid == uid)
+            it.copy(selectedGoogleMapsAddress = it.uid == uid)
+        }
+    }
+
+    override suspend fun unselectAllGoogleMapsPlaceAndSelect(uid: Int?) {
+        _fakeServers.value = _fakeServers.value.map {
+            it.copy(selectedGoogleMapsPlace = it.uid == uid)
         }
     }
 

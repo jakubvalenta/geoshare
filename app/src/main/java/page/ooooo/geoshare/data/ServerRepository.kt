@@ -14,7 +14,8 @@ import javax.inject.Inject
 
 interface ServerRepository {
     val all: Flow<List<Server>>
-    val selectedGoogleMaps: Flow<Server?>
+    val selectedGoogleMapsAddress: Flow<Server?>
+    val selectedGoogleMapsPlace: Flow<Server?>
     val selectedSearch: Flow<Server?>
 
     suspend fun getAll(): List<Server>
@@ -23,7 +24,9 @@ interface ServerRepository {
 
     suspend fun getByUUID(uuid: UUID): Server?
 
-    suspend fun getSelectedGoogleMaps(): Server?
+    suspend fun getSelectedGoogleMapsAddress(): Server?
+
+    suspend fun getSelectedGoogleMapsPlace(): Server?
 
     suspend fun getSelectedSearch(): Server?
 
@@ -33,7 +36,9 @@ interface ServerRepository {
 
     suspend fun delete(server: Server)
 
-    suspend fun unselectAllGoogleMapsAndSelect(uid: Int?)
+    suspend fun unselectAllGoogleMapsAddressAndSelect(uid: Int?)
+
+    suspend fun unselectAllGoogleMapsPlaceAndSelect(uid: Int?)
 
     suspend fun unselectAllSearchAndSelect(uid: Int?)
 
@@ -51,7 +56,10 @@ class DefaultServerRepository @Inject constructor(
     override val all: Flow<List<Server>> = serverDao.getAllFlow()
         .shareIn(applicationScope, SharingStarted.WhileSubscribed(5000), replay = 1)
 
-    override val selectedGoogleMaps: Flow<Server?> = serverDao.getSelectedGoogleMapsFlow()
+    override val selectedGoogleMapsAddress: Flow<Server?> = serverDao.getSelectedGoogleMapsAddressFlow()
+        .shareIn(applicationScope, SharingStarted.WhileSubscribed(5000), replay = 1)
+
+    override val selectedGoogleMapsPlace: Flow<Server?> = serverDao.getSelectedGoogleMapsPlaceFlow()
         .shareIn(applicationScope, SharingStarted.WhileSubscribed(5000), replay = 1)
 
     override val selectedSearch: Flow<Server?> = serverDao.getSelectedSearchFlow()
@@ -66,7 +74,9 @@ class DefaultServerRepository @Inject constructor(
 
     override suspend fun getByUUID(uuid: UUID): Server? = serverDao.getByUUID(uuid)
 
-    override suspend fun getSelectedGoogleMaps(): Server? = serverDao.getSelectedGoogleMaps()
+    override suspend fun getSelectedGoogleMapsAddress(): Server? = serverDao.getSelectedGoogleMapsAddress()
+
+    override suspend fun getSelectedGoogleMapsPlace(): Server? = serverDao.getSelectedGoogleMapsPlace()
 
     override suspend fun getSelectedSearch(): Server? = serverDao.getSelectedSearch()
 
@@ -76,7 +86,11 @@ class DefaultServerRepository @Inject constructor(
 
     override suspend fun delete(server: Server) = serverDao.delete(server)
 
-    override suspend fun unselectAllGoogleMapsAndSelect(uid: Int?) = serverDao.unselectAllGoogleMapsAndSelect(uid)
+    override suspend fun unselectAllGoogleMapsAddressAndSelect(uid: Int?) =
+        serverDao.unselectAllGoogleMapsAddressAndSelect(uid)
+
+    override suspend fun unselectAllGoogleMapsPlaceAndSelect(uid: Int?) =
+        serverDao.unselectAllGoogleMapsPlaceAndSelect(uid)
 
     override suspend fun unselectAllSearchAndSelect(uid: Int?) = serverDao.unselectAllSearchAndSelect(uid)
 

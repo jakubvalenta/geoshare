@@ -75,7 +75,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test
     fun parse_whenServerIsNotConfigured_returnsNextStep() = runTest {
         val serverRepository: FakeServerRepository = mock {
-            on { getSelectedGoogleMaps() } doReturn null
+            on { getSelectedGoogleMapsPlace() } doReturn null
         }
         val input = GoogleMapsPlaceApiInput(
             serverRepository = serverRepository,
@@ -96,7 +96,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test
     fun parse_whenPlaceIdIsInQueryParamAndApiReturnsResult_returnsPoint() = runTest {
         val serverRepository: FakeServerRepository = mock {
-            on { getSelectedGoogleMaps() } doReturn server
+            on { getSelectedGoogleMapsPlace() } doReturn server
         }
         val input = GoogleMapsPlaceApiInput(
             serverRepository = serverRepository,
@@ -119,7 +119,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test
     fun parse_whenQueryIsNotFoundInUri_returnsNoPoints() = runTest {
         val serverRepository: FakeServerRepository = mock {
-            on { getSelectedGoogleMaps() } doReturn server
+            on { getSelectedGoogleMapsPlace() } doReturn server
         }
         val input = GoogleMapsPlaceApiInput(
             serverRepository = serverRepository,
@@ -138,7 +138,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test
     fun parse_whenQueryIsEmpty_returnsNoPoints() = runTest {
         val serverRepository: FakeServerRepository = mock {
-            on { getSelectedGoogleMaps() } doReturn server
+            on { getSelectedGoogleMapsPlace() } doReturn server
         }
         val input = GoogleMapsPlaceApiInput(
             serverRepository = serverRepository,
@@ -157,7 +157,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test(expected = UnknownNetworkException::class)
     fun parse_whenApiReturnsEmptyObject_throwsException() = runTest {
         val serverRepository: FakeServerRepository = mock {
-            on { getSelectedGoogleMaps() } doReturn server
+            on { getSelectedGoogleMapsPlace() } doReturn server
         }
         val input = GoogleMapsPlaceApiInput(
             serverRepository = serverRepository,
@@ -173,7 +173,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test(expected = UnknownNetworkException::class)
     fun parse_whenApiReturnsInvalidResponse_throwsException() = runTest {
         val serverRepository: FakeServerRepository = mock {
-            on { getSelectedGoogleMaps() } doReturn server
+            on { getSelectedGoogleMapsPlace() } doReturn server
         }
         val input = GoogleMapsPlaceApiInput(
             serverRepository = serverRepository,
@@ -189,7 +189,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test
     fun parse_whenApiReturns400_returnsNoPoints() = runTest {
         val serverRepository: FakeServerRepository = mock {
-            on { getSelectedGoogleMaps() } doReturn server
+            on { getSelectedGoogleMapsPlace() } doReturn server
         }
         val input = GoogleMapsPlaceApiInput(
             serverRepository = serverRepository,
@@ -208,7 +208,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test(expected = ResponseNetworkException::class)
     fun parse_whenApiReturns404_throwsException() = runTest {
         val serverRepository: FakeServerRepository = mock {
-            on { getSelectedGoogleMaps() } doReturn server
+            on { getSelectedGoogleMapsPlace() } doReturn server
         }
         val input = GoogleMapsPlaceApiInput(
             serverRepository = serverRepository,
@@ -224,7 +224,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test(expected = SocketTimeoutNetworkException::class)
     fun parse_whenApiThrowsKnownException_throwsNetworkException() = runTest {
         val serverRepository: FakeServerRepository = mock {
-            on { getSelectedGoogleMaps() } doReturn server
+            on { getSelectedGoogleMapsPlace() } doReturn server
         }
         val input = GoogleMapsPlaceApiInput(
             serverRepository = serverRepository,
@@ -240,7 +240,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test(expected = UnknownNetworkException::class)
     fun parse_whenApiThrowsUnknownException_throwsUnknownNetworkException() = runTest {
         val serverRepository: FakeServerRepository = mock {
-            on { getSelectedGoogleMaps() } doReturn server
+            on { getSelectedGoogleMapsPlace() } doReturn server
         }
         val input = GoogleMapsPlaceApiInput(
             serverRepository = serverRepository,

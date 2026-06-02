@@ -23,10 +23,10 @@ object InitialServersImpl : InitialServers {
     override fun restore(db: SupportSQLiteDatabase) {
         db.execSQL("DELETE FROM server")
         db.execSQL(
-            "INSERT INTO server (`name`,`description`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMaps`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO server (`name`,`description`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             arrayOf<Any>(
                 "Google Maps",
-                "",
+                "Geocode Address",
                 "https://geocode.googleapis.com/v4/geocode/address/{q}",
                 "API_KEY",
                 "",
@@ -36,8 +36,28 @@ object InitialServersImpl : InitialServers {
                 "",
                 0,
                 0,
+                0,
                 1779859252618,
                 Uuid.parse("16b3bb06-3a3b-4853-ac06-c4bf1eb346f8").toByteArray(),
+            )
+        )
+        db.execSQL(
+            "INSERT INTO server (`name`,`description`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            arrayOf<Any>(
+                "Google Maps",
+                "Geocode Place",
+                "https://geocode.googleapis.com/v4/geocode/places/{q}",
+                "API_KEY",
+                "",
+                "X-Goog-Api-Key",
+                "",
+                "",
+                "",
+                0,
+                0,
+                0,
+                1779859252618,
+                Uuid.parse("c5c215a1-c453-4de9-adb3-daecbd7dc876").toByteArray(),
             )
         )
     }
@@ -46,10 +66,10 @@ object InitialServersImpl : InitialServers {
         object : Migration(7, 8) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
-                    "INSERT OR REPLACE INTO server (`name`,`description`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMaps`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT OR REPLACE INTO server (`name`,`description`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "Google Maps",
-                        "",
+                        "Geocode Address",
                         "https://geocode.googleapis.com/v4/geocode/address/{q}",
                         "API_KEY",
                         "",
@@ -59,8 +79,28 @@ object InitialServersImpl : InitialServers {
                         "",
                         0,
                         0,
+                        0,
                         1779859252618,
                         Uuid.parse("16b3bb06-3a3b-4853-ac06-c4bf1eb346f8").toByteArray(),
+                    )
+                )
+                db.execSQL(
+                    "INSERT OR REPLACE INTO server (`name`,`description`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    arrayOf<Any>(
+                        "Google Maps",
+                        "Geocode Place",
+                        "https://geocode.googleapis.com/v4/geocode/places/{q}",
+                        "API_KEY",
+                        "",
+                        "X-Goog-Api-Key",
+                        "",
+                        "",
+                        "",
+                        0,
+                        0,
+                        0,
+                        1779859252618,
+                        Uuid.parse("c5c215a1-c453-4de9-adb3-daecbd7dc876").toByteArray(),
                     )
                 )
             }
