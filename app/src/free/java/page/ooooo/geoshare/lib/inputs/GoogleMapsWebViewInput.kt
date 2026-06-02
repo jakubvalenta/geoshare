@@ -23,6 +23,7 @@ class GoogleMapsWebViewInput @Inject constructor(
     """.trimIndent()
 
     override suspend fun parse(data: String, match: String) = parseResult {
+        // TODO Fix infinite loop if the GoogleMapsUriInput again returns nextStep GoogleMapsWebViewInput
         nextStep = NextStep(googleMapsUriInput.get(), data)
     }
 
