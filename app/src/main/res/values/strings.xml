@@ -260,7 +260,7 @@
     <string name="inputs_settings">Go to Android settings to choose links that should always open in %1$s</string>
     <string name="inputs_title">Supported maps</string>
     <string name="licenses">Licenses</string>
-    <string name="delete">Delete</string>
+    <string name="links_delete">Delete</string>
     <string name="links_delete_text">The web map “%1$s” will be permanently deleted.</string>
     <string name="links_delete_title">Delete web map?</string>
     <string name="links_description">Web maps allow opening coordinates in the browser. Turn on the pre-installed ones or add your own.</string>
@@ -270,6 +270,7 @@
     <string name="links_form_enabled_option_sheet">Show in the copy menu</string>
     <string name="links_form_group">Group</string>
     <string name="links_form_name">Name</string>
+    <string name="links_form_save">Save</string>
     <string name="links_form_srs">Coordinate system</string>
     <string name="links_form_test_china" translatable="false">Test Forbidden City</string>
     <string name="links_form_test_world" translatable="false">Test Kilimanjaro</string>
@@ -299,7 +300,6 @@
     <string name="network_exception_unauthorized">Unauthorized</string>
     <string name="network_exception_unresolved_address">Unresolved address</string>
     <string name="reset">reset</string>
-    <string name="save">Save</string>
     <string name="seconds_unit">seconds</string>
     <plurals name="seconds">
         <item quantity="one">%1$d second</item>
@@ -326,7 +326,7 @@
     <string name="server_message_factory_reset">Server have been reset to factory defaults</string>
     <string name="server_message_inserted">Server added</string>
     <string name="server_message_updated">Server updated</string>
-    <string name="server_none">None</string>
+    <string name="server_none">No server</string>
     <string name="server_restore_initial_data">Reset servers to factory defaults</string>
     <string name="server_restore_initial_data_text">All your servers will be deleted and replaced with the pre-installed ones.</string>
     <string name="server_restore_initial_data_title">Reset servers to factory defaults?</string>
@@ -350,7 +350,7 @@
     <string name="user_preferences_section_output">Output</string>
     <string name="user_preferences_servers_description">Certain map links can’t be converted on your device but require a remote server. Choose which servers provide this functionality.</string>
     <string name="user_preferences_servers_google_maps_address_title">Google Maps addresses</string>
-    <string name="user_preferences_servers_google_maps_none_description">Use experimental extraction of coordinates from HTML</string>
+    <string name="user_preferences_servers_google_maps_none_description">Use experimental extraction of coordinates from HTML on your device</string>
     <string name="user_preferences_servers_google_maps_place_title">Google Maps place ids</string>
     <string name="user_preferences_servers_search_none_description">Search will not be available</string>
     <string name="user_preferences_servers_search_title">Search</string>

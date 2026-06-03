@@ -31,7 +31,6 @@ import javax.inject.Singleton
 class GoogleMapsPlaceApiInput @Inject constructor(
     private val serverHttpClientFactory: ServerHttpClientFactory,
     private val googleMapsHtmlInput: Lazy<GoogleMapsHtmlInput>,
-    private val log: Log,
     private val serverRepository: ServerRepository,
     private val uriQuote: UriQuote,
 ) : BasicInput<Uri>, Input.HasPermission {
@@ -73,9 +72,9 @@ class GoogleMapsPlaceApiInput @Inject constructor(
                     }
             }
         } catch (tr: ResponseNetworkException) {
-            if (tr.response.status == HttpStatusCode.BadRequest) {
-                // Google returns error 400 when the place id is incorrect, so let's do nothing in this case
-                log.i(TAG, "API returned no results")
+            // TODO Test
+            if (tr.response.status == HttpStatusCode.BadRequest || tr.response.status == HttpStatusCode.NotFound) {
+                // Return no points
                 return@parseResult
             }
             throw tr
