@@ -32,7 +32,7 @@ class ConversionBehaviorTest {
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
         // Shows precise location
-        assertConversionSucceeded(WGS84Point(52.5067296, 13.2599309, z = 11.0, source = Source.MAP_CENTER))
+        assertConversionSucceeds(WGS84Point(52.5067296, 13.2599309, z = 11.0, source = Source.MAP_CENTER))
 
         // Tap the Google Maps icon
         onElement { viewIdResourceName == "geoShareApp_${PackageNames.GOOGLE_MAPS}" }.click()
@@ -65,7 +65,7 @@ class ConversionBehaviorTest {
             z = 11.0,
             source = Source.MAP_CENTER,
         )
-        assertConversionSucceeded(expectedPoint)
+        assertConversionSucceeds(expectedPoint)
 
         // Tap the Google Maps icon
         onElement { viewIdResourceName == "geoShareApp_${PackageNames.GOOGLE_MAPS}" }.click()
@@ -87,7 +87,7 @@ class ConversionBehaviorTest {
         onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
 
         // Shows precise location
-        assertConversionSucceeded(
+        assertConversionSucceeds(
             WGS84Point(52.4737758, 13.4373898, source = Source.HTML),
         )
 
@@ -115,7 +115,7 @@ class ConversionBehaviorTest {
         }
 
         // Shows precise location
-        assertConversionSucceeded(
+        assertConversionSucceeds(
             WGS84Point(52.4737758, 13.4373898, source = Source.HTML),
         )
 
@@ -124,7 +124,7 @@ class ConversionBehaviorTest {
         quickWaitForStableInActiveWindow()
 
         // Shows precise location again
-        assertConversionSucceeded(
+        assertConversionSucceeds(
             WGS84Point(52.4737758, 13.4373898, source = Source.HTML),
         )
     }
@@ -211,7 +211,7 @@ class ConversionBehaviorTest {
             onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
 
             // Shows precise location
-            assertConversionSucceeded(WGS84Point(52.4697882, 13.4257989, source = Source.HTML))
+            assertConversionSucceeds(WGS84Point(52.4697882, 13.4257989, source = Source.HTML))
 
             // Share another Apple Maps place link with the app
             shareUri("https://maps.apple.com/place?place-id=I849C144AAC7A794F&_provider=9902")
@@ -238,14 +238,14 @@ class ConversionBehaviorTest {
             }
 
             // Shows precise location
-            assertConversionSucceeded(WGS84Point(52.4778665, 13.426398, source = Source.HTML))
+            assertConversionSucceeds(WGS84Point(52.4778665, 13.426398, source = Source.HTML))
 
             // Share another Apple Maps place link with the app
             shareUri("https://maps.apple.com/place?place-id=I6E0F00362159B5EC&_provider=9902")
             quickWaitForStableInActiveWindow()
 
             // Shows precise location again
-            assertConversionSucceeded(WGS84Point(52.4820815, 13.4338421, source = Source.HTML))
+            assertConversionSucceeds(WGS84Point(52.4820815, 13.4338421, source = Source.HTML))
         }
 
     @Test

@@ -196,7 +196,7 @@ fun assumeNotEmulator() {
  * because we often cannot use an exact match, because Google Maps returns different place name depending on the
  * phone's language and location.
  */
-fun UiAutomatorTestScope.assertConversionSucceeded(
+fun UiAutomatorTestScope.assertConversionSucceeds(
     expectedPoints: Points,
     accurate: Boolean? = null,
     timeoutMs: Long = NETWORK_TIMEOUT,
@@ -293,11 +293,11 @@ fun UiAutomatorTestScope.assertConversionSucceeded(
     }
 }
 
-fun UiAutomatorTestScope.assertConversionSucceeded(
+fun UiAutomatorTestScope.assertConversionSucceeds(
     expectedPoint: Point,
     accurate: Boolean? = null,
     timeoutMs: Long = NETWORK_TIMEOUT,
-) = assertConversionSucceeded(persistentListOf(expectedPoint), accurate, timeoutMs)
+) = assertConversionSucceeds(persistentListOf(expectedPoint), accurate, timeoutMs)
 
 fun UiAutomatorTestScope.waitAndAssertGoogleMapsContainsElement(block: AccessibilityNodeInfo.() -> Boolean) {
     // Wait for Google Maps
@@ -320,6 +320,22 @@ fun UiAutomatorTestScope.waitAndAssertGoogleMapsContainsElement(block: Accessibi
 
     // Verify Google Maps content
     onElement(20_000L) { packageName == PackageNames.GOOGLE_MAPS && this.block() }
+}
+
+fun UiAutomatorTestScope.assertConversionSucceedsAnyCoordinates(timeoutMs: Long = NETWORK_TIMEOUT) {
+    onElement(timeoutMs) {
+        if (viewIdResourceName == "geoShareResultSuccessLastPointName") {
+            assertTrue(
+                @Suppress("SpellCheckingInspection") """Expected "${textAsString()}" to equal "Coordinates" or "Coordonnées""""",
+                textAsString() in setOf(
+                    "Coordinates", @Suppress("SpellCheckingInspection") "Coordonnées"
+                ),
+            )
+            true
+        } else {
+            false
+        }
+    }
 }
 
 fun UiAutomatorTestScope.assertConversionFails(expectedMessage: Set<String>, timeoutMs: Long = NETWORK_TIMEOUT) {

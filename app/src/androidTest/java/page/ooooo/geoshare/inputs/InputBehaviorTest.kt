@@ -4,7 +4,8 @@ import androidx.test.uiautomator.UiAutomatorTestScope
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.NETWORK_TIMEOUT
 import page.ooooo.geoshare.assertConversionFails
-import page.ooooo.geoshare.assertConversionSucceeded
+import page.ooooo.geoshare.assertConversionSucceeds
+import page.ooooo.geoshare.assertConversionSucceedsAnyCoordinates
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.goToUserPreferencesDetail
 import page.ooooo.geoshare.lib.geo.Point
@@ -42,10 +43,10 @@ fun UiAutomatorTestScope.testUri(
     confirmDialogIfVisible()
 
     try {
-        assertConversionSucceeded(expectedPoints, accurate, timeoutMs)
+        assertConversionSucceeds(expectedPoints, accurate, timeoutMs)
     } catch (e: AssertionError) {
         if (fallbackPoints != null) {
-            assertConversionSucceeded(fallbackPoints, accurate, timeoutMs)
+            assertConversionSucceeds(fallbackPoints, accurate, timeoutMs)
         } else {
             throw e
         }
@@ -82,6 +83,20 @@ fun UiAutomatorTestScope.testUriFails(
     assertConversionFails(expectedMessage, timeoutMs)
 }
 
+fun UiAutomatorTestScope.testUriAnyCoordinates(
+    unsafeUriString: String,
+    timeoutMs: Long = NETWORK_TIMEOUT,
+) {
+    // Go to main form
+    goToMainForm()
+
+    // Share URI and confirm permission dialog
+    shareUri(unsafeUriString)
+    confirmDialogIfVisible()
+
+    assertConversionSucceedsAnyCoordinates(timeoutMs)
+}
+
 fun UiAutomatorTestScope.testText(expectedPoints: Points, unsafeText: String) {
     // It would be preferable to test sharing of the text with the app, but this shell command doesn't work when
     // there are spaces in the text. So instead, we type the text in the main form of the app.
@@ -110,7 +125,7 @@ fun UiAutomatorTestScope.testText(expectedPoints: Points, unsafeText: String) {
     confirmDialogIfVisible()
 
     // Shows points
-    assertConversionSucceeded(expectedPoints)
+    assertConversionSucceeds(expectedPoints)
 }
 
 fun UiAutomatorTestScope.testText(expectedPoint: Point, unsafeText: String) =
