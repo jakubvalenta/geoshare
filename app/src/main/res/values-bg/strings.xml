@@ -206,7 +206,7 @@
     <string name="output_open_navigation">Навигиране</string>
     <string name="output_open_street_view">Изглед улица</string>
     <string name="output_open_link">Отваряне на връзка %1$s</string>
-    <string name="delete">Изтриване</string>
+    <string name="links_delete">Изтриване</string>
     <string name="links_delete_text">Уеб картата „%1$s“ ще бъде изтрита за постоянно.</string>
     <string name="links_delete_title">Изтриване на уеб картата?</string>
     <string name="links_description">Уеб картите позволяват отваряне на координати в браузъра. Включете предварително инсталираните или добавете свои собствени.</string>
@@ -216,7 +216,7 @@
     <string name="links_form_enabled_option_sheet">Показване в менюто за копиране</string>
     <string name="links_form_group">Група</string>
     <string name="links_form_name">Име</string>
-    <string name="save">Запазване</string>
+    <string name="links_form_save">Запазване</string>
     <string name="links_form_srs">Координатна система</string>
     <string name="links_form_type">Икона на контекстното меню</string>
     <string name="links_form_uri_template_coords">Шаблон за URL адрес</string>

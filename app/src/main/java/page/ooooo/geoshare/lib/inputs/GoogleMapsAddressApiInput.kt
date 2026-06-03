@@ -8,6 +8,7 @@ import io.ktor.client.request.accept
 import io.ktor.client.request.prepareRequest
 import io.ktor.client.request.url
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.headers
 import io.ktor.serialization.JsonConvertException
 import io.ktor.serialization.kotlinx.json.json
@@ -22,6 +23,7 @@ import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.network.ResponseNetworkException
 import page.ooooo.geoshare.lib.network.ServerHttpClientFactory
 import page.ooooo.geoshare.lib.network.UnknownNetworkException
 import javax.inject.Inject
@@ -72,10 +74,16 @@ class GoogleMapsAddressApiInput @Inject constructor(
                         response.body<ServerHttpClientFactory.GoogleMapsResults>()
                     }
             }
+        } catch (tr: ResponseNetworkException) {
+            if (tr.response.status == HttpStatusCode.BadRequest || tr.response.status == HttpStatusCode.NotFound) {
+                // Return no points
+                return@parseResult
+            }
+            throw tr
         } catch (tr: UnknownNetworkException) {
             if (tr.cause is JsonConvertException) {
-                // Google returns a JSON without the 'results' property when no coordinates are found, so let's do
-                // nothing in this case
+                // Google returns a JSON without the 'results' property when no coordinates are found, so let's silently
+                // return no points in this case
                 log.i(TAG, "API returned no results")
                 return@parseResult
             }

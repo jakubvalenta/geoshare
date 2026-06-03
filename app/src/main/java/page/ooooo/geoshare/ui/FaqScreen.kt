@@ -25,24 +25,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.LinkAnnotation
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextLinkStyles
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.ui.components.ExpandablePane
+import page.ooooo.geoshare.ui.components.FormatArg
 import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.TextList
 import page.ooooo.geoshare.ui.components.TextListBullet
 import page.ooooo.geoshare.ui.components.TextListItem
+import page.ooooo.geoshare.ui.components.annotatedStringResource
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -79,7 +77,10 @@ fun FaqScreen(
             )
         },
     ) { innerPadding ->
+        val context = LocalContext.current
         val appName = stringResource(R.string.app_name)
+        val appServerName = stringResource(R.string.app_server_name)
+        val appServerUrl = stringResource(R.string.app_server_url)
         Column(
             Modifier
                 .padding(innerPadding)
@@ -111,6 +112,7 @@ fun FaqScreen(
                         listOf(
                             R.string.faq_how_text_2_item_http to R.string.faq_how_text_2_item_http_example,
                             R.string.faq_how_text_2_item_html to R.string.faq_how_text_2_item_html_example,
+                            R.string.faq_how_text_2_item_api to R.string.faq_how_text_2_item_api_example,
                             R.string.faq_how_text_2_item_web to null,
                         ).forEach { (textResId, exampleResId) ->
                             TextListItem(bullet = { TextListBullet() }) {
@@ -133,29 +135,12 @@ fun FaqScreen(
                     stringResource(R.string.faq_how_text_3, appName)
                 )
                 ParagraphText(
-                    buildAnnotatedString {
-                        val parts = stringResource(R.string.faq_how_text_4).split($$"%1$s")
-                        parts.forEachIndexed { i, part ->
-                            append(part)
-                            if (i < parts.size - 1) {
-                                withLink(
-                                    LinkAnnotation.Clickable(
-                                        "preferences",
-                                        styles = TextLinkStyles(
-                                            SpanStyle(
-                                                color = MaterialTheme.colorScheme.tertiary,
-                                                textDecoration = TextDecoration.Underline
-                                            )
-                                        ),
-                                    ) {
-                                        onNavigateToUserPreferencesConnectionPermissionScreen()
-                                    }
-                                ) {
-                                    append(stringResource(R.string.faq_how_text_4_preferences_button))
-                                }
-                            }
-                        }
-                    }
+                    annotatedStringResource(
+                        R.string.faq_how_text_4,
+                        FormatArg.Link(stringResource(R.string.faq_how_text_4_preferences_button)) {
+                            onNavigateToUserPreferencesConnectionPermissionScreen()
+                        },
+                    )
                 )
             }
             FaqItem(
@@ -166,6 +151,19 @@ fun FaqScreen(
             ) {
                 ParagraphText(
                     stringResource(R.string.faq_privacy_text, appName)
+                )
+                ParagraphText(
+                    annotatedStringResource(
+                        R.string.faq_privacy_text_server,
+                        FormatArg.Text(appName),
+                        FormatArg.Text(appServerName),
+                        FormatArg.Link(appServerName) {
+                            AndroidTools.openWebUri(context, appServerUrl)
+                        },
+                    )
+                )
+                ParagraphText(
+                    stringResource(R.string.faq_privacy_text_html, appName)
                 )
             }
             FaqItem(

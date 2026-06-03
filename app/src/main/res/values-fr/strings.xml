@@ -212,7 +212,7 @@
     <string name="output_open_navigation">Naviguer</string>
     <string name="output_open_street_view">Street view</string>
     <string name="output_open_link">Ouvrir le lien %1$s</string>
-    <string name="delete">Supprimer</string>
+    <string name="links_delete">Supprimer</string>
     <string name="links_delete_text">La carte web « %1$s » sera définitivement supprimée.</string>
     <string name="links_delete_title">Supprimer la carte web ?</string>
     <string name="links_description">Les cartes Web permettent d’afficher des coordonnées dans le navigateur. Activez celles qui sont préinstallées ou ajoutez les vôtres.</string>
@@ -222,7 +222,7 @@
     <string name="links_form_enabled_option_sheet">Afficher dans le menu Copier</string>
     <string name="links_form_group">Groupe</string>
     <string name="links_form_name">Nom</string>
-    <string name="save">Enregistrer</string>
+    <string name="links_form_save">Enregistrer</string>
     <string name="links_form_srs">Système de coordonnées</string>
     <string name="links_form_type">Icône du menu contextuel</string>
     <string name="links_form_uri_template_coords">Modèle d’URL</string>

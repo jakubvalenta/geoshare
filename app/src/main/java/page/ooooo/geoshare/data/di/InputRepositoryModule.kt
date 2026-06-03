@@ -182,7 +182,6 @@ object FakeInputRepository : InputRepository {
     val googleMapsPlaceApiInput = GoogleMapsPlaceApiInput(
         serverHttpClientFactory = serverHttpClientFactory,
         googleMapsHtmlInput = { googleMapsHtmlInput },
-        log = log,
         serverRepository = serverRepository,
         uriQuote = uriQuote,
     )

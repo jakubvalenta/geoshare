@@ -15,7 +15,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.ServerRepository
-import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
@@ -31,7 +30,6 @@ import javax.inject.Singleton
 class GoogleMapsPlaceApiInput @Inject constructor(
     private val serverHttpClientFactory: ServerHttpClientFactory,
     private val googleMapsHtmlInput: Lazy<GoogleMapsHtmlInput>,
-    private val log: Log,
     private val serverRepository: ServerRepository,
     private val uriQuote: UriQuote,
 ) : BasicInput<Uri>, Input.HasPermission {
@@ -73,9 +71,8 @@ class GoogleMapsPlaceApiInput @Inject constructor(
                     }
             }
         } catch (tr: ResponseNetworkException) {
-            if (tr.response.status == HttpStatusCode.BadRequest) {
-                // Google returns error 400 when the place id is incorrect, so let's do nothing in this case
-                log.i(TAG, "API returned no results")
+            if (tr.response.status == HttpStatusCode.BadRequest || tr.response.status == HttpStatusCode.NotFound) {
+                // Return no points
                 return@parseResult
             }
             throw tr

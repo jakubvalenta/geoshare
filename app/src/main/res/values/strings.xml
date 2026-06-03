@@ -1,6 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">GeoShare</string>
     <string name="app_name_pro" translatable="false">GeoShare Pro</string>
+    <string name="app_server_name" translatable="false">GeoShare Server</string>
+    <string name="app_server_url" translatable="false">https://github.com/jakubvalenta/geoshare-server</string>
     <string name="not_available">Not available</string>
     <string name="billing_consume_purchases" translatable="false">consume purchases</string>
     <string name="billing_feature_all" translatable="false">All features of the basic version</string>
@@ -205,8 +207,9 @@
     <string name="faq_title">FAQ</string>
     <string name="faq_how_headline">How it works</string>
     <string name="faq_how_text_1">%1$s converts map links into geo: links that can be opened by other map apps. To create a geo: link, geographic coordinates are required. %1$s extracts them from the map URL.</string>
-    <string name="faq_how_text_2">However, not all map URLs include coordinates. In such cases, %1$s will prompt you for permission to connect to the map service (Google Maps, Apple Maps etc.) and retrieve the coordinates from:
-</string>
+    <string name="faq_how_text_2">However, not all map URLs include coordinates. In such cases, %1$s will prompt you for permission to connect to the map service (Google Maps, Apple Maps etc.) and retrieve the coordinates from:</string>
+    <string name="faq_how_text_2_item_api">or the API of the map service,</string>
+    <string name="faq_how_text_2_item_api_example" translatable="false">GET https://geocode.googleapis.com/v4/geocode/address/…</string>
     <string name="faq_how_text_2_item_http">either HTTP headers,</string>
     <string name="faq_how_text_2_item_http_example" translatable="false">Location: https://google.com/maps/@40.78,-73.96,19z</string>
     <string name="faq_how_text_2_item_html">or HTML document,</string>
@@ -218,7 +221,9 @@
     <string name="faq_location_permission_headline">Location permission</string>
     <string name="faq_location_permission_text">%1$s asks for location permission when launching the TomTom navigation and when sharing a GPX route, because in these cases the app needs to create a GPX route that starts at your current location. The location information is discarded immediately after the creation of the route.</string>
     <string name="faq_privacy_headline">Privacy considerations</string>
-    <string name="faq_privacy_text">When possible, %1$s converts map links offline. If the map link requires online conversion, the app will ask you before connecting to the map service (Google Maps, Apple Maps, etc.). If you allow the connection, the map service will receive the map link, it will be able to read your IP address, and in some cases %1$s will load the live web page of the map service and execute its JavaScript. This happens in a restricted environment, which blocks tracking scripts and doesn’t store cookies.</string>
+    <string name="faq_privacy_text">When possible, %1$s converts map links offline. If the map link requires online conversion, the app will ask you before connecting to the map service (Google Maps, Apple Maps, etc.). If you allow the connection, the map service will receive the map link, and it will be able to read your IP address.</string>
+    <string name="faq_privacy_text_server">For some map links, %1$s calls a remote server, the open-source %3$s. This server then calls the map service API (e.g. the Google Maps API). %2$s doesn’t keep logs of map links. To apply rate limiting, it stores a public key that identifies your device and separately your IP address for limited time.</string>
+    <string name="faq_privacy_text_html">For some map links, %1$s loads the live web page of the map service and executes its JavaScript. This happens in a restricted environment, which blocks tracking scripts and doesn’t store cookies.</string>
     <string name="user_preferences_title">Preferences</string>
     <string name="user_preferences_automation_description">Choose an action to perform automatically when a map link is converted to coordinates.</string>
     <string name="user_preferences_automation_nothing">Nothing</string>
@@ -260,7 +265,7 @@
     <string name="inputs_settings">Go to Android settings to choose links that should always open in %1$s</string>
     <string name="inputs_title">Supported maps</string>
     <string name="licenses">Licenses</string>
-    <string name="delete">Delete</string>
+    <string name="links_delete">Delete</string>
     <string name="links_delete_text">The web map “%1$s” will be permanently deleted.</string>
     <string name="links_delete_title">Delete web map?</string>
     <string name="links_description">Web maps allow opening coordinates in the browser. Turn on the pre-installed ones or add your own.</string>
@@ -270,6 +275,7 @@
     <string name="links_form_enabled_option_sheet">Show in the copy menu</string>
     <string name="links_form_group">Group</string>
     <string name="links_form_name">Name</string>
+    <string name="links_form_save">Save</string>
     <string name="links_form_srs">Coordinate system</string>
     <string name="links_form_test_china" translatable="false">Test Forbidden City</string>
     <string name="links_form_test_world" translatable="false">Test Kilimanjaro</string>
@@ -299,7 +305,6 @@
     <string name="network_exception_unauthorized">Unauthorized</string>
     <string name="network_exception_unresolved_address">Unresolved address</string>
     <string name="reset">reset</string>
-    <string name="save">Save</string>
     <string name="seconds_unit">seconds</string>
     <plurals name="seconds">
         <item quantity="one">%1$d second</item>
@@ -320,13 +325,13 @@
     <string name="server_description">Description</string>
     <string name="server_insert">Add server</string>
     <string name="server_invalid">Draft</string>
-    <string name="server_list_description">Configure URLs and authentication of remote servers, which provide map link conversion.</string>
-    <string name="server_list_title">Server details</string>
+    <string name="server_list_description">Configure the addresses and authentication of the servers that provide map link conversion.</string>
+    <string name="server_list_title">Server list</string>
     <string name="server_message_deleted">Server deleted</string>
     <string name="server_message_factory_reset">Server have been reset to factory defaults</string>
     <string name="server_message_inserted">Server added</string>
     <string name="server_message_updated">Server updated</string>
-    <string name="server_none">None</string>
+    <string name="server_none">No server</string>
     <string name="server_restore_initial_data">Reset servers to factory defaults</string>
     <string name="server_restore_initial_data_text">All your servers will be deleted and replaced with the pre-installed ones.</string>
     <string name="server_restore_initial_data_title">Reset servers to factory defaults?</string>
@@ -345,12 +350,12 @@
     <string name="user_preferences_apps_description">Choose which of your installed apps should be displayed after converting a map link to coordinates.</string>
     <string name="user_preferences_apps_message_hidden">The app has been hidden. You can show it again in preferences.</string>
     <string name="user_preferences_apps_title">Apps</string>
-    <string name="user_preferences_navigate_to_server_screen">Configure server details</string>
+    <string name="user_preferences_navigate_to_server_list">Edit server list</string>
     <string name="user_preferences_section_input">Input</string>
     <string name="user_preferences_section_output">Output</string>
     <string name="user_preferences_servers_description">Certain map links can’t be converted on your device but require a remote server. Choose which servers provide this functionality.</string>
     <string name="user_preferences_servers_google_maps_address_title">Google Maps addresses</string>
-    <string name="user_preferences_servers_google_maps_none_description">Use experimental extraction of coordinates from HTML</string>
+    <string name="user_preferences_servers_google_maps_none_description">Use experimental extraction of coordinates from HTML on your device</string>
     <string name="user_preferences_servers_google_maps_place_title">Google Maps place ids</string>
     <string name="user_preferences_servers_search_none_description">Search will not be available</string>
     <string name="user_preferences_servers_search_title">Search</string>

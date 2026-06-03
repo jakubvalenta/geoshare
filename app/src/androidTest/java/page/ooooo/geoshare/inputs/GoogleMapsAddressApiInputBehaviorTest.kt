@@ -265,6 +265,27 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
                 )
             },
         )
-    }
 
+        // No points found
+        if (testServer is TestServer.Configured) {
+            testUriFails(
+                setOf(
+                    "No points found",
+                    @Suppress("SpellCheckingInspection") "Aucun point trouvé",
+                ),
+                "https://www.google.com/maps/place//",
+            )
+        } else if (htmlParsingSupported) {
+            // Google Maps HTML shows coordinates of the IP address that the request came from
+            testUriAnyCoordinates("https://www.google.com/maps/place//")
+        } else {
+            testUriFails(
+                setOf(
+                    "This link is not supported"
+                    // TODO Add French translation
+                ),
+                "https://www.google.com/maps/place//",
+            )
+        }
+    }
 }

@@ -21,7 +21,7 @@ class ConversionFreeBehaviorTest {
             onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
 
             // Shows precise location
-            assertConversionSucceeded(
+            assertConversionSucceeds(
                 GCJ02Point(
                     52.4848232, 13.4240791,
                     name = @Suppress("SpellCheckingInspection") "Hermannstraße 10, 12049 Berlin",
@@ -54,7 +54,7 @@ class ConversionFreeBehaviorTest {
             }
 
             // Shows precise location
-            assertConversionSucceeded(
+            assertConversionSucceeds(
                 GCJ02Point(
                     52.4834254, 13.4245399,
                     name = @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin",
@@ -67,7 +67,7 @@ class ConversionFreeBehaviorTest {
             quickWaitForStableInActiveWindow()
 
             // Shows precise location again
-            assertConversionSucceeded(
+            assertConversionSucceeds(
                 GCJ02Point(
                     52.4832988, 13.4245179,
                     name = @Suppress("SpellCheckingInspection") "Hermannstraße 21, 12049 Berlin",
@@ -90,7 +90,7 @@ class ConversionFreeBehaviorTest {
             onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.dismissDialog()
 
             // Shows location search
-            assertConversionSucceeded(
+            assertConversionSucceeds(
                 GCJ02Point(
                     name = @Suppress("SpellCheckingInspection") "Hermannstr. 30, Berlin",
                     source = Source.URI,
@@ -121,7 +121,7 @@ class ConversionFreeBehaviorTest {
             }
 
             // Shows location search
-            assertConversionSucceeded(
+            assertConversionSucceeds(
                 GCJ02Point(
                     name = @Suppress("SpellCheckingInspection") "Hermannstr. 40, Berlin",
                     source = Source.URI,
@@ -133,7 +133,7 @@ class ConversionFreeBehaviorTest {
             quickWaitForStableInActiveWindow()
 
             // Shows location search
-            assertConversionSucceeded(
+            assertConversionSucceeds(
                 GCJ02Point(
                     name = @Suppress("SpellCheckingInspection") "Hermannstr. 41, Berlin",
                     source = Source.URI,
