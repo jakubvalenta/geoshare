@@ -207,8 +207,7 @@
     <string name="faq_title">FAQ</string>
     <string name="faq_how_headline">How it works</string>
     <string name="faq_how_text_1">%1$s converts map links into geo: links that can be opened by other map apps. To create a geo: link, geographic coordinates are required. %1$s extracts them from the map URL.</string>
-    <string name="faq_how_text_2">However, not all map URLs include coordinates. In such cases, %1$s will prompt you for permission to connect to the map service (Google Maps, Apple Maps etc.) and retrieve the coordinates from:
-</string>
+    <string name="faq_how_text_2">However, not all map URLs include coordinates. In such cases, %1$s will prompt you for permission to connect to the map service (Google Maps, Apple Maps etc.) and retrieve the coordinates from:</string>
     <string name="faq_how_text_2_item_api">or the API of the map service,</string>
     <string name="faq_how_text_2_item_api_example" translatable="false">GET https://geocode.googleapis.com/v4/geocode/address/…</string>
     <string name="faq_how_text_2_item_http">either HTTP headers,</string>
@@ -223,8 +222,8 @@
     <string name="faq_location_permission_text">%1$s asks for location permission when launching the TomTom navigation and when sharing a GPX route, because in these cases the app needs to create a GPX route that starts at your current location. The location information is discarded immediately after the creation of the route.</string>
     <string name="faq_privacy_headline">Privacy considerations</string>
     <string name="faq_privacy_text">When possible, %1$s converts map links offline. If the map link requires online conversion, the app will ask you before connecting to the map service (Google Maps, Apple Maps, etc.). If you allow the connection, the map service will receive the map link, and it will be able to read your IP address.</string>
-    <string name="faq_privacy_text_2">For some map links, %1$s calls a remote server, the open-source %3$s. This server then calls the map service API (e.g. the Google Maps API). %2$s doesn’t keep logs of map links. To apply rate limiting, it stores a public key that identifies your device and separately your IP address for limited time.</string>
-    <string name="faq_privacy_text_3">For some map links, %1$s loads the live web page of the map service and executes its JavaScript. This happens in a restricted environment, which blocks tracking scripts and doesn’t store cookies.</string>
+    <string name="faq_privacy_text_server">For some map links, %1$s calls a remote server, the open-source %3$s. This server then calls the map service API (e.g. the Google Maps API). %2$s doesn’t keep logs of map links. To apply rate limiting, it stores a public key that identifies your device and separately your IP address for limited time.</string>
+    <string name="faq_privacy_text_html">For some map links, %1$s loads the live web page of the map service and executes its JavaScript. This happens in a restricted environment, which blocks tracking scripts and doesn’t store cookies.</string>
     <string name="user_preferences_title">Preferences</string>
     <string name="user_preferences_automation_description">Choose an action to perform automatically when a map link is converted to coordinates.</string>
     <string name="user_preferences_automation_nothing">Nothing</string>

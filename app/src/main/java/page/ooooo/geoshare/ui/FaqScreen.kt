@@ -154,7 +154,7 @@ fun FaqScreen(
                 )
                 ParagraphText(
                     annotatedStringResource(
-                        R.string.faq_privacy_text_2,
+                        R.string.faq_privacy_text_server,
                         FormatArg.Text(appName),
                         FormatArg.Text(appServerName),
                         FormatArg.Link(appServerName) {
@@ -162,9 +162,8 @@ fun FaqScreen(
                         },
                     )
                 )
-                // TODO Distinguish free and pro
                 ParagraphText(
-                    stringResource(R.string.faq_privacy_text_3, appName)
+                    stringResource(R.string.faq_privacy_text_html, appName)
                 )
             }
             FaqItem(
