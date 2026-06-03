@@ -221,7 +221,7 @@
     <string name="user_preferences_coordinate_format_option_dec">Desetinné stupně</string>
     <string name="user_preferences_coordinate_format_option_deg_min_sec">Stupně, minuty, vteřiny</string>
     <string name="user_preferences_coordinate_format_title">Formát souřadnic</string>
-    <string name="delete">Smazat</string>
+    <string name="links_delete">Smazat</string>
     <string name="links_delete_text">Webová mapa „%1$s“ bude trvale smazána.</string>
     <string name="links_delete_title">Smazat webovou mapu?</string>
     <string name="links_description">Webové mapy umožňují otevřít souřadnice v prohlížeči. Povolte ty předinstalované nebo přidejte své vlastní.</string>
@@ -231,7 +231,7 @@
     <string name="links_form_enabled_option_sheet">Zobrazit v menu kopírování</string>
     <string name="links_form_group">Skupina</string>
     <string name="links_form_name">Název</string>
-    <string name="save">Uložit</string>
+    <string name="links_form_save">Uložit</string>
     <string name="links_form_srs">Systém souřadnic</string>
     <string name="links_form_type">Ikona v kontextovém menu</string>
     <string name="links_form_uri_template_coords">Šablona URL</string>

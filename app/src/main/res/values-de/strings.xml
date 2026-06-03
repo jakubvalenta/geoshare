@@ -230,7 +230,7 @@
     <string name="conversion_failed_reason_no_points">Keine Punkte gefunden</string>
     <string name="conversion_failed_reason_timeout">Zeitüberschreitung</string>
     <string name="licenses">Lizenzen</string>
-    <string name="delete">Löschen</string>
+    <string name="links_delete">Löschen</string>
     <string name="links_delete_text">Die Webkarte „%1$s“ wird endgültig gelöscht.</string>
     <string name="links_delete_title">Webkarte löschen?</string>
     <string name="links_description">Webkarten ermöglichen das Öffnen von Koordinaten im Webbrowser. Aktiviere die vorinstallierten Karten oder füge eigene hinzu.</string>
@@ -240,7 +240,7 @@
     <string name="links_form_enabled_option_sheet">Im Kopiermenü anzeigen</string>
     <string name="links_form_group">Gruppe</string>
     <string name="links_form_name">Name</string>
-    <string name="save">Speichern</string>
+    <string name="links_form_save">Speichern</string>
     <string name="links_form_srs">Koordinatensystem</string>
     <string name="links_form_type">Kontextmenü-Symbol</string>
     <string name="links_form_uri_template_coords">URL-Vorlage</string>

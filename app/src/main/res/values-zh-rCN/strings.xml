@@ -200,7 +200,7 @@
     <string name="output_open_navigation">导航</string>
     <string name="output_open_street_view">街景</string>
     <string name="output_open_link">打开 %1$s 链接</string>
-    <string name="delete">删除</string>
+    <string name="links_delete">删除</string>
     <string name="links_delete_text">网络地图“%1$s”将被永久删除。</string>
     <string name="links_delete_title">删除网络地图？</string>
     <string name="links_description">网络地图允许在浏览器中打开坐标。开启预装地图或添加自定义地图。</string>
@@ -210,7 +210,7 @@
     <string name="links_form_enabled_option_sheet">在复制菜单中显示</string>
     <string name="links_form_group">分组</string>
     <string name="links_form_name">名称</string>
-    <string name="save">保存</string>
+    <string name="links_form_save">保存</string>
     <string name="links_form_srs">坐标系</string>
     <string name="links_form_type">上下文菜单图标</string>
     <string name="links_form_uri_template_coords">URL 模板</string>

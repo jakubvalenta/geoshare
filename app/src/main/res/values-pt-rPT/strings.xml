@@ -230,7 +230,7 @@
     <string name="conversion_failed_reason_no_points">Nenhum ponto encontrado</string>
     <string name="conversion_failed_reason_timeout">Tempo esgotado</string>
     <string name="licenses">Licenças</string>
-    <string name="delete">Apagar</string>
+    <string name="links_delete">Apagar</string>
     <string name="links_delete_text">O mapa da web \"%1$s\" será apagado permanentemente.</string>
     <string name="links_delete_title">Apagar mapa da web?</string>
     <string name="links_description">Os mapas da web permitem abrir coordenadas no navegador. Ative os pré-instalados, ou adicione o seu.</string>
@@ -240,7 +240,7 @@
     <string name="links_form_enabled_option_sheet">Mostrar no menu de copiar</string>
     <string name="links_form_group">Grupo</string>
     <string name="links_form_name">Nome</string>
-    <string name="save">Gravar</string>
+    <string name="links_form_save">Gravar</string>
     <string name="links_form_srs">Sistema de coordenadas</string>
     <string name="links_form_type">Ícone do menu de contexto</string>
     <string name="links_form_uri_template_coords">Modelo de URL</string>
