@@ -9,8 +9,8 @@ height="80">](https://f-droid.org/packages/page.ooooo.geoshare/)
 alt="Get it on Izzy on Droid"
 height="80">](https://apt.izzysoft.de/packages/page.ooooo.geoshare)
 
-If you'd like to help getting the app published on **Google Play**, write me an
-email to `jakub at jakubvalenta dot cz` and I'll invite you to the testing
+If you’d like to help getting the app published on **Google Play**, write me an
+email to `jakub at jakubvalenta dot cz` and I’ll invite you to the testing
 program.
 
 [![F-Droid](https://img.shields.io/f-droid/v/page.ooooo.geoshare?logo=f-droid&label=F-Droid)](https://f-droid.org/packages/page.ooooo.geoshare/)
@@ -106,7 +106,7 @@ for Google Maps.
 
 ## How it works
 
-GeoShare converts map links (e.g. https://maps.app.goo.gl/...) into geo: links
+GeoShare converts map links (e.g. https://maps.app.goo.gl/…) into geo: links
 that can be opened by other map apps. To create a geo: link, geographic
 coordinates are required. GeoShare extracts them from the map URL.
 
@@ -118,7 +118,9 @@ Maps etc.)** and retrieve the coordinates from:
   `Location: https://google.com/maps/@40.78,-73.96,19z`
 - or HTML document, e.g.
   `<meta property="place:location:latitude" content="40.78">`
-- or the whole web page with running JavaScript.
+- or the API of the map service, e.g.
+  `GET https://geocode.googleapis.com/v4/geocode/address/…`
+- or the live web page including JavaScript.
 
 If you don’t allow connecting to the map service, then GeoShare creates a geo:
 link with a search term instead of coordinates, or it stops, depending on the
@@ -129,13 +131,20 @@ asking (the default), go to the app’s preferences.
 
 ## Privacy considerations
 
-When possible, GeoShare converts map links offline. If the map link requires
-online conversion, the app will ask you before connecting to the map service (
-Google Maps, Apple Maps, etc.). If you allow the connection, the map service
-will receive the map link, it will be able to read your IP address, and in some
-cases GeoShare will load the live web page of the map service and execute its
-JavaScript. This happens in a restricted environment, which blocks tracking
-scripts and doesn’t store cookies.
+When possible, GeoShare converts map links **offline**. If the map link requires
+online conversion, the app will ask you before connecting to the map service
+(Google Maps, Apple Maps, etc.). If you allow the connection, the map service
+will receive the map link, and it will be able to read your IP address.
+
+For some map links, GeoShare calls a **remote server**, the open-source
+[GeoShare Server](https://github.com/jakubvalenta/geoshare-server). This server
+then calls the map service API (e.g. the Google Maps API). GeoShare Server
+doesn’t keep logs of map links. To apply rate limiting, it stores a public key
+that identifies your device and separately your IP address for limited time.
+
+For some map links, GeoShare loads the **live web page** of the map service and
+executes its JavaScript. This happens in a restricted environment, which blocks
+tracking scripts and doesn’t store cookies.
 
 ## Location permission
 
@@ -238,7 +247,7 @@ fastlane metadata
 To share a URI input with the app running in emulator, run:
 
 ```shell
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.apple.com/?q=Central+Park\&sll=50.894967,4.341626\&z=10\&t=s' page.ooooo.geoshare.debug
+adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d "https://maps.apple.com/?q=Central+Park\&sll=50.894967,4.341626\&z=10\&t=s" page.ooooo.geoshare.debug
 ```
 
 Don’t forget to escape the `&` character.
@@ -246,7 +255,7 @@ Don’t forget to escape the `&` character.
 To share a text input, run:
 
 ```shell
-adb -s emulator-5554 shell am start -W -a android.intent.action.SEND -t text/plain -e android.intent.extra.TEXT 'N-68.648556,\ E-152.775879' page.ooooo.geoshare.debug
+adb -s emulator-5554 shell am start -W -a android.intent.action.SEND -t text/plain -e android.intent.extra.TEXT "N-68.648556,\ E-152.775879" page.ooooo.geoshare.debug
 ```
 
 ### Running against local API server
