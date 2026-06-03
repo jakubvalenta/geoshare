@@ -134,7 +134,7 @@ fun UserPreferenceServersControls(
                     .padding(top = spacing.mediumAdaptive, bottom = spacing.tinyAdaptive),
                 colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.tertiary),
             ) {
-                Text(stringResource(R.string.user_preferences_navigate_to_server_screen))
+                Text(stringResource(R.string.user_preferences_navigate_to_server_list))
             }
         }
     }
