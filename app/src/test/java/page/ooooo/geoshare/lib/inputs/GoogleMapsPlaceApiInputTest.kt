@@ -64,6 +64,8 @@ class GoogleMapsPlaceApiInputTest {
 
             server.getUrl("not-found", uriQuote) -> respondError(HttpStatusCode.NotFound)
 
+            server.getUrl("405", uriQuote) -> respondError(HttpStatusCode.MethodNotAllowed)
+
             else -> throw NotImplementedError()
         }
     }
@@ -198,8 +200,8 @@ class GoogleMapsPlaceApiInputTest {
         )
     }
 
-    @Test(expected = ResponseNetworkException::class)
-    fun parse_whenApiReturns404_throwsException() = runTest {
+    @Test
+    fun parse_whenApiReturns404_returnsNoPoints() = runTest {
         val serverRepository: FakeServerRepository = mock {
             on { getSelectedGoogleMapsPlace() } doReturn server
         }
@@ -210,6 +212,24 @@ class GoogleMapsPlaceApiInputTest {
             uriQuote = uriQuote,
         )
         val match = "https://www.google.com/maps/search/?query_place_id=not-found"
+        assertEquals(
+            ParseResult(),
+            input.fetch(match) { data -> input.parse(data, match) },
+        )
+    }
+
+    @Test(expected = ResponseNetworkException::class)
+    fun parse_whenApiReturnsOther4xx_throwsException() = runTest {
+        val serverRepository: FakeServerRepository = mock {
+            on { getSelectedGoogleMapsPlace() } doReturn server
+        }
+        val input = GoogleMapsPlaceApiInput(
+            serverRepository = serverRepository,
+            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
+            googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
+            uriQuote = uriQuote,
+        )
+        val match = "https://www.google.com/maps/search/?query_place_id=405"
         input.fetch(match) { data -> input.parse(data, match) }
     }
 

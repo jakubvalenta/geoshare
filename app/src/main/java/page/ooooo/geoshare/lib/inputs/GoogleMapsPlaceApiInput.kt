@@ -15,7 +15,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.ServerRepository
-import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
@@ -72,7 +71,6 @@ class GoogleMapsPlaceApiInput @Inject constructor(
                     }
             }
         } catch (tr: ResponseNetworkException) {
-            // TODO Test
             if (tr.response.status == HttpStatusCode.BadRequest || tr.response.status == HttpStatusCode.NotFound) {
                 // Return no points
                 return@parseResult

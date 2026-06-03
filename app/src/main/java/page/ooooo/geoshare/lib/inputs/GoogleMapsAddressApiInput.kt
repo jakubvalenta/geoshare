@@ -75,7 +75,6 @@ class GoogleMapsAddressApiInput @Inject constructor(
                     }
             }
         } catch (tr: ResponseNetworkException) {
-            // TODO Test
             if (tr.response.status == HttpStatusCode.BadRequest || tr.response.status == HttpStatusCode.NotFound) {
                 // Return no points
                 return@parseResult
