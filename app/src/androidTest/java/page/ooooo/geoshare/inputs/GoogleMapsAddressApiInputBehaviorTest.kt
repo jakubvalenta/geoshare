@@ -97,6 +97,17 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
                 )
             },
             "https://www.google.com/maps/search/?api=1&query=Louisenstra%C3%9Fe%2060,%2001099%20Dresden",
+            fallbackPoint = if (testServer is TestServer.Configured) {
+                null
+            } else if (htmlParsingSupported) {
+                WGS84Point(
+                    51.0657922, 13.7555827,
+                    name = @Suppress("SpellCheckingInspection") "Louisenstraße 60, 01099 Neustadt",
+                    source = Source.URI,
+                )
+            } else {
+                null
+            },
         )
 
         // Short links with coordinates in HTML
