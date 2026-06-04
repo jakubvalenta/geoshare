@@ -353,12 +353,12 @@
     <string name="user_preferences_navigate_to_server_list">Edit server list</string>
     <string name="user_preferences_section_input">Input</string>
     <string name="user_preferences_section_output">Output</string>
-    <string name="user_preferences_servers_description">Certain map links can’t be converted on your device but require a remote server. Choose which servers provide this functionality.</string>
+    <string name="user_preferences_servers_description">Certain map links can’t be converted on your device and require a remote server instead. Choose which servers to use.</string>
     <string name="user_preferences_servers_google_maps_address_title">Google Maps addresses</string>
     <string name="user_preferences_servers_google_maps_none_description">Use experimental extraction of coordinates from HTML on your device</string>
     <string name="user_preferences_servers_google_maps_place_title">Google Maps place ids</string>
     <string name="user_preferences_servers_search_none_description">Search will not be available</string>
     <string name="user_preferences_servers_search_title">Search</string>
-    <string name="user_preferences_servers_title">API Servers</string>
+    <string name="user_preferences_servers_title">API servers</string>
     <string name="yes">Yes</string>
 </resources>
