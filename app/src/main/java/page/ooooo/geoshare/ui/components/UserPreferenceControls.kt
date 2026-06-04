@@ -152,7 +152,10 @@ fun LazyListScope.userPreferenceServerControls(
             itemTestTag = itemTestTag,
         ) { item, modifier ->
             Column(modifier.weight(1f)) {
-                Text(item?.name ?: stringResource(R.string.server_none))
+                Text(
+                    item?.name?.let { stringResource(R.string.user_preferences_servers_item, it) }
+                        ?: stringResource(R.string.user_preferences_servers_none)
+                )
                 if (item == null) {
                     Text(itemNoneDescription(), style = MaterialTheme.typography.bodySmall)
                 } else if (item.description.isNotEmpty()) {

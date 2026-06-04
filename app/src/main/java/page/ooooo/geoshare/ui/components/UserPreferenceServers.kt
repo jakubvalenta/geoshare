@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ListItemDefaults
@@ -74,7 +75,7 @@ fun UserPreferenceServersControls(
     UserPreferenceControls(
         titleResId = R.string.user_preferences_servers_title,
         description = {
-            stringResource(R.string.user_preferences_servers_description)
+            stringResource(R.string.user_preferences_servers_description, stringResource(R.string.app_name))
         },
         billingAppNameResId = billingAppNameResId,
         wide = wide,
@@ -82,10 +83,22 @@ fun UserPreferenceServersControls(
         onNavigateToBillingScreen = onNavigateToBillingScreen,
     ) {
         item {
+            Button(
+                onClick = onNavigateToServerScreen,
+                modifier = Modifier.testTag("geoShareUserPreferenceNavigateToServerList"),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onSecondary,
+                ),
+            ) {
+                Text(stringResource(R.string.user_preferences_navigate_to_server_list))
+            }
+        }
+        item {
             val spacing = LocalSpacing.current
             LabelLarge(
                 stringResource(R.string.user_preferences_servers_google_maps_address_title),
-                Modifier.padding(top = spacing.smallAdaptive),
+                Modifier.padding(top = spacing.mediumAdaptive),
             )
         }
         userPreferenceServerControls(
@@ -124,18 +137,6 @@ fun UserPreferenceServersControls(
                 itemTestTag = { item -> "geoShareUserPreferenceServerSearch_${item?.name}" },
                 onSelect = onSelectServerSearch,
             )
-        }
-        item {
-            val spacing = LocalSpacing.current
-            TextButton(
-                onClick = onNavigateToServerScreen,
-                modifier = Modifier
-                    .testTag("geoShareUserPreferenceNavigateToServerList")
-                    .padding(top = spacing.mediumAdaptive, bottom = spacing.tinyAdaptive),
-                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.tertiary),
-            ) {
-                Text(stringResource(R.string.user_preferences_navigate_to_server_list))
-            }
         }
     }
 }
