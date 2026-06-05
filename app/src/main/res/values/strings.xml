@@ -354,7 +354,6 @@
     <string name="user_preferences_apps_description">Choose which of your installed apps should be displayed after converting a map link to coordinates.</string>
     <string name="user_preferences_apps_message_hidden">The app has been hidden. You can show it again in preferences.</string>
     <string name="user_preferences_apps_title">Apps</string>
-    <string name="user_preferences_navigate_to_server_list">Configure addresses and authentication</string>
     <string name="user_preferences_section_input">Input</string>
     <string name="user_preferences_section_output">Output</string>
     <string name="yes">Yes</string>
