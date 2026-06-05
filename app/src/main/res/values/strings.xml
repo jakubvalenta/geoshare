@@ -312,17 +312,17 @@
     </plurals>
     <string name="server_api_key">API key</string>
     <string name="server_api_key_header">HTTP header</string>
-    <string name="server_api_key_supporting_text">To avoid unexpected costs, set strict service restrictions and usage limits on the key.</string>
+    <string name="server_api_key_supporting_text">To avoid unexpected costs, use a key with strict service restrictions and quotas.</string>
     <string name="server_attestation">Hardware-backed key attestation</string>
     <string name="server_auth_type">Authentication</string>
     <string name="server_challenge_url">Challenge URL</string>
     <string name="server_delete_text">The server “%1$s” will be permanently deleted.</string>
     <string name="server_delete_title">Delete server?</string>
     <string name="server_insert">Add server</string>
-    <string name="server_invalid">Finish configuration</string>
-    <string name="server_list_description">When map service connection is allowed, %1$s can convert certain map links using remote servers.</string>
+    <string name="server_invalid">Set credentials</string>
+    <string name="server_list_description">When map service connection is allowed, %1$s uses API servers to convert certain links to coordinates. Choose whether to use official servers with your own credentials, proxy servers, or none.</string>
     <string name="server_list_google_maps_address_title">Google Maps addresses</string>
-    <string name="server_list_google_maps_none_description">Prefer experimental extraction from HTML</string>
+    <string name="server_list_google_maps_none_description">Extract coordinates from HTML (experimental)</string>
     <string name="server_list_google_maps_place_title">Google Maps place ids</string>
     <string name="server_list_none">Don’t use API server</string>
     <string name="server_list_search_none_description">Search will not be available</string>
