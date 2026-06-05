@@ -598,36 +598,27 @@ fun TestServerParams.getAndAssumeTestServer(): TestServer = when (this) {
 }
 
 fun UiAutomatorTestScope.configureServer(testServer: TestServer) {
-    // Go to Google Maps Server preferences
+    // Go to server list
     goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
 
     when (testServer) {
         is TestServer.Configured -> {
-            // Go to server list
-            onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }.apply {
-                scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceNavigateToServerList" }.click()
-            }
-
             // Insert a new server
             onElement { viewIdResourceName == "geoShareServerListInsert" }.click()
             fillAndSaveServerForm(testServer.server)
 
-            // Go back to Google Maps Server preferences
-            quickWaitForStableInActiveWindow() // Wait for the new server to get saved
-            pressBack()
-
             // Select the server
-            onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }.apply {
-                scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServerGoogleMapsAddress_${testServer.server.name}" }.click()
-                scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServerGoogleMapsPlace_${testServer.server.name}" }.click()
+            onElement { viewIdResourceName == "geoShareServerListPane" }.apply {
+                scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerListItem_GoogleMapsAddress_${testServer.server.name}" }.click()
+                scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerListItem_GoogleMapsPlace_${testServer.server.name}" }.click()
             }
         }
 
         is TestServer.None -> {
             // Select no server
-            onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }.apply {
-                scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServerGoogleMapsAddress_null" }.click()
-                scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServerGoogleMapsPlace_null" }.click()
+            onElement { viewIdResourceName == "geoShareServerListPane" }.apply {
+                scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerListItem_GoogleMapsAddress_null" }.click()
+                scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerListItem_GoogleMapsPlace_null" }.click()
             }
         }
     }

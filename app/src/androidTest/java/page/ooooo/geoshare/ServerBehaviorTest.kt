@@ -21,13 +21,8 @@ class ServerBehaviorTest {
         waitForAppToBeVisible()
         closeIntro()
 
-        // Go to server preferences
-        goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
-
         // Go to server list
-        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }.apply {
-            scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceNavigateToServerList" }.click()
-        }
+        goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
 
         // Insert a new server
         val server = Server(
@@ -42,7 +37,7 @@ class ServerBehaviorTest {
         fillAndSaveServerForm(server)
 
         // Shows the new server
-        onElement { viewIdResourceName == "geoShareSegmentedListItemContent" && textAsString() == server.name }
+        onElement { viewIdResourceName == "geoShareServerListItem_GoogleMapsAddress_${server.name}" }
     }
 
     @Test
@@ -52,16 +47,12 @@ class ServerBehaviorTest {
         waitForAppToBeVisible()
         closeIntro()
 
-        // Go to server preferences
+        // Go to server list
         goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
 
-        // Go to server list
-        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }.apply {
-            scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceNavigateToServerList" }.click()
-        }
-
         // Go to server detail
-        onElement { viewIdResourceName == "geoShareServerListItem_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" }.click()
+        onElement { viewIdResourceName == "geoShareServerListItemMenu_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" }.click()
+        onElement { viewIdResourceName == "geoShareServerListItemMenuDetail_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" }.click()
 
         // Update the server
         val server = Server(
@@ -73,13 +64,14 @@ class ServerBehaviorTest {
         fillAndSaveServerForm(server)
 
         // Shows the updated server
-        onElement { viewIdResourceName == "geoShareSegmentedListItemContent" && textAsString() == "Google Maps edited" }
+        onElement { viewIdResourceName == "geoShareServerListItem_GoogleMapsAddress_Google Maps Geocode Address edited" }
 
         // Go to the server detail again
-        onElement { viewIdResourceName == "geoShareServerListItem_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" }.click()
+        onElement { viewIdResourceName == "geoShareServerListItemMenu_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" }.click()
+        onElement { viewIdResourceName == "geoShareServerListItemMenuDetail_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" }.click()
 
         // Shows the updated values
-        onElement { viewIdResourceName == "geoShareServerFormName" && textAsString() == "Google Maps edited" }
+        onElement { viewIdResourceName == "geoShareServerFormName" && textAsString() == "Google Maps Geocode Address edited" }
         onElement { viewIdResourceName == "geoShareServerFormUrlTemplate" && textAsString() == "https://geocode.googleapis.com/v4/geocode/address/{q}/edited" }
         onElement { viewIdResourceName == "geoShareServerDetailPane" }.apply {
             scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerFormApiKeyHeader" && textAsString() == "X-My-Header" }
@@ -93,7 +85,7 @@ class ServerBehaviorTest {
         onElement { viewIdResourceName == "geoShareServerDeleteDialog" }.confirmDialog()
 
         // Does not show the server anymore
-        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareServerListItem_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" })
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareServerListItemMenu_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" })
 
         // Wait for the delete toast to disappear, because it covers the restore button
         runBlocking {
@@ -113,7 +105,7 @@ class ServerBehaviorTest {
 
         // Shows the restored server
         onElement { viewIdResourceName == "geoShareServerListPane" }
-            .scrollToElement(Direction.UP) { viewIdResourceName == "geoShareServerListItem_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" }
+            .scrollToElement(Direction.UP) { viewIdResourceName == "geoShareServerListItemMenu_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" }
     }
 }
 

@@ -321,7 +321,7 @@ private fun ServerListPane(
         serverListSection(
             destination = destination,
             all = all,
-            itemTestTag = { "geoShareServerGoogleAddressListItem_${it?.uuid}" },
+            itemTestTag = { "geoShareServerListItem_GoogleMapsAddress_${it?.name}" },
             title = { stringResource(R.string.server_list_google_maps_address_title) },
             noneDescription = { stringResource(R.string.server_list_google_maps_none_description) },
             selectedServer = selectedServerGoogleMapsAddress,
@@ -331,7 +331,7 @@ private fun ServerListPane(
         serverListSection(
             destination = destination,
             all = all,
-            itemTestTag = { "geoShareServerGoogleMapsPlaceListItem_${it?.uuid}" },
+            itemTestTag = { "geoShareServerListItem_GoogleMapsPlace_${it?.name}" },
             title = { stringResource(R.string.server_list_google_maps_place_title) },
             noneDescription = { stringResource(R.string.server_list_google_maps_none_description) },
             selectedServer = selectedServerGoogleMapsPlace,
@@ -342,7 +342,7 @@ private fun ServerListPane(
             serverListSection(
                 destination = destination,
                 all = all,
-                itemTestTag = { "geoShareServerSearchListItem_${it?.uuid}" },
+                itemTestTag = { "geoShareServerSearchListItem_${it?.name}" },
                 title = { stringResource(R.string.server_list_search_title) },
                 noneDescription = { stringResource(R.string.server_list_search_none_description) },
                 selectedServer = selectedServerSearch,
