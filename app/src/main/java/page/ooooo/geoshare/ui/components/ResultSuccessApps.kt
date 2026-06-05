@@ -63,7 +63,7 @@ fun ResultSuccessApps(
     onDisableLinkGroup: (group: String?) -> Unit,
     onExecute: (Action<*>) -> Unit,
     onHideApp: (packageName: String) -> Unit,
-    onNavigateToLinksScreen: () -> Unit,
+    onNavigateToLinkScreen: () -> Unit,
 ) {
     val lastPoint = points.lastOrNull() ?: return
     val onClick = { output: Output ->
@@ -147,7 +147,7 @@ fun ResultSuccessApps(
                 style = MaterialTheme.typography.bodyLarge,
             )
             IconButton(
-                { onNavigateToLinksScreen() },
+                { onNavigateToLinkScreen() },
             ) {
                 Icon(
                     Icons.Default.Add,

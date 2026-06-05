@@ -93,7 +93,7 @@ fun MainNavigation(
                 onNavigateToFaqScreen = { navController.navigate(FaqRoute) },
                 onNavigateToInputsScreen = { navController.navigate(InputsRoute()) },
                 onNavigateToIntroScreen = { navController.navigate(IntroRoute) },
-                onNavigateToLinksScreen = { navController.navigate(LinkRoute) },
+                onNavigateToLinkScreen = { navController.navigate(LinkRoute) },
                 onNavigateToUserPreferencesAutomationScreen = {
                     navController.navigate(UserPreferencesRoute(UserPreferenceGroupId.AUTOMATION))
                 },
@@ -137,7 +137,7 @@ fun MainNavigation(
                 initialGroupId = route.id,
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
                 onNavigateToBillingScreen = { navController.navigate(BillingRoute) },
-                onNavigateToLinksScreen = { navController.navigate(LinkRoute) },
+                onNavigateToLinkScreen = { navController.navigate(LinkRoute) },
                 onNavigateToServerScreen = { navController.navigate(ServerRoute) },
                 billingViewModel = billingViewModel,
             )

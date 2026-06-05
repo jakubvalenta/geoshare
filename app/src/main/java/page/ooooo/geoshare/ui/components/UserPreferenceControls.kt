@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.ui.components
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,12 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.MutablePreferences
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.preferences.OptionsPreference
 import page.ooooo.geoshare.data.local.preferences.TextPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
@@ -129,42 +126,6 @@ fun <T> LazyListScope.userPreferenceOptionsControl(
                 HorizontalDivider(
                     modifier.padding(vertical = LocalSpacing.current.tinyAdaptive),
                     thickness = Dp.Hairline,
-                )
-            }
-        }
-    }
-}
-
-fun LazyListScope.userPreferenceServerControls(
-    selected: Server?,
-    servers: List<Server>,
-    itemNoneDescription: @Composable () -> String,
-    itemTestTag: ((item: Server?) -> String)? = null,
-    onSelect: (Server?) -> Unit,
-) {
-    item {
-        RadioButtonGroup(
-            selectedValue = selected,
-            onSelect = onSelect,
-            values = listOf(null) + servers,
-            modifier = Modifier.padding(top = LocalSpacing.current.tinyAdaptive),
-            itemEnabled = { item -> item?.isValid() != false },
-            itemTestTag = itemTestTag,
-        ) { item, modifier ->
-            Column(modifier.weight(1f)) {
-                Text(item?.name ?: stringResource(R.string.server_none))
-                if (item == null) {
-                    Text(itemNoneDescription(), style = MaterialTheme.typography.bodySmall)
-                } else if (item.description.isNotEmpty()) {
-                    Text(item.description, style = MaterialTheme.typography.bodySmall)
-                }
-            }
-            if (item?.isValid() == false) {
-                Text(
-                    stringResource(R.string.server_invalid),
-                    modifier,
-                    fontStyle = FontStyle.Italic,
-                    style = MaterialTheme.typography.bodySmall,
                 )
             }
         }

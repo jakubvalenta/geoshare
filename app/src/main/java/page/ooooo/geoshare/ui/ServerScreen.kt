@@ -7,17 +7,22 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -33,21 +38,31 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
+import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.di.FakeGeoShareGoogleMapsAddressServer
+import page.ooooo.geoshare.data.di.FakeGeoShareGoogleMapsPlaceServer
 import page.ooooo.geoshare.data.di.FakeGoogleMapsAddressServer
 import page.ooooo.geoshare.data.di.defaultFakeServers
 import page.ooooo.geoshare.data.local.database.Server
@@ -60,6 +75,7 @@ import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
 import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.ScrollablePane
 import page.ooooo.geoshare.ui.components.SegmentedList
+import page.ooooo.geoshare.ui.components.SegmentedListLabel
 import page.ooooo.geoshare.ui.components.ServerForm
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -73,6 +89,9 @@ fun ServerScreen(
     val resources = LocalResources.current
     val all by viewModel.all.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
+    val selectedServerGoogleMapsAddress by viewModel.selectedServerGoogleMapsAddress.collectAsStateWithLifecycle()
+    val selectedServerGoogleMapsPlace by viewModel.selectedServerGoogleMapsPlace.collectAsStateWithLifecycle()
+    val selectedServerSearch by viewModel.selectedServerSearch.collectAsStateWithLifecycle()
 
     ServerScreen(
         destination = viewModel.destination,
@@ -82,10 +101,12 @@ fun ServerScreen(
         apiKeyHeader = viewModel.apiKeyHeader,
         authType = viewModel.authType,
         challengeUrl = viewModel.challengeUrl,
-        description = viewModel.description,
         name = viewModel.name,
         loginUrl = viewModel.loginUrl,
         registerUrl = viewModel.registerUrl,
+        selectedServerGoogleMapsAddress = selectedServerGoogleMapsAddress,
+        selectedServerGoogleMapsPlace = selectedServerGoogleMapsPlace,
+        selectedServerSearch = selectedServerSearch,
         urlTemplate = viewModel.urlTemplate,
         onBack = onBack,
         onDelete = { viewModel.delete(resources) },
@@ -97,11 +118,13 @@ fun ServerScreen(
         },
         onRestoreInitialData = { viewModel.restoreInitialData(resources) },
         onSaveForm = { viewModel.saveForm(resources) },
+        onSelectServerGoogleMapsAddress = { viewModel.selectServerGoogleMapsAddress(it?.uid) },
+        onSelectServerGoogleMapsPlace = { viewModel.selectServerGoogleMapsPlace(it?.uid) },
+        onSelectServerSearch = { viewModel.selectServerSearch(it?.uid) },
         onSetApiKey = { viewModel.apiKey = it },
         onSetApiKeyHeader = { viewModel.apiKeyHeader = it },
         onSetAuthType = { viewModel.authType = it },
         onSetChallengeUrl = { viewModel.challengeUrl = it },
-        onSetDescription = { viewModel.description = it },
         onSetLoginUrl = { viewModel.loginUrl = it },
         onSetName = { viewModel.name = it },
         onSetRegisterUrl = { viewModel.registerUrl = it },
@@ -120,10 +143,12 @@ private fun ServerScreen(
     apiKeyHeader: String,
     authType: ServerAuthType,
     challengeUrl: String,
-    description: String,
     loginUrl: String,
     name: String,
     registerUrl: String,
+    selectedServerGoogleMapsAddress: Server?,
+    selectedServerGoogleMapsPlace: Server?,
+    selectedServerSearch: Server?,
     urlTemplate: String,
     onBack: () -> Unit,
     onDelete: () -> Unit,
@@ -131,11 +156,13 @@ private fun ServerScreen(
     onNavigateTo: (Int?) -> Unit,
     onRestoreInitialData: () -> Unit,
     onSaveForm: () -> Unit,
+    onSelectServerGoogleMapsAddress: (Server?) -> Unit,
+    onSelectServerGoogleMapsPlace: (Server?) -> Unit,
+    onSelectServerSearch: (Server?) -> Unit,
     onSetApiKey: (String) -> Unit,
     onSetApiKeyHeader: (String) -> Unit,
     onSetAuthType: (ServerAuthType) -> Unit,
     onSetChallengeUrl: (String) -> Unit,
-    onSetDescription: (String) -> Unit,
     onSetLoginUrl: (String) -> Unit,
     onSetName: (String) -> Unit,
     onSetRegisterUrl: (String) -> Unit,
@@ -197,9 +224,15 @@ private fun ServerScreen(
                     destination = destination,
                     containerColor = containerColor,
                     all = all,
+                    selectedServerGoogleMapsAddress = selectedServerGoogleMapsAddress,
+                    selectedServerGoogleMapsPlace = selectedServerGoogleMapsPlace,
+                    selectedServerSearch = selectedServerSearch,
                     onBack = onBack,
                     onNavigateToContentKey = onNavigateTo,
                     onRestoreInitialData = onRestoreInitialData,
+                    onSelectServerGoogleMapsAddress = onSelectServerGoogleMapsAddress,
+                    onSelectServerGoogleMapsPlace = onSelectServerGoogleMapsPlace,
+                    onSelectServerSearch = onSelectServerSearch,
                 )
             },
             detailPane = { wide ->
@@ -213,7 +246,6 @@ private fun ServerScreen(
                         apiKeyHeader = apiKeyHeader,
                         authType = authType,
                         challengeUrl = challengeUrl,
-                        description = description,
                         loginUrl = loginUrl,
                         onBack = { onNavigateTo(null) },
                         onDelete = onDelete,
@@ -225,7 +257,6 @@ private fun ServerScreen(
                         onSetApiKeyHeader = onSetApiKeyHeader,
                         onSetAuthType = onSetAuthType,
                         onSetChallengeUrl = onSetChallengeUrl,
-                        onSetDescription = onSetDescription,
                         onSetLoginUrl = onSetLoginUrl,
                         onSetName = onSetName,
                         onSetRegisterUrl = onSetRegisterUrl,
@@ -244,9 +275,15 @@ private fun ServerListPane(
     destination: Int?,
     containerColor: Color,
     all: List<Server>,
+    selectedServerGoogleMapsAddress: Server?,
+    selectedServerGoogleMapsPlace: Server?,
+    selectedServerSearch: Server?,
     onBack: () -> Unit,
     onNavigateToContentKey: (Int?) -> Unit,
     onRestoreInitialData: () -> Unit,
+    onSelectServerGoogleMapsAddress: (Server?) -> Unit,
+    onSelectServerGoogleMapsPlace: (Server?) -> Unit,
+    onSelectServerSearch: (Server?) -> Unit,
 ) {
     val spacing = LocalSpacing.current
     val (restoreInitialDataDialogOpen, setRestoreInitialDataDialogOpen) = retain { mutableStateOf(false) }
@@ -263,7 +300,7 @@ private fun ServerListPane(
     ) {
         item {
             ParagraphText(
-                stringResource(R.string.server_list_description),
+                stringResource(R.string.server_list_description, stringResource(R.string.app_name)),
                 Modifier.padding(top = spacing.tinyAdaptive, bottom = spacing.smallAdaptive),
             )
         }
@@ -281,37 +318,36 @@ private fun ServerListPane(
                 Text(stringResource(R.string.server_insert))
             }
         }
-        item {
-            SegmentedList(
-                values = all,
-                modifier = Modifier.padding(top = spacing.medium),
-                itemHeadline = { item -> item.name },
-                itemIsSelected = { item -> item.uid == destination },
-                itemOnClick = { item -> onNavigateToContentKey(item.uid) },
-                itemSupportingContent = { item ->
-                    item.description.takeIf { it.isNotEmpty() }?.let { description ->
-                        {
-                            Text(
-                                description,
-                                style = MaterialTheme.typography.bodySmall,
-                            )
-                        }
-                    }
-                },
-                itemTrailingContent = { item ->
-                    if (!item.isValid()) {
-                        {
-                            Text(
-                                stringResource(R.string.server_invalid),
-                                fontStyle = FontStyle.Italic,
-                                style = MaterialTheme.typography.bodySmall,
-                            )
-                        }
-                    } else {
-                        null
-                    }
-                },
-                itemTestTag = { "geoShareServerListItem_${it.uuid}" },
+        serverListSection(
+            destination = destination,
+            all = all,
+            itemTestTag = { "geoShareServerListItem_GoogleMapsAddress_${it?.name}" },
+            title = { stringResource(R.string.server_list_google_maps_address_title) },
+            noneDescription = { stringResource(R.string.server_list_google_maps_none_description) },
+            selectedServer = selectedServerGoogleMapsAddress,
+            onNavigateToContentKey = onNavigateToContentKey,
+            onSelectServer = onSelectServerGoogleMapsAddress,
+        )
+        serverListSection(
+            destination = destination,
+            all = all,
+            itemTestTag = { "geoShareServerListItem_GoogleMapsPlace_${it?.name}" },
+            title = { stringResource(R.string.server_list_google_maps_place_title) },
+            noneDescription = { stringResource(R.string.server_list_google_maps_none_description) },
+            selectedServer = selectedServerGoogleMapsPlace,
+            onNavigateToContentKey = onNavigateToContentKey,
+            onSelectServer = onSelectServerGoogleMapsPlace,
+        )
+        if (BuildConfig.DEBUG) {
+            serverListSection(
+                destination = destination,
+                all = all,
+                itemTestTag = { "geoShareServerSearchListItem_${it?.name}" },
+                title = { stringResource(R.string.server_list_search_title) },
+                noneDescription = { stringResource(R.string.server_list_search_none_description) },
+                selectedServer = selectedServerSearch,
+                onNavigateToContentKey = onNavigateToContentKey,
+                onSelectServer = onSelectServerSearch,
             )
         }
         item {
@@ -356,7 +392,6 @@ private fun ServerDetailPane(
     challengeUrl: String,
     loginUrl: String,
     name: String,
-    description: String,
     registerUrl: String,
     urlTemplate: String,
     onBack: () -> Unit,
@@ -366,7 +401,6 @@ private fun ServerDetailPane(
     onSetApiKeyHeader: (String) -> Unit,
     onSetAuthType: (ServerAuthType) -> Unit,
     onSetChallengeUrl: (String) -> Unit,
-    onSetDescription: (String) -> Unit,
     onSetLoginUrl: (String) -> Unit,
     onSetName: (String) -> Unit,
     onSetRegisterUrl: (String) -> Unit,
@@ -407,7 +441,6 @@ private fun ServerDetailPane(
                         apiKeyHeader = apiKeyHeader,
                         authType = authType,
                         challengeUrl = challengeUrl,
-                        description = description,
                         loginUrl = loginUrl,
                         name = name,
                         registerUrl = registerUrl,
@@ -419,7 +452,6 @@ private fun ServerDetailPane(
                         onSetChallengeUrl = onSetChallengeUrl,
                         onSetLoginUrl = onSetLoginUrl,
                         onSetName = onSetName,
-                        onSetDescription = onSetDescription,
                         onSetRegisterUrl = onSetRegisterUrl,
                         onSetUrlTemplate = onSetUrlTemplate,
                         modifier = Modifier
@@ -450,9 +482,116 @@ private fun ServerDetailPane(
     }
 }
 
+fun LazyListScope.serverListSection(
+    destination: Int?,
+    all: List<Server>,
+    itemTestTag: (Server?) -> String,
+    title: @Composable () -> String,
+    noneDescription: @Composable () -> String,
+    selectedServer: Server?,
+    onNavigateToContentKey: (Int?) -> Unit,
+    onSelectServer: (Server?) -> Unit,
+) {
+    item {
+        SegmentedListLabel(title())
+    }
+    item {
+        SegmentedList(
+            values = listOf(null) + all,
+            itemHeadline = { item -> item?.name ?: stringResource(R.string.server_list_none) },
+            itemIsSelected = { item -> item?.uid == destination },
+            itemOnClick = onSelectServer,
+            itemEnabled = { item -> item?.isValid() != false },
+            itemLeadingContent = { item ->
+                {
+                    RadioButton(
+                        selected = item == selectedServer,
+                        // Null recommended for accessibility with screen readers
+                        onClick = null,
+                        enabled = item?.isValid() != false,
+                    )
+                }
+            },
+            itemSupportingContent = { item ->
+                if (item == null) {
+                    {
+                        Text(
+                            noneDescription(),
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                } else if (!item.isValid()) {
+                    {
+                        Text(
+                            buildAnnotatedString {
+                                withLink(
+                                    LinkAnnotation.Clickable(
+                                        "link",
+                                        styles = TextLinkStyles(
+                                            SpanStyle(
+                                                color = MaterialTheme.colorScheme.tertiary,
+                                                textDecoration = TextDecoration.Underline
+                                            )
+                                        ),
+                                    ) {
+                                        onNavigateToContentKey(item.uid)
+                                    }
+                                ) {
+                                    append(stringResource(R.string.server_invalid))
+                                }
+                            },
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                } else {
+                    null
+                }
+            },
+            itemTrailingContent = { item ->
+                if (item != null) {
+                    {
+                        var expanded by remember { mutableStateOf(false) }
+
+                        Box {
+                            IconButton(
+                                { expanded = true },
+                                Modifier.testTag("geoShareServerListItemMenu_${item.uuid}"),
+                            ) {
+                                Icon(
+                                    painterResource(R.drawable.more_vert_24px),
+                                    contentDescription = stringResource(R.string.nav_menu_content_description),
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false },
+                                modifier = Modifier.semantics { testTagsAsResourceId = true },
+                                shape = ShapeDefaults.Large,
+                                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.server_update)) },
+                                    modifier = Modifier.testTag("geoShareServerListItemMenuDetail_${item.uuid}"),
+                                    onClick = {
+                                        expanded = false
+                                        onNavigateToContentKey(item.uid)
+                                    },
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    null
+                }
+            },
+            itemTestTag = itemTestTag,
+        )
+    }
+}
+
 // Previews
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, device = "spec:width=1080px,height=4200px,dpi=440")
 @Composable
 private fun DefaultPreview() {
     AppTheme {
@@ -466,10 +605,12 @@ private fun DefaultPreview() {
                     apiKeyHeader = "",
                     authType = ServerAuthType.API_KEY,
                     challengeUrl = "",
-                    description = "",
                     loginUrl = "",
                     name = "",
                     registerUrl = "",
+                    selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
+                    selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
+                    selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
                     urlTemplate = "",
                     onBack = {},
                     onDelete = {},
@@ -477,11 +618,13 @@ private fun DefaultPreview() {
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
+                    onSelectServerGoogleMapsAddress = {},
+                    onSelectServerGoogleMapsPlace = {},
+                    onSelectServerSearch = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetChallengeUrl = {},
-                    onSetDescription = {},
                     onSetLoginUrl = {},
                     onSetName = {},
                     onSetRegisterUrl = {},
@@ -492,7 +635,11 @@ private fun DefaultPreview() {
     }
 }
 
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(
+    showBackground = true,
+    device = "spec:width=1080px,height=4200px,dpi=440",
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
 @Composable
 private fun DarkPreview() {
     AppTheme {
@@ -506,10 +653,12 @@ private fun DarkPreview() {
                     apiKeyHeader = "",
                     authType = ServerAuthType.API_KEY,
                     challengeUrl = "",
-                    description = "",
                     loginUrl = "",
                     name = "",
                     registerUrl = "",
+                    selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
+                    selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
+                    selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
                     urlTemplate = "",
                     onBack = {},
                     onDelete = {},
@@ -517,11 +666,13 @@ private fun DarkPreview() {
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
+                    onSelectServerGoogleMapsAddress = {},
+                    onSelectServerGoogleMapsPlace = {},
+                    onSelectServerSearch = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetChallengeUrl = {},
-                    onSetDescription = {},
                     onSetLoginUrl = {},
                     onSetName = {},
                     onSetRegisterUrl = {},
@@ -546,10 +697,12 @@ private fun TabletPreview() {
                     apiKeyHeader = "",
                     authType = ServerAuthType.API_KEY,
                     challengeUrl = "",
-                    description = "",
                     loginUrl = "",
                     name = "",
                     registerUrl = "",
+                    selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
+                    selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
+                    selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
                     urlTemplate = "",
                     onBack = {},
                     onDelete = {},
@@ -557,11 +710,13 @@ private fun TabletPreview() {
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
+                    onSelectServerGoogleMapsAddress = {},
+                    onSelectServerGoogleMapsPlace = {},
+                    onSelectServerSearch = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetChallengeUrl = {},
-                    onSetDescription = {},
                     onSetLoginUrl = {},
                     onSetName = {},
                     onSetRegisterUrl = {},
@@ -586,10 +741,12 @@ private fun InsertPreview() {
                     apiKeyHeader = "",
                     authType = ServerAuthType.API_KEY,
                     challengeUrl = "",
-                    description = "",
                     loginUrl = "",
                     name = "",
                     registerUrl = "",
+                    selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
+                    selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
+                    selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
                     urlTemplate = "",
                     onBack = {},
                     onDelete = {},
@@ -597,11 +754,13 @@ private fun InsertPreview() {
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
+                    onSelectServerGoogleMapsAddress = {},
+                    onSelectServerGoogleMapsPlace = {},
+                    onSelectServerSearch = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetChallengeUrl = {},
-                    onSetDescription = {},
                     onSetLoginUrl = {},
                     onSetName = {},
                     onSetRegisterUrl = {},
@@ -626,10 +785,12 @@ private fun DarkInsertPreview() {
                     apiKeyHeader = "",
                     authType = ServerAuthType.ATTESTATION,
                     challengeUrl = "",
-                    description = "",
                     loginUrl = "",
                     name = "",
                     registerUrl = "",
+                    selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
+                    selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
+                    selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
                     urlTemplate = "",
                     onBack = {},
                     onDelete = {},
@@ -637,11 +798,13 @@ private fun DarkInsertPreview() {
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
+                    onSelectServerGoogleMapsAddress = {},
+                    onSelectServerGoogleMapsPlace = {},
+                    onSelectServerSearch = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetChallengeUrl = {},
-                    onSetDescription = {},
                     onSetLoginUrl = {},
                     onSetName = {},
                     onSetRegisterUrl = {},
@@ -667,10 +830,12 @@ private fun TabletInsertPreview() {
                     apiKeyHeader = "",
                     authType = ServerAuthType.ATTESTATION,
                     challengeUrl = "",
-                    description = "",
                     loginUrl = "",
                     name = "",
                     registerUrl = "",
+                    selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
+                    selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
+                    selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
                     urlTemplate = "",
                     onBack = {},
                     onDelete = {},
@@ -678,11 +843,13 @@ private fun TabletInsertPreview() {
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
+                    onSelectServerGoogleMapsAddress = {},
+                    onSelectServerGoogleMapsPlace = {},
+                    onSelectServerSearch = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetChallengeUrl = {},
-                    onSetDescription = {},
                     onSetLoginUrl = {},
                     onSetName = {},
                     onSetRegisterUrl = {},
@@ -709,10 +876,12 @@ private fun UpdatePreview() {
                     apiKeyHeader = item.apiKeyHeader,
                     authType = item.authType,
                     challengeUrl = item.challengeUrl,
-                    description = item.description,
                     loginUrl = item.loginUrl,
                     name = item.name,
                     registerUrl = item.registerUrl,
+                    selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
+                    selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
+                    selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
                     urlTemplate = item.urlTemplate,
                     onBack = {},
                     onDelete = {},
@@ -720,11 +889,13 @@ private fun UpdatePreview() {
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
+                    onSelectServerGoogleMapsAddress = {},
+                    onSelectServerGoogleMapsPlace = {},
+                    onSelectServerSearch = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetChallengeUrl = {},
-                    onSetDescription = {},
                     onSetLoginUrl = {},
                     onSetName = {},
                     onSetRegisterUrl = {},
@@ -751,10 +922,12 @@ private fun DarkUpdatePreview() {
                     apiKeyHeader = item.apiKeyHeader,
                     authType = item.authType,
                     challengeUrl = item.challengeUrl,
-                    description = item.description,
                     loginUrl = item.loginUrl,
                     name = item.name,
                     registerUrl = item.registerUrl,
+                    selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
+                    selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
+                    selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
                     urlTemplate = item.urlTemplate,
                     onBack = {},
                     onDelete = {},
@@ -762,11 +935,13 @@ private fun DarkUpdatePreview() {
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
+                    onSelectServerGoogleMapsAddress = {},
+                    onSelectServerGoogleMapsPlace = {},
+                    onSelectServerSearch = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetChallengeUrl = {},
-                    onSetDescription = {},
                     onSetLoginUrl = {},
                     onSetName = {},
                     onSetRegisterUrl = {},
@@ -793,10 +968,12 @@ private fun TabletUpdatePreview() {
                     apiKeyHeader = item.apiKeyHeader,
                     authType = item.authType,
                     challengeUrl = item.challengeUrl,
-                    description = item.description,
                     loginUrl = item.loginUrl,
                     name = item.name,
                     registerUrl = item.registerUrl,
+                    selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
+                    selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
+                    selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
                     urlTemplate = item.urlTemplate,
                     onBack = {},
                     onDelete = {},
@@ -804,11 +981,13 @@ private fun TabletUpdatePreview() {
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
+                    onSelectServerGoogleMapsAddress = {},
+                    onSelectServerGoogleMapsPlace = {},
+                    onSelectServerSearch = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetChallengeUrl = {},
-                    onSetDescription = {},
                     onSetLoginUrl = {},
                     onSetName = {},
                     onSetRegisterUrl = {},

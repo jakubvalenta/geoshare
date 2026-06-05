@@ -23,10 +23,9 @@ object InitialServersImpl : InitialServers {
     override fun restore(db: SupportSQLiteDatabase) {
         db.execSQL("DELETE FROM server")
         db.execSQL(
-            "INSERT INTO server (`name`,`description`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO server (`name`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             arrayOf<Any>(
-                "Google Maps",
-                "Geocode Address",
+                "Google Maps Geocode Address",
                 "https://geocode.googleapis.com/v4/geocode/address/{q}",
                 "API_KEY",
                 "",
@@ -42,10 +41,9 @@ object InitialServersImpl : InitialServers {
             )
         )
         db.execSQL(
-            "INSERT INTO server (`name`,`description`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO server (`name`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             arrayOf<Any>(
-                "Google Maps",
-                "Geocode Place",
+                "Google Maps Geocode Place",
                 "https://geocode.googleapis.com/v4/geocode/places/{q}",
                 "API_KEY",
                 "",
@@ -66,10 +64,9 @@ object InitialServersImpl : InitialServers {
         object : Migration(7, 8) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
-                    "INSERT OR REPLACE INTO server (`name`,`description`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT OR REPLACE INTO server (`name`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
-                        "Google Maps",
-                        "Geocode Address",
+                        "Google Maps Geocode Address",
                         "https://geocode.googleapis.com/v4/geocode/address/{q}",
                         "API_KEY",
                         "",
@@ -85,10 +82,9 @@ object InitialServersImpl : InitialServers {
                     )
                 )
                 db.execSQL(
-                    "INSERT OR REPLACE INTO server (`name`,`description`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT OR REPLACE INTO server (`name`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
-                        "Google Maps",
-                        "Geocode Place",
+                        "Google Maps Geocode Place",
                         "https://geocode.googleapis.com/v4/geocode/places/{q}",
                         "API_KEY",
                         "",
