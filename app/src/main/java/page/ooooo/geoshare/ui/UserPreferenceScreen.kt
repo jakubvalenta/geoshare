@@ -32,13 +32,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.di.FakeGeoShareGoogleMapsAddressServer
-import page.ooooo.geoshare.data.di.FakeGeoShareGoogleMapsPlaceServer
 import page.ooooo.geoshare.data.di.defaultFakeLinks
-import page.ooooo.geoshare.data.di.defaultFakeServers
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.database.Link
-import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
@@ -66,7 +62,6 @@ import page.ooooo.geoshare.ui.components.UserPreferenceDeveloperOptionsListItem
 import page.ooooo.geoshare.ui.components.UserPreferenceHiddenAppsControls
 import page.ooooo.geoshare.ui.components.UserPreferenceHiddenAppsListItem
 import page.ooooo.geoshare.ui.components.UserPreferenceLinksListItem
-import page.ooooo.geoshare.ui.components.UserPreferenceServersControls
 import page.ooooo.geoshare.ui.components.UserPreferenceServersListItem
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -89,12 +84,11 @@ fun UserPreferenceScreen(
     initialGroupId: UserPreferenceGroupId?,
     onBack: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
-    onNavigateToLinksScreen: () -> Unit,
+    onNavigateToLinkScreen: () -> Unit,
     onNavigateToServerScreen: () -> Unit,
     billingViewModel: BillingViewModel,
     linkViewModel: LinkViewModel = hiltViewModel(),
     outputViewModel: OutputViewModel = hiltViewModel(),
-    serverViewModel: ServerViewModel = hiltViewModel(),
     viewModel: UserPreferenceViewModel = hiltViewModel(),
 ) {
     val apps by viewModel.apps.collectAsStateWithLifecycle()
@@ -103,10 +97,6 @@ fun UserPreferenceScreen(
     val billingFeatures = billingViewModel.billingFeatures
     val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
     val links by linkViewModel.all.collectAsStateWithLifecycle()
-    val servers by serverViewModel.all.collectAsStateWithLifecycle()
-    val selectedServerGoogleMapsAddress by serverViewModel.selectedServerGoogleMapsAddress.collectAsStateWithLifecycle()
-    val selectedServerGoogleMapsPlace by serverViewModel.selectedServerGoogleMapsPlace.collectAsStateWithLifecycle()
-    val selectedServerSearch by serverViewModel.selectedServerSearch.collectAsStateWithLifecycle()
     val userPreferencesValues by viewModel.values.collectAsStateWithLifecycle()
 
     UserPreferenceScreen(
@@ -117,21 +107,14 @@ fun UserPreferenceScreen(
         billingFeatures = billingFeatures,
         billingStatus = billingStatus,
         links = links,
-        selectedServerGoogleMapsAddress = selectedServerGoogleMapsAddress,
-        selectedServerGoogleMapsPlace = selectedServerGoogleMapsPlace,
-        selectedServerSearch = selectedServerSearch,
-        servers = servers,
         userPreferencesValues = userPreferencesValues,
         onBack = onBack,
         onGetAutomationOutput = { automation, getLinkByUUID ->
             outputViewModel.getAutomationOutput(automation, getLinkByUUID)
         },
         onNavigateToBillingScreen = onNavigateToBillingScreen,
-        onNavigateToLinksScreen = onNavigateToLinksScreen,
+        onNavigateToLinkScreen = onNavigateToLinkScreen,
         onNavigateToServerScreen = onNavigateToServerScreen,
-        onSelectServerGoogleMapsAddress = { serverViewModel.selectServerGoogleMapsAddress(it?.uid) },
-        onSelectServerGoogleMapsPlace = { serverViewModel.selectServerGoogleMapsPlace(it?.uid) },
-        onSelectServerSearch = { serverViewModel.selectServerSearch(it?.uid) },
         onValueChange = { transform: (preferences: MutablePreferences) -> Unit ->
             viewModel.editUserPreferences(transform)
         },
@@ -148,19 +131,12 @@ private fun UserPreferenceScreen(
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
     links: List<Link>,
-    selectedServerGoogleMapsAddress: Server?,
-    selectedServerGoogleMapsPlace: Server?,
-    selectedServerSearch: Server?,
-    servers: List<Server>,
     userPreferencesValues: UserPreferencesValues,
     onBack: () -> Unit,
     onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
     onNavigateToBillingScreen: () -> Unit,
-    onNavigateToLinksScreen: () -> Unit,
+    onNavigateToLinkScreen: () -> Unit,
     onNavigateToServerScreen: () -> Unit,
-    onSelectServerGoogleMapsAddress: (Server?) -> Unit,
-    onSelectServerGoogleMapsPlace: (Server?) -> Unit,
-    onSelectServerSearch: (Server?) -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -204,7 +180,8 @@ private fun UserPreferenceScreen(
                         navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, id)
                     }
                 },
-                onNavigateToLinksScreen = onNavigateToLinksScreen,
+                onNavigateToLinkScreen = onNavigateToLinkScreen,
+                onNavigateToServerScreen = onNavigateToServerScreen,
             )
         },
         detailPane = { wide ->
@@ -217,10 +194,6 @@ private fun UserPreferenceScreen(
                     billingFeatures = billingFeatures,
                     billingStatus = billingStatus,
                     links = links,
-                    selectedServerGoogleMapsAddress = selectedServerGoogleMapsAddress,
-                    selectedServerGoogleMapsPlace = selectedServerGoogleMapsPlace,
-                    selectedServerSearch = selectedServerSearch,
-                    servers = servers,
                     values = userPreferencesValues,
                     wide = wide,
                     onBack = {
@@ -234,10 +207,6 @@ private fun UserPreferenceScreen(
                     },
                     onGetAutomationOutput = onGetAutomationOutput,
                     onNavigateToBillingScreen = onNavigateToBillingScreen,
-                    onNavigateToServerScreen = onNavigateToServerScreen,
-                    onSelectServerGoogleMapsAddress = onSelectServerGoogleMapsAddress,
-                    onSelectServerGoogleMapsPlace = onSelectServerGoogleMapsPlace,
-                    onSelectServerSearch = onSelectServerSearch,
                     onValueChange = onValueChange,
                 )
             }
@@ -260,7 +229,8 @@ private fun UserPreferenceListPane(
     onBack: () -> Unit,
     onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
     onNavigateToGroup: (id: UserPreferenceGroupId) -> Unit,
-    onNavigateToLinksScreen: () -> Unit,
+    onNavigateToLinkScreen: () -> Unit,
+    onNavigateToServerScreen: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
 
@@ -300,7 +270,7 @@ private fun UserPreferenceListPane(
                     selected = currentGroupId == UserPreferenceGroupId.SERVERS,
                     values = values,
                     modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.SERVERS}"),
-                    onClick = { onNavigateToGroup(UserPreferenceGroupId.SERVERS) },
+                    onClick = onNavigateToServerScreen,
                 )
             }
         }
@@ -362,7 +332,7 @@ private fun UserPreferenceListPane(
                     links = links,
                     selected = currentGroupId == UserPreferenceGroupId.LINKS,
                     modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.LINKS}"),
-                    onClick = onNavigateToLinksScreen,
+                    onClick = onNavigateToLinkScreen,
                 )
                 UserPreferenceCoordinateFormatListItem(
                     index = 1,
@@ -405,19 +375,11 @@ private fun UserPreferenceDetailPane(
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
     links: List<Link>,
-    selectedServerGoogleMapsAddress: Server?,
-    selectedServerGoogleMapsPlace: Server?,
-    selectedServerSearch: Server?,
-    servers: List<Server>,
     values: UserPreferencesValues,
     wide: Boolean,
     onBack: () -> Unit,
     onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
     onNavigateToBillingScreen: () -> Unit,
-    onNavigateToServerScreen: () -> Unit,
-    onSelectServerGoogleMapsAddress: (Server?) -> Unit,
-    onSelectServerGoogleMapsPlace: (Server?) -> Unit,
-    onSelectServerSearch: (Server?) -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
     when (currentGroupId) {
@@ -487,20 +449,7 @@ private fun UserPreferenceDetailPane(
 
         UserPreferenceGroupId.LINKS -> {}
 
-        UserPreferenceGroupId.SERVERS -> UserPreferenceServersControls(
-            billingAppNameResId = billingAppNameResId,
-            selectedServerGoogleMapsAddress = selectedServerGoogleMapsAddress,
-            selectedServerGoogleMapsPlace = selectedServerGoogleMapsPlace,
-            selectedServerSearch = selectedServerSearch,
-            servers = servers,
-            onBack = onBack,
-            wide = wide,
-            onNavigateToBillingScreen = onNavigateToBillingScreen,
-            onNavigateToServerScreen = onNavigateToServerScreen,
-            onSelectServerGoogleMapsAddress = onSelectServerGoogleMapsAddress,
-            onSelectServerGoogleMapsPlace = onSelectServerGoogleMapsPlace,
-            onSelectServerSearch = onSelectServerSearch,
-        )
+        UserPreferenceGroupId.SERVERS -> {}
     }
 }
 
@@ -520,20 +469,13 @@ private fun DefaultPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
-                    selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
-                    selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
-                    selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
-                    servers = defaultFakeServers,
                     userPreferencesValues = defaultFakeUserPreferences.copy(
                         connectionPermission = Permission.NEVER,
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onSelectServerGoogleMapsAddress = {},
-                    onSelectServerGoogleMapsPlace = {},
-                    onSelectServerSearch = {},
                     onNavigateToBillingScreen = {},
-                    onNavigateToLinksScreen = {},
+                    onNavigateToLinkScreen = {},
                     onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
@@ -556,20 +498,13 @@ private fun DarkPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
-                    selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
-                    selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
-                    selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
-                    servers = defaultFakeServers,
                     userPreferencesValues = defaultFakeUserPreferences.copy(
                         connectionPermission = Permission.NEVER,
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onSelectServerGoogleMapsAddress = {},
-                    onSelectServerGoogleMapsPlace = {},
-                    onSelectServerSearch = {},
                     onNavigateToBillingScreen = {},
-                    onNavigateToLinksScreen = {},
+                    onNavigateToLinkScreen = {},
                     onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
@@ -592,20 +527,13 @@ private fun TabletPreview() {
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
-                    selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
-                    selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
-                    selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
-                    servers = defaultFakeServers,
                     userPreferencesValues = defaultFakeUserPreferences.copy(
                         connectionPermission = Permission.NEVER,
                     ),
                     onBack = {},
                     onGetAutomationOutput = { _, _ -> null },
-                    onSelectServerGoogleMapsAddress = {},
-                    onSelectServerGoogleMapsPlace = {},
-                    onSelectServerSearch = {},
                     onNavigateToBillingScreen = {},
-                    onNavigateToLinksScreen = {},
+                    onNavigateToLinkScreen = {},
                     onNavigateToServerScreen = {},
                     onValueChange = {},
                 )
