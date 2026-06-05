@@ -34,7 +34,6 @@ fun ServerForm(
     apiKeyHeader: String,
     authType: ServerAuthType,
     challengeUrl: String,
-    description: String,
     loginUrl: String,
     name: String,
     registerUrl: String,
@@ -44,7 +43,6 @@ fun ServerForm(
     onSetApiKeyHeader: (String) -> Unit,
     onSetAuthType: (ServerAuthType) -> Unit,
     onSetChallengeUrl: (String) -> Unit,
-    onSetDescription: (String) -> Unit,
     onSetLoginUrl: (String) -> Unit,
     onSetName: (String) -> Unit,
     onSetRegisterUrl: (String) -> Unit,
@@ -52,20 +50,9 @@ fun ServerForm(
     modifier: Modifier = Modifier,
 ) {
     val spacing = LocalSpacing.current
-    val item = remember(
-        apiKey,
-        apiKeyHeader,
-        authType,
-        challengeUrl,
-        description,
-        loginUrl,
-        name,
-        registerUrl,
-        urlTemplate
-    ) {
+    val item = remember(apiKey, apiKeyHeader, authType, challengeUrl, loginUrl, name, registerUrl, urlTemplate) {
         Server(
             name = name,
-            description = description,
             urlTemplate = urlTemplate,
             authType = authType,
             apiKey = apiKey,
@@ -88,19 +75,6 @@ fun ServerForm(
                 Text(stringResource(R.string.server_name))
             },
             isError = name.isEmpty(),
-            singleLine = true,
-        )
-        TextField(
-            value = description,
-            onValueChange = onSetDescription,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = spacing.windowPadding)
-                .padding(top = spacing.medium)
-                .testTag("geoShareServerFormDescription"),
-            label = {
-                Text(stringResource(R.string.server_description))
-            },
             singleLine = true,
         )
         TextField(
@@ -247,7 +221,6 @@ private fun DefaultPreview() {
                 apiKeyHeader = "",
                 authType = ServerAuthType.ATTESTATION,
                 challengeUrl = "",
-                description = "",
                 loginUrl = "",
                 name = "",
                 registerUrl = "",
@@ -257,7 +230,6 @@ private fun DefaultPreview() {
                 onSetApiKeyHeader = {},
                 onSetAuthType = {},
                 onSetChallengeUrl = {},
-                onSetDescription = {},
                 onSetLoginUrl = {},
                 onSetName = {},
                 onSetRegisterUrl = {},
@@ -277,7 +249,6 @@ private fun DarkPreview() {
                 apiKeyHeader = "",
                 authType = ServerAuthType.ATTESTATION,
                 challengeUrl = "",
-                description = "",
                 loginUrl = "",
                 name = "",
                 registerUrl = "",
@@ -287,7 +258,6 @@ private fun DarkPreview() {
                 onSetApiKeyHeader = {},
                 onSetAuthType = {},
                 onSetChallengeUrl = {},
-                onSetDescription = {},
                 onSetLoginUrl = {},
                 onSetName = {},
                 onSetRegisterUrl = {},
@@ -308,7 +278,6 @@ private fun UpdateApiKeyPreview() {
                 apiKeyHeader = item.apiKeyHeader,
                 authType = item.authType,
                 challengeUrl = item.challengeUrl,
-                description = item.description,
                 loginUrl = item.loginUrl,
                 name = item.name,
                 registerUrl = item.registerUrl,
@@ -318,7 +287,6 @@ private fun UpdateApiKeyPreview() {
                 onSetApiKeyHeader = {},
                 onSetAuthType = {},
                 onSetChallengeUrl = {},
-                onSetDescription = {},
                 onSetLoginUrl = {},
                 onSetName = {},
                 onSetRegisterUrl = {},
@@ -339,7 +307,6 @@ private fun DarkUpdateApiKeyPreview() {
                 apiKeyHeader = item.apiKeyHeader,
                 authType = item.authType,
                 challengeUrl = item.challengeUrl,
-                description = item.description,
                 loginUrl = item.loginUrl,
                 name = item.name,
                 registerUrl = item.registerUrl,
@@ -349,7 +316,6 @@ private fun DarkUpdateApiKeyPreview() {
                 onSetApiKeyHeader = {},
                 onSetAuthType = {},
                 onSetChallengeUrl = {},
-                onSetDescription = {},
                 onSetLoginUrl = {},
                 onSetName = {},
                 onSetRegisterUrl = {},
@@ -370,7 +336,6 @@ private fun UpdateAttestationPreview() {
                 apiKeyHeader = item.apiKeyHeader,
                 authType = item.authType,
                 challengeUrl = item.challengeUrl,
-                description = item.description,
                 loginUrl = item.loginUrl,
                 name = item.name,
                 registerUrl = item.registerUrl,
@@ -380,7 +345,6 @@ private fun UpdateAttestationPreview() {
                 onSetApiKeyHeader = {},
                 onSetAuthType = {},
                 onSetChallengeUrl = {},
-                onSetDescription = {},
                 onSetLoginUrl = {},
                 onSetName = {},
                 onSetRegisterUrl = {},
@@ -401,7 +365,6 @@ private fun DarkUpdateExpandedPreview() {
                 apiKeyHeader = item.apiKeyHeader,
                 authType = item.authType,
                 challengeUrl = item.challengeUrl,
-                description = item.description,
                 loginUrl = item.loginUrl,
                 name = item.name,
                 registerUrl = item.registerUrl,
@@ -411,7 +374,6 @@ private fun DarkUpdateExpandedPreview() {
                 onSetApiKeyHeader = {},
                 onSetAuthType = {},
                 onSetChallengeUrl = {},
-                onSetDescription = {},
                 onSetLoginUrl = {},
                 onSetName = {},
                 onSetRegisterUrl = {},

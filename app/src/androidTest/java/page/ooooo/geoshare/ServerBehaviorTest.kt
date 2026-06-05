@@ -32,7 +32,6 @@ class ServerBehaviorTest {
         // Insert a new server
         val server = Server(
             name = "Test Server",
-            description = "Test description",
             urlTemplate = "https://api.example.com/{q}",
             authType = ServerAuthType.ATTESTATION,
             challengeUrl = "https://api.example.com/auth/challenge",
@@ -121,9 +120,6 @@ class ServerBehaviorTest {
 fun UiAutomatorTestScope.fillAndSaveServerForm(server: Server) {
     server.name.takeIf { it.isNotEmpty() }?.let {
         onElement { viewIdResourceName == "geoShareServerFormName" }.setText(it)
-    }
-    server.description.takeIf { it.isNotEmpty() }?.let {
-        onElement { viewIdResourceName == "geoShareServerFormDescription" }.setText(it)
     }
     server.urlTemplate.takeIf { it.isNotEmpty() }?.let {
         onElement { viewIdResourceName == "geoShareServerFormUrlTemplate" }.setText(it)

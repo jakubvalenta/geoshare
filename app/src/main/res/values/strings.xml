@@ -318,7 +318,6 @@
     <string name="server_challenge_url">Challenge URL</string>
     <string name="server_delete_text">The server “%1$s” will be permanently deleted.</string>
     <string name="server_delete_title">Delete server?</string>
-    <string name="server_description">Description</string>
     <string name="server_insert">Add server</string>
     <string name="server_invalid">Finish configuration</string>
     <string name="server_list_description">When map service connection is allowed, %1$s can convert certain map links using remote servers.</string>

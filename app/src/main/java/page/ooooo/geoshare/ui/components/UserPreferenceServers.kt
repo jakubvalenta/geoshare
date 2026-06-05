@@ -39,7 +39,7 @@ fun UserPreferenceServersListItem(
         colors = segmentedListColors(),
     ) {
         Text(
-            stringResource(R.string.user_preferences_servers_title),
+            stringResource(R.string.server_list_title),
             style = MaterialTheme.typography.bodyLarge,
         )
     }

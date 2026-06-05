@@ -82,7 +82,6 @@ class ServerViewModel @Inject constructor(
             withMutableSnapshot {
                 this.destination = destination
                 this.name = default.name
-                this.description = default.description
                 this.urlTemplate = default.urlTemplate
                 this.authType = default.authType
                 this.apiKey = default.apiKey
@@ -97,7 +96,6 @@ class ServerViewModel @Inject constructor(
                 withMutableSnapshot {
                     this.destination = destination
                     this.name = item.name
-                    this.description = item.description
                     this.urlTemplate = item.urlTemplate
                     this.authType = item.authType
                     this.apiKey = item.apiKey
@@ -113,7 +111,6 @@ class ServerViewModel @Inject constructor(
     // Form
 
     var name by savedStateHandle.saveable { mutableStateOf(default.name) }
-    var description by savedStateHandle.saveable { mutableStateOf(default.description) }
     var urlTemplate by savedStateHandle.saveable { mutableStateOf(default.urlTemplate) }
     var authType by savedStateHandle.saveable { mutableStateOf(default.authType) }
     var apiKey by savedStateHandle.saveable { mutableStateOf(default.apiKey) }
@@ -129,7 +126,6 @@ class ServerViewModel @Inject constructor(
                     serverRepository.insert(
                         Server(
                             name = name,
-                            description = description,
                             urlTemplate = urlTemplate,
                             authType = authType,
                             apiKey = apiKey,
@@ -150,7 +146,6 @@ class ServerViewModel @Inject constructor(
                         serverRepository.update(
                             item.copy(
                                 name = name,
-                                description = description,
                                 urlTemplate = urlTemplate,
                                 authType = authType,
                                 apiKey = apiKey,
