@@ -17,9 +17,26 @@ class GoogleMapsWebViewInput @Inject constructor(
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
+    /**
+     * Extracts the final URL of the page.
+     *
+     * When the extraction is first called, it remembers the URL of the page. Then if in a subsequent extraction call
+     * the URL is different, it returns the new URL. This way we wait for the JavaScript of the page to change the URL
+     * and don't erroneously consider the extraction done before the JavaScript fully ran.
+     */
     // language=JavaScript
     override val unsafeExtractionJavascript = """
-        () => window.location.href !== 'about:blank' ? window.location.href : undefined;
+        () => {
+            const url = window.location.href;
+            if (url !== 'about:blank') {
+                if (window.__firstUrl === undefined) {
+                    window.__firstUrl = url;
+                } else if (window.__firstUrl !== url) {
+                    return url;
+                }
+            }
+            return undefined;
+        };
     """.trimIndent()
 
     override suspend fun parse(data: String, match: String) = parseResult {

@@ -121,7 +121,7 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
             } else if (htmlParsingSupported) {
                 WGS84Point(
                     51.1982447, 6.4389493,
-                    name = @Suppress("SpellCheckingInspection") "Konditorei+Heinemann",
+                    name = @Suppress("SpellCheckingInspection") "Café Heinemann",
                     source = Source.URI,
                 )
             } else {
@@ -131,6 +131,17 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
                 )
             },
             "https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8",
+            if (testServer is TestServer.Configured) {
+                null
+            } else if (htmlParsingSupported) {
+                WGS84Point(
+                    51.1982447, 6.4389493,
+                    name = @Suppress("SpellCheckingInspection") "Konditorei+Heinemann",
+                    source = Source.URI,
+                )
+            } else {
+                null
+            },
         )
         testUri(
             if (testServer is TestServer.Configured) {
@@ -174,7 +185,7 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
             } else if (htmlParsingSupported) {
                 WGS84Point(
                     52.4842015, 13.4167277,
-                    name = @Suppress("SpellCheckingInspection") "Hasenheide Park",
+                    name = @Suppress("SpellCheckingInspection") "Volkspark Hasenheide",
                     source = Source.URI,
                 )
             } else {
