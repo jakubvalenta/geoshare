@@ -101,16 +101,15 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
                 )
             },
             "https://www.google.com/maps/search/?api=1&query=Louisenstra%C3%9Fe%2060,%2001099%20Dresden",
-            fallbackPoint = if (testServer is TestServer.Configured) {
-                null
+            fallbackNames = if (testServer is TestServer.Configured) {
+                emptySet()
             } else if (htmlParsingSupported) {
-                WGS84Point(
-                    51.0657922, 13.7555827,
-                    name = @Suppress("SpellCheckingInspection") "Louisenstraße 60, 01099 Neustadt",
-                    source = Source.URI,
+                setOf(
+                    @Suppress("SpellCheckingInspection") "Louisenstraße 60, 01099 Neustadt",
+                    @Suppress("SpellCheckingInspection") "Louisenstraße 60, 01099 Neustadt, Allemagne",
                 )
             } else {
-                null
+                emptySet()
             },
         )
 
@@ -135,16 +134,12 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
                 )
             },
             "https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8",
-            if (testServer is TestServer.Configured) {
-                null
+            fallbackNames = if (testServer is TestServer.Configured) {
+                emptySet()
             } else if (htmlParsingSupported) {
-                WGS84Point(
-                    51.1982447, 6.4389493,
-                    name = @Suppress("SpellCheckingInspection") "Konditorei+Heinemann",
-                    source = Source.URI,
-                )
+                setOf(@Suppress("SpellCheckingInspection") "Konditorei Heinemann")
             } else {
-                null
+                emptySet()
             },
         )
         testUri(
@@ -199,16 +194,15 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
                 )
             },
             "https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6",
-            fallbackPoint = if (testServer is TestServer.Configured) {
-                null
+            fallbackNames = if (testServer is TestServer.Configured) {
+                emptySet()
             } else if (htmlParsingSupported) {
-                WGS84Point(
-                    52.4842015, 13.4167277,
-                    name = @Suppress("SpellCheckingInspection") "Hasenheide Park", // FIXME Parc public Hasenheide
-                    source = Source.URI,
+                setOf(
+                    @Suppress("SpellCheckingInspection") "Hasenheide Park",
+                    @Suppress("SpellCheckingInspection") "Parc public Hasenheide",
                 )
             } else {
-                null
+                emptySet()
             },
         )
 
@@ -232,7 +226,14 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
                     source = Source.URI,
                 )
             },
-            "https://www.google.com/maps/place/Hermannstr.+20,+Berlin/"
+            "https://www.google.com/maps/place/Hermannstr.+20,+Berlin/",
+            fallbackNames = if (testServer is TestServer.Configured) {
+                emptySet()
+            } else if (htmlParsingSupported) {
+                setOf(@Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln")
+            } else {
+                emptySet()
+            }
         )
 
         // Directions address
@@ -260,7 +261,7 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
                 WGS84Point(
                     40.6400537, 22.9589055,
                     z = 6.0,
-                    name = @Suppress("SpellCheckingInspection") "Box+now+Ακροπόλεως+65,+Akropoleos+65,+Thessaloniki+546+34,+Greece",
+                    name = @Suppress("SpellCheckingInspection") "Box now Ακροπόλεως 65, Akropoleos 65, Thessaloniki 546 34, Greece",
                     source = Source.URI,
                 )
             } else {
@@ -270,24 +271,17 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
                 )
             },
             "https://maps.google.com/maps?oe=utf-8&client=firefox-b&um=1&ie=UTF-8&fb=1&gl=fr&sa=X&geocode=KWmqxjsAOagUMaSMgMRdOas1&daddr=Akropoleos+65,+Thessaloniki+546+34,+Gr%C3%A8ce",
-            fallbackPoint = if (testServer is TestServer.Configured) {
-                WGS84Point(
-                    40.6400258, 22.9589454,
-                    z = 6.0,
-                    name = @Suppress("SpellCheckingInspection") "Akropoleos 65, Thessaloniki 546 34, Grèce",
-                    source = Source.API,
+            fallbackNames = if (testServer is TestServer.Configured) {
+                setOf(
+                    @Suppress("SpellCheckingInspection") "Akropoleos 65, Thessaloniki 546 34, Grèce",
                 )
             } else if (htmlParsingSupported) {
-                WGS84Point(
-                    40.6400537, 22.9589055,
-                    z = 6.0,
-                    name = @Suppress("SpellCheckingInspection") "Box+now+Ακροπόλεως+65,+Akropoleos+65,+Thessaloniki+546+34,+Grèce",
-                    source = Source.URI,
+                setOf(
+                    @Suppress("SpellCheckingInspection") "Box now Ακροπόλεως 65, Akropoleos 65, Thessaloniki 546 34, Grèce",
                 )
             } else {
-                WGS84Point(
-                    name = @Suppress("SpellCheckingInspection") "Akropoleos 65, Thessaloniki 546 34, Grèce",
-                    source = Source.URI,
+                setOf(
+                    @Suppress("SpellCheckingInspection") "Akropoleos 65, Thessaloniki 546 34, Grèce",
                 )
             },
         )

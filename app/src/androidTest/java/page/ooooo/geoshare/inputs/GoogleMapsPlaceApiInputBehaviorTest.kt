@@ -82,17 +82,17 @@ class GoogleMapsPlaceApiInputBehaviorTest(private val testServerParams: TestServ
             if (testServer is TestServer.Configured) {
                 WGS84Point(47.5951518, -122.3316394, name = "Lumen Field", source = Source.API)
             } else if (htmlParsingSupported) {
-                WGS84Point(47.5951518, -122.3316394, name = "Seattle Stadium", source = Source.URI)
+                WGS84Point(47.5951518, -122.3316394, name = "Lumen Field", source = Source.URI)
             } else {
                 WGS84Point(name = "Lumen Field", source = Source.URI)
             },
             "https://www.google.com/maps/search/?query_place_id=ChIJKxjxuaNqkFQR3CK6O1HNNqY&query=Lumen%20Field&api=1",
-            fallbackPoint = if (testServer is TestServer.Configured) {
-                null
+            fallbackNames = if (testServer is TestServer.Configured) {
+                emptySet()
             } else if (htmlParsingSupported) {
-                WGS84Point(47.5951518, -122.3316394, name = "Lumen Field", source = Source.URI)
+                setOf("Seattle Stadium")
             } else {
-                null
+                emptySet()
             },
         )
     }

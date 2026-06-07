@@ -89,7 +89,7 @@ class ServerBehaviorTest {
 
         // Wait for the delete toast to disappear, because it covers the restore button
         runBlocking {
-            delay(3_000L)
+            delay(TOAST_TIMEOUT)
         }
 
         // Restore initial servers

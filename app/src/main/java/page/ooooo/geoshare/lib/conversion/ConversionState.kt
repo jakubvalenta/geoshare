@@ -384,18 +384,19 @@ data class DataParsed(
         results.values.reversed().merge().run {
             if (points.lastOrNull()?.hasCoordinates() == true) {
                 stateContext.log.i(
-                    TAG, "Extracted point with coordinates $points from $matchedInput"
+                    TAG, "Extracted coordinates $points from $matchedInput"
                 )
                 ConversionSucceeded(stateContext, source, points)
             } else if (next != null) {
                 if (next in results) {
                     stateContext.log.w(
-                        TAG, "Failed to extract point with coordinates from $matchedInput and next step creates a loop"
+                        TAG,
+                        "Failed to extract point with coordinates from $matchedInput and next matched input creates a loop"
                     )
                     ConversionFailed(source, matchedInput.input.getErrorMessage(stateContext.resources))
                 } else {
                     stateContext.log.i(
-                        TAG, "Failed to extract point with coordinates from $matchedInput, going to next step"
+                        TAG, "Failed to extract point with coordinates from $matchedInput, going to next matched input"
                     )
                     InputMatched(stateContext, source, next, permission, results)
                 }

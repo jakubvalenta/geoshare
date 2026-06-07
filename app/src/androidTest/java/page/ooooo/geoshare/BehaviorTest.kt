@@ -21,6 +21,7 @@ import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.junit.Assert.assertTrue
@@ -63,6 +64,7 @@ class MockLocationScope(val locationManager: LocationManager, val mockProviderNa
 }
 
 const val ELEMENT_DOES_NOT_EXIST_TIMEOUT = 500L
+const val TOAST_TIMEOUT = 5_000L
 const val MAX_ATTEMPTS = 10
 val NETWORK_TIMEOUT = (1..MAX_ATTEMPTS).fold(CONNECT_TIMEOUT + REQUEST_TIMEOUT) { acc, curr ->
     acc + calcExponentialBackoffMillis(curr) + CONNECT_TIMEOUT + REQUEST_TIMEOUT
@@ -199,6 +201,7 @@ fun assumeNotEmulator() {
  */
 fun UiAutomatorTestScope.assertConversionSucceeds(
     expectedPoints: Points,
+    fallbackNames: Set<String> = emptySet(),
     accurate: Boolean? = null,
     timeoutMs: Long = NETWORK_TIMEOUT,
 ) {
@@ -215,26 +218,19 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
     }
     val lastPoint = expectedPoints.lastOrNull() ?: return
     lastPoint.cleanName.let { expectedName ->
+        val expectedNames = if (!expectedName.isNullOrEmpty()) {
+            setOf(expectedName) + fallbackNames
+        } else if (expectedPoints.size > 1) {
+            setOf("Last point", "Dernier point")
+        } else {
+            setOf("Coordinates", @Suppress("SpellCheckingInspection") "Coordonnées")
+        }
         onElement {
             if (viewIdResourceName == "geoShareResultSuccessLastPointName") {
-                if (!expectedName.isNullOrEmpty()) {
-                    assertTrue(
-                        """Expected "${textAsString()}" to contain "$expectedName"""",
-                        textAsString()?.contains(expectedName) == true,
-                    )
-                } else if (expectedPoints.size > 1) {
-                    assertTrue(
-                        """Expected "${textAsString()}" to equal "Last point" or "Dernier point""""",
-                        textAsString() in setOf("Last point", "Dernier point"),
-                    )
-                } else {
-                    assertTrue(
-                        @Suppress("SpellCheckingInspection") """Expected "${textAsString()}" to equal "Coordinates" or "Coordonnées""""",
-                        textAsString() in setOf(
-                            "Coordinates", @Suppress("SpellCheckingInspection") "Coordonnées"
-                        ),
-                    )
-                }
+                assertTrue(
+                    """Expected "${textAsString()}" to equal one of ${expectedNames.joinToString()}""",
+                    textAsString() in expectedNames,
+                )
                 true
             } else {
                 false
@@ -298,7 +294,7 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
     expectedPoint: Point,
     accurate: Boolean? = null,
     timeoutMs: Long = NETWORK_TIMEOUT,
-) = assertConversionSucceeds(persistentListOf(expectedPoint), accurate, timeoutMs)
+) = assertConversionSucceeds(persistentListOf(expectedPoint), accurate = accurate, timeoutMs = timeoutMs)
 
 fun UiAutomatorTestScope.waitAndAssertGoogleMapsContainsElement(block: AccessibilityNodeInfo.() -> Boolean) {
     // Wait for Google Maps
@@ -387,37 +383,22 @@ fun UiAutomatorTestScope.configureConnectionPermissionPreference(permission: Per
 fun UiAutomatorTestScope.testUri(
     expectedPoints: Points,
     unsafeUriString: String,
-    fallbackPoints: Points? = null,
+    fallbackNames: Set<String> = emptySet(),
     accurate: Boolean? = null,
     timeoutMs: Long = NETWORK_TIMEOUT,
 ) {
     shareUri(unsafeUriString)
     quickWaitForStableInActiveWindow() // Wait for the result to render, because there might be the old result
-    try {
-        assertConversionSucceeds(expectedPoints, accurate, timeoutMs)
-    } catch (e: AssertionError) {
-        if (fallbackPoints != null) {
-            assertConversionSucceeds(fallbackPoints, accurate, timeoutMs)
-        } else {
-            throw e
-        }
-    }
+    assertConversionSucceeds(expectedPoints, fallbackNames, accurate, timeoutMs)
 }
 
 fun UiAutomatorTestScope.testUri(
     expectedPoint: Point,
     unsafeUriString: String,
-    fallbackPoint: Point? = null,
+    fallbackNames: Set<String> = emptySet(),
     accurate: Boolean? = null,
     timeoutMs: Long = NETWORK_TIMEOUT,
-) =
-    testUri(
-        persistentListOf(expectedPoint),
-        unsafeUriString,
-        fallbackPoint?.let { persistentListOf(it) },
-        accurate,
-        timeoutMs,
-    )
+) = testUri(persistentListOf(expectedPoint), unsafeUriString, fallbackNames, accurate, timeoutMs)
 
 fun UiAutomatorTestScope.testUriFails(
     expectedMessage: Set<String>,
@@ -697,6 +678,11 @@ fun UiAutomatorTestScope.configureServer(testServer: TestServer) {
             // Insert a new server
             onElement { viewIdResourceName == "geoShareServerListInsert" }.click()
             fillAndSaveServerForm(testServer.server)
+
+            // Wait for the insert toast to disappear, because it covers the radio buttons
+            runBlocking {
+                delay(TOAST_TIMEOUT)
+            }
 
             // Select the server
             onElement { viewIdResourceName == "geoShareServerListPane" }.apply {
