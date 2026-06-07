@@ -4,9 +4,15 @@ import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import page.ooooo.geoshare.assumeDomainResolvable
+import page.ooooo.geoshare.closeIntro
+import page.ooooo.geoshare.configureConnectionPermissionPreference
+import page.ooooo.geoshare.data.local.preferences.Permission
+import page.ooooo.geoshare.launchApplication
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.testUri
+import page.ooooo.geoshare.waitForAppToBeVisible
 
 class AmapInputBehaviorTest {
     @Test
@@ -67,6 +73,12 @@ class AmapInputBehaviorTest {
         runBlocking {
             assumeDomainResolvable(@Suppress("SpellCheckingInspection") "surl.amap.com")
         }
+
+        // Launch app and close intro
+        launchApplication()
+        waitForAppToBeVisible()
+        closeIntro()
+        configureConnectionPermissionPreference(Permission.ALWAYS)
 
         // Short link
         testUri(

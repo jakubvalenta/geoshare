@@ -9,6 +9,7 @@ import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.TestServer
 import page.ooooo.geoshare.TestServerParams
 import page.ooooo.geoshare.closeIntro
+import page.ooooo.geoshare.configureConnectionPermissionPreference
 import page.ooooo.geoshare.configureServer
 import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.data.local.preferences.Permission
@@ -16,6 +17,7 @@ import page.ooooo.geoshare.getAndAssumeTestServer
 import page.ooooo.geoshare.launchApplication
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.testUri
 import page.ooooo.geoshare.waitForAppToBeVisible
 
 @RunWith(Parameterized::class)

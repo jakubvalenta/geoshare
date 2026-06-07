@@ -9,7 +9,7 @@ class UrbiHtmlInputTest : InputTest {
     private val input = FakeInputRepository.urbiHtmlInput
 
     @Test
-    fun parseHtml() = runTest {
+    fun parse() = runTest {
         assertEquals(
             ParseResult(
                 next = MatchedInput(

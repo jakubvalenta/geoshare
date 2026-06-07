@@ -6,6 +6,7 @@ import page.ooooo.geoshare.closeIntro
 import page.ooooo.geoshare.launchApplication
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.testText
 import page.ooooo.geoshare.waitForAppToBeVisible
 
 class CoordinateInputBehaviorTest {
