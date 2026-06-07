@@ -68,7 +68,7 @@ class AppleMapsUriInput @Inject constructor(
                 // https://maps.apple.com/place?place-id={id}...
                 !queryParams["place-id"].isNullOrEmpty()
             ) {
-                nextStep = NextStep(appleMapsHtmlInput.get(), match)
+                next = MatchedInput(appleMapsHtmlInput.get(), match)
             }
 
             if (name != null) {

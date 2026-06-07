@@ -34,7 +34,7 @@ class UrbiHtmlInput @Inject constructor(
         while (true) {
             val line = data.readLine() ?: break
             pattern.find(line)?.groupOrNull()?.let { attr ->
-                nextStep = NextStep(urbiUriInput.get(), attr.decodeBasicHtmlEntities())
+                next = MatchedInput(urbiUriInput.get(), attr.decodeBasicHtmlEntities())
                 return@parseResult
             }
         }

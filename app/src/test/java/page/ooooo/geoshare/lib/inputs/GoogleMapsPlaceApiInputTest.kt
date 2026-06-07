@@ -75,7 +75,7 @@ class GoogleMapsPlaceApiInputTest {
     private val userPreferencesRepository = FakeUserPreferencesRepository()
 
     @Test
-    fun parse_whenServerIsNotConfigured_returnsNextStep() = runTest {
+    fun parse_whenServerIsNotConfigured_returnsMatchedInput() = runTest {
         val serverRepository: FakeServerRepository = mock {
             on { getSelectedGoogleMapsPlace() } doReturn null
         }
@@ -88,7 +88,7 @@ class GoogleMapsPlaceApiInputTest {
         val match = "https://www.google.com/maps/search/?query_place_id=$placeId"
         assertEquals(
             ParseResult(
-                nextStep = NextStep(FakeInputRepository.googleMapsHtmlInput, match),
+                next = MatchedInput(FakeInputRepository.googleMapsHtmlInput, match),
             ),
             input.fetch(match) { data -> input.parse(data, match) },
         )

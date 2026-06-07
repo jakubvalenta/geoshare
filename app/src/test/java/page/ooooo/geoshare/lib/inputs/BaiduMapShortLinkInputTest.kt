@@ -25,10 +25,10 @@ class BaiduMapShortLinkInputTest : InputTest {
     }
 
     @Test
-    fun parse_returnsNextStep() = runTest {
+    fun parse_returnsMatchedInput() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(
+                next = MatchedInput(
                     FakeInputRepository.baiduMapUriInput,
                     "https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13392211,3619117,17z"
                 )

@@ -61,10 +61,10 @@ class GoogleMapsHtmlInputImplTest : InputTest {
     }
 
     @Test
-    fun parse_whenHtmlContainsGenericMetaTagAndAppInitState_returnsNextStep() = runTest {
+    fun parse_whenHtmlContainsGenericMetaTagAndAppInitState_returnsMatchedInput() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(
+                next = MatchedInput(
                     googleMapsWebViewInput,
                     "https://www.google.com/maps/place/Berlin,+Germany/"
                 )
@@ -189,10 +189,10 @@ class GoogleMapsHtmlInputImplTest : InputTest {
     }
 
     @Test
-    fun parse_htmlDoesNotMatch_returnsNextStep() = runTest {
+    fun parse_htmlDoesNotMatch_returnsMatchedInput() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(
+                next = MatchedInput(
                     googleMapsWebViewInput,
                     "https://www.google.com/maps/place/Berlin,+Germany/"
                 )
@@ -202,10 +202,10 @@ class GoogleMapsHtmlInputImplTest : InputTest {
     }
 
     @Test
-    fun parse_googleSearchHtmlDoesNotContainUrl_returnsNextStep() = runTest {
+    fun parse_googleSearchHtmlDoesNotContainUrl_returnsMatchedInput() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(
+                next = MatchedInput(
                     googleMapsWebViewInput,
                     "https://www.google.com/maps/place/Berlin,+Germany/"
                 )
@@ -218,7 +218,7 @@ class GoogleMapsHtmlInputImplTest : InputTest {
     fun parse_googleSearchHtmlContainsRelativeUrl_returnsNextStepWithAbsoluteUrl() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(
+                next = MatchedInput(
                     FakeInputRepository.googleMapsUriInput,
                     "https://www.google.com/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705%3A0xa9ea51361ed84bda?sa=X&ved=2ahUKEwiY7vv80aeKAxU41QIHHSgBOlsQ4kB6BAgHEAA&hl=de&gl=de"
                 )
@@ -240,20 +240,20 @@ class GoogleMapsHtmlInputImplTest : InputTest {
     }
 
     @Test
-    fun parse_googleSearchHtmlContainsAbsoluteUrl_returnsNextStep() = runTest {
+    fun parse_googleSearchHtmlContainsAbsoluteUrl_returnsMatchedInput() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(FakeInputRepository.googleMapsUriInput, "https://www.example.com/foo")
+                next = MatchedInput(FakeInputRepository.googleMapsUriInput, "https://www.example.com/foo")
             ),
             input.parse("""<html><a href="" data-url="https://www.example.com/foo"></a></html>"""),
         )
     }
 
     @Test
-    fun parse_googleSearchHtmlContainsInvalidUrl_returnsNextStep() = runTest {
+    fun parse_googleSearchHtmlContainsInvalidUrl_returnsMatchedInput() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(FakeInputRepository.googleMapsUriInput, "https://example.com//spam")
+                next = MatchedInput(FakeInputRepository.googleMapsUriInput, "https://example.com//spam")
             ),
             input.parse("""<html><a href="" data-url="spam"></a></html>"""),
         )

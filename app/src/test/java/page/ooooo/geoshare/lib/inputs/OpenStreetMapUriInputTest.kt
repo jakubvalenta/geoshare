@@ -125,7 +125,7 @@ class OpenStreetMapUriInputTest : InputTest {
     fun parse_element() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(
+                next = MatchedInput(
                     FakeInputRepository.openStreetMapApiInput,
                     "https://www.openstreetmap.org/api/0.6/node/6284640534.json"
                 )
@@ -134,7 +134,7 @@ class OpenStreetMapUriInputTest : InputTest {
         )
         assertEquals(
             ParseResult(
-                nextStep = NextStep(
+                next = MatchedInput(
                     FakeInputRepository.openStreetMapApiInput,
                     "https://www.openstreetmap.org/api/0.6/relation/910699/full.json"
                 )
@@ -143,7 +143,7 @@ class OpenStreetMapUriInputTest : InputTest {
         )
         assertEquals(
             ParseResult(
-                nextStep = NextStep(
+                next = MatchedInput(
                     FakeInputRepository.openStreetMapApiInput,
                     "https://www.openstreetmap.org/api/0.6/way/596674456/full.json"
                 )

@@ -14,20 +14,21 @@ import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.inputs.MatchedInput
 import page.ooooo.geoshare.lib.inputs.ParseResult
 
 class PermissionRequestedTest {
     private val source = "https://maps.app.goo.gl/foo"
     private val input = FakeInputRepository.googleMapsShortLinkInput
-    private val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-    private val prevResult = ParseResult(prevPoints)
+    private val matchedInput = MatchedInput(input, source)
+    private val oldPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+    private val oldResult = ParseResult(oldPoints)
+    private val results: Results = mapOf(MatchedInput(FakeInputRepository.debugUriInput, source) to oldResult)
 
     @Test
     fun transition_returnsNull() = runTest {
         val stateContext: ConversionStateContext = mock()
-        val state = PermissionRequested(
-            stateContext, source, match = source, input, listOf(prevResult), input.permissionTitleResId
-        )
+        val state = PermissionRequested(stateContext, source, matchedInput, results, input.permissionTitleResId)
         assertNull(state.transition())
     }
 
@@ -39,11 +40,9 @@ class PermissionRequestedTest {
         val stateContext: ConversionStateContext = mock {
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = PermissionRequested(
-            stateContext, source, match = source, input, listOf(prevResult), input.permissionTitleResId
-        )
+        val state = PermissionRequested(stateContext, source, matchedInput, results, input.permissionTitleResId)
         assertEquals(
-            PermissionGranted(stateContext, source, match = source, input, Permission.ALWAYS, listOf(prevResult)),
+            PermissionGranted(stateContext, source, matchedInput, Permission.ALWAYS, results),
             state.grant(false),
         )
         assertEquals(
@@ -60,17 +59,9 @@ class PermissionRequestedTest {
         val stateContext: ConversionStateContext = mock {
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state =
-            PermissionRequested(
-                stateContext,
-                source,
-                match = source,
-                input,
-                listOf(prevResult),
-                input.permissionTitleResId
-            )
+        val state = PermissionRequested(stateContext, source, matchedInput, results, input.permissionTitleResId)
         assertEquals(
-            PermissionGranted(stateContext, source, match = source, input, Permission.ALWAYS, listOf(prevResult)),
+            PermissionGranted(stateContext, source, matchedInput, Permission.ALWAYS, results),
             state.grant(true),
         )
         assertEquals(
@@ -87,17 +78,9 @@ class PermissionRequestedTest {
         val stateContext: ConversionStateContext = mock {
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state =
-            PermissionRequested(
-                stateContext,
-                source,
-                match = source,
-                input,
-                listOf(prevResult),
-                input.permissionTitleResId
-            )
+        val state = PermissionRequested(stateContext, source, matchedInput, results, input.permissionTitleResId)
         assertEquals(
-            PermissionDenied(stateContext, source, match = source, input, listOf(prevResult)),
+            PermissionDenied(stateContext, source, matchedInput, results),
             state.deny(false),
         )
         assertEquals(
@@ -114,11 +97,9 @@ class PermissionRequestedTest {
         val stateContext: ConversionStateContext = mock {
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = PermissionRequested(
-            stateContext, source, match = source, input, listOf(prevResult), input.permissionTitleResId
-        )
+        val state = PermissionRequested(stateContext, source, matchedInput, results, input.permissionTitleResId)
         assertEquals(
-            PermissionDenied(stateContext, source, match = source, input, listOf(prevResult)),
+            PermissionDenied(stateContext, source, matchedInput, results),
             state.deny(true),
         )
         assertEquals(

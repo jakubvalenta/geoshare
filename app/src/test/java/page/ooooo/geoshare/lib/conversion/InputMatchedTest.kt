@@ -13,14 +13,17 @@ import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.inputs.MatchedInput
 import page.ooooo.geoshare.lib.inputs.ParseResult
 
-class InputFoundTest {
+class InputMatchedTest {
     private val log = FakeLog
     private val source = "https://maps.app.goo.gl/foo"
     private val input = FakeInputRepository.googleMapsShortLinkInput
-    private val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-    private val prevResult = ParseResult(prevPoints)
+    private val matchedInput = MatchedInput(input, source)
+    private val oldPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+    private val oldResult = ParseResult(oldPoints)
+    private val results: Results = mapOf(MatchedInput(FakeInputRepository.debugUriInput, source) to oldResult)
 
     @Test
     fun transition_whenPermissionIsAlways_returnsPermissionGrantedAndPassesPermissionParam() = runTest {
@@ -31,9 +34,9 @@ class InputFoundTest {
             on { this@on.log } doReturn log
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = InputFound(stateContext, source, match = source, input, Permission.ALWAYS, listOf(prevResult))
+        val state = InputMatched(stateContext, source, matchedInput, Permission.ALWAYS, results)
         assertEquals(
-            PermissionGranted(stateContext, source, match = source, input, Permission.ALWAYS, listOf(prevResult)),
+            PermissionGranted(stateContext, source, matchedInput, Permission.ALWAYS, results),
             state.transition(),
         )
     }
@@ -47,16 +50,9 @@ class InputFoundTest {
             on { this@on.log } doReturn log
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = InputFound(stateContext, source, match = source, input, Permission.ASK, listOf(prevResult))
+        val state = InputMatched(stateContext, source, matchedInput, Permission.ASK, results)
         assertEquals(
-            PermissionRequested(
-                stateContext,
-                source,
-                match = source,
-                input,
-                listOf(prevResult),
-                input.permissionTitleResId
-            ),
+            PermissionRequested(stateContext, source, matchedInput, results, input.permissionTitleResId),
             state.transition(),
         )
     }
@@ -70,9 +66,9 @@ class InputFoundTest {
             on { this@on.log } doReturn log
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = InputFound(stateContext, source, match = source, input, Permission.NEVER, listOf(prevResult))
+        val state = InputMatched(stateContext, source, matchedInput, Permission.NEVER, results)
         assertEquals(
-            PermissionDenied(stateContext, source, match = source, input, listOf(prevResult)),
+            PermissionDenied(stateContext, source, matchedInput, results),
             state.transition(),
         )
     }
@@ -87,9 +83,9 @@ class InputFoundTest {
                 on { this@on.log } doReturn log
                 on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
             }
-            val state = InputFound(stateContext, source, match = source, input, permission = null, listOf(prevResult))
+            val state = InputMatched(stateContext, source, matchedInput, permission = null, results)
             assertEquals(
-                PermissionGranted(stateContext, source, match = source, input, Permission.ALWAYS, listOf(prevResult)),
+                PermissionGranted(stateContext, source, matchedInput, Permission.ALWAYS, results),
                 state.transition(),
             )
         }
@@ -103,11 +99,9 @@ class InputFoundTest {
             on { this@on.log } doReturn log
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = InputFound(stateContext, source, match = source, input, permission = null, listOf(prevResult))
+        val state = InputMatched(stateContext, source, matchedInput, permission = null, results)
         assertEquals(
-            PermissionRequested(
-                stateContext, source, match = source, input, listOf(prevResult), input.permissionTitleResId
-            ),
+            PermissionRequested(stateContext, source, matchedInput, results, input.permissionTitleResId),
             state.transition(),
         )
     }
@@ -121,9 +115,9 @@ class InputFoundTest {
             on { this@on.log } doReturn log
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = InputFound(stateContext, source, match = source, input, permission = null, listOf(prevResult))
+        val state = InputMatched(stateContext, source, matchedInput, permission = null, results)
         assertEquals(
-            PermissionDenied(stateContext, source, match = source, input, listOf(prevResult)),
+            PermissionDenied(stateContext, source, matchedInput, results),
             state.transition(),
         )
     }
@@ -131,12 +125,13 @@ class InputFoundTest {
     @Test
     fun transition_whenInputDoesNotHavePermission_returnsPermissionGrantedAndPassesPermissionParam() = runTest {
         val input = FakeInputRepository.geoUriInput
+        val matchedInput = MatchedInput(input, source)
         val stateContext: ConversionStateContext = mock {
             on { this@on.log } doReturn log
         }
-        val state = InputFound(stateContext, source, match = source, input, Permission.NEVER, listOf(prevResult))
+        val state = InputMatched(stateContext, source, matchedInput, Permission.NEVER, results)
         assertEquals(
-            PermissionGranted(stateContext, source, match = source, input, Permission.NEVER, listOf(prevResult)),
+            PermissionGranted(stateContext, source, matchedInput, Permission.NEVER, results),
             state.transition(),
         )
     }

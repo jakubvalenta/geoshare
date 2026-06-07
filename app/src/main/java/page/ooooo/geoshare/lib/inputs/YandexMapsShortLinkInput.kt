@@ -25,7 +25,7 @@ class YandexMapsShortLinkInput @Inject constructor(
     override val pattern = Regex("""((?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/maps/-/\S+)""")
 
     override suspend fun parse(data: Uri, match: String) = parseResult {
-        nextStep = NextStep(yandexMapsUriInput.get(), data.toString())
+        next = MatchedInput(yandexMapsUriInput.get(), data.toString())
     }
 
     override fun toString() = "YandexMapsShortLinkInput"

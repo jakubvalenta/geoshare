@@ -124,8 +124,8 @@ import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import page.ooooo.geoshare.lib.inputs.DebugWebViewInput
 import page.ooooo.geoshare.lib.inputs.Input
+import page.ooooo.geoshare.lib.inputs.MatchedInput
 import page.ooooo.geoshare.lib.network.ConnectTimeoutNetworkException
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.ActionContext
@@ -672,7 +672,7 @@ private fun MainScreen(
                     AnnotatedString.fromHtml(
                         stringResource(
                             R.string.conversion_permission_common_text,
-                            currentState.match.truncateMiddle(),
+                            currentState.matchedInput.match.truncateMiddle(),
                             appName,
                         )
                     ),
@@ -793,11 +793,11 @@ private fun MainBottomPane(currentState: State) {
                     .checkeredBackground(squarePx)
             )
             ConversionWebView(
-                unsafeUrl = currentState.match,
-                unsafeExtractionJavascript = currentState.input.unsafeExtractionJavascript,
+                unsafeUrl = currentState.matchedInput.match,
+                unsafeExtractionJavascript = currentState.matchedInput.input.unsafeExtractionJavascript,
                 onExtractionSettle = { currentState.setData(it) },
-                extendWebSettings = { currentState.input.extendWebSettings(it) },
-                shouldInterceptRequest = { currentState.input.shouldInterceptRequest(it) },
+                extendWebSettings = { currentState.matchedInput.input.extendWebSettings(it) },
+                shouldInterceptRequest = { currentState.matchedInput.input.shouldInterceptRequest(it) },
             )
             if (!BuildConfig.DEBUG) {
                 Box(
@@ -1778,9 +1778,9 @@ private fun WebViewPreview() {
                 billing = BillingImpl(LocalContext.current),
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            match = "https://www.example.com/",
-            input = DebugWebViewInput(),
+            matchedInput = MatchedInput(FakeInputRepository.debugWebViewInput, "https://www.example.com/"),
             permission = Permission.ALWAYS,
+            results = emptyMap(),
         )
         MainScreen(
             currentState = currentState,
@@ -1851,9 +1851,9 @@ private fun DarkWebViewPreview() {
                 billing = BillingImpl(LocalContext.current),
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            match = "https://www.example.com/",
-            input = DebugWebViewInput(),
+            matchedInput = MatchedInput(FakeInputRepository.debugWebViewInput, "https://www.example.com/"),
             permission = Permission.ALWAYS,
+            results = emptyMap(),
         )
         MainScreen(
             currentState = currentState,
@@ -1924,9 +1924,9 @@ private fun TabletWebViewPreview() {
                 billing = BillingImpl(LocalContext.current),
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            match = "https://www.example.com/",
-            input = DebugWebViewInput(),
+            matchedInput = MatchedInput(FakeInputRepository.debugWebViewInput, "https://www.example.com/"),
             permission = Permission.ALWAYS,
+            results = emptyMap(),
         )
         MainScreen(
             currentState = currentState,
@@ -2244,9 +2244,11 @@ private fun LoadingIndicatorPreview() {
                 billing = BillingImpl(LocalContext.current),
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            input = FakeInputRepository.googleMapsShortLinkInput,
+            matchedInput = MatchedInput(
+                FakeInputRepository.googleMapsShortLinkInput, "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+            ),
             permission = Permission.ALWAYS,
+            results = emptyMap(),
             lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )
         MainScreen(
@@ -2318,9 +2320,11 @@ private fun DarkLoadingIndicatorPreview() {
                 billing = BillingImpl(LocalContext.current),
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            input = FakeInputRepository.googleMapsShortLinkInput,
+            matchedInput = MatchedInput(
+                FakeInputRepository.googleMapsShortLinkInput, "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+            ),
             permission = Permission.ALWAYS,
+            results = emptyMap(),
             lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )
         MainScreen(
@@ -2392,9 +2396,11 @@ private fun TabletLoadingIndicatorPreview() {
                 billing = BillingImpl(LocalContext.current),
             ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            input = FakeInputRepository.googleMapsShortLinkInput,
+            matchedInput = MatchedInput(
+                FakeInputRepository.googleMapsShortLinkInput, "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+            ),
             permission = Permission.ALWAYS,
+            results = emptyMap(),
             lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )
         MainScreen(

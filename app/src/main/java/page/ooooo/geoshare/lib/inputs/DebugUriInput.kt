@@ -22,7 +22,7 @@ class DebugUriInput @Inject constructor(
     )
 
     override suspend fun parse(data: Uri, match: String) = parseResult {
-        nextStep = NextStep(debugWebViewInput.get(), match)
+        next = MatchedInput(debugWebViewInput.get(), match)
     }
 
     override fun toString() = "DebugUriInput"

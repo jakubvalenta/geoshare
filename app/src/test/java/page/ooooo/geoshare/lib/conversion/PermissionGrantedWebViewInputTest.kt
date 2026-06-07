@@ -19,7 +19,7 @@ import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import page.ooooo.geoshare.lib.inputs.NextStep
+import page.ooooo.geoshare.lib.inputs.MatchedInput
 import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.inputs.WebViewInput
 import kotlin.time.Duration.Companion.seconds
@@ -38,10 +38,11 @@ class PermissionGrantedWebViewInputTest {
     }
     private val source = "https://maps.google.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-    private val nextStep = NextStep(FakeInputRepository.debugUriInput, source)
-    private val result = ParseResult(points, nextStep)
-    private val prevPoints = persistentListOf(WGS84Point(3.0, 4.0, source = Source.GENERATED))
-    private val prevResult = ParseResult(prevPoints)
+    private val next = MatchedInput(FakeInputRepository.debugUriInput, source)
+    private val result = ParseResult(points, next)
+    private val oldPoints = persistentListOf(WGS84Point(3.0, 4.0, source = Source.GENERATED))
+    private val oldResult = ParseResult(oldPoints)
+    private val results: Results = mapOf(MatchedInput(FakeInputRepository.debugUriInput, source) to oldResult)
     private val uriQuote = FakeUriQuote
 
     @Test
@@ -52,8 +53,9 @@ class PermissionGrantedWebViewInputTest {
             override val unsafeExtractionJavascript = "undefined"
 
             override suspend fun parse(data: String, match: String) =
-                result.copy(nextStep = nextStep.copy(match = data)) // Store data in nextStep, so we can test it
+                result.copy(next = next.copy(match = data)) // Store data in MatchedInput, so we can test it
         }
+        val matchedInput = MatchedInput<WebViewInput>(input, source)
         val permission = Permission.ALWAYS
         val timeout = 7.seconds
         val stateContext: ConversionStateContext = mock {
@@ -62,14 +64,7 @@ class PermissionGrantedWebViewInputTest {
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedWebViewInput(
-            stateContext,
-            source,
-            match = source,
-            input,
-            permission,
-            listOf(prevResult),
-            timeout,
-            dispatcher = testScheduler
+            stateContext, source, matchedInput, permission, results, timeout, dispatcher = testScheduler
         )
         var res: State? = null
         launch {
@@ -81,13 +76,9 @@ class PermissionGrantedWebViewInputTest {
             DataParsed(
                 stateContext,
                 source,
-                match = source,
-                input,
+                matchedInput,
                 permission,
-                listOf(
-                    result.copy(nextStep = nextStep.copy(match = "$source-data")),
-                    prevResult,
-                ),
+                results + (matchedInput to result.copy(next = next.copy(match = "$source-data"))),
             ),
             res,
         )
@@ -101,8 +92,9 @@ class PermissionGrantedWebViewInputTest {
             override val unsafeExtractionJavascript = "undefined"
 
             override suspend fun parse(data: String, match: String) =
-                result.copy(nextStep = nextStep.copy(match = data)) // Store data in nextStep, so we can test it
+                result.copy(next = next.copy(match = data)) // Store data in MatchedInput, so we can test it
         }
+        val matchedInput = MatchedInput<WebViewInput>(input, source)
         val permission = Permission.ALWAYS
         val timeout = 7.seconds
         val stateContext: ConversionStateContext = mock {
@@ -111,14 +103,7 @@ class PermissionGrantedWebViewInputTest {
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedWebViewInput(
-            stateContext,
-            source,
-            match = source,
-            input,
-            permission,
-            listOf(prevResult),
-            timeout,
-            dispatcher = testScheduler
+            stateContext, source, matchedInput, permission, results, timeout, dispatcher = testScheduler
         )
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
@@ -142,6 +127,7 @@ class PermissionGrantedWebViewInputTest {
             override suspend fun parse(data: String, match: String) =
                 throw CancellationException()
         }
+        val matchedInput = MatchedInput<WebViewInput>(input, source)
         val permission = Permission.ALWAYS
         val timeout = 7.seconds
         val stateContext: ConversionStateContext = mock {
@@ -150,14 +136,7 @@ class PermissionGrantedWebViewInputTest {
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedWebViewInput(
-            stateContext,
-            source,
-            match = source,
-            input,
-            permission,
-            listOf(prevResult),
-            timeout,
-            dispatcher = testScheduler,
+            stateContext, source, matchedInput, permission, results, timeout, dispatcher = testScheduler
         )
         var res: State? = null
         launch {
@@ -181,6 +160,7 @@ class PermissionGrantedWebViewInputTest {
             override suspend fun parse(data: String, match: String) =
                 ParseResult()
         }
+        val matchedInput = MatchedInput<WebViewInput>(input, source)
         val permission = Permission.ALWAYS
         val timeout = 7.seconds
         val stateContext: ConversionStateContext = mock {
@@ -189,14 +169,7 @@ class PermissionGrantedWebViewInputTest {
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedWebViewInput(
-            stateContext,
-            source,
-            match = source,
-            input,
-            permission,
-            listOf(prevResult),
-            timeout,
-            dispatcher = testScheduler,
+            stateContext, source, matchedInput, permission, results, timeout, dispatcher = testScheduler
         )
         var res: State? = null
         val job = launch {
@@ -225,11 +198,12 @@ class PermissionGrantedWebViewInputTest {
             override suspend fun parse(data: String, match: String) =
                 throw NotImplementedError()
         }
+        val matchedInput = MatchedInput<WebViewInput>(input, source)
         val stateContext: ConversionStateContext = mock {
             on { this@on.resources } doReturn resources
         }
         val state = PermissionGrantedWebViewInput(
-            stateContext, source, match = source, input, Permission.ALWAYS, dispatcher = testScheduler
+            stateContext, source, matchedInput, Permission.ALWAYS, results, dispatcher = testScheduler
         )
         assertEquals(
             LoadingIndicator.Large(

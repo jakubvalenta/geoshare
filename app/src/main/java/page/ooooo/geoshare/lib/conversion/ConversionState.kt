@@ -29,6 +29,7 @@ import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.inputs.BasicInput
 import page.ooooo.geoshare.lib.inputs.Input
+import page.ooooo.geoshare.lib.inputs.MatchedInput
 import page.ooooo.geoshare.lib.inputs.NoopInput
 import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.inputs.WebViewInput
@@ -50,6 +51,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 interface ConversionState : State {
+    // TODO Make stateContext a transition() param
     override suspend fun transition(): State? = null
 
     interface HasError {
@@ -83,6 +85,8 @@ class Initial : ConversionState {
     override fun toString() = "Initial"
 }
 
+typealias Results = Map<MatchedInput<*>, ParseResult>
+
 data class SourceReceived(
     val stateContext: ConversionStateContext,
     val source: String,
@@ -97,7 +101,7 @@ data class SourceReceived(
         for (input in stateContext.inputs) {
             val match = input.match(source)
             if (match != null) {
-                return InputFound(stateContext, source, match, input)
+                return InputMatched(stateContext, source, MatchedInput(input, match))
             }
         }
         return ConversionFailed(
@@ -106,104 +110,105 @@ data class SourceReceived(
         )
     }
 
+    override fun toString() = "$TAG(source=$source)"
+
     private companion object {
         private const val TAG = "SourceReceived"
     }
-
-    override fun toString() = "$TAG(source=$source)"
 }
 
-data class InputFound(
+data class InputMatched(
     val stateContext: ConversionStateContext,
     val source: String,
-    val match: String,
-    val input: Input,
+    val matchedInput: MatchedInput<*>,
     val permission: Permission? = null,
-    val results: List<ParseResult> = emptyList(),
+    val results: Results = emptyMap(),
 ) : ConversionState {
     override suspend fun transition(): State {
-        return if (input is Input.HasPermission) {
+        return if (matchedInput.input is Input.HasPermission) {
             when (permission ?: stateContext.userPreferencesRepository.getValue(ConnectionPermissionPreference)) {
                 Permission.ALWAYS -> PermissionGranted(
-                    stateContext, source, match, input, Permission.ALWAYS, results
+                    stateContext, source, matchedInput, Permission.ALWAYS, results
                 )
 
                 Permission.ASK -> PermissionRequested(
-                    stateContext, source, match, input, results, input.permissionTitleResId
+                    stateContext, source, matchedInput, results, matchedInput.input.permissionTitleResId
                 )
 
                 Permission.NEVER -> PermissionDenied(
-                    stateContext, source, match, input, results
+                    stateContext, source, matchedInput, results
                 )
             }
         } else {
-            PermissionGranted(stateContext, source, match, input, permission, results)
+            PermissionGranted(stateContext, source, matchedInput, permission, results)
         }
     }
 
-    private companion object {
-        private const val TAG = "InputFound"
-    }
-
     override fun toString() =
-        "$TAG(source=$source, match=$match, input=$input, permission=$permission, results=$results)"
+        "$TAG(source=$source, matchedInput=$matchedInput, permission=$permission, results=$results)"
+
+    private companion object {
+        private const val TAG = "InputMatched"
+    }
 }
 
 data class PermissionRequested(
     val stateContext: ConversionStateContext,
     val source: String,
-    val match: String,
-    val input: Input,
-    val results: List<ParseResult> = emptyList(),
+    val matchedInput: MatchedInput<*>,
+    val results: Results = emptyMap(),
     override val permissionTitleResId: Int,
 ) : ConversionState, ConversionState.HasPermission {
     override suspend fun grant(doNotAsk: Boolean): State {
         if (doNotAsk) {
             stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.ALWAYS)
         }
-        return PermissionGranted(stateContext, source, match, input, Permission.ALWAYS, results)
+        return PermissionGranted(stateContext, source, matchedInput, Permission.ALWAYS, results)
     }
 
     override suspend fun deny(doNotAsk: Boolean): State {
         if (doNotAsk) {
             stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.NEVER)
         }
-        return PermissionDenied(stateContext, source, match, input, results)
+        return PermissionDenied(stateContext, source, matchedInput, results)
     }
+
+    override fun toString() = "$TAG(source=$source, matchedInput=$matchedInput, results=$results)"
 
     private companion object {
         private const val TAG = "PermissionRequested"
     }
-
-    override fun toString() = "$TAG(source=$source, match=$match, input=$input, results=$results)"
 }
 
 data class PermissionGranted(
     val stateContext: ConversionStateContext,
     val source: String,
-    val match: String,
-    val input: Input,
+    val matchedInput: MatchedInput<*>,
     val permission: Permission?,
-    val results: List<ParseResult> = emptyList(),
+    val results: Results = emptyMap(),
 ) : ConversionState {
     override suspend fun transition(): State =
-        when (input) {
+        when (matchedInput.input) {
             is BasicInput<*> ->
-                PermissionGrantedBasicInput(stateContext, source, match, input, permission, results)
+                PermissionGrantedBasicInput(
+                    stateContext, source, MatchedInput(matchedInput.input, matchedInput.match), permission, results
+                )
 
             is WebViewInput ->
-                PermissionGrantedWebViewInput(stateContext, source, match, input, permission, results)
+                PermissionGrantedWebViewInput(
+                    stateContext, source, MatchedInput(matchedInput.input, matchedInput.match), permission, results
+                )
 
             is NoopInput ->
-                DataParsed(stateContext, source, match, input, permission, listOf(ParseResult()) + results)
+                DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to ParseResult()))
         }
+
+    override fun toString() =
+        "$TAG(source=$source, matchedInput=$matchedInput, permission=$permission, results=$results)"
 
     private companion object {
         private const val TAG = "PermissionGranted"
     }
-
-    override fun toString() =
-        "$TAG(source=$source, match=$match, input=$input, permission=$permission, results=$results)"
 }
 
 /**
@@ -218,10 +223,9 @@ data class PermissionGranted(
 data class PermissionGrantedBasicInput<T>(
     val stateContext: ConversionStateContext,
     val source: String,
-    val match: String,
-    val input: BasicInput<T>,
+    val matchedInput: MatchedInput<BasicInput<T>>,
     val permission: Permission?,
-    val results: List<ParseResult> = emptyList(),
+    val results: Results,
     val lastAttempt: Attempt<RecoverableNetworkException>? = null,
     val maxAttempts: Int = 10,
     val dispatcher: CoroutineContext = Dispatchers.Default,
@@ -232,20 +236,20 @@ data class PermissionGrantedBasicInput<T>(
             val attemptNumber = lastAttempt?.number?.plus(1) ?: 1
             try {
                 if (lastAttempt != null && lastAttempt.number >= maxAttempts) {
-                    stateContext.log.w(TAG, "Maximum number of $maxAttempts attempts reached for $match")
+                    stateContext.log.w(TAG, "Maximum number of $maxAttempts attempts reached for $matchedInput")
                     throw MaxAttemptsReachedNetworkException(lastAttempt.cause)
                 }
                 val delayMillis = calcExponentialBackoffMillis(attemptNumber)
                 if (delayMillis > 0) {
                     stateContext.log.i(
-                        TAG, "Waiting ${delayMillis}ms before attempt $attemptNumber of $maxAttempts for $match"
+                        TAG, "Waiting ${delayMillis}ms before attempt $attemptNumber of $maxAttempts for $matchedInput"
                     )
                     delay(delayMillis)
                 }
-                val result = input.fetch(match) { data ->
-                    input.parse(data, match)
+                val result = matchedInput.input.fetch(matchedInput.match) { data ->
+                    matchedInput.input.parse(data, matchedInput.match)
                 }
-                DataParsed(stateContext, source, match, input, permission, listOf(result) + results)
+                DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to result))
             } catch (_: MalformedURLException) {
                 ConversionFailed(
                     source,
@@ -254,7 +258,7 @@ data class PermissionGrantedBasicInput<T>(
             } catch (tr: RecoverableNetworkException) {
                 val attempt = Attempt(attemptNumber, tr)
                 PermissionGrantedBasicInput(
-                    stateContext, source, match, input, permission, results, attempt, maxAttempts
+                    stateContext, source, matchedInput, permission, results, attempt, maxAttempts
                 )
             } catch (tr: UnrecoverableNetworkException) {
                 ConversionFailed(
@@ -273,7 +277,7 @@ data class PermissionGrantedBasicInput<T>(
     }
 
     override fun getLoadingIndicator() =
-        (input as? Input.HasPermission)?.loadingIndicatorTitleResId?.let { loadingIndicatorTitleResId ->
+        (matchedInput.input as? Input.HasPermission)?.loadingIndicatorTitleResId?.let { loadingIndicatorTitleResId ->
             LoadingIndicator.Large(
                 title = stateContext.resources.getString(loadingIndicatorTitleResId),
                 description = lastAttempt?.let {
@@ -287,17 +291,17 @@ data class PermissionGrantedBasicInput<T>(
             )
         }
 
+    override fun toString() =
+        "$TAG(source=$source, matchedInput=$matchedInput, permission=$permission, results=$results, lastAttempt=$lastAttempt)"
+
     private companion object {
         private const val TAG = "PermissionGrantedBasicInput"
     }
-
-    override fun toString() =
-        "$TAG(source=$source, match=$match, input=$input, permission=$permission, results=$results, lastAttempt=$lastAttempt)"
 }
 
 /**
- * When this state is the current state, the UI should load [match] as a page URL in a WebView and call [setData] with
- * the URL that the page redirects to once it's fully loaded.
+ * When this state is the current state, the UI should load [matchedInput]'s match as a page URL in a WebView and call
+ * [setData] with the URL that the page redirects to once it's fully loaded.
  *
  * The [transition] function of this state will wait for [setData] to be called. If it's not called within [timeout], it
  * returns failure.
@@ -305,10 +309,9 @@ data class PermissionGrantedBasicInput<T>(
 data class PermissionGrantedWebViewInput(
     val stateContext: ConversionStateContext,
     val source: String,
-    val match: String,
-    val input: WebViewInput,
+    val matchedInput: MatchedInput<WebViewInput>,
     val permission: Permission?,
-    val results: List<ParseResult> = emptyList(),
+    val results: Results,
     val timeout: Duration = 60.seconds,
     val dispatcher: CoroutineContext = Dispatchers.Default,
 ) : ConversionState, ConversionState.HasLargeLoadingIndicator {
@@ -326,8 +329,8 @@ data class PermissionGrantedWebViewInput(
                     .filterNotNull()
                     .timeout(timeout)
                     .first()
-                val result = input.parse(data, match)
-                DataParsed(stateContext, source, match, input, permission, listOf(result) + results)
+                val result = matchedInput.input.parse(data, matchedInput.match)
+                DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to result))
             } catch (_: TimeoutCancellationException) {
                 stateContext.log.e(TAG, "Timed out")
                 ConversionFailed(
@@ -345,61 +348,67 @@ data class PermissionGrantedWebViewInput(
     }
 
     override fun getLoadingIndicator() =
-        LoadingIndicator.Large(stateContext.resources.getString(input.loadingIndicatorTitleResId))
+        LoadingIndicator.Large(stateContext.resources.getString(matchedInput.input.loadingIndicatorTitleResId))
+
+    override fun toString() =
+        "$TAG(source=$source, matchedInput=$matchedInput, permission=$permission, results=$results)"
 
     private companion object {
         private const val TAG = "PermissionGrantedWebViewInput"
     }
-
-    override fun toString() =
-        "$TAG(source=$source, match=$match, input=$input, permission=$permission, results=$results)"
 }
 
 data class PermissionDenied(
     val stateContext: ConversionStateContext,
     val source: String,
-    val match: String,
-    val input: Input,
-    val results: List<ParseResult>,
+    val matchedInput: MatchedInput<*>,
+    val results: Results,
 ) : ConversionState {
     override suspend fun transition() =
-        DataParsed(stateContext, source, match, input, Permission.NEVER, listOf(ParseResult()) + results)
+        DataParsed(stateContext, source, matchedInput, Permission.NEVER, results + (matchedInput to ParseResult()))
+
+    override fun toString() = "$TAG(source=$source, matchedInput=$matchedInput, results=$results)"
 
     private companion object {
         private const val TAG = "PermissionDenied"
     }
-
-    override fun toString() = "$TAG(source=$source, match=$match, input=$input, results=$results)"
 }
 
 data class DataParsed(
     val stateContext: ConversionStateContext,
     val source: String,
-    val match: String,
-    val input: Input,
+    val matchedInput: MatchedInput<*>,
     val permission: Permission?,
-    val results: List<ParseResult>,
+    val results: Results,
 ) : ConversionState {
     override suspend fun transition(): State =
-        results.merge().run {
+        results.values.reversed().merge().run {
             if (points.lastOrNull()?.hasCoordinates() == true) {
                 stateContext.log.i(
-                    TAG, "Extracted point with coordinates $points from $match"
+                    TAG, "Extracted point with coordinates $points from $matchedInput"
                 )
                 ConversionSucceeded(stateContext, source, points)
-            } else if (nextStep != null) {
-                stateContext.log.i(
-                    TAG, "Failed to extract point with coordinates from $match, going to next step"
-                )
-                InputFound(stateContext, source, nextStep.match, nextStep.input, permission, results)
+            } else if (next != null) {
+                if (next in results) {
+                    // TODO Test a loop of GoogleMapsUriInput > GoogleMapsAddressApiInput > GoogleMapsHtmlInput > GoogleMapsWebViewInput > GoogleMapsUriInput
+                    stateContext.log.w(
+                        TAG, "Failed to extract point with coordinates from $matchedInput and next step creates a loop"
+                    )
+                    ConversionFailed(source, matchedInput.input.getErrorMessage(stateContext.resources))
+                } else {
+                    stateContext.log.i(
+                        TAG, "Failed to extract point with coordinates from $matchedInput, going to next step"
+                    )
+                    InputMatched(stateContext, source, next, permission, results)
+                }
             } else if (points.lastOrNull()?.hasName() == true) {
                 stateContext.log.i(
-                    TAG, "Extracted point with name $points from $match"
+                    TAG, "Extracted point with name $points from $matchedInput"
                 )
                 ConversionSucceeded(stateContext, source, points)
             } else if (permission == Permission.NEVER) {
                 stateContext.log.i(
-                    TAG, "Failed to extract point from $match, because permission was denied"
+                    TAG, "Failed to extract point from $matchedInput, because permission was denied"
                 )
                 ConversionFailed(
                     source,
@@ -407,18 +416,18 @@ data class DataParsed(
                 )
             } else {
                 stateContext.log.i(
-                    TAG, "Failed to extract point from $match"
+                    TAG, "Failed to extract point from $matchedInput"
                 )
-                ConversionFailed(source, input.getErrorMessage(stateContext.resources))
+                ConversionFailed(source, matchedInput.input.getErrorMessage(stateContext.resources))
             }
         }
+
+    override fun toString() =
+        "$TAG(source=$source, matchedInput=$matchedInput, permission=$permission, results=$results)"
 
     private companion object {
         private const val TAG = "DataParsed"
     }
-
-    override fun toString() =
-        "$TAG(source=$source, match=$match, input=$input, permission=$permission, results=$results)"
 }
 
 data class ConversionSucceeded(
@@ -496,11 +505,11 @@ data class ConversionSucceeded(
         return null
     }
 
+    override fun toString() = "$TAG(source=$source, points=$points)"
+
     private companion object {
         private const val TAG = "ConversionSucceeded"
     }
-
-    override fun toString() = "$TAG(source=$source, points=$points)"
 }
 
 data class ConversionFailed(
@@ -508,11 +517,11 @@ data class ConversionFailed(
     override val message: String,
     override val details: String? = null,
 ) : ConversionState, ConversionState.HasError {
+    override fun toString() = "$TAG(source=$source, message=$message)"
+
     private companion object {
         private const val TAG = "ConversionFailed"
     }
-
-    override fun toString() = "$TAG(source=$source, message=$message)"
 }
 
 data class ActionWaiting(
@@ -533,11 +542,11 @@ data class ActionWaiting(
         ActionFinished(source, points, ActionResult.Failed)
     }
 
+    override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
+
     private companion object {
         private const val TAG = "ActionWaiting"
     }
-
-    override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
 }
 
 data class ActionReady(
@@ -552,11 +561,11 @@ data class ActionReady(
         is LocationAction -> LocationRationaleRequested(source, points, action, isAutomation)
     }
 
+    override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
+
     private companion object {
         private const val TAG = "ActionReady"
     }
-
-    override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
 }
 
 data class BasicActionReady(
@@ -565,11 +574,11 @@ data class BasicActionReady(
     val action: BasicAction<*>,
     val isAutomation: Boolean,
 ) : ConversionState, ConversionState.HasResult {
+    override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
+
     private companion object {
         private const val TAG = "BasicActionReady"
     }
-
-    override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
 }
 
 data class FileActionReady(
@@ -579,12 +588,12 @@ data class FileActionReady(
     val isAutomation: Boolean,
     val uri: Uri,
 ) : ConversionState, ConversionState.HasResult {
+    override fun toString() =
+        "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation, uri=$uri)"
+
     private companion object {
         private const val TAG = "FileActionReady"
     }
-
-    override fun toString() =
-        "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation, uri=$uri)"
 }
 
 data class LocationActionReady(
@@ -594,12 +603,12 @@ data class LocationActionReady(
     val isAutomation: Boolean,
     val location: Point,
 ) : ConversionState, ConversionState.HasResult {
+    override fun toString() =
+        "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation, location=$location)"
+
     private companion object {
         private const val TAG = "LocationActionReady"
     }
-
-    override fun toString() =
-        "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation, location=$location)"
 }
 
 data class ActionRan(
@@ -645,12 +654,12 @@ data class ActionRan(
         }
     }
 
+    override fun toString() =
+        "$TAG(source=$source, points=$points, action=$action, actionResult=$actionResult, isAutomation=$isAutomation)"
+
     private companion object {
         private const val TAG = "ActionRan"
     }
-
-    override fun toString() =
-        "$TAG(source=$source, points=$points, action=$action, actionResult=$actionResult, isAutomation=$isAutomation)"
 }
 
 data class ActionSucceeded(
@@ -668,11 +677,11 @@ data class ActionSucceeded(
         return ActionFinished(source, points, actionResult)
     }
 
+    override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
+
     private companion object {
         private const val TAG = "ActionSucceeded"
     }
-
-    override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
 }
 
 data class ActionAutomationSucceeded(
@@ -690,11 +699,11 @@ data class ActionAutomationSucceeded(
         return ActionFinished(source, points, actionResult)
     }
 
+    override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
+
     private companion object {
         private const val TAG = "ActionAutomationSucceeded"
     }
-
-    override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
 }
 
 data class ActionFailed(
@@ -712,11 +721,11 @@ data class ActionFailed(
         return ActionFinished(source, points, actionResult)
     }
 
+    override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
+
     private companion object {
         private const val TAG = "ActionFailed"
     }
-
-    override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
 }
 
 data class ActionAutomationFailed(
@@ -734,11 +743,11 @@ data class ActionAutomationFailed(
         return ActionFinished(source, points, actionResult)
     }
 
+    override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
+
     private companion object {
         private const val TAG = "ActionAutomationFailed"
     }
-
-    override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
 }
 
 data class ActionFinished(
@@ -746,11 +755,11 @@ data class ActionFinished(
     override val points: Points,
     val actionResult: ActionResult,
 ) : ConversionState, ConversionState.HasResult {
+    override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
+
     private companion object {
         private const val TAG = "ActionFinished"
     }
-
-    override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
 }
 
 data class FileUriRequested(
@@ -759,11 +768,11 @@ data class FileUriRequested(
     val action: FileAction<*>,
     val isAutomation: Boolean,
 ) : ConversionState, ConversionState.HasResult {
+    override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
+
     private companion object {
         private const val TAG = "FileUriRequested"
     }
-
-    override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
 }
 
 data class LocationRationaleRequested(
@@ -772,11 +781,11 @@ data class LocationRationaleRequested(
     val action: LocationAction<*>,
     val isAutomation: Boolean,
 ) : ConversionState, ConversionState.HasResult {
+    override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
+
     private companion object {
         private const val TAG = "LocationRationaleRequested"
     }
-
-    override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
 }
 
 data class LocationRationaleShown(
@@ -794,11 +803,11 @@ data class LocationRationaleShown(
     override suspend fun deny(doNotAsk: Boolean): State =
         ActionFinished(source, points, ActionResult.Failed)
 
+    override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
+
     private companion object {
         private const val TAG = "LocationRationaleShown"
     }
-
-    override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
 }
 
 data class LocationRationaleConfirmed(
@@ -807,11 +816,11 @@ data class LocationRationaleConfirmed(
     val action: LocationAction<*>,
     val isAutomation: Boolean,
 ) : ConversionState, ConversionState.HasResult {
+    override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
+
     private companion object {
         private const val TAG = "LocationRationaleConfirmed"
     }
-
-    override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
 }
 
 data class LocationPermissionReceived(
@@ -825,11 +834,11 @@ data class LocationPermissionReceived(
         stateContext.resources.getString(R.string.conversion_succeeded_location_loading_indicator_title)
     )
 
+    override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
+
     private companion object {
         private const val TAG = "LocationPermissionReceived"
     }
-
-    override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
 }
 
 data class LocationReceived(
@@ -845,12 +854,12 @@ data class LocationReceived(
         LocationActionReady(source, points, action, isAutomation, location)
     }
 
+    override fun toString() =
+        "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation, location=$location)"
+
     private companion object {
         private const val TAG = "LocationReceived"
     }
-
-    override fun toString() =
-        "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation, location=$location)"
 }
 
 data class LocationFindingFailed(
@@ -867,9 +876,9 @@ data class LocationFindingFailed(
         return ActionFinished(source, points, actionResult)
     }
 
+    override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
+
     private companion object {
         private const val TAG = "LocationFindingFailed"
     }
-
-    override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
 }

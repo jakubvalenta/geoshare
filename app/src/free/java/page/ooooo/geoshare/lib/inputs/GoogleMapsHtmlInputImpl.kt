@@ -106,10 +106,10 @@ class GoogleMapsHtmlInputImpl @Inject constructor(
             } else if (redirectUriString != null) {
                 val baseUri = Uri.parse(match, uriQuote)
                 val redirectUri = Uri.parse(redirectUriString, uriQuote).toAbsoluteUri(baseUri)
-                nextStep = NextStep(googleMapsUriInput.get(), redirectUri.toString())
+                next = MatchedInput(googleMapsUriInput.get(), redirectUri.toString())
             } else {
                 // Go to web parsing
-                nextStep = NextStep(googleMapsWebViewInput.get(), match)
+                next = MatchedInput(googleMapsWebViewInput.get(), match)
             }
         }
 

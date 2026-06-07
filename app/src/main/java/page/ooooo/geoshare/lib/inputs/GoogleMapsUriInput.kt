@@ -63,7 +63,7 @@ class GoogleMapsUriInput @Inject constructor(
                     points = naivePoints.map { GCJ02MainlandChinaPoint(it, z) }.toImmutableList()
                     if (points.any { !it.hasCoordinates() }) {
                         // Go to HTML parsing, unless coordinates have been extracted for all points
-                        nextStep = NextStep(googleMapsAddressApiInput.get(), match)
+                        next = MatchedInput(googleMapsAddressApiInput.get(), match)
                     }
                     return@run
                 }
@@ -111,10 +111,10 @@ class GoogleMapsUriInput @Inject constructor(
                 if (query != null) {
                     points = persistentListOf(GCJ02MainlandChinaPoint(z = z, name = query, source = Source.URI))
                 }
-                nextStep = if (placeId != null) {
-                    NextStep(googleMapsPlaceApiInput.get(), match)
+                next = if (placeId != null) {
+                    MatchedInput(googleMapsPlaceApiInput.get(), match)
                 } else {
-                    NextStep(googleMapsAddressApiInput.get(), match)
+                    MatchedInput(googleMapsAddressApiInput.get(), match)
                 }
                 return@run
             }
@@ -131,7 +131,7 @@ class GoogleMapsUriInput @Inject constructor(
                     points = parseParts(parts.drop(1), z)
                     if (points.lastOrNull()?.hasCoordinates() != true) {
                         // Go to API parsing, if no coordinates have been extracted
-                        nextStep = NextStep(googleMapsAddressApiInput.get(), match)
+                        next = MatchedInput(googleMapsAddressApiInput.get(), match)
                     }
                 }
 
@@ -141,7 +141,7 @@ class GoogleMapsUriInput @Inject constructor(
                     points = parseParts(parts.drop(1), z)
                     if (points.lastOrNull()?.hasCoordinates() != true) {
                         // Go to API parsing, if no coordinates have been extracted
-                        nextStep = NextStep(googleMapsAddressApiInput.get(), match)
+                        next = MatchedInput(googleMapsAddressApiInput.get(), match)
                     }
                 }
 
@@ -152,7 +152,7 @@ class GoogleMapsUriInput @Inject constructor(
                 // https://www.google.com/maps/d/view?mid={id}
                 firstPart == "placelists" || firstPart == "@" || firstPart == "d" -> {
                     // Go to API parsing
-                    nextStep = NextStep(googleMapsPlaceListInput.get(), match)
+                    next = MatchedInput(googleMapsPlaceListInput.get(), match)
                 }
 
                 // Search
@@ -161,7 +161,7 @@ class GoogleMapsUriInput @Inject constructor(
                     points = parseParts(parts.drop(1), z)
                     if (points.lastOrNull()?.hasCoordinates() != true) {
                         // Go to API parsing, if no coordinates have been extracted
-                        nextStep = NextStep(googleMapsAddressApiInput.get(), match)
+                        next = MatchedInput(googleMapsAddressApiInput.get(), match)
                     }
                 }
 

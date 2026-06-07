@@ -29,10 +29,10 @@ class MapyComShortLinkInputTest : InputTest {
     }
 
     @Test
-    fun parse_returnsNextStep() = runTest {
+    fun parse_returnsMatchedInput() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(
+                next = MatchedInput(
                     FakeInputRepository.mapyComUriInput,
                     "https://mapy.com/en/turisticka?source=base&id=1723771&x=14.4549515&y=50.0831498&z=17"
                 )

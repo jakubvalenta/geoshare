@@ -8,6 +8,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeInputRepository
+import page.ooooo.geoshare.lib.inputs.MatchedInput
 
 class SourceReceivedTest {
     private val resources: Resources = mock {
@@ -34,7 +35,9 @@ class SourceReceivedTest {
         val source = "geo:1,2?q="
         val state = SourceReceived(stateContext, source)
         assertEquals(
-            InputFound(stateContext, source, match = source, FakeInputRepository.geoUriInput, permission = null),
+            InputMatched(
+                stateContext, source, MatchedInput(FakeInputRepository.geoUriInput, source), permission = null
+            ),
             state.transition(),
         )
     }
@@ -45,7 +48,9 @@ class SourceReceivedTest {
         val match = "https://www.osmand.net/foo"
         val state = SourceReceived(stateContext, source)
         assertEquals(
-            InputFound(stateContext, source, match, FakeInputRepository.osmAndUriInput, permission = null),
+            InputMatched(
+                stateContext, source, MatchedInput(FakeInputRepository.osmAndUriInput, match), permission = null
+            ),
             state.transition(),
         )
     }
@@ -55,7 +60,9 @@ class SourceReceivedTest {
         val source = "https://www.osmand.net/foo"
         val state = SourceReceived(stateContext, source)
         assertEquals(
-            InputFound(stateContext, source, match = source, FakeInputRepository.osmAndUriInput, permission = null),
+            InputMatched(
+                stateContext, source, MatchedInput(FakeInputRepository.osmAndUriInput, source), permission = null
+            ),
             state.transition(),
         )
     }

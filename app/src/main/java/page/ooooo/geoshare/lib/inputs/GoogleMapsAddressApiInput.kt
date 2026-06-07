@@ -50,7 +50,7 @@ class GoogleMapsAddressApiInput @Inject constructor(
     override suspend fun parse(data: Uri, match: String) = parseResult {
         val server = serverRepository.getSelectedGoogleMapsAddress() ?: run {
             // Go to HTML parsing, if server is not configured
-            nextStep = NextStep(googleMapsHtmlInput.get(), match)
+            next = MatchedInput(googleMapsHtmlInput.get(), match)
             return@parseResult
         }
         val client = serverHttpClientFactory.createHttpClient(server).config {
