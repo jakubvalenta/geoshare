@@ -292,9 +292,10 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
 
 fun UiAutomatorTestScope.assertConversionSucceeds(
     expectedPoint: Point,
+    fallbackNames: Set<String> = emptySet(),
     accurate: Boolean? = null,
     timeoutMs: Long = NETWORK_TIMEOUT,
-) = assertConversionSucceeds(persistentListOf(expectedPoint), accurate = accurate, timeoutMs = timeoutMs)
+) = assertConversionSucceeds(persistentListOf(expectedPoint), fallbackNames, accurate, timeoutMs)
 
 fun UiAutomatorTestScope.waitAndAssertGoogleMapsContainsElement(block: AccessibilityNodeInfo.() -> Boolean) {
     // Wait for Google Maps
