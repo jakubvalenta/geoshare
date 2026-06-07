@@ -51,7 +51,6 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 interface ConversionState : State {
-    // TODO Make stateContext a transition() param
     override suspend fun transition(): State? = null
 
     interface HasError {
@@ -390,7 +389,6 @@ data class DataParsed(
                 ConversionSucceeded(stateContext, source, points)
             } else if (next != null) {
                 if (next in results) {
-                    // TODO Test a loop of GoogleMapsUriInput > GoogleMapsAddressApiInput > GoogleMapsHtmlInput > GoogleMapsWebViewInput > GoogleMapsUriInput
                     stateContext.log.w(
                         TAG, "Failed to extract point with coordinates from $matchedInput and next step creates a loop"
                     )

@@ -115,7 +115,7 @@ class DataParsedTest {
         }
 
     @Test
-    fun transition_whenLastPointHasNoCoordinatesAndNextStepIsSet_returnsInputFound() = runTest {
+    fun transition_whenLastPointHasNameOnlyAndNext_returnsInputFound() = runTest {
         val points = persistentListOf(WGS84Point(name = "bar", source = Source.GENERATED))
         val next = MatchedInput(FakeInputRepository.googleMapsUriInput, source)
         val results: Results = mapOf(matchedInput to ParseResult(points, next))
@@ -123,6 +123,25 @@ class DataParsedTest {
         val state = DataParsed(stateContext, source, matchedInput, permission, results)
         assertEquals(
             InputMatched(stateContext, source, next, permission, results),
+            state.transition(),
+        )
+    }
+
+    @Test
+    fun transition_whenLastPointHasNameOnlyAndNextThatAppearsInResults_returnsConversionFailed() = runTest {
+        val points = persistentListOf(WGS84Point(name = "bar", source = Source.GENERATED))
+        val oldMatchedInput = MatchedInput(FakeInputRepository.googleMapsUriInput, source)
+        val results: Results = mapOf(
+            oldMatchedInput to ParseResult(next = matchedInput),
+            matchedInput to ParseResult(points, oldMatchedInput),
+        )
+        val permission = Permission.ALWAYS
+        val state = DataParsed(stateContext, source, matchedInput, permission, results)
+        assertEquals(
+            ConversionFailed(
+                source,
+                resources.getString(R.string.conversion_failed_reason_no_points),
+            ),
             state.transition(),
         )
     }
