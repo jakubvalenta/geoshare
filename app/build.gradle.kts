@@ -83,16 +83,17 @@ android {
         buildConfig = true
         compose = true
     }
-    room {
-        // Enable room auto-migrations.
-        schemaDirectory("$projectDir/schemas")
-    }
     lint {
         disable += "MissingTranslation" // Translation is crowdsourced, so this isn't viable
     }
     testOptions {
         execution = "ANDROIDX_TEST_ORCHESTRATOR"
     }
+}
+
+room {
+    // Enable room auto-migrations.
+    schemaDirectory("$projectDir/schemas")
 }
 
 aboutLibraries {
