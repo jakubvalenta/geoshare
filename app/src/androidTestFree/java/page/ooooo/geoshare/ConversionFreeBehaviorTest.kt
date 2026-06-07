@@ -26,7 +26,8 @@ class ConversionFreeBehaviorTest {
                     52.4848232, 13.4240791,
                     name = @Suppress("SpellCheckingInspection") "Hermannstraße 10, 12049 Berlin",
                     source = Source.URI,
-                )
+                ),
+                fallbackNames = setOf(@Suppress("SpellCheckingInspection") "Hermannstraße 10, 12049 Berlin-Bezirk Neukölln"),
             )
 
             // Share another Google Maps place link with the app
@@ -60,6 +61,7 @@ class ConversionFreeBehaviorTest {
                     name = @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin",
                     source = Source.URI,
                 ),
+                fallbackNames = setOf(@Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln"),
             )
 
             // Share another Google Maps place link with the app
@@ -72,7 +74,8 @@ class ConversionFreeBehaviorTest {
                     52.4832988, 13.4245179,
                     name = @Suppress("SpellCheckingInspection") "Hermannstraße 21, 12049 Berlin",
                     source = Source.URI,
-                )
+                ),
+                fallbackNames = setOf(@Suppress("SpellCheckingInspection") "Hermannstraße 21, 12049 Berlin-Bezirk Neukölln"),
             )
         }
 
