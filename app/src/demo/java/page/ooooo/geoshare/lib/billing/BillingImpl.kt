@@ -17,7 +17,7 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
 class BillingImpl(
-    context: Context,
+    override val context: Context,
     private val resources: Resources = context.resources,
 ) : Billing {
     @StringRes

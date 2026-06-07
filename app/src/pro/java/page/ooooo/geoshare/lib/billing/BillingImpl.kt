@@ -42,7 +42,7 @@ import page.ooooo.geoshare.lib.Message
 import kotlin.time.Duration.Companion.hours
 
 class BillingImpl(
-    context: Context,
+    override val context: Context,
     billingClientBuilder: BillingClientBuilder = DefaultBillingClientBuilder(context),
     override val products: ImmutableList<BillingProduct> = persistentListOf(
         BillingProduct("pro_lifetime", BillingProduct.Type.ONE_TIME),
