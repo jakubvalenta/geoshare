@@ -330,7 +330,7 @@
     <string name="server_list_title">API servers</string>
     <string name="server_login_url">Login URL</string>
     <string name="server_message_deleted">Server deleted</string>
-    <string name="server_message_factory_reset">Server have been reset to factory defaults</string>
+    <string name="server_message_factory_reset">Servers have been reset to factory defaults</string>
     <string name="server_message_inserted">Server added</string>
     <string name="server_message_updated">Server updated</string>
     <string name="server_name">Name</string>
