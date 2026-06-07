@@ -14,35 +14,35 @@ class ParseResultTest {
             WGS84Point(3.0, 4.0, source = Source.URI),
             WGS84Point(1.0, 2.0, z = 3.14, name = "coordinatesAndZoomAndName", source = Source.URI),
         ),
-        nextStep = NextStep(FakeInputRepository.googleMapsHtmlInput, "coordinatesAndZoomAndNameMatch")
+        next = MatchedInput(FakeInputRepository.googleMapsHtmlInput, "coordinatesAndZoomAndNameMatch")
     )
     private val coordinatesResult = ParseResult(
         persistentListOf(
             WGS84Point(3.0, 4.0, source = Source.URI),
             WGS84Point(1.0, 2.0, source = Source.URI),
         ),
-        nextStep = NextStep(FakeInputRepository.googleMapsHtmlInput, "coordinatesMatch")
+        next = MatchedInput(FakeInputRepository.googleMapsHtmlInput, "coordinatesMatch")
     )
     private val zoomResult = ParseResult(
         persistentListOf(
             WGS84Point(7.0, 8.0, source = Source.URI),
             WGS84Point(z = 3.14, source = Source.URI),
         ),
-        nextStep = NextStep(FakeInputRepository.googleMapsHtmlInput, "zoomMatch")
+        next = MatchedInput(FakeInputRepository.googleMapsHtmlInput, "zoomMatch")
     )
     private val nameResult = ParseResult(
         persistentListOf(
             WGS84Point(5.0, 6.0, source = Source.URI),
             WGS84Point(name = "nameResult", source = Source.URI),
         ),
-        nextStep = NextStep(FakeInputRepository.googleMapsHtmlInput, "nameMatch")
+        next = MatchedInput(FakeInputRepository.googleMapsHtmlInput, "nameMatch")
     )
     private val zoomAndNameResult = ParseResult(
         persistentListOf(
             WGS84Point(9.0, 10.0, source = Source.URI),
             WGS84Point(name = "zoomAndNameResult", z = 3.14, source = Source.URI),
         ),
-        nextStep = NextStep(FakeInputRepository.googleMapsHtmlInput, "zoomAndNameMatch")
+        next = MatchedInput(FakeInputRepository.googleMapsHtmlInput, "zoomAndNameMatch")
     )
 
     @Test
@@ -85,7 +85,7 @@ class ParseResultTest {
                     WGS84Point(3.0, 4.0, source = Source.URI),
                     WGS84Point(1.0, 2.0, z = 3.14, source = Source.URI),
                 ),
-                nextStep = coordinatesResult.nextStep,
+                next = coordinatesResult.next,
             ),
             listOf(coordinatesResult, zoomResult).merge(),
         )
@@ -99,7 +99,7 @@ class ParseResultTest {
                     WGS84Point(3.0, 4.0, source = Source.URI),
                     WGS84Point(1.0, 2.0, name = "nameResult", source = Source.URI),
                 ),
-                nextStep = coordinatesResult.nextStep,
+                next = coordinatesResult.next,
             ),
             listOf(coordinatesResult, nameResult).merge(),
         )
@@ -113,7 +113,7 @@ class ParseResultTest {
                     WGS84Point(3.0, 4.0, source = Source.URI),
                     WGS84Point(1.0, 2.0, z = 3.14, name = "zoomAndNameResult", source = Source.URI),
                 ),
-                nextStep = coordinatesResult.nextStep,
+                next = coordinatesResult.next,
             ),
             listOf(coordinatesResult, emptyResult, zoomAndNameResult).merge(),
         )

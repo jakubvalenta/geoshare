@@ -116,7 +116,7 @@ class BaiduMapUriInputTest : InputTest {
     fun parse_sharedCoordinates() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(
+                next = MatchedInput(
                     FakeInputRepository.baiduMapWebViewInput,
                     "https://map.baidu.com/?poiShareId=p8cdf0522067cf66173901fc9e4"
                 )
@@ -129,7 +129,7 @@ class BaiduMapUriInputTest : InputTest {
     fun parse_sharedPOIParamS_returnsSupportsWebParsing() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(
+                next = MatchedInput(
                     FakeInputRepository.baiduMapWebViewInput,
                     "https://map.baidu.com/?newmap=1&s=inf%26uid%3D2c2bd9487c142391100daa62&sharecallbackflag=poiDetailPage"
                 )
@@ -142,7 +142,7 @@ class BaiduMapUriInputTest : InputTest {
     fun parse_sharedPOIParamUid_returnsSupportsWebParsing() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(
+                next = MatchedInput(
                     FakeInputRepository.baiduMapWebViewInput,
                     "https://map.baidu.com/?shareurl=1&poiShareUid=fef3b5922f87e66c63180999"
                 )
@@ -155,7 +155,7 @@ class BaiduMapUriInputTest : InputTest {
     fun parse_mobilePlaceDetailWithoutCoords_returnsSupportsWebParsing() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(
+                next = MatchedInput(
                     FakeInputRepository.baiduMapWebViewInput,
                     "https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=p8cdf0522067cf66173901fc9e4/act=read_share&vt=map&da_from=weixin&openna=1"
                 )

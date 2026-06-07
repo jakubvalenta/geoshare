@@ -9,21 +9,24 @@ import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.inputs.MatchedInput
 import page.ooooo.geoshare.lib.inputs.ParseResult
 
 class PermissionDeniedTest {
     private val source = "https://maps.google.com/foo"
     private val input = FakeInputRepository.googleMapsShortLinkInput
-    private val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-    private val prevResult = ParseResult(prevPoints)
+    private val matchedInput = MatchedInput(input, source)
+    private val oldPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+    private val oldResult = ParseResult(oldPoints)
+    private val results: Results = mapOf(MatchedInput(FakeInputRepository.debugUriInput, source) to oldResult)
     private val stateContext: ConversionStateContext = mock()
 
     @Test
     fun transition_returnsDataParsed() = runTest {
-        val state = PermissionDenied(stateContext, source, match = source, input, listOf(prevResult))
+        val state = PermissionDenied(stateContext, source, matchedInput, results)
         assertEquals(
             DataParsed(
-                stateContext, source, match = source, input, Permission.NEVER, listOf(ParseResult(), prevResult)
+                stateContext, source, matchedInput, Permission.NEVER, results + (matchedInput to ParseResult())
             ),
             state.transition(),
         )

@@ -11,7 +11,6 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
 
-
 class FileActionReadyTest {
     private val coordinateConverter: CoordinateConverter = mock()
     private val source = "https://maps.apple.com/foo"

@@ -25,7 +25,7 @@ class MapyComShortLinkInput @Inject constructor(
     override val loadingIndicatorTitleResId = R.string.converter_mapy_com_loading_indicator_title
 
     override suspend fun parse(data: Uri, match: String) = parseResult {
-        nextStep = NextStep(mapyComUriInput.get(), data.toString())
+        next = MatchedInput(mapyComUriInput.get(), data.toString())
     }
 
     override fun toString() = "MapyComShortLinkInput"

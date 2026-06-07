@@ -8,8 +8,11 @@ import org.mockito.kotlin.mock
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.local.preferences.Permission
+import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.inputs.BasicInput
+import page.ooooo.geoshare.lib.inputs.MatchedInput
 import page.ooooo.geoshare.lib.inputs.NoopInput
 import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.inputs.WebViewInput
@@ -17,16 +20,18 @@ import page.ooooo.geoshare.lib.inputs.WebViewInput
 class PermissionGrantedTest {
     private val source = "https://maps.google.com/foo"
     private val permission = Permission.ALWAYS
-    private val prevPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-    private val prevResult = ParseResult(prevPoints)
+    private val oldPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+    private val oldResult = ParseResult(oldPoints)
+    private val results: Results = mapOf(MatchedInput(FakeInputRepository.debugUriInput, source) to oldResult)
     private val stateContext: ConversionStateContext = mock()
 
     @Test
     fun transition_whenInputIsBasicInput_returnsPermissionGrantedBasicInput() = runTest {
         val input = FakeInputRepository.googleMapsShortLinkInput
-        val state = PermissionGranted(stateContext, source, match = source, input, permission, listOf(prevResult))
+        val matchedInput = MatchedInput<BasicInput<Uri>>(input, source)
+        val state = PermissionGranted(stateContext, source, matchedInput, permission, results)
         assertEquals(
-            PermissionGrantedBasicInput(stateContext, source, match = source, input, permission, listOf(prevResult)),
+            PermissionGrantedBasicInput(stateContext, source, matchedInput, permission, results),
             state.transition(),
         )
     }
@@ -43,10 +48,11 @@ class PermissionGrantedTest {
                 match: String,
             ) = throw NotImplementedError()
         }
-        val state = PermissionGranted(stateContext, source, match = source, input, permission, listOf(prevResult))
+        val matchedInput = MatchedInput<WebViewInput>(input, source)
+        val state = PermissionGranted(stateContext, source, matchedInput, permission, results)
         assertEquals(
             PermissionGrantedWebViewInput(
-                stateContext, source, match = source, input, permission, listOf(prevResult)
+                stateContext, source, matchedInput, permission, results
             ),
             state.transition(),
         )
@@ -55,9 +61,12 @@ class PermissionGrantedTest {
     @Test
     fun transition_whenInputIsNoopInput_returnsDataParsed() = runTest {
         val input = object : NoopInput {}
-        val state = PermissionGranted(stateContext, source, match = source, input, permission, listOf(prevResult))
+        val matchedInput = MatchedInput<NoopInput>(input, source)
+        val state = PermissionGranted(stateContext, source, matchedInput, permission, results)
         assertEquals(
-            DataParsed(stateContext, source, match = source, input, permission, listOf(ParseResult(), prevResult)),
+            DataParsed(
+                stateContext, source, matchedInput, permission, results + (matchedInput to ParseResult())
+            ),
             state.transition(),
         )
     }

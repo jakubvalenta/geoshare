@@ -52,10 +52,10 @@ class BodyAsTextInputTest {
     fun whenMatchHasScheme_makesGetRequestWithFollowRedirectsAndReturnsResponse() = runTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
-            ParseResult(nextStep = NextStep(nextInput, "test data")),
+            ParseResult(next = MatchedInput(nextInput, "test data")),
             input.fetch(match) { data ->
                 ParseResult(
-                    nextStep = NextStep(nextInput, data) // Store data in nextStep, so we can test it
+                    next = MatchedInput(nextInput, data) // Store data in MatchedInput, so we can test it
                 )
             }
         )
@@ -68,10 +68,10 @@ class BodyAsTextInputTest {
     fun whenMatchHasNoScheme_makesGetRequestToUrlWithHttpsSchemeAndReturnsResponse() = runTest {
         val match = "maps.google.com/foo"
         assertEquals(
-            ParseResult(nextStep = NextStep(nextInput, "test data")),
+            ParseResult(next = MatchedInput(nextInput, "test data")),
             input.fetch(match) { data ->
                 ParseResult(
-                    nextStep = NextStep(nextInput, data) // Store data in nextStep, so we can test it
+                    next = MatchedInput(nextInput, data) // Store data in MatchedInput, so we can test it
                 )
             }
         )

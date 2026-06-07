@@ -9,11 +9,14 @@ import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.assumeDomainResolvable
 import page.ooooo.geoshare.assumeNotEmulator
 import page.ooooo.geoshare.closeIntro
+import page.ooooo.geoshare.configureConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.launchApplication
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.testUri
+import page.ooooo.geoshare.testUriFails
 import page.ooooo.geoshare.waitForAppToBeVisible
 
 class GoogleMapsInputBehaviorTest {
@@ -148,6 +151,12 @@ class GoogleMapsInputBehaviorTest {
 
     @Test
     fun googleMapsPlaceListInput() = uiAutomator {
+        // Launch app and close intro
+        launchApplication()
+        waitForAppToBeVisible()
+        closeIntro()
+        configureConnectionPermissionPreference(Permission.ALWAYS)
+
         if (htmlParsingSupported) {
             testUri(
                 persistentListOf(
@@ -180,6 +189,12 @@ class GoogleMapsInputBehaviorTest {
             false,
         )
         assumeNotEmulator()
+
+        // Launch app and close intro
+        launchApplication()
+        waitForAppToBeVisible()
+        closeIntro()
+        configureConnectionPermissionPreference(Permission.ALWAYS)
 
         // Google Search
         testUri(

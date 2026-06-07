@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.billing
 
 import android.app.Activity
+import android.content.Context
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.lib.Message
@@ -9,6 +10,7 @@ import kotlin.time.Duration
 @Suppress("EmptyMethod")
 interface Billing {
     val appNameResId: Int
+    val context: Context
     val features: ImmutableList<Feature>
     val products: ImmutableList<BillingProduct>
     val refundableDuration: Duration

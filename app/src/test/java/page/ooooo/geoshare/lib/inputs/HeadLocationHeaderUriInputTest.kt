@@ -65,10 +65,10 @@ class HeadLocationHeaderUriInputTest {
     fun whenMatchHasScheme_makesHeadRequestWithRedirectsFalseAndReturnsLocationHeader() = runTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
-            ParseResult(nextStep = NextStep(nextInput, "https://maps.google.com/redirected")),
+            ParseResult(next = MatchedInput(nextInput, "https://maps.google.com/redirected")),
             input.fetch(match) { data ->
                 ParseResult(
-                    nextStep = NextStep(nextInput, data.toString()) // Store data in nextStep, so we can test it
+                    next = MatchedInput(nextInput, data.toString()) // Store data in MatchedInput, so we can test it
                 )
             }
         )
@@ -81,10 +81,10 @@ class HeadLocationHeaderUriInputTest {
     fun whenMatchHasNoScheme_makesHeadRequestToUrlWithHttpsSchemeAndReturnsLocationHeader() = runTest {
         val match = "maps.google.com/foo"
         assertEquals(
-            ParseResult(nextStep = NextStep(nextInput, "https://maps.google.com/redirected")),
+            ParseResult(next = MatchedInput(nextInput, "https://maps.google.com/redirected")),
             input.fetch(match) { data ->
                 ParseResult(
-                    nextStep = NextStep(nextInput, data.toString()) // Store data in nextStep, so we can test it
+                    next = MatchedInput(nextInput, data.toString()) // Store data in MatchedInput, so we can test it
                 )
             }
         )
@@ -94,10 +94,10 @@ class HeadLocationHeaderUriInputTest {
     fun whenHttpClientRespondsLocationHeaderAsRelativeUrl_returnsItAsAbsoluteUrl() = runTest {
         val match = "https://maps.google.com/respond-relative"
         assertEquals(
-            ParseResult(nextStep = NextStep(nextInput, "https://maps.google.com/respond-relative/redirected")),
+            ParseResult(next = MatchedInput(nextInput, "https://maps.google.com/respond-relative/redirected")),
             input.fetch(match) { data ->
                 ParseResult(
-                    nextStep = NextStep(nextInput, data.toString()) // Store data in nextStep, so we can test it
+                    next = MatchedInput(nextInput, data.toString()) // Store data in MatchedInput, so we can test it
                 )
             }
         )

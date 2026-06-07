@@ -4,6 +4,7 @@ import androidx.test.uiautomator.uiAutomator
 import org.junit.Test
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.testUri
 
 class MagicEarthInputBehaviorTest {
     @Test

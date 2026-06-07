@@ -11,10 +11,10 @@ class GoogleMapsWebViewInputTest : InputTest {
     )
 
     @Test
-    fun parse_returnsNextStep() = runTest {
+    fun parse_returnsMatchedInput() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(
+                next = MatchedInput(
                     FakeInputRepository.googleMapsUriInput,
                     "https://maps.google.com/redirected"
                 )

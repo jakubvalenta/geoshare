@@ -28,10 +28,10 @@ class YandexMapsShortLinkInputTest : InputTest {
     }
 
     @Test
-    fun parse_returnsNextStep() = runTest {
+    fun parse_returnsMatchedInput() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(
+                next = MatchedInput(
                     FakeInputRepository.yandexMapsUriInput,
                     "https://yandex.com/maps/org/94933420809/?display-text=Cafes&ll=8.668963,50.111192"
                 )

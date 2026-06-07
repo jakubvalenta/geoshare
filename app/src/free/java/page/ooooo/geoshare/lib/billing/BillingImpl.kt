@@ -12,8 +12,7 @@ import kotlinx.coroutines.flow.stateIn
 import page.ooooo.geoshare.R
 import kotlin.time.Duration
 
-class BillingImpl(@Suppress("unused") context: Context) : Billing {
-
+class BillingImpl(override val context: Context) : Billing {
     private val product = BillingProduct("free_donation", BillingProduct.Type.DONATION)
 
     @StringRes

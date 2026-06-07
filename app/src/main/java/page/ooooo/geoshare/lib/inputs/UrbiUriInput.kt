@@ -87,7 +87,7 @@ class UrbiUriInput @Inject constructor(
                 return@run
             }
 
-            nextStep = NextStep(urbiHtmlInput.get(), match)
+            next = MatchedInput(urbiHtmlInput.get(), match)
         }
     }
 

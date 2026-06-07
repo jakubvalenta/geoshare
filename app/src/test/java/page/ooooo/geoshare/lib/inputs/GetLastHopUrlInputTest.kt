@@ -63,13 +63,13 @@ class GetLastHopUrlInputTest {
     fun whenMatchHasScheme_makesGetRequestWithFollowRedirectTrueAndReturnsRequestUrl() = runTest {
         val match = "https://maps.google.com/hop-one"
         assertEquals(
-            ParseResult(nextStep = NextStep(nextInput, "https://maps.google.com/redirected")),
+            ParseResult(next = MatchedInput(nextInput, "https://maps.google.com/redirected")),
             input.fetch(match) { data ->
                 ParseResult(
-                    nextStep = NextStep(
+                    next = MatchedInput(
                         nextInput,
                         data.toString()
-                    ) // Store data in nextStep, so we can test it
+                    ) // Store data in MatchedInput, so we can test it
                 )
             }
         )
@@ -82,13 +82,13 @@ class GetLastHopUrlInputTest {
     fun whenMatchHasNoScheme_makesGetRequestToUrlWithHttpsSchemeAndReturnsRequestUrl() = runTest {
         val match = "maps.google.com/hop-one"
         assertEquals(
-            ParseResult(nextStep = NextStep(nextInput, "https://maps.google.com/redirected")),
+            ParseResult(next = MatchedInput(nextInput, "https://maps.google.com/redirected")),
             input.fetch(match) { data ->
                 ParseResult(
-                    nextStep = NextStep(
+                    next = MatchedInput(
                         nextInput,
                         data.toString()
-                    ) // Store data in nextStep, so we can test it
+                    ) // Store data in MatchedInput, so we can test it
                 )
             }
         )
@@ -98,13 +98,13 @@ class GetLastHopUrlInputTest {
     fun whenHttpClientRespondsRequestUrlAsRelativeUrl_returnsItAsAbsoluteUrl() = runTest {
         val match = "https://maps.google.com/hop-one"
         assertEquals(
-            ParseResult(nextStep = NextStep(nextInput, "https://maps.google.com/redirected")),
+            ParseResult(next = MatchedInput(nextInput, "https://maps.google.com/redirected")),
             input.fetch(match) { data ->
                 ParseResult(
-                    nextStep = NextStep(
+                    next = MatchedInput(
                         nextInput,
                         data.toString()
-                    ) // Store data in nextStep, so we can test it
+                    ) // Store data in MatchedInput, so we can test it
                 )
             }
         )

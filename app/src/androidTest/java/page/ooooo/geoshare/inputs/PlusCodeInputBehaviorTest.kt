@@ -5,6 +5,8 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.testText
+import page.ooooo.geoshare.testUri
 
 class PlusCodeInputBehaviorTest {
     @Test

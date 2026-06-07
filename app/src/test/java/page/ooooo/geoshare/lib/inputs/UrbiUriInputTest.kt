@@ -163,7 +163,7 @@ class UrbiUriInputTest : InputTest {
     fun parse_geo() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(
+                next = MatchedInput(
                     FakeInputRepository.urbiHtmlInput,
                     "https://maps.urbi.ae/dubai/geo/13933621232533580"
                 )
@@ -176,7 +176,7 @@ class UrbiUriInputTest : InputTest {
     fun parse_firm() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(
+                next = MatchedInput(
                     FakeInputRepository.urbiHtmlInput,
                     "https://2gis.uz/tashkent/firm/70000001060803297"
                 )
@@ -205,7 +205,7 @@ class UrbiUriInputTest : InputTest {
     fun parse_shortLink() = runTest {
         assertEquals(
             ParseResult(
-                nextStep = NextStep(
+                next = MatchedInput(
                     FakeInputRepository.urbiHtmlInput,
                     "https://go.2gis.com/WSTdK"
                 )
@@ -214,7 +214,7 @@ class UrbiUriInputTest : InputTest {
         )
         assertEquals(
             ParseResult(
-                nextStep = NextStep(
+                next = MatchedInput(
                     FakeInputRepository.urbiHtmlInput,
                     "https://go.urbi.ae/3JtpM"
                 )
