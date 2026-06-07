@@ -169,7 +169,7 @@
     <string name="faq_how_text_3">如果您拒绝连接到地图服务，%1$s 会根据具体链接类型，要么创建包含搜索词而非坐标的 geo: 链接，要么直接停止转换。</string>
     <string name="faq_how_text_4">如需永久允许或拒绝连接到地图服务（替代默认的始终询问），请前往应用的%1$s。</string>
     <string name="faq_privacy_headline">隐私考量</string>
-    <string name="faq_privacy_text">%1$s 会在可能的情况下离线转换地图链接。如果地图链接需要在线转换，应用会在连接到地图服务（例如 Google 地图、Apple 地图等）之前询问您。如果您允许连接，地图服务将接收到地图链接，并能够读取您的 IP 地址。在某些情况下，%1$s 将加载地图服务的实时网页并执行其 JavaScript。此操作在受限环境中进行，该环境会阻止跟踪脚本，并且不会存储 Cookie。</string>
+    <string name="faq_privacy_text">%1$s 会在可能的情况下离线转换地图链接。如果地图链接需要在线转换，应用会在连接到地图服务（例如 Google 地图、Apple 地图等）之前询问您。如果您允许连接，地图服务将接收到地图链接，并能够读取您的 IP 地址。</string>
     <string name="converter_amap_name">高德地图</string>
     <string name="converter_apple_maps_name">Apple 地图</string>
     <string name="converter_baidu_map_name">百度地图</string>
@@ -296,4 +296,8 @@
     <string name="server_list_google_maps_none_description">从 HTML 中提取坐标（实验）</string>
     <string name="server_list_google_maps_place_title">Google 地图地点 ID</string>
     <string name="server_list_none">不使用 API 服务器</string>
+    <string name="faq_how_text_2_item_api">或者该地图服务的 API，</string>
+    <string name="faq_privacy_text_server">对于一些地图链接，%1$s 调用远程服务器，开源的 %3$s。此服务器然后调用地图服务 API（如 Google 地图 API）。%2$s 不保留地图链接的记录。为了施加速率限制，它会在有限期限内存储 IP 地址和识别设备的公钥。</string>
+    <string name="faq_privacy_text_html">对于一些地图链接，%1$s 加载地图服务的实时网页并执行其 JavaScript。这一动作发生在受限环境中，会拦截跟踪脚本且不存储 cookies。</string>
+    <string name="server_list_description">允许地图服务连接时，%1$s 使用 API 服务器来转换某些链接到坐标。选择用官方服务器（搭配自己的凭证）、代理服务器还是不使用。</string>
 </resources>
