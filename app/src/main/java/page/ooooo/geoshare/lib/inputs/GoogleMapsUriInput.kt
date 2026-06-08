@@ -30,6 +30,7 @@ import javax.inject.Singleton
 @Singleton
 class GoogleMapsUriInput @Inject constructor(
     private val googleMapsAddressApiInput: dagger.Lazy<GoogleMapsAddressApiInput>,
+    private val googleMapsHtmlInput: dagger.Lazy<GoogleMapsHtmlInput>,
     private val googleMapsPlaceApiInput: dagger.Lazy<GoogleMapsPlaceApiInput>,
     private val googleMapsPlaceListInput: dagger.Lazy<GoogleMapsPlaceListInput>,
     override val uriQuote: UriQuote,
@@ -172,6 +173,16 @@ class GoogleMapsUriInput @Inject constructor(
                 firstPart.startsWith('@') -> {
                     points = parseParts(parts, z)
                 }
+            }
+
+            // ID
+            // https://maps.google.com/?ftid={id}
+            if (
+                points.lastOrNull()?.hasCoordinates() != true &&
+                !queryParams[@Suppress("SpellCheckingInspection") "ftid"].isNullOrEmpty()
+            ) {
+                // Go to HTML parsing, if no coordinates have been extracted
+                next = MatchedInput(googleMapsHtmlInput.get(), match)
             }
         }
     }

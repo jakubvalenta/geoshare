@@ -150,6 +150,63 @@ class GoogleMapsInputBehaviorTest {
     }
 
     @Test
+    fun googleMapsHtmlInput() = uiAutomator {
+        runBlocking {
+            assumeDomainResolvable("maps.google.com")
+        }
+
+        // Launch app and close intro
+        launchApplication()
+        waitForAppToBeVisible()
+        closeIntro()
+        configureConnectionPermissionPreference(Permission.ALWAYS)
+
+        if (htmlParsingSupported) {
+            testUri(
+                persistentListOf(
+                    WGS84Point(
+                        30.0598138, 31.2144658,
+                        z = 17.0,
+                        name = "The National Circus in Giza",
+                        source = Source.URI,
+                    ),
+                ),
+                "https://maps.google.com/maps?client=firefox-b-m&um=1&ie=UTF-8&fb=1&gl=eg&sa=X&ftid=0x1458411f8f55adbb:0xbc693e01227e010d",
+                fallbackNames = setOf("السيرك+القومى+بالجيزة"),
+            )
+        } else {
+            testUriFails(
+                setOf(
+                    "This link is not supported",
+                    @Suppress("SpellCheckingInspection") "Ce lien n’est pas pris en charge",
+                ),
+                "https://maps.google.com/maps?client=firefox-b-m&um=1&ie=UTF-8&fb=1&gl=eg&sa=X&ftid=0x1458411f8f55adbb:0xbc693e01227e010d",
+            )
+        }
+    }
+
+    @Test
+    fun googleMapsHtmlInput_googleSearch() = uiAutomator {
+        assumeTrue(
+            "This test currently fails, because Google returns a captcha, even though we only run the test on a real device",
+            false,
+        )
+        assumeNotEmulator()
+
+        // Launch app and close intro
+        launchApplication()
+        waitForAppToBeVisible()
+        closeIntro()
+        configureConnectionPermissionPreference(Permission.ALWAYS)
+
+        // Google Search
+        testUri(
+            WGS84Point(27.765028, -15.600889, source = Source.JAVASCRIPT),
+            "https://g.co/kgs/91UYXud",
+        )
+    }
+
+    @Test
     fun googleMapsPlaceListInput() = uiAutomator {
         // Launch app and close intro
         launchApplication()
@@ -175,31 +232,10 @@ class GoogleMapsInputBehaviorTest {
             testUriFails(
                 setOf(
                     "Place lists are not supported",
-                    // TODO Add French translation
+                    @Suppress("SpellCheckingInspection") "Les listes de lieux ne sont pas prises en charge",
                 ),
                 "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg",
             )
         }
-    }
-
-    @Test
-    fun googleMapsHtmlInput_googleSearch() = uiAutomator {
-        assumeTrue(
-            "This test currently fails, because Google returns a captcha, even though we only run the test on a real device",
-            false,
-        )
-        assumeNotEmulator()
-
-        // Launch app and close intro
-        launchApplication()
-        waitForAppToBeVisible()
-        closeIntro()
-        configureConnectionPermissionPreference(Permission.ALWAYS)
-
-        // Google Search
-        testUri(
-            WGS84Point(27.765028, -15.600889, source = Source.JAVASCRIPT),
-            "https://g.co/kgs/91UYXud",
-        )
     }
 }
