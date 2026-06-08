@@ -1,3 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="conversion_failed_unsupported_source">Це посилання не підтримується</string>
+    <string name="server_list_google_maps_none_description">Витягнути пошуковий запит замість координат</string>
 </resources>
