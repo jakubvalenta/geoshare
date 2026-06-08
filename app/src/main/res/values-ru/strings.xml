@@ -311,7 +311,7 @@
     <string name="server_login_url">URL входа</string>
     <string name="server_message_deleted">Сервер удалён</string>
     <string name="server_invalid">Указать учётные данные</string>
-    <string name="server_message_factory_reset">Настройки сервера были сброшены до начальных</string>
+    <string name="server_message_factory_reset">Настройки серверов были сброшены до начальных</string>
     <string name="server_message_inserted">Сервер добавлен</string>
     <string name="server_message_updated">Сервер обновлён</string>
     <string name="server_name">Название</string>
