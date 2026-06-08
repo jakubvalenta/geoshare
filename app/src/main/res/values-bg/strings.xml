@@ -295,7 +295,7 @@
     <string name="server_list_title">API сървъри</string>
     <string name="server_login_url">URL адрес за вход</string>
     <string name="server_message_deleted">Сървърът е изтрит</string>
-    <string name="server_message_factory_reset">Сървърът е върнат към фабричните настройки</string>
+    <string name="server_message_factory_reset">Сървърите са върнати към фабричните настройки</string>
     <string name="server_message_inserted">Сървърът е добавен</string>
     <string name="server_message_updated">Сървърът е актуализиран</string>
     <string name="server_name">Име</string>
