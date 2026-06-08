@@ -876,6 +876,20 @@ class GoogleMapsUriInputTest : InputTest {
     }
 
     @Test
+    @Suppress("SpellCheckingInspection")
+    fun parse_ftidOnly() = runTest {
+        assertEquals(
+            ParseResult(
+                next = MatchedInput(
+                    FakeInputRepository.googleMapsHtmlInput,
+                    "https://maps.google.com/maps?client=firefox-b-m&um=1&ie=UTF-8&fb=1&gl=eg&sa=X&ftid=0x1458411f8f55adbb:0xbc693e01227e010d",
+                )
+            ),
+            input.parse("https://maps.google.com/maps?client=firefox-b-m&um=1&ie=UTF-8&fb=1&gl=eg&sa=X&ftid=0x1458411f8f55adbb:0xbc693e01227e010d"),
+        )
+    }
+
+    @Test
     fun parse_googleSearch() = runTest {
         assertEquals(
             ParseResult(

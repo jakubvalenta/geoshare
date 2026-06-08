@@ -168,6 +168,7 @@ object FakeInputRepository : InputRepository {
     )
     override val googleMapsUriInput = GoogleMapsUriInput(
         googleMapsAddressApiInput = { googleMapsAddressApiInput },
+        googleMapsHtmlInput = { googleMapsHtmlInput },
         googleMapsPlaceApiInput = { googleMapsPlaceApiInput },
         googleMapsPlaceListInput = { googleMapsPlaceListInput },
         uriQuote = uriQuote,

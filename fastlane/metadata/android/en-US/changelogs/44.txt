@@ -1,4 +1,5 @@
 - Added the option to use Google Maps API to convert map links.
 - Added support for Yandex Maps direction links.
+- Added support for Google Maps links with id only.
 - Improved error message details.
 - Fixed error when processing certain Google Maps links.
