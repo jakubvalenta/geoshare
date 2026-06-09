@@ -2,6 +2,7 @@ package page.ooooo.geoshare.data.local.database
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import page.ooooo.geoshare.BuildConfig
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -58,6 +59,44 @@ object InitialServersImpl : InitialServers {
                 Uuid.parse("c5c215a1-c453-4de9-adb3-daecbd7dc876").toByteArray(),
             )
         )
+        if (BuildConfig.DEBUG) {
+            db.execSQL(
+                "INSERT INTO server (`name`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                arrayOf<Any>(
+                    "Local GeoShare Proxy (GM Address)",
+                    "http://127.0.0.1:8080/v1/google-maps/geocode/address/{q}",
+                    "ATTESTATION",
+                    "",
+                    "",
+                    "http://127.0.0.1:8080/v1/auth/challenge",
+                    "http://127.0.0.1:8080/v1/auth/login",
+                    "http://127.0.0.1:8080/v1/auth/register",
+                    0,
+                    0,
+                    0,
+                    1779859252618,
+                    Uuid.parse("274f5f6e-8e44-49ed-aa60-16ac05f9b37f").toByteArray(),
+                )
+            )
+            db.execSQL(
+                "INSERT INTO server (`name`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                arrayOf<Any>(
+                    "Local GeoShare Proxy (GM Place)",
+                    "http://127.0.0.1:8080/v1/google-maps/geocode/places/{q}",
+                    "ATTESTATION",
+                    "",
+                    "",
+                    "http://127.0.0.1:8080/v1/auth/challenge",
+                    "http://127.0.0.1:8080/v1/auth/login",
+                    "http://127.0.0.1:8080/v1/auth/register",
+                    0,
+                    0,
+                    0,
+                    1779859252618,
+                    Uuid.parse("6655c0d2-0f0d-4490-a8b2-53a76e08294c").toByteArray(),
+                )
+            )
+        }
     }
 
     override val migrations = arrayOf(
@@ -99,6 +138,44 @@ object InitialServersImpl : InitialServers {
                         Uuid.parse("c5c215a1-c453-4de9-adb3-daecbd7dc876").toByteArray(),
                     )
                 )
+                if (BuildConfig.DEBUG) {
+                    db.execSQL(
+                        "INSERT OR REPLACE INTO server (`name`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        arrayOf<Any>(
+                            "Local GeoShare Proxy (GM Address)",
+                            "http://127.0.0.1:8080/v1/google-maps/geocode/address/{q}",
+                            "ATTESTATION",
+                            "",
+                            "",
+                            "http://127.0.0.1:8080/v1/auth/challenge",
+                            "http://127.0.0.1:8080/v1/auth/login",
+                            "http://127.0.0.1:8080/v1/auth/register",
+                            0,
+                            0,
+                            0,
+                            1779859252618,
+                            Uuid.parse("274f5f6e-8e44-49ed-aa60-16ac05f9b37f").toByteArray(),
+                        )
+                    )
+                    db.execSQL(
+                        "INSERT OR REPLACE INTO server (`name`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        arrayOf<Any>(
+                            "Local GeoShare Proxy (GM Place)",
+                            "http://127.0.0.1:8080/v1/google-maps/geocode/places/{q}",
+                            "ATTESTATION",
+                            "",
+                            "",
+                            "http://127.0.0.1:8080/v1/auth/challenge",
+                            "http://127.0.0.1:8080/v1/auth/login",
+                            "http://127.0.0.1:8080/v1/auth/register",
+                            0,
+                            0,
+                            0,
+                            1779859252618,
+                            Uuid.parse("6655c0d2-0f0d-4490-a8b2-53a76e08294c").toByteArray(),
+                        )
+                    )
+                }
             }
         },
     )
