@@ -34,8 +34,6 @@ android {
                 "en",
                 "es",
                 "fr",
-                "it",
-                "pl",
                 "pt-rBR",
                 "pt-rPT",
                 "ru",
