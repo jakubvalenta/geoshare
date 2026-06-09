@@ -40,7 +40,6 @@ fun ScrollablePane(
     Column(Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)) {
         LargeTopAppBar(
             title = title,
-            // TODO Navigation icon space when null
             navigationIcon = {
                 if (onBack != null) {
                     IconButton(

@@ -157,11 +157,7 @@ fun ResultSuccessApps(
                 )
             }
         }
-        Grid(
-            Modifier
-                .padding(horizontal = spacing.windowPadding)
-                .padding(top = spacing.smallAdaptive)
-        ) {
+        Grid(Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.smallAdaptive)) {
             // Links
             outputsForLinks
                 .forEach { (group, outputs) ->

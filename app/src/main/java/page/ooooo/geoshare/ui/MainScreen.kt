@@ -13,6 +13,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -584,7 +585,7 @@ private fun MainScreen(
                                     MainForm(
                                         source = source,
                                         errorMessageResId = errorMessageResId,
-                                        modifier = Modifier.padding(top = spacing.medium),
+                                        modifier = Modifier.padding(top = spacing.largeAdaptive),
                                         onSetErrorMessageResId = setErrorMessageResId,
                                         onSubmit = onStart,
                                         onUpdateInput = onUpdateInput,
@@ -618,15 +619,11 @@ private fun MainScreen(
                         }
 
                         if (currentState is ConversionState.HasSource) {
-                            Column(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .background(MaterialTheme.colorScheme.surfaceContainer)
-                                    .padding(innerPadding)
-                                    .consumeWindowInsets(innerPadding)
-                            ) {
-                                MainCopySourceButton(currentState.source)
-                            }
+                            MainCopySourceButton(
+                                source = currentState.source,
+                                innerPadding = innerPadding,
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                            )
                         }
                     } else {
                         Column(Modifier.weight(1f)) {
@@ -692,13 +689,10 @@ private fun MainScreen(
                             }
                         }
                         if (currentState is ConversionState.HasSource) {
-                            Column(
-                                Modifier
-                                    .padding(innerPadding)
-                                    .consumeWindowInsets(innerPadding)
-                            ) {
-                                MainCopySourceButton(currentState.source)
-                            }
+                            MainCopySourceButton(
+                                source = currentState.source,
+                                innerPadding = innerPadding,
+                            )
                         }
                     }
                 }
@@ -968,22 +962,34 @@ private fun MainWebView(
 }
 
 @Composable
-private fun MainCopySourceButton(source: String) {
+private fun MainCopySourceButton(
+    source: String,
+    containerColor: Color = Color.Transparent,
+    innerPadding: PaddingValues,
+) {
     val clipboard = LocalClipboard.current
     val coroutineScope = rememberCoroutineScope()
     val spacing = LocalSpacing.current
 
-    TextButton(
-        {
-            coroutineScope.launch {
-                AndroidTools.copyToClipboard(clipboard, source)
-            }
-        },
+    Column(
         Modifier
-            .padding(start = 4.dp)
-            .padding(top = spacing.tinyAdaptive),
+            .fillMaxWidth()
+            .padding(innerPadding)
+            .consumeWindowInsets(innerPadding)
+            .background(containerColor)
     ) {
-        Text(stringResource(R.string.conversion_succeeded_skip))
+        TextButton(
+            {
+                coroutineScope.launch {
+                    AndroidTools.copyToClipboard(clipboard, source)
+                }
+            },
+            Modifier
+                .padding(start = 4.dp)
+                .padding(top = spacing.tinyAdaptive),
+        ) {
+            Text(stringResource(R.string.conversion_succeeded_skip))
+        }
     }
 }
 

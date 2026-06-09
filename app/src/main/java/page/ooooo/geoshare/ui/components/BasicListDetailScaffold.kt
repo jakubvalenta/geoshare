@@ -88,7 +88,7 @@ fun BasicListDetailScaffold(
                     Modifier
                         .background(if (wide) colors.wideMainContainerColor else colors.mainContainerColor)
                         .padding(containerPadding)
-                        .consumeWindowInsets(containerPadding)
+                        .consumeWindowInsets(insetPadding)
                 ) {
                     CompositionLocalProvider(LocalContentColor provides if (wide) colors.wideMainContentColor else colors.mainContentColor) {
                         listPane(wide)
@@ -110,7 +110,7 @@ fun BasicListDetailScaffold(
                 Column(
                     Modifier
                         .padding(containerPadding)
-                        .consumeWindowInsets(containerPadding),
+                        .consumeWindowInsets(insetPadding),
                 ) {
                     CompositionLocalProvider(LocalContentColor provides colors.contentColor) {
                         detailPane(wide)

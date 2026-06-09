@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.minus
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -92,26 +93,31 @@ fun BasicSupportingPaneScaffold(
         scaffoldState = navigator.scaffoldState,
         mainPane = {
             AnimatedPane {
-                val (containerPadding, innerPadding) = if (wide) {
+                val containerPadding = if (wide) {
                     PaddingValues(
                         start = insetPadding.calculateStartPadding(layoutDirection),
                         top = insetPadding.calculateTopPadding(),
                         bottom = insetPadding.calculateBottomPadding(),
-                    ) to PaddingValues.Zero
+                    )
                 } else {
                     PaddingValues(
                         start = insetPadding.calculateStartPadding(layoutDirection),
                         top = insetPadding.calculateTopPadding(),
                         end = insetPadding.calculateEndPadding(layoutDirection),
-                    ) to PaddingValues(
-                        bottom = insetPadding.calculateBottomPadding(),
                     )
+                }
+                // Don't apply bottom inset, but pass it down to mainPane, so that a composable within mainPane -- such
+                // as MainCopySourceButton or ScaffoldAction -- can set a background under system navigation bar.
+                val innerPadding = if (wide) {
+                    PaddingValues.Zero
+                } else {
+                    PaddingValues(bottom = insetPadding.calculateBottomPadding())
                 }
                 Column(
                     Modifier
                         .background(if (wide) colors.wideMainContainerColor else colors.mainContainerColor)
                         .padding(containerPadding)
-                        .consumeWindowInsets(containerPadding)
+                        .consumeWindowInsets(insetPadding.minus(innerPadding))
                 ) {
                     CompositionLocalProvider(LocalContentColor provides if (wide) colors.wideMainContentColor else colors.mainContentColor) {
                         mainPane(innerPadding, wide)
@@ -137,7 +143,7 @@ fun BasicSupportingPaneScaffold(
                 Column(
                     Modifier
                         .padding(containerPadding)
-                        .consumeWindowInsets(containerPadding),
+                        .consumeWindowInsets(insetPadding)
                 ) {
                     CompositionLocalProvider(LocalContentColor provides colors.contentColor) {
                         supportingPane(wide)
