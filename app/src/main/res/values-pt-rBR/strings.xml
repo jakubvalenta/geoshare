@@ -302,7 +302,7 @@
     <string name="server_list_title">Servidores de API</string>
     <string name="server_login_url">URL de autenticação</string>
     <string name="server_message_deleted">Servidor apagado</string>
-    <string name="server_message_factory_reset">O servidor foi reconfigurado</string>
+    <string name="server_message_factory_reset">Os servidores foram reconfigurados</string>
     <string name="server_message_inserted">Servidor adicionado</string>
     <string name="server_message_updated">Servidor atualizado</string>
     <string name="server_name">Nome</string>
