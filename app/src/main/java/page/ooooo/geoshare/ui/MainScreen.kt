@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
@@ -41,6 +40,7 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
@@ -389,7 +389,8 @@ fun MainScreen(
         },
         onRetry = { conversionViewModel.retry() },
         onStart = { conversionViewModel.start() },
-    ) { conversionViewModel.source = it }
+        onUpdateInput = { conversionViewModel.source = it },
+    )
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -510,14 +511,19 @@ private fun MainScreen(
                             )
                         }
                     },
+                    expandedHeight = if (currentState is Initial) {
+                        TopAppBarDefaults.LargeAppBarExpandedHeight + spacing.headlineTopAdaptive
+                    } else {
+                        TopAppBarDefaults.LargeAppBarExpandedHeight
+                    },
                 ) {
-                    if (!wide) {
-                        Column(
-                            modifier = Modifier
-                                .weight(1f)
-                                .verticalScroll(rememberScrollState())
-                                .testTag("geoShareMainPane"),
-                        ) {
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .verticalScroll(rememberScrollState())
+                            .testTag("geoShareMainPane"),
+                    ) {
+                        if (!wide) {
                             when (currentState) {
                                 is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
                                     MainLoadingIndicator(
@@ -600,33 +606,7 @@ private fun MainScreen(
                                     )
                                 }
                             }
-
-                            Column(
-                                Modifier
-                                    .weight(1f)
-                                    .fillMaxWidth()
-                                    .background(MaterialTheme.colorScheme.surface)
-                            ) {
-                                if (currentState is PermissionGrantedWebViewInput) {
-                                    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                                        MainWebView(
-                                            matchedInput = currentState.matchedInput,
-                                            onExtractionSettle = { currentState.onExtractionSettle(it) },
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        if (currentState is ConversionState.HasSource) {
-                            MainCopySourceButton(
-                                source = currentState.source,
-                                innerPadding = innerPadding,
-                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                            )
-                        }
-                    } else {
-                        Column(Modifier.weight(1f)) {
+                        } else {
                             Card(
                                 colors = CardDefaults.cardColors(
                                     containerColor = mainContainerColor,
@@ -634,8 +614,6 @@ private fun MainScreen(
                                 ),
                                 modifier = Modifier.testTag("geoShareMainPane"),
                             ) {
-                                Spacer(Modifier.height(spacing.mediumAdaptive))
-
                                 when (currentState) {
                                     is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
                                         MainLoadingIndicator(
@@ -680,27 +658,44 @@ private fun MainScreen(
                                     }
                                 }
                             }
+                        }
 
+                        Column(
+                            Modifier
+                                .weight(1f)
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.surface)
+                        ) {
                             if (currentState is PermissionGrantedWebViewInput) {
-                                MainWebView(
-                                    matchedInput = currentState.matchedInput,
-                                    onExtractionSettle = { currentState.onExtractionSettle(it) },
-                                )
+                                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                                    MainWebView(
+                                        matchedInput = currentState.matchedInput,
+                                        onExtractionSettle = { currentState.onExtractionSettle(it) },
+                                    )
+                                }
                             }
                         }
-                        if (currentState is ConversionState.HasSource) {
-                            MainCopySourceButton(
-                                source = currentState.source,
-                                innerPadding = innerPadding,
-                            )
-                        }
+                    }
+
+                    if (currentState is ConversionState.HasSource) {
+                        MainCopySourceButton(
+                            source = currentState.source,
+                            innerPadding = innerPadding,
+                            containerColor = if (!wide) {
+                                MaterialTheme.colorScheme.surfaceContainer
+                            } else {
+                                Color.Transparent
+                            },
+                        )
+                    } else {
+                        Spacer(Modifier.padding(innerPadding))
                     }
                 }
             },
             supportingPane = { wide ->
                 ScrollablePane(
-                    title = {
-                        if (currentState is ConversionState.HasResult) {
+                    title = if (currentState is ConversionState.HasResult) {
+                        {
                             ResultSuccessMessage(
                                 currentState = currentState,
                                 appDetails = appDetails,
@@ -710,6 +705,8 @@ private fun MainScreen(
                                 onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
                             )
                         }
+                    } else {
+                        null
                     },
                     actions = {
                         if (wide) {
@@ -964,7 +961,7 @@ private fun MainWebView(
 @Composable
 private fun MainCopySourceButton(
     source: String,
-    containerColor: Color = Color.Transparent,
+    containerColor: Color,
     innerPadding: PaddingValues,
 ) {
     val clipboard = LocalClipboard.current
@@ -974,9 +971,9 @@ private fun MainCopySourceButton(
     Column(
         Modifier
             .fillMaxWidth()
+            .background(containerColor)
             .padding(innerPadding)
             .consumeWindowInsets(innerPadding)
-            .background(containerColor)
     ) {
         TextButton(
             {
@@ -1042,7 +1039,8 @@ private fun DefaultPreview() {
             onReset = {},
             onRetry = {},
             onStart = {},
-        ) {}
+            onUpdateInput = {},
+        )
     }
 }
 
@@ -1093,7 +1091,8 @@ private fun DarkPreview() {
             onReset = {},
             onRetry = {},
             onStart = {},
-        ) {}
+            onUpdateInput = {},
+        )
     }
 }
 
@@ -1144,7 +1143,8 @@ private fun TabletPreview() {
             onReset = {},
             onRetry = {},
             onStart = {},
-        ) {}
+            onUpdateInput = {},
+        )
     }
 }
 
@@ -1223,7 +1223,8 @@ private fun SucceededPreview() {
             onReset = {},
             onRetry = {},
             onStart = {},
-        ) {}
+            onUpdateInput = {},
+        )
     }
 }
 
@@ -1302,7 +1303,8 @@ private fun DarkSucceededPreview() {
             onReset = {},
             onRetry = {},
             onStart = {},
-        ) {}
+            onUpdateInput = {},
+        )
     }
 }
 
@@ -1381,7 +1383,8 @@ private fun SmallSucceededPreview() {
             onReset = {},
             onRetry = {},
             onStart = {},
-        ) {}
+            onUpdateInput = {},
+        )
     }
 }
 
@@ -1460,7 +1463,8 @@ private fun TabletSucceededPreview() {
             onReset = {},
             onRetry = {},
             onStart = {},
-        ) {}
+            onUpdateInput = {},
+        )
     }
 }
 
@@ -1519,7 +1523,8 @@ private fun ErrorPreview() {
             onReset = {},
             onRetry = {},
             onStart = {},
-        ) {}
+            onUpdateInput = {},
+        )
     }
 }
 
@@ -1578,7 +1583,8 @@ private fun DarkErrorPreview() {
             onReset = {},
             onRetry = {},
             onStart = {},
-        ) {}
+            onUpdateInput = {},
+        )
     }
 }
 
@@ -1637,7 +1643,8 @@ private fun TabletErrorPreview() {
             onReset = {},
             onRetry = {},
             onStart = {},
-        ) {}
+            onUpdateInput = {},
+        )
     }
 }
 
@@ -1713,7 +1720,8 @@ private fun LoadingIndicatorPreview() {
             onReset = {},
             onRetry = {},
             onStart = {},
-        ) {}
+            onUpdateInput = {},
+        )
     }
 }
 
@@ -1789,7 +1797,8 @@ private fun DarkLoadingIndicatorPreview() {
             onReset = {},
             onRetry = {},
             onStart = {},
-        ) {}
+            onUpdateInput = {},
+        )
     }
 }
 
@@ -1865,7 +1874,8 @@ private fun TabletLoadingIndicatorPreview() {
             onReset = {},
             onRetry = {},
             onStart = {},
-        ) {}
+            onUpdateInput = {},
+        )
     }
 }
 
@@ -1938,7 +1948,8 @@ private fun WebViewPreview() {
             onReset = {},
             onRetry = {},
             onStart = {},
-        ) {}
+            onUpdateInput = {},
+        )
     }
 }
 
@@ -2011,7 +2022,8 @@ private fun DarkWebViewPreview() {
             onReset = {},
             onRetry = {},
             onStart = {},
-        ) {}
+            onUpdateInput = {},
+        )
     }
 }
 
@@ -2084,7 +2096,8 @@ private fun TabletWebViewPreview() {
             onReset = {},
             onRetry = {},
             onStart = {},
-        ) {}
+            onUpdateInput = {},
+        )
     }
 }
 
@@ -2154,6 +2167,7 @@ private fun EmptyPreview() {
             onReset = {},
             onRetry = {},
             onStart = {},
-        ) {}
+            onUpdateInput = {},
+        )
     }
 }

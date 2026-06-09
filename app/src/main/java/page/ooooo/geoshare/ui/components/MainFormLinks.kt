@@ -35,10 +35,7 @@ fun MainFormLinks(
     val resources = LocalResources.current
     val spacing = LocalSpacing.current
 
-    Column(
-        modifier
-            .padding(horizontal = spacing.windowPadding),
-    ) {
+    Column(modifier.padding(horizontal = spacing.windowPadding)) {
         TextButton(onNavigateToInputsScreen) {
             Icon(
                 Icons.Outlined.Info,
