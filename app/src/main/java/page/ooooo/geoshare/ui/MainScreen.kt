@@ -863,7 +863,7 @@ private fun MainTitle(
 
         is ConversionState.HasResult ->
             Text(
-                currentState.points.lastOrNull()?.cleanName
+                currentState.points.lastOrNull()?.cleanName?.takeIf { it.isNotEmpty() }
                     ?: if (currentState.points.size > 1) {
                         stringResource(R.string.conversion_succeeded_point_last)
                     } else {
