@@ -148,7 +148,7 @@ import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
 import page.ooooo.geoshare.ui.components.PermissionDialog
 import page.ooooo.geoshare.ui.components.ResultError
-import page.ooooo.geoshare.ui.components.ResultSuccessApps
+import page.ooooo.geoshare.ui.components.ResultApps
 import page.ooooo.geoshare.ui.components.ResultSuccessCoordinates
 import page.ooooo.geoshare.ui.components.ResultSuccessMessage
 import page.ooooo.geoshare.ui.components.ResultSuccessSheet
@@ -573,7 +573,7 @@ private fun MainScreen(
                                                 onCancel = onCancel,
                                                 onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
                                             )
-                                            ResultSuccessApps(
+                                            ResultApps(
                                                 appDetails = appDetails,
                                                 outputsForApps = outputsForApps,
                                                 outputsForLinks = outputsForLinks,
@@ -734,7 +734,7 @@ private fun MainScreen(
                             is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null -> {}
 
                             is ConversionState.HasResult ->
-                                ResultSuccessApps(
+                                ResultApps(
                                     appDetails = appDetails,
                                     outputsForApps = outputsForApps,
                                     outputsForLinks = outputsForLinks,

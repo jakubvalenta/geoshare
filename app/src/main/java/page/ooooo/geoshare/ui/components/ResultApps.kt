@@ -51,10 +51,9 @@ import page.ooooo.geoshare.lib.outputs.PointsOutput
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
-// TODO Rename ResultSuccessApps to ResultApps
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun ResultSuccessApps(
+fun ResultApps(
     appDetails: AppDetails,
     outputsForApps: Map<String, List<Output>>,
     outputsForLinks: Map<String?, List<Output>>,
@@ -202,7 +201,7 @@ private fun DefaultPreview() {
                     coordinateConverter = coordinateConverter,
                 )
                 @SuppressLint("LocalContextGetResourceValueCall")
-                ResultSuccessApps(
+                ResultApps(
                     appDetails = mapOf(
                         PackageNames.COMAPS_FDROID to AppDetail(
                             "CoMaps",
@@ -280,7 +279,7 @@ private fun DarkPreview() {
                     coordinateConverter = coordinateConverter,
                 )
                 @SuppressLint("LocalContextGetResourceValueCall")
-                ResultSuccessApps(
+                ResultApps(
                     appDetails = mapOf(
                         PackageNames.COMAPS_FDROID to AppDetail(
                             "CoMaps",
@@ -357,7 +356,7 @@ private fun LoadingPreview() {
                 val outputRepository = OutputRepository(
                     coordinateConverter = coordinateConverter,
                 )
-                ResultSuccessApps(
+                ResultApps(
                     appDetails = emptyMap(),
                     outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
@@ -390,7 +389,7 @@ private fun DarkLoadingPreview() {
                 val outputRepository = OutputRepository(
                     coordinateConverter = coordinateConverter,
                 )
-                ResultSuccessApps(
+                ResultApps(
                     appDetails = emptyMap(),
                     outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
@@ -423,7 +422,7 @@ private fun EmptyPreview() {
                 val outputRepository = OutputRepository(
                     coordinateConverter = coordinateConverter,
                 )
-                ResultSuccessApps(
+                ResultApps(
                     appDetails = emptyMap(),
                     outputsForApps = emptyMap(),
                     outputsForLinks = emptyMap(),
@@ -450,7 +449,7 @@ private fun DarkEmptyPreview() {
                 val outputRepository = OutputRepository(
                     coordinateConverter = coordinateConverter,
                 )
-                ResultSuccessApps(
+                ResultApps(
                     appDetails = emptyMap(),
                     outputsForApps = outputRepository.getOutputsForApps(emptyMap(), emptySet()),
                     outputsForLinks = emptyMap(),
