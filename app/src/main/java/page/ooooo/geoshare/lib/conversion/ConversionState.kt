@@ -53,18 +53,20 @@ import kotlin.time.Duration.Companion.seconds
 interface ConversionState : State {
     override suspend fun transition(): State? = null
 
-    interface HasError {
+    interface HasSource {
         val source: String
+    }
+
+    interface HasError : HasSource {
         val message: String
         val details: String?
     }
 
-    interface HasResult {
-        val source: String
+    interface HasResult : HasSource {
         val points: Points
     }
 
-    interface HasPermission {
+    interface HasPermission : HasSource {
         val permissionTitleResId: Int
 
         suspend fun grant(doNotAsk: Boolean): State
@@ -88,8 +90,8 @@ typealias Results = Map<MatchedInput<*>, ParseResult>
 
 data class SourceReceived(
     val stateContext: ConversionStateContext,
-    val source: String,
-) : ConversionState {
+    override val source: String,
+) : ConversionState, ConversionState.HasSource {
     override suspend fun transition(): State {
         if (source.isEmpty()) {
             return ConversionFailed(
@@ -118,11 +120,11 @@ data class SourceReceived(
 
 data class InputMatched(
     val stateContext: ConversionStateContext,
-    val source: String,
+    override val source: String,
     val matchedInput: MatchedInput<*>,
     val permission: Permission? = null,
     val results: Results = emptyMap(),
-) : ConversionState {
+) : ConversionState, ConversionState.HasSource {
     override suspend fun transition(): State {
         return if (matchedInput.input is Input.HasPermission) {
             when (permission ?: stateContext.userPreferencesRepository.getValue(ConnectionPermissionPreference)) {
@@ -153,7 +155,7 @@ data class InputMatched(
 
 data class PermissionRequested(
     val stateContext: ConversionStateContext,
-    val source: String,
+    override val source: String,
     val matchedInput: MatchedInput<*>,
     val results: Results = emptyMap(),
     override val permissionTitleResId: Int,
@@ -181,11 +183,11 @@ data class PermissionRequested(
 
 data class PermissionGranted(
     val stateContext: ConversionStateContext,
-    val source: String,
+    override val source: String,
     val matchedInput: MatchedInput<*>,
     val permission: Permission?,
     val results: Results = emptyMap(),
-) : ConversionState {
+) : ConversionState, ConversionState.HasSource {
     override suspend fun transition(): State =
         when (matchedInput.input) {
             is BasicInput<*> ->
@@ -221,14 +223,14 @@ data class PermissionGranted(
  */
 data class PermissionGrantedBasicInput<T>(
     val stateContext: ConversionStateContext,
-    val source: String,
+    override val source: String,
     val matchedInput: MatchedInput<BasicInput<T>>,
     val permission: Permission?,
     val results: Results,
     val lastAttempt: Attempt<RecoverableNetworkException>? = null,
     val maxAttempts: Int = 10,
     val dispatcher: CoroutineContext = Dispatchers.Default,
-) : ConversionState, ConversionState.HasLargeLoadingIndicator {
+) : ConversionState, ConversionState.HasSource, ConversionState.HasLargeLoadingIndicator {
     @OptIn(FlowPreview::class)
     override suspend fun transition(): State = try {
         withContext(dispatcher) {
@@ -299,27 +301,30 @@ data class PermissionGrantedBasicInput<T>(
 }
 
 /**
- * When this state is the current state, the UI should load [matchedInput]'s match as a page URL in a WebView and call
- * [setData] with the URL that the page redirects to once it's fully loaded.
+ * When this state is the current state, the UI should:
  *
- * The [transition] function of this state will wait for [setData] to be called. If it's not called within [timeout], it
- * returns failure.
+ * 1. Load [matchedInput]'s match as a page URL in a WebView.
+ * 2. Call [WebViewInput.unsafeExtractionJavascript] periodically.
+ * 3. Once the result of the extraction JavaScript stops changing, call [onExtractionSettle].
  */
 data class PermissionGrantedWebViewInput(
     val stateContext: ConversionStateContext,
-    val source: String,
+    override val source: String,
     val matchedInput: MatchedInput<WebViewInput>,
     val permission: Permission?,
     val results: Results,
     val timeout: Duration = 60.seconds,
     val dispatcher: CoroutineContext = Dispatchers.Default,
-) : ConversionState, ConversionState.HasLargeLoadingIndicator {
+) : ConversionState, ConversionState.HasSource, ConversionState.HasLargeLoadingIndicator {
     private val dataFlow = MutableStateFlow<String?>(null)
 
-    fun setData(data: String) {
+    fun onExtractionSettle(data: String) {
         dataFlow.value = data
     }
 
+    /**
+     * Waits for [onExtractionSettle] to be called. If it's not called within [timeout], it returns failure.
+     */
     @OptIn(FlowPreview::class)
     override suspend fun transition(): State = try {
         withContext(dispatcher) {
@@ -359,10 +364,10 @@ data class PermissionGrantedWebViewInput(
 
 data class PermissionDenied(
     val stateContext: ConversionStateContext,
-    val source: String,
+    override val source: String,
     val matchedInput: MatchedInput<*>,
     val results: Results,
-) : ConversionState {
+) : ConversionState, ConversionState.HasSource {
     override suspend fun transition() =
         DataParsed(stateContext, source, matchedInput, Permission.NEVER, results + (matchedInput to ParseResult()))
 
@@ -375,11 +380,11 @@ data class PermissionDenied(
 
 data class DataParsed(
     val stateContext: ConversionStateContext,
-    val source: String,
+    override val source: String,
     val matchedInput: MatchedInput<*>,
     val permission: Permission?,
     val results: Results,
-) : ConversionState {
+) : ConversionState, ConversionState.HasSource {
     override suspend fun transition(): State =
         results.values.reversed().merge().run {
             if (points.lastOrNull()?.hasCoordinates() == true) {

@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
@@ -26,7 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -35,14 +33,10 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 @Composable
 fun <T> NavigableBasicListDetailScaffold(
     navigator: ThreePaneScaffoldNavigator<T>,
-    listPane: @Composable ColumnScope.(wide: Boolean, containerColor: Color) -> Unit,
+    listPane: @Composable ColumnScope.(wide: Boolean) -> Unit,
     detailPane: @Composable ColumnScope.(wide: Boolean) -> Unit,
-    containerColor: Color = MaterialTheme.colorScheme.surface,
-    contentColor: Color = MaterialTheme.colorScheme.onSurface,
-    listContainerColor: Color = Color.Transparent,
-    listContentColor: Color = contentColor,
-    defaultBackBehavior: BackNavigationBehavior =
-        BackNavigationBehavior.PopUntilScaffoldValueChange,
+    colors: TwoPaneScaffoldColors = TwoPaneScaffoldDefaults.colors(),
+    defaultBackBehavior: BackNavigationBehavior = BackNavigationBehavior.PopUntilScaffoldValueChange,
 ) {
     ThreePaneScaffoldPredictiveBackHandler(
         navigator = navigator,
@@ -54,24 +48,19 @@ fun <T> NavigableBasicListDetailScaffold(
         scaffoldState = navigator.scaffoldState,
         listPane = listPane,
         detailPane = detailPane,
-        containerColor = containerColor,
-        contentColor = contentColor,
-        listContainerColor = listContainerColor,
-        listContentColor = listContentColor,
+        colors = colors,
     )
 }
 
+// TODO Rename BasicListDetailScaffold to TwoPaneListDetailScaffold
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun BasicListDetailScaffold(
     directive: PaneScaffoldDirective,
     scaffoldState: ThreePaneScaffoldState,
-    listPane: @Composable ColumnScope.(wide: Boolean, containerColor: Color) -> Unit,
+    listPane: @Composable ColumnScope.(wide: Boolean) -> Unit,
     detailPane: @Composable ColumnScope.(wide: Boolean) -> Unit,
-    containerColor: Color = MaterialTheme.colorScheme.surface,
-    contentColor: Color = MaterialTheme.colorScheme.onSurface,
-    listContainerColor: Color = Color.Transparent,
-    listContentColor: Color = contentColor,
+    colors: TwoPaneScaffoldColors = TwoPaneScaffoldDefaults.colors(),
 ) {
     val layoutDirection = LocalLayoutDirection.current
 
@@ -95,16 +84,14 @@ fun BasicListDetailScaffold(
                 } else {
                     insetPadding
                 }
-                val listContainerColor = if (wide) listContainerColor else containerColor
-                val listContentColor = if (wide) listContentColor else contentColor
                 Column(
                     Modifier
-                        .background(listContainerColor)
+                        .background(if (wide) colors.wideMainContainerColor else colors.mainContainerColor)
                         .padding(containerPadding)
                         .consumeWindowInsets(containerPadding)
                 ) {
-                    CompositionLocalProvider(LocalContentColor provides listContentColor) {
-                        listPane(wide, listContainerColor)
+                    CompositionLocalProvider(LocalContentColor provides if (wide) colors.wideMainContentColor else colors.mainContentColor) {
+                        listPane(wide)
                     }
                 }
             }
@@ -125,7 +112,7 @@ fun BasicListDetailScaffold(
                         .padding(containerPadding)
                         .consumeWindowInsets(containerPadding),
                 ) {
-                    CompositionLocalProvider(LocalContentColor provides contentColor) {
+                    CompositionLocalProvider(LocalContentColor provides colors.contentColor) {
                         detailPane(wide)
                     }
                 }
@@ -133,6 +120,6 @@ fun BasicListDetailScaffold(
         },
         modifier = Modifier
             .semantics { testTagsAsResourceId = true }
-            .background(containerColor),
+            .background(colors.containerColor),
     )
 }

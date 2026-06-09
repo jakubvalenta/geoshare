@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -53,6 +55,7 @@ import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.ScrollablePane
 import page.ooooo.geoshare.ui.components.SegmentedList
 import page.ooooo.geoshare.ui.components.SegmentedListLabel
+import page.ooooo.geoshare.ui.components.TwoPaneScaffoldDefaults
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -104,12 +107,11 @@ private fun InputsScreen(
 
     NavigableBasicListDetailScaffold(
         navigator = navigator,
-        listPane = { wide, containerColor ->
+        listPane = { wide ->
             InputsListPane(
                 currentDocumentationGroup = navigator.currentDestination?.contentKey,
                 allDocumentations = allDocumentations,
                 recentDocumentations = recentDocumentations,
-                containerColor = containerColor,
                 wide = wide,
                 onBack = {
                     coroutineScope.launch {
@@ -144,7 +146,9 @@ private fun InputsScreen(
                 )
             }
         },
-        listContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+        colors = TwoPaneScaffoldDefaults.colors(
+            wideMainContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+        ),
     )
 }
 
@@ -153,7 +157,6 @@ private fun InputsListPane(
     currentDocumentationGroup: InputDocumentationGroup?,
     allDocumentations: List<InputDocumentation>,
     recentDocumentations: List<InputDocumentation>,
-    containerColor: Color,
     wide: Boolean,
     onBack: () -> Unit,
     onNavigateToDocumentation: (id: InputDocumentationGroup) -> Unit,
@@ -171,53 +174,57 @@ private fun InputsListPane(
             Text(stringResource(R.string.inputs_title))
         },
         onBack = onBack,
-        modifier = Modifier.padding(horizontal = spacing.windowPadding),
-        containerColor = containerColor,
     ) {
-        if (!wide) {
-            item {
-                Column {
-                    ParagraphText(
-                        stringResource(R.string.inputs_list_text, appName),
-                        Modifier.padding(top = spacing.tinyAdaptive, bottom = spacing.mediumAdaptive),
-                    )
-                    InputsSettingsButton {
-                        AndroidTools.showOpenByDefaultSettings(context, settingsLauncher)
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(horizontal = spacing.windowPadding)
+        ) {
+            if (!wide) {
+                item {
+                    Column {
+                        ParagraphText(
+                            stringResource(R.string.inputs_list_text, appName),
+                            Modifier.padding(top = spacing.tinyAdaptive, bottom = spacing.mediumAdaptive),
+                        )
+                        InputsSettingsButton {
+                            AndroidTools.showOpenByDefaultSettings(context, settingsLauncher)
+                        }
                     }
                 }
             }
-        }
-        if (recentDocumentations.isNotEmpty()) {
-            item {
-                SegmentedListLabel(stringResource(R.string.inputs_recent), MaterialTheme.colorScheme.error)
+            if (recentDocumentations.isNotEmpty()) {
+                item {
+                    SegmentedListLabel(stringResource(R.string.inputs_recent), MaterialTheme.colorScheme.error)
+                }
+                item {
+                    SegmentedList(
+                        values = recentDocumentations,
+                        itemHeadline = { stringResource(it.group.nameResId) },
+                        itemIsSelected = { it.group == currentDocumentationGroup },
+                        itemOnClick = { onNavigateToDocumentation(it.group) },
+                        itemTestTag = { "geoShareInputsDocumentationRecent_${it.group}" },
+                        sort = true,
+                    )
+                }
+                item {
+                    SegmentedListLabel(stringResource(R.string.inputs_all))
+                }
+            } else {
+                item {
+                    Spacer(Modifier.height(spacing.mediumAdaptive))
+                }
             }
             item {
                 SegmentedList(
-                    values = recentDocumentations,
+                    values = allDocumentations,
                     itemHeadline = { stringResource(it.group.nameResId) },
                     itemIsSelected = { it.group == currentDocumentationGroup },
                     itemOnClick = { onNavigateToDocumentation(it.group) },
-                    itemTestTag = { "geoShareInputsDocumentationRecent_${it.group}" },
+                    itemTestTag = { "geoShareInputsDocumentationAll_${it.group}" },
                     sort = true,
                 )
             }
-            item {
-                SegmentedListLabel(stringResource(R.string.inputs_all))
-            }
-        } else {
-            item {
-                Spacer(Modifier.height(spacing.mediumAdaptive))
-            }
-        }
-        item {
-            SegmentedList(
-                values = allDocumentations,
-                itemHeadline = { stringResource(it.group.nameResId) },
-                itemIsSelected = { it.group == currentDocumentationGroup },
-                itemOnClick = { onNavigateToDocumentation(it.group) },
-                itemTestTag = { "geoShareInputsDocumentationAll_${it.group}" },
-                sort = true,
-            )
         }
     }
 }
@@ -265,76 +272,81 @@ private fun InputsDetailPane(
             Text(stringResource(currentDocumentation.group.nameResId))
         },
         onBack = onBack.takeUnless { wide },
-        modifier = Modifier.padding(horizontal = spacing.windowPadding),
     ) {
-        item {
-            ParagraphText(
-                stringResource(R.string.inputs_detail_text, appName),
-                Modifier
-                    .widthIn(max = maxWidth)
-                    .padding(top = spacing.tinyAdaptive, bottom = spacing.mediumAdaptive),
-            )
-        }
-        item {
-            InputsSettingsButton {
-                AndroidTools.showOpenByDefaultSettings(context, settingsLauncher)
-            }
-        }
-        item {
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = spacing.largeAdaptive, bottom = spacing.smallAdaptive),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text(
-                    stringResource(R.string.inputs_link),
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.labelLarge,
-                )
-                Text(
-                    stringResource(R.string.inputs_default_handler, appName),
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.labelLarge,
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(horizontal = spacing.windowPadding)
+        ) {
+            item {
+                ParagraphText(
+                    stringResource(R.string.inputs_detail_text, appName),
+                    Modifier
+                        .widthIn(max = maxWidth)
+                        .padding(top = spacing.tinyAdaptive, bottom = spacing.mediumAdaptive),
                 )
             }
-        }
-        item {
-            HorizontalDivider()
-        }
-        documentationInputDetailsList.forEach { documentationInputDetails ->
+            item {
+                InputsSettingsButton {
+                    AndroidTools.showOpenByDefaultSettings(context, settingsLauncher)
+                }
+            }
             item {
                 Row(
-                    Modifier.padding(vertical = spacing.smallAdaptive),
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = spacing.largeAdaptive, bottom = spacing.smallAdaptive),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    SelectionContainer(Modifier.weight(1f)) {
-                        Text(
-                            when (documentationInputDetails.documentationInput) {
-                                is InputDocumentationItem.Text ->
-                                    documentationInputDetails.documentationInput.text()
-
-                                is InputDocumentationItem.Url ->
-                                    documentationInputDetails.documentationInput.urlString.trimUrl()
-                            },
-                            Modifier.padding(end = spacing.tiny),
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                    }
                     Text(
-                        stringResource(
-                            when (documentationInputDetails.defaultHandlerEnabled) {
-                                true -> R.string.yes
-                                false -> R.string.no
-                                null -> R.string.not_available
-                            },
-                            appName,
-                        ),
-                        style = MaterialTheme.typography.bodySmall,
+                        stringResource(R.string.inputs_link),
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                    Text(
+                        stringResource(R.string.inputs_default_handler, appName),
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.labelLarge,
                     )
                 }
+            }
+            item {
                 HorizontalDivider()
+            }
+            documentationInputDetailsList.forEach { documentationInputDetails ->
+                item {
+                    Row(
+                        Modifier.padding(vertical = spacing.smallAdaptive),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        SelectionContainer(Modifier.weight(1f)) {
+                            Text(
+                                when (documentationInputDetails.documentationInput) {
+                                    is InputDocumentationItem.Text ->
+                                        documentationInputDetails.documentationInput.text()
+
+                                    is InputDocumentationItem.Url ->
+                                        documentationInputDetails.documentationInput.urlString.trimUrl()
+                                },
+                                Modifier.padding(end = spacing.tiny),
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                        }
+                        Text(
+                            stringResource(
+                                when (documentationInputDetails.defaultHandlerEnabled) {
+                                    true -> R.string.yes
+                                    false -> R.string.no
+                                    null -> R.string.not_available
+                                },
+                                appName,
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                    HorizontalDivider()
+                }
             }
         }
     }

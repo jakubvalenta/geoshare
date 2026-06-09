@@ -5,9 +5,13 @@ import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Delete
@@ -40,7 +44,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -77,6 +80,7 @@ import page.ooooo.geoshare.ui.components.ScrollablePane
 import page.ooooo.geoshare.ui.components.SegmentedList
 import page.ooooo.geoshare.ui.components.SegmentedListLabel
 import page.ooooo.geoshare.ui.components.ServerForm
+import page.ooooo.geoshare.ui.components.TwoPaneScaffoldDefaults
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -217,12 +221,11 @@ private fun ServerScreen(
         BasicListDetailScaffold(
             directive = navigator.scaffoldDirective,
             scaffoldState = navigator.scaffoldState,
-            listPane = { _, containerColor ->
+            listPane = {
                 // Use destination coming from view model, because if we use navigator.currentDestination?.contentKey,
                 // fields get briefly rendered with empty values when switching from detail to list.
                 ServerListPane(
                     destination = destination,
-                    containerColor = containerColor,
                     all = all,
                     selectedServerGoogleMapsAddress = selectedServerGoogleMapsAddress,
                     selectedServerGoogleMapsPlace = selectedServerGoogleMapsPlace,
@@ -264,7 +267,9 @@ private fun ServerScreen(
                     )
                 }
             },
-            listContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+            colors = TwoPaneScaffoldDefaults.colors(
+                wideMainContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+            ),
         )
     }
 }
@@ -273,7 +278,6 @@ private fun ServerScreen(
 @Composable
 private fun ServerListPane(
     destination: Int?,
-    containerColor: Color,
     all: List<Server>,
     selectedServerGoogleMapsAddress: Server?,
     selectedServerGoogleMapsPlace: Server?,
@@ -293,72 +297,75 @@ private fun ServerListPane(
             Text(stringResource(R.string.server_list_title))
         },
         onBack = onBack,
-        modifier = Modifier
-            .padding(horizontal = spacing.windowPadding)
-            .testTag("geoShareServerListPane"),
-        containerColor = containerColor,
     ) {
-        item {
-            ParagraphText(
-                stringResource(R.string.server_list_description, stringResource(R.string.app_name)),
-                Modifier.padding(top = spacing.tinyAdaptive, bottom = spacing.smallAdaptive),
-            )
-        }
-        item {
-            Button(
-                { onNavigateToContentKey(-1) },
-                Modifier
-                    .padding(top = spacing.smallAdaptive)
-                    .testTag("geoShareServerListInsert"),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onSecondary,
-                ),
-            ) {
-                Text(stringResource(R.string.server_insert))
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(horizontal = spacing.windowPadding)
+                .testTag("geoShareServerListPane"),
+        ) {
+            item {
+                ParagraphText(
+                    stringResource(R.string.server_list_description, stringResource(R.string.app_name)),
+                    Modifier.padding(top = spacing.tinyAdaptive, bottom = spacing.smallAdaptive),
+                )
             }
-        }
-        serverListSection(
-            destination = destination,
-            all = all,
-            itemTestTag = { "geoShareServerListItem_GoogleMapsAddress_${it?.name}" },
-            title = { stringResource(R.string.server_list_google_maps_address_title) },
-            noneDescription = { stringResource(R.string.server_list_google_maps_none_description) },
-            selectedServer = selectedServerGoogleMapsAddress,
-            onNavigateToContentKey = onNavigateToContentKey,
-            onSelectServer = onSelectServerGoogleMapsAddress,
-        )
-        serverListSection(
-            destination = destination,
-            all = all,
-            itemTestTag = { "geoShareServerListItem_GoogleMapsPlace_${it?.name}" },
-            title = { stringResource(R.string.server_list_google_maps_place_title) },
-            noneDescription = { stringResource(R.string.server_list_google_maps_none_description) },
-            selectedServer = selectedServerGoogleMapsPlace,
-            onNavigateToContentKey = onNavigateToContentKey,
-            onSelectServer = onSelectServerGoogleMapsPlace,
-        )
-        if (BuildConfig.DEBUG) {
+            item {
+                Button(
+                    { onNavigateToContentKey(-1) },
+                    Modifier
+                        .padding(top = spacing.smallAdaptive)
+                        .testTag("geoShareServerListInsert"),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondary,
+                    ),
+                ) {
+                    Text(stringResource(R.string.server_insert))
+                }
+            }
             serverListSection(
                 destination = destination,
                 all = all,
-                itemTestTag = { "geoShareServerSearchListItem_${it?.name}" },
-                title = { stringResource(R.string.server_list_search_title) },
-                noneDescription = { stringResource(R.string.server_list_search_none_description) },
-                selectedServer = selectedServerSearch,
+                itemTestTag = { "geoShareServerListItem_GoogleMapsAddress_${it?.name}" },
+                title = { stringResource(R.string.server_list_google_maps_address_title) },
+                noneDescription = { stringResource(R.string.server_list_google_maps_none_description) },
+                selectedServer = selectedServerGoogleMapsAddress,
                 onNavigateToContentKey = onNavigateToContentKey,
-                onSelectServer = onSelectServerSearch,
+                onSelectServer = onSelectServerGoogleMapsAddress,
             )
-        }
-        item {
-            TextButton(
-                onClick = { setRestoreInitialDataDialogOpen(true) },
-                modifier = Modifier
-                    .testTag("geoShareServerRestoreInitialButton")
-                    .padding(top = spacing.mediumAdaptive, bottom = spacing.tinyAdaptive),
-                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
-            ) {
-                Text(stringResource(R.string.server_restore_initial_data))
+            serverListSection(
+                destination = destination,
+                all = all,
+                itemTestTag = { "geoShareServerListItem_GoogleMapsPlace_${it?.name}" },
+                title = { stringResource(R.string.server_list_google_maps_place_title) },
+                noneDescription = { stringResource(R.string.server_list_google_maps_none_description) },
+                selectedServer = selectedServerGoogleMapsPlace,
+                onNavigateToContentKey = onNavigateToContentKey,
+                onSelectServer = onSelectServerGoogleMapsPlace,
+            )
+            if (BuildConfig.DEBUG) {
+                serverListSection(
+                    destination = destination,
+                    all = all,
+                    itemTestTag = { "geoShareServerSearchListItem_${it?.name}" },
+                    title = { stringResource(R.string.server_list_search_title) },
+                    noneDescription = { stringResource(R.string.server_list_search_none_description) },
+                    selectedServer = selectedServerSearch,
+                    onNavigateToContentKey = onNavigateToContentKey,
+                    onSelectServer = onSelectServerSearch,
+                )
+            }
+            item {
+                TextButton(
+                    onClick = { setRestoreInitialDataDialogOpen(true) },
+                    modifier = Modifier
+                        .testTag("geoShareServerRestoreInitialButton")
+                        .padding(top = spacing.mediumAdaptive, bottom = spacing.tinyAdaptive),
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                ) {
+                    Text(stringResource(R.string.server_restore_initial_data))
+                }
             }
         }
     }
@@ -419,7 +426,6 @@ private fun ServerDetailPane(
                     )
                 },
                 onBack = onBack.takeUnless { wide },
-                modifier = Modifier.testTag("geoShareServerDetailPane"),
                 actions = {
                     if (destination != -1) {
                         IconButton(
@@ -435,7 +441,13 @@ private fun ServerDetailPane(
                 },
                 navigationImageVector = Icons.Default.Close,
             ) {
-                item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = spacing.windowPadding)
+                        .testTag("geoShareServerDetailPane"),
+                ) {
                     ServerForm(
                         apiKey = apiKey,
                         apiKeyHeader = apiKeyHeader,

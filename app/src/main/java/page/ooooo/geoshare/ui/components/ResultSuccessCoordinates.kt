@@ -48,6 +48,7 @@ import page.ooooo.geoshare.lib.outputs.PointsOutput
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
+// TODO Rename ResultSuccessCoordinates to ResultCoordinates
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ResultSuccessCoordinates(
@@ -66,18 +67,6 @@ fun ResultSuccessCoordinates(
     var expanded by remember { mutableStateOf(initialExpanded) }
 
     Column {
-        Headline(
-            lastPoint.cleanName
-                ?: if (points.size > 1) {
-                    stringResource(R.string.conversion_succeeded_point_last)
-                } else {
-                    stringResource(R.string.conversion_succeeded_title)
-                },
-            Modifier
-                .testTag("geoShareResultSuccessLastPointName")
-                .padding(horizontal = spacing.windowPadding)
-                .padding(top = 4.dp), // Align with the "Open with..." headline on wide screen
-        )
         Row(
             Modifier
                 .fillMaxWidth()

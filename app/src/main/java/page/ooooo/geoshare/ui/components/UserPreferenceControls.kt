@@ -3,10 +3,12 @@ package page.ooooo.geoshare.ui.components
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
@@ -52,27 +54,31 @@ fun UserPreferenceControls(
                 Text(stringResource(titleResId))
             },
             onBack = onBack.takeUnless { wide },
-            modifier = Modifier
-                .padding(horizontal = spacing.windowPadding)
-                .testTag("geoShareUserPreferencesControlsPane"),
         ) {
-            item {
-                description?.let { description ->
-                    ParagraphHtml(
-                        description(),
-                        Modifier
-                            .padding(top = spacing.tiny, bottom = spacing.mediumAdaptive)
-                            .run {
-                                if (featureNotPurchased) {
-                                    alpha(0.7f)
-                                } else {
-                                    this
-                                }
-                            },
-                    )
-                } ?: Spacer(Modifier.height(spacing.tiny))
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(horizontal = spacing.windowPadding)
+                    .testTag("geoShareUserPreferencesControlsPane"),
+            ) {
+                item {
+                    description?.let { description ->
+                        ParagraphHtml(
+                            description(),
+                            Modifier
+                                .padding(top = spacing.tiny, bottom = spacing.mediumAdaptive)
+                                .run {
+                                    if (featureNotPurchased) {
+                                        alpha(0.7f)
+                                    } else {
+                                        this
+                                    }
+                                },
+                        )
+                    } ?: Spacer(Modifier.height(spacing.tiny))
+                }
+                content()
             }
-            content()
         }
         if (featureNotPurchased) {
             FeatureWall(

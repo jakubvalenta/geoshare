@@ -428,7 +428,7 @@ fun UiAutomatorTestScope.testText(expectedPoints: Points, unsafeText: String) {
     // )
 
     // Go to main form, if we're on the result screen
-    onElementOrNull(1_000L) { viewIdResourceName == "geoShareMainBackButton" }?.click()
+    onElementOrNull(1_000L) { viewIdResourceName == "geoShareBack" }?.click()
 
     // Set main input
     val mainInput = onElement { viewIdResourceName == "geoShareMainSourceTextField" }

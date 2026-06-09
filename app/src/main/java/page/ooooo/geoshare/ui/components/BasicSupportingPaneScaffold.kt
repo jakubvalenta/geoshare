@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -14,9 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.adaptive.layout.AnimatedPane
@@ -30,7 +26,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -61,21 +56,16 @@ private fun PaneScaffoldDirective.copy(
     shouldAutoFocusCurrentDestination = shouldAutoFocusCurrentDestination,
 )
 
+// TODO Rename BasicListDetailScaffold to TwoPaneSupportingPaneScaffold
 @OptIn(
     ExperimentalMaterial3Api::class,
     ExperimentalMaterial3AdaptiveApi::class,
 )
 @Composable
 fun BasicSupportingPaneScaffold(
-    title: @Composable () -> Unit = {},
-    navigationIcon: @Composable () -> Unit = {},
-    actions: @Composable RowScope.() -> Unit = {},
     mainPane: @Composable ColumnScope.(innerPadding: PaddingValues, wide: Boolean) -> Unit,
     supportingPane: @Composable ColumnScope.(wide: Boolean) -> Unit,
-    containerColor: Color = MaterialTheme.colorScheme.surface,
-    contentColor: Color = MaterialTheme.colorScheme.onSurface,
-    mainContainerColor: Color = Color.Transparent,
-    mainContentColor: Color = contentColor,
+    colors: TwoPaneScaffoldColors = TwoPaneScaffoldDefaults.colors(),
     shouldAutoFocusCurrentDestination: Boolean = true,
 ) {
     val layoutDirection = LocalLayoutDirection.current
@@ -119,26 +109,11 @@ fun BasicSupportingPaneScaffold(
                 }
                 Column(
                     Modifier
-                        .background(mainContainerColor)
+                        .background(if (wide) colors.wideMainContainerColor else colors.mainContainerColor)
                         .padding(containerPadding)
                         .consumeWindowInsets(containerPadding)
                 ) {
-                    TopAppBar(
-                        title = title,
-                        navigationIcon = navigationIcon,
-                        actions = {
-                            if (!wide) {
-                                actions()
-                            }
-                        },
-                        colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = Color.Transparent,
-                            navigationIconContentColor = mainContentColor,
-                            actionIconContentColor = mainContentColor,
-                        ),
-                        contentPadding = TopAppBarDefaults.ContentPadding
-                    )
-                    CompositionLocalProvider(LocalContentColor provides mainContentColor) {
+                    CompositionLocalProvider(LocalContentColor provides if (wide) colors.wideMainContentColor else colors.mainContentColor) {
                         mainPane(innerPadding, wide)
                     }
                 }
@@ -164,18 +139,7 @@ fun BasicSupportingPaneScaffold(
                         .padding(containerPadding)
                         .consumeWindowInsets(containerPadding),
                 ) {
-                    if (wide) {
-                        TopAppBar(
-                            title = {},
-                            actions = actions,
-                            colors = TopAppBarDefaults.topAppBarColors(
-                                containerColor = Color.Transparent,
-                                navigationIconContentColor = contentColor,
-                                actionIconContentColor = contentColor,
-                            ),
-                        )
-                    }
-                    CompositionLocalProvider(LocalContentColor provides contentColor) {
+                    CompositionLocalProvider(LocalContentColor provides colors.contentColor) {
                         supportingPane(wide)
                     }
                 }
@@ -183,6 +147,6 @@ fun BasicSupportingPaneScaffold(
         },
         modifier = Modifier
             .semantics { testTagsAsResourceId = true }
-            .background(containerColor),
+            .background(colors.containerColor),
     )
 }

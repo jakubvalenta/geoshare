@@ -76,6 +76,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
+// TODO Rename ResultSuccessMessage to ResultTitle
 @Composable
 fun ResultSuccessMessage(
     currentState: ConversionState.HasResult,
@@ -87,7 +88,6 @@ fun ResultSuccessMessage(
     onCancel: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
 ) {
-    val spacing = LocalSpacing.current
     var counterSec by remember { mutableIntStateOf(0) }
 
     AnimatedMessage(
@@ -102,7 +102,6 @@ fun ResultSuccessMessage(
                 state is ConversionState.HasSmallLoadingIndicator
         },
         modifier = modifier
-            .padding(horizontal = spacing.windowPadding)
             .fillMaxWidth()
             .height(40.dp),
         animationsEnabled = animationsEnabled,
@@ -191,40 +190,31 @@ fun ResultSuccessMessage(
                 }
             }
 
-            else -> DefaultResultMessageRow(billingFeatures, billingStatus, onNavigateToUserPreferencesAutomationScreen)
-        }
-    }
-}
-
-@Composable
-private fun DefaultResultMessageRow(
-    billingFeatures: List<Feature>,
-    billingStatus: BillingStatus,
-    onNavigateToUserPreferencesAutomationScreen: () -> Unit,
-) {
-    ResultMessageRow {
-        Text(
-            stringResource(R.string.conversion_succeeded_apps_headline),
-            style = MaterialTheme.typography.headlineSmall,
-        )
-        FeatureBadged(
-            enabled = AutomationFeature in billingFeatures && billingStatus !is BillingStatus.Loading && billingStatus !is BillingStatus.Purchased,
-            badge = { modifier ->
-                FeatureBadgeSmall(
-                    onNavigateToUserPreferencesAutomationScreen,
-                    modifier.testTag("geoShareAutomationFeatureBadge")
+            else -> ResultMessageRow {
+                Text(
+                    stringResource(R.string.conversion_succeeded_apps_headline),
+                    style = MaterialTheme.typography.headlineSmall,
                 )
-            },
-        ) { modifier ->
-            Button(
-                onNavigateToUserPreferencesAutomationScreen,
-                modifier.testTag("geoShareResultAutomationButton"),
-                colors = ButtonDefaults.elevatedButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                    contentColor = MaterialTheme.colorScheme.onSurface,
-                ),
-            ) {
-                Text(stringResource(R.string.user_preferences_automation_title))
+                FeatureBadged(
+                    enabled = AutomationFeature in billingFeatures && billingStatus !is BillingStatus.Loading && billingStatus !is BillingStatus.Purchased,
+                    badge = { modifier ->
+                        FeatureBadgeSmall(
+                            onNavigateToUserPreferencesAutomationScreen,
+                            modifier.testTag("geoShareAutomationFeatureBadge")
+                        )
+                    },
+                ) { modifier ->
+                    Button(
+                        onNavigateToUserPreferencesAutomationScreen,
+                        modifier.testTag("geoShareResultAutomationButton"),
+                        colors = ButtonDefaults.elevatedButtonColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                            contentColor = MaterialTheme.colorScheme.onSurface,
+                        ),
+                    ) {
+                        Text(stringResource(R.string.user_preferences_automation_title))
+                    }
+                }
             }
         }
     }

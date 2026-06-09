@@ -61,7 +61,6 @@ fun ResultError(
             .graphicsLayer { alpha = animatedAlpha }
     ) {
         Column(Modifier.padding(horizontal = spacing.windowPadding)) {
-            Headline(stringResource(R.string.conversion_error_title))
             if (details != null) {
                 ExpandablePane(
                     expanded = expanded,

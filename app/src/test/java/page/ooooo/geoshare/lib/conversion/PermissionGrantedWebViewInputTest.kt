@@ -46,7 +46,7 @@ class PermissionGrantedWebViewInputTest {
     private val uriQuote = FakeUriQuote
 
     @Test
-    fun transition_whenSetDataIsCalled_returnsDataParsed() = runTest {
+    fun transition_whenOnExtractionSettleIsCalled_returnsDataParsed() = runTest {
         val input = object : WebViewInput {
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
@@ -70,7 +70,7 @@ class PermissionGrantedWebViewInputTest {
         launch {
             res = state.transition()
         }
-        state.setData("$source-data")
+        state.onExtractionSettle("$source-data")
         advanceUntilIdle()
         assertEquals(
             DataParsed(
@@ -85,7 +85,7 @@ class PermissionGrantedWebViewInputTest {
     }
 
     @Test
-    fun transition_whenSetDataIsNotCalledWithinTimeout_returnsConversionFailed() = runTest {
+    fun transition_whenOnExtractionSettleIsNotCalledWithinTimeout_returnsConversionFailed() = runTest {
         val input = object : WebViewInput {
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
@@ -142,7 +142,7 @@ class PermissionGrantedWebViewInputTest {
         launch {
             res = state.transition()
         }
-        state.setData("$source-data")
+        state.onExtractionSettle("$source-data")
         advanceUntilIdle()
         assertEquals(
             ConversionFailed(source, resources.getString(R.string.conversion_failed_cancelled)),

@@ -51,6 +51,7 @@ import page.ooooo.geoshare.lib.outputs.PointsOutput
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
+// TODO Rename ResultSuccessApps to ResultApps
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ResultSuccessApps(

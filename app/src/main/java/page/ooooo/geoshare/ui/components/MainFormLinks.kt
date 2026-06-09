@@ -22,6 +22,7 @@ import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
+// TODO Rename MainFormLinks to MainHelp
 @Composable
 fun MainFormLinks(
     allInputs: List<Input>,

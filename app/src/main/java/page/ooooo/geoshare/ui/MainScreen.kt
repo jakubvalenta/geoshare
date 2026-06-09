@@ -13,24 +13,24 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -40,6 +40,7 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -100,7 +101,6 @@ import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.CustomLinkFeature
 import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.conversion.ActionFinished
-import page.ooooo.geoshare.lib.conversion.ActionWaiting
 import page.ooooo.geoshare.lib.conversion.BasicActionReady
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
 import page.ooooo.geoshare.lib.conversion.ConversionState
@@ -123,25 +123,24 @@ import page.ooooo.geoshare.lib.extensions.truncateMiddle
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.NaivePoint
-import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.MatchedInput
+import page.ooooo.geoshare.lib.inputs.WebViewInput
 import page.ooooo.geoshare.lib.network.ConnectTimeoutNetworkException
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.ActionContext
 import page.ooooo.geoshare.lib.outputs.ActionResult
 import page.ooooo.geoshare.lib.outputs.LocationAction
-import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
 import page.ooooo.geoshare.ui.components.BasicSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.ConversionWebView
-import page.ooooo.geoshare.ui.components.Headline
 import page.ooooo.geoshare.ui.components.MainForm
 import page.ooooo.geoshare.ui.components.MainFormLinks
+import page.ooooo.geoshare.ui.components.MainHeadline
 import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
@@ -151,11 +150,12 @@ import page.ooooo.geoshare.ui.components.ResultSuccessApps
 import page.ooooo.geoshare.ui.components.ResultSuccessCoordinates
 import page.ooooo.geoshare.ui.components.ResultSuccessMessage
 import page.ooooo.geoshare.ui.components.ResultSuccessSheet
+import page.ooooo.geoshare.ui.components.ScrollablePane
+import page.ooooo.geoshare.ui.components.TwoPaneScaffoldDefaults
 import page.ooooo.geoshare.ui.components.checkeredBackground
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.math.floor
-import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun MainScreen(
@@ -437,9 +437,14 @@ private fun MainScreen(
     onUpdateInput: (String) -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
-    val containerColor = MaterialTheme.colorScheme.surface
-    val contentColor = MaterialTheme.colorScheme.onSurface
     val coroutineScope = rememberCoroutineScope()
+    val mainContainerColor = when (currentState) {
+        is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null -> MaterialTheme.colorScheme.surfaceContainer
+        is ConversionState.HasError -> MaterialTheme.colorScheme.errorContainer
+        is ConversionState.HasResult -> MaterialTheme.colorScheme.secondaryContainer
+        else -> MaterialTheme.colorScheme.surface
+    }
+    val mainContentColor = contentColorFor(mainContainerColor)
     val spacing = LocalSpacing.current
 
     val (errorMessageResId, setErrorMessageResId) = retain { mutableStateOf<Int?>(null) }
@@ -473,159 +478,301 @@ private fun MainScreen(
         },
     ) {
         BasicSupportingPaneScaffold(
-            navigationIcon = {
-                if (currentState !is Initial) {
-                    IconButton(
-                        onReset,
-                        Modifier.testTag("geoShareMainBackButton"),
-                    ) {
-                        Icon(
-                            Icons.AutoMirrored.Default.ArrowBack,
-                            stringResource(R.string.nav_back_content_description)
-                        )
-                    }
-                }
-            },
-            actions = {
-                MainMenu(
-                    currentState = currentState,
-                    billingAppNameResId = billingAppNameResId,
-                    billingStatus = billingStatus,
-                    changelogShown = changelogShown,
-                    onNavigateToAboutScreen = onNavigateToAboutScreen,
-                    onNavigateToBillingScreen = onNavigateToBillingScreen,
-                    onNavigateToFaqScreen = onNavigateToFaqScreen,
-                    onNavigateToInputsScreen = onNavigateToInputsScreen,
-                    onNavigateToIntroScreen = onNavigateToIntroScreen,
-                    onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
-                )
-            },
             mainPane = { innerPadding, wide ->
-                Column(
-                    Modifier
-                        .weight(1f)
-                        .verticalScroll(rememberScrollState())
-                        .testTag("geoShareMainPane"),
+                ScrollablePane(
+                    title = {
+                        MainTitle(
+                            currentState = currentState,
+                            billingAppNameResId = billingAppNameResId,
+                            billingStatus = billingStatus,
+                            largeLoadingIndicator = largeLoadingIndicator,
+                        )
+                    },
+                    onBack = if (currentState !is Initial) {
+                        onReset
+                    } else {
+                        null
+                    },
+                    actions = {
+                        if (!wide) {
+                            MainMenu(
+                                currentState = currentState,
+                                billingAppNameResId = billingAppNameResId,
+                                billingStatus = billingStatus,
+                                changelogShown = changelogShown,
+                                onNavigateToAboutScreen = onNavigateToAboutScreen,
+                                onNavigateToBillingScreen = onNavigateToBillingScreen,
+                                onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                onNavigateToIntroScreen = onNavigateToIntroScreen,
+                                onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
+                            )
+                        }
+                    },
                 ) {
-                    MainMainPane(
-                        currentState = currentState,
-                        appDetails = appDetails,
-                        outputsForPointChips = outputsForPointChips,
-                        outputsForPointsChips = outputsForPointsChips,
-                        billingAppNameResId = billingAppNameResId,
-                        billingStatus = billingStatus,
-                        coordinateConverter = coordinateConverter,
-                        coordinateFormat = coordinateFormat,
-                        errorMessageResId = errorMessageResId,
-                        source = source,
-                        largeLoadingIndicator = largeLoadingIndicator,
-                        onCancel = onCancel,
-                        onNavigateToInputsScreen = onNavigateToInputsScreen,
-                        onExecute = onExecute,
-                        onRetry = onRetry,
-                        onSelect = { index ->
-                            onCancel()
-                            setSelectedPointIndex(index)
-                        },
-                        onSetErrorMessageResId = setErrorMessageResId,
-                        onStart = onStart,
-                        onUpdateInput = onUpdateInput,
-                    )
                     if (!wide) {
                         Column(
-                            // This column must not have weight(1f), otherwise the last row of app icons gets shrunk
-                            Modifier
-                                .fillMaxWidth()
-                                .background(containerColor)
+                            modifier = Modifier
+                                .weight(1f)
+                                .verticalScroll(rememberScrollState())
+                                .testTag("geoShareMainPane"),
                         ) {
-                            CompositionLocalProvider(LocalContentColor provides contentColor) {
-                                MainSupportingPane(
-                                    allInputs = allInputs,
-                                    appDetails = appDetails,
-                                    billingFeatures = billingFeatures,
-                                    billingStatus = billingStatus,
-                                    currentState = currentState,
-                                    largeLoadingIndicator = largeLoadingIndicator,
-                                    outputsForApps = outputsForApps,
-                                    outputsForLinks = outputsForLinks,
-                                    outputsForSharing = outputsForSharing,
-                                    onCancel = onCancel,
-                                    onDisableLinkGroup = onDisableLinkGroup,
-                                    onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                    onNavigateToIntroScreen = onNavigateToIntroScreen,
-                                    onNavigateToLinkScreen = onNavigateToLinkScreen,
-                                    onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
-                                    onExecute = onExecute,
-                                    onHideApp = onHideApp,
-                                    onSetErrorMessageResId = setErrorMessageResId,
-                                    onUpdateInput = onUpdateInput,
-                                    modifier = Modifier.padding(top = spacing.largeAdaptive),
+                            when (currentState) {
+                                is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
+                                    MainLoadingIndicator(
+                                        loadingIndicator = largeLoadingIndicator,
+                                        onCancel = onCancel,
+                                    )
+
+                                is ConversionState.HasError ->
+                                    ResultError(
+                                        source = currentState.source,
+                                        message = currentState.message,
+                                        details = currentState.details,
+                                        onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                        onRetry = onRetry,
+                                    )
+
+                                is ConversionState.HasResult -> {
+                                    ResultSuccessCoordinates(
+                                        points = currentState.points,
+                                        appDetails = appDetails,
+                                        coordinateConverter = coordinateConverter,
+                                        coordinateFormat = coordinateFormat,
+                                        outputsForPointChips = outputsForPointChips,
+                                        outputsForPointsChips = outputsForPointsChips,
+                                        onExecute = onExecute,
+                                        onSelect = { index ->
+                                            onCancel()
+                                            setSelectedPointIndex(index)
+                                        },
+                                    )
+                                    Column(
+                                        // This column must not have weight(1f), otherwise the last row of app icons gets shrunk
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .background(MaterialTheme.colorScheme.surface)
+                                    ) {
+                                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                                            ResultSuccessMessage(
+                                                currentState = currentState,
+                                                appDetails = appDetails,
+                                                billingFeatures = billingFeatures,
+                                                billingStatus = billingStatus,
+                                                modifier = Modifier
+                                                    .padding(horizontal = spacing.windowPadding)
+                                                    .padding(top = spacing.largeAdaptive),
+                                                onCancel = onCancel,
+                                                onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
+                                            )
+                                            ResultSuccessApps(
+                                                appDetails = appDetails,
+                                                outputsForApps = outputsForApps,
+                                                outputsForLinks = outputsForLinks,
+                                                outputsForSharing = outputsForSharing,
+                                                points = currentState.points,
+                                                onDisableLinkGroup = onDisableLinkGroup,
+                                                onExecute = onExecute,
+                                                onHideApp = onHideApp,
+                                                onNavigateToLinkScreen = onNavigateToLinkScreen,
+                                            )
+                                        }
+                                    }
+                                }
+
+                                is Initial -> {
+                                    MainForm(
+                                        source = source,
+                                        errorMessageResId = errorMessageResId,
+                                        modifier = Modifier.padding(top = spacing.medium),
+                                        onSetErrorMessageResId = setErrorMessageResId,
+                                        onSubmit = onStart,
+                                        onUpdateInput = onUpdateInput,
+                                    )
+                                    MainFormLinks(
+                                        allInputs = allInputs,
+                                        modifier = Modifier.padding(top = spacing.largeAdaptive),
+                                        onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                        onNavigateToIntroScreen = onNavigateToIntroScreen,
+                                        onSetErrorMessageResId = setErrorMessageResId,
+                                        onUpdateInput = onUpdateInput,
+                                    )
+                                }
+                            }
+
+                            Column(
+                                Modifier
+                                    .weight(1f)
+                                    .fillMaxWidth()
+                                    .background(MaterialTheme.colorScheme.surface)
+                            ) {
+                                if (currentState is PermissionGrantedWebViewInput) {
+                                    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                                        MainWebView(
+                                            matchedInput = currentState.matchedInput,
+                                            onExtractionSettle = { currentState.onExtractionSettle(it) },
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        if (currentState is ConversionState.HasSource) {
+                            Column(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .background(MaterialTheme.colorScheme.surfaceContainer)
+                                    .padding(innerPadding)
+                                    .consumeWindowInsets(innerPadding)
+                            ) {
+                                MainCopySourceButton(currentState.source)
+                            }
+                        }
+                    } else {
+                        Column(Modifier.weight(1f)) {
+                            Card(
+                                colors = CardDefaults.cardColors(
+                                    containerColor = mainContainerColor,
+                                    contentColor = mainContentColor,
+                                ),
+                                modifier = Modifier.testTag("geoShareMainPane"),
+                            ) {
+                                Spacer(Modifier.height(spacing.mediumAdaptive))
+
+                                when (currentState) {
+                                    is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
+                                        MainLoadingIndicator(
+                                            loadingIndicator = largeLoadingIndicator,
+                                            onCancel = onCancel,
+                                        )
+
+                                    is ConversionState.HasError ->
+                                        ResultError(
+                                            source = currentState.source,
+                                            message = currentState.message,
+                                            details = currentState.details,
+                                            onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                            onRetry = onRetry,
+                                        )
+
+                                    is ConversionState.HasResult -> {
+                                        ResultSuccessCoordinates(
+                                            points = currentState.points,
+                                            appDetails = appDetails,
+                                            coordinateConverter = coordinateConverter,
+                                            coordinateFormat = coordinateFormat,
+                                            outputsForPointChips = outputsForPointChips,
+                                            outputsForPointsChips = outputsForPointsChips,
+                                            onExecute = onExecute,
+                                            onSelect = { index ->
+                                                onCancel()
+                                                setSelectedPointIndex(index)
+                                            },
+                                        )
+                                    }
+
+                                    is Initial -> {
+                                        MainForm(
+                                            source = source,
+                                            errorMessageResId = errorMessageResId,
+                                            modifier = Modifier.padding(top = spacing.medium),
+                                            onSetErrorMessageResId = setErrorMessageResId,
+                                            onSubmit = onStart,
+                                            onUpdateInput = onUpdateInput,
+                                        )
+                                    }
+                                }
+                            }
+
+                            if (currentState is PermissionGrantedWebViewInput) {
+                                MainWebView(
+                                    matchedInput = currentState.matchedInput,
+                                    onExtractionSettle = { currentState.onExtractionSettle(it) },
                                 )
                             }
                         }
+                        if (currentState is ConversionState.HasSource) {
+                            Column(
+                                Modifier
+                                    .padding(innerPadding)
+                                    .consumeWindowInsets(innerPadding)
+                            ) {
+                                MainCopySourceButton(currentState.source)
+                            }
+                        }
                     }
+                }
+            },
+            supportingPane = { wide ->
+                ScrollablePane(
+                    title = {
+                        if (currentState is ConversionState.HasResult) {
+                            ResultSuccessMessage(
+                                currentState = currentState,
+                                appDetails = appDetails,
+                                billingFeatures = billingFeatures,
+                                billingStatus = billingStatus,
+                                onCancel = onCancel,
+                                onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
+                            )
+                        }
+                    },
+                    actions = {
+                        if (wide) {
+                            MainMenu(
+                                currentState = currentState,
+                                billingAppNameResId = billingAppNameResId,
+                                billingStatus = billingStatus,
+                                changelogShown = changelogShown,
+                                onNavigateToAboutScreen = onNavigateToAboutScreen,
+                                onNavigateToBillingScreen = onNavigateToBillingScreen,
+                                onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                onNavigateToIntroScreen = onNavigateToIntroScreen,
+                                onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
+                            )
+                        }
+                    },
+                ) {
                     Column(
                         Modifier
-                            .weight(1f)
-                            .fillMaxWidth()
-                            .background(containerColor)
+                            .verticalScroll(rememberScrollState())
+                            .testTag("geoShareMainSupportingPane")
                     ) {
-                        MainBottomPane(currentState)
+                        when (currentState) {
+                            is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null -> {}
+
+                            is ConversionState.HasResult ->
+                                ResultSuccessApps(
+                                    appDetails = appDetails,
+                                    outputsForApps = outputsForApps,
+                                    outputsForLinks = outputsForLinks,
+                                    outputsForSharing = outputsForSharing,
+                                    points = currentState.points,
+                                    onDisableLinkGroup = onDisableLinkGroup,
+                                    onExecute = onExecute,
+                                    onHideApp = onHideApp,
+                                    onNavigateToLinkScreen = onNavigateToLinkScreen,
+                                )
+
+                            is Initial ->
+                                MainFormLinks(
+                                    allInputs = allInputs,
+                                    onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                    onNavigateToIntroScreen = onNavigateToIntroScreen,
+                                    onSetErrorMessageResId = setErrorMessageResId,
+                                    onUpdateInput = onUpdateInput,
+                                )
+                        }
                     }
                 }
-                MainBottomBar(
-                    currentState,
-                    largeLoadingIndicator,
-                    modifier = Modifier
-                        .padding(innerPadding)
-                        .consumeWindowInsets(innerPadding),
-                    containerColor = containerColor,
-                    contentColor = contentColor,
-                )
             },
-            supportingPane = {
-                Column(
-                    Modifier
-                        .weight(1f)
-                        .verticalScroll(rememberScrollState())
-                        .testTag("geoShareMainSupportingPane"),
-                ) {
-                    MainSupportingPane(
-                        allInputs = allInputs,
-                        appDetails = appDetails,
-                        billingFeatures = billingFeatures,
-                        billingStatus = billingStatus,
-                        currentState = currentState,
-                        largeLoadingIndicator = largeLoadingIndicator,
-                        outputsForApps = outputsForApps,
-                        outputsForLinks = outputsForLinks,
-                        outputsForSharing = outputsForSharing,
-                        onCancel = onCancel,
-                        onDisableLinkGroup = onDisableLinkGroup,
-                        onNavigateToInputsScreen = onNavigateToInputsScreen,
-                        onNavigateToIntroScreen = onNavigateToIntroScreen,
-                        onNavigateToLinkScreen = onNavigateToLinkScreen,
-                        onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
-                        onExecute = onExecute,
-                        onHideApp = onHideApp,
-                        onSetErrorMessageResId = setErrorMessageResId,
-                        onUpdateInput = onUpdateInput,
-                        modifier = Modifier.padding(top = spacing.headlineTopAdaptive),
-                    )
-                }
-            },
-            mainContainerColor = when (currentState) {
-                is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null -> MaterialTheme.colorScheme.surfaceContainer
-                is ConversionState.HasError -> MaterialTheme.colorScheme.errorContainer
-                is ConversionState.HasResult -> MaterialTheme.colorScheme.secondaryContainer
-                else -> containerColor
-            },
-            mainContentColor = when (currentState) {
-                is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null -> contentColor
-                is ConversionState.HasError -> MaterialTheme.colorScheme.onErrorContainer
-                is ConversionState.HasResult -> MaterialTheme.colorScheme.onSecondaryContainer
-                else -> contentColor
-            },
+            colors = TwoPaneScaffoldDefaults.colors(
+                mainContainerColor = mainContainerColor,
+                mainContentColor = mainContentColor,
+                wideMainContainerColor = Color.Transparent,
+                wideMainContentColor = MaterialTheme.colorScheme.onSurface,
+            ),
             shouldAutoFocusCurrentDestination = false,
         )
     }
@@ -708,167 +855,34 @@ private fun MainScreen(
 }
 
 @Composable
-private fun MainMainPane(
+private fun MainTitle(
     currentState: State,
-    appDetails: AppDetails,
-    outputsForPointChips: List<PointOutput>,
-    outputsForPointsChips: List<PointsOutput>,
     billingAppNameResId: Int,
     billingStatus: BillingStatus,
-    coordinateConverter: CoordinateConverter,
-    coordinateFormat: CoordinateFormat,
-    errorMessageResId: Int?,
-    source: String,
     largeLoadingIndicator: LoadingIndicator.Large?,
-    onCancel: () -> Unit,
-    onNavigateToInputsScreen: () -> Unit,
-    onExecute: (Action<*>) -> Unit,
-    onRetry: () -> Unit,
-    onSelect: (Int?) -> Unit,
-    onSetErrorMessageResId: (Int?) -> Unit,
-    onStart: () -> Unit,
-    onUpdateInput: (String) -> Unit,
 ) {
     when (currentState) {
-        is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null -> {
-            MainLoadingIndicator(
-                loadingIndicator = largeLoadingIndicator,
-                onCancel = onCancel,
-            )
-        }
-
-        is ConversionState.HasError -> {
-            ResultError(
-                currentState.source,
-                currentState.message,
-                currentState.details,
-                onNavigateToInputsScreen = onNavigateToInputsScreen,
-                onRetry = onRetry,
-            )
-        }
-
-        is ConversionState.HasResult -> {
-            ResultSuccessCoordinates(
-                points = currentState.points,
-                appDetails = appDetails,
-                coordinateConverter = coordinateConverter,
-                coordinateFormat = coordinateFormat,
-                outputsForPointChips = outputsForPointChips,
-                outputsForPointsChips = outputsForPointsChips,
-                onExecute = onExecute,
-                onSelect = onSelect,
-            )
-        }
-
-        is Initial -> {
-            MainForm(
-                source = source,
-                billingAppNameResId = billingAppNameResId,
-                billingStatus = billingStatus,
-                errorMessageResId = errorMessageResId,
-                onSetErrorMessageResId = onSetErrorMessageResId,
-                onSubmit = onStart,
-                onUpdateInput = onUpdateInput,
-            )
-        }
-    }
-}
-
-@Composable
-private fun MainBottomPane(currentState: State) {
-    if (currentState is PermissionGrantedWebViewInput) {
-        BoxWithConstraints(
-            Modifier
-                .fillMaxSize()
-                // Clip to bounds, so that the WebView inside this box never overflows the top edge of the box, which
-                // can happen due to how Modifier.requiredSize, which we use in ConversionWebView, works
-                .clipToBounds()
-        ) {
-            val density = LocalDensity.current
-            val wholeSquaresCount = floor(maxWidth.value / 30)
-            val squarePx = with(density) { (maxWidth / wholeSquaresCount).toPx() }
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .graphicsLayer { alpha = 0.1f }
-                    .checkeredBackground(squarePx)
-            )
-            ConversionWebView(
-                unsafeUrl = currentState.matchedInput.match,
-                unsafeExtractionJavascript = currentState.matchedInput.input.unsafeExtractionJavascript,
-                onExtractionSettle = { currentState.setData(it) },
-                extendWebSettings = { currentState.matchedInput.input.extendWebSettings(it) },
-                shouldInterceptRequest = { currentState.matchedInput.input.shouldInterceptRequest(it) },
-            )
-            if (!BuildConfig.DEBUG) {
-                Box(
-                    Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.surface)
-                )
+        is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
+            currentState.getLoadingIndicator()?.title?.let { title ->
+                Text(title)
             }
-        }
-    }
-}
 
-@Composable
-private fun MainSupportingPane(
-    allInputs: List<Input>,
-    appDetails: AppDetails,
-    billingFeatures: List<Feature>,
-    billingStatus: BillingStatus,
-    currentState: State,
-    largeLoadingIndicator: LoadingIndicator.Large?,
-    outputsForApps: Map<String, List<Output>>,
-    outputsForLinks: Map<String?, List<Output>>,
-    outputsForSharing: List<Output>,
-    onCancel: () -> Unit,
-    onDisableLinkGroup: (group: String?) -> Unit,
-    onNavigateToInputsScreen: () -> Unit,
-    onNavigateToIntroScreen: () -> Unit,
-    onNavigateToLinkScreen: () -> Unit,
-    onNavigateToUserPreferencesAutomationScreen: () -> Unit,
-    onExecute: (action: Action<*>) -> Unit,
-    onHideApp: (packageName: String) -> Unit,
-    onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
-    onUpdateInput: (newSource: String) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    when (currentState) {
-        is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null -> {}
-        is ConversionState.HasResult -> {
-            ResultSuccessMessage(
-                currentState = currentState,
-                appDetails = appDetails,
-                billingFeatures = billingFeatures,
-                billingStatus = billingStatus,
-                modifier = modifier,
-                onCancel = onCancel,
-                onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
-            )
-            ResultSuccessApps(
-                appDetails = appDetails,
-                outputsForApps = outputsForApps,
-                outputsForLinks = outputsForLinks,
-                outputsForSharing = outputsForSharing,
-                points = currentState.points,
-                onDisableLinkGroup = onDisableLinkGroup,
-                onExecute = onExecute,
-                onHideApp = onHideApp,
-                onNavigateToLinkScreen = onNavigateToLinkScreen,
-            )
-        }
+        is ConversionState.HasError ->
+            Text(stringResource(R.string.conversion_error_title))
 
-        is Initial -> {
-            MainFormLinks(
-                allInputs = allInputs,
-                modifier = modifier,
-                onNavigateToInputsScreen = onNavigateToInputsScreen,
-                onNavigateToIntroScreen = onNavigateToIntroScreen,
-                onSetErrorMessageResId = onSetErrorMessageResId,
-                onUpdateInput = onUpdateInput,
+        is ConversionState.HasResult ->
+            Text(
+                currentState.points.lastOrNull()?.cleanName
+                    ?: if (currentState.points.size > 1) {
+                        stringResource(R.string.conversion_succeeded_point_last)
+                    } else {
+                        stringResource(R.string.conversion_succeeded_title)
+                    },
+                Modifier.testTag("geoShareResultSuccessLastPointName"),
             )
-        }
+
+        is Initial ->
+            MainHeadline(billingAppNameResId, billingStatus)
     }
 }
 
@@ -883,9 +897,8 @@ private fun MainLoadingIndicator(
     Column(
         Modifier
             .fillMaxWidth()
-            .padding(horizontal = spacing.windowPadding),
+            .padding(horizontal = spacing.windowPadding)
     ) {
-        Headline(loadingIndicator.title)
         LoadingIndicator(
             Modifier
                 .size(96.dp)
@@ -917,63 +930,60 @@ private fun MainLoadingIndicator(
 }
 
 @Composable
-private fun MainBottomBar(
-    currentState: State,
-    largeLoadingIndicator: LoadingIndicator.Large?,
-    containerColor: Color,
-    contentColor: Color,
-    modifier: Modifier = Modifier,
+private fun MainWebView(
+    matchedInput: MatchedInput<WebViewInput>,
+    onExtractionSettle: (data: String) -> Unit,
 ) {
-    when (currentState) {
-        is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null -> {}
-        is ConversionState.HasError -> MainSkipButton(
-            currentState.source,
-            containerColor,
-            contentColor,
-            modifier,
+    BoxWithConstraints(
+        Modifier
+            .fillMaxSize()
+            // Clip to bounds, so that the WebView inside this box never overflows the top edge of the box, which
+            // can happen due to how Modifier.requiredSize, which we use in ConversionWebView, works
+            .clipToBounds()
+    ) {
+        val density = LocalDensity.current
+        val wholeSquaresCount = floor(maxWidth.value / 30)
+        val squarePx = with(density) { (maxWidth / wholeSquaresCount).toPx() }
+        Box(
+            Modifier
+                .fillMaxSize()
+                .graphicsLayer { alpha = 0.1f }
+                .checkeredBackground(squarePx)
         )
-
-        is ConversionState.HasResult -> MainSkipButton(
-            currentState.source,
-            containerColor,
-            contentColor,
-            modifier,
+        ConversionWebView(
+            unsafeUrl = matchedInput.match,
+            unsafeExtractionJavascript = matchedInput.input.unsafeExtractionJavascript,
+            onExtractionSettle = onExtractionSettle,
+            extendWebSettings = { matchedInput.input.extendWebSettings(it) },
+            shouldInterceptRequest = { matchedInput.input.shouldInterceptRequest(it) },
         )
+        if (!BuildConfig.DEBUG) {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.surface)
+            )
+        }
     }
 }
 
 @Composable
-private fun MainSkipButton(
-    source: String,
-    containerColor: Color,
-    contentColor: Color,
-    modifier: Modifier = Modifier,
-) {
+private fun MainCopySourceButton(source: String) {
     val clipboard = LocalClipboard.current
     val coroutineScope = rememberCoroutineScope()
     val spacing = LocalSpacing.current
 
-    Column(
+    TextButton(
+        {
+            coroutineScope.launch {
+                AndroidTools.copyToClipboard(clipboard, source)
+            }
+        },
         Modifier
-            .background(containerColor)
-            .fillMaxWidth()
-            .then(modifier),
+            .padding(start = 4.dp)
+            .padding(top = spacing.tinyAdaptive),
     ) {
-        TextButton(
-            {
-                coroutineScope.launch {
-                    AndroidTools.copyToClipboard(clipboard, source)
-                }
-            },
-            Modifier
-                .padding(horizontal = spacing.windowPadding)
-                .padding(top = spacing.tinyAdaptive),
-            colors = ButtonDefaults.textButtonColors(
-                contentColor = contentColor,
-            ),
-        ) {
-            Text(stringResource(R.string.conversion_succeeded_skip))
-        }
+        Text(stringResource(R.string.conversion_succeeded_skip))
     }
 }
 
@@ -1448,104 +1458,17 @@ private fun TabletSucceededPreview() {
     }
 }
 
-@Preview(showBackground = true, device = Devices.TABLET, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkTabletSucceededPreview() {
-    AppTheme {
-        val context = LocalContext.current
-        val geometries = Geometries(context)
-        val coordinateConverter = CoordinateConverter(geometries)
-        val outputRepository = OutputRepository(
-            coordinateConverter = coordinateConverter,
-        )
-        MainScreen(
-            currentState = ActionFinished(
-                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                points = persistentListOf(
-                    WGS84Point(NaivePoint.genRandomPoint()),
-                    WGS84Point(NaivePoint.example),
-                ),
-                actionResult = ActionResult.Succeeded,
-            ),
-            allInputs = emptyList(),
-            appDetails = emptyMap(),
-            billingAppNameResId = R.string.app_name,
-            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
-            ),
-            changelogShown = true,
-            coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
-            source = "",
-            largeLoadingIndicator = null,
-            linkMessage = null,
-            outputsForApps = outputRepository.getOutputsForApps(
-                mapOf(
-                    PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                ),
-                emptySet(),
-            ),
-            outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
-            outputsForSharing = outputRepository.getOutputsForSharing(),
-            userPreferenceMessage = null,
-            onCancel = {},
-            onDisableLinkGroup = {},
-            onDismissLinkMessage = {},
-            onDismissUserPreferenceMessage = {},
-            onDeny = {},
-            onExecute = {},
-            onGrant = {},
-            onHideApp = {},
-            onNavigateToAboutScreen = {},
-            onNavigateToBillingScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToLinkScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
-            onNavigateToUserPreferencesScreen = {},
-            onReset = {},
-            onRetry = {},
-            onStart = {},
-        ) {}
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
-private fun AutomationPreview() {
+private fun ErrorPreview() {
     AppTheme {
         val context = LocalContext.current
-        val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val outputRepository = OutputRepository(
-            coordinateConverter = coordinateConverter,
-        )
-        val output = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
         MainScreen(
-            currentState = ActionWaiting(
-                stateContext = ConversionStateContext(
-                    linkRepository = FakeLinkRepository(),
-                    outputRepository = outputRepository,
-                    resources = resources,
-                    userPreferencesRepository = FakeUserPreferencesRepository(),
-                    billing = BillingImpl(LocalContext.current),
-                ),
+            currentState = ConversionFailed(
                 source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                points = persistentListOf(WGS84Point(NaivePoint.example)),
-                action = output.toAction(WGS84Point(source = Source.GENERATED)),
-                output = output,
-                isAutomation = true,
-                delay = 3.seconds,
+                message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
             allInputs = emptyList(),
             appDetails = emptyMap(),
@@ -1563,18 +1486,13 @@ private fun AutomationPreview() {
             source = "",
             largeLoadingIndicator = null,
             linkMessage = null,
-            outputsForApps = outputRepository.getOutputsForApps(
-                mapOf(
-                    PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                ),
-                emptySet(),
-            ),
-            outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
+            outputsForApps = emptyMap(),
+            outputsForLinks = emptyMap(),
             outputsForPoint = emptyList(),
-            outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
+            outputsForPointChips = emptyList(),
             outputsForPoints = emptyList(),
-            outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
-            outputsForSharing = outputRepository.getOutputsForSharing(),
+            outputsForPointsChips = emptyList(),
+            outputsForSharing = emptyList(),
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -1601,31 +1519,15 @@ private fun AutomationPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkAutomationPreview() {
+private fun DarkErrorPreview() {
     AppTheme {
         val context = LocalContext.current
-        val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val outputRepository = OutputRepository(
-            coordinateConverter = coordinateConverter,
-        )
-        val output = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
         MainScreen(
-            currentState = ActionWaiting(
-                stateContext = ConversionStateContext(
-                    linkRepository = FakeLinkRepository(),
-                    outputRepository = outputRepository,
-                    resources = resources,
-                    userPreferencesRepository = FakeUserPreferencesRepository(),
-                    billing = BillingImpl(LocalContext.current),
-                ),
+            currentState = ConversionFailed(
                 source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                points = persistentListOf(WGS84Point(NaivePoint.example)),
-                action = output.toAction(WGS84Point(source = Source.GENERATED)),
-                output = output,
-                isAutomation = true,
-                delay = 3.seconds,
+                message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
             allInputs = emptyList(),
             appDetails = emptyMap(),
@@ -1643,18 +1545,13 @@ private fun DarkAutomationPreview() {
             source = "",
             largeLoadingIndicator = null,
             linkMessage = null,
-            outputsForApps = outputRepository.getOutputsForApps(
-                mapOf(
-                    PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                ),
-                emptySet(),
-            ),
-            outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
+            outputsForApps = emptyMap(),
+            outputsForLinks = emptyMap(),
             outputsForPoint = emptyList(),
-            outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
+            outputsForPointChips = emptyList(),
             outputsForPoints = emptyList(),
-            outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
-            outputsForSharing = outputRepository.getOutputsForSharing(),
+            outputsForPointsChips = emptyList(),
+            outputsForSharing = emptyList(),
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -1681,31 +1578,15 @@ private fun DarkAutomationPreview() {
 
 @Preview(showBackground = true, device = Devices.TABLET)
 @Composable
-private fun TabletAutomationPreview() {
+private fun TabletErrorPreview() {
     AppTheme {
         val context = LocalContext.current
-        val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val outputRepository = OutputRepository(
-            coordinateConverter = coordinateConverter,
-        )
-        val output = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
         MainScreen(
-            currentState = ActionWaiting(
-                stateContext = ConversionStateContext(
-                    linkRepository = FakeLinkRepository(),
-                    outputRepository = outputRepository,
-                    resources = resources,
-                    userPreferencesRepository = FakeUserPreferencesRepository(),
-                    billing = BillingImpl(LocalContext.current),
-                ),
+            currentState = ConversionFailed(
                 source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                points = persistentListOf(WGS84Point(NaivePoint.example)),
-                action = output.toAction(WGS84Point(source = Source.GENERATED)),
-                output = output,
-                isAutomation = true,
-                delay = 3.seconds,
+                message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
             allInputs = emptyList(),
             appDetails = emptyMap(),
@@ -1723,18 +1604,241 @@ private fun TabletAutomationPreview() {
             source = "",
             largeLoadingIndicator = null,
             linkMessage = null,
-            outputsForApps = outputRepository.getOutputsForApps(
-                mapOf(
-                    PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                ),
-                emptySet(),
-            ),
-            outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
+            outputsForApps = emptyMap(),
+            outputsForLinks = emptyMap(),
             outputsForPoint = emptyList(),
-            outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
+            outputsForPointChips = emptyList(),
             outputsForPoints = emptyList(),
-            outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
-            outputsForSharing = outputRepository.getOutputsForSharing(),
+            outputsForPointsChips = emptyList(),
+            outputsForSharing = emptyList(),
+            userPreferenceMessage = null,
+            onCancel = {},
+            onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
+            onDeny = {},
+            onExecute = {},
+            onGrant = {},
+            onHideApp = {},
+            onNavigateToAboutScreen = {},
+            onNavigateToBillingScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinkScreen = {},
+            onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+            onReset = {},
+            onRetry = {},
+            onStart = {},
+        ) {}
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LoadingIndicatorPreview() {
+    AppTheme {
+        val context = LocalContext.current
+        val resources = LocalResources.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+        )
+        val currentState = PermissionGrantedBasicInput(
+            stateContext = ConversionStateContext(
+                linkRepository = FakeLinkRepository(),
+                outputRepository = outputRepository,
+                resources = resources,
+                userPreferencesRepository = FakeUserPreferencesRepository(),
+                billing = BillingImpl(LocalContext.current),
+            ),
+            source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            matchedInput = MatchedInput(
+                FakeInputRepository.googleMapsShortLinkInput, "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+            ),
+            permission = Permission.ALWAYS,
+            results = emptyMap(),
+            lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
+        )
+        MainScreen(
+            currentState = currentState,
+            allInputs = emptyList(),
+            appDetails = emptyMap(),
+            billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+            billingStatus = BillingStatus.Purchased(
+                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                expired = false,
+                refundable = true,
+                token = "test_purchased",
+            ),
+            changelogShown = true,
+            coordinateConverter = coordinateConverter,
+            coordinateFormat = CoordinateFormat.DEC,
+            source = "",
+            largeLoadingIndicator = currentState.getLoadingIndicator(),
+            linkMessage = null,
+            outputsForApps = emptyMap(),
+            outputsForLinks = emptyMap(),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = emptyList(),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = emptyList(),
+            outputsForSharing = emptyList(),
+            userPreferenceMessage = null,
+            onCancel = {},
+            onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
+            onDeny = {},
+            onExecute = {},
+            onGrant = {},
+            onHideApp = {},
+            onNavigateToAboutScreen = {},
+            onNavigateToBillingScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinkScreen = {},
+            onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+            onReset = {},
+            onRetry = {},
+            onStart = {},
+        ) {}
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkLoadingIndicatorPreview() {
+    AppTheme {
+        val context = LocalContext.current
+        val resources = LocalResources.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+        )
+        val currentState = PermissionGrantedBasicInput(
+            stateContext = ConversionStateContext(
+                linkRepository = FakeLinkRepository(),
+                outputRepository = outputRepository,
+                resources = resources,
+                userPreferencesRepository = FakeUserPreferencesRepository(),
+                billing = BillingImpl(LocalContext.current),
+            ),
+            source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            matchedInput = MatchedInput(
+                FakeInputRepository.googleMapsShortLinkInput, "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+            ),
+            permission = Permission.ALWAYS,
+            results = emptyMap(),
+            lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
+        )
+        MainScreen(
+            currentState = currentState,
+            allInputs = emptyList(),
+            appDetails = emptyMap(),
+            billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+            billingStatus = BillingStatus.Purchased(
+                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                expired = false,
+                refundable = true,
+                token = "test_purchased",
+            ),
+            changelogShown = true,
+            coordinateConverter = coordinateConverter,
+            coordinateFormat = CoordinateFormat.DEC,
+            source = "",
+            largeLoadingIndicator = currentState.getLoadingIndicator(),
+            linkMessage = null,
+            outputsForApps = emptyMap(),
+            outputsForLinks = emptyMap(),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = emptyList(),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = emptyList(),
+            outputsForSharing = emptyList(),
+            userPreferenceMessage = null,
+            onCancel = {},
+            onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
+            onDeny = {},
+            onExecute = {},
+            onGrant = {},
+            onHideApp = {},
+            onNavigateToAboutScreen = {},
+            onNavigateToBillingScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinkScreen = {},
+            onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+            onReset = {},
+            onRetry = {},
+            onStart = {},
+        ) {}
+    }
+}
+
+@Preview(showBackground = true, device = Devices.TABLET)
+@Composable
+private fun TabletLoadingIndicatorPreview() {
+    AppTheme {
+        val context = LocalContext.current
+        val resources = LocalResources.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+        )
+        val currentState = PermissionGrantedBasicInput(
+            stateContext = ConversionStateContext(
+                linkRepository = FakeLinkRepository(),
+                outputRepository = outputRepository,
+                resources = resources,
+                userPreferencesRepository = FakeUserPreferencesRepository(),
+                billing = BillingImpl(LocalContext.current),
+            ),
+            source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            matchedInput = MatchedInput(
+                FakeInputRepository.googleMapsShortLinkInput, "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+            ),
+            permission = Permission.ALWAYS,
+            results = emptyMap(),
+            lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
+        )
+        MainScreen(
+            currentState = currentState,
+            allInputs = emptyList(),
+            appDetails = emptyMap(),
+            billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+            billingStatus = BillingStatus.Purchased(
+                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                expired = false,
+                refundable = true,
+                token = "test_purchased",
+            ),
+            changelogShown = true,
+            coordinateConverter = coordinateConverter,
+            coordinateFormat = CoordinateFormat.DEC,
+            source = "",
+            largeLoadingIndicator = currentState.getLoadingIndicator(),
+            linkMessage = null,
+            outputsForApps = emptyMap(),
+            outputsForLinks = emptyMap(),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = emptyList(),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = emptyList(),
+            outputsForSharing = emptyList(),
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -1980,183 +2084,6 @@ private fun TabletWebViewPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun ErrorPreview() {
-    AppTheme {
-        val context = LocalContext.current
-        val geometries = Geometries(context)
-        val coordinateConverter = CoordinateConverter(geometries)
-        MainScreen(
-            currentState = ConversionFailed(
-                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                message = stringResource(R.string.conversion_failed_reason_no_points),
-            ),
-            allInputs = emptyList(),
-            appDetails = emptyMap(),
-            billingAppNameResId = R.string.app_name,
-            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
-            ),
-            changelogShown = true,
-            coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
-            source = "",
-            largeLoadingIndicator = null,
-            linkMessage = null,
-            outputsForApps = emptyMap(),
-            outputsForLinks = emptyMap(),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = emptyList(),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = emptyList(),
-            outputsForSharing = emptyList(),
-            userPreferenceMessage = null,
-            onCancel = {},
-            onDisableLinkGroup = {},
-            onDismissLinkMessage = {},
-            onDismissUserPreferenceMessage = {},
-            onDeny = {},
-            onExecute = {},
-            onGrant = {},
-            onHideApp = {},
-            onNavigateToAboutScreen = {},
-            onNavigateToBillingScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToLinkScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
-            onNavigateToUserPreferencesScreen = {},
-            onReset = {},
-            onRetry = {},
-            onStart = {},
-        ) {}
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkErrorPreview() {
-    AppTheme {
-        val context = LocalContext.current
-        val geometries = Geometries(context)
-        val coordinateConverter = CoordinateConverter(geometries)
-        MainScreen(
-            currentState = ConversionFailed(
-                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                message = stringResource(R.string.conversion_failed_reason_no_points),
-            ),
-            allInputs = emptyList(),
-            appDetails = emptyMap(),
-            billingAppNameResId = R.string.app_name,
-            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
-            ),
-            changelogShown = true,
-            coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
-            source = "",
-            largeLoadingIndicator = null,
-            linkMessage = null,
-            outputsForApps = emptyMap(),
-            outputsForLinks = emptyMap(),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = emptyList(),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = emptyList(),
-            outputsForSharing = emptyList(),
-            userPreferenceMessage = null,
-            onCancel = {},
-            onDisableLinkGroup = {},
-            onDismissLinkMessage = {},
-            onDismissUserPreferenceMessage = {},
-            onDeny = {},
-            onExecute = {},
-            onGrant = {},
-            onHideApp = {},
-            onNavigateToAboutScreen = {},
-            onNavigateToBillingScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToLinkScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
-            onNavigateToUserPreferencesScreen = {},
-            onReset = {},
-            onRetry = {},
-            onStart = {},
-        ) {}
-    }
-}
-
-@Preview(showBackground = true, device = Devices.TABLET)
-@Composable
-private fun TabletErrorPreview() {
-    AppTheme {
-        val context = LocalContext.current
-        val geometries = Geometries(context)
-        val coordinateConverter = CoordinateConverter(geometries)
-        MainScreen(
-            currentState = ConversionFailed(
-                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                message = stringResource(R.string.conversion_failed_reason_no_points),
-            ),
-            allInputs = emptyList(),
-            appDetails = emptyMap(),
-            billingAppNameResId = R.string.app_name,
-            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
-            ),
-            changelogShown = true,
-            coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
-            source = "",
-            largeLoadingIndicator = null,
-            linkMessage = null,
-            outputsForApps = emptyMap(),
-            outputsForLinks = emptyMap(),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = emptyList(),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = emptyList(),
-            outputsForSharing = emptyList(),
-            userPreferenceMessage = null,
-            onCancel = {},
-            onDisableLinkGroup = {},
-            onDismissLinkMessage = {},
-            onDismissUserPreferenceMessage = {},
-            onDeny = {},
-            onExecute = {},
-            onGrant = {},
-            onHideApp = {},
-            onNavigateToAboutScreen = {},
-            onNavigateToBillingScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToLinkScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
-            onNavigateToUserPreferencesScreen = {},
-            onReset = {},
-            onRetry = {},
-            onStart = {},
-        ) {}
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
 private fun EmptyPreview() {
     AppTheme {
         val context = LocalContext.current
@@ -2193,234 +2120,6 @@ private fun EmptyPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             source = "",
             largeLoadingIndicator = null,
-            linkMessage = null,
-            outputsForApps = emptyMap(),
-            outputsForLinks = emptyMap(),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = emptyList(),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = emptyList(),
-            outputsForSharing = emptyList(),
-            userPreferenceMessage = null,
-            onCancel = {},
-            onDisableLinkGroup = {},
-            onDismissLinkMessage = {},
-            onDismissUserPreferenceMessage = {},
-            onDeny = {},
-            onExecute = {},
-            onGrant = {},
-            onHideApp = {},
-            onNavigateToAboutScreen = {},
-            onNavigateToBillingScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToLinkScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
-            onNavigateToUserPreferencesScreen = {},
-            onReset = {},
-            onRetry = {},
-            onStart = {},
-        ) {}
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun LoadingIndicatorPreview() {
-    AppTheme {
-        val context = LocalContext.current
-        val resources = LocalResources.current
-        val geometries = Geometries(context)
-        val coordinateConverter = CoordinateConverter(geometries)
-        val outputRepository = OutputRepository(
-            coordinateConverter = coordinateConverter,
-        )
-        val currentState = PermissionGrantedBasicInput(
-            stateContext = ConversionStateContext(
-                linkRepository = FakeLinkRepository(),
-                outputRepository = outputRepository,
-                resources = resources,
-                userPreferencesRepository = FakeUserPreferencesRepository(),
-                billing = BillingImpl(LocalContext.current),
-            ),
-            source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            matchedInput = MatchedInput(
-                FakeInputRepository.googleMapsShortLinkInput, "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
-            ),
-            permission = Permission.ALWAYS,
-            results = emptyMap(),
-            lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
-        )
-        MainScreen(
-            currentState = currentState,
-            allInputs = emptyList(),
-            appDetails = emptyMap(),
-            billingAppNameResId = R.string.app_name,
-            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
-            ),
-            changelogShown = true,
-            coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
-            source = "",
-            largeLoadingIndicator = currentState.getLoadingIndicator(),
-            linkMessage = null,
-            outputsForApps = emptyMap(),
-            outputsForLinks = emptyMap(),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = emptyList(),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = emptyList(),
-            outputsForSharing = emptyList(),
-            userPreferenceMessage = null,
-            onCancel = {},
-            onDisableLinkGroup = {},
-            onDismissLinkMessage = {},
-            onDismissUserPreferenceMessage = {},
-            onDeny = {},
-            onExecute = {},
-            onGrant = {},
-            onHideApp = {},
-            onNavigateToAboutScreen = {},
-            onNavigateToBillingScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToLinkScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
-            onNavigateToUserPreferencesScreen = {},
-            onReset = {},
-            onRetry = {},
-            onStart = {},
-        ) {}
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkLoadingIndicatorPreview() {
-    AppTheme {
-        val context = LocalContext.current
-        val resources = LocalResources.current
-        val geometries = Geometries(context)
-        val coordinateConverter = CoordinateConverter(geometries)
-        val outputRepository = OutputRepository(
-            coordinateConverter = coordinateConverter,
-        )
-        val currentState = PermissionGrantedBasicInput(
-            stateContext = ConversionStateContext(
-                linkRepository = FakeLinkRepository(),
-                outputRepository = outputRepository,
-                resources = resources,
-                userPreferencesRepository = FakeUserPreferencesRepository(),
-                billing = BillingImpl(LocalContext.current),
-            ),
-            source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            matchedInput = MatchedInput(
-                FakeInputRepository.googleMapsShortLinkInput, "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
-            ),
-            permission = Permission.ALWAYS,
-            results = emptyMap(),
-            lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
-        )
-        MainScreen(
-            currentState = currentState,
-            allInputs = emptyList(),
-            appDetails = emptyMap(),
-            billingAppNameResId = R.string.app_name,
-            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
-            ),
-            changelogShown = true,
-            coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
-            source = "",
-            largeLoadingIndicator = currentState.getLoadingIndicator(),
-            linkMessage = null,
-            outputsForApps = emptyMap(),
-            outputsForLinks = emptyMap(),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = emptyList(),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = emptyList(),
-            outputsForSharing = emptyList(),
-            userPreferenceMessage = null,
-            onCancel = {},
-            onDisableLinkGroup = {},
-            onDismissLinkMessage = {},
-            onDismissUserPreferenceMessage = {},
-            onDeny = {},
-            onExecute = {},
-            onGrant = {},
-            onHideApp = {},
-            onNavigateToAboutScreen = {},
-            onNavigateToBillingScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToLinkScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
-            onNavigateToUserPreferencesScreen = {},
-            onReset = {},
-            onRetry = {},
-            onStart = {},
-        ) {}
-    }
-}
-
-@Preview(showBackground = true, device = Devices.TABLET)
-@Composable
-private fun TabletLoadingIndicatorPreview() {
-    AppTheme {
-        val context = LocalContext.current
-        val resources = LocalResources.current
-        val geometries = Geometries(context)
-        val coordinateConverter = CoordinateConverter(geometries)
-        val outputRepository = OutputRepository(
-            coordinateConverter = coordinateConverter,
-        )
-        val currentState = PermissionGrantedBasicInput(
-            stateContext = ConversionStateContext(
-                linkRepository = FakeLinkRepository(),
-                outputRepository = outputRepository,
-                resources = resources,
-                userPreferencesRepository = FakeUserPreferencesRepository(),
-                billing = BillingImpl(LocalContext.current),
-            ),
-            source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            matchedInput = MatchedInput(
-                FakeInputRepository.googleMapsShortLinkInput, "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
-            ),
-            permission = Permission.ALWAYS,
-            results = emptyMap(),
-            lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
-        )
-        MainScreen(
-            currentState = currentState,
-            allInputs = emptyList(),
-            appDetails = emptyMap(),
-            billingAppNameResId = R.string.app_name,
-            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
-            ),
-            changelogShown = true,
-            coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
-            source = "",
-            largeLoadingIndicator = currentState.getLoadingIndicator(),
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
