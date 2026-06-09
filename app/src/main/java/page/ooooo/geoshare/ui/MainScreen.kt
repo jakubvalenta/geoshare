@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
@@ -606,14 +607,24 @@ private fun MainScreen(
                                     )
                                 }
                             }
+                        } else if (currentState is Initial) {
+                            MainForm(
+                                source = source,
+                                errorMessageResId = errorMessageResId,
+                                modifier = Modifier.padding(top = spacing.medium),
+                                onSetErrorMessageResId = setErrorMessageResId,
+                                onSubmit = onStart,
+                                onUpdateInput = onUpdateInput,
+                            )
                         } else {
                             Card(
                                 colors = CardDefaults.cardColors(
                                     containerColor = mainContainerColor,
                                     contentColor = mainContentColor,
                                 ),
-                                modifier = Modifier.testTag("geoShareMainPane"),
                             ) {
+                                Spacer(Modifier.height(spacing.mediumAdaptive))
+
                                 when (currentState) {
                                     is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
                                         MainLoadingIndicator(
@@ -643,17 +654,6 @@ private fun MainScreen(
                                                 onCancel()
                                                 setSelectedPointIndex(index)
                                             },
-                                        )
-                                    }
-
-                                    is Initial -> {
-                                        MainForm(
-                                            source = source,
-                                            errorMessageResId = errorMessageResId,
-                                            modifier = Modifier.padding(top = spacing.medium),
-                                            onSetErrorMessageResId = setErrorMessageResId,
-                                            onSubmit = onStart,
-                                            onUpdateInput = onUpdateInput,
                                         )
                                     }
                                 }
