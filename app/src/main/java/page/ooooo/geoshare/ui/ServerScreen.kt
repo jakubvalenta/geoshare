@@ -71,7 +71,7 @@ import page.ooooo.geoshare.data.di.defaultFakeServers
 import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.lib.Message
-import page.ooooo.geoshare.ui.components.BasicListDetailScaffold
+import page.ooooo.geoshare.ui.components.StyledListDetailPaneScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
@@ -80,7 +80,7 @@ import page.ooooo.geoshare.ui.components.ScrollablePane
 import page.ooooo.geoshare.ui.components.SegmentedList
 import page.ooooo.geoshare.ui.components.SegmentedListLabel
 import page.ooooo.geoshare.ui.components.ServerForm
-import page.ooooo.geoshare.ui.components.TwoPaneScaffoldDefaults
+import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -218,7 +218,7 @@ private fun ServerScreen(
     ) {
         // Use BasicListDetailScaffold instead of NavigableBasicListDetailScaffold, because the latter navigates using
         // the navigator when back button is pressed, but we want to do all navigation ourselves using the view model.
-        BasicListDetailScaffold(
+        StyledListDetailPaneScaffold(
             directive = navigator.scaffoldDirective,
             scaffoldState = navigator.scaffoldState,
             listPane = {
@@ -267,7 +267,7 @@ private fun ServerScreen(
                     )
                 }
             },
-            colors = TwoPaneScaffoldDefaults.colors(
+            colors = StyledPaneScaffoldDefaults.colors(
                 wideMainContainerColor = MaterialTheme.colorScheme.surfaceContainer,
             ),
         )

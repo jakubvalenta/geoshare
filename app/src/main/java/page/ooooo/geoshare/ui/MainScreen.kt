@@ -137,7 +137,7 @@ import page.ooooo.geoshare.lib.outputs.LocationAction
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
-import page.ooooo.geoshare.ui.components.BasicSupportingPaneScaffold
+import page.ooooo.geoshare.ui.components.StyledSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.ConversionWebView
 import page.ooooo.geoshare.ui.components.MainForm
@@ -153,7 +153,7 @@ import page.ooooo.geoshare.ui.components.ResultSuccessCoordinates
 import page.ooooo.geoshare.ui.components.ResultSuccessMessage
 import page.ooooo.geoshare.ui.components.ResultSuccessSheet
 import page.ooooo.geoshare.ui.components.ScrollablePane
-import page.ooooo.geoshare.ui.components.TwoPaneScaffoldDefaults
+import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
 import page.ooooo.geoshare.ui.components.checkeredBackground
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -480,7 +480,7 @@ private fun MainScreen(
             MessageSnackbarHost(snackbarHostState)
         },
     ) {
-        BasicSupportingPaneScaffold(
+        StyledSupportingPaneScaffold(
             mainPane = { innerPadding, wide ->
                 ScrollablePane(
                     title = {
@@ -758,7 +758,7 @@ private fun MainScreen(
                     }
                 }
             },
-            colors = TwoPaneScaffoldDefaults.colors(
+            colors = StyledPaneScaffoldDefaults.colors(
                 mainContainerColor = mainContainerColor,
                 mainContentColor = mainContentColor,
                 wideMainContainerColor = Color.Transparent,

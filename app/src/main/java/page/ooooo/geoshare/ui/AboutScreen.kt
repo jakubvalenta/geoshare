@@ -47,12 +47,12 @@ import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
-import page.ooooo.geoshare.ui.components.BasicSupportingPaneScaffold
+import page.ooooo.geoshare.ui.components.StyledSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.LargeButton
 import page.ooooo.geoshare.ui.components.ParagraphHtml
 import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.ScaffoldAction
-import page.ooooo.geoshare.ui.components.TwoPaneScaffoldDefaults
+import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -83,7 +83,7 @@ private fun AboutScreen(
 ) {
     val spacing = LocalSpacing.current
 
-    BasicSupportingPaneScaffold(
+    StyledSupportingPaneScaffold(
         mainPane = { innerPadding, wide ->
             TopAppBar(
                 title = { Text(stringResource(R.string.about_title)) },
@@ -139,7 +139,7 @@ private fun AboutScreen(
                 )
             }
         },
-        colors = TwoPaneScaffoldDefaults.colors(
+        colors = StyledPaneScaffoldDefaults.colors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
     )

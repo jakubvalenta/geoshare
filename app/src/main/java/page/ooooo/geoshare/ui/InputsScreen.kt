@@ -49,12 +49,12 @@ import page.ooooo.geoshare.lib.inputs.InputDocumentation
 import page.ooooo.geoshare.lib.inputs.InputDocumentationGroup
 import page.ooooo.geoshare.lib.inputs.InputDocumentationItem
 import page.ooooo.geoshare.ui.components.InputsSettingsButton
-import page.ooooo.geoshare.ui.components.NavigableBasicListDetailScaffold
+import page.ooooo.geoshare.ui.components.NavigableStyledListDetailPaneScaffold
 import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.ScrollablePane
 import page.ooooo.geoshare.ui.components.SegmentedList
 import page.ooooo.geoshare.ui.components.SegmentedListLabel
-import page.ooooo.geoshare.ui.components.TwoPaneScaffoldDefaults
+import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -104,7 +104,7 @@ private fun InputsScreen(
         onBack()
     }
 
-    NavigableBasicListDetailScaffold(
+    NavigableStyledListDetailPaneScaffold(
         navigator = navigator,
         listPane = { wide ->
             InputsListPane(
@@ -145,7 +145,7 @@ private fun InputsScreen(
                 )
             }
         },
-        colors = TwoPaneScaffoldDefaults.colors(
+        colors = StyledPaneScaffoldDefaults.colors(
             wideMainContainerColor = MaterialTheme.colorScheme.surfaceContainer,
         ),
     )

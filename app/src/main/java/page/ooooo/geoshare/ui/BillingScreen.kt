@@ -73,7 +73,7 @@ import page.ooooo.geoshare.lib.billing.FakeSubscriptionOffer
 import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.billing.Offer
 import page.ooooo.geoshare.ui.components.AnimatedMessage
-import page.ooooo.geoshare.ui.components.BasicSupportingPaneScaffold
+import page.ooooo.geoshare.ui.components.StyledSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.LargeButton
 import page.ooooo.geoshare.ui.components.MainHeadline
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
@@ -82,7 +82,7 @@ import page.ooooo.geoshare.ui.components.ScaffoldAction
 import page.ooooo.geoshare.ui.components.SegmentedList
 import page.ooooo.geoshare.ui.components.TextList
 import page.ooooo.geoshare.ui.components.TextListItem
-import page.ooooo.geoshare.ui.components.TwoPaneScaffoldDefaults
+import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration
@@ -155,7 +155,7 @@ private fun BillingScreen(
             MessageSnackbarHost(snackbarHostState)
         },
     ) {
-        BasicSupportingPaneScaffold(
+        StyledSupportingPaneScaffold(
             mainPane = { innerPadding, wide ->
                 TopAppBar(
                     title = {},
@@ -223,7 +223,7 @@ private fun BillingScreen(
                     )
                 }
             },
-            colors = TwoPaneScaffoldDefaults.colors(
+            colors = StyledPaneScaffoldDefaults.colors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainer,
             ),
         )

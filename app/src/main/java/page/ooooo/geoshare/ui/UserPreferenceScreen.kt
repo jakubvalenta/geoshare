@@ -47,10 +47,10 @@ import page.ooooo.geoshare.lib.billing.CustomLinkFeature
 import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.ui.components.LabelLarge
-import page.ooooo.geoshare.ui.components.NavigableBasicListDetailScaffold
+import page.ooooo.geoshare.ui.components.NavigableStyledListDetailPaneScaffold
 import page.ooooo.geoshare.ui.components.ScrollablePane
 import page.ooooo.geoshare.ui.components.SegmentedListLabel
-import page.ooooo.geoshare.ui.components.TwoPaneScaffoldDefaults
+import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
 import page.ooooo.geoshare.ui.components.UserPreferenceAutomationControls
 import page.ooooo.geoshare.ui.components.UserPreferenceAutomationDelayControls
 import page.ooooo.geoshare.ui.components.UserPreferenceAutomationDelayListItem
@@ -155,7 +155,7 @@ private fun UserPreferenceScreen(
         navigator.currentDestination?.contentKey
     }
 
-    NavigableBasicListDetailScaffold(
+    NavigableStyledListDetailPaneScaffold(
         navigator = navigator,
         listPane = {
             UserPreferenceListPane(
@@ -212,7 +212,7 @@ private fun UserPreferenceScreen(
                 )
             }
         },
-        colors = TwoPaneScaffoldDefaults.colors(
+        colors = StyledPaneScaffoldDefaults.colors(
             wideMainContainerColor = MaterialTheme.colorScheme.surfaceContainer,
         ),
     )
