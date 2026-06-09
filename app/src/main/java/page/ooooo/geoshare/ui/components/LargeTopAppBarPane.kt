@@ -22,10 +22,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import page.ooooo.geoshare.R
 
-// TODO Rename ScrollablePane to LargeTopBarPane
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScrollablePane(
+fun LargeTopAppBarPane(
     title: (@Composable () -> Unit)? = null,
     onBack: (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},

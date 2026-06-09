@@ -51,7 +51,7 @@ import page.ooooo.geoshare.lib.inputs.InputDocumentationItem
 import page.ooooo.geoshare.ui.components.InputsSettingsButton
 import page.ooooo.geoshare.ui.components.NavigableStyledListDetailPaneScaffold
 import page.ooooo.geoshare.ui.components.ParagraphText
-import page.ooooo.geoshare.ui.components.ScrollablePane
+import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
 import page.ooooo.geoshare.ui.components.SegmentedList
 import page.ooooo.geoshare.ui.components.SegmentedListLabel
 import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
@@ -168,7 +168,7 @@ private fun InputsListPane(
         // Do nothing
     }
 
-    ScrollablePane(
+    LargeTopAppBarPane(
         title = {
             Text(stringResource(R.string.inputs_title))
         },
@@ -266,7 +266,7 @@ private fun InputsDetailPane(
         documentationInputDetailsList = getDocumentationInputDetails(currentDocumentation, context.packageManager)
     }
 
-    ScrollablePane(
+    LargeTopAppBarPane(
         title = {
             Text(stringResource(currentDocumentation.group.nameResId))
         },

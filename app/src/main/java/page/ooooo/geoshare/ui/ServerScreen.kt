@@ -76,7 +76,7 @@ import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
 import page.ooooo.geoshare.ui.components.ParagraphText
-import page.ooooo.geoshare.ui.components.ScrollablePane
+import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
 import page.ooooo.geoshare.ui.components.SegmentedList
 import page.ooooo.geoshare.ui.components.SegmentedListLabel
 import page.ooooo.geoshare.ui.components.ServerForm
@@ -292,7 +292,7 @@ private fun ServerListPane(
     val spacing = LocalSpacing.current
     val (restoreInitialDataDialogOpen, setRestoreInitialDataDialogOpen) = retain { mutableStateOf(false) }
 
-    ScrollablePane(
+    LargeTopAppBarPane(
         title = {
             Text(stringResource(R.string.server_list_title))
         },
@@ -418,7 +418,7 @@ private fun ServerDetailPane(
 
     Box {
         Column {
-            ScrollablePane(
+            LargeTopAppBarPane(
                 title = {
                     Text(
                         stringResource(if (destination == -1) R.string.server_insert else R.string.server_update),

@@ -152,7 +152,7 @@ import page.ooooo.geoshare.ui.components.ResultApps
 import page.ooooo.geoshare.ui.components.ResultCoordinates
 import page.ooooo.geoshare.ui.components.ResultTitle
 import page.ooooo.geoshare.ui.components.ResultSuccessSheet
-import page.ooooo.geoshare.ui.components.ScrollablePane
+import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
 import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
 import page.ooooo.geoshare.ui.components.checkeredBackground
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -482,7 +482,7 @@ private fun MainScreen(
     ) {
         StyledSupportingPaneScaffold(
             mainPane = { innerPadding, wide ->
-                ScrollablePane(
+                LargeTopAppBarPane(
                     title = {
                         MainTitle(
                             currentState = currentState,
@@ -693,7 +693,7 @@ private fun MainScreen(
                 }
             },
             supportingPane = { wide ->
-                ScrollablePane(
+                LargeTopAppBarPane(
                     title = if (currentState is ConversionState.HasResult) {
                         {
                             ResultTitle(

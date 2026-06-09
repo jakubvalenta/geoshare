@@ -80,7 +80,7 @@ import page.ooooo.geoshare.ui.components.LinkForm
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
 import page.ooooo.geoshare.ui.components.ParagraphText
-import page.ooooo.geoshare.ui.components.ScrollablePane
+import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
 import page.ooooo.geoshare.ui.components.SegmentedList
 import page.ooooo.geoshare.ui.components.SegmentedListLabel
 import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
@@ -306,7 +306,7 @@ private fun LinkListPane(
     val spacing = LocalSpacing.current
     val (restoreInitialDataDialogOpen, setRestoreInitialDataDialogOpen) = retain { mutableStateOf(false) }
 
-    ScrollablePane(
+    LargeTopAppBarPane(
         title = {
             Text(stringResource(R.string.links_title))
         },
@@ -486,7 +486,7 @@ private fun LinkDetailPane(
 
     Box {
         Column {
-            ScrollablePane(
+            LargeTopAppBarPane(
                 title = {
                     Text(
                         stringResource(if (destination == -1) R.string.links_insert else R.string.links_update),

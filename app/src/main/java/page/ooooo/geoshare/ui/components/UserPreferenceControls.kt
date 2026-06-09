@@ -49,7 +49,7 @@ fun UserPreferenceControls(
     val maxWidth = 500.dp
 
     Box(Modifier.widthIn(max = maxWidth)) {
-        ScrollablePane(
+        LargeTopAppBarPane(
             title = {
                 Text(stringResource(titleResId))
             },

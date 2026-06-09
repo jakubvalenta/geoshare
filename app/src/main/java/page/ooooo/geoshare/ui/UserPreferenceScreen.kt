@@ -48,7 +48,7 @@ import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.ui.components.LabelLarge
 import page.ooooo.geoshare.ui.components.NavigableStyledListDetailPaneScaffold
-import page.ooooo.geoshare.ui.components.ScrollablePane
+import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
 import page.ooooo.geoshare.ui.components.SegmentedListLabel
 import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
 import page.ooooo.geoshare.ui.components.UserPreferenceAutomationControls
@@ -236,7 +236,7 @@ private fun UserPreferenceListPane(
 ) {
     val spacing = LocalSpacing.current
 
-    ScrollablePane(
+    LargeTopAppBarPane(
         title = {
             Text(stringResource(R.string.user_preferences_title))
         },
