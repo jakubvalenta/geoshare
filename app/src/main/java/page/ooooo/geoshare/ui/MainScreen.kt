@@ -149,7 +149,7 @@ import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
 import page.ooooo.geoshare.ui.components.PermissionDialog
 import page.ooooo.geoshare.ui.components.ResultError
 import page.ooooo.geoshare.ui.components.ResultApps
-import page.ooooo.geoshare.ui.components.ResultSuccessCoordinates
+import page.ooooo.geoshare.ui.components.ResultCoordinates
 import page.ooooo.geoshare.ui.components.ResultTitle
 import page.ooooo.geoshare.ui.components.ResultSuccessSheet
 import page.ooooo.geoshare.ui.components.ScrollablePane
@@ -542,7 +542,7 @@ private fun MainScreen(
                                     )
 
                                 is ConversionState.HasResult -> {
-                                    ResultSuccessCoordinates(
+                                    ResultCoordinates(
                                         points = currentState.points,
                                         appDetails = appDetails,
                                         coordinateConverter = coordinateConverter,
@@ -642,7 +642,7 @@ private fun MainScreen(
                                         )
 
                                     is ConversionState.HasResult -> {
-                                        ResultSuccessCoordinates(
+                                        ResultCoordinates(
                                             points = currentState.points,
                                             appDetails = appDetails,
                                             coordinateConverter = coordinateConverter,
