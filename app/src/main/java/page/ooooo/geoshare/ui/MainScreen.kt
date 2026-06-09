@@ -150,7 +150,7 @@ import page.ooooo.geoshare.ui.components.PermissionDialog
 import page.ooooo.geoshare.ui.components.ResultError
 import page.ooooo.geoshare.ui.components.ResultApps
 import page.ooooo.geoshare.ui.components.ResultSuccessCoordinates
-import page.ooooo.geoshare.ui.components.ResultSuccessMessage
+import page.ooooo.geoshare.ui.components.ResultTitle
 import page.ooooo.geoshare.ui.components.ResultSuccessSheet
 import page.ooooo.geoshare.ui.components.ScrollablePane
 import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
@@ -562,7 +562,7 @@ private fun MainScreen(
                                             .background(MaterialTheme.colorScheme.surface)
                                     ) {
                                         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                                            ResultSuccessMessage(
+                                            ResultTitle(
                                                 currentState = currentState,
                                                 appDetails = appDetails,
                                                 billingFeatures = billingFeatures,
@@ -696,7 +696,7 @@ private fun MainScreen(
                 ScrollablePane(
                     title = if (currentState is ConversionState.HasResult) {
                         {
-                            ResultSuccessMessage(
+                            ResultTitle(
                                 currentState = currentState,
                                 appDetails = appDetails,
                                 billingFeatures = billingFeatures,

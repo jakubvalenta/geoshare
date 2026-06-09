@@ -76,9 +76,8 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
-// TODO Rename ResultSuccessMessage to ResultTitle
 @Composable
-fun ResultSuccessMessage(
+fun ResultTitle(
     currentState: ConversionState.HasResult,
     appDetails: AppDetails,
     billingFeatures: List<Feature>,
@@ -265,7 +264,7 @@ private fun ActionFinishedPreview() {
         Surface {
             val context = LocalContext.current
             @SuppressLint("LocalContextGetResourceValueCall")
-            ResultSuccessMessage(
+            ResultTitle(
                 currentState = ActionFinished(
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
@@ -299,7 +298,7 @@ private fun DarkActionFinishedPreview() {
         Surface {
             val context = LocalContext.current
             @SuppressLint("LocalContextGetResourceValueCall")
-            ResultSuccessMessage(
+            ResultTitle(
                 currentState = ActionFinished(
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
@@ -334,7 +333,7 @@ private fun ActionFinishedFeatureNotAvailablePreview() {
             Column {
                 val context = LocalContext.current
                 @SuppressLint("LocalContextGetResourceValueCall")
-                ResultSuccessMessage(
+                ResultTitle(
                     currentState = ActionFinished(
                         source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         points = persistentListOf(WGS84Point(NaivePoint.example)),
@@ -366,7 +365,7 @@ private fun DarkActionFinishedFeatureNotAvailablePreview() {
             Column {
                 val context = LocalContext.current
                 @SuppressLint("LocalContextGetResourceValueCall")
-                ResultSuccessMessage(
+                ResultTitle(
                     currentState = ActionFinished(
                         source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         points = persistentListOf(WGS84Point(NaivePoint.example)),
@@ -404,7 +403,7 @@ private fun ActionWaitingPreview() {
             )
             val output = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
-            ResultSuccessMessage(
+            ResultTitle(
                 currentState = ActionWaiting(
                     stateContext = ConversionStateContext(
                         linkRepository = FakeLinkRepository(),
@@ -455,7 +454,7 @@ private fun DarkActionWaitingPreview() {
             )
             val output = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
-            ResultSuccessMessage(
+            ResultTitle(
                 currentState = ActionWaiting(
                     stateContext = ConversionStateContext(
                         linkRepository = FakeLinkRepository(),
@@ -505,7 +504,7 @@ private fun LocationPermissionReceivedPreview() {
                 coordinateConverter = coordinateConverter,
             )
             @SuppressLint("LocalContextGetResourceValueCall")
-            ResultSuccessMessage(
+            ResultTitle(
                 currentState = LocationPermissionReceived(
                     stateContext = ConversionStateContext(
                         linkRepository = FakeLinkRepository(),
@@ -554,7 +553,7 @@ private fun DarkLocationPermissionReceivedPreview() {
                 coordinateConverter = coordinateConverter,
             )
             @SuppressLint("LocalContextGetResourceValueCall")
-            ResultSuccessMessage(
+            ResultTitle(
                 currentState = LocationPermissionReceived(
                     stateContext = ConversionStateContext(
                         linkRepository = FakeLinkRepository(),
@@ -599,7 +598,7 @@ private fun SucceededPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             @SuppressLint("LocalContextGetResourceValueCall")
-            ResultSuccessMessage(
+            ResultTitle(
                 currentState = ActionSucceeded(
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
@@ -636,7 +635,7 @@ private fun DarSucceededPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             @SuppressLint("LocalContextGetResourceValueCall")
-            ResultSuccessMessage(
+            ResultTitle(
                 currentState = ActionSucceeded(
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
@@ -673,7 +672,7 @@ private fun FailedPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             @SuppressLint("LocalContextGetResourceValueCall")
-            ResultSuccessMessage(
+            ResultTitle(
                 currentState = ActionFailed(
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
@@ -710,7 +709,7 @@ private fun DarkFailedPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             @SuppressLint("LocalContextGetResourceValueCall")
-            ResultSuccessMessage(
+            ResultTitle(
                 currentState = ActionFailed(
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
