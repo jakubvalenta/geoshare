@@ -141,7 +141,7 @@ import page.ooooo.geoshare.ui.components.StyledSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.ConversionWebView
 import page.ooooo.geoshare.ui.components.MainForm
-import page.ooooo.geoshare.ui.components.MainFormLinks
+import page.ooooo.geoshare.ui.components.MainHelp
 import page.ooooo.geoshare.ui.components.MainHeadline
 import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
@@ -597,7 +597,7 @@ private fun MainScreen(
                                         onSubmit = onStart,
                                         onUpdateInput = onUpdateInput,
                                     )
-                                    MainFormLinks(
+                                    MainHelp(
                                         allInputs = allInputs,
                                         modifier = Modifier.padding(top = spacing.largeAdaptive),
                                         onNavigateToInputsScreen = onNavigateToInputsScreen,
@@ -747,7 +747,7 @@ private fun MainScreen(
                                 )
 
                             is Initial ->
-                                MainFormLinks(
+                                MainHelp(
                                     allInputs = allInputs,
                                     onNavigateToInputsScreen = onNavigateToInputsScreen,
                                     onNavigateToIntroScreen = onNavigateToIntroScreen,

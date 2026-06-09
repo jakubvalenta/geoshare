@@ -22,9 +22,8 @@ import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
-// TODO Rename MainFormLinks to MainHelp
 @Composable
-fun MainFormLinks(
+fun MainHelp(
     allInputs: List<Input>,
     modifier: Modifier = Modifier,
     onNavigateToInputsScreen: () -> Unit,
@@ -83,7 +82,7 @@ fun MainFormLinks(
 private fun DefaultPreview() {
     AppTheme {
         Surface {
-            MainFormLinks(
+            MainHelp(
                 allInputs = emptyList(),
                 onNavigateToInputsScreen = {},
                 onNavigateToIntroScreen = {},
@@ -99,7 +98,7 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         Surface {
-            MainFormLinks(
+            MainHelp(
                 allInputs = emptyList(),
                 onNavigateToInputsScreen = {},
                 onNavigateToIntroScreen = {},
