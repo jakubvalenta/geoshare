@@ -119,7 +119,7 @@ class ServerHttpClientFactory @Inject constructor(
                     .body<ChallengeResponse>().challenge.base64Decode()
             } catch (e: ClientRequestException) {
                 with(e.response) {
-                    log.e(TAG, "Login challenge failed: ${status.value} ${bodyAsErrorMessage()}")
+                    log.e(TAG, "Login challenge error ${status.value} ${bodyAsErrorMessage()}")
                 }
                 throw e
             }
@@ -144,7 +144,7 @@ class ServerHttpClientFactory @Inject constructor(
                     return null
                 }
                 with(e.response) {
-                    log.e(TAG, "Login failed: ${status.value} ${bodyAsErrorMessage()}")
+                    log.e(TAG, "Login error ${status.value} ${bodyAsErrorMessage()}")
                 }
                 throw e
             }
@@ -172,7 +172,7 @@ class ServerHttpClientFactory @Inject constructor(
                     .body<ChallengeResponse>().challenge.base64Decode()
             } catch (e: ClientRequestException) {
                 with(e.response) {
-                    log.e(TAG, "Registration challenge failed: ${status.value} ${bodyAsErrorMessage()}")
+                    log.e(TAG, "Registration challenge error ${status.value} ${bodyAsErrorMessage()}")
                 }
                 throw e
             }
@@ -198,7 +198,7 @@ class ServerHttpClientFactory @Inject constructor(
                     .body<TokenResponse>().token
             } catch (e: ClientRequestException) {
                 with(e.response) {
-                    log.e(TAG, "Registration failed: ${status.value} ${bodyAsErrorMessage()}")
+                    log.e(TAG, "Registration error ${status.value} ${bodyAsErrorMessage()}")
                 }
                 throw e
             }
@@ -219,6 +219,6 @@ class ServerHttpClientFactory @Inject constructor(
     }
 
     private companion object {
-        private const val TAG = "ServerHttpClientFactory"
+        private const val TAG = "ServerHttpClient"
     }
 }
