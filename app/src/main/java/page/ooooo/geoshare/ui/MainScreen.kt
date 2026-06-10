@@ -879,15 +879,14 @@ private fun MainLoadingIndicator(
         LoadingIndicator(
             Modifier
                 .size(96.dp)
-                .align(Alignment.CenterHorizontally)
-                .padding(top = spacing.smallAdaptive),
+                .align(Alignment.CenterHorizontally),
             color = MaterialTheme.colorScheme.tertiary,
         )
         Button(
             onCancel,
             Modifier
                 .align(Alignment.CenterHorizontally)
-                .padding(top = spacing.smallAdaptive, bottom = spacing.mediumAdaptive),
+                .padding(vertical = spacing.small),
             colors = ButtonDefaults.elevatedButtonColors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                 contentColor = MaterialTheme.colorScheme.onSurface,
@@ -898,7 +897,7 @@ private fun MainLoadingIndicator(
         loadingIndicator.description?.let { description ->
             Text(
                 description,
-                Modifier.padding(bottom = spacing.mediumAdaptive),
+                Modifier.padding(bottom = spacing.small),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyMedium,
             )
@@ -969,7 +968,7 @@ private fun MainCopySourceButton(
             },
             Modifier
                 .padding(start = 4.dp)
-                .padding(top = spacing.tinyAdaptive),
+                .padding(top = spacing.tiny),
         ) {
             Text(stringResource(R.string.conversion_succeeded_skip))
         }
