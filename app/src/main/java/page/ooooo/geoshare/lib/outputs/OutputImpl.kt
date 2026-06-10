@@ -203,7 +203,7 @@ sealed interface SharePointOutput :
 
     @Composable
     override fun automationWaitingText(counterSec: Int, appDetails: AppDetails) =
-        pluralStringResource(R.plurals.conversion_automation_share_waiting, counterSec)
+        pluralStringResource(R.plurals.conversion_automation_share_waiting, counterSec, counterSec)
 }
 
 sealed interface SharePointsOutput :

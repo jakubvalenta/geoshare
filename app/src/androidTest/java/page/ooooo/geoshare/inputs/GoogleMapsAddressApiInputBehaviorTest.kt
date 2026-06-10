@@ -301,8 +301,8 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
         } else {
             testUriFails(
                 setOf(
-                    "This link is not supported"
-                    // TODO Add French translation
+                    "This link is not supported",
+                    @Suppress("SpellCheckingInspection") "Ce lien n’est pas pris en charge",
                 ),
                 "https://www.google.com/maps/place//",
             )

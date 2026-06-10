@@ -21,10 +21,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.billing.BillingProduct
+import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable
-fun MainHeadline(@StringRes appNameResId: Int, modifier: Modifier = Modifier, iconEnabled: Boolean = true) {
+fun MainHeadline(
+    @StringRes billingAppNameResId: Int,
+    billingStatus: BillingStatus,
+    modifier: Modifier = Modifier,
+    iconEnabled: Boolean = true,
+) {
     val iconSize = with(LocalDensity.current) { MaterialTheme.typography.headlineLarge.fontSize.toDp() * 2f }
     val space = 4.dp
 
@@ -48,7 +55,13 @@ fun MainHeadline(@StringRes appNameResId: Int, modifier: Modifier = Modifier, ic
             )
         }
         Text(
-            stringResource(appNameResId),
+            stringResource(
+                if (billingStatus is BillingStatus.Purchased) {
+                    billingAppNameResId
+                } else {
+                    R.string.app_name
+                }
+            ),
             Modifier.testTag("geoShareAppHeadlineText"),
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.headlineLarge,
@@ -63,7 +76,10 @@ fun MainHeadline(@StringRes appNameResId: Int, modifier: Modifier = Modifier, ic
 private fun DefaultPreview() {
     AppTheme {
         Surface {
-            MainHeadline(appNameResId = R.string.app_name)
+            MainHeadline(
+                billingAppNameResId = R.string.app_name_pro,
+                billingStatus = BillingStatus.NotPurchased(),
+            )
         }
     }
 }
@@ -73,7 +89,10 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         Surface {
-            MainHeadline(appNameResId = R.string.app_name)
+            MainHeadline(
+                billingAppNameResId = R.string.app_name_pro,
+                billingStatus = BillingStatus.NotPurchased(),
+            )
         }
     }
 }
@@ -83,7 +102,15 @@ private fun DarkPreview() {
 private fun PurchasedPreview() {
     AppTheme {
         Surface {
-            MainHeadline(appNameResId = R.string.app_name_pro)
+            MainHeadline(
+                billingAppNameResId = R.string.app_name_pro,
+                billingStatus = BillingStatus.Purchased(
+                    BillingProduct("test", BillingProduct.Type.DONATION),
+                    expired = false,
+                    refundable = true,
+                    token = "test_purchased",
+                ),
+            )
         }
     }
 }
@@ -93,7 +120,15 @@ private fun PurchasedPreview() {
 private fun DarkPurchasedPreview() {
     AppTheme {
         Surface {
-            MainHeadline(appNameResId = R.string.app_name_pro)
+            MainHeadline(
+                billingAppNameResId = R.string.app_name_pro,
+                billingStatus = BillingStatus.Purchased(
+                    BillingProduct("test", BillingProduct.Type.DONATION),
+                    expired = false,
+                    refundable = true,
+                    token = "test_purchased",
+                ),
+            )
         }
     }
 }

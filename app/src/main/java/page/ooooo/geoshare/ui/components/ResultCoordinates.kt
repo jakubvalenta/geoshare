@@ -50,7 +50,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun ResultSuccessCoordinates(
+fun ResultCoordinates(
     points: Points,
     appDetails: AppDetails,
     coordinateFormat: CoordinateFormat,
@@ -66,18 +66,6 @@ fun ResultSuccessCoordinates(
     var expanded by remember { mutableStateOf(initialExpanded) }
 
     Column {
-        Headline(
-            lastPoint.cleanName
-                ?: if (points.size > 1) {
-                    stringResource(R.string.conversion_succeeded_point_last)
-                } else {
-                    stringResource(R.string.conversion_succeeded_title)
-                },
-            Modifier
-                .testTag("geoShareResultSuccessLastPointName")
-                .padding(horizontal = spacing.windowPadding)
-                .padding(top = 4.dp), // Align with the "Open with..." headline on wide screen
-        )
         Row(
             Modifier
                 .fillMaxWidth()
@@ -251,7 +239,7 @@ private fun DefaultPreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
-            ResultSuccessCoordinates(
+            ResultCoordinates(
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
@@ -279,7 +267,7 @@ private fun DarkPreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
-            ResultSuccessCoordinates(
+            ResultCoordinates(
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
@@ -307,7 +295,7 @@ private fun DescriptionPreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
-            ResultSuccessCoordinates(
+            ResultCoordinates(
                 points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI)),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
@@ -335,7 +323,7 @@ private fun DarkDescriptionPreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
-            ResultSuccessCoordinates(
+            ResultCoordinates(
                 points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI)),
                 appDetails = emptyMap(),
                 coordinateFormat = CoordinateFormat.DEC,
@@ -363,7 +351,7 @@ private fun NamePreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
-            ResultSuccessCoordinates(
+            ResultCoordinates(
                 points = persistentListOf(
                     WGS84Point(NaivePoint.example),
                     GCJ02Point(31.22850685422705, 121.47552456472106, z = 11.0, source = Source.MAP_CENTER),
@@ -394,7 +382,7 @@ private fun DarkNamePreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
-            ResultSuccessCoordinates(
+            ResultCoordinates(
                 points = persistentListOf(
                     WGS84Point(NaivePoint.example),
                     GCJ02Point(31.22850685422705, 121.47552456472106, z = 11.0, source = Source.MAP_CENTER),
@@ -425,7 +413,7 @@ private fun PointsPreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
-            ResultSuccessCoordinates(
+            ResultCoordinates(
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.genRandomPoint()),
@@ -462,7 +450,7 @@ private fun DarkPointsPreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
-            ResultSuccessCoordinates(
+            ResultCoordinates(
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.genRandomPoint()),
@@ -499,7 +487,7 @@ private fun PointsWithNamePreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
-            ResultSuccessCoordinates(
+            ResultCoordinates(
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.genRandomPoint()),
@@ -532,7 +520,7 @@ private fun DarkPointsWithNamePreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
-            ResultSuccessCoordinates(
+            ResultCoordinates(
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.genRandomPoint()),

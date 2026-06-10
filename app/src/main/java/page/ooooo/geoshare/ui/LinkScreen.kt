@@ -6,9 +6,13 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Delete
@@ -40,7 +44,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
@@ -68,7 +71,7 @@ import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.Srs
-import page.ooooo.geoshare.ui.components.BasicListDetailScaffold
+import page.ooooo.geoshare.ui.components.StyledListDetailPaneScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.FeatureBadgeSmall
 import page.ooooo.geoshare.ui.components.FeatureBadged
@@ -77,9 +80,10 @@ import page.ooooo.geoshare.ui.components.LinkForm
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
 import page.ooooo.geoshare.ui.components.ParagraphText
-import page.ooooo.geoshare.ui.components.ScrollablePane
+import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
 import page.ooooo.geoshare.ui.components.SegmentedList
 import page.ooooo.geoshare.ui.components.SegmentedListLabel
+import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -226,10 +230,10 @@ private fun LinkScreen(
     ) {
         // Use BasicListDetailScaffold instead of NavigableBasicListDetailScaffold, because the latter navigates using
         // the navigator when back button is pressed, but we want to do all navigation ourselves using the view model.
-        BasicListDetailScaffold(
+        StyledListDetailPaneScaffold(
             directive = navigator.scaffoldDirective,
             scaffoldState = navigator.scaffoldState,
-            listPane = { _, containerColor ->
+            listPane = {
                 // Use destination coming from view model, because if we use navigator.currentDestination?.contentKey,
                 // fields get briefly rendered with empty values when switching from detail to list.
                 LinkListPane(
@@ -237,7 +241,6 @@ private fun LinkScreen(
                     all = all,
                     billingFeatures = billingFeatures,
                     billingStatus = billingStatus,
-                    containerColor = containerColor,
                     onBack = onBack,
                     onDisable = onDisable,
                     onEnable = onEnable,
@@ -281,7 +284,9 @@ private fun LinkScreen(
                     )
                 }
             },
-            listContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+            colors = StyledPaneScaffoldDefaults.colors(
+                wideMainContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+            ),
         )
     }
 }
@@ -292,7 +297,6 @@ private fun LinkListPane(
     all: List<Link>,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
-    containerColor: Color,
     onBack: () -> Unit,
     onDisable: (uid: Int) -> Unit,
     onEnable: (uid: Int) -> Unit,
@@ -302,124 +306,127 @@ private fun LinkListPane(
     val spacing = LocalSpacing.current
     val (restoreInitialDataDialogOpen, setRestoreInitialDataDialogOpen) = retain { mutableStateOf(false) }
 
-    ScrollablePane(
+    LargeTopAppBarPane(
         title = {
             Text(stringResource(R.string.links_title))
         },
         onBack = onBack,
-        modifier = Modifier
-            .padding(horizontal = spacing.windowPadding)
-            .testTag("geoShareLinkListPane"),
-        containerColor = containerColor,
     ) {
-        item {
-            ParagraphText(
-                stringResource(R.string.links_description),
-                Modifier.padding(top = spacing.tinyAdaptive, bottom = spacing.smallAdaptive),
-            )
-        }
-        item {
-            FeatureBadged(
-                enabled = CustomLinkFeature in billingFeatures && billingStatus !is BillingStatus.Loading && billingStatus !is BillingStatus.Purchased,
-                badge = { modifier ->
-                    FeatureBadgeSmall(
-                        { onNavigateToContentKey(-1) },
-                        modifier.testTag("geoShareCustomLinkFeatureBadge"),
-                    )
-                },
-            ) { modifier ->
-                Button(
-                    { onNavigateToContentKey(-1) },
-                    modifier.testTag("geoShareLinkListInsert"),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        contentColor = MaterialTheme.colorScheme.onSecondary,
-                    ),
-                ) {
-                    Text(stringResource(R.string.links_insert))
-                }
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(horizontal = spacing.windowPadding)
+                .testTag("geoShareLinkListPane"),
+        ) {
+            item {
+                ParagraphText(
+                    stringResource(R.string.links_description),
+                    Modifier.padding(top = spacing.tinyAdaptive, bottom = spacing.smallAdaptive),
+                )
             }
-        }
-        all
-            .groupBy { it.groupOrName }
-            .toSortedMap()
-            .forEach { (group, links) ->
-                item {
-                    if (group.isNotEmpty()) {
-                        SegmentedListLabel(group)
-                    } else {
-                        Spacer(Modifier.height(spacing.mediumAdaptive))
+            item {
+                FeatureBadged(
+                    enabled = CustomLinkFeature in billingFeatures && billingStatus !is BillingStatus.Loading && billingStatus !is BillingStatus.Purchased,
+                    badge = { modifier ->
+                        FeatureBadgeSmall(
+                            { onNavigateToContentKey(-1) },
+                            modifier.testTag("geoShareCustomLinkFeatureBadge"),
+                        )
+                    },
+                ) { modifier ->
+                    Button(
+                        { onNavigateToContentKey(-1) },
+                        modifier.testTag("geoShareLinkListInsert"),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            contentColor = MaterialTheme.colorScheme.onSecondary,
+                        ),
+                    ) {
+                        Text(stringResource(R.string.links_insert))
                     }
                 }
-                item {
-                    SegmentedList(
-                        values = links,
-                        itemHeadline = { it.name },
-                        itemIsSelected = { it.uid == destination },
-                        itemOnClick = {
-                            if (!it.enabled) {
-                                onEnable(it.uid)
-                            } else {
-                                onDisable(it.uid)
-                            }
-                        },
-                        itemLeadingContent = {
-                            {
-                                Checkbox(
-                                    checked = it.enabled,
-                                    // Null recommended for accessibility with screen readers
-                                    onCheckedChange = null,
-                                    modifier = Modifier.testTag("geoShareLinkListItemToggle_${it.uuid}"),
-                                )
-                            }
-                        },
-                        itemTrailingContent = {
-                            {
-                                var expanded by remember { mutableStateOf(false) }
+            }
+            all
+                .groupBy { it.groupOrName }
+                .toSortedMap()
+                .forEach { (group, links) ->
+                    item {
+                        if (group.isNotEmpty()) {
+                            SegmentedListLabel(group)
+                        } else {
+                            Spacer(Modifier.height(spacing.mediumAdaptive))
+                        }
+                    }
+                    item {
+                        SegmentedList(
+                            values = links,
+                            itemHeadline = { it.name },
+                            itemIsSelected = { it.uid == destination },
+                            itemOnClick = {
+                                if (!it.enabled) {
+                                    onEnable(it.uid)
+                                } else {
+                                    onDisable(it.uid)
+                                }
+                            },
+                            itemLeadingContent = {
+                                {
+                                    Checkbox(
+                                        checked = it.enabled,
+                                        // Null recommended for accessibility with screen readers
+                                        onCheckedChange = null,
+                                        modifier = Modifier.testTag("geoShareLinkListItemToggle_${it.uuid}"),
+                                    )
+                                }
+                            },
+                            itemTrailingContent = {
+                                {
+                                    var expanded by remember { mutableStateOf(false) }
 
-                                Box {
-                                    IconButton(
-                                        { expanded = true },
-                                        Modifier.testTag("geoShareLinkListItemMenu_${it.uuid}"),
-                                    ) {
-                                        Icon(
-                                            painterResource(R.drawable.more_vert_24px),
-                                            contentDescription = stringResource(R.string.nav_menu_content_description),
-                                        )
-                                    }
-                                    DropdownMenu(
-                                        expanded = expanded,
-                                        onDismissRequest = { expanded = false },
-                                        modifier = Modifier.semantics { testTagsAsResourceId = true },
-                                        shape = ShapeDefaults.Large,
-                                        containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                                    ) {
-                                        DropdownMenuItem(
-                                            text = { Text(stringResource(R.string.links_update)) },
-                                            modifier = Modifier.testTag("geoShareLinkListItemMenuDetail_${it.uuid}"),
-                                            onClick = {
-                                                expanded = false
-                                                onNavigateToContentKey(it.uid)
-                                            },
-                                        )
+                                    Box {
+                                        IconButton(
+                                            { expanded = true },
+                                            Modifier.testTag("geoShareLinkListItemMenu_${it.uuid}"),
+                                        ) {
+                                            Icon(
+                                                painterResource(R.drawable.more_vert_24px),
+                                                contentDescription = stringResource(R.string.nav_menu_content_description),
+                                            )
+                                        }
+                                        DropdownMenu(
+                                            expanded = expanded,
+                                            onDismissRequest = { expanded = false },
+                                            modifier = Modifier.semantics { testTagsAsResourceId = true },
+                                            shape = ShapeDefaults.Large,
+                                            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                                        ) {
+                                            DropdownMenuItem(
+                                                text = { Text(stringResource(R.string.links_update)) },
+                                                modifier = Modifier.testTag("geoShareLinkListItemMenuDetail_${it.uuid}"),
+                                                onClick = {
+                                                    expanded = false
+                                                    onNavigateToContentKey(it.uid)
+                                                },
+                                            )
+                                        }
                                     }
                                 }
-                            }
-                        },
-                        itemTestTag = { "geoShareLinkListItem_${it.uuid}" },
-                        sort = true,
-                    )
+                            },
+                            itemTestTag = { "geoShareLinkListItem_${it.uuid}" },
+                            sort = true,
+                        )
+                    }
                 }
-            }
-        item {
-            TextButton(
-                onClick = { setRestoreInitialDataDialogOpen(true) },
-                modifier = Modifier
-                    .testTag("geoShareLinkRestoreInitialButton")
-                    .padding(top = spacing.mediumAdaptive, bottom = spacing.tinyAdaptive),
-                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
-            ) {
-                Text(stringResource(R.string.links_restore_initial_data))
+            item {
+                TextButton(
+                    onClick = { setRestoreInitialDataDialogOpen(true) },
+                    modifier = Modifier
+                        .testTag("geoShareLinkRestoreInitialButton")
+                        .padding(top = spacing.mediumAdaptive, bottom = spacing.tinyAdaptive),
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                ) {
+                    Text(stringResource(R.string.links_restore_initial_data))
+                }
             }
         }
     }
@@ -479,7 +486,7 @@ private fun LinkDetailPane(
 
     Box {
         Column {
-            ScrollablePane(
+            LargeTopAppBarPane(
                 title = {
                     Text(
                         stringResource(if (destination == -1) R.string.links_insert else R.string.links_update),
@@ -487,7 +494,6 @@ private fun LinkDetailPane(
                     )
                 },
                 onBack = onBack.takeUnless { wide },
-                modifier = Modifier.testTag("geoShareLinkDetailPane"),
                 actions = {
                     if (destination != -1) {
                         IconButton(
@@ -503,7 +509,13 @@ private fun LinkDetailPane(
                 },
                 navigationImageVector = Icons.Default.Close,
             ) {
-                item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = spacing.windowPadding)
+                        .testTag("geoShareLinkDetailPane"),
+                ) {
                     LinkForm(
                         appEnabled = appEnabled,
                         chipEnabled = chipEnabled,

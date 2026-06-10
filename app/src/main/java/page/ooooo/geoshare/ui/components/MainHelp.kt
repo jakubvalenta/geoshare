@@ -23,7 +23,7 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
-fun MainFormLinks(
+fun MainHelp(
     allInputs: List<Input>,
     modifier: Modifier = Modifier,
     onNavigateToInputsScreen: () -> Unit,
@@ -34,10 +34,7 @@ fun MainFormLinks(
     val resources = LocalResources.current
     val spacing = LocalSpacing.current
 
-    Column(
-        modifier
-            .padding(horizontal = spacing.windowPadding),
-    ) {
+    Column(modifier.padding(horizontal = spacing.windowPadding)) {
         TextButton(onNavigateToInputsScreen) {
             Icon(
                 Icons.Outlined.Info,
@@ -85,7 +82,7 @@ fun MainFormLinks(
 private fun DefaultPreview() {
     AppTheme {
         Surface {
-            MainFormLinks(
+            MainHelp(
                 allInputs = emptyList(),
                 onNavigateToInputsScreen = {},
                 onNavigateToIntroScreen = {},
@@ -101,7 +98,7 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         Surface {
-            MainFormLinks(
+            MainHelp(
                 allInputs = emptyList(),
                 onNavigateToInputsScreen = {},
                 onNavigateToIntroScreen = {},

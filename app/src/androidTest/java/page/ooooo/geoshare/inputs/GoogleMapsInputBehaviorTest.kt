@@ -172,7 +172,7 @@ class GoogleMapsInputBehaviorTest {
                     ),
                 ),
                 "https://maps.google.com/maps?client=firefox-b-m&um=1&ie=UTF-8&fb=1&gl=eg&sa=X&ftid=0x1458411f8f55adbb:0xbc693e01227e010d",
-                fallbackNames = setOf("السيرك+القومى+بالجيزة"),
+                fallbackNames = setOf("السيرك القومى بالجيزة\u202D"),
             )
         } else {
             testUriFails(
