@@ -27,12 +27,12 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable
-fun InputsSettingsButton(onClick: () -> Unit) {
+fun InputsSettingsButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
     val appName = stringResource(R.string.app_name)
 
     Button(
         onClick = onClick,
-        modifier = Modifier.widthIn(max = 400.dp),
+        modifier = modifier.widthIn(max = 400.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,

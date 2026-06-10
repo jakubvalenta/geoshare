@@ -25,8 +25,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -482,149 +480,56 @@ private fun MainScreen(
     ) {
         StyledSupportingPaneScaffold(
             mainPane = { innerPadding, wide ->
-                LargeTopAppBarPane(
-                    title = {
-                        MainTitle(
-                            currentState = currentState,
-                            billingAppNameResId = billingAppNameResId,
-                            billingStatus = billingStatus,
-                            largeLoadingIndicator = largeLoadingIndicator,
-                        )
-                    },
-                    onBack = if (currentState !is Initial) {
-                        onReset
-                    } else {
-                        null
-                    },
-                    actions = {
-                        if (!wide) {
-                            MainMenu(
+                Column(Modifier.weight(1f)) {
+                    LargeTopAppBarPane(
+                        modifier = Modifier.testTag("geoShareMainPane"),
+                        title = {
+                            MainTitle(
                                 currentState = currentState,
                                 billingAppNameResId = billingAppNameResId,
                                 billingStatus = billingStatus,
-                                changelogShown = changelogShown,
-                                onNavigateToAboutScreen = onNavigateToAboutScreen,
-                                onNavigateToBillingScreen = onNavigateToBillingScreen,
-                                onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                onNavigateToIntroScreen = onNavigateToIntroScreen,
-                                onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
+                                largeLoadingIndicator = largeLoadingIndicator,
                             )
-                        }
-                    },
-                    expandedHeight = if (currentState is Initial) {
-                        TopAppBarDefaults.LargeAppBarExpandedHeight + spacing.headlineTopAdaptive
-                    } else {
-                        TopAppBarDefaults.LargeAppBarExpandedHeight
-                    },
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .verticalScroll(rememberScrollState())
-                            .testTag("geoShareMainPane"),
+                        },
+                        onBack = if (currentState !is Initial) {
+                            onReset
+                        } else {
+                            null
+                        },
+                        actions = {
+                            if (!wide) {
+                                MainMenu(
+                                    currentState = currentState,
+                                    billingAppNameResId = billingAppNameResId,
+                                    billingStatus = billingStatus,
+                                    changelogShown = changelogShown,
+                                    onNavigateToAboutScreen = onNavigateToAboutScreen,
+                                    onNavigateToBillingScreen = onNavigateToBillingScreen,
+                                    onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                    onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                    onNavigateToIntroScreen = onNavigateToIntroScreen,
+                                    onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
+                                )
+                            }
+                        },
+                        expandedHeight = if (currentState is Initial) {
+                            TopAppBarDefaults.LargeAppBarExpandedHeight + spacing.largeAdaptive
+                        } else {
+                            TopAppBarDefaults.LargeAppBarExpandedHeight
+                        },
                     ) {
                         if (!wide) {
                             when (currentState) {
                                 is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
-                                    MainLoadingIndicator(
-                                        loadingIndicator = largeLoadingIndicator,
-                                        onCancel = onCancel,
-                                    )
-
-                                is ConversionState.HasError ->
-                                    ResultError(
-                                        source = currentState.source,
-                                        message = currentState.message,
-                                        details = currentState.details,
-                                        onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                        onRetry = onRetry,
-                                    )
-
-                                is ConversionState.HasResult -> {
-                                    ResultCoordinates(
-                                        points = currentState.points,
-                                        appDetails = appDetails,
-                                        coordinateConverter = coordinateConverter,
-                                        coordinateFormat = coordinateFormat,
-                                        outputsForPointChips = outputsForPointChips,
-                                        outputsForPointsChips = outputsForPointsChips,
-                                        onExecute = onExecute,
-                                        onSelect = { index ->
-                                            onCancel()
-                                            setSelectedPointIndex(index)
-                                        },
-                                    )
-                                    Column(
-                                        // This column must not have weight(1f), otherwise the last row of app icons gets shrunk
-                                        Modifier
-                                            .fillMaxWidth()
-                                            .background(MaterialTheme.colorScheme.surface)
-                                    ) {
-                                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                                            ResultTitle(
-                                                currentState = currentState,
-                                                appDetails = appDetails,
-                                                billingFeatures = billingFeatures,
-                                                billingStatus = billingStatus,
-                                                modifier = Modifier
-                                                    .padding(horizontal = spacing.windowPadding)
-                                                    .padding(top = spacing.largeAdaptive),
-                                                onCancel = onCancel,
-                                                onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
-                                            )
-                                            ResultApps(
-                                                appDetails = appDetails,
-                                                outputsForApps = outputsForApps,
-                                                outputsForLinks = outputsForLinks,
-                                                outputsForSharing = outputsForSharing,
-                                                points = currentState.points,
-                                                onDisableLinkGroup = onDisableLinkGroup,
-                                                onExecute = onExecute,
-                                                onHideApp = onHideApp,
-                                                onNavigateToLinkScreen = onNavigateToLinkScreen,
-                                            )
-                                        }
-                                    }
-                                }
-
-                                is Initial -> {
-                                    MainForm(
-                                        source = source,
-                                        errorMessageResId = errorMessageResId,
-                                        inputRepository = inputRepository,
-                                        onSetErrorMessageResId = setErrorMessageResId,
-                                        onSubmit = onStart,
-                                        onUpdateInput = onUpdateInput,
-                                    )
-                                }
-                            }
-                        } else if (currentState is Initial) {
-                            MainForm(
-                                source = source,
-                                errorMessageResId = errorMessageResId,
-                                inputRepository = inputRepository,
-                                onSetErrorMessageResId = setErrorMessageResId,
-                                onSubmit = onStart,
-                                onUpdateInput = onUpdateInput,
-                            )
-                        } else {
-                            Card(
-                                colors = CardDefaults.cardColors(
-                                    containerColor = mainContainerColor,
-                                    contentColor = mainContentColor,
-                                ),
-                            ) {
-                                Spacer(Modifier.height(spacing.mediumAdaptive))
-
-                                when (currentState) {
-                                    is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
+                                    item {
                                         MainLoadingIndicator(
                                             loadingIndicator = largeLoadingIndicator,
                                             onCancel = onCancel,
                                         )
+                                    }
 
-                                    is ConversionState.HasError ->
+                                is ConversionState.HasError ->
+                                    item {
                                         ResultError(
                                             source = currentState.source,
                                             message = currentState.message,
@@ -632,8 +537,10 @@ private fun MainScreen(
                                             onNavigateToInputsScreen = onNavigateToInputsScreen,
                                             onRetry = onRetry,
                                         )
+                                    }
 
-                                    is ConversionState.HasResult -> {
+                                is ConversionState.HasResult -> {
+                                    item {
                                         ResultCoordinates(
                                             points = currentState.points,
                                             appDetails = appDetails,
@@ -648,44 +555,145 @@ private fun MainScreen(
                                             },
                                         )
                                     }
+                                    item {
+                                        Column(
+                                            // This column must not have weight(1f), otherwise the last row of app icons gets shrunk
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .background(MaterialTheme.colorScheme.surface)
+                                        ) {
+                                            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                                                ResultTitle(
+                                                    currentState = currentState,
+                                                    appDetails = appDetails,
+                                                    billingFeatures = billingFeatures,
+                                                    billingStatus = billingStatus,
+                                                    modifier = Modifier
+                                                        .padding(horizontal = spacing.windowPadding)
+                                                        .padding(top = spacing.largeAdaptive),
+                                                    onCancel = onCancel,
+                                                    onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
+                                                )
+                                                ResultApps(
+                                                    appDetails = appDetails,
+                                                    outputsForApps = outputsForApps,
+                                                    outputsForLinks = outputsForLinks,
+                                                    outputsForSharing = outputsForSharing,
+                                                    points = currentState.points,
+                                                    onDisableLinkGroup = onDisableLinkGroup,
+                                                    onExecute = onExecute,
+                                                    onHideApp = onHideApp,
+                                                    onNavigateToLinkScreen = onNavigateToLinkScreen,
+                                                )
+                                            }
+                                        }
+                                    }
                                 }
-                            }
-                        }
 
-                        Column(
-                            Modifier
-                                .weight(1f)
-                                .fillMaxWidth()
-                                .background(MaterialTheme.colorScheme.surface)
-                        ) {
-                            if (currentState is PermissionGrantedWebViewInput) {
-                                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                                    MainWebView(
-                                        matchedInput = currentState.matchedInput,
-                                        onExtractionSettle = { currentState.onExtractionSettle(it) },
-                                    )
+                                is Initial ->
+                                    item {
+                                        MainForm(
+                                            source = source,
+                                            errorMessageResId = errorMessageResId,
+                                            inputRepository = inputRepository,
+                                            onSetErrorMessageResId = setErrorMessageResId,
+                                            onSubmit = onStart,
+                                            onUpdateInput = onUpdateInput,
+                                        )
+                                    }
+                            }
+                        } else if (currentState is Initial) {
+                            item {
+                                MainForm(
+                                    source = source,
+                                    errorMessageResId = errorMessageResId,
+                                    inputRepository = inputRepository,
+                                    onSetErrorMessageResId = setErrorMessageResId,
+                                    onSubmit = onStart,
+                                    onUpdateInput = onUpdateInput,
+                                )
+                            }
+                        } else {
+                            item {
+                                Card(
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = mainContainerColor,
+                                        contentColor = mainContentColor,
+                                    ),
+                                ) {
+                                    Spacer(Modifier.height(spacing.mediumAdaptive))
+
+                                    when (currentState) {
+                                        is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
+                                            MainLoadingIndicator(
+                                                loadingIndicator = largeLoadingIndicator,
+                                                onCancel = onCancel,
+                                            )
+
+                                        is ConversionState.HasError ->
+                                            ResultError(
+                                                source = currentState.source,
+                                                message = currentState.message,
+                                                details = currentState.details,
+                                                onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                                onRetry = onRetry,
+                                            )
+
+                                        is ConversionState.HasResult -> {
+                                            ResultCoordinates(
+                                                points = currentState.points,
+                                                appDetails = appDetails,
+                                                coordinateConverter = coordinateConverter,
+                                                coordinateFormat = coordinateFormat,
+                                                outputsForPointChips = outputsForPointChips,
+                                                outputsForPointsChips = outputsForPointsChips,
+                                                onExecute = onExecute,
+                                                onSelect = { index ->
+                                                    onCancel()
+                                                    setSelectedPointIndex(index)
+                                                },
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
 
-                    if (currentState is ConversionState.HasSource) {
-                        MainCopySourceButton(
-                            source = currentState.source,
-                            innerPadding = innerPadding,
-                            containerColor = if (!wide) {
-                                MaterialTheme.colorScheme.surfaceContainer
-                            } else {
-                                Color.Transparent
-                            },
-                        )
-                    } else {
-                        Spacer(Modifier.padding(innerPadding))
+                    Column(
+                        Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.surface)
+                    ) {
+                        if (currentState is PermissionGrantedWebViewInput) {
+                            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                                MainWebView(
+                                    matchedInput = currentState.matchedInput,
+                                    onExtractionSettle = { currentState.onExtractionSettle(it) },
+                                )
+                            }
+                        }
                     }
+                }
+
+                if (currentState is ConversionState.HasSource) {
+                    MainCopySourceButton(
+                        source = currentState.source,
+                        innerPadding = innerPadding,
+                        containerColor = if (!wide) {
+                            MaterialTheme.colorScheme.surfaceContainer
+                        } else {
+                            Color.Transparent
+                        },
+                    )
+                } else {
+                    Spacer(Modifier.padding(innerPadding))
                 }
             },
             supportingPane = { wide ->
                 LargeTopAppBarPane(
+                    modifier = Modifier.testTag("geoShareMainSupportingPane"),
                     title = if (currentState is ConversionState.HasResult) {
                         {
                             ResultTitle(
@@ -717,15 +725,11 @@ private fun MainScreen(
                         }
                     },
                 ) {
-                    Column(
-                        Modifier
-                            .verticalScroll(rememberScrollState())
-                            .testTag("geoShareMainSupportingPane")
-                    ) {
-                        when (currentState) {
-                            is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null -> {}
+                    when (currentState) {
+                        is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null -> {}
 
-                            is ConversionState.HasResult ->
+                        is ConversionState.HasResult ->
+                            item {
                                 ResultApps(
                                     appDetails = appDetails,
                                     outputsForApps = outputsForApps,
@@ -737,7 +741,7 @@ private fun MainScreen(
                                     onHideApp = onHideApp,
                                     onNavigateToLinkScreen = onNavigateToLinkScreen,
                                 )
-                        }
+                            }
                     }
                 }
             },
@@ -1029,6 +1033,58 @@ private fun DefaultPreview() {
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DarkPreview() {
+    AppTheme {
+        val context = LocalContext.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        MainScreen(
+            currentState = Initial(),
+            appDetails = emptyMap(),
+            billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+            billingStatus = BillingStatus.NotPurchased(),
+            changelogShown = false,
+            coordinateConverter = coordinateConverter,
+            coordinateFormat = CoordinateFormat.DEC,
+            inputRepository = FakeInputRepository,
+            largeLoadingIndicator = null,
+            linkMessage = null,
+            outputsForApps = emptyMap(),
+            outputsForLinks = emptyMap(),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = emptyList(),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = emptyList(),
+            outputsForSharing = emptyList(),
+            source = "",
+            userPreferenceMessage = null,
+            onCancel = {},
+            onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
+            onDeny = {},
+            onExecute = {},
+            onGrant = {},
+            onHideApp = {},
+            onNavigateToAboutScreen = {},
+            onNavigateToBillingScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinkScreen = {},
+            onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+            onReset = {},
+            onRetry = {},
+            onStart = {},
+            onUpdateInput = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, device = Devices.NEXUS_5)
+@Composable
+private fun SmallPreview() {
     AppTheme {
         val context = LocalContext.current
         val geometries = Geometries(context)

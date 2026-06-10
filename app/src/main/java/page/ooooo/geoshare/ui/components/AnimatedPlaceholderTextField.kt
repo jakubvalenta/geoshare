@@ -3,9 +3,6 @@ package page.ooooo.geoshare.ui.components
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.SizeTransform
-import androidx.compose.animation.core.EaseInCubic
-import androidx.compose.animation.core.EaseInOutCubic
-import androidx.compose.animation.core.EaseOutCubic
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -97,11 +94,11 @@ fun AnimatedPlaceholderTextField(
 
     val animationDurationMs = placeholderAnimationDuration.inWholeMilliseconds.toInt()
     val enterTransition = slideInVertically(
-        animationSpec = tween(animationDurationMs, easing = EaseInOutCubic),
+        animationSpec = tween(animationDurationMs, easing = LinearEasing),
         initialOffsetY = { fullHeight -> fullHeight }
     ) + fadeIn(tween(animationDurationMs))
     val exitTransition = slideOutVertically(
-        animationSpec = tween(animationDurationMs, easing = EaseInOutCubic),
+        animationSpec = tween(animationDurationMs, easing = LinearEasing),
         targetOffsetY = { fullHeight -> -fullHeight }
     ) + fadeOut(tween(animationDurationMs))
 
