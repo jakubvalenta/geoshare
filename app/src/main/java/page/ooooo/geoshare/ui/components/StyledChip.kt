@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
+// TODO Rename StyledChip to OutlinedSuggestionChip
 @Composable
 fun StyledChip(
     label: String,
@@ -29,9 +30,38 @@ fun StyledChip(
         icon = icon,
         colors = colors,
         border = SuggestionChipDefaults.suggestionChipBorder(
-            enabled = true,
-            borderColor = LocalContentColor.current.copy(alpha = 0.5f),
-            disabledBorderColor = LocalContentColor.current.copy(alpha = 0.5f),
+            enabled = enabled,
+            borderColor = LocalContentColor.current.copy(alpha = 0.3f),
+            disabledBorderColor = LocalContentColor.current.copy(alpha = 0.3f),
+        ),
+        shape = MaterialTheme.shapes.medium,
+    )
+}
+
+@Composable
+fun FilledSuggestionChip(
+    label: String,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    icon: (@Composable () -> Unit)? = null,
+    colors: ChipColors = SuggestionChipDefaults.suggestionChipColors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+        labelColor = LocalContentColor.current,
+        iconContentColor = LocalContentColor.current,
+    ),
+    onClick: () -> Unit,
+) {
+    SuggestionChip(
+        onClick = onClick,
+        label = { Text(label) },
+        modifier = modifier,
+        enabled = enabled,
+        icon = icon,
+        colors = colors,
+        border = SuggestionChipDefaults.suggestionChipBorder(
+            enabled = enabled,
+            borderColor = LocalContentColor.current.copy(alpha = 0f),
+            disabledBorderColor = LocalContentColor.current.copy(alpha = 0f),
         ),
         shape = MaterialTheme.shapes.medium,
     )

@@ -96,13 +96,13 @@
     <string name="intro_nav_next">Next</string>
     <string name="intro_nav_finish">Get started</string>
     <string name="intro_settings_activity_not_found">Failed to open settings</string>
-    <string name="main_input_uri_label">Paste a map link here</string>
+    <string name="main_input_uri_label">Your map link</string>
     <string name="main_input_uri_clear_content_description">Clear</string>
     <string name="main_input_uri_paste_content_description">Paste</string>
-    <string name="main_input_uri_supporting_text">e.g. https://maps.app.goo.gl/&#8230; or maps.apple.com/&#8230;</string>
+    <string name="main_input_uri_supporting_text">Open in another map, show coordinates, save GPX&#8230;</string>
     <string name="main_create_geo_uri">Show coordinates</string>
     <string name="main_navigate_to_intro">Discover more app features</string>
-    <string name="main_random">Random link</string>
+    <string name="main_random">Random</string>
     <string name="no">No</string>
     <string name="output_gpx_location_permission">%1$s will create a route that starts at your current location.</string>
     <string name="output_gpx_point_save">Save GPX with one point</string>
