@@ -60,7 +60,11 @@ fun ResultError(
             .fillMaxWidth()
             .graphicsLayer { alpha = animatedAlpha }
     ) {
-        Column(Modifier.padding(horizontal = spacing.windowPadding)) {
+        Column(
+            Modifier
+                .padding(horizontal = spacing.windowPadding)
+                .padding(bottom = spacing.tiny)
+        ) {
             if (details != null) {
                 ExpandablePane(
                     expanded = expanded,
@@ -74,12 +78,11 @@ fun ResultError(
                             )
                         }
                     },
-                    modifier = Modifier.padding(bottom = spacing.smallAdaptive),
                 ) {
                     SelectionContainer {
                         Text(
                             details,
-                            Modifier.padding(top = spacing.tinyAdaptive),
+                            Modifier.padding(top = spacing.tiny),
                             fontFamily = FontFamily.Monospace,
                             maxLines = 25,
                             style = MaterialTheme.typography.bodySmall,
@@ -96,7 +99,7 @@ fun ResultError(
                 }
             }
             if (source.isNotEmpty()) {
-                SelectionContainer(Modifier.padding(bottom = spacing.smallAdaptive)) {
+                SelectionContainer(Modifier.padding(top = spacing.small)) {
                     if (source.startsWith("https://")) {
                         Text(
                             source,
