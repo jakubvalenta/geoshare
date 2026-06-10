@@ -2,8 +2,11 @@ package page.ooooo.geoshare.ui.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.EaseInCubic
+import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.EaseOutCubic
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -94,11 +97,11 @@ fun AnimatedPlaceholderTextField(
 
     val animationDurationMs = placeholderAnimationDuration.inWholeMilliseconds.toInt()
     val enterTransition = slideInVertically(
-        animationSpec = tween(animationDurationMs, easing = EaseOutCubic),
+        animationSpec = tween(animationDurationMs, easing = EaseInOutCubic),
         initialOffsetY = { fullHeight -> fullHeight }
     ) + fadeIn(tween(animationDurationMs))
     val exitTransition = slideOutVertically(
-        animationSpec = tween(animationDurationMs, easing = EaseInCubic),
+        animationSpec = tween(animationDurationMs, easing = EaseInOutCubic),
         targetOffsetY = { fullHeight -> -fullHeight }
     ) + fadeOut(tween(animationDurationMs))
 
@@ -134,7 +137,11 @@ fun AnimatedPlaceholderTextField(
                             // Don't render placeholder when it's invisible for accessibility with screen readers
                             AnimatedContent(
                                 targetState = currentPlaceholderIndex,
-                                transitionSpec = { enterTransition togetherWith exitTransition },
+                                transitionSpec = {
+                                    (enterTransition togetherWith exitTransition).using(
+                                        SizeTransform(clip = false)
+                                    )
+                                },
                             ) { index ->
                                 Text(
                                     placeholders[index],
