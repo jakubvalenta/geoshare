@@ -10,18 +10,17 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
@@ -139,22 +138,22 @@ import page.ooooo.geoshare.lib.outputs.LocationAction
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
-import page.ooooo.geoshare.ui.components.StyledSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.ConversionWebView
+import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
 import page.ooooo.geoshare.ui.components.MainForm
 import page.ooooo.geoshare.ui.components.MainHeadline
 import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
 import page.ooooo.geoshare.ui.components.PermissionDialog
-import page.ooooo.geoshare.ui.components.ResultError
 import page.ooooo.geoshare.ui.components.ResultApps
 import page.ooooo.geoshare.ui.components.ResultCoordinates
-import page.ooooo.geoshare.ui.components.ResultTitle
+import page.ooooo.geoshare.ui.components.ResultError
 import page.ooooo.geoshare.ui.components.ResultSuccessSheet
-import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
+import page.ooooo.geoshare.ui.components.ResultTitle
 import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
+import page.ooooo.geoshare.ui.components.StyledSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.checkeredBackground
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -856,9 +855,7 @@ private fun MainTitle(
             )
 
         is Initial ->
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                MainHeadline(billingAppNameResId, billingStatus)
-            }
+            MainHeadline(billingAppNameResId, billingStatus, Modifier.offset(x = -(12).dp))
     }
 }
 

@@ -17,6 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.OutlinedTextFieldDefaults.contentPaddingWithoutLabel
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -24,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.testTag
@@ -70,7 +72,7 @@ fun MainForm(
     LabelLarge(
         stringResource(R.string.main_input_uri_label),
         Modifier
-            .padding(horizontal = spacing.windowPadding + 2.dp)
+            .padding(horizontal = spacing.windowPadding)
             .padding(top = spacing.small),
         color = MaterialTheme.colorScheme.primary,
     )
@@ -101,7 +103,7 @@ fun MainForm(
                         onUpdateInput("")
                         onSetErrorMessageResId(null)
                     },
-                    Modifier.offset(x = 4.dp),
+                    Modifier.offset(x = 2.dp),
                 ) {
                     Icon(
                         Icons.Default.Clear,
@@ -116,7 +118,7 @@ fun MainForm(
                             onSetErrorMessageResId(null)
                         }
                     },
-                    Modifier.offset(x = 4.dp),
+                    Modifier.offset(x = 2.dp),
                 ) {
                     Icon(
                         painterResource(R.drawable.content_paste_24px),
@@ -138,7 +140,7 @@ fun MainForm(
                     }
                 },
                 modifier = Modifier
-                    .padding(end = 4.dp)
+                    .padding(end = 5.dp)
                     .testTag("geoShareMainSubmitButton"),
                 colors = IconButtonDefaults.filledIconButtonColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -152,25 +154,8 @@ fun MainForm(
             }
         },
         supportingText = {
-            Text(
-                stringResource(errorMessageResId ?: R.string.main_input_uri_supporting_text),
-                Modifier.padding(horizontal = 4.dp),
-            )
+            Text(stringResource(errorMessageResId ?: R.string.main_input_uri_supporting_text))
         },
-        // TODO
-        // supportingText = {
-        //     ParagraphText(
-        //         annotatedStringResource(
-        //             R.string.main_text,
-        //             FormatArg.Link(
-        //                 stringResource(R.string.main_navigate_to_intro),
-        //                 onNavigateToIntroScreen,
-        //             ),
-        //         ),
-        //         color = MaterialTheme.colorScheme.onSurfaceVariant,
-        //         style = MaterialTheme.typography.bodySmall,
-        //     )
-        // },
         isError = errorMessageResId != null,
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Done,
@@ -178,23 +163,30 @@ fun MainForm(
         keyboardActions = KeyboardActions(
             onDone = { onSubmit() },
         ),
-        shape = MaterialTheme.shapes.extraLarge,
-        contentPadding = contentPaddingWithoutLabel(start = 0.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+            errorContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+            focusedBorderColor = Color.Transparent,
+            unfocusedBorderColor = Color.Transparent,
+            disabledBorderColor = Color.Transparent,
+        ),
+        contentPadding = contentPaddingWithoutLabel(
+            start = 0.dp,
+            top = 20.dp,
+            bottom = 20.dp,
+        ),
     )
     ScrollableChips(
         PaddingValues(
-            start = spacing.windowPadding + 1.dp,
-            end = spacing.windowPadding + 1.dp,
+            start = spacing.windowPadding,
+            end = spacing.windowPadding,
             top = spacing.small,
         )
     ) {
         item {
-            FilledSuggestionChip(
-                label = stringResource(R.string.main_random),
-                icon = {
-                    Icon(painterResource(R.drawable.ifl_24px), null)
-                },
-            ) {
+            StyledChip(stringResource(R.string.main_random)) {
                 inputRepository
                     .all
                     .shuffled()
