@@ -1,3 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="conversion_failed_unsupported_source">Bu bağlantı desteklenmiyor</string>
+    <string name="server_list_google_maps_none_description">Koordinatlar yerine arama terimini çıkartın</string>
 </resources>
