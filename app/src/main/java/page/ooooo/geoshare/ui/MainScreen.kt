@@ -773,6 +773,7 @@ private fun MainScreen(
                 wideMainContainerColor = Color.Transparent,
                 wideMainContentColor = MaterialTheme.colorScheme.onSurface,
             ),
+            shouldAutoFocusCurrentDestination = false,
         )
     }
 
