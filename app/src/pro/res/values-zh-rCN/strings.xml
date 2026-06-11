@@ -1,3 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="conversion_failed_unsupported_source">此链接不受支持</string>
+    <string name="server_list_google_maps_none_description">提取搜索词而非坐标</string>
 </resources>
