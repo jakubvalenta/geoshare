@@ -141,6 +141,7 @@ import page.ooooo.geoshare.ui.components.ConversionWebView
 import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
 import page.ooooo.geoshare.ui.components.MainForm
 import page.ooooo.geoshare.ui.components.MainHeadline
+import page.ooooo.geoshare.ui.components.MainHelp
 import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
@@ -590,24 +591,33 @@ private fun MainScreen(
                                     }
                                 }
 
-                                is Initial ->
+                                is Initial -> {
                                     item {
                                         MainForm(
                                             source = source,
                                             errorMessageResId = errorMessageResId,
-                                            inputRepository = inputRepository,
                                             onSetErrorMessageResId = setErrorMessageResId,
                                             onSubmit = onStart,
                                             onUpdateInput = onUpdateInput,
                                         )
                                     }
+                                    item {
+                                        MainHelp(
+                                            inputRepository = inputRepository,
+                                            modifier = Modifier.padding(top = spacing.largeAdaptive),
+                                            onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                            onNavigateToIntroScreen = onNavigateToIntroScreen,
+                                            onSetErrorMessageResId = setErrorMessageResId,
+                                            onUpdateInput = onUpdateInput,
+                                        )
+                                    }
+                                }
                             }
                         } else if (currentState is Initial) {
                             item {
                                 MainForm(
                                     source = source,
                                     errorMessageResId = errorMessageResId,
-                                    inputRepository = inputRepository,
                                     onSetErrorMessageResId = setErrorMessageResId,
                                     onSubmit = onStart,
                                     onUpdateInput = onUpdateInput,
@@ -740,6 +750,18 @@ private fun MainScreen(
                                     onExecute = onExecute,
                                     onHideApp = onHideApp,
                                     onNavigateToLinkScreen = onNavigateToLinkScreen,
+                                )
+                            }
+
+                        is Initial ->
+                            item {
+                                MainHelp(
+                                    inputRepository = inputRepository,
+                                    modifier = Modifier.padding(top = spacing.largeAdaptive),
+                                    onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                    onNavigateToIntroScreen = onNavigateToIntroScreen,
+                                    onSetErrorMessageResId = setErrorMessageResId,
+                                    onUpdateInput = onUpdateInput,
                                 )
                             }
                     }
