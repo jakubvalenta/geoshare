@@ -1,14 +1,13 @@
 package page.ooooo.geoshare.ui.components
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
@@ -49,23 +48,20 @@ fun UserPreferenceControls(
     val maxWidth = 500.dp
 
     Box(Modifier.widthIn(max = maxWidth)) {
-        LargeTopAppBarPane(
-            title = {
-                Text(stringResource(titleResId))
-            },
-            onBack = onBack.takeUnless { wide },
-        ) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(horizontal = spacing.windowPadding)
-                    .testTag("geoShareUserPreferencesControlsPane"),
+        Column {
+            LargeTopAppBarPane(
+                modifier = Modifier.testTag("geoShareUserPreferencesControlsPane"),
+                title = {
+                    Text(stringResource(titleResId))
+                },
+                onBack = onBack.takeUnless { wide },
             ) {
                 item {
                     description?.let { description ->
                         ParagraphHtml(
                             description(),
                             Modifier
+                                .padding(horizontal = spacing.windowPadding)
                                 .padding(top = spacing.tiny, bottom = spacing.mediumAdaptive)
                                 .run {
                                     if (featureNotPurchased) {
@@ -116,13 +112,15 @@ fun <T> LazyListScope.userPreferenceOptionsControl(
                 },
                 values = values,
                 enabled = enabled,
-                modifier = modifier.run {
-                    if (i == 0) {
-                        padding(top = LocalSpacing.current.tinyAdaptive)
-                    } else {
-                        this
-                    }
-                },
+                modifier = modifier
+                    .padding(horizontal = LocalSpacing.current.windowPadding)
+                    .run {
+                        if (i == 0) {
+                            padding(top = LocalSpacing.current.tinyAdaptive)
+                        } else {
+                            this
+                        }
+                    },
                 itemTestTag = itemTestTag,
                 option = option,
             )
@@ -160,7 +158,9 @@ fun <T> LazyListScope.userPreferenceTextControl(
                     userPreference.setValue(preferences, userPreference.deserialize(it))
                 }
             },
-            modifier = modifier.fillMaxWidth(),
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = LocalSpacing.current.windowPadding),
             enabled = enabled,
             suffix = suffix?.let { suffix ->
                 {

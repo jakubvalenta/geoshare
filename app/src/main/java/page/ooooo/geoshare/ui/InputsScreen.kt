@@ -9,12 +9,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -49,9 +47,9 @@ import page.ooooo.geoshare.lib.inputs.InputDocumentation
 import page.ooooo.geoshare.lib.inputs.InputDocumentationGroup
 import page.ooooo.geoshare.lib.inputs.InputDocumentationItem
 import page.ooooo.geoshare.ui.components.InputsSettingsButton
+import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
 import page.ooooo.geoshare.ui.components.NavigableStyledListDetailPaneScaffold
 import page.ooooo.geoshare.ui.components.ParagraphText
-import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
 import page.ooooo.geoshare.ui.components.SegmentedList
 import page.ooooo.geoshare.ui.components.SegmentedListLabel
 import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
@@ -174,56 +172,59 @@ private fun InputsListPane(
         },
         onBack = onBack,
     ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxHeight()
-                .padding(horizontal = spacing.windowPadding)
-        ) {
-            if (!wide) {
-                item {
-                    Column {
-                        ParagraphText(
-                            stringResource(R.string.inputs_list_text, appName),
-                            Modifier.padding(top = spacing.tinyAdaptive, bottom = spacing.mediumAdaptive),
-                        )
-                        InputsSettingsButton {
-                            AndroidTools.showOpenByDefaultSettings(context, settingsLauncher)
-                        }
+        if (!wide) {
+            item {
+                Column(Modifier.padding(horizontal = spacing.windowPadding)) {
+                    ParagraphText(
+                        stringResource(R.string.inputs_list_text, appName),
+                        Modifier.padding(top = spacing.tinyAdaptive, bottom = spacing.mediumAdaptive),
+                    )
+                    InputsSettingsButton {
+                        AndroidTools.showOpenByDefaultSettings(context, settingsLauncher)
                     }
                 }
             }
-            if (recentDocumentations.isNotEmpty()) {
-                item {
-                    SegmentedListLabel(stringResource(R.string.inputs_recent), MaterialTheme.colorScheme.error)
-                }
-                item {
-                    SegmentedList(
-                        values = recentDocumentations,
-                        itemHeadline = { stringResource(it.group.nameResId) },
-                        itemIsSelected = { it.group == currentDocumentationGroup },
-                        itemOnClick = { onNavigateToDocumentation(it.group) },
-                        itemTestTag = { "geoShareInputsDocumentationRecent_${it.group}" },
-                        sort = true,
-                    )
-                }
-                item {
-                    SegmentedListLabel(stringResource(R.string.inputs_all))
-                }
-            } else {
-                item {
-                    Spacer(Modifier.height(spacing.mediumAdaptive))
-                }
+        }
+        if (recentDocumentations.isNotEmpty()) {
+            item {
+                SegmentedListLabel(
+                    stringResource(R.string.inputs_recent),
+                    modifier = Modifier.padding(horizontal = spacing.windowPadding),
+                    color = MaterialTheme.colorScheme.error,
+                )
             }
             item {
                 SegmentedList(
-                    values = allDocumentations,
+                    values = recentDocumentations,
+                    modifier = Modifier.padding(horizontal = spacing.windowPadding),
                     itemHeadline = { stringResource(it.group.nameResId) },
                     itemIsSelected = { it.group == currentDocumentationGroup },
                     itemOnClick = { onNavigateToDocumentation(it.group) },
-                    itemTestTag = { "geoShareInputsDocumentationAll_${it.group}" },
+                    itemTestTag = { "geoShareInputsDocumentationRecent_${it.group}" },
                     sort = true,
                 )
             }
+            item {
+                SegmentedListLabel(
+                    stringResource(R.string.inputs_all),
+                    modifier = Modifier.padding(horizontal = spacing.windowPadding),
+                )
+            }
+        } else {
+            item {
+                Spacer(Modifier.height(spacing.mediumAdaptive))
+            }
+        }
+        item {
+            SegmentedList(
+                values = allDocumentations,
+                modifier = Modifier.padding(horizontal = spacing.windowPadding),
+                itemHeadline = { stringResource(it.group.nameResId) },
+                itemIsSelected = { it.group == currentDocumentationGroup },
+                itemOnClick = { onNavigateToDocumentation(it.group) },
+                itemTestTag = { "geoShareInputsDocumentationAll_${it.group}" },
+                sort = true,
+            )
         }
     }
 }
@@ -272,80 +273,78 @@ private fun InputsDetailPane(
         },
         onBack = onBack.takeUnless { wide },
     ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxHeight()
-                .padding(horizontal = spacing.windowPadding)
-        ) {
-            item {
-                ParagraphText(
-                    stringResource(R.string.inputs_detail_text, appName),
-                    Modifier
-                        .widthIn(max = maxWidth)
-                        .padding(top = spacing.tinyAdaptive, bottom = spacing.mediumAdaptive),
+        item {
+            ParagraphText(
+                stringResource(R.string.inputs_detail_text, appName),
+                Modifier
+                    .widthIn(max = maxWidth)
+                    .padding(horizontal = spacing.windowPadding)
+                    .padding(top = spacing.tinyAdaptive, bottom = spacing.mediumAdaptive),
+            )
+        }
+        item {
+            InputsSettingsButton(Modifier.padding(horizontal = spacing.windowPadding)) {
+                AndroidTools.showOpenByDefaultSettings(context, settingsLauncher)
+            }
+        }
+        item {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = spacing.windowPadding)
+                    .padding(top = spacing.largeAdaptive, bottom = spacing.smallAdaptive),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    stringResource(R.string.inputs_link),
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.labelLarge,
+                )
+                Text(
+                    stringResource(R.string.inputs_default_handler, appName),
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.labelLarge,
                 )
             }
-            item {
-                InputsSettingsButton {
-                    AndroidTools.showOpenByDefaultSettings(context, settingsLauncher)
-                }
-            }
+        }
+        item {
+            HorizontalDivider(Modifier.padding(horizontal = spacing.windowPadding))
+        }
+        documentationInputDetailsList.forEach { documentationInputDetails ->
             item {
                 Row(
                     Modifier
-                        .fillMaxWidth()
-                        .padding(top = spacing.largeAdaptive, bottom = spacing.smallAdaptive),
+                        .padding(horizontal = spacing.windowPadding)
+                        .padding(vertical = spacing.smallAdaptive),
                     horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(
-                        stringResource(R.string.inputs_link),
-                        color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-                    Text(
-                        stringResource(R.string.inputs_default_handler, appName),
-                        color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-                }
-            }
-            item {
-                HorizontalDivider()
-            }
-            documentationInputDetailsList.forEach { documentationInputDetails ->
-                item {
-                    Row(
-                        Modifier.padding(vertical = spacing.smallAdaptive),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        SelectionContainer(Modifier.weight(1f)) {
-                            Text(
-                                when (documentationInputDetails.documentationInput) {
-                                    is InputDocumentationItem.Text ->
-                                        documentationInputDetails.documentationInput.text()
-
-                                    is InputDocumentationItem.Url ->
-                                        documentationInputDetails.documentationInput.urlString.trimUrl()
-                                },
-                                Modifier.padding(end = spacing.tiny),
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
-                        }
+                    SelectionContainer(Modifier.weight(1f)) {
                         Text(
-                            stringResource(
-                                when (documentationInputDetails.defaultHandlerEnabled) {
-                                    true -> R.string.yes
-                                    false -> R.string.no
-                                    null -> R.string.not_available
-                                },
-                                appName,
-                            ),
-                            style = MaterialTheme.typography.bodySmall,
+                            when (documentationInputDetails.documentationInput) {
+                                is InputDocumentationItem.Text ->
+                                    documentationInputDetails.documentationInput.text()
+
+                                is InputDocumentationItem.Url ->
+                                    documentationInputDetails.documentationInput.urlString.trimUrl()
+                            },
+                            Modifier.padding(end = spacing.tiny),
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                     }
-                    HorizontalDivider()
+                    Text(
+                        stringResource(
+                            when (documentationInputDetails.defaultHandlerEnabled) {
+                                true -> R.string.yes
+                                false -> R.string.no
+                                null -> R.string.not_available
+                            },
+                            appName,
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
                 }
+                HorizontalDivider(Modifier.padding(horizontal = spacing.windowPadding))
             }
         }
     }

@@ -68,7 +68,9 @@ fun UserPreferenceDeveloperOptionsControls(
         item {
             ParagraphHtml(
                 stringResource(R.string.user_preferences_changelog_shown_for_version_code_title),
-                Modifier.padding(bottom = LocalSpacing.current.smallAdaptive),
+                Modifier
+                    .padding(horizontal = LocalSpacing.current.windowPadding)
+                    .padding(bottom = LocalSpacing.current.smallAdaptive),
             )
         }
         userPreferenceTextControl(
@@ -80,10 +82,12 @@ fun UserPreferenceDeveloperOptionsControls(
         item {
             ParagraphHtml(
                 stringResource(R.string.user_preferences_last_run_version_code_title),
-                Modifier.padding(
-                    top = LocalSpacing.current.mediumAdaptive,
-                    bottom = LocalSpacing.current.smallAdaptive,
-                ),
+                Modifier
+                    .padding(horizontal = LocalSpacing.current.windowPadding)
+                    .padding(
+                        top = LocalSpacing.current.mediumAdaptive,
+                        bottom = LocalSpacing.current.smallAdaptive,
+                    ),
             )
         }
         userPreferenceTextControl(
@@ -94,10 +98,12 @@ fun UserPreferenceDeveloperOptionsControls(
         item {
             ParagraphHtml(
                 stringResource(R.string.user_preferences_billing_cached_purchase),
-                Modifier.padding(
-                    top = LocalSpacing.current.mediumAdaptive,
-                    bottom = LocalSpacing.current.smallAdaptive,
-                ),
+                Modifier
+                    .padding(horizontal = LocalSpacing.current.windowPadding)
+                    .padding(
+                        top = LocalSpacing.current.mediumAdaptive,
+                        bottom = LocalSpacing.current.smallAdaptive,
+                    ),
             )
         }
         userPreferenceTextControl(

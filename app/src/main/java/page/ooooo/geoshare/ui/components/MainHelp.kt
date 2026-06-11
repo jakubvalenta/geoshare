@@ -16,6 +16,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.InputRepository
+import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.Input
@@ -24,7 +26,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun MainHelp(
-    allInputs: List<Input>,
+    inputRepository: InputRepository,
     modifier: Modifier = Modifier,
     onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
@@ -57,7 +59,8 @@ fun MainHelp(
                     name = resources.getString(R.string.intro_how_to_share_google_maps_screenshot_place),
                 )
             )
-            allInputs
+            inputRepository
+                .all
                 .shuffled()
                 .firstNotNullOfOrNull { (it as? Input.HasRandomUri)?.genRandomUri(randomPoint) }
                 ?.let { newSource ->
@@ -83,7 +86,7 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             MainHelp(
-                allInputs = emptyList(),
+                inputRepository = FakeInputRepository,
                 onNavigateToInputsScreen = {},
                 onNavigateToIntroScreen = {},
                 onSetErrorMessageResId = {},
@@ -99,7 +102,7 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             MainHelp(
-                allInputs = emptyList(),
+                inputRepository = FakeInputRepository,
                 onNavigateToInputsScreen = {},
                 onNavigateToIntroScreen = {},
                 onSetErrorMessageResId = {},

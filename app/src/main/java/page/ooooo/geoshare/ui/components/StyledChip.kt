@@ -29,9 +29,9 @@ fun StyledChip(
         icon = icon,
         colors = colors,
         border = SuggestionChipDefaults.suggestionChipBorder(
-            enabled = true,
-            borderColor = LocalContentColor.current.copy(alpha = 0.5f),
-            disabledBorderColor = LocalContentColor.current.copy(alpha = 0.5f),
+            enabled = enabled,
+            borderColor = LocalContentColor.current.copy(alpha = 0.3f),
+            disabledBorderColor = LocalContentColor.current.copy(alpha = 0.3f),
         ),
         shape = MaterialTheme.shapes.medium,
     )

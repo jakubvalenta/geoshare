@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ListItemDefaults
@@ -33,6 +34,7 @@ import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.DataTypes
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.ui.theme.AppTheme
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -116,9 +118,11 @@ fun UserPreferenceHiddenAppsControls(
         }
 
         item {
+            val spacing = LocalSpacing.current
+
             SegmentedList(
                 values = HiddenAppsPreference.getOptions(apps).toList(),
-                modifier = modifier,
+                modifier = modifier.padding(horizontal = spacing.windowPadding),
                 itemHeadline = { option -> appDetails[option]?.label ?: option },
                 itemOnClick = { option -> setValue(option, !isChecked(option)) },
                 itemEnabled = { enabled },

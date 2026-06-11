@@ -20,12 +20,11 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -83,6 +82,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.InputRepository
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.di.FakeLinkRepository
@@ -126,7 +126,6 @@ import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.MatchedInput
 import page.ooooo.geoshare.lib.inputs.WebViewInput
 import page.ooooo.geoshare.lib.network.ConnectTimeoutNetworkException
@@ -137,23 +136,23 @@ import page.ooooo.geoshare.lib.outputs.LocationAction
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
-import page.ooooo.geoshare.ui.components.StyledSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.ConversionWebView
+import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
 import page.ooooo.geoshare.ui.components.MainForm
-import page.ooooo.geoshare.ui.components.MainHelp
 import page.ooooo.geoshare.ui.components.MainHeadline
+import page.ooooo.geoshare.ui.components.MainHelp
 import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
 import page.ooooo.geoshare.ui.components.PermissionDialog
-import page.ooooo.geoshare.ui.components.ResultError
 import page.ooooo.geoshare.ui.components.ResultApps
 import page.ooooo.geoshare.ui.components.ResultCoordinates
-import page.ooooo.geoshare.ui.components.ResultTitle
+import page.ooooo.geoshare.ui.components.ResultError
 import page.ooooo.geoshare.ui.components.ResultSuccessSheet
-import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
+import page.ooooo.geoshare.ui.components.ResultTitle
 import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
+import page.ooooo.geoshare.ui.components.StyledSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.checkeredBackground
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -319,7 +318,6 @@ fun MainScreen(
 
     MainScreen(
         currentState = currentState,
-        allInputs = inputViewModel.allInputs,
         appDetails = appDetails,
         billingAppNameResId = billingAppNameResId,
         billingFeatures = billingFeatures,
@@ -327,7 +325,7 @@ fun MainScreen(
         changelogShown = changelogShown,
         coordinateConverter = outputViewModel.coordinateConverter,
         coordinateFormat = userPreferencesValues.coordinateFormat,
-        source = conversionViewModel.source,
+        inputRepository = inputViewModel.inputRepository,
         largeLoadingIndicator = largeLoadingIndicator,
         linkMessage = linkMessage,
         outputsForApps = outputsForApps,
@@ -337,6 +335,7 @@ fun MainScreen(
         outputsForPoints = outputsForPoints,
         outputsForPointsChips = outputsForPointsChips,
         outputsForSharing = outputsForSharing,
+        source = conversionViewModel.source,
         userPreferenceMessage = userPreferencesMessage,
         onCancel = {
             locationJob?.cancel()
@@ -399,7 +398,6 @@ fun MainScreen(
 @Composable
 private fun MainScreen(
     currentState: State,
-    allInputs: List<Input>,
     appDetails: AppDetails,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
@@ -407,7 +405,7 @@ private fun MainScreen(
     changelogShown: Boolean,
     coordinateConverter: CoordinateConverter,
     coordinateFormat: CoordinateFormat,
-    source: String,
+    inputRepository: InputRepository,
     largeLoadingIndicator: LoadingIndicator.Large?,
     linkMessage: Message?,
     outputsForApps: Map<String, List<Output>>,
@@ -417,6 +415,7 @@ private fun MainScreen(
     outputsForPoints: List<PointsOutput>,
     outputsForPointsChips: List<PointsOutput>,
     outputsForSharing: List<Output>,
+    source: String,
     userPreferenceMessage: Message?,
     onCancel: () -> Unit,
     onDeny: (Boolean) -> Unit,
@@ -482,157 +481,56 @@ private fun MainScreen(
     ) {
         StyledSupportingPaneScaffold(
             mainPane = { innerPadding, wide ->
-                LargeTopAppBarPane(
-                    title = {
-                        MainTitle(
-                            currentState = currentState,
-                            billingAppNameResId = billingAppNameResId,
-                            billingStatus = billingStatus,
-                            largeLoadingIndicator = largeLoadingIndicator,
-                        )
-                    },
-                    onBack = if (currentState !is Initial) {
-                        onReset
-                    } else {
-                        null
-                    },
-                    actions = {
-                        if (!wide) {
-                            MainMenu(
+                Column(Modifier.weight(1f)) {
+                    LargeTopAppBarPane(
+                        modifier = Modifier.testTag("geoShareMainPane"),
+                        title = {
+                            MainTitle(
                                 currentState = currentState,
                                 billingAppNameResId = billingAppNameResId,
                                 billingStatus = billingStatus,
-                                changelogShown = changelogShown,
-                                onNavigateToAboutScreen = onNavigateToAboutScreen,
-                                onNavigateToBillingScreen = onNavigateToBillingScreen,
-                                onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                onNavigateToIntroScreen = onNavigateToIntroScreen,
-                                onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
+                                largeLoadingIndicator = largeLoadingIndicator,
                             )
-                        }
-                    },
-                    expandedHeight = if (currentState is Initial) {
-                        TopAppBarDefaults.LargeAppBarExpandedHeight + spacing.headlineTopAdaptive
-                    } else {
-                        TopAppBarDefaults.LargeAppBarExpandedHeight
-                    },
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .verticalScroll(rememberScrollState())
-                            .testTag("geoShareMainPane"),
+                        },
+                        onBack = if (currentState !is Initial) {
+                            onReset
+                        } else {
+                            null
+                        },
+                        actions = {
+                            if (!wide) {
+                                MainMenu(
+                                    currentState = currentState,
+                                    billingAppNameResId = billingAppNameResId,
+                                    billingStatus = billingStatus,
+                                    changelogShown = changelogShown,
+                                    onNavigateToAboutScreen = onNavigateToAboutScreen,
+                                    onNavigateToBillingScreen = onNavigateToBillingScreen,
+                                    onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                    onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                    onNavigateToIntroScreen = onNavigateToIntroScreen,
+                                    onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
+                                )
+                            }
+                        },
+                        expandedHeight = if (currentState is Initial) {
+                            TopAppBarDefaults.LargeAppBarExpandedHeight + spacing.largeAdaptive
+                        } else {
+                            TopAppBarDefaults.LargeAppBarExpandedHeight
+                        },
                     ) {
                         if (!wide) {
                             when (currentState) {
                                 is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
-                                    MainLoadingIndicator(
-                                        loadingIndicator = largeLoadingIndicator,
-                                        onCancel = onCancel,
-                                    )
-
-                                is ConversionState.HasError ->
-                                    ResultError(
-                                        source = currentState.source,
-                                        message = currentState.message,
-                                        details = currentState.details,
-                                        onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                        onRetry = onRetry,
-                                    )
-
-                                is ConversionState.HasResult -> {
-                                    ResultCoordinates(
-                                        points = currentState.points,
-                                        appDetails = appDetails,
-                                        coordinateConverter = coordinateConverter,
-                                        coordinateFormat = coordinateFormat,
-                                        outputsForPointChips = outputsForPointChips,
-                                        outputsForPointsChips = outputsForPointsChips,
-                                        onExecute = onExecute,
-                                        onSelect = { index ->
-                                            onCancel()
-                                            setSelectedPointIndex(index)
-                                        },
-                                    )
-                                    Column(
-                                        // This column must not have weight(1f), otherwise the last row of app icons gets shrunk
-                                        Modifier
-                                            .fillMaxWidth()
-                                            .background(MaterialTheme.colorScheme.surface)
-                                    ) {
-                                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                                            ResultTitle(
-                                                currentState = currentState,
-                                                appDetails = appDetails,
-                                                billingFeatures = billingFeatures,
-                                                billingStatus = billingStatus,
-                                                modifier = Modifier
-                                                    .padding(horizontal = spacing.windowPadding)
-                                                    .padding(top = spacing.largeAdaptive),
-                                                onCancel = onCancel,
-                                                onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
-                                            )
-                                            ResultApps(
-                                                appDetails = appDetails,
-                                                outputsForApps = outputsForApps,
-                                                outputsForLinks = outputsForLinks,
-                                                outputsForSharing = outputsForSharing,
-                                                points = currentState.points,
-                                                onDisableLinkGroup = onDisableLinkGroup,
-                                                onExecute = onExecute,
-                                                onHideApp = onHideApp,
-                                                onNavigateToLinkScreen = onNavigateToLinkScreen,
-                                            )
-                                        }
-                                    }
-                                }
-
-                                is Initial -> {
-                                    MainForm(
-                                        source = source,
-                                        errorMessageResId = errorMessageResId,
-                                        modifier = Modifier.padding(top = spacing.largeAdaptive),
-                                        onSetErrorMessageResId = setErrorMessageResId,
-                                        onSubmit = onStart,
-                                        onUpdateInput = onUpdateInput,
-                                    )
-                                    MainHelp(
-                                        allInputs = allInputs,
-                                        modifier = Modifier.padding(top = spacing.largeAdaptive),
-                                        onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                        onNavigateToIntroScreen = onNavigateToIntroScreen,
-                                        onSetErrorMessageResId = setErrorMessageResId,
-                                        onUpdateInput = onUpdateInput,
-                                    )
-                                }
-                            }
-                        } else if (currentState is Initial) {
-                            MainForm(
-                                source = source,
-                                errorMessageResId = errorMessageResId,
-                                modifier = Modifier.padding(top = spacing.medium),
-                                onSetErrorMessageResId = setErrorMessageResId,
-                                onSubmit = onStart,
-                                onUpdateInput = onUpdateInput,
-                            )
-                        } else {
-                            Card(
-                                colors = CardDefaults.cardColors(
-                                    containerColor = mainContainerColor,
-                                    contentColor = mainContentColor,
-                                ),
-                            ) {
-                                Spacer(Modifier.height(spacing.mediumAdaptive))
-
-                                when (currentState) {
-                                    is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
+                                    item {
                                         MainLoadingIndicator(
                                             loadingIndicator = largeLoadingIndicator,
                                             onCancel = onCancel,
                                         )
+                                    }
 
-                                    is ConversionState.HasError ->
+                                is ConversionState.HasError ->
+                                    item {
                                         ResultError(
                                             source = currentState.source,
                                             message = currentState.message,
@@ -640,8 +538,10 @@ private fun MainScreen(
                                             onNavigateToInputsScreen = onNavigateToInputsScreen,
                                             onRetry = onRetry,
                                         )
+                                    }
 
-                                    is ConversionState.HasResult -> {
+                                is ConversionState.HasResult -> {
+                                    item {
                                         ResultCoordinates(
                                             points = currentState.points,
                                             appDetails = appDetails,
@@ -656,44 +556,154 @@ private fun MainScreen(
                                             },
                                         )
                                     }
+                                    item {
+                                        Column(
+                                            // This column must not have weight(1f), otherwise the last row of app icons gets shrunk
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .background(MaterialTheme.colorScheme.surface)
+                                        ) {
+                                            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                                                ResultTitle(
+                                                    currentState = currentState,
+                                                    appDetails = appDetails,
+                                                    billingFeatures = billingFeatures,
+                                                    billingStatus = billingStatus,
+                                                    modifier = Modifier
+                                                        .padding(horizontal = spacing.windowPadding)
+                                                        .padding(top = spacing.largeAdaptive),
+                                                    onCancel = onCancel,
+                                                    onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
+                                                )
+                                                ResultApps(
+                                                    appDetails = appDetails,
+                                                    outputsForApps = outputsForApps,
+                                                    outputsForLinks = outputsForLinks,
+                                                    outputsForSharing = outputsForSharing,
+                                                    points = currentState.points,
+                                                    onDisableLinkGroup = onDisableLinkGroup,
+                                                    onExecute = onExecute,
+                                                    onHideApp = onHideApp,
+                                                    onNavigateToLinkScreen = onNavigateToLinkScreen,
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+
+                                is Initial -> {
+                                    item {
+                                        MainForm(
+                                            source = source,
+                                            errorMessageResId = errorMessageResId,
+                                            onSetErrorMessageResId = setErrorMessageResId,
+                                            onSubmit = onStart,
+                                            onUpdateInput = onUpdateInput,
+                                        )
+                                    }
+                                    item {
+                                        MainHelp(
+                                            inputRepository = inputRepository,
+                                            modifier = Modifier.padding(top = spacing.largeAdaptive),
+                                            onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                            onNavigateToIntroScreen = onNavigateToIntroScreen,
+                                            onSetErrorMessageResId = setErrorMessageResId,
+                                            onUpdateInput = onUpdateInput,
+                                        )
+                                    }
                                 }
                             }
-                        }
+                        } else if (currentState is Initial) {
+                            item {
+                                MainForm(
+                                    source = source,
+                                    errorMessageResId = errorMessageResId,
+                                    onSetErrorMessageResId = setErrorMessageResId,
+                                    onSubmit = onStart,
+                                    onUpdateInput = onUpdateInput,
+                                )
+                            }
+                        } else {
+                            item {
+                                Card(
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = mainContainerColor,
+                                        contentColor = mainContentColor,
+                                    ),
+                                ) {
+                                    Spacer(Modifier.height(spacing.mediumAdaptive))
 
-                        Column(
-                            Modifier
-                                .weight(1f)
-                                .fillMaxWidth()
-                                .background(MaterialTheme.colorScheme.surface)
-                        ) {
-                            if (currentState is PermissionGrantedWebViewInput) {
-                                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                                    MainWebView(
-                                        matchedInput = currentState.matchedInput,
-                                        onExtractionSettle = { currentState.onExtractionSettle(it) },
-                                    )
+                                    when (currentState) {
+                                        is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
+                                            MainLoadingIndicator(
+                                                loadingIndicator = largeLoadingIndicator,
+                                                onCancel = onCancel,
+                                            )
+
+                                        is ConversionState.HasError ->
+                                            ResultError(
+                                                source = currentState.source,
+                                                message = currentState.message,
+                                                details = currentState.details,
+                                                onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                                onRetry = onRetry,
+                                            )
+
+                                        is ConversionState.HasResult -> {
+                                            ResultCoordinates(
+                                                points = currentState.points,
+                                                appDetails = appDetails,
+                                                coordinateConverter = coordinateConverter,
+                                                coordinateFormat = coordinateFormat,
+                                                outputsForPointChips = outputsForPointChips,
+                                                outputsForPointsChips = outputsForPointsChips,
+                                                onExecute = onExecute,
+                                                onSelect = { index ->
+                                                    onCancel()
+                                                    setSelectedPointIndex(index)
+                                                },
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
 
-                    if (currentState is ConversionState.HasSource) {
-                        MainCopySourceButton(
-                            source = currentState.source,
-                            innerPadding = innerPadding,
-                            containerColor = if (!wide) {
-                                MaterialTheme.colorScheme.surfaceContainer
-                            } else {
-                                Color.Transparent
-                            },
-                        )
-                    } else {
-                        Spacer(Modifier.padding(innerPadding))
+                    Column(
+                        Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.surface)
+                    ) {
+                        if (currentState is PermissionGrantedWebViewInput) {
+                            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                                MainWebView(
+                                    matchedInput = currentState.matchedInput,
+                                    onExtractionSettle = { currentState.onExtractionSettle(it) },
+                                )
+                            }
+                        }
                     }
+                }
+
+                if (currentState is ConversionState.HasSource) {
+                    MainCopySourceButton(
+                        source = currentState.source,
+                        innerPadding = innerPadding,
+                        containerColor = if (!wide) {
+                            MaterialTheme.colorScheme.surfaceContainer
+                        } else {
+                            Color.Transparent
+                        },
+                    )
+                } else {
+                    Spacer(Modifier.padding(innerPadding))
                 }
             },
             supportingPane = { wide ->
                 LargeTopAppBarPane(
+                    modifier = Modifier.testTag("geoShareMainSupportingPane"),
                     title = if (currentState is ConversionState.HasResult) {
                         {
                             ResultTitle(
@@ -725,15 +735,11 @@ private fun MainScreen(
                         }
                     },
                 ) {
-                    Column(
-                        Modifier
-                            .verticalScroll(rememberScrollState())
-                            .testTag("geoShareMainSupportingPane")
-                    ) {
-                        when (currentState) {
-                            is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null -> {}
+                    when (currentState) {
+                        is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null -> {}
 
-                            is ConversionState.HasResult ->
+                        is ConversionState.HasResult ->
+                            item {
                                 ResultApps(
                                     appDetails = appDetails,
                                     outputsForApps = outputsForApps,
@@ -745,16 +751,19 @@ private fun MainScreen(
                                     onHideApp = onHideApp,
                                     onNavigateToLinkScreen = onNavigateToLinkScreen,
                                 )
+                            }
 
-                            is Initial ->
+                        is Initial ->
+                            item {
                                 MainHelp(
-                                    allInputs = allInputs,
+                                    inputRepository = inputRepository,
+                                    modifier = Modifier.padding(top = spacing.largeAdaptive),
                                     onNavigateToInputsScreen = onNavigateToInputsScreen,
                                     onNavigateToIntroScreen = onNavigateToIntroScreen,
                                     onSetErrorMessageResId = setErrorMessageResId,
                                     onUpdateInput = onUpdateInput,
                                 )
-                        }
+                            }
                     }
                 }
             },
@@ -873,7 +882,7 @@ private fun MainTitle(
             )
 
         is Initial ->
-            MainHeadline(billingAppNameResId, billingStatus)
+            MainHeadline(billingAppNameResId, billingStatus, Modifier.offset(x = -(12).dp))
     }
 }
 
@@ -893,15 +902,14 @@ private fun MainLoadingIndicator(
         LoadingIndicator(
             Modifier
                 .size(96.dp)
-                .align(Alignment.CenterHorizontally)
-                .padding(top = spacing.smallAdaptive),
+                .align(Alignment.CenterHorizontally),
             color = MaterialTheme.colorScheme.tertiary,
         )
         Button(
             onCancel,
             Modifier
                 .align(Alignment.CenterHorizontally)
-                .padding(top = spacing.smallAdaptive, bottom = spacing.mediumAdaptive),
+                .padding(vertical = spacing.small),
             colors = ButtonDefaults.elevatedButtonColors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                 contentColor = MaterialTheme.colorScheme.onSurface,
@@ -912,7 +920,7 @@ private fun MainLoadingIndicator(
         loadingIndicator.description?.let { description ->
             Text(
                 description,
-                Modifier.padding(bottom = spacing.mediumAdaptive),
+                Modifier.padding(bottom = spacing.small),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyMedium,
             )
@@ -983,7 +991,7 @@ private fun MainCopySourceButton(
             },
             Modifier
                 .padding(start = 4.dp)
-                .padding(top = spacing.tinyAdaptive),
+                .padding(top = spacing.tiny),
         ) {
             Text(stringResource(R.string.conversion_succeeded_skip))
         }
@@ -1001,7 +1009,6 @@ private fun DefaultPreview() {
         val coordinateConverter = CoordinateConverter(geometries)
         MainScreen(
             currentState = Initial(),
-            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1009,7 +1016,7 @@ private fun DefaultPreview() {
             changelogShown = false,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            source = "",
+            inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -1019,6 +1026,7 @@ private fun DefaultPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            source = "",
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -1053,7 +1061,6 @@ private fun DarkPreview() {
         val coordinateConverter = CoordinateConverter(geometries)
         MainScreen(
             currentState = Initial(),
-            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1061,7 +1068,7 @@ private fun DarkPreview() {
             changelogShown = false,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            source = "",
+            inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -1071,6 +1078,59 @@ private fun DarkPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            source = "",
+            userPreferenceMessage = null,
+            onCancel = {},
+            onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
+            onDeny = {},
+            onExecute = {},
+            onGrant = {},
+            onHideApp = {},
+            onNavigateToAboutScreen = {},
+            onNavigateToBillingScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinkScreen = {},
+            onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+            onReset = {},
+            onRetry = {},
+            onStart = {},
+            onUpdateInput = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, device = Devices.NEXUS_5)
+@Composable
+private fun SmallPreview() {
+    AppTheme {
+        val context = LocalContext.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        MainScreen(
+            currentState = Initial(),
+            appDetails = emptyMap(),
+            billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+            billingStatus = BillingStatus.NotPurchased(),
+            changelogShown = false,
+            coordinateConverter = coordinateConverter,
+            coordinateFormat = CoordinateFormat.DEC,
+            inputRepository = FakeInputRepository,
+            largeLoadingIndicator = null,
+            linkMessage = null,
+            outputsForApps = emptyMap(),
+            outputsForLinks = emptyMap(),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = emptyList(),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = emptyList(),
+            outputsForSharing = emptyList(),
+            source = "",
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -1105,7 +1165,6 @@ private fun TabletPreview() {
         val coordinateConverter = CoordinateConverter(geometries)
         MainScreen(
             currentState = Initial(),
-            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1113,7 +1172,7 @@ private fun TabletPreview() {
             changelogShown = false,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            source = "",
+            inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -1123,6 +1182,7 @@ private fun TabletPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            source = "",
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -1167,7 +1227,6 @@ private fun SucceededPreview() {
                 ),
                 actionResult = ActionResult.Succeeded,
             ),
-            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1180,7 +1239,7 @@ private fun SucceededPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            source = "",
+            inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
@@ -1203,6 +1262,7 @@ private fun SucceededPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
+            source = "",
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -1247,7 +1307,6 @@ private fun DarkSucceededPreview() {
                 ),
                 actionResult = ActionResult.Succeeded,
             ),
-            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1260,7 +1319,7 @@ private fun DarkSucceededPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            source = "",
+            inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
@@ -1283,6 +1342,7 @@ private fun DarkSucceededPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
+            source = "",
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -1327,7 +1387,6 @@ private fun SmallSucceededPreview() {
                 ),
                 actionResult = ActionResult.Succeeded,
             ),
-            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1340,7 +1399,7 @@ private fun SmallSucceededPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            source = "",
+            inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
@@ -1363,6 +1422,7 @@ private fun SmallSucceededPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
+            source = "",
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -1407,7 +1467,6 @@ private fun TabletSucceededPreview() {
                 ),
                 actionResult = ActionResult.Succeeded,
             ),
-            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1420,7 +1479,7 @@ private fun TabletSucceededPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            source = "",
+            inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
@@ -1443,6 +1502,7 @@ private fun TabletSucceededPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
+            source = "",
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -1480,7 +1540,6 @@ private fun ErrorPreview() {
                 source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
-            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1493,7 +1552,7 @@ private fun ErrorPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            source = "",
+            inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -1503,6 +1562,7 @@ private fun ErrorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            source = "",
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -1540,7 +1600,6 @@ private fun DarkErrorPreview() {
                 source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
-            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1553,7 +1612,7 @@ private fun DarkErrorPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            source = "",
+            inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -1563,6 +1622,7 @@ private fun DarkErrorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            source = "",
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -1600,7 +1660,6 @@ private fun TabletErrorPreview() {
                 source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
-            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1613,7 +1672,7 @@ private fun TabletErrorPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            source = "",
+            inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -1623,6 +1682,7 @@ private fun TabletErrorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            source = "",
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -1677,7 +1737,6 @@ private fun LoadingIndicatorPreview() {
         )
         MainScreen(
             currentState = currentState,
-            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1690,7 +1749,7 @@ private fun LoadingIndicatorPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            source = "",
+            inputRepository = FakeInputRepository,
             largeLoadingIndicator = currentState.getLoadingIndicator(),
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -1700,6 +1759,7 @@ private fun LoadingIndicatorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            source = "",
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -1754,7 +1814,6 @@ private fun DarkLoadingIndicatorPreview() {
         )
         MainScreen(
             currentState = currentState,
-            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1767,7 +1826,7 @@ private fun DarkLoadingIndicatorPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            source = "",
+            inputRepository = FakeInputRepository,
             largeLoadingIndicator = currentState.getLoadingIndicator(),
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -1777,6 +1836,7 @@ private fun DarkLoadingIndicatorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            source = "",
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -1831,7 +1891,6 @@ private fun TabletLoadingIndicatorPreview() {
         )
         MainScreen(
             currentState = currentState,
-            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1844,7 +1903,7 @@ private fun TabletLoadingIndicatorPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            source = "",
+            inputRepository = FakeInputRepository,
             largeLoadingIndicator = currentState.getLoadingIndicator(),
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -1854,6 +1913,7 @@ private fun TabletLoadingIndicatorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            source = "",
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -1905,7 +1965,6 @@ private fun WebViewPreview() {
         )
         MainScreen(
             currentState = currentState,
-            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1918,7 +1977,7 @@ private fun WebViewPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            source = "",
+            inputRepository = FakeInputRepository,
             largeLoadingIndicator = currentState.getLoadingIndicator(),
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -1928,6 +1987,7 @@ private fun WebViewPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            source = "",
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -1979,7 +2039,6 @@ private fun DarkWebViewPreview() {
         )
         MainScreen(
             currentState = currentState,
-            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1992,7 +2051,7 @@ private fun DarkWebViewPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            source = "",
+            inputRepository = FakeInputRepository,
             largeLoadingIndicator = currentState.getLoadingIndicator(),
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -2002,6 +2061,7 @@ private fun DarkWebViewPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            source = "",
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -2053,7 +2113,6 @@ private fun TabletWebViewPreview() {
         )
         MainScreen(
             currentState = currentState,
-            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -2066,7 +2125,7 @@ private fun TabletWebViewPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            source = "",
+            inputRepository = FakeInputRepository,
             largeLoadingIndicator = currentState.getLoadingIndicator(),
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -2076,6 +2135,7 @@ private fun TabletWebViewPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            source = "",
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
@@ -2124,7 +2184,6 @@ private fun EmptyPreview() {
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 persistentListOf(),
             ),
-            allInputs = emptyList(),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -2137,7 +2196,7 @@ private fun EmptyPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            source = "",
+            inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -2147,6 +2206,7 @@ private fun EmptyPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            source = "",
             userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},

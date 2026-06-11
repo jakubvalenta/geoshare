@@ -19,11 +19,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InputViewModel @Inject constructor(
-    private val inputRepository: InputRepository,
+    val inputRepository: InputRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
 ) : ViewModel() {
-
-    val allInputs = inputRepository.all
 
     private val allDocumentationsFlow = flow {
         emit(

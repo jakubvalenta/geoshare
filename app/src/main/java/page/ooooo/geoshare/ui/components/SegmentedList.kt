@@ -78,11 +78,11 @@ fun <T> SegmentedList(
 }
 
 @Composable
-fun SegmentedListLabel(text: String, color: Color = MaterialTheme.colorScheme.primary) {
+fun SegmentedListLabel(text: String, modifier: Modifier = Modifier, color: Color = MaterialTheme.colorScheme.primary) {
     val spacing = LocalSpacing.current
     LabelLarge(
         text,
-        Modifier.padding(top = spacing.medium, bottom = spacing.tiny),
+        modifier.padding(top = spacing.medium, bottom = spacing.tiny),
         color = color,
     )
 }

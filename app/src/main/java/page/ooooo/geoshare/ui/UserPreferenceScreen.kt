@@ -4,9 +4,7 @@ import android.content.res.Configuration
 import androidx.annotation.Keep
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -47,8 +45,8 @@ import page.ooooo.geoshare.lib.billing.CustomLinkFeature
 import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.ui.components.LabelLarge
-import page.ooooo.geoshare.ui.components.NavigableStyledListDetailPaneScaffold
 import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
+import page.ooooo.geoshare.ui.components.NavigableStyledListDetailPaneScaffold
 import page.ooooo.geoshare.ui.components.SegmentedListLabel
 import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
 import page.ooooo.geoshare.ui.components.UserPreferenceAutomationControls
@@ -237,134 +235,147 @@ private fun UserPreferenceListPane(
     val spacing = LocalSpacing.current
 
     LargeTopAppBarPane(
+        modifier = Modifier.testTag("geoShareUserPreferencesListPane"),
         title = {
             Text(stringResource(R.string.user_preferences_title))
         },
         onBack = onBack,
     ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxHeight()
-                .padding(horizontal = spacing.windowPadding)
-                .testTag("geoShareUserPreferencesListPane"),
-        ) {
+        item {
+            LabelLarge(
+                stringResource(R.string.user_preferences_section_input),
+                Modifier
+                    .padding(horizontal = spacing.windowPadding)
+                    .padding(top = spacing.tiny, bottom = spacing.tiny),
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+        item {
+            Column(
+                modifier = Modifier
+                    .selectableGroup()
+                    .padding(horizontal = spacing.windowPadding),
+                verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+            ) {
+                UserPreferenceConnectionPermissionListItem(
+                    index = 0,
+                    count = 2,
+                    selected = currentGroupId == UserPreferenceGroupId.CONNECTION_PERMISSION,
+                    values = values,
+                    modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.CONNECTION_PERMISSION}"),
+                    onClick = { onNavigateToGroup(UserPreferenceGroupId.CONNECTION_PERMISSION) },
+                )
+                UserPreferenceServersListItem(
+                    index = 1,
+                    count = 2,
+                    selected = currentGroupId == UserPreferenceGroupId.SERVERS,
+                    values = values,
+                    modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.SERVERS}"),
+                    onClick = onNavigateToServerScreen,
+                )
+            }
+        }
+        item {
+            SegmentedListLabel(
+                stringResource(R.string.user_preferences_automation_title),
+                modifier = Modifier.padding(horizontal = spacing.windowPadding),
+            )
+        }
+        item {
+            Column(
+                modifier = Modifier
+                    .selectableGroup()
+                    .padding(horizontal = spacing.windowPadding),
+                verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+            ) {
+                UserPreferenceAutomationListItem(
+                    index = 0,
+                    count = 2,
+                    appDetails = appDetails,
+                    billingFeatures = billingFeatures,
+                    billingStatus = billingStatus,
+                    links = links,
+                    selected = currentGroupId == UserPreferenceGroupId.AUTOMATION,
+                    values = values,
+                    modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.AUTOMATION}"),
+                    onClick = { onNavigateToGroup(UserPreferenceGroupId.AUTOMATION) },
+                    onGetAutomationOutput = onGetAutomationOutput,
+                )
+                UserPreferenceAutomationDelayListItem(
+                    index = 1,
+                    count = 2,
+                    billingFeatures = billingFeatures,
+                    billingStatus = billingStatus,
+                    links = links,
+                    selected = currentGroupId == UserPreferenceGroupId.AUTOMATION_DELAY,
+                    values = values,
+                    modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.AUTOMATION_DELAY}"),
+                    onClick = { onNavigateToGroup(UserPreferenceGroupId.AUTOMATION_DELAY) },
+                    onGetAutomationOutput = onGetAutomationOutput,
+                )
+            }
+        }
+        item {
+            SegmentedListLabel(
+                stringResource(R.string.user_preferences_section_output),
+                modifier = Modifier.padding(horizontal = spacing.windowPadding),
+            )
+        }
+        item {
+            Column(
+                modifier = Modifier
+                    .selectableGroup()
+                    .padding(horizontal = spacing.windowPadding),
+                verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+            ) {
+                UserPreferenceHiddenAppsListItem(
+                    index = 0,
+                    count = 3,
+                    apps = apps,
+                    selected = currentGroupId == UserPreferenceGroupId.HIDDEN_APPS,
+                    values = values,
+                    modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.HIDDEN_APPS}"),
+                    onClick = { onNavigateToGroup(UserPreferenceGroupId.HIDDEN_APPS) },
+                )
+                UserPreferenceLinksListItem(
+                    index = 1,
+                    count = 3,
+                    links = links,
+                    selected = currentGroupId == UserPreferenceGroupId.LINKS,
+                    modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.LINKS}"),
+                    onClick = onNavigateToLinkScreen,
+                )
+                UserPreferenceCoordinateFormatListItem(
+                    index = 1,
+                    count = 2,
+                    selected = currentGroupId == UserPreferenceGroupId.COORDINATE_FORMAT,
+                    values = values,
+                    modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.COORDINATE_FORMAT}"),
+                    onClick = { onNavigateToGroup(UserPreferenceGroupId.COORDINATE_FORMAT) },
+                )
+            }
+        }
+        if (BuildConfig.DEBUG) {
             item {
-                LabelLarge(
-                    stringResource(R.string.user_preferences_section_input),
-                    Modifier.padding(top = spacing.tiny, bottom = spacing.tiny),
-                    color = MaterialTheme.colorScheme.primary
+                SegmentedListLabel(
+                    stringResource(R.string.user_preferences_developer_title),
+                    modifier = Modifier.padding(horizontal = spacing.windowPadding),
                 )
             }
             item {
                 Column(
-                    modifier = Modifier.selectableGroup(),
+                    modifier = Modifier
+                        .selectableGroup()
+                        .padding(horizontal = spacing.windowPadding),
                     verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
                 ) {
-                    UserPreferenceConnectionPermissionListItem(
+                    UserPreferenceDeveloperOptionsListItem(
                         index = 0,
-                        count = 2,
-                        selected = currentGroupId == UserPreferenceGroupId.CONNECTION_PERMISSION,
-                        values = values,
-                        modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.CONNECTION_PERMISSION}"),
-                        onClick = { onNavigateToGroup(UserPreferenceGroupId.CONNECTION_PERMISSION) },
+                        count = 1,
+                        selected = currentGroupId == UserPreferenceGroupId.DEVELOPER_OPTIONS,
+                        modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.DEVELOPER_OPTIONS}"),
+                        onClick = { onNavigateToGroup(UserPreferenceGroupId.DEVELOPER_OPTIONS) },
                     )
-                    UserPreferenceServersListItem(
-                        index = 1,
-                        count = 2,
-                        selected = currentGroupId == UserPreferenceGroupId.SERVERS,
-                        values = values,
-                        modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.SERVERS}"),
-                        onClick = onNavigateToServerScreen,
-                    )
-                }
-            }
-            item {
-                SegmentedListLabel(stringResource(R.string.user_preferences_automation_title))
-            }
-            item {
-                Column(
-                    modifier = Modifier.selectableGroup(),
-                    verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
-                ) {
-                    UserPreferenceAutomationListItem(
-                        index = 0,
-                        count = 2,
-                        appDetails = appDetails,
-                        billingFeatures = billingFeatures,
-                        billingStatus = billingStatus,
-                        links = links,
-                        selected = currentGroupId == UserPreferenceGroupId.AUTOMATION,
-                        values = values,
-                        modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.AUTOMATION}"),
-                        onClick = { onNavigateToGroup(UserPreferenceGroupId.AUTOMATION) },
-                        onGetAutomationOutput = onGetAutomationOutput,
-                    )
-                    UserPreferenceAutomationDelayListItem(
-                        index = 1,
-                        count = 2,
-                        billingFeatures = billingFeatures,
-                        billingStatus = billingStatus,
-                        links = links,
-                        selected = currentGroupId == UserPreferenceGroupId.AUTOMATION_DELAY,
-                        values = values,
-                        modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.AUTOMATION_DELAY}"),
-                        onClick = { onNavigateToGroup(UserPreferenceGroupId.AUTOMATION_DELAY) },
-                        onGetAutomationOutput = onGetAutomationOutput,
-                    )
-                }
-            }
-            item {
-                SegmentedListLabel(stringResource(R.string.user_preferences_section_output))
-            }
-            item {
-                Column(
-                    modifier = Modifier.selectableGroup(),
-                    verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
-                ) {
-                    UserPreferenceHiddenAppsListItem(
-                        index = 0,
-                        count = 3,
-                        apps = apps,
-                        selected = currentGroupId == UserPreferenceGroupId.HIDDEN_APPS,
-                        values = values,
-                        modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.HIDDEN_APPS}"),
-                        onClick = { onNavigateToGroup(UserPreferenceGroupId.HIDDEN_APPS) },
-                    )
-                    UserPreferenceLinksListItem(
-                        index = 1,
-                        count = 3,
-                        links = links,
-                        selected = currentGroupId == UserPreferenceGroupId.LINKS,
-                        modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.LINKS}"),
-                        onClick = onNavigateToLinkScreen,
-                    )
-                    UserPreferenceCoordinateFormatListItem(
-                        index = 1,
-                        count = 2,
-                        selected = currentGroupId == UserPreferenceGroupId.COORDINATE_FORMAT,
-                        values = values,
-                        modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.COORDINATE_FORMAT}"),
-                        onClick = { onNavigateToGroup(UserPreferenceGroupId.COORDINATE_FORMAT) },
-                    )
-                }
-            }
-            if (BuildConfig.DEBUG) {
-                item {
-                    SegmentedListLabel(stringResource(R.string.user_preferences_developer_title))
-                }
-                item {
-                    Column(
-                        modifier = Modifier.selectableGroup(),
-                        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
-                    ) {
-                        UserPreferenceDeveloperOptionsListItem(
-                            index = 0,
-                            count = 1,
-                            selected = currentGroupId == UserPreferenceGroupId.DEVELOPER_OPTIONS,
-                            modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.DEVELOPER_OPTIONS}"),
-                            onClick = { onNavigateToGroup(UserPreferenceGroupId.DEVELOPER_OPTIONS) },
-                        )
-                    }
                 }
             }
         }

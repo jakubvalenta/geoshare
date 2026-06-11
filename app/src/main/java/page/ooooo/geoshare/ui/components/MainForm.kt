@@ -35,7 +35,6 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun MainForm(
     source: String,
     errorMessageResId: Int?,
-    modifier: Modifier = Modifier,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
     onSubmit: () -> Unit,
     onUpdateInput: (newSource: String) -> Unit,
