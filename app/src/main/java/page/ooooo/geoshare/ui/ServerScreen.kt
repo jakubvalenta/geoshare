@@ -433,7 +433,7 @@ private fun ServerDetailPane(
                         }
                     }
                 },
-                navigationImageVector = Icons.Default.Close,
+                backIcon = Icons.Default.Close,
             ) {
                 item {
                     ServerForm(

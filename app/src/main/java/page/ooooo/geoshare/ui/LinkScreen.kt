@@ -503,7 +503,7 @@ private fun LinkDetailPane(
                         }
                     }
                 },
-                navigationImageVector = Icons.Default.Close,
+                backIcon = Icons.Default.Close,
             ) {
                 item {
                     LinkForm(
