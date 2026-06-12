@@ -69,6 +69,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.LineBreak
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -879,6 +880,8 @@ private fun MainTitle(
                         stringResource(R.string.conversion_succeeded_title)
                     },
                 Modifier.testTag("geoShareResultSuccessLastPointName"),
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 2,
             )
 
         is Initial ->
@@ -1223,7 +1226,10 @@ private fun SucceededPreview() {
                 source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
-                    WGS84Point(NaivePoint.example),
+                    WGS84Point(
+                        NaivePoint.example,
+                        name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
+                    ),
                 ),
                 actionResult = ActionResult.Succeeded,
             ),
@@ -1303,7 +1309,10 @@ private fun DarkSucceededPreview() {
                 source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
-                    WGS84Point(NaivePoint.example),
+                    WGS84Point(
+                        NaivePoint.example,
+                        name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
+                    ),
                 ),
                 actionResult = ActionResult.Succeeded,
             ),
@@ -1383,7 +1392,10 @@ private fun SmallSucceededPreview() {
                 source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
-                    WGS84Point(NaivePoint.example),
+                    WGS84Point(
+                        NaivePoint.example,
+                        name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
+                    ),
                 ),
                 actionResult = ActionResult.Succeeded,
             ),
@@ -1463,7 +1475,10 @@ private fun TabletSucceededPreview() {
                 source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
-                    WGS84Point(NaivePoint.example),
+                    WGS84Point(
+                        NaivePoint.example,
+                        name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
+                    ),
                 ),
                 actionResult = ActionResult.Succeeded,
             ),

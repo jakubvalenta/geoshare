@@ -230,7 +230,10 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
             fallbackNames = if (testServer is TestServer.Configured) {
                 emptySet()
             } else if (htmlParsingSupported) {
-                setOf(@Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln")
+                setOf(
+                    @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln",
+                    @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln, Allemagne",
+                )
             } else {
                 emptySet()
             }
