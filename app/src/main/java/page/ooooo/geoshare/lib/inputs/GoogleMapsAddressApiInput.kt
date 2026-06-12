@@ -120,15 +120,6 @@ class GoogleMapsAddressApiInput @Inject constructor(
                 return it
             }
 
-        // Google Navigation URI search
-        // google.navigation:q={query}
-        if (scheme == "google.navigation") {
-            Regex("""(?:^|.*&)q=([^&]+).*""").matchEntire(pathParts.firstOrNull())?.groupOrNull()
-                ?.let {
-                    return it
-                }
-        }
-
         val parts = pathParts.dropWhile { it.isEmpty() || it == "maps" }
         val firstPart = parts.firstOrNull()
         when (firstPart) {

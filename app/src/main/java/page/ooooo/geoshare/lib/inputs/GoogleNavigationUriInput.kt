@@ -2,6 +2,7 @@ package page.ooooo.geoshare.lib.inputs
 
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
@@ -16,7 +17,6 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 import javax.inject.Inject
 import javax.inject.Singleton
 
-// TODO Instrumented test
 /**
  * See https://developer.android.com/guide/components/google-maps-intents#launch-turn-by-turn-navigation
  */
@@ -54,7 +54,15 @@ class GoogleNavigationUriInput @Inject constructor(
             Q_PATH_PATTERN.matchEntire(q)?.groupOrNull()?.let {
                 points = persistentListOf(WGS84Point(name = it, source = Source.URI))
                 // Go to API parsing
-                next = MatchedInput(googleMapsAddressApiInput.get(), match)
+                next = MatchedInput(
+                    googleMapsAddressApiInput.get(),
+                    Uri(
+                        scheme = "https",
+                        host = "maps.google.com",
+                        queryParams = mapOf("q" to it).toImmutableMap(),
+                        uriQuote = uriQuote,
+                    ).toString()
+                )
                 return@run
             }
         }

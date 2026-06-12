@@ -96,7 +96,10 @@ class GoogleNavigationUriInputTest : InputTest {
         assertEquals(
             ParseResult(
                 persistentListOf(WGS84Point(name = "foo bar", source = Source.URI)),
-                next = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, "google.navigation:q=foo+bar")
+                next = MatchedInput(
+                    FakeInputRepository.googleMapsAddressApiInput,
+                    "https://maps.google.com?q=foo%20bar"
+                )
             ),
             input.parse("google.navigation:q=foo+bar")
         )
@@ -109,7 +112,7 @@ class GoogleNavigationUriInputTest : InputTest {
                 persistentListOf(WGS84Point(name = "foo bar", source = Source.URI)),
                 next = MatchedInput(
                     FakeInputRepository.googleMapsAddressApiInput,
-                    "google.navigation:q=foo+bar&avoid=tf&model=l"
+                    "https://maps.google.com?q=foo%20bar"
                 )
             ),
             input.parse("google.navigation:q=foo+bar&avoid=tf&model=l")
@@ -123,7 +126,7 @@ class GoogleNavigationUriInputTest : InputTest {
                 persistentListOf(WGS84Point(name = "foo bar", source = Source.URI)),
                 next = MatchedInput(
                     FakeInputRepository.googleMapsAddressApiInput,
-                    "google.navigation:avoid=tf&model=l&q=foo+bar"
+                    "https://maps.google.com?q=foo%20bar"
                 )
             ),
             input.parse("google.navigation:avoid=tf&model=l&q=foo+bar")
