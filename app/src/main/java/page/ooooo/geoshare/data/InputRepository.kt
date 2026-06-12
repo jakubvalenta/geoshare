@@ -12,6 +12,7 @@ import page.ooooo.geoshare.lib.inputs.DebugUriInput
 import page.ooooo.geoshare.lib.inputs.GeoUriInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsShortLinkInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsUriInput
+import page.ooooo.geoshare.lib.inputs.GoogleNavigationUriInput
 import page.ooooo.geoshare.lib.inputs.HereWeGoUriInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.MagicEarthUriInput
@@ -40,6 +41,7 @@ interface InputRepository {
     val geoUriInput: GeoUriInput
     val googleMapsShortLinkInput: GoogleMapsShortLinkInput
     val googleMapsUriInput: GoogleMapsUriInput
+    val googleNavigationUriInput: GoogleNavigationUriInput
     val hereWeGoUriInput: HereWeGoUriInput
     val magicEarthUriInput: MagicEarthUriInput
     val mapsMeUriInput: MapsMeUriInput
@@ -65,6 +67,7 @@ interface InputRepository {
             plusCodeInput,
             googleMapsShortLinkInput,
             googleMapsUriInput,
+            googleNavigationUriInput,
             appleMapsUriInput,
             amapShortLinkInput,
             amapUriInput,
@@ -106,6 +109,7 @@ class DefaultInputRepository @Inject constructor(
     override val geoUriInput: GeoUriInput,
     override val googleMapsShortLinkInput: GoogleMapsShortLinkInput,
     override val googleMapsUriInput: GoogleMapsUriInput,
+    override val googleNavigationUriInput: GoogleNavigationUriInput,
     override val hereWeGoUriInput: HereWeGoUriInput,
     override val magicEarthUriInput: MagicEarthUriInput,
     override val mapsMeUriInput: MapsMeUriInput,

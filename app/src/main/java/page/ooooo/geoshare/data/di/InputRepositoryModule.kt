@@ -27,6 +27,7 @@ import page.ooooo.geoshare.lib.inputs.GoogleMapsPlaceApiInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsPlaceListInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsShortLinkInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsUriInput
+import page.ooooo.geoshare.lib.inputs.GoogleNavigationUriInput
 import page.ooooo.geoshare.lib.inputs.HereWeGoUriInput
 import page.ooooo.geoshare.lib.inputs.MagicEarthUriInput
 import page.ooooo.geoshare.lib.inputs.MapsMeUriInput
@@ -64,6 +65,7 @@ object InputRepositoryModule {
         geoUriInput: GeoUriInput,
         googleMapsShortLinkInput: GoogleMapsShortLinkInput,
         googleMapsUriInput: GoogleMapsUriInput,
+        googleNavigationUriInput: GoogleNavigationUriInput,
         hereWeGoUriInput: HereWeGoUriInput,
         magicEarthUriInput: MagicEarthUriInput,
         mapsMeUriInput: MapsMeUriInput,
@@ -89,6 +91,7 @@ object InputRepositoryModule {
             geoUriInput,
             googleMapsShortLinkInput,
             googleMapsUriInput,
+            googleNavigationUriInput,
             hereWeGoUriInput,
             magicEarthUriInput,
             mapsMeUriInput,
@@ -188,6 +191,10 @@ object FakeInputRepository : InputRepository {
     )
     val googleMapsHtmlInput = object : GoogleMapsHtmlInput {}
     val googleMapsPlaceListInput = object : GoogleMapsPlaceListInput {}
+    override val googleNavigationUriInput = GoogleNavigationUriInput(
+        googleMapsAddressApiInput = { googleMapsAddressApiInput },
+        uriQuote = uriQuote,
+    )
     override val hereWeGoUriInput = HereWeGoUriInput(
         uriQuote = uriQuote,
     )
