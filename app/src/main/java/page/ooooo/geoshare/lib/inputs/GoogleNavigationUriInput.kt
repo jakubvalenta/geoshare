@@ -17,6 +17,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 // TODO Unit test
+// TODO Unit test LAT+LON
 // TODO Instrumented test
 @Singleton
 class GoogleNavigationUriInput @Inject constructor(
@@ -42,7 +43,8 @@ class GoogleNavigationUriInput @Inject constructor(
 
             // Coordinates
             // google.navigation:q={lat},{lon}
-            LAT_LON_PATTERN.matchEntire(q)?.toLatLonPoint(Source.URI)?.let {
+            // google.navigation:q={lat}+{lon}
+            Regex("""$LAT[,+]$LON""").matchEntire(q)?.toLatLonPoint(Source.URI)?.let {
                 points = persistentListOf(WGS84Point(it))
                 return@run
             }
