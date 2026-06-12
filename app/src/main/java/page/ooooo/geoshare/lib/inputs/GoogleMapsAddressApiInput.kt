@@ -103,7 +103,7 @@ class GoogleMapsAddressApiInput @Inject constructor(
     }
 
     private fun parseQuery(uri: Uri): String? = uri.run {
-        val qWithoutCoordsPattern = Regex("""(.+?)(?:[\s+]*@$LAT,$LON\s*)?""")
+        val qWithoutCoordsPattern = Regex("""(.+?)(?:[\s+]*@$LAT$COORD_SEP$LON\s*)?""")
 
         // API directions
         // https://www.google.com/maps/dir/?origin={name}&destination={name}

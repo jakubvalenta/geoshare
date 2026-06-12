@@ -90,7 +90,7 @@ class GoogleMapsPlaceApiInputBehaviorTest(private val testServerParams: TestServ
             fallbackNames = if (testServer is TestServer.Configured) {
                 emptySet()
             } else if (htmlParsingSupported) {
-                setOf("Seattle Stadium")
+                setOf("Seattle Stadium", "Seattle-Stadion")
             } else {
                 emptySet()
             },

@@ -14,14 +14,14 @@ class GpxFormatterTest {
 <gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
-<wpt lat="50.123456" lon="-11.123456" />
+<wpt lat="50.123456" lon="-120.123456" />
 <wpt lat="52.5067296" lon="13.2599309" />
 </gpx>
 """,
             StringBuilder().apply {
                 GpxFormatter.writeGpxPoints(
                     persistentListOf(
-                        WGS84Point(50.123456, -11.123456, source = Source.GENERATED),
+                        WGS84Point(50.123456, -120.123456, source = Source.GENERATED),
                         WGS84Point(source = Source.GENERATED), // Empty point
                         WGS84Point(52.5067296, 13.2599309, source = Source.GENERATED),
                     ),
@@ -38,7 +38,7 @@ class GpxFormatterTest {
 <gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
-<wpt lat="50.123456" lon="-11.123456">
+<wpt lat="50.123456" lon="-120.123456">
     <name>&lt;script&gt;alert()&lt;/script&gt;</name>
 </wpt>
 </gpx>
@@ -46,7 +46,12 @@ class GpxFormatterTest {
             StringBuilder().apply {
                 GpxFormatter.writeGpxPoints(
                     persistentListOf(
-                        WGS84Point(50.123456, -11.123456, name = "<script>alert()</script>", source = Source.GENERATED),
+                        WGS84Point(
+                            50.123456,
+                            -120.123456,
+                            name = "<script>alert()</script>",
+                            source = Source.GENERATED
+                        ),
                     ),
                     this,
                 )
@@ -80,7 +85,7 @@ class GpxFormatterTest {
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
 <rte>
-<rtept lat="50.123456" lon="-11.123456" />
+<rtept lat="50.123456" lon="-120.123456" />
 <rtept lat="52.5067296" lon="13.2599309" />
 <rtept lat="53" lon="14" />
 </rte>
@@ -89,7 +94,7 @@ class GpxFormatterTest {
             StringBuilder().apply {
                 GpxFormatter.writeGpxRoute(
                     persistentListOf(
-                        WGS84Point(50.123456, -11.123456, source = Source.GENERATED),
+                        WGS84Point(50.123456, -120.123456, source = Source.GENERATED),
                         WGS84Point(source = Source.GENERATED), // Empty point
                         WGS84Point(52.5067296, 13.2599309, source = Source.GENERATED),
                         WGS84Point(53.0, 14.0, source = Source.GENERATED),
@@ -108,7 +113,7 @@ class GpxFormatterTest {
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
 <rte>
-<rtept lat="50.123456" lon="-11.123456">
+<rtept lat="50.123456" lon="-120.123456">
     <name>&lt;script&gt;alert()&lt;/script&gt;</name>
 </rtept>
 </rte>
@@ -117,7 +122,12 @@ class GpxFormatterTest {
             StringBuilder().apply {
                 GpxFormatter.writeGpxRoute(
                     persistentListOf(
-                        WGS84Point(50.123456, -11.123456, name = "<script>alert()</script>", source = Source.GENERATED),
+                        WGS84Point(
+                            50.123456,
+                            -120.123456,
+                            name = "<script>alert()</script>",
+                            source = Source.GENERATED
+                        ),
                     ),
                     this,
                 )

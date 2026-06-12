@@ -451,6 +451,15 @@
                     android:pathPrefix="/kgs"
                     android:scheme="https" />
             </intent-filter>
+            <!-- Google Navigation URI -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="google.navigation" />
+            </intent-filter>
             <!-- Here WeGo -->
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW" />
