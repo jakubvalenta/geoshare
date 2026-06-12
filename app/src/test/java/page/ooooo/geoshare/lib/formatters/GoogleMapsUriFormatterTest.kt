@@ -13,9 +13,9 @@ class GoogleMapsUriFormatterTest {
     @Test
     fun formatNavigationUriString_whenPointHasCoordinatesAndZoom_returnsLinkWithCoordinatesAsQueryAndZoom() {
         assertEquals(
-            "google.navigation:q=50.123456,-11.123456",
+            "google.navigation:q=50.123456,-120.123456",
             GoogleMapsUriFormatter.formatNavigationUriString(
-                WGS84Point(50.123456, -11.123456, z = 3.4, source = Source.GENERATED),
+                WGS84Point(50.123456, -120.123456, z = 3.4, source = Source.GENERATED),
                 uriQuote,
             ),
         )
@@ -25,9 +25,9 @@ class GoogleMapsUriFormatterTest {
     fun formatStreetViewUriString_whenPointHasCoordinatesAndZoom_returnsLinkWithCoordinatesAsQueryAndZoom() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            "google.streetview:cbll=50.123456,-11.123456",
+            "google.streetview:cbll=50.123456,-120.123456",
             GoogleMapsUriFormatter.formatStreetViewUriString(
-                WGS84Point(50.123456, -11.123456, z = 3.4, source = Source.GENERATED),
+                WGS84Point(50.123456, -120.123456, z = 3.4, source = Source.GENERATED),
                 uriQuote,
             ),
         )
@@ -59,9 +59,9 @@ class GoogleMapsUriFormatterTest {
     @Test
     fun formatNavigationUriString_whenPointHasCoordinatesAndQueryAndZoom_returnsLinkWithCoordinatesAndZoom() {
         assertEquals(
-            "google.navigation:q=50.123456,-11.123456",
+            "google.navigation:q=50.123456,-120.123456",
             GoogleMapsUriFormatter.formatNavigationUriString(
-                WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4, source = Source.GENERATED),
+                WGS84Point(50.123456, -120.123456, name = "foo bar", z = 3.4, source = Source.GENERATED),
                 uriQuote,
             ),
         )
@@ -71,9 +71,9 @@ class GoogleMapsUriFormatterTest {
     fun formatStreetViewUriString_whenPointHasCoordinatesAndQueryAndZoom_returnsLinkWithCoordinatesAndZoom() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            "google.streetview:cbll=50.123456,-11.123456",
+            "google.streetview:cbll=50.123456,-120.123456",
             GoogleMapsUriFormatter.formatStreetViewUriString(
-                WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4, source = Source.GENERATED),
+                WGS84Point(50.123456, -120.123456, name = "foo bar", z = 3.4, source = Source.GENERATED),
                 uriQuote,
             ),
         )
@@ -105,9 +105,9 @@ class GoogleMapsUriFormatterTest {
     @Test
     fun formatNavigationUriString_whenPointHasCoordinates_returnsLinkWithCoordinatesAsQuery() {
         assertEquals(
-            "google.navigation:q=50.123456,-11.123456",
+            "google.navigation:q=50.123456,-120.123456",
             GoogleMapsUriFormatter.formatNavigationUriString(
-                WGS84Point(50.123456, -11.123456, source = Source.GENERATED),
+                WGS84Point(50.123456, -120.123456, source = Source.GENERATED),
                 uriQuote,
             ),
         )
@@ -117,9 +117,9 @@ class GoogleMapsUriFormatterTest {
     fun formatStreetViewUriString_whenPointHasCoordinates_returnsLinkWithCoordinatesAsQuery() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            "google.streetview:cbll=50.123456,-11.123456",
+            "google.streetview:cbll=50.123456,-120.123456",
             GoogleMapsUriFormatter.formatStreetViewUriString(
-                WGS84Point(50.123456, -11.123456, source = Source.GENERATED),
+                WGS84Point(50.123456, -120.123456, source = Source.GENERATED),
                 uriQuote,
             ),
         )

@@ -23,8 +23,8 @@ class MagicEarthUriInputTest : InputTest {
             input.match("magicearth.com/?show_on_map&lat=48.85649&lon=2.35216&name=48.85649,+2.35216&img_id=12345")
         )
         assertEquals(
-            "magicearth://?lat=50.123456&lon=-11.123456&q=foo%20bar&zoom=3.4",
-            input.match("magicearth://?lat=50.123456&lon=-11.123456&q=foo%20bar&zoom=3.4")
+            "magicearth://?lat=50.123456&lon=-120.123456&q=foo%20bar&zoom=3.4",
+            input.match("magicearth://?lat=50.123456&lon=-120.123456&q=foo%20bar&zoom=3.4")
         )
     }
 
@@ -151,14 +151,14 @@ class MagicEarthUriInputTest : InputTest {
             ParseResult(
                 persistentListOf(
                     WGS84Point(
-                        50.123456, -11.123456,
+                        50.123456, -120.123456,
                         z = 3.4,
                         name = "foo bar",
                         source = Source.URI,
                     )
                 )
             ),
-            input.parse("magicearth://?lat=50.123456&lon=-11.123456&q=foo%20bar&zoom=3.4"),
+            input.parse("magicearth://?lat=50.123456&lon=-120.123456&q=foo%20bar&zoom=3.4"),
         )
     }
 }

@@ -38,7 +38,7 @@ class GoogleMapsPlaceApiInputTest {
                 """
                     {
                         "place": "//places.googleapis.com/places/foo",
-                        "location": {"latitude": 50.123456, "longitude": -11.123456}
+                        "location": {"latitude": 50.123456, "longitude": -120.123456}
                     }
                 """.trimIndent(),
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
@@ -109,7 +109,7 @@ class GoogleMapsPlaceApiInputTest {
         assertEquals(
             ParseResult(
                 persistentListOf(
-                    GCJ02MainlandChinaPoint(50.123456, -11.123456, source = Source.API)
+                    GCJ02MainlandChinaPoint(50.123456, -120.123456, source = Source.API)
                 )
             ),
             input.fetch(match) { data -> input.parse(data, match) },

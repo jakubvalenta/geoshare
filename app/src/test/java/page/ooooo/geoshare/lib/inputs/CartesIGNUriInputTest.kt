@@ -15,25 +15,25 @@ class CartesIGNUriInputTest : InputTest {
     @Test
     fun match_fullUrl() {
         assertEquals(
-            "https://cartes-ign.ign.fr?lng=-11.123456&lat=50.123456&z=3.14",
-            input.match("https://cartes-ign.ign.fr?lng=-11.123456&lat=50.123456&z=3.14")
+            "https://cartes-ign.ign.fr?lng=-120.123456&lat=50.123456&z=3.14",
+            input.match("https://cartes-ign.ign.fr?lng=-120.123456&lat=50.123456&z=3.14")
         )
         assertEquals(
-            "cartes-ign.ign.fr?lng=-11.123456&lat=50.123456&z=3.14",
-            input.match("cartes-ign.ign.fr?lng=-11.123456&lat=50.123456&z=3.14")
+            "cartes-ign.ign.fr?lng=-120.123456&lat=50.123456&z=3.14",
+            input.match("cartes-ign.ign.fr?lng=-120.123456&lat=50.123456&z=3.14")
         )
     }
 
     @Test
     fun match_unknownHost() {
-        assertNull(input.match("https://www.example.com/?lng=-11.123456&lat=50.123456&z=3.14"))
+        assertNull(input.match("https://www.example.com/?lng=-120.123456&lat=50.123456&z=3.14"))
     }
 
     @Test
     fun match_unknownScheme() {
         assertEquals(
-            "cartes-ign.ign.fr?lng=-11.123456&lat=50.123456&z=3.14",
-            input.match("ftp://cartes-ign.ign.fr?lng=-11.123456&lat=50.123456&z=3.14"),
+            "cartes-ign.ign.fr?lng=-120.123456&lat=50.123456&z=3.14",
+            input.match("ftp://cartes-ign.ign.fr?lng=-120.123456&lat=50.123456&z=3.14"),
         )
     }
 
@@ -67,9 +67,9 @@ class CartesIGNUriInputTest : InputTest {
     fun parse_coordinates() = runTest {
         assertEquals(
             ParseResult(
-                persistentListOf(WGS84Point(50.123456, -11.123456, z = 3.14, source = Source.URI))
+                persistentListOf(WGS84Point(50.123456, -120.123456, z = 3.14, source = Source.URI))
             ),
-            input.parse("https://cartes-ign.ign.fr?lng=-11.123456&lat=50.123456&z=3.14"),
+            input.parse("https://cartes-ign.ign.fr?lng=-120.123456&lat=50.123456&z=3.14"),
         )
     }
 }

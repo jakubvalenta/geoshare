@@ -20,8 +20,8 @@ class GeoUriInputBehaviorTest {
 
         // Coordinates, query and zoom
         testUri(
-            WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4, source = Source.URI),
-            "geo:50.123456,-11.123456?q=foo%20bar&z=3.4",
+            WGS84Point(50.123456, -120.123456, name = "foo bar", z = 3.4, source = Source.URI),
+            "geo:50.123456,-120.123456?q=foo%20bar&z=3.4",
         )
 
         // Coordinates in query with space; this is not a valid URI, but we support it anyway

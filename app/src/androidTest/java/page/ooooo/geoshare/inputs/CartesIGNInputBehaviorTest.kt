@@ -11,8 +11,8 @@ class CartesIGNInputBehaviorTest {
     fun cartesIGN() = uiAutomator {
         // Coordinates
         testUri(
-            WGS84Point(50.123456, -11.123456, z = 3.14, source = Source.URI),
-            "https://cartes-ign.ign.fr?lng=-11.123456&lat=50.123456&z=3.14",
+            WGS84Point(50.123456, -120.123456, z = 3.14, source = Source.URI),
+            "https://cartes-ign.ign.fr?lng=-120.123456&lat=50.123456&z=3.14",
         )
     }
 }

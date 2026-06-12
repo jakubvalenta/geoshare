@@ -12,25 +12,25 @@ class UriFormatterTest {
     @Test
     fun formatUriString_whenPointHasCoordinatesAndZoomAndName_returnsCoordsTemplateWithFilledVariables() {
         assertEquals(
-            "https://maps.apple.com/?ll=50.123456%2C-11.123456&z=3.4&q=foo%20bar",
+            "https://maps.apple.com/?ll=50.123456%2C-120.123456&z=3.4&q=foo%20bar",
             UriFormatter.formatUriString(
-                WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4, source = Source.GENERATED),
+                WGS84Point(50.123456, -120.123456, name = "foo bar", z = 3.4, source = Source.GENERATED),
                 coordsUriTemplate = "https://maps.apple.com/?ll={lat}%2C{lon}&z={z}&q={name}",
                 uriQuote = FakeUriQuote,
             ),
         )
         assertEquals(
-            "https://www.google.com/maps/search/?api=1&query=50.123456%2C-11.123456",
+            "https://www.google.com/maps/search/?api=1&query=50.123456%2C-120.123456",
             UriFormatter.formatUriString(
-                WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4, source = Source.GENERATED),
+                WGS84Point(50.123456, -120.123456, name = "foo bar", z = 3.4, source = Source.GENERATED),
                 coordsUriTemplate = "https://www.google.com/maps/search/?api=1&query={lat}%2C{lon}",
                 uriQuote = FakeUriQuote,
             ),
         )
         assertEquals(
-            "https://www.openstreetmap.org/?mlat=50.123456&mlon=-11.123456#map=3.4/50.123456/-11.123456",
+            "https://www.openstreetmap.org/?mlat=50.123456&mlon=-120.123456#map=3.4/50.123456/-120.123456",
             UriFormatter.formatUriString(
-                WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4, source = Source.GENERATED),
+                WGS84Point(50.123456, -120.123456, name = "foo bar", z = 3.4, source = Source.GENERATED),
                 coordsUriTemplate = @Suppress("SpellCheckingInspection") "https://www.openstreetmap.org/?mlat={lat}&mlon={lon}#map={z}/{lat}/{lon}",
                 uriQuote = FakeUriQuote,
             ),
@@ -42,7 +42,7 @@ class UriFormatterTest {
         assertEquals(
             "https://maps.apple.com/",
             UriFormatter.formatUriString(
-                WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4, source = Source.GENERATED),
+                WGS84Point(50.123456, -120.123456, name = "foo bar", z = 3.4, source = Source.GENERATED),
                 coordsUriTemplate = "https://maps.apple.com/",
                 uriQuote = FakeUriQuote,
             ),
@@ -52,9 +52,9 @@ class UriFormatterTest {
     @Test
     fun formatUriString_whenPointHasCoordinatesOnly_returnsCoordsTemplateWithEmptyNameVariableAndDefaultZoomVariable() {
         assertEquals(
-            "https://maps.apple.com/?ll=50.123456%2C-11.123456&z=16&q=",
+            "https://maps.apple.com/?ll=50.123456%2C-120.123456&z=16&q=",
             UriFormatter.formatUriString(
-                WGS84Point(50.123456, -11.123456, source = Source.GENERATED),
+                WGS84Point(50.123456, -120.123456, source = Source.GENERATED),
                 coordsUriTemplate = "https://maps.apple.com/?ll={lat}%2C{lon}&z={z}&q={name}",
                 uriQuote = FakeUriQuote,
             ),
@@ -64,9 +64,9 @@ class UriFormatterTest {
     @Test
     fun formatUriString_whenPointIsOutsideMainlandChinaAndCoordsTemplateHasPlusCode_returnsCoordsTemplateWithFilledPlusCode() {
         assertEquals(
-            "https://www.google.com/maps/place/9C2C4VFG%2B9JM",
+            "https://www.google.com/maps/place/942X4VFG%2B9JM",
             UriFormatter.formatUriString(
-                WGS84Point(50.123456, -11.123456, source = Source.GENERATED),
+                WGS84Point(50.123456, -120.123456, source = Source.GENERATED),
                 coordsUriTemplate = "https://www.google.com/maps/place/{plus_code}",
                 uriQuote = FakeUriQuote,
             ),
@@ -144,7 +144,7 @@ class UriFormatterTest {
         assertEquals(
             "https://www.google.com/maps/search/?api=1&query=foo%20bar",
             UriFormatter.formatUriString(
-                WGS84Point(50.123456, -11.123456, name = "foo bar", source = Source.GENERATED),
+                WGS84Point(50.123456, -120.123456, name = "foo bar", source = Source.GENERATED),
                 coordsUriTemplate = "",
                 nameUriTemplate = "https://www.google.com/maps/search/?api=1&query={q}",
                 uriQuote = FakeUriQuote,
@@ -156,7 +156,7 @@ class UriFormatterTest {
     fun formatUriString_whenPointHasCoordsOnlyAndCoordsTemplateIsEmpty_returnsNull() {
         assertNull(
             UriFormatter.formatUriString(
-                WGS84Point(50.123456, -11.123456, source = Source.GENERATED),
+                WGS84Point(50.123456, -120.123456, source = Source.GENERATED),
                 coordsUriTemplate = "",
                 nameUriTemplate = "https://www.google.com/maps/search/?api=1&query={q}",
                 uriQuote = FakeUriQuote,
@@ -180,7 +180,7 @@ class UriFormatterTest {
     fun formatUriString_whenBothTemplatesAreEmpty_returnsNull() {
         assertNull(
             UriFormatter.formatUriString(
-                WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4, source = Source.GENERATED),
+                WGS84Point(50.123456, -120.123456, name = "foo bar", z = 3.4, source = Source.GENERATED),
                 coordsUriTemplate = "",
                 nameUriTemplate = "",
                 uriQuote = FakeUriQuote,

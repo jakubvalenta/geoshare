@@ -16,9 +16,10 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 import javax.inject.Inject
 import javax.inject.Singleton
 
-// TODO Unit test
-// TODO Unit test LAT+LON
 // TODO Instrumented test
+/**
+ * See https://developer.android.com/guide/components/google-maps-intents#launch-turn-by-turn-navigation
+ */
 @Singleton
 class GoogleNavigationUriInput @Inject constructor(
     private val googleMapsAddressApiInput: dagger.Lazy<GoogleMapsAddressApiInput>,
@@ -43,8 +44,7 @@ class GoogleNavigationUriInput @Inject constructor(
 
             // Coordinates
             // google.navigation:q={lat},{lon}
-            // google.navigation:q={lat}+{lon}
-            Regex("""$LAT[,+]$LON""").matchEntire(q)?.toLatLonPoint(Source.URI)?.let {
+            LAT_LON_PATTERN.matchEntire(q)?.toLatLonPoint(Source.URI)?.let {
                 points = persistentListOf(WGS84Point(it))
                 return@run
             }

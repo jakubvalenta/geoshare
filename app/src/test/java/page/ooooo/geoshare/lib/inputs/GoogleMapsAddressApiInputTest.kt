@@ -38,7 +38,7 @@ class GoogleMapsAddressApiInputTest {
                 """
                     {
                         "results": [
-                            {"place": "//places.googleapis.com/places/foo", "location": {"latitude": 50.123456, "longitude": -11.123456}},
+                            {"place": "//places.googleapis.com/places/foo", "location": {"latitude": 50.123456, "longitude": -120.123456}},
                             {"place": "//places.googleapis.com/places/bar", "location": {"latitude": 9, "longitude": -120}}
                         ]
                     }
@@ -124,7 +124,7 @@ class GoogleMapsAddressApiInputTest {
             assertEquals(
                 ParseResult(
                     persistentListOf(
-                        GCJ02MainlandChinaPoint(50.123456, -11.123456, name = query, source = Source.API)
+                        GCJ02MainlandChinaPoint(50.123456, -120.123456, name = query, source = Source.API)
                     )
                 ),
                 input.fetch(match) { data -> input.parse(data, match) },
@@ -143,7 +143,7 @@ class GoogleMapsAddressApiInputTest {
                     """
                         {
                             "results": [
-                                {"place": "//places.googleapis.com/places/foo", "location": {"latitude": 50.123456, "longitude": -11.123456}}
+                                {"place": "//places.googleapis.com/places/foo", "location": {"latitude": 50.123456, "longitude": -120.123456}}
                             ]
                         }
                     """.trimIndent(),
@@ -167,7 +167,7 @@ class GoogleMapsAddressApiInputTest {
         assertEquals(
             ParseResult(
                 persistentListOf(
-                    GCJ02MainlandChinaPoint(50.123456, -11.123456, name = cleanQuery, source = Source.API)
+                    GCJ02MainlandChinaPoint(50.123456, -120.123456, name = cleanQuery, source = Source.API)
                 )
             ),
             input.fetch(match) { data -> input.parse(data, match) },
@@ -195,7 +195,7 @@ class GoogleMapsAddressApiInputTest {
             assertEquals(
                 ParseResult(
                     persistentListOf(
-                        GCJ02MainlandChinaPoint(50.123456, -11.123456, name = query, source = Source.API)
+                        GCJ02MainlandChinaPoint(50.123456, -120.123456, name = query, source = Source.API)
                     )
                 ),
                 input.fetch(match) { data -> input.parse(data, match) },
