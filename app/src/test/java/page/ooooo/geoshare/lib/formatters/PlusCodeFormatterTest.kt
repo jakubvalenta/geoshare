@@ -10,9 +10,9 @@ class PlusCodeFormatterTest {
     @Test
     fun formatPlusCode_pointIsOutsideMainlandChina() {
         assertEquals(
-            "9C2C4VFG+9JM",
+            "942X4VFG+9JM",
             PlusCodeFormatter.formatPlusCode(
-                GCJ02MainlandChinaPoint(50.123456, -11.123456, source = Source.GENERATED)
+                GCJ02MainlandChinaPoint(50.123456, -120.123456, source = Source.GENERATED)
             ),
         )
     }

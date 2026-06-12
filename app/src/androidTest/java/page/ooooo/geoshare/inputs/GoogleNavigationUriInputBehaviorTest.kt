@@ -6,13 +6,13 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.testUri
 
-class CartesIGNInputBehaviorTest {
+class GoogleNavigationUriInputBehaviorTest {
     @Test
-    fun cartesIGN() = uiAutomator {
+    fun googleNavigationUri() = uiAutomator {
         // Coordinates
         testUri(
-            WGS84Point(50.123456, -120.123456, z = 3.14, source = Source.URI),
-            "https://cartes-ign.ign.fr?lng=-120.123456&lat=50.123456&z=3.14",
+            WGS84Point(50.123456, -120.123456, source = Source.URI),
+            "google.navigation:q=50.123456,-120.123456",
         )
     }
 }

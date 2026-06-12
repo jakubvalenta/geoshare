@@ -1,11 +1,12 @@
 package page.ooooo.geoshare.lib.inputs
 
 const val MAX_PRECISION = 17
-const val LAT_NUM = """-?\d{1,2}(?:\.\d{1,$MAX_PRECISION})?"""
-const val LON_NUM = """-?\d{1,3}(?:\.\d{1,$MAX_PRECISION})?"""
-const val LAT = """[+ ]?($LAT_NUM)"""
-const val LON = """[+ ]?($LON_NUM)"""
+const val LAT_NUM = """[+-]?\d{1,2}(?:\.\d{1,$MAX_PRECISION})?"""
+const val LON_NUM = """[+-]?\d{1,3}(?:\.\d{1,$MAX_PRECISION})?"""
+const val LAT = """($LAT_NUM)"""
+const val LON = """($LON_NUM)"""
 const val Z = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
+const val COORD_SEP = """(?:,[+ ]?|[,+ ])"""
 
 /**
  * Matches all characters up until two spaces, new line, or end of string.
@@ -22,19 +23,19 @@ const val URI_REST = """[\S ]*?\S(?= {2}|\n|\t|\s*$)"""
  *
  * Notice that if it contains LAT,LON, then the group doesn't match.
  */
-const val NAME_PARAM = """[+ ]?$LAT_NUM,[+ ]?$LON_NUM|(.+)"""
+const val NAME_PARAM = """$LAT_NUM$COORD_SEP$LON_NUM|(.+)"""
 
 /**
  * Name when it appears in URI path
  *
  * Notice that if it contains LAT,LON, then the group doesn't match.
  */
-const val NAME_PATH = """[+ ]?$LAT_NUM,[+ ]?$LON_NUM|([^/]+)"""
+const val NAME_PATH = """$LAT_NUM$COORD_SEP$LON_NUM|([^/]+)"""
 
 val LAT_PATTERN = LAT.toRegex()
 val LON_PATTERN = LON.toRegex()
-val LAT_LON_PATTERN = "$LAT,$LON".toRegex()
-val LON_LAT_PATTERN = "$LON,$LAT".toRegex()
+val LAT_LON_PATTERN = "$LAT$COORD_SEP$LON".toRegex()
+val LON_LAT_PATTERN = "$LON$COORD_SEP$LAT".toRegex()
 val Z_PATTERN = Z.toRegex()
 val Q_PATH_PATTERN = NAME_PATH.toRegex()
 val Q_PARAM_PATTERN = NAME_PARAM.toRegex()

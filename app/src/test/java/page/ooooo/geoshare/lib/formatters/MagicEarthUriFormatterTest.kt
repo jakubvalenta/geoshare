@@ -24,9 +24,9 @@ class MagicEarthUriFormatterTest {
     @Test
     fun formatDisplayUriString_pointsHasCoordinatesAndZoom_returnsShowOnMapUriAndIgnoresZoom() {
         assertEquals(
-            "magicearth://?show_on_map&lat=50.123456&lon=-11.123456",
+            "magicearth://?show_on_map&lat=50.123456&lon=-120.123456",
             MagicEarthUriFormatter.formatDisplayUriString(
-                WGS84Point(50.123456, -11.123456, z = 5.0, source = Source.GENERATED),
+                WGS84Point(50.123456, -120.123456, z = 5.0, source = Source.GENERATED),
                 uriQuote,
             ),
         )
@@ -35,9 +35,9 @@ class MagicEarthUriFormatterTest {
     @Test
     fun formatDisplayUriString_pointsHasCoordinatesAndName_returnsShowOnMapUriWithNameParam() {
         assertEquals(
-            "magicearth://?show_on_map&lat=50.123456&lon=-11.123456&name=foo%20bar",
+            "magicearth://?show_on_map&lat=50.123456&lon=-120.123456&name=foo%20bar",
             MagicEarthUriFormatter.formatDisplayUriString(
-                WGS84Point(50.123456, -11.123456, name = "foo bar", source = Source.GENERATED),
+                WGS84Point(50.123456, -120.123456, name = "foo bar", source = Source.GENERATED),
                 uriQuote,
             ),
         )
@@ -68,9 +68,9 @@ class MagicEarthUriFormatterTest {
     @Test
     fun formatDisplayUriString_pointsHasCoordinates_returnsNavigateToUriWithLatAndLonParameters() {
         assertEquals(
-            "magicearth://?get_directions&lat=50.123456&lon=-11.123456",
+            "magicearth://?get_directions&lat=50.123456&lon=-120.123456",
             MagicEarthUriFormatter.formatNavigationUriString(
-                WGS84Point(50.123456, -11.123456, source = Source.GENERATED),
+                WGS84Point(50.123456, -120.123456, source = Source.GENERATED),
                 uriQuote,
             ),
         )

@@ -13,10 +13,10 @@ class GeoUriUriInputTest : InputTest {
     private val input = FakeInputRepository.geoUriInput
 
     @Test
-    fun match_geoUri() {
+    fun match_valid() {
         assertEquals(
-            "geo:50.123456,-11.123456?q=foo%20bar&z=3.4",
-            input.match("geo:50.123456,-11.123456?q=foo%20bar&z=3.4")
+            "geo:50.123456,-120.123456?q=foo%20bar&z=3.4",
+            input.match("geo:50.123456,-120.123456?q=foo%20bar&z=3.4")
         )
         assertEquals(
             "geo:52.47254,13.4345?q=52.47254,13.4345(My%20place)",
@@ -25,7 +25,7 @@ class GeoUriUriInputTest : InputTest {
     }
 
     @Test
-    fun match_geoUriWithSpaceInQ() = runTest {
+    fun match_qWithSpace() = runTest {
         assertEquals("geo:0,0?q=45.4786785, 9.2473799", input.match("geo:0,0?q=45.4786785, 9.2473799"))
     }
 
@@ -36,12 +36,12 @@ class GeoUriUriInputTest : InputTest {
 
     @Test
     fun match_noScheme() {
-        assertNull(input.match("50.123456,-11.123456?q=foo%20bar&z=3.4"))
+        assertNull(input.match("50.123456,-120.123456?q=foo%20bar&z=3.4"))
     }
 
     @Test
     fun match_nonGeoScheme() {
-        assertNull(input.match("ftp:50.123456,-11.123456?q=foo%20bar&z=3.4"))
+        assertNull(input.match("ftp:50.123456,-120.123456?q=foo%20bar&z=3.4"))
     }
 
     @Test
@@ -94,22 +94,22 @@ class GeoUriUriInputTest : InputTest {
             ParseResult(
                 persistentListOf(
                     WGS84Point(
-                        50.123456, -11.123456,
+                        50.123456, -120.123456,
                         name = "foo bar",
                         z = 3.4,
                         source = Source.URI,
                     )
                 )
             ),
-            input.parse("geo:50.123456,-11.123456?q=foo%20bar&z=3.4"),
+            input.parse("geo:50.123456,-120.123456?q=foo%20bar&z=3.4"),
         )
     }
 
     @Test
     fun parse_coordsAndQCoords() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(50.123456, -11.123456, source = Source.URI))),
-            input.parse("geo:50.123456,-11.123456?q=50.123456,-11.123456"),
+            ParseResult(persistentListOf(WGS84Point(50.123456, -120.123456, source = Source.URI))),
+            input.parse("geo:50.123456,-120.123456?q=50.123456,-120.123456"),
         )
     }
 
@@ -117,7 +117,7 @@ class GeoUriUriInputTest : InputTest {
     fun parse_coordsAndQCoordsDiffer_qCoordsTakePrecedence() = runTest {
         assertEquals(
             ParseResult(persistentListOf(WGS84Point(40.7127400, -74.0059965, source = Source.URI))),
-            input.parse("geo:50.123456,-11.123456?q=40.7127400,-74.0059965"),
+            input.parse("geo:50.123456,-120.123456?q=40.7127400,-74.0059965"),
         )
     }
 

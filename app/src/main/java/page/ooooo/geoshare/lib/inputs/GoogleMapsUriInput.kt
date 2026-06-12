@@ -188,7 +188,7 @@ class GoogleMapsUriInput @Inject constructor(
     }
 
     private fun parseParts(parts: List<String>, z: Double?): Points {
-        val pointPattern = Regex("""$LAT,$LON.*""")
+        val pointPattern = Regex("""$LAT$COORD_SEP$LON.*""")
 
         val mutableNaivePoints = mutableListOf<NaivePoint>()
 
@@ -223,7 +223,7 @@ class GoogleMapsUriInput @Inject constructor(
             } else if (part.startsWith('@')) {
                 // Map center
                 // /@{lat},{lon},{z}z
-                Regex("""@$LAT,$LON(?:,${Z}z)?.*""").matchEntire(part)?.toLatLonZPoint(Source.MAP_CENTER)
+                Regex("""@$LAT$COORD_SEP$LON(?:,${Z}z)?.*""").matchEntire(part)?.toLatLonZPoint(Source.MAP_CENTER)
                     ?.let { naivePoint ->
                         val lastPoint = mutableNaivePoints.lastOrNull()
                         if (lastPoint == null) {

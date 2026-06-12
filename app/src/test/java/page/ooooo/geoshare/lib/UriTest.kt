@@ -294,11 +294,11 @@ class UriTest {
         assertEquals(
             Uri(
                 scheme = "geo",
-                path = "50.123456,-11.123456",
+                path = "50.123456,-120.123456",
                 queryParams = persistentMapOf("q" to "foo bar", "z" to "3.4"),
                 uriQuote = uriQuote,
             ),
-            Uri.parse("geo:50.123456,-11.123456?q=foo%20bar&z=3.4", uriQuote)
+            Uri.parse("geo:50.123456,-120.123456?q=foo%20bar&z=3.4", uriQuote)
         )
     }
 

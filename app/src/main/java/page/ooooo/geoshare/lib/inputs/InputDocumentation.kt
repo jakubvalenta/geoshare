@@ -17,6 +17,7 @@ enum class InputDocumentationGroup(@param:StringRes val nameResId: Int) {
     DEBUG(R.string.converter_debug_name),
     GEO_URI(R.string.converter_geo_name),
     GOOGLE_MAPS(R.string.converter_google_maps_name),
+    GOOGLE_NAVIGATION_URI(R.string.converter_google_navigation_uri_name),
     HERE_WEGO(R.string.converter_here_wego_name),
     MAGIC_EARTH(R.string.converter_magic_earth_name),
     MAPS_ME(R.string.converter_ge0_name),
