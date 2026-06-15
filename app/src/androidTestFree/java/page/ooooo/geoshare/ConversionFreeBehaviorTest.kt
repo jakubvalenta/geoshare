@@ -27,7 +27,10 @@ class ConversionFreeBehaviorTest {
                     name = @Suppress("SpellCheckingInspection") "Hermannstraße 10, 12049 Berlin",
                     source = Source.URI,
                 ),
-                fallbackNames = setOf(@Suppress("SpellCheckingInspection") "Hermannstraße 10, 12049 Berlin-Bezirk Neukölln"),
+                fallbackNames = setOf(
+                    @Suppress("SpellCheckingInspection") "Hermannstraße 10, 12049 Berlin-Bezirk Neukölln",
+                    @Suppress("SpellCheckingInspection") "Hermannstraße 10, 12049 Berlin-Bezirk Neukölln, Allemagne",
+                ),
             )
 
             // Share another Google Maps place link with the app
@@ -61,7 +64,10 @@ class ConversionFreeBehaviorTest {
                     name = @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin",
                     source = Source.URI,
                 ),
-                fallbackNames = setOf(@Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln"),
+                fallbackNames = setOf(
+                    @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln",
+                    @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln, Allemagne",
+                ),
             )
 
             // Share another Google Maps place link with the app
@@ -75,7 +81,10 @@ class ConversionFreeBehaviorTest {
                     name = @Suppress("SpellCheckingInspection") "Hermannstraße 21, 12049 Berlin",
                     source = Source.URI,
                 ),
-                fallbackNames = setOf(@Suppress("SpellCheckingInspection") "Hermannstraße 21, 12049 Berlin-Bezirk Neukölln"),
+                fallbackNames = setOf(
+                    @Suppress("SpellCheckingInspection") "Hermannstraße 21, 12049 Berlin-Bezirk Neukölln",
+                    @Suppress("SpellCheckingInspection") "Hermannstraße 21, 12049 Berlin, Allemagne",
+                ),
             )
         }
 
