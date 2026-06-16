@@ -29,7 +29,7 @@ class GoogleNavigationUriInput @Inject constructor(
     override val documentation = InputDocumentation(
         group = InputDocumentationGroup.GOOGLE_NAVIGATION_URI,
         items = listOf(
-            InputDocumentationItem.Text(44) {
+            InputDocumentationItem.Text(45) {
                 stringResource(
                     R.string.example,
                     GoogleMapsUriFormatter.formatNavigationUriString(WGS84Point(NaivePoint.example), uriQuote)
