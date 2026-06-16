@@ -1,22 +1,27 @@
 package page.ooooo.geoshare.ui.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
@@ -36,11 +41,14 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 /**
@@ -56,7 +64,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @Composable
 fun LargeTopAppBarPane(
     modifier: Modifier = Modifier,
-    title: (@Composable () -> Unit)? = null,
+    title: (@Composable (maxLines: Int) -> Unit)? = null,
     onBack: (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
     backIcon: ImageVector = Icons.AutoMirrored.Default.ArrowBack,
@@ -82,11 +90,14 @@ fun LargeTopAppBarPane(
 
     LaunchedEffect(listState, title, collapsedHeight, expandedHeight) {
         if (title != null) {
-            val titleHeightPx = with(density) { titleTextStyle.lineHeight.toPx() }
+            // Notice that we assume the title has only one line, while in reality it often has two and sometimes even
+            // three lines. It means that when scrolling the pane, an expanded multi-line title disappears a bit earlier
+            // than it should. But it's not a big deal, and it saves us some measuring of composables.
+            val titleLineHeightPx = with(density) { titleTextStyle.lineHeight.toPx() }
             val headlineTopOffsetPx = with(density) {
-                expandedHeight.toPx() - collapsedHeight.toPx() - titleHeightPx - titleBottomPadding.toPx()
+                expandedHeight.toPx() - collapsedHeight.toPx() - titleLineHeightPx - titleBottomPadding.toPx()
             }
-            val titleAlphaSlope = 1 / titleHeightPx
+            val titleAlphaSlope = 1 / titleLineHeightPx
             snapshotFlow { listState.firstVisibleItemScrollOffset }
                 .map { firstVisibleItemScrollOffset ->
                     if (listState.firstVisibleItemIndex == 0) {
@@ -104,7 +115,7 @@ fun LargeTopAppBarPane(
         title = {
             if (title != null) {
                 Box(Modifier.graphicsLayer { alpha = titleAlpha }) {
-                    title()
+                    title(1)
                 }
             }
         },
@@ -132,16 +143,85 @@ fun LargeTopAppBarPane(
                     Modifier
                         .padding(horizontal = spacing.windowPadding)
                         .padding(bottom = titleBottomPadding)
-                        .height(expandedHeight - collapsedHeight)
+                        .heightIn(min = expandedHeight - collapsedHeight)
                         .graphicsLayer { alpha = 1 - titleAlpha },
                     verticalArrangement = Arrangement.Bottom,
                 ) {
                     CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.headlineMedium) {
-                        title()
+                        title(Int.MAX_VALUE)
                     }
                 }
             }
         }
         content()
+    }
+}
+
+// Previews
+@Preview(showBackground = true)
+@Composable
+private fun DefaultPreview() {
+    AppTheme {
+        Scaffold { innerPadding ->
+            Column(
+                Modifier
+                    .fillMaxHeight()
+                    .padding(innerPadding)
+            ) {
+                LargeTopAppBarPane(
+                    title = { maxLines ->
+                        Text(
+                            @Suppress("SpellCheckingInspection") "Wikimedia Foundation, Inc., 1 Sansome St #1895, San Francisco, CA 94104, Vereinigte Staaten",
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = maxLines
+                        )
+                    },
+                    onBack = {},
+                    actions = {
+                        IconButton({}) {
+                            Icon(
+                                Icons.Default.Menu,
+                                contentDescription = stringResource(R.string.nav_menu_content_description),
+                            )
+                        }
+                    },
+                    content = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkPreview() {
+    AppTheme {
+        Scaffold { innerPadding ->
+            Column(
+                Modifier
+                    .fillMaxHeight()
+                    .padding(innerPadding)
+            ) {
+                LargeTopAppBarPane(
+                    title = { maxLines ->
+                        Text(
+                            @Suppress("SpellCheckingInspection") "Wikimedia Foundation, Inc., 1 Sansome St #1895, San Francisco, CA 94104, Vereinigte Staaten",
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = maxLines,
+                        )
+                    },
+                    onBack = {},
+                    actions = {
+                        IconButton({}) {
+                            Icon(
+                                Icons.Default.Menu,
+                                contentDescription = stringResource(R.string.nav_menu_content_description),
+                            )
+                        }
+                    },
+                    content = {},
+                )
+            }
+        }
     }
 }

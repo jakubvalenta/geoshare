@@ -47,6 +47,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -304,8 +305,8 @@ private fun LinkListPane(
 
     LargeTopAppBarPane(
         modifier = Modifier.testTag("geoShareLinkListPane"),
-        title = {
-            Text(stringResource(R.string.links_title))
+        title = { maxLines ->
+            Text(stringResource(R.string.links_title), overflow = TextOverflow.Ellipsis, maxLines = maxLines)
         },
         onBack = onBack,
     ) {
@@ -484,9 +485,11 @@ private fun LinkDetailPane(
         Column {
             LargeTopAppBarPane(
                 modifier = Modifier.testTag("geoShareLinkDetailPane"),
-                title = {
+                title = { maxLines ->
                     Text(
-                        stringResource(if (destination == -1) R.string.links_insert else R.string.links_update)
+                        stringResource(if (destination == -1) R.string.links_insert else R.string.links_update),
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = maxLines,
                     )
                 },
                 onBack = onBack.takeUnless { wide },

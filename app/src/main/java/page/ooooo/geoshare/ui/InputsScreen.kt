@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -167,8 +168,8 @@ private fun InputsListPane(
     }
 
     LargeTopAppBarPane(
-        title = {
-            Text(stringResource(R.string.inputs_title))
+        title = { maxLines ->
+            Text(stringResource(R.string.inputs_title), overflow = TextOverflow.Ellipsis, maxLines = maxLines)
         },
         onBack = onBack,
     ) {
@@ -268,8 +269,12 @@ private fun InputsDetailPane(
     }
 
     LargeTopAppBarPane(
-        title = {
-            Text(stringResource(currentDocumentation.group.nameResId))
+        title = { maxLines ->
+            Text(
+                stringResource(currentDocumentation.group.nameResId),
+                overflow = TextOverflow.Ellipsis,
+                maxLines = maxLines,
+            )
         },
         onBack = onBack.takeUnless { wide },
     ) {
