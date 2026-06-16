@@ -33,7 +33,7 @@ class GoogleMapsHtmlInputImpl @Inject constructor(
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
-    override val cookies = GoogleMapsShortLinkInput.cookies
+    override val cookies = GoogleMapsShortLinkInput.COOKIES
     override val userAgent = GoogleMapsShortLinkInput.USER_AGENT
 
     override suspend fun parse(data: ByteReadChannel, match: String) = parseResult {

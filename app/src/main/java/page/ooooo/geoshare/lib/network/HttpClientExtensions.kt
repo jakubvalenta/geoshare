@@ -3,6 +3,7 @@ package page.ooooo.geoshare.lib.network
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.network.sockets.ConnectTimeoutException
+import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.HttpTimeout
@@ -35,13 +36,23 @@ private const val TAG = "HttpClient"
 
 /**
  * Makes a HEAD request to [url] and returns the value of the response Location header.
+ *
+ * Retries a 404 response, because that sometimes happens for Google Maps. Do this retrying using the standard
+ * [HttpRequestRetry] instead of our custom retrying based on [RecoverableNetworkException] and
+ * [UnrecoverableNetworkException], which is implemented in [rethrowExceptionsAsNetworkException]. The reason is that we
+ * only want to retry 404 when resolving short links and not make it a recoverable exception for all network requests.
  */
 @Throws(NetworkException::class)
 suspend fun HttpClient.headLocationHeader(url: URL): String =
     config {
         followRedirects = false
+        install(HttpRequestRetry) {
+            maxRetries = 1
+            retryIf { _, response -> response.status == HttpStatusCode.NotFound }
+            delayMillis { 3_000 }
+        }
     }.use { client ->
-        try {
+        val res = try {
             client.head(url)
         } catch (e: RedirectResponseException) {
             // Expect that the request returns 3xx
@@ -50,7 +61,7 @@ suspend fun HttpClient.headLocationHeader(url: URL): String =
             // Expect that the request returns 3xx; version for when the exception is wrapped in NetworkException
             (e.cause as? RedirectResponseException)?.response ?: throw e
         }
-            .headers[HttpHeaders.Location] ?: throw MissingHeaderNetworkException()
+        res.headers[HttpHeaders.Location] ?: throw MissingHeaderNetworkException()
     }
 
 /**

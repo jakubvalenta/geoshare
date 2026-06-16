@@ -139,9 +139,66 @@ class HttpClientExtensionsTest {
         }
 
     @Test
+    fun headLocationHeader_whenResponseIs404_retriesAndReturnsLocationHeader() = runTest {
+        val responses = listOf(false, true).iterator()
+        val engine = MockEngine { request ->
+            if (request.method == HttpMethod.Head && request.url.toString() == "https://maps.google.com/foo") {
+                when (responses.next()) {
+                    true -> respond("", HttpStatusCode.MovedPermanently, headers {
+                        append(HttpHeaders.Location, "https://maps.google.com/redirected")
+                    })
+
+                    false -> respond("", HttpStatusCode.NotFound)
+                }
+            } else {
+                throw NotImplementedError()
+            }
+        }
+        val header = HttpClient(engine) {
+            expectSuccess = true
+            rethrowExceptionsAsNetworkException(log)
+        }.use { client ->
+            client.headLocationHeader(url)
+        }
+        assertEquals(
+            "https://maps.google.com/redirected",
+            header,
+        )
+    }
+
+    @Test
+    fun headLocationHeader_whenResponseIs404AndRetryingFails_throwsException() = runTest {
+        val responses = listOf(false, false).iterator()
+        val engine = MockEngine { request ->
+            if (request.method == HttpMethod.Head && request.url.toString() == "https://maps.google.com/foo") {
+                when (responses.next()) {
+                    true -> respond("", HttpStatusCode.MovedPermanently, headers {
+                        append(HttpHeaders.Location, "https://maps.google.com/redirected")
+                    })
+
+                    false -> respond("", HttpStatusCode.NotFound)
+                }
+            } else {
+                throw NotImplementedError()
+            }
+        }
+        val threw = HttpClient(engine) {
+            expectSuccess = true
+        }.use { client ->
+            try {
+                client.headLocationHeader(url)
+                null
+            } catch (tr: Exception) {
+                tr
+            }
+        }
+        assertTrue(threw is ResponseException)
+    }
+
+    @Test
     fun headLocationHeader_whenResponseIs4xxOr5xx_throwsException() = runTest {
         for (status in listOf(
-            HttpStatusCode.NotFound,
+            HttpStatusCode.BadRequest,
             HttpStatusCode.InternalServerError,
         )) {
             val engine = MockEngine { request ->
@@ -169,7 +226,7 @@ class HttpClientExtensionsTest {
     fun headLocationHeader_whenResponseIs4xxOr5xxAndExceptionsAreRethrownAsNetworkException_throwsException() =
         runTest {
             for (status in listOf(
-                HttpStatusCode.NotFound,
+                HttpStatusCode.BadRequest,
                 HttpStatusCode.InternalServerError,
             )) {
                 val engine = MockEngine { request ->

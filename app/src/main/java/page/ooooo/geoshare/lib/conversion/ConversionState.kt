@@ -218,8 +218,9 @@ data class PermissionGranted(
  * When [BasicInput.fetch] fails, it is retried up to [maxAttempts]. Retrying is done by recursively transitioning
  * this state while tracking the number of attempts made and the cause of the last failure in [lastAttempt].
  *
- * We use this custom retrying instead of the [io.ktor.client.plugins.HttpRequestRetry] plugin, because it makes the
- * state change, which allows the UI to react to it and show the user a message about the progress of the retrying.
+ * We use this custom retrying instead of the standard [io.ktor.client.plugins.HttpRequestRetry] plugin, because our
+ * custom retrying changes the current conversion state, which allows the UI to react to it and show the user a message
+ * about the progress of the retrying.
  */
 data class PermissionGrantedBasicInput<T>(
     val stateContext: ConversionStateContext,
