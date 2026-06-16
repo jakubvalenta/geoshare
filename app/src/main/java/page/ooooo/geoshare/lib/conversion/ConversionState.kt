@@ -314,7 +314,6 @@ data class PermissionGrantedWebViewInput(
     val matchedInput: MatchedInput<WebViewInput>,
     val permission: Permission?,
     val results: Results,
-    val timeout: Duration = 60.seconds,
     val dispatcher: CoroutineContext = Dispatchers.Default,
 ) : ConversionState, ConversionState.HasSource, ConversionState.HasLargeLoadingIndicator {
     private val dataFlow = MutableStateFlow<String?>(null)
@@ -332,7 +331,7 @@ data class PermissionGrantedWebViewInput(
             try {
                 val data = dataFlow
                     .filterNotNull()
-                    .timeout(timeout)
+                    .timeout(matchedInput.input.timeout)
                     .first()
                 val result = matchedInput.input.parse(data, matchedInput.match)
                 DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to result))
