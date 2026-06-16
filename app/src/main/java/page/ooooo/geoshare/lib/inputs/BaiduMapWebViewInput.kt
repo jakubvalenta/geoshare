@@ -27,6 +27,9 @@ class BaiduMapWebViewInput @Inject constructor(
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_baidu_map_loading_indicator_title
 
+    /**
+     * Notice that we don't take coordinates from `_appStateFromUrl.loc`, because these have a longitude offset.
+     */
     // language=JavaScript
     override val unsafeExtractionJavascript = """
         () => {
@@ -36,21 +39,39 @@ class BaiduMapWebViewInput @Inject constructor(
                     return acc[key];
                 }, obj);
             }
-            const lat =
-                deepGet(window, '_indoorMgr', '_map', 'temp', 'infoWin', 'overlay', 'point', 'lat') ||
-                deepGet(window, '_appStateFromUrl', 'loc', 'y');
-            if (!lat) {
+
+            function findOverlays() {
+                const overlay = deepGet(window, '_indoorMgr', '_map', 'temp', 'infoWin', 'overlay');
+                if (overlay) {
+                    return [overlay];
+                }
+                const overlays = deepGet(window, '_indoorMgr', '_map', '_overlayArray');
+                if (Array.isArray(overlays)) {
+                    return overlays;
+                }
                 return undefined;
             }
-            const lon =
-                deepGet(window, '_indoorMgr', '_map', 'temp', 'infoWin', 'overlay', 'point', 'lng') ||
-                deepGet(window, '_appStateFromUrl', 'loc', 'x');
-            if (!lon) {
+
+            function findPoint(overlays) {
+                if (overlays) {
+                    for (const overlay of overlays) {
+                        const point = deepGet(overlay, 'point');
+                        if (point && point.lat && point.lng) {
+                            return point;
+                        }
+                    }
+                }
                 return undefined;
             }
-            const z = deepGet(window, '_appStateFromUrl', 'loc', 'z');
-            const name = deepGet(window, '_appStateFromUrl', 'wd', 0);
-            return JSON.stringify({ lat, lon, z, name });
+
+            const overlays = findOverlays();
+            const point = findPoint(overlays);
+            if (point) {
+                const z = deepGet(window, '_appStateFromUrl', 'loc', 'z');
+                const name = deepGet(window, '_appStateFromUrl', 'wd', 0);
+                return JSON.stringify({ lat: point.lat, lon: point.lng, z, name });
+            }
+            return undefined;
         };
     """.trimIndent()
 
