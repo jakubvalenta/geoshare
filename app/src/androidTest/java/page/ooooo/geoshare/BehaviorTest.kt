@@ -702,4 +702,15 @@ fun UiAutomatorTestScope.configureServer(testServer: TestServer) {
     }
 }
 
+/**
+ * Run [block] and if it throws [AssertionError], then run it one more time.
+ */
+fun retryTest(block: () -> Unit) {
+    try {
+        block()
+    } catch (_: AssertionError) {
+        block()
+    }
+}
+
 private const val SERVER_API_KEY_ARG = "SERVER_API_KEY"

@@ -50,6 +50,7 @@ class PermissionGrantedWebViewInputTest {
         val input = object : WebViewInput {
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
+            override val timeout = 7.seconds
             override val unsafeExtractionJavascript = "undefined"
 
             override suspend fun parse(data: String, match: String) =
@@ -57,14 +58,13 @@ class PermissionGrantedWebViewInputTest {
         }
         val matchedInput = MatchedInput<WebViewInput>(input, source)
         val permission = Permission.ALWAYS
-        val timeout = 7.seconds
         val stateContext: ConversionStateContext = mock {
             on { this@on.log } doReturn log
             on { this@on.resources } doReturn resources
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedWebViewInput(
-            stateContext, source, matchedInput, permission, results, timeout, dispatcher = testScheduler
+            stateContext, source, matchedInput, permission, results, dispatcher = testScheduler
         )
         var res: State? = null
         launch {
@@ -89,6 +89,7 @@ class PermissionGrantedWebViewInputTest {
         val input = object : WebViewInput {
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
+            override val timeout = 7.seconds
             override val unsafeExtractionJavascript = "undefined"
 
             override suspend fun parse(data: String, match: String) =
@@ -96,14 +97,13 @@ class PermissionGrantedWebViewInputTest {
         }
         val matchedInput = MatchedInput<WebViewInput>(input, source)
         val permission = Permission.ALWAYS
-        val timeout = 7.seconds
         val stateContext: ConversionStateContext = mock {
             on { this@on.log } doReturn log
             on { this@on.resources } doReturn resources
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedWebViewInput(
-            stateContext, source, matchedInput, permission, results, timeout, dispatcher = testScheduler
+            stateContext, source, matchedInput, permission, results, dispatcher = testScheduler
         )
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
@@ -114,7 +114,7 @@ class PermissionGrantedWebViewInputTest {
                 state.transition(),
             )
         }
-        assertEquals(timeout, workDuration)
+        assertEquals(input.timeout, workDuration)
     }
 
     @Test
@@ -122,6 +122,7 @@ class PermissionGrantedWebViewInputTest {
         val input = object : WebViewInput {
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
+            override val timeout = 7.seconds
             override val unsafeExtractionJavascript = "undefined"
 
             override suspend fun parse(data: String, match: String) =
@@ -129,14 +130,13 @@ class PermissionGrantedWebViewInputTest {
         }
         val matchedInput = MatchedInput<WebViewInput>(input, source)
         val permission = Permission.ALWAYS
-        val timeout = 7.seconds
         val stateContext: ConversionStateContext = mock {
             on { this@on.log } doReturn log
             on { this@on.resources } doReturn resources
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedWebViewInput(
-            stateContext, source, matchedInput, permission, results, timeout, dispatcher = testScheduler
+            stateContext, source, matchedInput, permission, results, dispatcher = testScheduler
         )
         var res: State? = null
         launch {
@@ -155,6 +155,7 @@ class PermissionGrantedWebViewInputTest {
         val input = object : WebViewInput {
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
+            override val timeout = 7.seconds
             override val unsafeExtractionJavascript = "undefined"
 
             override suspend fun parse(data: String, match: String) =
@@ -162,14 +163,13 @@ class PermissionGrantedWebViewInputTest {
         }
         val matchedInput = MatchedInput<WebViewInput>(input, source)
         val permission = Permission.ALWAYS
-        val timeout = 7.seconds
         val stateContext: ConversionStateContext = mock {
             on { this@on.log } doReturn log
             on { this@on.resources } doReturn resources
             on { this@on.uriQuote } doReturn uriQuote
         }
         val state = PermissionGrantedWebViewInput(
-            stateContext, source, matchedInput, permission, results, timeout, dispatcher = testScheduler
+            stateContext, source, matchedInput, permission, results, dispatcher = testScheduler
         )
         var res: State? = null
         val job = launch {
@@ -193,6 +193,7 @@ class PermissionGrantedWebViewInputTest {
         val input = object : WebViewInput {
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
+            override val timeout = 7.seconds
             override val unsafeExtractionJavascript = "undefined"
 
             override suspend fun parse(data: String, match: String) =

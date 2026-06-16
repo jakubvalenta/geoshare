@@ -4,6 +4,8 @@ import android.content.res.Resources
 import android.webkit.WebSettings
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.geo.Point
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 sealed interface Input {
     @Suppress("SameReturnValue")
@@ -31,6 +33,7 @@ interface BasicInput<T> : Input {
 }
 
 interface WebViewInput : Input, Input.HasPermission {
+    val timeout: Duration get() = 60.seconds
     val unsafeExtractionJavascript: String
 
     suspend fun parse(data: String, match: String): ParseResult

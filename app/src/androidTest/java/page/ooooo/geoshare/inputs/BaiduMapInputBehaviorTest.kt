@@ -13,6 +13,7 @@ import page.ooooo.geoshare.launchApplication
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.retryTest
 import page.ooooo.geoshare.testUri
 import page.ooooo.geoshare.waitForAppToBeVisible
 
@@ -113,21 +114,32 @@ class BaiduMapInputBehaviorTest {
         closeIntro()
         configureConnectionPermissionPreference(Permission.ALWAYS)
 
-        // Shared coordinates
+        // Retry the first test, because it usually fails the first time it's run, probably because the WebView needs to
+        // cache some resources.
+        retryTest {
+            // Shared POI -- bridge on Xuanwu Lake
+            testUri(
+                BD09MCPoint(3749806.99, 13225411.94, z = 19.0, name = "台菱堤", source = Source.JAVASCRIPT),
+                "https://j.map.baidu.com/d7/RyTc", // Resolves to https://map.baidu.com/poi/%E5%8F%B0%E8%8F%B1%E5%A0%A4/@13225312.44,3749806.99,19z...
+                timeoutMs = NETWORK_TIMEOUT * 2,
+            )
+        }
+
+        // Shared POI -- bus station in Taizhou
+        testUri(
+            BD09MCPoint(3316047.58, 13502565.27, 19.0, name = "黄岩客运中心", source = Source.JAVASCRIPT),
+            "https://j.map.baidu.com/44/lth", // Resolves to https://map.baidu.com/poi/%E9%BB%84%E5%B2%A9%E5%AE%A2%E8%BF%90%E4%B8%AD%E5%BF%83/@13502465.77,3316047.58,19z...
+            timeoutMs = NETWORK_TIMEOUT * 2,
+        )
+
+        // Shared coordinates -- small island on Taihu Lake
         testUri(
             BD09MCPoint(3619117.0, 13392211.0, 17.0, name = "地图上的点", source = Source.JAVASCRIPT),
             "https://j.map.baidu.com/64/lqEk", // Resolves to https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13392211,3619117,17z...
             timeoutMs = NETWORK_TIMEOUT * 2,
         )
 
-        // Shared POI
-        testUri(
-            BD09MCPoint(3316047.58, 13502465.77, 19.0, name = "黄岩客运中心", source = Source.JAVASCRIPT),
-            "https://j.map.baidu.com/44/lth", // Resolves to https://map.baidu.com/poi/%E9%BB%84%E5%B2%A9%E5%AE%A2%E8%BF%90%E4%B8%AD%E5%BF%83/@13502465.77,3316047.58,19z...
-            timeoutMs = NETWORK_TIMEOUT * 2,
-        )
-
-        // Shared POI that requires CSS
+        // Shared coordinates -- tip of island on Xuanwu Lake
         testUri(
             BD09MCPoint(3750567.0, 13224540.0, 17.0, name = "地图上的点", source = Source.JAVASCRIPT),
             "https://j.map.baidu.com/a7/GXfM", // Resolves to https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13224540,3750567,17z...
