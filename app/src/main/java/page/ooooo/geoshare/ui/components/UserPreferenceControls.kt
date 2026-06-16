@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.MutablePreferences
@@ -51,8 +52,8 @@ fun UserPreferenceControls(
         Column {
             LargeTopAppBarPane(
                 modifier = Modifier.testTag("geoShareUserPreferencesControlsPane"),
-                title = {
-                    Text(stringResource(titleResId))
+                title = { maxLines ->
+                    Text(stringResource(titleResId), overflow = TextOverflow.Ellipsis, maxLines = maxLines)
                 },
                 onBack = onBack.takeUnless { wide },
             ) {

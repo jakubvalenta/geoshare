@@ -485,12 +485,13 @@ private fun MainScreen(
                 Column(Modifier.weight(1f)) {
                     LargeTopAppBarPane(
                         modifier = Modifier.testTag("geoShareMainPane"),
-                        title = {
+                        title = { maxLines ->
                             MainTitle(
                                 currentState = currentState,
                                 billingAppNameResId = billingAppNameResId,
                                 billingStatus = billingStatus,
                                 largeLoadingIndicator = largeLoadingIndicator,
+                                maxLines = maxLines,
                             )
                         },
                         onBack = if (currentState !is Initial) {
@@ -861,15 +862,16 @@ private fun MainTitle(
     billingAppNameResId: Int,
     billingStatus: BillingStatus,
     largeLoadingIndicator: LoadingIndicator.Large?,
+    maxLines: Int,
 ) {
     when (currentState) {
         is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
             currentState.getLoadingIndicator()?.title?.let { title ->
-                Text(title)
+                Text(title, overflow = TextOverflow.Ellipsis, maxLines = maxLines)
             }
 
         is ConversionState.HasError ->
-            Text(stringResource(R.string.conversion_error_title))
+            Text(stringResource(R.string.conversion_error_title), overflow = TextOverflow.Ellipsis, maxLines = maxLines)
 
         is ConversionState.HasResult ->
             Text(
@@ -881,11 +883,15 @@ private fun MainTitle(
                     },
                 Modifier.testTag("geoShareResultSuccessLastPointName"),
                 overflow = TextOverflow.Ellipsis,
-                maxLines = 2,
+                maxLines = maxLines,
             )
 
         is Initial ->
-            MainHeadline(billingAppNameResId, billingStatus, Modifier.offset(x = -(12).dp))
+            MainHeadline(
+                billingAppNameResId = billingAppNameResId,
+                billingStatus = billingStatus,
+                modifier = Modifier.offset(x = -(12).dp),
+            )
     }
 }
 
