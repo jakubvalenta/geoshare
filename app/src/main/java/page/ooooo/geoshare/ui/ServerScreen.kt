@@ -51,6 +51,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -290,8 +291,8 @@ private fun ServerListPane(
 
     LargeTopAppBarPane(
         modifier = Modifier.testTag("geoShareServerListPane"),
-        title = {
-            Text(stringResource(R.string.server_list_title))
+        title = { maxLines ->
+            Text(stringResource(R.string.server_list_title), overflow = TextOverflow.Ellipsis, maxLines = maxLines)
         },
         onBack = onBack,
     ) {
@@ -414,9 +415,11 @@ private fun ServerDetailPane(
         Column {
             LargeTopAppBarPane(
                 modifier = Modifier.testTag("geoShareServerDetailPane"),
-                title = {
+                title = { maxLines ->
                     Text(
-                        stringResource(if (destination == -1) R.string.server_insert else R.string.server_update)
+                        stringResource(if (destination == -1) R.string.server_insert else R.string.server_update),
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = maxLines,
                     )
                 },
                 onBack = onBack.takeUnless { wide },
