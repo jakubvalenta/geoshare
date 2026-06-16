@@ -132,14 +132,14 @@ class BaiduMapInputBehaviorTest {
             timeoutMs = NETWORK_TIMEOUT * 2,
         )
 
-        // Shared coordinates -- island on Taihu Lake 1
+        // Shared coordinates -- small island on Taihu Lake
         testUri(
             BD09MCPoint(3619117.0, 13392211.0, 17.0, name = "地图上的点", source = Source.JAVASCRIPT),
             "https://j.map.baidu.com/64/lqEk", // Resolves to https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13392211,3619117,17z...
             timeoutMs = NETWORK_TIMEOUT * 2,
         )
 
-        // Shared coordinates -- island on Taihu Lake 2
+        // Shared coordinates -- tip of island on Xuanwu Lake
         testUri(
             BD09MCPoint(3750567.0, 13224540.0, 17.0, name = "地图上的点", source = Source.JAVASCRIPT),
             "https://j.map.baidu.com/a7/GXfM", // Resolves to https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13224540,3750567,17z...
