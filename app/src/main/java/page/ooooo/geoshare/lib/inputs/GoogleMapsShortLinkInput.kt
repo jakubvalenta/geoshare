@@ -36,7 +36,7 @@ class GoogleMapsShortLinkInput @Inject constructor(
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
-    override val cookies = Companion.cookies
+    override val cookies = COOKIES
     override val userAgent = USER_AGENT
 
     override suspend fun parse(data: Uri, match: String) = parseResult {
@@ -56,7 +56,7 @@ class GoogleMapsShortLinkInput @Inject constructor(
 
     companion object {
         // Bypass consent page https://stackoverflow.com/a/78115353
-        val cookies = ConstantCookiesStorage(
+        val COOKIES = ConstantCookiesStorage(
             Cookie(
                 name = "CONSENT",
                 value = "PENDING+987",
