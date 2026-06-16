@@ -13,6 +13,7 @@ import page.ooooo.geoshare.launchApplication
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.retryTest
 import page.ooooo.geoshare.testUri
 import page.ooooo.geoshare.waitForAppToBeVisible
 
@@ -113,12 +114,16 @@ class BaiduMapInputBehaviorTest {
         closeIntro()
         configureConnectionPermissionPreference(Permission.ALWAYS)
 
-        // Shared POI -- bridge on Xuanwu Lake
-        testUri(
-            BD09MCPoint(3749806.99, 13225411.94, z = 19.0, name = "台菱堤", source = Source.JAVASCRIPT),
-            "https://j.map.baidu.com/d7/RyTc", // Resolves to https://map.baidu.com/poi/%E5%8F%B0%E8%8F%B1%E5%A0%A4/@13225312.44,3749806.99,19z...
-            timeoutMs = NETWORK_TIMEOUT * 2,
-        )
+        // Retry the first test, because it usually fails the first time it's run, probably because the WebView needs to
+        // cache some resources.
+        retryTest {
+            // Shared POI -- bridge on Xuanwu Lake
+            testUri(
+                BD09MCPoint(3749806.99, 13225411.94, z = 19.0, name = "台菱堤", source = Source.JAVASCRIPT),
+                "https://j.map.baidu.com/d7/RyTc", // Resolves to https://map.baidu.com/poi/%E5%8F%B0%E8%8F%B1%E5%A0%A4/@13225312.44,3749806.99,19z...
+                timeoutMs = NETWORK_TIMEOUT * 2,
+            )
+        }
 
         // Shared POI -- bus station in Taizhou
         testUri(

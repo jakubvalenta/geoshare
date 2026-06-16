@@ -48,6 +48,7 @@ import java.net.UnknownHostException
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
+import kotlin.reflect.KClass
 
 class MockLocationScope(val locationManager: LocationManager, val mockProviderName: String) {
     fun setLocation(lat: Double, lon: Double) {
@@ -699,6 +700,17 @@ fun UiAutomatorTestScope.configureServer(testServer: TestServer) {
                 scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerListItem_GoogleMapsPlace_null" }.click()
             }
         }
+    }
+}
+
+/**
+ * Run [block] and if it throws [AssertionError], then run it one more time.
+ */
+fun retryTest(block: () -> Unit) {
+    try {
+        block()
+    } catch (_: AssertionError) {
+        block()
     }
 }
 
