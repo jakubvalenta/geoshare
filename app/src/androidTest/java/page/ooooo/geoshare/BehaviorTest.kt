@@ -48,7 +48,6 @@ import java.net.UnknownHostException
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
-import kotlin.reflect.KClass
 
 class MockLocationScope(val locationManager: LocationManager, val mockProviderName: String) {
     fun setLocation(lat: Double, lon: Double) {
