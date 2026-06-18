@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,9 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
@@ -234,7 +230,7 @@ fun LinkForm(
                 .background(MaterialTheme.colorScheme.surfaceContainerHigh),
             verticalArrangement = Arrangement.spacedBy(spacing.tiny / 2)
         ) {
-            LinkFormEnabledCheckbox(
+            LinkFormCheckbox(
                 value = appEnabled,
                 onCheckedChange = onSetAppEnabled,
                 label = stringResource(R.string.links_form_enabled_option_app),
@@ -260,7 +256,7 @@ fun LinkForm(
                 }
             }
             HorizontalDivider()
-            LinkFormEnabledCheckbox(
+            LinkFormCheckbox(
                 value = sheetEnabled,
                 onCheckedChange = onSetSheetEnabled,
                 label = stringResource(R.string.links_form_enabled_option_sheet),
@@ -281,7 +277,7 @@ fun LinkForm(
                 }
             }
             HorizontalDivider()
-            LinkFormEnabledCheckbox(
+            LinkFormCheckbox(
                 value = chipEnabled,
                 onCheckedChange = onSetChipEnabled,
                 label = stringResource(R.string.links_form_enabled_option_chip),
@@ -310,27 +306,21 @@ fun LinkForm(
                 }
             }
         }
-        Row(
-            modifier
+        ExpandablePane(
+            expanded = expanded,
+            onSetExpanded = { expanded = it },
+            title = {
+                Text(
+                    stringResource(R.string.links_form_advanced),
+                    Modifier.weight(1f),
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+            },
+            modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = spacing.windowPadding, vertical = spacing.medium)
-                .toggleable(
-                    value = expanded,
-                    onValueChange = { expanded = it },
-                ),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+                .padding(horizontal = spacing.windowPadding, vertical = spacing.medium),
+            enabled = enabled,
         ) {
-            Text(
-                stringResource(R.string.links_form_advanced),
-                style = MaterialTheme.typography.bodyLarge,
-            )
-            Icon(
-                imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                contentDescription = null,
-            )
-        }
-        AnimatedVisibility(expanded) {
             Column {
                 TextField(
                     value = group,
@@ -392,7 +382,8 @@ fun LinkForm(
                                 withStyle(SpanStyle(fontWeight = FontWeight.ExtraBold)) {
                                     append("{q}")
                                 }
-                            })
+                            }
+                        )
                     },
                 )
                 Column(
@@ -448,7 +439,7 @@ fun LinkForm(
 }
 
 @Composable
-private fun LinkFormEnabledCheckbox(
+private fun LinkFormCheckbox(
     value: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     label: String,
@@ -461,7 +452,7 @@ private fun LinkFormEnabledCheckbox(
     Row(
         Modifier
             .padding(spacing.small)
-            .toggleable(value = value, role = Role.Checkbox, onValueChange = onCheckedChange),
+            .toggleable(value = value, enabled = enabled, role = Role.Checkbox, onValueChange = onCheckedChange),
         horizontalArrangement = Arrangement.spacedBy(spacing.small),
     ) {
         Checkbox(
