@@ -21,16 +21,14 @@ fun ExpandablePane(
     onSetExpanded: (expanded: Boolean) -> Unit,
     title: @Composable RowScope.() -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     val spacing = LocalSpacing.current
 
     Column(modifier) {
         Row(
-            Modifier.toggleable(
-                value = expanded,
-                onValueChange = onSetExpanded,
-            ),
+            Modifier.toggleable(value = expanded, enabled = enabled, onValueChange = onSetExpanded),
             horizontalArrangement = Arrangement.spacedBy(spacing.tiny),
             verticalAlignment = Alignment.CenterVertically,
         ) {

@@ -156,6 +156,7 @@ fun ResultCoordinates(
                 ) {
                     ExpandablePane(
                         expanded = expanded,
+                        onSetExpanded = { expanded = it },
                         title = {
                             Text(
                                 stringResource(R.string.conversion_succeeded_point_all, points.size),
@@ -165,7 +166,6 @@ fun ResultCoordinates(
                                     .testTag("geoShareResultSuccessAllPointsHeadline"),
                             )
                         },
-                        onSetExpanded = { expanded = it },
                         modifier = Modifier.padding(horizontal = spacing.windowPadding),
                     ) {
                         Column(
