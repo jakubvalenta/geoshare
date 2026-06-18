@@ -27,12 +27,13 @@ import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.calcExponentialBackoffMillis
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
-import page.ooooo.geoshare.lib.inputs.BasicInput
+import page.ooooo.geoshare.lib.inputs.SyncInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.MatchedInput
 import page.ooooo.geoshare.lib.inputs.NoopInput
 import page.ooooo.geoshare.lib.inputs.ParseResult
-import page.ooooo.geoshare.lib.inputs.WebViewInput
+import page.ooooo.geoshare.lib.inputs.AsyncInput
+import page.ooooo.geoshare.lib.inputs.FetchResult
 import page.ooooo.geoshare.lib.inputs.merge
 import page.ooooo.geoshare.lib.network.MaxAttemptsReachedNetworkException
 import page.ooooo.geoshare.lib.network.RecoverableNetworkException
@@ -86,7 +87,7 @@ class Initial : ConversionState {
     override fun toString() = "Initial"
 }
 
-typealias Results = Map<MatchedInput<*>, ParseResult>
+typealias Results = Map<MatchedInput, ParseResult>
 
 data class SourceReceived(
     val stateContext: ConversionStateContext,
@@ -121,7 +122,7 @@ data class SourceReceived(
 data class InputMatched(
     val stateContext: ConversionStateContext,
     override val source: String,
-    val matchedInput: MatchedInput<*>,
+    val matchedInput: MatchedInput,
     val permission: Permission? = null,
     val results: Results = emptyMap(),
 ) : ConversionState, ConversionState.HasSource {
@@ -156,7 +157,7 @@ data class InputMatched(
 data class PermissionRequested(
     val stateContext: ConversionStateContext,
     override val source: String,
-    val matchedInput: MatchedInput<*>,
+    val matchedInput: MatchedInput,
     val results: Results = emptyMap(),
     override val permissionTitleResId: Int,
 ) : ConversionState, ConversionState.HasPermission {
@@ -181,57 +182,38 @@ data class PermissionRequested(
     }
 }
 
-data class PermissionGranted(
-    val stateContext: ConversionStateContext,
-    override val source: String,
-    val matchedInput: MatchedInput<*>,
-    val permission: Permission?,
-    val results: Results = emptyMap(),
-) : ConversionState, ConversionState.HasSource {
-    override suspend fun transition(): State =
-        when (matchedInput.input) {
-            is BasicInput<*> ->
-                PermissionGrantedBasicInput(
-                    stateContext, source, MatchedInput(matchedInput.input, matchedInput.match), permission, results
-                )
-
-            is WebViewInput ->
-                PermissionGrantedWebViewInput(
-                    stateContext, source, MatchedInput(matchedInput.input, matchedInput.match), permission, results
-                )
-
-            is NoopInput ->
-                DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to ParseResult()))
-        }
-
-    override fun toString() =
-        "$TAG(source=$source, matchedInput=$matchedInput, permission=$permission, results=$results)"
-
-    private companion object {
-        private const val TAG = "PermissionGranted"
-    }
-}
-
 /**
- * Fetches input data using [BasicInput.fetch] and parses it using [BasicInput.parse].
+ * Fetches and parses a [matchedInput].
  *
- * When [BasicInput.fetch] fails, it is retried up to [maxAttempts]. Retrying is done by recursively transitioning
- * this state while tracking the number of attempts made and the cause of the last failure in [lastAttempt].
+ * If the input is a [SyncInput], it calls [SyncInput.fetch] and [SyncInput.parse] immediately.
+ *
+ * If the input is an [AsyncInput], it waits for [setFetchResult] to be called and only then proceeds to
+ * [AsyncInput.parse]. This is useful for [page.ooooo.geoshare.lib.inputs.WebViewInput], because in that case the
+ * conversion halts, waits for the UI layer to render a WebView, and resumes once data is extracted from the web page.
+ *
+ * When fetching data fails, it is retried up to [maxAttempts]. Retrying is done by recursively transitioning this state
+ * while tracking the number of attempts made and the cause of the last failure in [lastAttempt].
  *
  * We use this custom retrying instead of the standard [io.ktor.client.plugins.HttpRequestRetry] plugin, because our
  * custom retrying changes the current conversion state, which allows the UI to react to it and show the user a message
  * about the progress of the retrying.
  */
-data class PermissionGrantedBasicInput<T>(
+data class PermissionGranted(
     val stateContext: ConversionStateContext,
     override val source: String,
-    val matchedInput: MatchedInput<BasicInput<T>>,
+    val matchedInput: MatchedInput,
     val permission: Permission?,
     val results: Results,
     val lastAttempt: Attempt<RecoverableNetworkException>? = null,
     val maxAttempts: Int = 10,
     val dispatcher: CoroutineContext = Dispatchers.Default,
 ) : ConversionState, ConversionState.HasSource, ConversionState.HasLargeLoadingIndicator {
+    private val fetchResultFlow = MutableStateFlow<FetchResult<String>?>(null)
+
+    fun setFetchResult(fetchResult: FetchResult<String>) {
+        fetchResultFlow.value = fetchResult
+    }
+
     @OptIn(FlowPreview::class)
     override suspend fun transition(): State = try {
         withContext(dispatcher) {
@@ -248,10 +230,31 @@ data class PermissionGrantedBasicInput<T>(
                     )
                     delay(delayMillis)
                 }
-                val result = matchedInput.input.fetch(matchedInput.match) { data ->
-                    matchedInput.input.parse(data, matchedInput.match)
+                when (matchedInput.input) {
+                    is SyncInput<*> -> {
+                        val result = matchedInput.input.fetch(matchedInput.match) { data ->
+                            matchedInput.input.parse(data, matchedInput.match)
+                        }
+                        DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to result))
+                    }
+
+                    is AsyncInput -> {
+                        val fetchResult = fetchResultFlow
+                            .filterNotNull()
+                            .timeout(matchedInput.input.timeout)
+                            .first()
+                        val data = when (fetchResult) {
+                            is FetchResult.Success<String> -> fetchResult.data
+                            is FetchResult.Failure<String> -> throw fetchResult.exception
+                        }
+                        val result = matchedInput.input.parse(data, matchedInput.match)
+                        DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to result))
+                    }
+
+                    is NoopInput -> DataParsed(
+                        stateContext, source, matchedInput, permission, results + (matchedInput to ParseResult())
+                    )
                 }
-                DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to result))
             } catch (_: MalformedURLException) {
                 ConversionFailed(
                     source,
@@ -259,7 +262,7 @@ data class PermissionGrantedBasicInput<T>(
                 )
             } catch (tr: RecoverableNetworkException) {
                 val attempt = Attempt(attemptNumber, tr)
-                PermissionGrantedBasicInput(
+                PermissionGranted(
                     stateContext, source, matchedInput, permission, results, attempt, maxAttempts
                 )
             } catch (tr: UnrecoverableNetworkException) {
@@ -267,6 +270,12 @@ data class PermissionGrantedBasicInput<T>(
                     source,
                     tr.getMessage(stateContext.resources),
                     details = tr.getDetails(),
+                )
+            } catch (_: TimeoutCancellationException) {
+                stateContext.log.w(TAG, "Timed out")
+                ConversionFailed(
+                    source,
+                    stateContext.resources.getString(R.string.conversion_failed_reason_timeout),
                 )
             }
         }
@@ -297,75 +306,14 @@ data class PermissionGrantedBasicInput<T>(
         "$TAG(source=$source, matchedInput=$matchedInput, permission=$permission, results=$results, lastAttempt=$lastAttempt)"
 
     private companion object {
-        private const val TAG = "PermissionGrantedBasicInput"
-    }
-}
-
-/**
- * When this state is the current state, the UI should:
- *
- * 1. Load [matchedInput]'s match as a page URL in a WebView.
- * 2. Call [WebViewInput.unsafeExtractionJavascript] periodically.
- * 3. Once the result of the extraction JavaScript stops changing, call [onExtractionSettle].
- */
-data class PermissionGrantedWebViewInput(
-    val stateContext: ConversionStateContext,
-    override val source: String,
-    val matchedInput: MatchedInput<WebViewInput>,
-    val permission: Permission?,
-    val results: Results,
-    val dispatcher: CoroutineContext = Dispatchers.Default,
-) : ConversionState, ConversionState.HasSource, ConversionState.HasLargeLoadingIndicator {
-    private val dataFlow = MutableStateFlow<String?>(null)
-
-    fun onExtractionSettle(data: String) {
-        dataFlow.value = data
-    }
-
-    /**
-     * Waits for [onExtractionSettle] to be called. If it's not called within [timeout], it returns failure.
-     */
-    @OptIn(FlowPreview::class)
-    override suspend fun transition(): State = try {
-        withContext(dispatcher) {
-            try {
-                val data = dataFlow
-                    .filterNotNull()
-                    .timeout(matchedInput.input.timeout)
-                    .first()
-                val result = matchedInput.input.parse(data, matchedInput.match)
-                DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to result))
-            } catch (_: TimeoutCancellationException) {
-                stateContext.log.e(TAG, "Timed out")
-                ConversionFailed(
-                    source,
-                    stateContext.resources.getString(R.string.conversion_failed_reason_timeout),
-                )
-            }
-        }
-    } catch (_: CancellationException) {
-        // Cancellation must be caught outside withContext, because withContext somehow rethrows errors
-        ConversionFailed(
-            source,
-            stateContext.resources.getString(R.string.conversion_failed_cancelled),
-        )
-    }
-
-    override fun getLoadingIndicator() =
-        LoadingIndicator.Large(stateContext.resources.getString(matchedInput.input.loadingIndicatorTitleResId))
-
-    override fun toString() =
-        "$TAG(source=$source, matchedInput=$matchedInput, permission=$permission, results=$results)"
-
-    private companion object {
-        private const val TAG = "PermissionGrantedWebViewInput"
+        private const val TAG = "PermissionGranted"
     }
 }
 
 data class PermissionDenied(
     val stateContext: ConversionStateContext,
     override val source: String,
-    val matchedInput: MatchedInput<*>,
+    val matchedInput: MatchedInput,
     val results: Results,
 ) : ConversionState, ConversionState.HasSource {
     override suspend fun transition() =
@@ -381,7 +329,7 @@ data class PermissionDenied(
 data class DataParsed(
     val stateContext: ConversionStateContext,
     override val source: String,
-    val matchedInput: MatchedInput<*>,
+    val matchedInput: MatchedInput,
     val permission: Permission?,
     val results: Results,
 ) : ConversionState, ConversionState.HasSource {

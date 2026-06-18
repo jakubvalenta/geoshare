@@ -118,8 +118,7 @@ import page.ooooo.geoshare.lib.conversion.LocationPermissionReceived
 import page.ooooo.geoshare.lib.conversion.LocationRationaleConfirmed
 import page.ooooo.geoshare.lib.conversion.LocationRationaleRequested
 import page.ooooo.geoshare.lib.conversion.LocationRationaleShown
-import page.ooooo.geoshare.lib.conversion.PermissionGrantedBasicInput
-import page.ooooo.geoshare.lib.conversion.PermissionGrantedWebViewInput
+import page.ooooo.geoshare.lib.conversion.PermissionGranted
 import page.ooooo.geoshare.lib.conversion.PermissionRequested
 import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.lib.extensions.truncateMiddle
@@ -128,6 +127,7 @@ import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.MatchedInput
+import page.ooooo.geoshare.lib.inputs.FetchResult
 import page.ooooo.geoshare.lib.inputs.WebViewInput
 import page.ooooo.geoshare.lib.network.ConnectTimeoutNetworkException
 import page.ooooo.geoshare.lib.outputs.Action
@@ -678,11 +678,12 @@ private fun MainScreen(
                             .fillMaxWidth()
                             .background(MaterialTheme.colorScheme.surface)
                     ) {
-                        if (currentState is PermissionGrantedWebViewInput) {
+                        if (currentState is PermissionGranted && currentState.matchedInput.input is WebViewInput) {
                             CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
                                 MainWebView(
-                                    matchedInput = currentState.matchedInput,
-                                    onExtractionSettle = { currentState.onExtractionSettle(it) },
+                                    match = currentState.matchedInput.match,
+                                    input = currentState.matchedInput.input,
+                                    onFetchResult = { currentState.setFetchResult(it) },
                                 )
                             }
                         }
@@ -939,8 +940,9 @@ private fun MainLoadingIndicator(
 
 @Composable
 private fun MainWebView(
-    matchedInput: MatchedInput<WebViewInput>,
-    onExtractionSettle: (data: String) -> Unit,
+    match: String,
+    input: WebViewInput,
+    onFetchResult: (fetchResult: FetchResult<String>) -> Unit,
 ) {
     BoxWithConstraints(
         Modifier
@@ -959,11 +961,11 @@ private fun MainWebView(
                 .checkeredBackground(squarePx)
         )
         ConversionWebView(
-            unsafeUrl = matchedInput.match,
-            unsafeExtractionJavascript = matchedInput.input.unsafeExtractionJavascript,
-            onExtractionSettle = onExtractionSettle,
-            extendWebSettings = { matchedInput.input.extendWebSettings(it) },
-            shouldInterceptRequest = { matchedInput.input.shouldInterceptRequest(it) },
+            unsafeUrl = match,
+            unsafeExtractionJavascript = input.unsafeExtractionJavascript,
+            onFetchResult = onFetchResult,
+            extendWebSettings = { input.extendWebSettings(it) },
+            shouldInterceptRequest = { input.shouldInterceptRequest(it) },
         )
         if (!BuildConfig.DEBUG) {
             Box(
@@ -1740,7 +1742,7 @@ private fun LoadingIndicatorPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        val currentState = PermissionGrantedBasicInput(
+        val currentState = PermissionGranted(
             stateContext = ConversionStateContext(
                 linkRepository = FakeLinkRepository(),
                 outputRepository = outputRepository,
@@ -1817,7 +1819,7 @@ private fun DarkLoadingIndicatorPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        val currentState = PermissionGrantedBasicInput(
+        val currentState = PermissionGranted(
             stateContext = ConversionStateContext(
                 linkRepository = FakeLinkRepository(),
                 outputRepository = outputRepository,
@@ -1894,7 +1896,7 @@ private fun TabletLoadingIndicatorPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        val currentState = PermissionGrantedBasicInput(
+        val currentState = PermissionGranted(
             stateContext = ConversionStateContext(
                 linkRepository = FakeLinkRepository(),
                 outputRepository = outputRepository,
@@ -1971,7 +1973,7 @@ private fun WebViewPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        val currentState = PermissionGrantedWebViewInput(
+        val currentState = PermissionGranted(
             stateContext = ConversionStateContext(
                 linkRepository = FakeLinkRepository(),
                 outputRepository = outputRepository,
@@ -2045,7 +2047,7 @@ private fun DarkWebViewPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        val currentState = PermissionGrantedWebViewInput(
+        val currentState = PermissionGranted(
             stateContext = ConversionStateContext(
                 linkRepository = FakeLinkRepository(),
                 outputRepository = outputRepository,
@@ -2119,7 +2121,7 @@ private fun TabletWebViewPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        val currentState = PermissionGrantedWebViewInput(
+        val currentState = PermissionGranted(
             stateContext = ConversionStateContext(
                 linkRepository = FakeLinkRepository(),
                 outputRepository = outputRepository,

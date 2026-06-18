@@ -33,6 +33,8 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.onEach
+import page.ooooo.geoshare.lib.inputs.FetchResult
+import page.ooooo.geoshare.lib.network.WebViewNetworkException
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -45,7 +47,7 @@ private const val TAG = "ConversionWebView"
 fun ConversionWebView(
     unsafeUrl: String,
     unsafeExtractionJavascript: String,
-    onExtractionSettle: (data: String) -> Unit,
+    onFetchResult: (fetchResult: FetchResult<String>) -> Unit,
     extendWebSettings: (settings: WebSettings) -> Unit,
     shouldInterceptRequest: (requestUrlString: String) -> Boolean,
     // Set window size minus a common browser chrome size, so the numbers seem real, in case a web page checks
@@ -88,7 +90,7 @@ fun ConversionWebView(
             .debounce(settleTimeout)
             .collect { data ->
                 Log.i(TAG, "Extraction settled at $data after $settleTimeout")
-                onExtractionSettle(data)
+                onFetchResult(FetchResult.Success(data))
             }
     }
 
@@ -144,8 +146,15 @@ fun ConversionWebView(
                     object {
                         @Suppress("unused")
                         @JavascriptInterface
-                        fun onExtract(data: String) {
+                        fun onExtractSuccess(data: String) {
                             dataFlow.value = data
+                        }
+
+                        @Suppress("unused")
+                        @JavascriptInterface
+                        fun onExtractFailure() {
+                            Log.w(TAG, "Extraction failure")
+                            onFetchResult(FetchResult.Failure(WebViewNetworkException()))
                         }
                     },
                     "Android",
@@ -162,9 +171,13 @@ fun ConversionWebView(
                                     const extract = $unsafeExtractionJavascript;
                                     window.setInterval(
                                         () => {
-                                            const data = extract();
-                                            if (data !== null && data !== undefined) {
-                                                Android.onExtract(data);
+                                            if (location.protocol === 'chrome-error:') {
+                                                Android.onExtractFailure();
+                                            } else {
+                                                const data = extract();
+                                                if (data !== null && data !== undefined) {
+                                                    Android.onExtractSuccess(data);
+                                                }
                                             }
                                         },
                                         ${extractionInterval.inWholeMilliseconds}

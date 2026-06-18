@@ -7,12 +7,12 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 
 data class ParseResult(
     val points: Points = persistentListOf(),
-    val next: MatchedInput<*>? = null,
+    val next: MatchedInput? = null,
 )
 
 class ParseResultScope {
     var points: Points = persistentListOf()
-    var next: MatchedInput<*>? = null
+    var next: MatchedInput? = null
 
     internal fun build() = ParseResult(points, next)
 }
