@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.lib.inputs
 
-import android.webkit.WebSettings
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngine
@@ -19,7 +18,7 @@ import page.ooooo.geoshare.lib.network.setDefaultTimeouts
 import page.ooooo.geoshare.lib.network.setUserAgent
 import java.net.MalformedURLException
 
-interface TextInput : SyncInput<String> {
+interface TextInput : BasicInput<String> {
     val pattern: Regex
 
     override fun match(source: String) = pattern.find(source)?.groupOrNull()
@@ -28,7 +27,7 @@ interface TextInput : SyncInput<String> {
         block(match)
 }
 
-interface UriInput : SyncInput<Uri> {
+interface UriInput : BasicInput<Uri> {
     val uriQuote: UriQuote
 
     val pattern: Regex
@@ -103,7 +102,7 @@ interface HeadLocationHeaderInput : UriInput, Input.HasPermission {
     }
 }
 
-interface BodyAsChannelInput : SyncInput<ByteReadChannel>, Input.HasPermission {
+interface BodyAsChannelInput : BasicInput<ByteReadChannel>, Input.HasPermission {
     val engine: HttpClientEngine
     val log: Log
     val uriQuote: UriQuote
@@ -138,7 +137,7 @@ interface BodyAsChannelInput : SyncInput<ByteReadChannel>, Input.HasPermission {
     }
 }
 
-interface BodyAsTextInput : SyncInput<String>, Input.HasPermission {
+interface BodyAsTextInput : BasicInput<String>, Input.HasPermission {
     val engine: HttpClientEngine
     val log: Log
     val uriQuote: UriQuote
@@ -171,11 +170,4 @@ interface BodyAsTextInput : SyncInput<String>, Input.HasPermission {
     private companion object {
         private const val TAG = "BodyAsTextInput"
     }
-}
-
-interface WebViewInput : AsyncInput, Input.HasPermission {
-    val unsafeExtractionJavascript: String
-
-    fun extendWebSettings(settings: WebSettings) {}
-    fun shouldInterceptRequest(requestUrlString: String): Boolean = false
 }

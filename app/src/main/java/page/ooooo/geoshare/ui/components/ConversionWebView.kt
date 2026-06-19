@@ -27,14 +27,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.viewinterop.AndroidView
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.onEach
-import page.ooooo.geoshare.lib.inputs.FetchResult
-import page.ooooo.geoshare.lib.network.WebViewNetworkException
+import page.ooooo.geoshare.lib.inputs.WebViewException
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -47,7 +47,7 @@ private const val TAG = "ConversionWebView"
 fun ConversionWebView(
     unsafeUrl: String,
     unsafeExtractionJavascript: String,
-    onFetchResult: (fetchResult: FetchResult<String>) -> Unit,
+    pendingData: CompletableDeferred<String>,
     extendWebSettings: (settings: WebSettings) -> Unit,
     shouldInterceptRequest: (requestUrlString: String) -> Boolean,
     // Set window size minus a common browser chrome size, so the numbers seem real, in case a web page checks
@@ -90,7 +90,7 @@ fun ConversionWebView(
             .debounce(settleTimeout)
             .collect { data ->
                 Log.i(TAG, "Extraction settled at $data after $settleTimeout")
-                onFetchResult(FetchResult.Success(data))
+                pendingData.complete(data)
             }
     }
 
@@ -154,7 +154,7 @@ fun ConversionWebView(
                         @JavascriptInterface
                         fun onExtractFailure() {
                             Log.w(TAG, "Extraction failure")
-                            onFetchResult(FetchResult.Failure(WebViewNetworkException()))
+                            pendingData.cancel(WebViewException())
                         }
                     },
                     "Android",

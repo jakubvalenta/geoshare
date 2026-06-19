@@ -81,7 +81,3 @@ class MaxAttemptsReachedNetworkException(override val cause: RecoverableNetworkE
     UnrecoverableNetworkException(cause) {
     override fun getMessage(resources: Resources) = cause.getMessage(resources)
 }
-
-class WebViewNetworkException : RecoverableNetworkException(Throwable()) {
-    override fun getMessage(resources: Resources) = resources.getString(R.string.network_exception_unknown)
-}

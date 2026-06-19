@@ -1,3 +1,3 @@
 package page.ooooo.geoshare.lib.inputs
 
-data class MatchedInput(val input: Input, val match: String)
+data class MatchedInput<T : Input>(val input: T, val match: String)

@@ -6,7 +6,7 @@ import kotlin.math.roundToLong
 private const val EXPONENTIAL_DELAY_BASE = 2.0
 private const val EXPONENTIAL_DELAY_BASE_DELAY_MILLIS = 1_000L
 
-data class Attempt<T : Throwable>(val number: Int, val cause: T)
+data class Attempt<T>(val number: Int, val cause: T)
 
 fun calcExponentialBackoffMillis(attemptNumber: Int = 1): Long =
     if (attemptNumber < 2) {

@@ -77,6 +77,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -118,7 +119,8 @@ import page.ooooo.geoshare.lib.conversion.LocationPermissionReceived
 import page.ooooo.geoshare.lib.conversion.LocationRationaleConfirmed
 import page.ooooo.geoshare.lib.conversion.LocationRationaleRequested
 import page.ooooo.geoshare.lib.conversion.LocationRationaleShown
-import page.ooooo.geoshare.lib.conversion.PermissionGranted
+import page.ooooo.geoshare.lib.conversion.PermissionGrantedBasicInput
+import page.ooooo.geoshare.lib.conversion.PermissionGrantedWebViewInput
 import page.ooooo.geoshare.lib.conversion.PermissionRequested
 import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.lib.extensions.truncateMiddle
@@ -127,7 +129,6 @@ import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.MatchedInput
-import page.ooooo.geoshare.lib.inputs.FetchResult
 import page.ooooo.geoshare.lib.inputs.WebViewInput
 import page.ooooo.geoshare.lib.network.ConnectTimeoutNetworkException
 import page.ooooo.geoshare.lib.outputs.Action
@@ -678,12 +679,11 @@ private fun MainScreen(
                             .fillMaxWidth()
                             .background(MaterialTheme.colorScheme.surface)
                     ) {
-                        if (currentState is PermissionGranted && currentState.matchedInput.input is WebViewInput) {
+                        if (currentState is PermissionGrantedWebViewInput) {
                             CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
                                 MainWebView(
-                                    match = currentState.matchedInput.match,
-                                    input = currentState.matchedInput.input,
-                                    onFetchResult = { currentState.setFetchResult(it) },
+                                    matchedInput = currentState.matchedInput,
+                                    pendingData = currentState.pendingData,
                                 )
                             }
                         }
@@ -940,9 +940,8 @@ private fun MainLoadingIndicator(
 
 @Composable
 private fun MainWebView(
-    match: String,
-    input: WebViewInput,
-    onFetchResult: (fetchResult: FetchResult<String>) -> Unit,
+    matchedInput: MatchedInput<WebViewInput>,
+    pendingData: CompletableDeferred<String>,
 ) {
     BoxWithConstraints(
         Modifier
@@ -961,11 +960,11 @@ private fun MainWebView(
                 .checkeredBackground(squarePx)
         )
         ConversionWebView(
-            unsafeUrl = match,
-            unsafeExtractionJavascript = input.unsafeExtractionJavascript,
-            onFetchResult = onFetchResult,
-            extendWebSettings = { input.extendWebSettings(it) },
-            shouldInterceptRequest = { input.shouldInterceptRequest(it) },
+            unsafeUrl = matchedInput.match,
+            unsafeExtractionJavascript = matchedInput.input.unsafeExtractionJavascript,
+            pendingData = pendingData,
+            extendWebSettings = { matchedInput.input.extendWebSettings(it) },
+            shouldInterceptRequest = { matchedInput.input.shouldInterceptRequest(it) },
         )
         if (!BuildConfig.DEBUG) {
             Box(
@@ -1742,7 +1741,7 @@ private fun LoadingIndicatorPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        val currentState = PermissionGranted(
+        val currentState = PermissionGrantedBasicInput(
             stateContext = ConversionStateContext(
                 linkRepository = FakeLinkRepository(),
                 outputRepository = outputRepository,
@@ -1819,7 +1818,7 @@ private fun DarkLoadingIndicatorPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        val currentState = PermissionGranted(
+        val currentState = PermissionGrantedBasicInput(
             stateContext = ConversionStateContext(
                 linkRepository = FakeLinkRepository(),
                 outputRepository = outputRepository,
@@ -1896,7 +1895,7 @@ private fun TabletLoadingIndicatorPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        val currentState = PermissionGranted(
+        val currentState = PermissionGrantedBasicInput(
             stateContext = ConversionStateContext(
                 linkRepository = FakeLinkRepository(),
                 outputRepository = outputRepository,
@@ -1973,7 +1972,7 @@ private fun WebViewPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        val currentState = PermissionGranted(
+        val currentState = PermissionGrantedWebViewInput(
             stateContext = ConversionStateContext(
                 linkRepository = FakeLinkRepository(),
                 outputRepository = outputRepository,
@@ -2047,7 +2046,7 @@ private fun DarkWebViewPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        val currentState = PermissionGranted(
+        val currentState = PermissionGrantedWebViewInput(
             stateContext = ConversionStateContext(
                 linkRepository = FakeLinkRepository(),
                 outputRepository = outputRepository,
@@ -2121,7 +2120,7 @@ private fun TabletWebViewPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        val currentState = PermissionGranted(
+        val currentState = PermissionGrantedWebViewInput(
             stateContext = ConversionStateContext(
                 linkRepository = FakeLinkRepository(),
                 outputRepository = outputRepository,
