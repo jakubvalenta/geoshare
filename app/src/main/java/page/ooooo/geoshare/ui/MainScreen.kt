@@ -77,6 +77,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -682,7 +683,7 @@ private fun MainScreen(
                             CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
                                 MainWebView(
                                     matchedInput = currentState.matchedInput,
-                                    onExtractionSettle = { currentState.onExtractionSettle(it) },
+                                    pendingData = currentState.pendingData,
                                 )
                             }
                         }
@@ -940,7 +941,7 @@ private fun MainLoadingIndicator(
 @Composable
 private fun MainWebView(
     matchedInput: MatchedInput<WebViewInput>,
-    onExtractionSettle: (data: String) -> Unit,
+    pendingData: CompletableDeferred<String>,
 ) {
     BoxWithConstraints(
         Modifier
@@ -961,7 +962,7 @@ private fun MainWebView(
         ConversionWebView(
             unsafeUrl = matchedInput.match,
             unsafeExtractionJavascript = matchedInput.input.unsafeExtractionJavascript,
-            onExtractionSettle = onExtractionSettle,
+            pendingData = pendingData,
             extendWebSettings = { matchedInput.input.extendWebSettings(it) },
             shouldInterceptRequest = { matchedInput.input.shouldInterceptRequest(it) },
         )
