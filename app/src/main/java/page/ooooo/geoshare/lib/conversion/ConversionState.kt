@@ -214,8 +214,8 @@ data class PermissionGranted(
 /**
  * Fetches and parses a match using [BasicInput].
  *
- * When it fails, it is retried up to [maxAttempts] times. Retrying is done by recursively transitioning this state
- * while tracking the number of attempts made and the cause of the last failure in [lastAttempt].
+ * When it fails, it retries up to [maxAttempts] times. Retrying is done by recursively transitioning this state while
+ * tracking the number of attempts made and the cause of the last failure in [lastAttempt].
  *
  * We use this custom retrying instead of the standard [io.ktor.client.plugins.HttpRequestRetry] plugin, because our
  * custom retrying changes the current conversion state, which allows the UI to react to it and show the user a message
@@ -231,48 +231,45 @@ data class PermissionGrantedBasicInput<T>(
     val maxAttempts: Int = 10,
     val dispatcher: CoroutineContext = Dispatchers.Default,
 ) : ConversionState, ConversionState.HasSource, ConversionState.HasLargeLoadingIndicator {
-    @OptIn(FlowPreview::class)
-    override suspend fun transition(): State {
-        val attemptNumber = lastAttempt?.number?.plus(1) ?: 1
-        return try {
-            withContext(dispatcher) {
-                try {
-                    if (lastAttempt != null && lastAttempt.number >= maxAttempts) {
-                        stateContext.log.w(TAG, "Maximum number of $maxAttempts attempts reached for $matchedInput")
-                        ConversionFailed(
-                            source, lastAttempt.cause.getMessage(stateContext.resources), lastAttempt.cause.getDetails()
-                        )
-                    } else {
-                        val delayMillis = calcExponentialBackoffMillis(attemptNumber)
-                        if (delayMillis > 0) {
-                            stateContext.log.i(
-                                TAG,
-                                "Waiting ${delayMillis}ms before attempt $attemptNumber of $maxAttempts for $matchedInput"
-                            )
-                            delay(delayMillis)
-                        }
-                        val result = matchedInput.input.fetch(matchedInput.match) { data ->
-                            matchedInput.input.parse(data, matchedInput.match)
-                        }
-                        DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to result))
-                    }
-                } catch (_: MalformedURLException) {
+    override suspend fun transition(): State = try {
+        withContext(dispatcher) {
+            val attemptNumber = lastAttempt?.number?.plus(1) ?: 1
+            try {
+                if (lastAttempt != null && lastAttempt.number >= maxAttempts) {
+                    stateContext.log.w(TAG, "Maximum number of $maxAttempts attempts reached for $matchedInput")
                     ConversionFailed(
-                        source, stateContext.resources.getString(R.string.conversion_failed_reason_invalid_url)
+                        source, lastAttempt.cause.getMessage(stateContext.resources), lastAttempt.cause.getDetails()
                     )
-                } catch (tr: RecoverableNetworkException) {
-                    val attempt = Attempt(attemptNumber, tr)
-                    PermissionGrantedBasicInput(
-                        stateContext, source, matchedInput, permission, results, attempt, maxAttempts
-                    )
-                } catch (tr: UnrecoverableNetworkException) {
-                    ConversionFailed(source, tr.getMessage(stateContext.resources), tr.getDetails())
+                } else {
+                    val delayMillis = calcExponentialBackoffMillis(attemptNumber)
+                    if (delayMillis > 0) {
+                        stateContext.log.i(
+                            TAG,
+                            "Waiting ${delayMillis}ms before attempt $attemptNumber of $maxAttempts for $matchedInput"
+                        )
+                        delay(delayMillis)
+                    }
+                    val result = matchedInput.input.fetch(matchedInput.match) { data ->
+                        matchedInput.input.parse(data, matchedInput.match)
+                    }
+                    DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to result))
                 }
+            } catch (_: MalformedURLException) {
+                ConversionFailed(
+                    source, stateContext.resources.getString(R.string.conversion_failed_reason_invalid_url)
+                )
+            } catch (tr: RecoverableNetworkException) {
+                val attempt = Attempt(attemptNumber, tr)
+                PermissionGrantedBasicInput(
+                    stateContext, source, matchedInput, permission, results, attempt, maxAttempts
+                )
+            } catch (tr: UnrecoverableNetworkException) {
+                ConversionFailed(source, tr.getMessage(stateContext.resources), tr.getDetails())
             }
-        } catch (_: CancellationException) {
-            // Cancellation must be caught outside withContext, because withContext somehow rethrows errors
-            ConversionFailed(source, stateContext.resources.getString(R.string.conversion_failed_cancelled))
         }
+    } catch (_: CancellationException) {
+        // Cancellation must be caught outside withContext, because withContext somehow rethrows errors
+        ConversionFailed(source, stateContext.resources.getString(R.string.conversion_failed_cancelled))
     }
 
     override fun getLoadingIndicator() =
@@ -307,8 +304,8 @@ data class PermissionGrantedBasicInput<T>(
  * 2. Call [WebViewInput.unsafeExtractionJavascript] periodically.
  * 3. Once the result of the extraction JavaScript stops changing, complete [pendingData].
  *
- * When it fails, it is retried up to [maxAttempts] times. Retrying is done by recursively transitioning this state
- * while tracking the number of attempts made and the cause of the last failure in [lastAttempt].
+ * When it fails, it retries up to [maxAttempts] times. Retrying is done by recursively transitioning this state while
+ * tracking the number of attempts made and the cause of the last failure in [lastAttempt].
  *
  * We use this custom retrying instead of the standard [io.ktor.client.plugins.HttpRequestRetry] plugin, because our
  * custom retrying changes the current conversion state, which allows the UI to react to it and show the user a message
@@ -326,42 +323,39 @@ data class PermissionGrantedWebViewInput(
 ) : ConversionState, ConversionState.HasSource, ConversionState.HasLargeLoadingIndicator {
     val pendingData: CompletableDeferred<String> = CompletableDeferred()
 
-    @OptIn(FlowPreview::class)
-    override suspend fun transition(): State {
-        val attemptNumber = lastAttempt?.number?.plus(1) ?: 1
-        return try {
-            withContext(dispatcher) {
-                try {
-                    if (lastAttempt != null && lastAttempt.number >= maxAttempts) {
-                        stateContext.log.w(TAG, "Maximum number of $maxAttempts attempts reached for $matchedInput")
-                        ConversionFailed(
-                            source, lastAttempt.cause.getMessage(stateContext.resources), lastAttempt.cause.getDetails()
-                        )
-                    } else {
-                        val data = withTimeout(matchedInput.input.timeout) {
-                            pendingData.await()
-                        }
-                        val result = matchedInput.input.parse(data, matchedInput.match)
-                        DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to result))
-                    }
-                } catch (tr: RecoverableNetworkException) {
-                    val attempt = Attempt(attemptNumber, tr)
-                    PermissionGrantedWebViewInput(
-                        stateContext, source, matchedInput, permission, results, attempt, maxAttempts
-                    )
-                } catch (tr: UnrecoverableNetworkException) {
-                    ConversionFailed(source, tr.getMessage(stateContext.resources), tr.getDetails())
-                } catch (_: TimeoutCancellationException) {
-                    stateContext.log.w(TAG, "Timed out")
+    override suspend fun transition(): State = try {
+        withContext(dispatcher) {
+            val attemptNumber = lastAttempt?.number?.plus(1) ?: 1
+            try {
+                if (lastAttempt != null && lastAttempt.number >= maxAttempts) {
+                    stateContext.log.w(TAG, "Maximum number of $maxAttempts attempts reached for $matchedInput")
                     ConversionFailed(
-                        source, stateContext.resources.getString(R.string.conversion_failed_reason_timeout)
+                        source, lastAttempt.cause.getMessage(stateContext.resources), lastAttempt.cause.getDetails()
                     )
+                } else {
+                    val data = withTimeout(matchedInput.input.timeout) {
+                        pendingData.await()
+                    }
+                    val result = matchedInput.input.parse(data, matchedInput.match)
+                    DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to result))
                 }
+            } catch (tr: RecoverableNetworkException) {
+                val attempt = Attempt(attemptNumber, tr)
+                PermissionGrantedWebViewInput(
+                    stateContext, source, matchedInput, permission, results, attempt, maxAttempts
+                )
+            } catch (tr: UnrecoverableNetworkException) {
+                ConversionFailed(source, tr.getMessage(stateContext.resources), tr.getDetails())
+            } catch (_: TimeoutCancellationException) {
+                stateContext.log.w(TAG, "Timed out")
+                ConversionFailed(
+                    source, stateContext.resources.getString(R.string.conversion_failed_reason_timeout)
+                )
             }
-        } catch (_: CancellationException) {
-            // Cancellation must be caught outside withContext, because withContext somehow rethrows errors
-            ConversionFailed(source, stateContext.resources.getString(R.string.conversion_failed_cancelled))
         }
+    } catch (_: CancellationException) {
+        // Cancellation must be caught outside withContext, because withContext somehow rethrows errors
+        ConversionFailed(source, stateContext.resources.getString(R.string.conversion_failed_cancelled))
     }
 
     override fun getLoadingIndicator() =
