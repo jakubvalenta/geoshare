@@ -19,7 +19,6 @@ import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.Attempt
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
-import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.BasicInput
@@ -39,6 +38,17 @@ import kotlin.time.measureTime
 class PermissionGrantedBasicInputTest {
     private val log = FakeLog
     private val source = "https://maps.google.com/foo"
+    private val input = object : BasicInput<String>, Input.HasPermission {
+        override suspend fun fetch(match: String, block: suspend (String) -> ParseResult) =
+            block("$match-data")
+
+        override suspend fun parse(data: String, match: String) =
+            result.copy(next = next.copy(match = data)) // Store data in MatchedInput, so we can test it
+
+        override val permissionTitleResId = R.string.converter_google_maps_permission_title
+        override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
+    }
+    private val matchedInput = MatchedInput<BasicInput<String>>(input, source)
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val next = MatchedInput(FakeInputRepository.debugUriInput, source)
     private val result = ParseResult(points, next)
@@ -46,6 +56,7 @@ class PermissionGrantedBasicInputTest {
     private val oldResult = ParseResult(oldPoints)
     private val results: Results = mapOf(MatchedInput(FakeInputRepository.debugUriInput, source) to oldResult)
     private val permission = Permission.ALWAYS
+    private val lastCause = ConnectionClosedNetworkException(EOFException())
     private val maxAttempts = 3
     private val resources: Resources = mock {
         on { getString(R.string.converter_google_maps_loading_indicator_title) } doReturn "Connecting to Google..."
@@ -69,17 +80,6 @@ class PermissionGrantedBasicInputTest {
 
     @Test
     fun transition_whenInputFetchSucceeds_returnsDataParsed() = runTest {
-        val input = object : BasicInput<String>, Input.HasPermission {
-            override suspend fun fetch(match: String, block: suspend (String) -> ParseResult) =
-                block("$match-data")
-
-            override suspend fun parse(data: String, match: String) =
-                result.copy(next = next.copy(match = data)) // Store data in MatchedInput, so we can test it
-
-            override val permissionTitleResId = R.string.converter_google_maps_permission_title
-            override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
-        }
-        val matchedInput = MatchedInput<BasicInput<String>>(input, source)
         val state = PermissionGrantedBasicInput(
             stateContext,
             source,
@@ -104,15 +104,12 @@ class PermissionGrantedBasicInputTest {
 
     @Test
     fun transition_whenInputFetchThrowsCancellationException_returnsConversionFailed() = runTest {
-        val input = object : BasicInput<String>, Input.HasPermission {
+        val input = object : BasicInput<String> {
             override suspend fun fetch(match: String, block: suspend (String) -> ParseResult) =
                 throw CancellationException()
 
             override suspend fun parse(data: String, match: String) =
-                result.copy(next = next.copy(match = data)) // Store data in MatchedInput, so we can test it
-
-            override val permissionTitleResId = R.string.converter_google_maps_permission_title
-            override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
+                throw NotImplementedError()
         }
         val matchedInput = MatchedInput<BasicInput<String>>(input, source)
         val state = PermissionGrantedBasicInput(
@@ -133,15 +130,12 @@ class PermissionGrantedBasicInputTest {
 
     @Test
     fun transition_whenInputFetchThrowsMalformedURLException_returnsConversionFailed() = runTest {
-        val input = object : BasicInput<String>, Input.HasPermission {
+        val input = object : BasicInput<String> {
             override suspend fun fetch(match: String, block: suspend (String) -> ParseResult) =
                 throw MalformedURLException()
 
             override suspend fun parse(data: String, match: String) =
-                result.copy(next = next.copy(match = data)) // Store data in MatchedInput, so we can test it
-
-            override val permissionTitleResId = R.string.converter_google_maps_permission_title
-            override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
+                throw NotImplementedError()
         }
         val matchedInput = MatchedInput<BasicInput<String>>(input, source)
         val state = PermissionGrantedBasicInput(
@@ -166,15 +160,12 @@ class PermissionGrantedBasicInputTest {
     @Test
     fun transition_whenInputFetchThrowsRecoverableNetworkExceptionAndLastAttemptIsNull_retries() = runTest {
         val cause = SocketTimeoutNetworkException(SocketTimeoutException())
-        val input = object : BasicInput<String>, Input.HasPermission {
+        val input = object : BasicInput<String> {
             override suspend fun fetch(match: String, block: suspend (String) -> ParseResult) =
                 throw cause
 
             override suspend fun parse(data: String, match: String) =
-                result.copy(next = next.copy(match = data)) // Store data in MatchedInput, so we can test it
-
-            override val permissionTitleResId = R.string.converter_google_maps_permission_title
-            override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
+                throw NotImplementedError()
         }
         val matchedInput = MatchedInput<BasicInput<String>>(input, source)
         val state = PermissionGrantedBasicInput(
@@ -207,18 +198,15 @@ class PermissionGrantedBasicInputTest {
     @Test
     fun transition_whenInputFetchThrowsRecoverableNetworkExceptionAndLastAttemptIsOne_waitsAndRetries() = runTest {
         val cause = SocketTimeoutNetworkException(SocketTimeoutException())
-        val input = object : BasicInput<String>, Input.HasPermission {
+        val input = object : BasicInput<String> {
             override suspend fun fetch(match: String, block: suspend (String) -> ParseResult) =
                 throw cause
 
             override suspend fun parse(data: String, match: String) =
-                result.copy(next = next.copy(match = data)) // Store data in MatchedInput, so we can test it
-
-            override val permissionTitleResId = R.string.converter_google_maps_permission_title
-            override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
+                throw NotImplementedError()
         }
         val matchedInput = MatchedInput<BasicInput<String>>(input, source)
-        val lastAttempt = Attempt<RecoverableNetworkException>(1, ConnectionClosedNetworkException(EOFException()))
+        val lastAttempt = Attempt<RecoverableNetworkException>(1, lastCause)
         val state = PermissionGrantedBasicInput(
             stateContext,
             source,
@@ -249,18 +237,15 @@ class PermissionGrantedBasicInputTest {
     @Test
     fun transition_whenInputFetchThrowsRecoverableNetworkExceptionAndLastAttemptIsMaxAttempts_returnsConversionFailed() =
         runTest {
-            val input = object : BasicInput<String>, Input.HasPermission {
+            val input = object : BasicInput<String> {
                 override suspend fun fetch(match: String, block: suspend (String) -> ParseResult) =
                     throw NotImplementedError()
 
                 override suspend fun parse(data: String, match: String) =
                     throw NotImplementedError()
-
-                override val permissionTitleResId = R.string.converter_google_maps_permission_title
-                override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
             }
             val matchedInput = MatchedInput<BasicInput<String>>(input, source)
-            val lastAttempt = Attempt<RecoverableNetworkException>(3, ConnectionClosedNetworkException(EOFException()))
+            val lastAttempt = Attempt<RecoverableNetworkException>(3, lastCause)
             val state = PermissionGrantedBasicInput(
                 stateContext,
                 source,
@@ -296,17 +281,13 @@ class PermissionGrantedBasicInputTest {
             on { status } doReturn HttpStatusCode.NotFound
             on { this.call } doReturn call
         }
-        val tr = Exception()
-        val cause = ResponseNetworkException(response, tr)
-        val input = object : BasicInput<String>, Input.HasPermission {
+        val cause = ResponseNetworkException(response, Exception())
+        val input = object : BasicInput<String> {
             override suspend fun fetch(match: String, block: suspend (String) -> ParseResult) =
                 throw cause
 
             override suspend fun parse(data: String, match: String) =
-                result.copy(next = next.copy(match = data)) // Store data in MatchedInput, so we can test it
-
-            override val permissionTitleResId = R.string.converter_google_maps_permission_title
-            override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
+                throw NotImplementedError()
         }
         val matchedInput = MatchedInput<BasicInput<String>>(input, source)
         val lastAttempt = null
@@ -332,8 +313,6 @@ class PermissionGrantedBasicInputTest {
 
     @Test
     fun getLoadingIndicator_whenLastAttemptIsNull_returnsLargeLoadingIndicatorWithoutDescription() = runTest {
-        val input = FakeInputRepository.googleMapsShortLinkInput
-        val matchedInput = MatchedInput<BasicInput<Uri>>(input, source)
         val state = PermissionGrantedBasicInput(
             stateContext,
             source,
@@ -353,9 +332,7 @@ class PermissionGrantedBasicInputTest {
 
     @Test
     fun getLoadingIndicator_whenLastAttemptNumberIsOne_returnsLargeLoadingIndicatorWithDescription() = runTest {
-        val input = FakeInputRepository.googleMapsShortLinkInput
-        val matchedInput = MatchedInput<BasicInput<Uri>>(input, source)
-        val lastAttempt = Attempt<RecoverableNetworkException>(1, ConnectionClosedNetworkException(EOFException()))
+        val lastAttempt = Attempt<RecoverableNetworkException>(1, lastCause)
         val state = PermissionGrantedBasicInput(
             stateContext,
             source,

@@ -56,7 +56,8 @@ class PermissionGrantedWebViewInputTest {
     private val oldPoints = persistentListOf(WGS84Point(3.0, 4.0, source = Source.GENERATED))
     private val oldResult = ParseResult(oldPoints)
     private val results: Results = mapOf(MatchedInput(FakeInputRepository.debugUriInput, source) to oldResult)
-    val permission = Permission.ALWAYS
+    private val permission = Permission.ALWAYS
+    private val lastCause = ConnectionClosedNetworkException(EOFException())
     private val maxAttempts = 3
     private val resources: Resources = mock {
         on { getString(R.string.converter_google_maps_loading_indicator_title) } doReturn "Connecting to Google..."
@@ -65,6 +66,10 @@ class PermissionGrantedWebViewInputTest {
         on {
             getString(R.string.conversion_loading_indicator_description, 2, 10, "connection closed")
         } doReturn "Attempt 2 out of 10 due to: Connection closed"
+        on { getString(R.string.network_exception_eof) } doReturn "Connection closed"
+        on {
+            getString(R.string.network_exception_response_error, HttpStatusCode.NotFound.value)
+        } doReturn "Response error 404"
     }
     private val uriQuote = FakeUriQuote
     private val stateContext: ConversionStateContext = mock {
@@ -132,7 +137,7 @@ class PermissionGrantedWebViewInputTest {
     @Test
     fun transition_whenPendingDataIsCompletedWithRecoverableNetworkExceptionAndLastAttemptIsOne_retries() = runTest {
         val cause = WebViewNetworkException()
-        val lastAttempt = Attempt<RecoverableNetworkException>(1, ConnectionClosedNetworkException(EOFException()))
+        val lastAttempt = Attempt<RecoverableNetworkException>(1, lastCause)
         val state = PermissionGrantedWebViewInput(
             stateContext,
             source,
@@ -164,9 +169,9 @@ class PermissionGrantedWebViewInputTest {
     }
 
     @Test
-    fun transition_whenIsCompletedWithRecoverableNetworkExceptionAndLastAttemptIsMaxAttempts_returnsConversionFailed() =
+    fun transition_whenPendingDataIsCompletedWithRecoverableNetworkExceptionAndLastAttemptIsMaxAttempts_returnsConversionFailed() =
         runTest {
-            val lastAttempt = Attempt<RecoverableNetworkException>(3, ConnectionClosedNetworkException(EOFException()))
+            val lastAttempt = Attempt<RecoverableNetworkException>(3, lastCause)
             val state = PermissionGrantedWebViewInput(
                 stateContext,
                 source,
@@ -199,8 +204,7 @@ class PermissionGrantedWebViewInputTest {
             on { status } doReturn HttpStatusCode.NotFound
             on { this.call } doReturn call
         }
-        val tr = Exception()
-        val cause = ResponseNetworkException(response, tr)
+        val cause = ResponseNetworkException(response, Exception())
         val state = PermissionGrantedWebViewInput(
             stateContext,
             source,
@@ -314,7 +318,7 @@ class PermissionGrantedWebViewInputTest {
 
     @Test
     fun getLoadingIndicator_whenLastAttemptNumberIsOne_returnsLargeLoadingIndicatorWithDescription() = runTest {
-        val lastAttempt = Attempt<RecoverableNetworkException>(1, ConnectionClosedNetworkException(EOFException()))
+        val lastAttempt = Attempt<RecoverableNetworkException>(1, lastCause)
         val state = PermissionGrantedWebViewInput(
             stateContext,
             source,

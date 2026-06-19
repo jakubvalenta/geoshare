@@ -236,37 +236,39 @@ data class PermissionGrantedBasicInput<T>(
         val attemptNumber = lastAttempt?.number?.plus(1) ?: 1
         return try {
             withContext(dispatcher) {
-                if (lastAttempt != null && lastAttempt.number >= maxAttempts) {
-                    stateContext.log.w(TAG, "Maximum number of $maxAttempts attempts reached for $matchedInput")
-                    ConversionFailed(
-                        source, lastAttempt.cause.getMessage(stateContext.resources), lastAttempt.cause.getDetails()
-                    )
-                } else {
-                    val delayMillis = calcExponentialBackoffMillis(attemptNumber)
-                    if (delayMillis > 0) {
-                        stateContext.log.i(
-                            TAG,
-                            "Waiting ${delayMillis}ms before attempt $attemptNumber of $maxAttempts for $matchedInput"
+                try {
+                    if (lastAttempt != null && lastAttempt.number >= maxAttempts) {
+                        stateContext.log.w(TAG, "Maximum number of $maxAttempts attempts reached for $matchedInput")
+                        ConversionFailed(
+                            source, lastAttempt.cause.getMessage(stateContext.resources), lastAttempt.cause.getDetails()
                         )
-                        delay(delayMillis)
+                    } else {
+                        val delayMillis = calcExponentialBackoffMillis(attemptNumber)
+                        if (delayMillis > 0) {
+                            stateContext.log.i(
+                                TAG,
+                                "Waiting ${delayMillis}ms before attempt $attemptNumber of $maxAttempts for $matchedInput"
+                            )
+                            delay(delayMillis)
+                        }
+                        val result = matchedInput.input.fetch(matchedInput.match) { data ->
+                            matchedInput.input.parse(data, matchedInput.match)
+                        }
+                        DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to result))
                     }
-                    val result = matchedInput.input.fetch(matchedInput.match) { data ->
-                        matchedInput.input.parse(data, matchedInput.match)
-                    }
-                    DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to result))
+                } catch (_: MalformedURLException) {
+                    ConversionFailed(
+                        source, stateContext.resources.getString(R.string.conversion_failed_reason_invalid_url)
+                    )
+                } catch (tr: RecoverableNetworkException) {
+                    val attempt = Attempt(attemptNumber, tr)
+                    PermissionGrantedBasicInput(
+                        stateContext, source, matchedInput, permission, results, attempt, maxAttempts
+                    )
+                } catch (tr: UnrecoverableNetworkException) {
+                    ConversionFailed(source, tr.getMessage(stateContext.resources), tr.getDetails())
                 }
             }
-        } catch (_: MalformedURLException) {
-            ConversionFailed(
-                source, stateContext.resources.getString(R.string.conversion_failed_reason_invalid_url)
-            )
-        } catch (tr: RecoverableNetworkException) {
-            val attempt = Attempt(attemptNumber, tr)
-            PermissionGrantedBasicInput(
-                stateContext, source, matchedInput, permission, results, attempt, maxAttempts
-            )
-        } catch (tr: UnrecoverableNetworkException) {
-            ConversionFailed(source, tr.getMessage(stateContext.resources), tr.getDetails())
         } catch (_: CancellationException) {
             // Cancellation must be caught outside withContext, because withContext somehow rethrows errors
             ConversionFailed(source, stateContext.resources.getString(R.string.conversion_failed_cancelled))
@@ -329,31 +331,33 @@ data class PermissionGrantedWebViewInput(
         val attemptNumber = lastAttempt?.number?.plus(1) ?: 1
         return try {
             withContext(dispatcher) {
-                if (lastAttempt != null && lastAttempt.number >= maxAttempts) {
-                    stateContext.log.w(TAG, "Maximum number of $maxAttempts attempts reached for $matchedInput")
-                    ConversionFailed(
-                        source, lastAttempt.cause.getMessage(stateContext.resources), lastAttempt.cause.getDetails()
-                    )
-                } else {
-                    val data = withTimeout(matchedInput.input.timeout) {
-                        pendingData.await()
+                try {
+                    if (lastAttempt != null && lastAttempt.number >= maxAttempts) {
+                        stateContext.log.w(TAG, "Maximum number of $maxAttempts attempts reached for $matchedInput")
+                        ConversionFailed(
+                            source, lastAttempt.cause.getMessage(stateContext.resources), lastAttempt.cause.getDetails()
+                        )
+                    } else {
+                        val data = withTimeout(matchedInput.input.timeout) {
+                            pendingData.await()
+                        }
+                        val result = matchedInput.input.parse(data, matchedInput.match)
+                        DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to result))
                     }
-                    val result = matchedInput.input.parse(data, matchedInput.match)
-                    DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to result))
+                } catch (tr: RecoverableNetworkException) {
+                    val attempt = Attempt(attemptNumber, tr)
+                    PermissionGrantedWebViewInput(
+                        stateContext, source, matchedInput, permission, results, attempt, maxAttempts
+                    )
+                } catch (tr: UnrecoverableNetworkException) {
+                    ConversionFailed(source, tr.getMessage(stateContext.resources), tr.getDetails())
+                } catch (_: TimeoutCancellationException) {
+                    stateContext.log.w(TAG, "Timed out")
+                    ConversionFailed(
+                        source, stateContext.resources.getString(R.string.conversion_failed_reason_timeout)
+                    )
                 }
             }
-        } catch (tr: RecoverableNetworkException) {
-            val attempt = Attempt(attemptNumber, tr)
-            PermissionGrantedWebViewInput(
-                stateContext, source, matchedInput, permission, results, attempt, maxAttempts
-            )
-        } catch (tr: UnrecoverableNetworkException) {
-            ConversionFailed(source, tr.getMessage(stateContext.resources), tr.getDetails())
-        } catch (_: TimeoutCancellationException) {
-            stateContext.log.w(TAG, "Timed out")
-            ConversionFailed(
-                source, stateContext.resources.getString(R.string.conversion_failed_reason_timeout)
-            )
         } catch (_: CancellationException) {
             // Cancellation must be caught outside withContext, because withContext somehow rethrows errors
             ConversionFailed(source, stateContext.resources.getString(R.string.conversion_failed_cancelled))
