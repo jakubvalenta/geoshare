@@ -149,6 +149,7 @@
     <string name="converter_google_maps_loading_indicator_title">Connecting to Google…</string>
     <string name="converter_google_maps_name">Google Maps</string>
     <string name="converter_google_maps_permission_title">Connect to Google?</string>
+    <string name="converter_google_navigation_uri_name">Google Navigation URI</string>
     <string name="converter_here_wego_name">HERE WeGo</string>
     <string name="converter_magic_earth_name">Magic Earth</string>
     <string name="converter_mapy_com_loading_indicator_title">Connecting to Mapy.com…</string>
@@ -304,6 +305,7 @@
     <string name="network_exception_unknown">Unknown error</string>
     <string name="network_exception_unauthorized">Unauthorized</string>
     <string name="network_exception_unresolved_address">Unresolved address</string>
+    <string name="network_exception_webview">WebView exception</string>
     <string name="reset">reset</string>
     <string name="seconds_unit">seconds</string>
     <plurals name="seconds">
@@ -357,5 +359,4 @@
     <string name="user_preferences_section_input">Input</string>
     <string name="user_preferences_section_output">Output</string>
     <string name="yes">Yes</string>
-    <string name="converter_google_navigation_uri_name">Google Navigation URI</string>
 </resources>
