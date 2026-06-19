@@ -34,7 +34,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.onEach
-import page.ooooo.geoshare.lib.inputs.WebViewException
+import page.ooooo.geoshare.lib.network.WebViewNetworkException
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -154,7 +154,7 @@ fun ConversionWebView(
                         @JavascriptInterface
                         fun onExtractFailure() {
                             Log.w(TAG, "Extraction failure")
-                            pendingData.cancel(WebViewException())
+                            pendingData.completeExceptionally(WebViewNetworkException())
                         }
                     },
                     "Android",

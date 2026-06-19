@@ -30,14 +30,10 @@ import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.inputs.BasicInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.MatchedInput
-import page.ooooo.geoshare.lib.inputs.MaxAttemptsReachedCancellationException
 import page.ooooo.geoshare.lib.inputs.NoopInput
 import page.ooooo.geoshare.lib.inputs.ParseResult
-import page.ooooo.geoshare.lib.inputs.RecoverableCancellationException
-import page.ooooo.geoshare.lib.inputs.UnrecoverableCancellationException
 import page.ooooo.geoshare.lib.inputs.WebViewInput
 import page.ooooo.geoshare.lib.inputs.merge
-import page.ooooo.geoshare.lib.network.MaxAttemptsReachedNetworkException
 import page.ooooo.geoshare.lib.network.RecoverableNetworkException
 import page.ooooo.geoshare.lib.network.UnrecoverableNetworkException
 import page.ooooo.geoshare.lib.outputs.Action
@@ -236,49 +232,45 @@ data class PermissionGrantedBasicInput<T>(
     val dispatcher: CoroutineContext = Dispatchers.Default,
 ) : ConversionState, ConversionState.HasSource, ConversionState.HasLargeLoadingIndicator {
     @OptIn(FlowPreview::class)
-    override suspend fun transition(): State = try {
-        withContext(dispatcher) {
-            val attemptNumber = lastAttempt?.number?.plus(1) ?: 1
-            try {
+    override suspend fun transition(): State {
+        val attemptNumber = lastAttempt?.number?.plus(1) ?: 1
+        return try {
+            withContext(dispatcher) {
                 if (lastAttempt != null && lastAttempt.number >= maxAttempts) {
                     stateContext.log.w(TAG, "Maximum number of $maxAttempts attempts reached for $matchedInput")
-                    throw MaxAttemptsReachedNetworkException(lastAttempt.cause)
-                }
-                val delayMillis = calcExponentialBackoffMillis(attemptNumber)
-                if (delayMillis > 0) {
-                    stateContext.log.i(
-                        TAG, "Waiting ${delayMillis}ms before attempt $attemptNumber of $maxAttempts for $matchedInput"
+                    ConversionFailed(
+                        source, lastAttempt.cause.getMessage(stateContext.resources), lastAttempt.cause.getDetails()
                     )
-                    delay(delayMillis)
+                } else {
+                    val delayMillis = calcExponentialBackoffMillis(attemptNumber)
+                    if (delayMillis > 0) {
+                        stateContext.log.i(
+                            TAG,
+                            "Waiting ${delayMillis}ms before attempt $attemptNumber of $maxAttempts for $matchedInput"
+                        )
+                        delay(delayMillis)
+                    }
+                    val result = matchedInput.input.fetch(matchedInput.match) { data ->
+                        matchedInput.input.parse(data, matchedInput.match)
+                    }
+                    DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to result))
                 }
-                val result = matchedInput.input.fetch(matchedInput.match) { data ->
-                    matchedInput.input.parse(data, matchedInput.match)
-                }
-                DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to result))
-            } catch (_: MalformedURLException) {
-                ConversionFailed(
-                    source,
-                    stateContext.resources.getString(R.string.conversion_failed_reason_invalid_url),
-                )
-            } catch (tr: RecoverableNetworkException) {
-                val attempt = Attempt(attemptNumber, tr)
-                PermissionGrantedBasicInput(
-                    stateContext, source, matchedInput, permission, results, attempt, maxAttempts
-                )
-            } catch (tr: UnrecoverableNetworkException) {
-                ConversionFailed(
-                    source,
-                    tr.getMessage(stateContext.resources),
-                    details = tr.getDetails(),
-                )
             }
+        } catch (_: MalformedURLException) {
+            ConversionFailed(
+                source, stateContext.resources.getString(R.string.conversion_failed_reason_invalid_url)
+            )
+        } catch (tr: RecoverableNetworkException) {
+            val attempt = Attempt(attemptNumber, tr)
+            PermissionGrantedBasicInput(
+                stateContext, source, matchedInput, permission, results, attempt, maxAttempts
+            )
+        } catch (tr: UnrecoverableNetworkException) {
+            ConversionFailed(source, tr.getMessage(stateContext.resources), tr.getDetails())
+        } catch (_: CancellationException) {
+            // Cancellation must be caught outside withContext, because withContext somehow rethrows errors
+            ConversionFailed(source, stateContext.resources.getString(R.string.conversion_failed_cancelled))
         }
-    } catch (_: CancellationException) {
-        // Cancellation must be caught outside withContext, because withContext somehow rethrows errors
-        ConversionFailed(
-            source,
-            stateContext.resources.getString(R.string.conversion_failed_cancelled),
-        )
     }
 
     override fun getLoadingIndicator() =
@@ -326,62 +318,62 @@ data class PermissionGrantedWebViewInput(
     val matchedInput: MatchedInput<WebViewInput>,
     val permission: Permission?,
     val results: Results,
-    val pendingData: CompletableDeferred<String> = CompletableDeferred(),
-    val lastAttempt: Attempt<RecoverableCancellationException>? = null,
-    val maxAttempts: Int = 10,
+    val lastAttempt: Attempt<RecoverableNetworkException>? = null,
+    val maxAttempts: Int = 3,
     val dispatcher: CoroutineContext = Dispatchers.Default,
 ) : ConversionState, ConversionState.HasSource, ConversionState.HasLargeLoadingIndicator {
+    val pendingData: CompletableDeferred<String> = CompletableDeferred()
+
     @OptIn(FlowPreview::class)
-    override suspend fun transition(): State = try {
-        withContext(dispatcher) {
-            val attemptNumber = lastAttempt?.number?.plus(1) ?: 1
-            try {
+    override suspend fun transition(): State {
+        val attemptNumber = lastAttempt?.number?.plus(1) ?: 1
+        return try {
+            withContext(dispatcher) {
                 if (lastAttempt != null && lastAttempt.number >= maxAttempts) {
                     stateContext.log.w(TAG, "Maximum number of $maxAttempts attempts reached for $matchedInput")
-                    throw MaxAttemptsReachedCancellationException(lastAttempt.cause)
+                    ConversionFailed(
+                        source, lastAttempt.cause.getMessage(stateContext.resources), lastAttempt.cause.getDetails()
+                    )
                 } else {
-                    val delayMillis = calcExponentialBackoffMillis(attemptNumber)
-                    if (delayMillis > 0) {
-                        stateContext.log.i(
-                            TAG,
-                            "Waiting ${delayMillis}ms before attempt $attemptNumber of $maxAttempts for $matchedInput"
-                        )
-                        delay(delayMillis)
-                    }
                     val data = withTimeout(matchedInput.input.timeout) {
                         pendingData.await()
                     }
                     val result = matchedInput.input.parse(data, matchedInput.match)
                     DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to result))
                 }
-            } catch (_: TimeoutCancellationException) {
-                stateContext.log.w(TAG, "Timed out")
-                ConversionFailed(
-                    source,
-                    stateContext.resources.getString(R.string.conversion_failed_reason_timeout),
-                )
-            } catch (tr: RecoverableCancellationException) {
-                val attempt = Attempt(attemptNumber, tr)
-                PermissionGrantedWebViewInput(
-                    stateContext,
-                    source,
-                    matchedInput,
-                    permission,
-                    results,
-                    lastAttempt = attempt,
-                    maxAttempts = maxAttempts,
-                )
-            } catch (tr: UnrecoverableCancellationException) {
-                ConversionFailed(source, tr.getMessage(stateContext.resources))
             }
+        } catch (tr: RecoverableNetworkException) {
+            val attempt = Attempt(attemptNumber, tr)
+            PermissionGrantedWebViewInput(
+                stateContext, source, matchedInput, permission, results, attempt, maxAttempts
+            )
+        } catch (tr: UnrecoverableNetworkException) {
+            ConversionFailed(source, tr.getMessage(stateContext.resources), tr.getDetails())
+        } catch (_: TimeoutCancellationException) {
+            stateContext.log.w(TAG, "Timed out")
+            ConversionFailed(
+                source, stateContext.resources.getString(R.string.conversion_failed_reason_timeout)
+            )
+        } catch (_: CancellationException) {
+            // Cancellation must be caught outside withContext, because withContext somehow rethrows errors
+            ConversionFailed(source, stateContext.resources.getString(R.string.conversion_failed_cancelled))
         }
-    } catch (_: CancellationException) {
-        // Cancellation must be caught outside withContext, because withContext somehow rethrows errors
-        ConversionFailed(source, stateContext.resources.getString(R.string.conversion_failed_cancelled))
     }
 
     override fun getLoadingIndicator() =
-        LoadingIndicator.Large(stateContext.resources.getString(matchedInput.input.loadingIndicatorTitleResId))
+        (matchedInput.input as? Input.HasPermission)?.loadingIndicatorTitleResId?.let { loadingIndicatorTitleResId ->
+            LoadingIndicator.Large(
+                title = stateContext.resources.getString(loadingIndicatorTitleResId),
+                description = lastAttempt?.let {
+                    stateContext.resources.getString(
+                        R.string.conversion_loading_indicator_description,
+                        it.number + 1,
+                        maxAttempts,
+                        it.cause.getMessage(stateContext.resources),
+                    )
+                },
+            )
+        }
 
     override fun toString() =
         "$TAG(source=$source, matchedInput=$matchedInput, permission=$permission, results=$results)"

@@ -77,7 +77,6 @@ class MissingHeaderNetworkException : UnrecoverableNetworkException(Throwable())
         resources.getString(R.string.conversion_failed_reason_missing_header)
 }
 
-class MaxAttemptsReachedNetworkException(override val cause: RecoverableNetworkException) :
-    UnrecoverableNetworkException(cause) {
-    override fun getMessage(resources: Resources) = cause.getMessage(resources)
+class WebViewNetworkException : RecoverableNetworkException(Throwable()) {
+    override fun getMessage(resources: Resources) = resources.getString(R.string.network_exception_webview)
 }
