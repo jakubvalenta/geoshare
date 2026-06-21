@@ -45,7 +45,7 @@ class GoogleNavigationUriInput @Inject constructor(
             // Coordinates
             // google.navigation:q={lat},{lon}
             LAT_LON_PATTERN.matchEntire(q)?.toLatLonPoint(Source.URI)?.let {
-                points = persistentListOf(WGS84Point(it))
+                points = persistentListOf(WGS84Point(it)) // TODO What about China?
                 return@run
             }
 
