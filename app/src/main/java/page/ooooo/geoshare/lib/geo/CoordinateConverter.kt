@@ -33,16 +33,16 @@ class CoordinateConverter @Inject constructor(
 
             is GCJ02Point ->
                 if (lat == null || lon == null) {
-                    WGS84Point(lat, lon, z, name, source)
+                    WGS84Point(lat, lon, z, name, placeId, source)
                 } else {
                     GCJPointer(lat, lon).toExactWGSPointer().run {
-                        WGS84Point(latitude, longitude, z, name, source)
+                        WGS84Point(latitude, longitude, z, name, placeId, source)
                     }
                 }
 
             is GCJ02MainlandChinaPoint ->
                 if (lat == null || lon == null || TransformUtil.outOfChina(lat, lon)) {
-                    WGS84Point(lat, lon, z, name, source)
+                    WGS84Point(lat, lon, z, name, placeId, source)
                 } else {
                     // If the point is within greater China but not within Hong Kong or Macao, transform its coordinates
                     // from GCJ-02 to WGS84
@@ -52,15 +52,15 @@ class CoordinateConverter @Inject constructor(
                         !geometries.hongKong.containsPoint(wgs84Coords.longitude, wgs84Coords.latitude) &&
                         !geometries.macao.containsPoint(wgs84Coords.longitude, wgs84Coords.latitude)
                     ) {
-                        WGS84Point(wgs84Coords.latitude, wgs84Coords.longitude, z, name, source)
+                        WGS84Point(wgs84Coords.latitude, wgs84Coords.longitude, z, name, placeId, source)
                     } else {
-                        WGS84Point(lat, lon, z, name, source)
+                        WGS84Point(lat, lon, z, name, placeId, source)
                     }
                 }
 
             is GCJ02GreaterChinaAndTaiwanPoint ->
                 if (lat == null || lon == null || TransformUtil.outOfChina(lat, lon)) {
-                    WGS84Point(lat, lon, z, name, source)
+                    WGS84Point(lat, lon, z, name, placeId, source)
                 } else {
                     // If the point is within greater China or Taiwan, transform its coordinates from GCJ-02 to WGS84
                     val wgs84Coords = GCJPointer(lat, lon).toExactWGSPointer()
@@ -68,9 +68,9 @@ class CoordinateConverter @Inject constructor(
                         geometries.greaterChina.containsPoint(wgs84Coords.longitude, wgs84Coords.latitude) ||
                         geometries.taiwan.containsPoint(wgs84Coords.longitude, wgs84Coords.latitude)
                     ) {
-                        WGS84Point(wgs84Coords.latitude, wgs84Coords.longitude, z, name, source)
+                        WGS84Point(wgs84Coords.latitude, wgs84Coords.longitude, z, name, placeId, source)
                     } else {
-                        WGS84Point(lat, lon, z, name, source)
+                        WGS84Point(lat, lon, z, name, placeId, source)
                     }
                 }
 
@@ -85,10 +85,10 @@ class CoordinateConverter @Inject constructor(
         when (this) {
             is WGS84Point ->
                 if (lat == null || lon == null) {
-                    GCJ02Point(lat, lon, z, name, source)
+                    GCJ02Point(lat, lon, z, name, placeId, source)
                 } else {
                     WGSPointer(lat, lon).toGCJPointer().run {
-                        GCJ02Point(latitude, longitude, z, name, source)
+                        GCJ02Point(latitude, longitude, z, name, placeId, source)
                     }
                 }
 
@@ -96,7 +96,7 @@ class CoordinateConverter @Inject constructor(
 
             is GCJ02MainlandChinaPoint ->
                 if (lat == null || lon == null || TransformUtil.outOfChina(lat, lon)) {
-                    GCJ02Point(lat, lon, z, name, source)
+                    GCJ02Point(lat, lon, z, name, placeId, source)
                 } else {
                     // If the point is outside greater China or within Hong Kong or within Macao, transform its
                     // coordinates from WGS 84 to GCJ-02
@@ -106,17 +106,17 @@ class CoordinateConverter @Inject constructor(
                         !geometries.hongKong.containsPoint(wgs84Coords.longitude, wgs84Coords.latitude) &&
                         !geometries.macao.containsPoint(wgs84Coords.longitude, wgs84Coords.latitude)
                     ) {
-                        GCJ02Point(lat, lon, z, name, source)
+                        GCJ02Point(lat, lon, z, name, placeId, source)
                     } else {
                         WGSPointer(lat, lon).toGCJPointer().run {
-                            GCJ02Point(latitude, longitude, z, name, source)
+                            GCJ02Point(latitude, longitude, z, name, placeId, source)
                         }
                     }
                 }
 
             is GCJ02GreaterChinaAndTaiwanPoint ->
                 if (lat == null || lon == null || TransformUtil.outOfChina(lat, lon)) {
-                    GCJ02Point(lat, lon, z, name, source)
+                    GCJ02Point(lat, lon, z, name, placeId, source)
                 } else {
                     // If the point is outside greater China or Taiwan, transform its coordinates from WGS 84 to GCJ-02
                     val wgs84Coords = GCJPointer(lat, lon).toExactWGSPointer()
@@ -124,21 +124,21 @@ class CoordinateConverter @Inject constructor(
                         geometries.greaterChina.containsPoint(wgs84Coords.longitude, wgs84Coords.latitude) ||
                         geometries.taiwan.containsPoint(wgs84Coords.longitude, wgs84Coords.latitude)
                     ) {
-                        GCJ02Point(lat, lon, z, name, source)
+                        GCJ02Point(lat, lon, z, name, placeId, source)
                     } else {
                         WGSPointer(lat, lon).toGCJPointer().run {
-                            GCJ02Point(latitude, longitude, z, name, source)
+                            GCJ02Point(latitude, longitude, z, name, placeId, source)
                         }
                     }
                 }
 
             is BD09MCPoint ->
                 if (lat == null || lon == null) {
-                    GCJ02Point(lat, lon, z, name, source)
+                    GCJ02Point(lat, lon, z, name, placeId, source)
                 } else {
                     BD09Convertor.convertMC2LL(lat, lon)
                         .let { (bd09Lat, bd09Lon) -> CoordTransform.bd09toGCJ02(bd09Lat, bd09Lon) }
-                        .let { (gcj02Lat, gcj02Lon) -> GCJ02Point(gcj02Lat, gcj02Lon, z, name, source) }
+                        .let { (gcj02Lat, gcj02Lon) -> GCJ02Point(gcj02Lat, gcj02Lon, z, name, placeId, source) }
                 }
         }
     }
@@ -147,7 +147,7 @@ class CoordinateConverter @Inject constructor(
         when (this) {
             is WGS84Point ->
                 if (lat == null || lon == null || TransformUtil.outOfChina(lat, lon)) {
-                    GCJ02MainlandChinaPoint(lat, lon, z, name, source)
+                    GCJ02MainlandChinaPoint(lat, lon, z, name, placeId, source)
                 } else {
                     // If the point is within greater China but not in Hong Kong or Macao, transform its coordinates
                     // from WGS 84 to GCJ-02
@@ -157,16 +157,16 @@ class CoordinateConverter @Inject constructor(
                         !geometries.macao.containsPoint(lon, lat)
                     ) {
                         WGSPointer(lat, lon).toGCJPointer().run {
-                            GCJ02MainlandChinaPoint(latitude, longitude, z, name, source)
+                            GCJ02MainlandChinaPoint(latitude, longitude, z, name, placeId, source)
                         }
                     } else {
-                        GCJ02MainlandChinaPoint(lat, lon, z, name, source)
+                        GCJ02MainlandChinaPoint(lat, lon, z, name, placeId, source)
                     }
                 }
 
             is GCJ02Point ->
                 if (lat == null || lon == null || TransformUtil.outOfChina(lat, lon)) {
-                    GCJ02MainlandChinaPoint(lat, lon, z, name, source)
+                    GCJ02MainlandChinaPoint(lat, lon, z, name, placeId, source)
                 } else {
                     // If the point is outside greater China or within Hong Kong or within Macao, transform its
                     // coordinates from GCJ-02 to WGS 84
@@ -176,9 +176,9 @@ class CoordinateConverter @Inject constructor(
                         !geometries.hongKong.containsPoint(wgs84Coords.longitude, wgs84Coords.latitude) &&
                         !geometries.macao.containsPoint(wgs84Coords.longitude, wgs84Coords.latitude)
                     ) {
-                        GCJ02MainlandChinaPoint(lat, lon, z, name, source)
+                        GCJ02MainlandChinaPoint(lat, lon, z, name, placeId, source)
                     } else {
-                        GCJ02MainlandChinaPoint(wgs84Coords.latitude, wgs84Coords.longitude, z, name, source)
+                        GCJ02MainlandChinaPoint(wgs84Coords.latitude, wgs84Coords.longitude, z, name, placeId, source)
                     }
                 }
 
@@ -186,7 +186,7 @@ class CoordinateConverter @Inject constructor(
 
             is GCJ02GreaterChinaAndTaiwanPoint ->
                 if (lat == null || lon == null || TransformUtil.outOfChina(lat, lon)) {
-                    GCJ02MainlandChinaPoint(lat, lon, z, name, source)
+                    GCJ02MainlandChinaPoint(lat, lon, z, name, placeId, source)
                 } else {
                     // If the point is within Hong Kong, Macao, or Taiwan, transform its coordinates from GCJ-02 to
                     // WGS 84
@@ -196,9 +196,9 @@ class CoordinateConverter @Inject constructor(
                         geometries.hongKong.containsPoint(wgs84Coords.longitude, wgs84Coords.latitude) ||
                         geometries.macao.containsPoint(wgs84Coords.longitude, wgs84Coords.latitude)
                     ) {
-                        GCJ02MainlandChinaPoint(wgs84Coords.latitude, wgs84Coords.longitude, z, name, source)
+                        GCJ02MainlandChinaPoint(wgs84Coords.latitude, wgs84Coords.longitude, z, name, placeId, source)
                     } else {
-                        GCJ02MainlandChinaPoint(lat, lon, z, name, source)
+                        GCJ02MainlandChinaPoint(lat, lon, z, name, placeId, source)
                     }
                 }
 
@@ -210,7 +210,7 @@ class CoordinateConverter @Inject constructor(
         when (this) {
             is WGS84Point ->
                 if (lat == null || lon == null || TransformUtil.outOfChina(lat, lon)) {
-                    GCJ02GreaterChinaAndTaiwanPoint(lat, lon, z, name, source)
+                    GCJ02GreaterChinaAndTaiwanPoint(lat, lon, z, name, placeId, source)
                 } else {
                     // If the point is within greater China or Taiwan, transform its coordinates from WGS 84 to GCJ-02
                     if (
@@ -218,16 +218,16 @@ class CoordinateConverter @Inject constructor(
                         geometries.taiwan.containsPoint(lon, lat)
                     ) {
                         WGSPointer(lat, lon).toGCJPointer().run {
-                            GCJ02GreaterChinaAndTaiwanPoint(latitude, longitude, z, name, source)
+                            GCJ02GreaterChinaAndTaiwanPoint(latitude, longitude, z, name, placeId, source)
                         }
                     } else {
-                        GCJ02GreaterChinaAndTaiwanPoint(lat, lon, z, name, source)
+                        GCJ02GreaterChinaAndTaiwanPoint(lat, lon, z, name, placeId, source)
                     }
                 }
 
             is GCJ02Point ->
                 if (lat == null || lon == null || TransformUtil.outOfChina(lat, lon)) {
-                    GCJ02GreaterChinaAndTaiwanPoint(lat, lon, z, name, source)
+                    GCJ02GreaterChinaAndTaiwanPoint(lat, lon, z, name, placeId, source)
                 } else {
                     // If the point is outside greater China or Taiwan, transform its coordinates from GCJ-02 to WGS 84
                     val wgs84Coords = GCJPointer(lat, lon).toExactWGSPointer()
@@ -235,15 +235,22 @@ class CoordinateConverter @Inject constructor(
                         geometries.greaterChina.containsPoint(wgs84Coords.longitude, wgs84Coords.latitude) ||
                         geometries.taiwan.containsPoint(wgs84Coords.longitude, wgs84Coords.latitude)
                     ) {
-                        GCJ02GreaterChinaAndTaiwanPoint(lat, lon, z, name, source)
+                        GCJ02GreaterChinaAndTaiwanPoint(lat, lon, z, name, placeId, source)
                     } else {
-                        GCJ02GreaterChinaAndTaiwanPoint(wgs84Coords.latitude, wgs84Coords.longitude, z, name, source)
+                        GCJ02GreaterChinaAndTaiwanPoint(
+                            wgs84Coords.latitude,
+                            wgs84Coords.longitude,
+                            z,
+                            name,
+                            placeId,
+                            source
+                        )
                     }
                 }
 
             is GCJ02MainlandChinaPoint ->
                 if (lat == null || lon == null || TransformUtil.outOfChina(lat, lon)) {
-                    GCJ02GreaterChinaAndTaiwanPoint(lat, lon, z, name, source)
+                    GCJ02GreaterChinaAndTaiwanPoint(lat, lon, z, name, placeId, source)
                 } else {
                     // If the point is within Hong Kong, Macao, or Taiwan, transform its coordinates from WGS 84 to
                     // GCJ-02
@@ -254,10 +261,10 @@ class CoordinateConverter @Inject constructor(
                         geometries.macao.containsPoint(wgs84Coords.longitude, wgs84Coords.latitude)
                     ) {
                         WGSPointer(lat, lon).toGCJPointer().run {
-                            GCJ02GreaterChinaAndTaiwanPoint(latitude, longitude, z, name, source)
+                            GCJ02GreaterChinaAndTaiwanPoint(latitude, longitude, z, name, placeId, source)
                         }
                     } else {
-                        GCJ02GreaterChinaAndTaiwanPoint(lat, lon, z, name, source)
+                        GCJ02GreaterChinaAndTaiwanPoint(lat, lon, z, name, placeId, source)
                     }
                 }
 
