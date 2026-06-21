@@ -328,12 +328,7 @@ class GoogleMapsUriInputTest : InputTest {
     @Test
     fun parse_placeWithoutName() = runTest {
         assertEquals(
-            ParseResult(
-                next = MatchedInput(
-                    FakeInputRepository.googleMapsAddressApiInput,
-                    "https://www.google.com/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705:0xa9ea51361ed84bda"
-                )
-            ),
+            ParseResult(),
             input.parse("https://www.google.com/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705:0xa9ea51361ed84bda"),
         )
     }
@@ -421,7 +416,13 @@ class GoogleMapsUriInputTest : InputTest {
     fun parse_searchQueryPlaceWithPlaceId() = runTest {
         assertEquals(
             ParseResult(
-                persistentListOf(GCJ02MainlandChinaPoint(name = "Lumen Field", source = Source.URI)),
+                persistentListOf(
+                    GCJ02MainlandChinaPoint(
+                        name = "Lumen Field",
+                        placeId = @Suppress("SpellCheckingInspection") "ChIJKxjxuaNqkFQR3CK6O1HNNqY",
+                        source = Source.URI,
+                    )
+                ),
                 next = MatchedInput(
                     FakeInputRepository.googleMapsPlaceApiInput,
                     "https://www.google.com/maps/search/?query_place_id=ChIJKxjxuaNqkFQR3CK6O1HNNqY&query=Lumen%20Field&api=1",
@@ -435,6 +436,12 @@ class GoogleMapsUriInputTest : InputTest {
     fun parse_searchQueryPlaceIdOnly() = runTest {
         assertEquals(
             ParseResult(
+                persistentListOf(
+                    GCJ02MainlandChinaPoint(
+                        placeId = @Suppress("SpellCheckingInspection") "ChIJKxjxuaNqkFQR3CK6O1HNNqY",
+                        source = Source.URI,
+                    )
+                ),
                 next = MatchedInput(
                     FakeInputRepository.googleMapsPlaceApiInput,
                     "https://www.google.com/maps/search/?query_place_id=ChIJKxjxuaNqkFQR3CK6O1HNNqY&api=1",
@@ -719,12 +726,7 @@ class GoogleMapsUriInputTest : InputTest {
     @Test
     fun parse_directionsEmpty() = runTest {
         assertEquals(
-            ParseResult(
-                next = MatchedInput(
-                    FakeInputRepository.googleMapsAddressApiInput,
-                    "https://www.google.com/maps/dir/"
-                )
-            ),
+            ParseResult(),
             input.parse("https://www.google.com/maps/dir/"),
         )
     }
@@ -892,12 +894,7 @@ class GoogleMapsUriInputTest : InputTest {
     @Test
     fun parse_googleSearch() = runTest {
         assertEquals(
-            ParseResult(
-                next = MatchedInput(
-                    FakeInputRepository.googleMapsAddressApiInput,
-                    "https://www.google.com/search?sca_esv=123&hl=en"
-                )
-            ),
+            ParseResult(),
             input.parse("https://www.google.com/search?sca_esv=123&hl=en"),
         )
     }
