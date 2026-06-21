@@ -18,7 +18,6 @@ import page.ooooo.geoshare.launchApplication
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.testUri
-import page.ooooo.geoshare.testUriAnyCoordinates
 import page.ooooo.geoshare.testUriFails
 import page.ooooo.geoshare.waitForAppToBeVisible
 
@@ -239,6 +238,8 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
             }
         )
 
+        // TODO Directions with waypoints
+
         // Directions address
         testUri(
             if (testServer is TestServer.Configured) {
@@ -322,8 +323,13 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
                 "https://www.google.com/maps/place//",
             )
         } else if (htmlParsingSupported) {
-            // Google Maps HTML shows coordinates of the IP address that the request came from
-            testUriAnyCoordinates("https://www.google.com/maps/place//")
+            testUriFails(
+                setOf(
+                    "No points found",
+                    @Suppress("SpellCheckingInspection") "Aucun point trouvé",
+                ),
+                "https://www.google.com/maps/place//",
+            )
         } else {
             testUriFails(
                 setOf(

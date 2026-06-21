@@ -411,15 +411,6 @@ fun UiAutomatorTestScope.testUriFails(
     assertConversionFails(expectedMessage, timeoutMs)
 }
 
-fun UiAutomatorTestScope.testUriAnyCoordinates(
-    unsafeUriString: String,
-    timeoutMs: Long = NETWORK_TIMEOUT,
-) {
-    shareUri(unsafeUriString)
-    quickWaitForStableInActiveWindow() // Wait for the result to render, because there might be the old result
-    assertConversionSucceedsAnyCoordinates(timeoutMs)
-}
-
 fun UiAutomatorTestScope.testText(expectedPoints: Points, unsafeText: String) {
     // It would be preferable to test sharing of the text with the app, but this shell command doesn't work when
     // there are spaces in the text. So instead, we type the text in the main form of the app.
