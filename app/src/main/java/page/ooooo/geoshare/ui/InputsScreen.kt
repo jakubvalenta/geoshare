@@ -179,6 +179,7 @@ private fun InputsListPane(
                     ParagraphText(
                         stringResource(R.string.inputs_list_text, appName),
                         Modifier.padding(top = spacing.tinyAdaptive, bottom = spacing.mediumAdaptive),
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                     InputsSettingsButton {
                         AndroidTools.showOpenByDefaultSettings(context, settingsLauncher)
@@ -285,6 +286,7 @@ private fun InputsDetailPane(
                     .widthIn(max = maxWidth)
                     .padding(horizontal = spacing.windowPadding)
                     .padding(top = spacing.tinyAdaptive, bottom = spacing.mediumAdaptive),
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
         item {

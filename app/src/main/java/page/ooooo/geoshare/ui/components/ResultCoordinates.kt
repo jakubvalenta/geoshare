@@ -6,15 +6,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,7 +27,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
@@ -45,10 +48,10 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
+import page.ooooo.geoshare.ui.FaqItemId
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ResultCoordinates(
     points: Points,
@@ -58,6 +61,7 @@ fun ResultCoordinates(
     outputsForPointChips: List<PointOutput>,
     outputsForPointsChips: List<PointsOutput>,
     onExecute: (action: Action<*>) -> Unit,
+    onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
     onSelect: (index: Int?) -> Unit,
     initialExpanded: Boolean = false,
 ) {
@@ -93,14 +97,17 @@ fun ResultCoordinates(
                     )
                 }
             } else {
-                ParagraphText(
-                    stringResource(R.string.conversion_succeeded_description_q_only),
+                ResultCoordinatesCheck(
+                    buildAnnotatedString {
+                        append(stringResource(R.string.conversion_succeeded_check_name_only))
+                        append(" ")
+                        ClickableLink(stringResource(R.string.faq_title)) {
+                            onNavigateToFaqScreen(FaqItemId.NAME_ONLY)
+                        }
+                    },
                     Modifier
                         .weight(1f)
-                        .fillMaxWidth()
-                        .testTag("geoShareResultSuccessLastPointDescription"),
-                    fontStyle = FontStyle.Italic,
-                    style = MaterialTheme.typography.bodySmall,
+                        .testTag("geoShareResultSuccessLastPointCheckPlaceName"),
                 )
             }
             IconButton(
@@ -114,19 +121,25 @@ fun ResultCoordinates(
             }
         }
         if (!lastPoint.isAccurate()) {
-            ResultSuccessCoordinatesCheck(
+            ResultCoordinatesCheck(
                 stringResource(R.string.conversion_succeeded_check_srs),
-                Modifier.testTag("geoShareResultSuccessLastPointCheckSRS"),
+                Modifier
+                    .padding(horizontal = spacing.windowPadding)
+                    .testTag("geoShareResultSuccessLastPointCheckSRS"),
             )
         } else if (lastPoint.source == Source.JAVASCRIPT) {
-            ResultSuccessCoordinatesCheck(
+            ResultCoordinatesCheck(
                 stringResource(R.string.conversion_succeeded_check_experimental),
-                Modifier.testTag("geoShareResultSuccessLastPointCheckJavaScript"),
+                Modifier
+                    .padding(horizontal = spacing.windowPadding)
+                    .testTag("geoShareResultSuccessLastPointCheckJavaScript"),
             )
         } else if (lastPoint.source == Source.MAP_CENTER) {
-            ResultSuccessCoordinatesCheck(
+            ResultCoordinatesCheck(
                 stringResource(R.string.conversion_succeeded_check_map_center),
-                Modifier.testTag("geoShareResultSuccessLastPointCheckMapCenter"),
+                Modifier
+                    .padding(horizontal = spacing.windowPadding)
+                    .testTag("geoShareResultSuccessLastPointCheckMapCenter"),
             )
         }
         if (outputsForPointChips.isNotEmpty()) {
@@ -150,39 +163,47 @@ fun ResultCoordinates(
                 color = MaterialTheme.colorScheme.surfaceContainer,
                 contentColor = MaterialTheme.colorScheme.onSurface,
             ) {
-                Column(
-                    Modifier.padding(top = spacing.mediumAdaptive),
-                    verticalArrangement = Arrangement.spacedBy(spacing.tinyAdaptive),
-                ) {
+                Column(Modifier.padding(top = spacing.mediumAdaptive)) {
                     ExpandablePane(
                         expanded = expanded,
                         onSetExpanded = { expanded = it },
                         title = {
-                            Text(
-                                stringResource(R.string.conversion_succeeded_point_all, points.size),
-                                style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .testTag("geoShareResultSuccessAllPointsHeadline"),
-                            )
+                            Column(Modifier.weight(1f)) {
+                                Text(
+                                    stringResource(R.string.conversion_succeeded_point_all, points.size),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    modifier = Modifier.testTag("geoShareResultSuccessPointsHeadline"),
+                                )
+                                if (points.any { !it.hasCoordinates() }) {
+                                    ResultCoordinatesCheck(
+                                        buildAnnotatedString {
+                                            append(stringResource(R.string.conversion_succeeded_check_name_only_points))
+                                            append(" ")
+                                            ClickableLink(stringResource(R.string.faq_title)) {
+                                                onNavigateToFaqScreen(FaqItemId.NAME_ONLY)
+                                            }
+                                        },
+                                        Modifier
+                                            .padding(top = spacing.tiny)
+                                            .testTag("geoShareResultSuccessPointsCheckPlaceName"),
+                                    )
+                                }
+                            }
                         },
                         modifier = Modifier.padding(horizontal = spacing.windowPadding),
                     ) {
-                        Column(
-                            Modifier.padding(
-                                top = spacing.mediumAdaptive,
-                                end = 10.dp, // Align with expand/collapse icon
-                            ),
-                            verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive)
-                        ) {
+                        Column(Modifier.padding(top = spacing.tiny)) {
                             points.forEachIndexed { index, point ->
-                                ResultSuccessPoint(
+                                ResultPoint(
                                     point = point,
                                     index = index,
                                     coordinateFormat = coordinateFormat,
                                     coordinateConverter = coordinateConverter,
                                     onSelect = { onSelect(index) },
                                 )
+                                if (index < points.size - 1) {
+                                    HorizontalDivider()
+                                }
                             }
                         }
                     }
@@ -209,18 +230,33 @@ fun ResultCoordinates(
 }
 
 @Composable
-private fun ResultSuccessCoordinatesCheck(
-    text: String,
-    modifier: Modifier = Modifier,
-) {
-    val spacing = LocalSpacing.current
+private fun ResultCoordinatesCheck(modifier: Modifier = Modifier, block: @Composable () -> Unit) {
+    Row(modifier) {
+        Icon(
+            painterResource(R.drawable.warning_24px),
+            contentDescription = null,
+            modifier = Modifier
+                .padding(end = 6.dp)
+                .requiredSize(16.dp),
+        )
+        CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.labelMedium) {
+            block()
+        }
+    }
+}
 
-    ParagraphText(
-        text,
-        modifier.padding(horizontal = spacing.windowPadding),
-        fontStyle = FontStyle.Italic,
-        style = MaterialTheme.typography.bodySmall,
-    )
+@Composable
+private fun ResultCoordinatesCheck(text: String, modifier: Modifier = Modifier) {
+    ResultCoordinatesCheck(modifier) {
+        ParagraphText(text)
+    }
+}
+
+@Composable
+private fun ResultCoordinatesCheck(text: AnnotatedString, modifier: Modifier = Modifier) {
+    ResultCoordinatesCheck(modifier) {
+        ParagraphText(text)
+    }
 }
 
 // Previews
@@ -247,6 +283,7 @@ private fun DefaultPreview() {
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 onExecute = {},
+                onNavigateToFaqScreen = {},
                 onSelect = {},
             )
         }
@@ -275,6 +312,7 @@ private fun DarkPreview() {
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 onExecute = {},
+                onNavigateToFaqScreen = {},
                 onSelect = {},
             )
         }
@@ -285,10 +323,7 @@ private fun DarkPreview() {
 @Composable
 private fun DescriptionPreview() {
     AppTheme {
-        Surface(
-            color = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-        ) {
+        Surface(color = MaterialTheme.colorScheme.secondaryContainer) {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
@@ -303,6 +338,7 @@ private fun DescriptionPreview() {
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 onExecute = {},
+                onNavigateToFaqScreen = {},
                 onSelect = {},
             )
         }
@@ -313,10 +349,7 @@ private fun DescriptionPreview() {
 @Composable
 private fun DarkDescriptionPreview() {
     AppTheme {
-        Surface(
-            color = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-        ) {
+        Surface(color = MaterialTheme.colorScheme.secondaryContainer) {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
@@ -331,6 +364,7 @@ private fun DarkDescriptionPreview() {
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 onExecute = {},
+                onNavigateToFaqScreen = {},
                 onSelect = {},
             )
         }
@@ -341,10 +375,7 @@ private fun DarkDescriptionPreview() {
 @Composable
 private fun NamePreview() {
     AppTheme {
-        Surface(
-            color = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-        ) {
+        Surface(color = MaterialTheme.colorScheme.secondaryContainer) {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
@@ -362,6 +393,7 @@ private fun NamePreview() {
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 onExecute = {},
+                onNavigateToFaqScreen = {},
                 onSelect = {},
             )
         }
@@ -372,10 +404,7 @@ private fun NamePreview() {
 @Composable
 private fun DarkNamePreview() {
     AppTheme {
-        Surface(
-            color = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-        ) {
+        Surface(color = MaterialTheme.colorScheme.secondaryContainer) {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
@@ -393,6 +422,7 @@ private fun DarkNamePreview() {
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 onExecute = {},
+                onNavigateToFaqScreen = {},
                 onSelect = {},
             )
         }
@@ -403,10 +433,7 @@ private fun DarkNamePreview() {
 @Composable
 private fun PointsPreview() {
     AppTheme {
-        Surface(
-            color = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-        ) {
+        Surface(color = MaterialTheme.colorScheme.secondaryContainer) {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
@@ -417,7 +444,7 @@ private fun PointsPreview() {
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.genRandomPoint()),
-                    WGS84Point(NaivePoint.genRandomPoint()),
+                    WGS84Point(name = "Central Park", source = Source.GENERATED),
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.genRandomPoint()),
@@ -430,6 +457,7 @@ private fun PointsPreview() {
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 initialExpanded = true,
                 onExecute = {},
+                onNavigateToFaqScreen = {},
                 onSelect = {},
             )
         }
@@ -440,10 +468,7 @@ private fun PointsPreview() {
 @Composable
 private fun DarkPointsPreview() {
     AppTheme {
-        Surface(
-            color = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-        ) {
+        Surface(color = MaterialTheme.colorScheme.secondaryContainer) {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
@@ -454,7 +479,7 @@ private fun DarkPointsPreview() {
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.genRandomPoint()),
-                    WGS84Point(NaivePoint.genRandomPoint()),
+                    WGS84Point(name = "Central Park", source = Source.GENERATED),
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.genRandomPoint()),
@@ -467,6 +492,7 @@ private fun DarkPointsPreview() {
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 initialExpanded = true,
                 onExecute = {},
+                onNavigateToFaqScreen = {},
                 onSelect = {},
             )
         }
@@ -477,10 +503,7 @@ private fun DarkPointsPreview() {
 @Composable
 private fun PointsWithNamePreview() {
     AppTheme {
-        Surface(
-            color = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-        ) {
+        Surface(color = MaterialTheme.colorScheme.secondaryContainer) {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
@@ -500,6 +523,7 @@ private fun PointsWithNamePreview() {
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 initialExpanded = true,
                 onExecute = {},
+                onNavigateToFaqScreen = {},
                 onSelect = {},
             )
         }
@@ -510,10 +534,7 @@ private fun PointsWithNamePreview() {
 @Composable
 private fun DarkPointsWithNamePreview() {
     AppTheme {
-        Surface(
-            color = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-        ) {
+        Surface(color = MaterialTheme.colorScheme.secondaryContainer) {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
@@ -533,6 +554,7 @@ private fun DarkPointsWithNamePreview() {
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 initialExpanded = true,
                 onExecute = {},
+                onNavigateToFaqScreen = {},
                 onSelect = {},
             )
         }

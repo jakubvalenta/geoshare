@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="conversion_failed_unsupported_source">This link is not supported</string>
-    <string name="server_list_google_maps_none_description">Extract a search term instead of coordinates</string>
+    <string name="server_list_google_maps_none_description">Extract place name instead of coordinates</string>
 </resources>

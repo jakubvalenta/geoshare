@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInputImpl
 import javax.inject.Singleton
@@ -14,5 +15,5 @@ object GoogleMapsHtmlInputModule {
 
     @Provides
     @Singleton
-    fun provideGoogleMapsHtmlInput(): GoogleMapsHtmlInput = GoogleMapsHtmlInputImpl()
+    fun provideGoogleMapsHtmlInput(uriQuote: UriQuote): GoogleMapsHtmlInput = GoogleMapsHtmlInputImpl(uriQuote)
 }

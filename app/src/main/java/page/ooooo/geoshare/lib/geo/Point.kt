@@ -10,6 +10,7 @@ sealed interface Point {
     val lon: Double?
     val z: Double?
     val name: String?
+    val placeId: String?
     val source: Source
 
     val latStr: String?
@@ -41,14 +42,15 @@ data class WGS84Point(
     override val lon: Double? = null,
     override val z: Double? = null,
     override val name: String? = null,
+    override val placeId: String? = null,
     override val source: Source,
 ) : Point {
     constructor(naivePoint: NaivePoint, z: Double? = null, name: String? = null) : this(
-        naivePoint.lat,
-        naivePoint.lon,
-        naivePoint.z ?: z,
-        naivePoint.name ?: name,
-        naivePoint.source,
+        lat = naivePoint.lat,
+        lon = naivePoint.lon,
+        z = naivePoint.z ?: z,
+        name = naivePoint.name ?: name,
+        source = naivePoint.source,
     )
 
     override fun copy(z: Double?, name: String?) = WGS84Point(
@@ -74,14 +76,15 @@ data class GCJ02Point(
     override val lon: Double? = null,
     override val z: Double? = null,
     override val name: String? = null,
+    override val placeId: String? = null,
     override val source: Source,
 ) : Point {
     constructor(naivePoint: NaivePoint, z: Double? = null, name: String? = null) : this(
-        naivePoint.lat,
-        naivePoint.lon,
-        naivePoint.z ?: z,
-        naivePoint.name ?: name,
-        naivePoint.source,
+        lat = naivePoint.lat,
+        lon = naivePoint.lon,
+        z = naivePoint.z ?: z,
+        name = naivePoint.name ?: name,
+        source = naivePoint.source,
     )
 
     override fun copy(
@@ -110,14 +113,15 @@ data class GCJ02MainlandChinaPoint(
     override val lon: Double? = null,
     override val z: Double? = null,
     override val name: String? = null,
+    override val placeId: String? = null,
     override val source: Source,
 ) : Point {
     constructor(naivePoint: NaivePoint, z: Double? = null, name: String? = null) : this(
-        naivePoint.lat,
-        naivePoint.lon,
-        naivePoint.z ?: z,
-        naivePoint.name ?: name,
-        naivePoint.source,
+        lat = naivePoint.lat,
+        lon = naivePoint.lon,
+        z = naivePoint.z ?: z,
+        name = naivePoint.name ?: name,
+        source = naivePoint.source,
     )
 
     override fun copy(
@@ -146,14 +150,15 @@ data class GCJ02GreaterChinaAndTaiwanPoint(
     override val lon: Double? = null,
     override val z: Double? = null,
     override val name: String? = null,
+    override val placeId: String? = null,
     override val source: Source,
 ) : Point {
     constructor(naivePoint: NaivePoint, z: Double? = null, name: String? = null) : this(
-        naivePoint.lat,
-        naivePoint.lon,
-        naivePoint.z ?: z,
-        naivePoint.name ?: name,
-        naivePoint.source,
+        lat = naivePoint.lat,
+        lon = naivePoint.lon,
+        z = naivePoint.z ?: z,
+        name = naivePoint.name ?: name,
+        source = naivePoint.source,
     )
 
     override fun copy(
@@ -179,14 +184,15 @@ data class BD09MCPoint(
     override val lon: Double? = null,
     override val z: Double? = null,
     override val name: String? = null,
+    override val placeId: String? = null,
     override val source: Source,
 ) : Point {
     constructor(naivePoint: NaivePoint, z: Double? = null, name: String? = null) : this(
-        naivePoint.lat,
-        naivePoint.lon,
-        naivePoint.z ?: z,
-        naivePoint.name ?: name,
-        naivePoint.source,
+        lat = naivePoint.lat,
+        lon = naivePoint.lon,
+        z = naivePoint.z ?: z,
+        name = naivePoint.name ?: name,
+        source = naivePoint.source,
     )
 
     override fun copy(

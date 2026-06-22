@@ -92,7 +92,7 @@ class GoogleMapsShortLinkInputTest : InputTest {
     }
 
     @Test
-    fun parse_returnsMatchedInput() = runTest {
+    fun parse_returnsNextStep() = runTest {
         assertEquals(
             ParseResult(
                 next = MatchedInput(
@@ -105,7 +105,7 @@ class GoogleMapsShortLinkInputTest : InputTest {
     }
 
     @Test
-    fun parse_googleMapsGo_returnsMatchedInput() = runTest {
+    fun parse_googleMapsGo_returnsNextStep() = runTest {
         assertEquals(
             ParseResult(
                 next = MatchedInput(

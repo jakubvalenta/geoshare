@@ -25,7 +25,7 @@ class AmapShortLinkInputTest : InputTest {
     }
 
     @Test
-    fun parse_returnsMatchedInput() = runTest {
+    fun parse_returnsNextStep() = runTest {
         assertEquals(
             ParseResult(
                 next = MatchedInput(

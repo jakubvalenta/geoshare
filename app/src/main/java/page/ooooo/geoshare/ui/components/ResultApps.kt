@@ -144,7 +144,7 @@ fun ResultApps(
             Text(
                 stringResource(R.string.links_title),
                 Modifier.semantics { heading() },
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.titleMedium,
             )
             IconButton(
                 { onNavigateToLinkScreen() },

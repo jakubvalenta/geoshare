@@ -66,11 +66,12 @@ fun UserPreferenceDeveloperOptionsControls(
         onNavigateToBillingScreen = onNavigateToBillingScreen,
     ) {
         item {
-            ParagraphHtml(
+            ParagraphText(
                 stringResource(R.string.user_preferences_changelog_shown_for_version_code_title),
                 Modifier
                     .padding(horizontal = LocalSpacing.current.windowPadding)
                     .padding(bottom = LocalSpacing.current.smallAdaptive),
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
         userPreferenceTextControl(
@@ -80,7 +81,7 @@ fun UserPreferenceDeveloperOptionsControls(
             modifier = Modifier.testTag("geoShareUserPreferenceChangelogShownForVersionCode"),
         )
         item {
-            ParagraphHtml(
+            ParagraphText(
                 stringResource(R.string.user_preferences_last_run_version_code_title),
                 Modifier
                     .padding(horizontal = LocalSpacing.current.windowPadding)
@@ -88,6 +89,7 @@ fun UserPreferenceDeveloperOptionsControls(
                         top = LocalSpacing.current.mediumAdaptive,
                         bottom = LocalSpacing.current.smallAdaptive,
                     ),
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
         userPreferenceTextControl(
@@ -96,7 +98,7 @@ fun UserPreferenceDeveloperOptionsControls(
             onValueChange = onValueChange,
         )
         item {
-            ParagraphHtml(
+            ParagraphText(
                 stringResource(R.string.user_preferences_billing_cached_purchase),
                 Modifier
                     .padding(horizontal = LocalSpacing.current.windowPadding)
@@ -104,6 +106,7 @@ fun UserPreferenceDeveloperOptionsControls(
                         top = LocalSpacing.current.mediumAdaptive,
                         bottom = LocalSpacing.current.smallAdaptive,
                     ),
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
         userPreferenceTextControl(
