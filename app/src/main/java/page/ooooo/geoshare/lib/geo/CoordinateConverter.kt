@@ -238,12 +238,7 @@ class CoordinateConverter @Inject constructor(
                         GCJ02GreaterChinaAndTaiwanPoint(lat, lon, z, name, placeId, source)
                     } else {
                         GCJ02GreaterChinaAndTaiwanPoint(
-                            wgs84Coords.latitude,
-                            wgs84Coords.longitude,
-                            z,
-                            name,
-                            placeId,
-                            source
+                            wgs84Coords.latitude, wgs84Coords.longitude, z, name, placeId, source
                         )
                     }
                 }

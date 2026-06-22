@@ -17,9 +17,9 @@ import androidx.compose.ui.Modifier
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 /**
- * Column with [title] and [content]. When clicking the title, the content appears and disappears.
+ * Column with [title] and [content]. Clicking the title toggles the content with animation.
  *
- * The [modifier] applies to title only.
+ * [modifier] is applied to the title row.
  */
 @Composable
 fun ExpandablePane(
