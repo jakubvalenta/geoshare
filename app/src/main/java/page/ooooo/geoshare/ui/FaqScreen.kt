@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.ui
 
 import android.content.res.Configuration
+import androidx.annotation.Keep
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -44,10 +45,12 @@ import page.ooooo.geoshare.ui.components.annotatedStringResource
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
+@Keep
 enum class FaqItemId {
     HOW_IT_WORKS,
-    PRIVACY,
     LOCATION_PERMISSION,
+    PLACE_NAME,
+    PRIVACY,
 }
 
 private val endOffset = 8.dp
@@ -56,8 +59,8 @@ private val endOffset = 8.dp
 @Composable
 fun FaqScreen(
     initialExpandedItemId: FaqItemId? = null,
-    onBack: () -> Unit = {},
-    onNavigateToUserPreferencesConnectionPermissionScreen: () -> Unit = {},
+    onBack: () -> Unit,
+    onNavigateToUserPreferencesScreen: (groupId: UserPreferenceGroupId) -> Unit,
 ) {
     val spacing = LocalSpacing.current
     var expandedItemId by retain { mutableStateOf(initialExpandedItemId) }
@@ -102,30 +105,23 @@ fun FaqScreen(
                 ParagraphText(
                     stringResource(R.string.faq_how_text_2, appName)
                 )
-                CompositionLocalProvider(
-                    LocalTextStyle provides MaterialTheme.typography.bodyMedium.copy(
-                        lineBreak = LineBreak.Paragraph,
-                        hyphens = Hyphens.Auto,
-                    )
-                ) {
-                    TextList(verticalSpace = spacing.tiny) {
-                        listOf(
-                            R.string.faq_how_text_2_item_http to R.string.faq_how_text_2_item_http_example,
-                            R.string.faq_how_text_2_item_html to R.string.faq_how_text_2_item_html_example,
-                            R.string.faq_how_text_2_item_api to R.string.faq_how_text_2_item_api_example,
-                            R.string.faq_how_text_2_item_web to null,
-                        ).forEach { (textResId, exampleResId) ->
-                            TextListItem(bullet = { TextListBullet() }) {
-                                Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny / 2)) {
-                                    Text(stringResource(textResId))
-                                    exampleResId?.let { exampleResId ->
-                                        Text(
-                                            stringResource(R.string.example, stringResource(exampleResId)),
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            fontStyle = FontStyle.Italic,
-                                            style = MaterialTheme.typography.bodySmall,
-                                        )
-                                    }
+                TextList(verticalSpace = spacing.tiny) {
+                    listOf(
+                        R.string.faq_how_text_2_item_http to R.string.faq_how_text_2_item_http_example,
+                        R.string.faq_how_text_2_item_html to R.string.faq_how_text_2_item_html_example,
+                        R.string.faq_how_text_2_item_api to R.string.faq_how_text_2_item_api_example,
+                        R.string.faq_how_text_2_item_web to null,
+                    ).forEach { (textResId, exampleResId) ->
+                        TextListItem(bullet = { TextListBullet() }) {
+                            Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny / 2)) {
+                                Text(stringResource(textResId))
+                                exampleResId?.let { exampleResId ->
+                                    Text(
+                                        stringResource(R.string.example, stringResource(exampleResId)),
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        fontStyle = FontStyle.Italic,
+                                        style = MaterialTheme.typography.bodySmall,
+                                    )
                                 }
                             }
                         }
@@ -138,9 +134,25 @@ fun FaqScreen(
                     annotatedStringResource(
                         R.string.faq_how_text_4,
                         FormatArg.Link(stringResource(R.string.faq_how_text_4_preferences_button)) {
-                            onNavigateToUserPreferencesConnectionPermissionScreen()
+                            onNavigateToUserPreferencesScreen(UserPreferenceGroupId.CONNECTION_PERMISSION)
                         },
                     )
+                )
+            }
+            FaqItem(
+                itemId = FaqItemId.PLACE_NAME,
+                expandedItemId = expandedItemId,
+                onSetExpandedItemId = { expandedItemId = it },
+                stringResource(R.string.faq_place_name_title),
+            ) {
+                ParagraphText(
+                    stringResource(R.string.faq_place_name_text_1, appName)
+                )
+                ParagraphText(
+                    stringResource(R.string.faq_place_name_text_2)
+                )
+                ParagraphText(
+                    stringResource(R.string.faq_place_name_text_3)
                 )
             }
             FaqItem(
@@ -197,7 +209,7 @@ private fun FaqItem(
             Text(
                 title,
                 Modifier.weight(1f),
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.titleMedium,
             )
         },
         modifier = Modifier.padding(top = spacing.tinyAdaptive),
@@ -206,7 +218,14 @@ private fun FaqItem(
             Modifier.padding(top = spacing.smallAdaptive, end = endOffset),
             verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive),
         ) {
-            content()
+            CompositionLocalProvider(
+                LocalTextStyle provides MaterialTheme.typography.bodyMedium.copy(
+                    lineBreak = LineBreak.Paragraph,
+                    hyphens = Hyphens.Auto,
+                )
+            ) {
+                content()
+            }
         }
     }
 }
@@ -217,7 +236,10 @@ private fun FaqItem(
 @Composable
 private fun DefaultPreview() {
     AppTheme {
-        FaqScreen()
+        FaqScreen(
+            onBack = {},
+            onNavigateToUserPreferencesScreen = {},
+        )
     }
 }
 
@@ -225,7 +247,10 @@ private fun DefaultPreview() {
 @Composable
 private fun DarkPreview() {
     AppTheme {
-        FaqScreen()
+        FaqScreen(
+            onBack = {},
+            onNavigateToUserPreferencesScreen = {},
+        )
     }
 }
 
@@ -233,7 +258,11 @@ private fun DarkPreview() {
 @Composable
 private fun HowItWorksPreview() {
     AppTheme {
-        FaqScreen(initialExpandedItemId = FaqItemId.HOW_IT_WORKS)
+        FaqScreen(
+            initialExpandedItemId = FaqItemId.HOW_IT_WORKS,
+            onBack = {},
+            onNavigateToUserPreferencesScreen = {},
+        )
     }
 }
 
@@ -241,7 +270,35 @@ private fun HowItWorksPreview() {
 @Composable
 private fun DarkHowItWorksPreview() {
     AppTheme {
-        FaqScreen(initialExpandedItemId = FaqItemId.HOW_IT_WORKS)
+        FaqScreen(
+            initialExpandedItemId = FaqItemId.HOW_IT_WORKS,
+            onBack = {},
+            onNavigateToUserPreferencesScreen = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MissingCoordinatesPreview() {
+    AppTheme {
+        FaqScreen(
+            initialExpandedItemId = FaqItemId.PLACE_NAME,
+            onBack = {},
+            onNavigateToUserPreferencesScreen = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkMissingCoordinatesPreview() {
+    AppTheme {
+        FaqScreen(
+            initialExpandedItemId = FaqItemId.PLACE_NAME,
+            onBack = {},
+            onNavigateToUserPreferencesScreen = {},
+        )
     }
 }
 
@@ -249,7 +306,11 @@ private fun DarkHowItWorksPreview() {
 @Composable
 private fun PrivacyPreview() {
     AppTheme {
-        FaqScreen(initialExpandedItemId = FaqItemId.PRIVACY)
+        FaqScreen(
+            initialExpandedItemId = FaqItemId.PRIVACY,
+            onBack = {},
+            onNavigateToUserPreferencesScreen = {},
+        )
     }
 }
 
@@ -257,7 +318,11 @@ private fun PrivacyPreview() {
 @Composable
 private fun DarkPrivacyPreview() {
     AppTheme {
-        FaqScreen(initialExpandedItemId = FaqItemId.PRIVACY)
+        FaqScreen(
+            initialExpandedItemId = FaqItemId.PRIVACY,
+            onBack = {},
+            onNavigateToUserPreferencesScreen = {},
+        )
     }
 }
 
@@ -265,7 +330,11 @@ private fun DarkPrivacyPreview() {
 @Composable
 private fun LocationPermissionPreview() {
     AppTheme {
-        FaqScreen(initialExpandedItemId = FaqItemId.LOCATION_PERMISSION)
+        FaqScreen(
+            initialExpandedItemId = FaqItemId.LOCATION_PERMISSION,
+            onBack = {},
+            onNavigateToUserPreferencesScreen = {},
+        )
     }
 }
 
@@ -273,6 +342,10 @@ private fun LocationPermissionPreview() {
 @Composable
 private fun DarkLocationPermissionPreview() {
     AppTheme {
-        FaqScreen(initialExpandedItemId = FaqItemId.LOCATION_PERMISSION)
+        FaqScreen(
+            initialExpandedItemId = FaqItemId.LOCATION_PERMISSION,
+            onBack = {},
+            onNavigateToUserPreferencesScreen = {},
+        )
     }
 }

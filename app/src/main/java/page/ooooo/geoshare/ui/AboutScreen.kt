@@ -19,11 +19,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,12 +35,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.LinkAnnotation
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,12 +44,13 @@ import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
-import page.ooooo.geoshare.ui.components.StyledSupportingPaneScaffold
+import page.ooooo.geoshare.ui.components.ClickableLink
 import page.ooooo.geoshare.ui.components.LargeButton
 import page.ooooo.geoshare.ui.components.ParagraphHtml
 import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.ScaffoldAction
 import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
+import page.ooooo.geoshare.ui.components.StyledSupportingPaneScaffold
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -166,45 +164,32 @@ private fun ColumnScope.AboutMainPane(
         Modifier.padding(bottom = spacing.mediumAdaptive),
         style = MaterialTheme.typography.headlineSmall,
     )
-    ParagraphHtml(
-        stringResource(
-            R.string.about_text,
-            appName,
-            stringResource(R.string.about_support_email),
-        )
-    )
-    ParagraphText(
-        buildAnnotatedString {
-            withLink(
-                LinkAnnotation.Clickable(
-                    "licenses",
-                    styles = TextLinkStyles(
-                        SpanStyle(
-                            color = MaterialTheme.colorScheme.tertiary,
-                            textDecoration = TextDecoration.Underline
-                        )
-                    ),
-                ) {
-                    onNavigateToLicensesScreen()
-                }
-            ) {
-                append(stringResource(R.string.licenses))
-            }
-        }
-    )
-
-    if (donationVisible) {
-        ElevatedCard(
-            modifier = Modifier.padding(top = spacing.largeAdaptive),
-            colors = CardDefaults.elevatedCardColors(
-                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-            ),
-        ) {
-            ParagraphText(
-                stringResource(R.string.about_text_google_play),
-                Modifier.padding(spacing.small),
+    CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
+        ParagraphHtml(
+            stringResource(
+                R.string.about_text,
+                appName,
+                stringResource(R.string.about_support_email),
             )
+        )
+        ParagraphText(
+            buildAnnotatedString {
+                ClickableLink(stringResource(R.string.licenses), onNavigateToLicensesScreen)
+            }
+        )
+        if (donationVisible) {
+            ElevatedCard(
+                modifier = Modifier.padding(top = spacing.largeAdaptive),
+                colors = CardDefaults.elevatedCardColors(
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                ),
+            ) {
+                ParagraphText(
+                    stringResource(R.string.about_text_google_play),
+                    Modifier.padding(spacing.small),
+                )
+            }
         }
     }
 }

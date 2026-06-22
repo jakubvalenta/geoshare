@@ -165,12 +165,11 @@ fun MainScreen(
     onFinish: () -> Unit,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
-    onNavigateToFaqScreen: () -> Unit,
+    onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
     onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
     onNavigateToLinkScreen: () -> Unit,
-    onNavigateToUserPreferencesAutomationScreen: () -> Unit,
-    onNavigateToUserPreferencesScreen: () -> Unit,
+    onNavigateToUserPreferencesScreen: (groupId: UserPreferenceGroupId?) -> Unit,
     billingViewModel: BillingViewModel,
     conversionViewModel: ConversionViewModel,
     inputViewModel: InputViewModel = hiltViewModel(),
@@ -361,9 +360,9 @@ fun MainScreen(
             conversionViewModel.cancel()
             onNavigateToBillingScreen()
         },
-        onNavigateToFaqScreen = {
+        onNavigateToFaqScreen = { itemId ->
             conversionViewModel.cancel()
-            onNavigateToFaqScreen()
+            onNavigateToFaqScreen(itemId)
         },
         onNavigateToInputsScreen = {
             conversionViewModel.cancel()
@@ -377,13 +376,9 @@ fun MainScreen(
             conversionViewModel.cancel()
             onNavigateToLinkScreen()
         },
-        onNavigateToUserPreferencesAutomationScreen = {
+        onNavigateToUserPreferencesScreen = { groupId ->
             conversionViewModel.cancel()
-            onNavigateToUserPreferencesAutomationScreen()
-        },
-        onNavigateToUserPreferencesScreen = {
-            conversionViewModel.cancel()
-            onNavigateToUserPreferencesScreen()
+            onNavigateToUserPreferencesScreen(groupId)
         },
         onReset = {
             conversionViewModel.cancel()
@@ -428,12 +423,11 @@ private fun MainScreen(
     onHideApp: (String) -> Unit,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
-    onNavigateToFaqScreen: () -> Unit,
+    onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
     onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
     onNavigateToLinkScreen: () -> Unit,
-    onNavigateToUserPreferencesAutomationScreen: () -> Unit,
-    onNavigateToUserPreferencesScreen: () -> Unit,
+    onNavigateToUserPreferencesScreen: (groupId: UserPreferenceGroupId?) -> Unit,
     onReset: () -> Unit,
     onRetry: () -> Unit,
     onExecute: (Action<*>) -> Unit,
@@ -553,6 +547,7 @@ private fun MainScreen(
                                             outputsForPointChips = outputsForPointChips,
                                             outputsForPointsChips = outputsForPointsChips,
                                             onExecute = onExecute,
+                                            onNavigateToFaqScreen = onNavigateToFaqScreen,
                                             onSelect = { index ->
                                                 onCancel()
                                                 setSelectedPointIndex(index)
@@ -576,7 +571,7 @@ private fun MainScreen(
                                                         .padding(horizontal = spacing.windowPadding)
                                                         .padding(top = spacing.largeAdaptive),
                                                     onCancel = onCancel,
-                                                    onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
+                                                    onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
                                                 )
                                                 ResultApps(
                                                     appDetails = appDetails,
@@ -661,6 +656,7 @@ private fun MainScreen(
                                                 outputsForPointChips = outputsForPointChips,
                                                 outputsForPointsChips = outputsForPointsChips,
                                                 onExecute = onExecute,
+                                                onNavigateToFaqScreen = onNavigateToFaqScreen,
                                                 onSelect = { index ->
                                                     onCancel()
                                                     setSelectedPointIndex(index)
@@ -715,7 +711,7 @@ private fun MainScreen(
                                 billingFeatures = billingFeatures,
                                 billingStatus = billingStatus,
                                 onCancel = onCancel,
-                                onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
+                                onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
                             )
                         }
                     } else {
@@ -1039,11 +1035,10 @@ private fun DefaultPreview() {
             source = "",
             userPreferenceMessage = null,
             onCancel = {},
+            onDeny = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
-            onDeny = {},
-            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1052,13 +1047,12 @@ private fun DefaultPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -1091,11 +1085,10 @@ private fun DarkPreview() {
             source = "",
             userPreferenceMessage = null,
             onCancel = {},
+            onDeny = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
-            onDeny = {},
-            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1104,13 +1097,12 @@ private fun DarkPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -1143,11 +1135,10 @@ private fun SmallPreview() {
             source = "",
             userPreferenceMessage = null,
             onCancel = {},
+            onDeny = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
-            onDeny = {},
-            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1156,13 +1147,12 @@ private fun SmallPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -1195,11 +1185,10 @@ private fun TabletPreview() {
             source = "",
             userPreferenceMessage = null,
             onCancel = {},
+            onDeny = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
-            onDeny = {},
-            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1208,13 +1197,12 @@ private fun TabletPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -1278,11 +1266,10 @@ private fun SucceededPreview() {
             source = "",
             userPreferenceMessage = null,
             onCancel = {},
+            onDeny = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
-            onDeny = {},
-            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1291,13 +1278,12 @@ private fun SucceededPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -1361,11 +1347,10 @@ private fun DarkSucceededPreview() {
             source = "",
             userPreferenceMessage = null,
             onCancel = {},
+            onDeny = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
-            onDeny = {},
-            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1374,13 +1359,12 @@ private fun DarkSucceededPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -1444,11 +1428,10 @@ private fun SmallSucceededPreview() {
             source = "",
             userPreferenceMessage = null,
             onCancel = {},
+            onDeny = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
-            onDeny = {},
-            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1457,13 +1440,12 @@ private fun SmallSucceededPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -1527,11 +1509,10 @@ private fun TabletSucceededPreview() {
             source = "",
             userPreferenceMessage = null,
             onCancel = {},
+            onDeny = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
-            onDeny = {},
-            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1540,13 +1521,12 @@ private fun TabletSucceededPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -1587,11 +1567,10 @@ private fun ErrorPreview() {
             source = "",
             userPreferenceMessage = null,
             onCancel = {},
+            onDeny = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
-            onDeny = {},
-            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1600,13 +1579,12 @@ private fun ErrorPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -1647,11 +1625,10 @@ private fun DarkErrorPreview() {
             source = "",
             userPreferenceMessage = null,
             onCancel = {},
+            onDeny = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
-            onDeny = {},
-            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1660,13 +1637,12 @@ private fun DarkErrorPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -1707,11 +1683,10 @@ private fun TabletErrorPreview() {
             source = "",
             userPreferenceMessage = null,
             onCancel = {},
+            onDeny = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
-            onDeny = {},
-            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1720,13 +1695,12 @@ private fun TabletErrorPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -1784,11 +1758,10 @@ private fun LoadingIndicatorPreview() {
             source = "",
             userPreferenceMessage = null,
             onCancel = {},
+            onDeny = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
-            onDeny = {},
-            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1797,13 +1770,12 @@ private fun LoadingIndicatorPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -1861,11 +1833,10 @@ private fun DarkLoadingIndicatorPreview() {
             source = "",
             userPreferenceMessage = null,
             onCancel = {},
+            onDeny = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
-            onDeny = {},
-            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1874,13 +1845,12 @@ private fun DarkLoadingIndicatorPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -1938,11 +1908,10 @@ private fun TabletLoadingIndicatorPreview() {
             source = "",
             userPreferenceMessage = null,
             onCancel = {},
+            onDeny = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
-            onDeny = {},
-            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -1951,13 +1920,12 @@ private fun TabletLoadingIndicatorPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -2012,11 +1980,10 @@ private fun WebViewPreview() {
             source = "",
             userPreferenceMessage = null,
             onCancel = {},
+            onDeny = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
-            onDeny = {},
-            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -2025,13 +1992,12 @@ private fun WebViewPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -2086,11 +2052,10 @@ private fun DarkWebViewPreview() {
             source = "",
             userPreferenceMessage = null,
             onCancel = {},
+            onDeny = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
-            onDeny = {},
-            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -2099,13 +2064,12 @@ private fun DarkWebViewPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -2160,11 +2124,10 @@ private fun TabletWebViewPreview() {
             source = "",
             userPreferenceMessage = null,
             onCancel = {},
+            onDeny = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
-            onDeny = {},
-            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -2173,13 +2136,12 @@ private fun TabletWebViewPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -2231,11 +2193,10 @@ private fun EmptyPreview() {
             source = "",
             userPreferenceMessage = null,
             onCancel = {},
+            onDeny = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
-            onDeny = {},
-            onExecute = {},
             onGrant = {},
             onHideApp = {},
             onNavigateToAboutScreen = {},
@@ -2244,12 +2205,11 @@ private fun EmptyPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }

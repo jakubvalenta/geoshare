@@ -24,6 +24,7 @@ import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 
@@ -43,20 +44,24 @@ fun ResultPoint(
                 )
             }
         },
-        supportingContent = {
-            SelectionContainer {
-                Text(
-                    when (coordinateFormat) {
-                        CoordinateFormat.DEC -> CoordinateFormatter.formatDecCoords(
-                            coordinateConverter.toWGS84(point)
-                        )
+        supportingContent = if (point.hasCoordinates()) {
+            {
+                SelectionContainer {
+                    Text(
+                        when (coordinateFormat) {
+                            CoordinateFormat.DEC -> CoordinateFormatter.formatDecCoords(
+                                coordinateConverter.toWGS84(point)
+                            )
 
-                        CoordinateFormat.DEG_MIN_SEC -> CoordinateFormatter.formatDegMinSecCoords(
-                            coordinateConverter.toWGS84(point)
-                        )
-                    }
-                )
+                            CoordinateFormat.DEG_MIN_SEC -> CoordinateFormatter.formatDegMinSecCoords(
+                                coordinateConverter.toWGS84(point)
+                            )
+                        }
+                    )
+                }
             }
+        } else {
+            null
         },
         trailingContent = {
             IconButton(
@@ -73,46 +78,6 @@ fun ResultPoint(
             containerColor = Color.Transparent,
         ),
     )
-    // Box {
-    //     FlowRow(
-    //         Modifier
-    //             .fillMaxWidth()
-    //             .padding(end = iconSize + spacing.tiny),
-    //         horizontalArrangement = Arrangement.spacedBy(spacing.small),
-    //         verticalArrangement = Arrangement.spacedBy(1.dp),
-    //         itemVerticalAlignment = Alignment.CenterVertically,
-    //     ) {
-    //         SelectionContainer {
-    //             Text(
-    //                 point.cleanName ?: stringResource(R.string.conversion_succeeded_point_number, index + 1),
-    //                 fontStyle = FontStyle.Italic,
-    //                 style = MaterialTheme.typography.bodySmall,
-    //             )
-    //         }
-    //         SelectionContainer {
-    //             Text(
-    //                 when (coordinateFormat) {
-    //                     CoordinateFormat.DEC -> CoordinateFormatter.formatDecCoords(
-    //                         coordinateConverter.toWGS84(point)
-    //                     )
-    //
-    //                     CoordinateFormat.DEG_MIN_SEC -> CoordinateFormatter.formatDegMinSecCoords(
-    //                         coordinateConverter.toWGS84(point)
-    //                     )
-    //                 },
-    //                 style = MaterialTheme.typography.bodySmall,
-    //             )
-    //         }
-    //     }
-    //     Box(Modifier.align(Alignment.TopEnd)) {
-    //         IconButton(onSelect, Modifier.size(iconSize)) {
-    //             Icon(
-    //                 painterResource(R.drawable.content_copy_24px),
-    //                 contentDescription = stringResource(R.string.nav_menu_content_description),
-    //             )
-    //         }
-    //     }
-    // }
 }
 
 @Preview(showBackground = true)
@@ -182,6 +147,50 @@ private fun DarkLongNamePreview() {
             val coordinateConverter = CoordinateConverter(geometries)
             ResultPoint(
                 point = WGS84Point(NaivePoint.genRandomPoint(name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany")),
+                index = 2,
+                coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
+                coordinateConverter = coordinateConverter,
+                onSelect = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun NameOnlyPreview() {
+    AppTheme {
+        Surface {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            ResultPoint(
+                point = WGS84Point(
+                    name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany",
+                    source = Source.GENERATED
+                ),
+                index = 2,
+                coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
+                coordinateConverter = coordinateConverter,
+                onSelect = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkNameOnlyPreview() {
+    AppTheme {
+        Surface {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            ResultPoint(
+                point = WGS84Point(
+                    name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany",
+                    source = Source.GENERATED
+                ),
                 index = 2,
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
                 coordinateConverter = coordinateConverter,

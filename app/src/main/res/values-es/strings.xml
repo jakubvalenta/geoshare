@@ -149,7 +149,6 @@
     <string name="inputs_link">Enlace</string>
     <string name="inputs_list_text">Puedes compartir enlaces a los siguientes servicios de mapa con %1$s o pegarlos en la aplicación.</string>
     <string name="inputs_settings">Ve a los ajustes de Android para elegir los enlaces que deberían siempre abrirse en %1$s</string>
-    <string name="conversion_succeeded_description_q_only">El enlace original no contiene coordenadas, solo el nombre de un lugar. Cuando abras esta ubicación en otra aplicación, podría encontrar un lugar diferente al del enlace original.</string>
     <string name="donation_button">Donar en Ko-fi</string>
     <string name="donation_description">¿Esta aplicación te ahorra tiempo?</string>
     <string name="user_preferences_automation_delay_sec_title">Retraso de automatización</string>

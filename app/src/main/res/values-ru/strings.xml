@@ -154,7 +154,6 @@
     <string name="inputs_list_text">Вы можете делиться ссылками со следующими службами используя %1$s или вставлять их в приложение.</string>
     <string name="inputs_recent">Недавно добавленные</string>
     <string name="inputs_settings">Зайдите в настройки Android и выберите ссылки, которые должны всегда открываться в %1$s</string>
-    <string name="conversion_succeeded_description_q_only">Исходная ссылка не содержит координат, а только название места. Если вы откроете это местоположение в другом приложении, оно может найти место, отличное от места в исходной ссылке.</string>
     <string name="conversion_succeeded_point_all">Все точки (%1$d)</string>
     <string name="conversion_succeeded_point_last">Последняя точка</string>
     <string name="donation_button">Поддержать на Ko-fi</string>

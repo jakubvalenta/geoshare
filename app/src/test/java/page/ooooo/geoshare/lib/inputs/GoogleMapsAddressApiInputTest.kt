@@ -93,7 +93,7 @@ class GoogleMapsAddressApiInputTest {
     )
 
     @Test
-    fun parse_whenServerIsNotConfigured_returnsMatchedInput() = runTest {
+    fun parse_whenServerIsNotConfigured_returnsPointsFromUriAndNextStep() = runTest {
         val serverRepository: FakeServerRepository = mock {
             on { getSelectedGoogleMapsAddress() } doReturn null
         }
@@ -106,6 +106,7 @@ class GoogleMapsAddressApiInputTest {
         )
         assertEquals(
             ParseResult(
+                persistentListOf(GCJ02MainlandChinaPoint(name = query, source = Source.URI)),
                 next = MatchedInput(FakeInputRepository.googleMapsHtmlInput, "https://maps.google.com/?q=$query"),
             ),
             input.fetchAndParse("https://maps.google.com/?q=$query"),

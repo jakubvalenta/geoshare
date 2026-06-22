@@ -41,6 +41,10 @@ class GoogleMapsPlaceApiInput @Inject constructor(
         block(Uri.parse(match, uriQuote))
 
     override suspend fun parse(data: Uri, match: String) = parseResult {
+        // Parse URI
+        val googleMapsParseResult = GoogleMapsUriParser.parse(data)
+        points = googleMapsParseResult.points
+
         // Get API configuration
         val server = serverRepository.getSelectedGoogleMapsPlace() ?: run {
             // Go to HTML parsing, if server is not configured
@@ -49,8 +53,6 @@ class GoogleMapsPlaceApiInput @Inject constructor(
         }
 
         // Parse place id
-        val googleMapsParseResult = GoogleMapsUriParser.parse(data)
-        points = googleMapsParseResult.points
         val lastPoint = points.lastOrNull() ?: return@parseResult
         val placeId = lastPoint.placeId ?: return@parseResult
 

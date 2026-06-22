@@ -10,14 +10,19 @@ import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
+import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.geo.WGS84Point
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
+ * Handles URIs with the `google.navigation:` scheme.
+ *
+ * Assumes the coordinates are in the [GCJ02MainlandChinaPoint] coordinate system, but we really don't know, it depends
+ * on the app or website that created the URI.
+ *
  * See https://developer.android.com/guide/components/google-maps-intents#launch-turn-by-turn-navigation
  */
 @Singleton
@@ -32,7 +37,9 @@ class GoogleNavigationUriInput @Inject constructor(
             InputDocumentationItem.Text(45) {
                 stringResource(
                     R.string.example,
-                    GoogleMapsUriFormatter.formatNavigationUriString(WGS84Point(NaivePoint.example), uriQuote)
+                    GoogleMapsUriFormatter.formatNavigationUriString(
+                        GCJ02MainlandChinaPoint(NaivePoint.example), uriQuote
+                    )
                 )
             },
         ),
@@ -45,14 +52,14 @@ class GoogleNavigationUriInput @Inject constructor(
             // Coordinates
             // google.navigation:q={lat},{lon}
             LAT_LON_PATTERN.matchEntire(q)?.toLatLonPoint(Source.URI)?.let {
-                points = persistentListOf(WGS84Point(it)) // TODO What about China?
+                points = persistentListOf(GCJ02MainlandChinaPoint(it))
                 return@run
             }
 
             // Search
             // google.navigation:q={query}
             Q_PATH_PATTERN.matchEntire(q)?.groupOrNull()?.let {
-                points = persistentListOf(WGS84Point(name = it, source = Source.URI))
+                points = persistentListOf(GCJ02MainlandChinaPoint(name = it, source = Source.URI))
                 // Go to API parsing
                 next = MatchedInput(
                     googleMapsAddressApiInput.get(),

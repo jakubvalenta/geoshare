@@ -33,10 +33,11 @@
     <string name="billing_terms_of_service" translatable="false">terms of service</string>
     <string name="conversion_succeeded_check_experimental">Location might be inaccurate due to an experimental extraction method.</string>
     <string name="conversion_succeeded_check_map_center">Location might be a map center, not a pin.</string>
+    <string name="conversion_succeeded_check_place_name">Location is identified by name, not coordinates.</string>
+    <string name="conversion_succeeded_check_place_name_points">Some points are identified by name, not coordinates.</string>
     <string name="conversion_succeeded_check_srs">Location might be inaccurate due to coordinate system conversion.</string>
     <string name="conversion_succeeded_copy_coordinates">Copy coordinates</string>
     <string name="conversion_succeeded_copy_link">Copy %1$s link</string>
-    <string name="conversion_succeeded_description_q_only">The original link doesn’t contain coordinates, only a place name. When you open this location in another app, it might find a different place than the original link.</string>
     <string name="conversion_succeeded_hide">Hide</string>
     <string name="conversion_succeeded_location_failed">Failed to find location</string>
     <string name="conversion_succeeded_location_loading_indicator_title">Finding your location…</string>
@@ -216,7 +217,7 @@
     <string name="faq_how_text_2_item_html">or HTML document,</string>
     <string name="faq_how_text_2_item_html_example" translatable="false">&lt;meta property=&quot;place:location:latitude&quot; content=&quot;40.78&quot;&gt;</string>
     <string name="faq_how_text_2_item_web">or the live web page including JavaScript.</string>
-    <string name="faq_how_text_3">If you don’t allow connecting to the map service, then %1$s creates a geo: link with a search term instead of coordinates, or it stops, depending on the particular link.</string>
+    <string name="faq_how_text_3">If you don’t allow connecting to the map service, then %1$s creates a geo: link with a place name instead of coordinates, or it stops, depending on the particular link.</string>
     <string name="faq_how_text_4">To permanently allow or deny connecting to the map service instead of always asking (the default), go to the app’s %1$s.</string>
     <string name="faq_how_text_4_preferences_button">preferences</string>
     <string name="faq_location_permission_headline">Location permission</string>
@@ -225,6 +226,10 @@
     <string name="faq_privacy_text">When possible, %1$s converts map links offline. If the map link requires online conversion, the app will ask you before connecting to the map service (Google Maps, Apple Maps, etc.). If you allow the connection, the map service will receive the map link, and it will be able to read your IP address.</string>
     <string name="faq_privacy_text_server">For some map links, %1$s calls a remote server, the open-source %3$s. This server then calls the map service API (e.g. the Google Maps API). %2$s doesn’t keep logs of map links. To apply rate limiting, it stores a public key that identifies your device and separately your IP address for limited time.</string>
     <string name="faq_privacy_text_html">For some map links, %1$s loads the live web page of the map service and executes its JavaScript. This happens in a restricted environment, which blocks tracking scripts and doesn’t store cookies.</string>
+    <string name="faq_place_name_title">Place name instead of coordinates</string>
+    <string name="faq_place_name_text_1">For some map links, %1$s can only figure out the place name, e.g. "Main Street", instead of geographic coordinates.</string>
+    <string name="faq_place_name_text_2">You can still open these links in another map app, but be aware that the map app might show a different location than the original link. The reason is that the map app will use its own search function to determine the geographic location of the place.</string>
+    <string name="faq_place_name_text_3">A point that is identified by a place name instead of coordinates will not be included in a GPX route.</string>
     <string name="user_preferences_title">Preferences</string>
     <string name="user_preferences_automation_description">Choose an action to perform automatically when a map link is converted to coordinates.</string>
     <string name="user_preferences_automation_nothing">Nothing</string>
@@ -282,7 +287,7 @@
     <string name="links_form_test_world" translatable="false">Test Kilimanjaro</string>
     <string name="links_form_type">Context menu icon</string>
     <string name="links_form_uri_template_coords">URL template</string>
-    <string name="links_form_uri_template_name">URL template when only a search term is available</string>
+    <string name="links_form_uri_template_name">URL template when only a place name is available</string>
     <string name="links_insert">Add web map</string>
     <string name="links_message_deleted">Web map deleted</string>
     <string name="links_message_disabled_group">The web map has been hidden. You can show it again in preferences.</string>

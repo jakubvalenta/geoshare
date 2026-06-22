@@ -237,34 +237,32 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
             }
         }
     }
-    lastPoint
-        .takeIf { it.hasCoordinates() }
-        ?.let { point ->
-            CoordinateFormat.entries.map { coordinateFormat ->
-                when (coordinateFormat) {
-                    CoordinateFormat.DEC -> CoordinateFormatter.formatDecCoords(
-                        coordinateConverter.toWGS84(point)
-                    )
+    if (lastPoint.hasCoordinates()) {
+        val expectedCoordinatesOptions = CoordinateFormat.entries.map { coordinateFormat ->
+            when (coordinateFormat) {
+                CoordinateFormat.DEC -> CoordinateFormatter.formatDecCoords(
+                    coordinateConverter.toWGS84(lastPoint)
+                )
 
-                    CoordinateFormat.DEG_MIN_SEC -> CoordinateFormatter.formatDegMinSecCoords(
-                        coordinateConverter.toWGS84(point)
-                    )
-                }
+                CoordinateFormat.DEG_MIN_SEC -> CoordinateFormatter.formatDegMinSecCoords(
+                    coordinateConverter.toWGS84(lastPoint)
+                )
             }
         }
-        ?.let { expectedCoordinatesOptions ->
-            onElement {
-                if (viewIdResourceName == "geoShareResultSuccessLastPointCoordinates") {
-                    assertTrue(
-                        """Expected "${textAsString()}" to equal one of ${expectedCoordinatesOptions.joinToString()}""",
-                        textAsString() in expectedCoordinatesOptions,
-                    )
-                    true
-                } else {
-                    false
-                }
+        onElement {
+            if (viewIdResourceName == "geoShareResultSuccessLastPointCoordinates") {
+                assertTrue(
+                    """Expected "${textAsString()}" to equal one of ${expectedCoordinatesOptions.joinToString()}""",
+                    textAsString() in expectedCoordinatesOptions,
+                )
+                true
+            } else {
+                false
             }
         }
+    } else {
+        onElement { viewIdResourceName == "geoShareResultSuccessLastPointCheckPlaceName" }
+    }
     lastPoint.source.let { expectedSource ->
         onElement { viewIdResourceName == "geoShareResultSuccessLastPointSource_${expectedSource}" }
         if (!(accurate ?: lastPoint.isAccurate())) {
@@ -276,16 +274,21 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
         }
     }
     if (expectedPoints.size > 1) {
+        // Notice that we don't test the coordinates of the points but only their number
+        val expectedPointsNumber = "(${expectedPoints.size})"
         onElement {
-            if (viewIdResourceName == "geoShareResultSuccessAllPointsHeadline") {
+            if (viewIdResourceName == "geoShareResultSuccessPointsHeadline") {
                 assertTrue(
-                    """Expected "${textAsString()}" to contain "${expectedPoints.size}"""",
-                    textAsString()?.contains(expectedPoints.size.toString()) == true,
+                    """Expected "${textAsString()}" to contain "$expectedPointsNumber"""",
+                    textAsString()?.contains(expectedPointsNumber) == true,
                 )
                 true
             } else {
                 false
             }
+        }
+        if (expectedPoints.any { !it.hasCoordinates() }) {
+            onElement { viewIdResourceName == "geoShareResultSuccessPointsCheckPlaceName" }
         }
     }
 }
@@ -318,22 +321,6 @@ fun UiAutomatorTestScope.waitAndAssertGoogleMapsContainsElement(block: Accessibi
 
     // Verify Google Maps content
     onElement(20_000L) { packageName == PackageNames.GOOGLE_MAPS && this.block() }
-}
-
-fun UiAutomatorTestScope.assertConversionSucceedsAnyCoordinates(timeoutMs: Long = NETWORK_TIMEOUT) {
-    onElement(timeoutMs) {
-        if (viewIdResourceName == "geoShareResultSuccessLastPointName") {
-            assertTrue(
-                @Suppress("SpellCheckingInspection") """Expected "${textAsString()}" to equal "Coordinates" or "Coordonnées""""",
-                textAsString() in setOf(
-                    "Coordinates", @Suppress("SpellCheckingInspection") "Coordonnées"
-                ),
-            )
-            true
-        } else {
-            false
-        }
-    }
 }
 
 fun UiAutomatorTestScope.assertConversionFails(expectedMessage: Set<String>, timeoutMs: Long = NETWORK_TIMEOUT) {

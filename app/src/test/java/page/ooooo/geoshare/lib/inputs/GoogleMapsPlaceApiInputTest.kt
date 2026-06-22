@@ -84,7 +84,7 @@ class GoogleMapsPlaceApiInputTest {
     )
 
     @Test
-    fun parse_whenServerIsNotConfigured_returnsMatchedInput() = runTest {
+    fun parse_whenServerIsNotConfigured_returnsPointsFromUriAndNextStep() = runTest {
         val serverRepository: FakeServerRepository = mock {
             on { getSelectedGoogleMapsPlace() } doReturn null
         }
@@ -96,6 +96,7 @@ class GoogleMapsPlaceApiInputTest {
         )
         assertEquals(
             ParseResult(
+                persistentListOf(GCJ02MainlandChinaPoint(placeId = placeId, source = Source.URI)),
                 next = MatchedInput(
                     FakeInputRepository.googleMapsHtmlInput,
                     "https://www.google.com/maps/search/?query_place_id=$placeId"

@@ -463,10 +463,7 @@ private fun LinkFormCheckbox(
             enabled = enabled,
         )
         Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
-            Text(
-                label,
-                style = MaterialTheme.typography.bodyMedium,
-            )
+            Text(label, style = MaterialTheme.typography.bodyMedium)
             content()
         }
     }

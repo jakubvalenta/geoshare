@@ -37,6 +37,8 @@ import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.conversion.Initial
 import page.ooooo.geoshare.lib.conversion.State
+import page.ooooo.geoshare.ui.FaqItemId
+import page.ooooo.geoshare.ui.UserPreferenceGroupId
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -48,10 +50,10 @@ fun MainMenu(
     changelogShown: Boolean = true,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
-    onNavigateToFaqScreen: () -> Unit,
+    onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
     onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
-    onNavigateToUserPreferencesScreen: () -> Unit,
+    onNavigateToUserPreferencesScreen: (groupId: UserPreferenceGroupId?) -> Unit,
 ) {
     val spacing = LocalSpacing.current
     var expanded by retain { mutableStateOf(false) }
@@ -92,7 +94,7 @@ fun MainMenu(
                 modifier = Modifier.testTag("geoShareMainMenuUserPreferences"),
                 onClick = {
                     expanded = false
-                    onNavigateToUserPreferencesScreen()
+                    onNavigateToUserPreferencesScreen(null)
                 },
                 leadingIcon = {
                     Icon(Icons.Default.Settings, null)
@@ -102,7 +104,7 @@ fun MainMenu(
                 text = { Text(stringResource(R.string.faq_title)) },
                 onClick = {
                     expanded = false
-                    onNavigateToFaqScreen()
+                    onNavigateToFaqScreen(null)
                 },
                 leadingIcon = {},
             )

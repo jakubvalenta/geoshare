@@ -59,7 +59,7 @@ fun UserPreferenceControls(
             ) {
                 item {
                     description?.let { description ->
-                        ParagraphHtml(
+                        ParagraphText(
                             description(),
                             Modifier
                                 .padding(horizontal = spacing.windowPadding)
@@ -71,6 +71,7 @@ fun UserPreferenceControls(
                                         this
                                     }
                                 },
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                     } ?: Spacer(Modifier.height(spacing.tiny))
                 }

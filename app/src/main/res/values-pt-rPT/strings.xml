@@ -71,7 +71,6 @@
     <string name="not_available">Não disponível</string>
     <string name="conversion_succeeded_copy_coordinates">Copiar coordenadas</string>
     <string name="conversion_succeeded_copy_link">Copiar ligação do %1$s</string>
-    <string name="conversion_succeeded_description_q_only">A ligação original não contém coordenadas, somente o nome do lugar. Quando abrir esta localização noutra app, ele pode encontrar um lugar diferente do que a ligação original.</string>
     <string name="conversion_succeeded_location_failed">Falha ao encontrar localização</string>
     <string name="conversion_succeeded_location_loading_indicator_title">A encontrar a sua localização…</string>
     <string name="conversion_succeeded_location_rationale_dialog_title">Permitir acesso à localização?</string>

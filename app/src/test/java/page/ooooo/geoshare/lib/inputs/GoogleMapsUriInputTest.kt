@@ -793,6 +793,11 @@ class GoogleMapsUriInputTest : InputTest {
             ParseResult(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(name = "Paris,France", source = Source.URI),
+                    // TODO Extract waypoints
+                    // GCJ02MainlandChinaPoint(name = "Versailles,France", source = Source.URI),
+                    // GCJ02MainlandChinaPoint(name = "Chartres,France", source = Source.URI),
+                    // GCJ02MainlandChinaPoint(name = "Le Mans,France", source = Source.URI),
+                    // GCJ02MainlandChinaPoint(name = "Caen,France", source = Source.URI),
                     GCJ02MainlandChinaPoint(name = "Cherbourg,France", source = Source.URI),
                 ),
                 next = MatchedInput(
