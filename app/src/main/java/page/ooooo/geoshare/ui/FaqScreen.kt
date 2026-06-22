@@ -49,7 +49,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 enum class FaqItemId {
     HOW_IT_WORKS,
     LOCATION_PERMISSION,
-    PLACE_NAME,
+    NAME_ONLY,
     PRIVACY,
 }
 
@@ -97,7 +97,7 @@ fun FaqScreen(
                 itemId = FaqItemId.HOW_IT_WORKS,
                 expandedItemId = expandedItemId,
                 onSetExpandedItemId = { expandedItemId = it },
-                stringResource(R.string.faq_how_headline),
+                title = stringResource(R.string.faq_how_headline),
             ) {
                 ParagraphText(
                     stringResource(R.string.faq_how_text_1, appName)
@@ -140,26 +140,23 @@ fun FaqScreen(
                 )
             }
             FaqItem(
-                itemId = FaqItemId.PLACE_NAME,
+                itemId = FaqItemId.NAME_ONLY,
                 expandedItemId = expandedItemId,
                 onSetExpandedItemId = { expandedItemId = it },
-                stringResource(R.string.faq_place_name_title),
+                title = stringResource(R.string.faq_name_only_title),
             ) {
                 ParagraphText(
-                    stringResource(R.string.faq_place_name_text_1, appName)
+                    stringResource(R.string.faq_name_only_text_1, appName)
                 )
                 ParagraphText(
-                    stringResource(R.string.faq_place_name_text_2)
-                )
-                ParagraphText(
-                    stringResource(R.string.faq_place_name_text_3)
+                    stringResource(R.string.faq_name_only_text_2)
                 )
             }
             FaqItem(
                 itemId = FaqItemId.PRIVACY,
                 expandedItemId = expandedItemId,
                 onSetExpandedItemId = { expandedItemId = it },
-                stringResource(R.string.faq_privacy_headline),
+                title = stringResource(R.string.faq_privacy_headline),
             ) {
                 ParagraphText(
                     stringResource(R.string.faq_privacy_text, appName)
@@ -182,7 +179,7 @@ fun FaqScreen(
                 itemId = FaqItemId.LOCATION_PERMISSION,
                 expandedItemId = expandedItemId,
                 onSetExpandedItemId = { expandedItemId = it },
-                stringResource(R.string.faq_location_permission_headline),
+                title = stringResource(R.string.faq_location_permission_headline),
             ) {
                 ParagraphText(
                     stringResource(R.string.faq_location_permission_text, appName)
@@ -280,10 +277,10 @@ private fun DarkHowItWorksPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun MissingCoordinatesPreview() {
+private fun NameOnlyPreview() {
     AppTheme {
         FaqScreen(
-            initialExpandedItemId = FaqItemId.PLACE_NAME,
+            initialExpandedItemId = FaqItemId.NAME_ONLY,
             onBack = {},
             onNavigateToUserPreferencesScreen = {},
         )
@@ -292,10 +289,10 @@ private fun MissingCoordinatesPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkMissingCoordinatesPreview() {
+private fun DarkNameOnlyPreview() {
     AppTheme {
         FaqScreen(
-            initialExpandedItemId = FaqItemId.PLACE_NAME,
+            initialExpandedItemId = FaqItemId.NAME_ONLY,
             onBack = {},
             onNavigateToUserPreferencesScreen = {},
         )

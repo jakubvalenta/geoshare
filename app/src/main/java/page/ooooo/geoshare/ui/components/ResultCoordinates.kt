@@ -99,10 +99,10 @@ fun ResultCoordinates(
             } else {
                 ResultCoordinatesCheck(
                     buildAnnotatedString {
-                        append(stringResource(R.string.conversion_succeeded_check_place_name))
+                        append(stringResource(R.string.conversion_succeeded_check_name_only))
                         append(" ")
                         ClickableLink(stringResource(R.string.faq_title)) {
-                            onNavigateToFaqScreen(FaqItemId.PLACE_NAME)
+                            onNavigateToFaqScreen(FaqItemId.NAME_ONLY)
                         }
                     },
                     Modifier
@@ -177,10 +177,10 @@ fun ResultCoordinates(
                                 if (points.any { !it.hasCoordinates() }) {
                                     ResultCoordinatesCheck(
                                         buildAnnotatedString {
-                                            append(stringResource(R.string.conversion_succeeded_check_place_name_points))
+                                            append(stringResource(R.string.conversion_succeeded_check_name_only_points))
                                             append(" ")
                                             ClickableLink(stringResource(R.string.faq_title)) {
-                                                onNavigateToFaqScreen(FaqItemId.PLACE_NAME)
+                                                onNavigateToFaqScreen(FaqItemId.NAME_ONLY)
                                             }
                                         },
                                         Modifier
