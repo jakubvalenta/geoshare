@@ -81,8 +81,6 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
         configureConnectionPermissionPreference(Permission.ALWAYS)
         configureServer(testServer)
 
-        /*
-
         // Search
         testUri(
             if (testServer is TestServer.Configured) {
@@ -242,8 +240,6 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
             }
         )
 
-         */
-
         // Directions with waypoints
         testUri(
             if (testServer is TestServer.Configured) {
@@ -297,8 +293,6 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
             },
             "https://www.google.com/maps/dir/?api=1&origin=Paris,France&destination=Cherbourg,France&travelmode=driving&waypoints=Versailles,France%7CChartres,France%7CLe%2BMans,France%7CCaen,France",
         )
-
-        /*
 
         // Directions address
         testUri(
@@ -399,7 +393,5 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
                 "https://www.google.com/maps/place//",
             )
         }
-
-        */
     }
 }
