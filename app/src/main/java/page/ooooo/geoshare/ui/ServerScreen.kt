@@ -46,13 +46,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import androidx.compose.ui.text.LinkAnnotation
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -68,6 +63,7 @@ import page.ooooo.geoshare.data.di.defaultFakeServers
 import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.lib.Message
+import page.ooooo.geoshare.ui.components.ClickableLink
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
@@ -302,6 +298,7 @@ private fun ServerListPane(
                 Modifier
                     .padding(horizontal = spacing.windowPadding)
                     .padding(top = spacing.tinyAdaptive, bottom = spacing.smallAdaptive),
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
         item {
@@ -531,20 +528,8 @@ fun LazyListScope.serverListSection(
                     {
                         Text(
                             buildAnnotatedString {
-                                withLink(
-                                    LinkAnnotation.Clickable(
-                                        "link",
-                                        styles = TextLinkStyles(
-                                            SpanStyle(
-                                                color = MaterialTheme.colorScheme.tertiary,
-                                                textDecoration = TextDecoration.Underline
-                                            )
-                                        ),
-                                    ) {
-                                        onNavigateToContentKey(item.uid)
-                                    }
-                                ) {
-                                    append(stringResource(R.string.server_invalid))
+                                ClickableLink(stringResource(R.string.server_invalid)) {
+                                    onNavigateToContentKey(item.uid)
                                 }
                             },
                             style = MaterialTheme.typography.bodySmall,

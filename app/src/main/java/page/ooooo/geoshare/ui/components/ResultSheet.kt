@@ -33,7 +33,7 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
-fun ResultSuccessSheet(
+fun ResultSheet(
     points: Points,
     selectedPointIndex: Int,
     appDetails: AppDetails,
@@ -104,7 +104,7 @@ private fun <T> ResultSuccessSheetItemGroup(
         }
         var prevIcon: IconDescriptor? = null
         actions.forEach { action ->
-            ResultSuccessSheetItem(
+            ResultSheetItem(
                 headlineText = action.output.label(appDetails),
                 onClick = { onClick(action) },
                 supportingText = action.getDescription(value),
@@ -127,7 +127,7 @@ private fun DefaultPreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
-            ResultSuccessSheet(
+            ResultSheet(
                 points = persistentListOf(WGS84Point(NaivePoint.example), WGS84Point(NaivePoint.genRandomPoint())),
                 selectedPointIndex = 1,
                 appDetails = emptyMap(),
@@ -155,7 +155,7 @@ private fun DarkPreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
-            ResultSuccessSheet(
+            ResultSheet(
                 points = persistentListOf(WGS84Point(NaivePoint.example), WGS84Point(NaivePoint.genRandomPoint())),
                 selectedPointIndex = 1,
                 appDetails = emptyMap(),
@@ -179,7 +179,7 @@ private fun LastPointPreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
-            ResultSuccessSheet(
+            ResultSheet(
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 selectedPointIndex = 0,
                 appDetails = emptyMap(),
@@ -207,7 +207,7 @@ private fun DarkLastPointPreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
-            ResultSuccessSheet(
+            ResultSheet(
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 selectedPointIndex = 0,
                 appDetails = emptyMap(),

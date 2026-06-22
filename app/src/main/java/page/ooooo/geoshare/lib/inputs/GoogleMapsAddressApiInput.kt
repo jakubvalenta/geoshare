@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
-import dagger.Lazy
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.accept
@@ -19,8 +18,6 @@ import page.ooooo.geoshare.data.ServerRepository
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.network.ResponseNetworkException
@@ -31,9 +28,9 @@ import javax.inject.Singleton
 
 @Singleton
 class GoogleMapsAddressApiInput @Inject constructor(
-    private val serverHttpClientFactory: ServerHttpClientFactory,
-    private val googleMapsHtmlInput: Lazy<GoogleMapsHtmlInput>,
+    private val googleMapsHtmlInput: dagger.Lazy<GoogleMapsHtmlInput>,
     private val log: Log,
+    private val serverHttpClientFactory: ServerHttpClientFactory,
     private val serverRepository: ServerRepository,
     private val uriQuote: UriQuote,
 ) : BasicInput<Uri>, Input.HasPermission {
@@ -48,11 +45,25 @@ class GoogleMapsAddressApiInput @Inject constructor(
         block(Uri.parse(match, uriQuote))
 
     override suspend fun parse(data: Uri, match: String) = parseResult {
+        // Parse URI
+        val googleMapsParseResult = GoogleMapsUriParser.parse(data)
+        points = googleMapsParseResult.points
+
+        // Get API configuration
         val server = serverRepository.getSelectedGoogleMapsAddress() ?: run {
             // Go to HTML parsing, if server is not configured
             next = MatchedInput(googleMapsHtmlInput.get(), match)
             return@parseResult
         }
+
+        // Parse query
+        val lastPoint = points.lastOrNull() ?: return@parseResult
+        val rawQuery = lastPoint.name?.takeIf { it.isNotEmpty() } ?: return@parseResult
+
+        // Remove trailing coordinates from query
+        val query = Regex("""[\s+]*@$LAT$COORD_SEP$LON\s*$""").replace(rawQuery, "")
+
+        // Call API
         val client = serverHttpClientFactory.createHttpClient(server).config {
             install(ContentNegotiation) {
                 json(Json {
@@ -60,7 +71,6 @@ class GoogleMapsAddressApiInput @Inject constructor(
                 })
             }
         }
-        val query = parseQuery(data) ?: return@parseResult
         val res = try {
             client.use { client ->
                 client
@@ -89,61 +99,22 @@ class GoogleMapsAddressApiInput @Inject constructor(
             }
             throw tr
         }
-        points = res.results
-            // Take only the highest ranked result
-            .take(1)
-            .map { result ->
-                GCJ02MainlandChinaPoint(
-                    result.location.latitude,
-                    result.location.longitude,
-                    name = query,
-                    source = Source.API
-                )
-            }.toImmutableList()
-    }
 
-    private fun parseQuery(uri: Uri): String? = uri.run {
-        val qWithoutCoordsPattern = Regex("""(.+?)(?:[\s+]*@$LAT$COORD_SEP$LON\s*)?""")
-
-        // API directions
-        // https://www.google.com/maps/dir/?origin={name}&destination={name}
-        // API search
-        // https://maps.google.com/?q={name}
-        listOf(
-            "destination",
-            @Suppress("SpellCheckingInspection") "daddr",
-            "q",
-            "query",
+        // Update points
+        val highestRankedResult = res.results.firstOrNull() ?: return@parseResult
+        val point = GCJ02MainlandChinaPoint(
+            lat = highestRankedResult.location.latitude,
+            lon = highestRankedResult.location.longitude,
+            z = lastPoint.z,
+            name = query,
+            source = Source.API
         )
-            .firstNotNullOfOrNull { key -> qWithoutCoordsPattern.matchEntire(queryParams[key])?.groupOrNull() }
-            ?.let {
-                return it
-            }
-
-        val parts = pathParts.dropWhile { it.isEmpty() || it == "maps" }
-        val firstPart = parts.firstOrNull()
-        when (firstPart) {
-            // Directions
-            // https://www.google.com/maps/place/{point}/{point}/@{centerX},{centerY},{centerZ}
-            "dir" ->
-                // Take as query the last path part that isn't a map center or data parameter
-                parts.drop(1).lastOrNull { !it.startsWith('@') && !it.startsWith("data=") }
-
-            // Place
-            // https://www.google.com/maps/place/{name}/@{centerX},{centerY},{centerZ}
-            // Search
-            // https://www.google.com/maps/search/{query}
-            "place", "search" ->
-                // Take as query the second path part
-                parts.getOrNull(1)
-
-            else -> null
-        }
+        points = points.dropLast(1).plus(point).toImmutableList()
     }
+
+    override fun toString() = TAG
 
     private companion object {
         private const val TAG = "GoogleMapsAddressApiInput"
     }
-
-    override fun toString() = TAG
 }

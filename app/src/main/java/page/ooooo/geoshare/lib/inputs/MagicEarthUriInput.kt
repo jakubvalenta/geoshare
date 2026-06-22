@@ -38,7 +38,7 @@ class MagicEarthUriInput @Inject constructor(
 
             LAT_PATTERN.matchEntire(queryParams["lat"])?.doubleGroupOrNull()?.let { lat ->
                 LON_PATTERN.matchEntire(queryParams["lon"])?.doubleGroupOrNull()?.let { lon ->
-                    points = persistentListOf(WGS84Point(lat, lon, z, name, Source.URI))
+                    points = persistentListOf(WGS84Point(lat, lon, z, name, source = Source.URI))
                     return@run
                 }
             }

@@ -179,7 +179,6 @@
     </plurals>
     <string name="donation_button">تبرّع على Ko-fi</string>
     <string name="donation_description">هل يوفر هذا التطبيق وقتك؟</string>
-    <string name="conversion_succeeded_description_q_only">الرابط الأصلي لا يحتوي على إحداثيات، بل على اسم مكان فقط. عند فتح هذا الموقع في تطبيق آخر، قد يُعثر على مكان مختلف عن الرابط الأصلي.</string>
     <string name="network_exception_connect_timeout">انتهت مهلة الاتصال</string>
     <string name="network_exception_eof">أُغلق الاتصال</string>
     <string name="network_exception_request_timeout">انتهت مهلة الطلب</string>

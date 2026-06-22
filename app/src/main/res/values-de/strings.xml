@@ -173,7 +173,6 @@
     <string name="converter_yandex_maps_name">Yandex Maps</string>
     <string name="faq_how_headline">Funktionsweise</string>
     <string name="faq_privacy_headline">Hinweise zum Datenschutz</string>
-    <string name="conversion_succeeded_description_q_only">Der Original-Link enthält keine Koordinaten, sondern nur einen Ortsnamen. Wenn du diesen Ort in einer anderen App öffnest, wird möglicherweise ein anderer Ort als im Original-Link angezeigt.</string>
     <string name="faq_how_text_1">%1$s wandelt Kartenlinks in geo:-Links um, die von anderen Karten-Apps geöffnet werden können. Um einen geo:-Link zu erstellen, sind geografische Koordinaten erforderlich. %1$s extrahiert sie aus der Karten-URL.</string>
     <string name="faq_how_text_2">Allerdings enthalten nicht alle Karten-URLs Koordinaten. In solchen Fällen, wird %1$s Dich um Erlaubnis bitten, Dich mit dem Kartendienst (Google Maps, Apple Maps usw.) zu verbinden, um die Koordinaten abzurufen:</string>
     <string name="faq_how_text_2_item_http">Entweder aus den HTTP-Headern,</string>

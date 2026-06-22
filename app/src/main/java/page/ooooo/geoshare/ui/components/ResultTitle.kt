@@ -71,6 +71,7 @@ import page.ooooo.geoshare.lib.outputs.ActionResult
 import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
+import page.ooooo.geoshare.ui.UserPreferenceGroupId
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
@@ -85,7 +86,7 @@ fun ResultTitle(
     modifier: Modifier = Modifier,
     animationsEnabled: Boolean = true,
     onCancel: () -> Unit,
-    onNavigateToUserPreferencesAutomationScreen: () -> Unit,
+    onNavigateToUserPreferencesScreen: (groupId: UserPreferenceGroupId?) -> Unit,
 ) {
     var counterSec by remember { mutableIntStateOf(0) }
 
@@ -198,13 +199,13 @@ fun ResultTitle(
                     enabled = AutomationFeature in billingFeatures && billingStatus !is BillingStatus.Loading && billingStatus !is BillingStatus.Purchased,
                     badge = { modifier ->
                         FeatureBadgeSmall(
-                            onNavigateToUserPreferencesAutomationScreen,
+                            { onNavigateToUserPreferencesScreen(UserPreferenceGroupId.AUTOMATION) },
                             modifier.testTag("geoShareAutomationFeatureBadge")
                         )
                     },
                 ) { modifier ->
                     Button(
-                        onNavigateToUserPreferencesAutomationScreen,
+                        { onNavigateToUserPreferencesScreen(UserPreferenceGroupId.AUTOMATION) },
                         modifier.testTag("geoShareResultAutomationButton"),
                         colors = ButtonDefaults.elevatedButtonColors(
                             containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
@@ -285,7 +286,7 @@ private fun ActionFinishedPreview() {
                 ),
                 animationsEnabled = false,
                 onCancel = {},
-                onNavigateToUserPreferencesAutomationScreen = {},
+                onNavigateToUserPreferencesScreen = {},
             )
         }
     }
@@ -319,7 +320,7 @@ private fun DarkActionFinishedPreview() {
                 ),
                 animationsEnabled = false,
                 onCancel = {},
-                onNavigateToUserPreferencesAutomationScreen = {},
+                onNavigateToUserPreferencesScreen = {},
             )
         }
     }
@@ -349,7 +350,7 @@ private fun ActionFinishedFeatureNotAvailablePreview() {
                     billingStatus = BillingStatus.NotPurchased(),
                     animationsEnabled = false,
                     onCancel = {},
-                    onNavigateToUserPreferencesAutomationScreen = {},
+                    onNavigateToUserPreferencesScreen = {},
                 )
                 Spacer(Modifier.height(15.dp))
             }
@@ -381,7 +382,7 @@ private fun DarkActionFinishedFeatureNotAvailablePreview() {
                     billingStatus = BillingStatus.NotPurchased(),
                     animationsEnabled = false,
                     onCancel = {},
-                    onNavigateToUserPreferencesAutomationScreen = {},
+                    onNavigateToUserPreferencesScreen = {},
                 )
                 Spacer(Modifier.height(15.dp))
             }
@@ -434,7 +435,7 @@ private fun ActionWaitingPreview() {
                 ),
                 animationsEnabled = false,
                 onCancel = {},
-                onNavigateToUserPreferencesAutomationScreen = {},
+                onNavigateToUserPreferencesScreen = {},
             )
         }
     }
@@ -485,7 +486,7 @@ private fun DarkActionWaitingPreview() {
                 ),
                 animationsEnabled = false,
                 onCancel = {},
-                onNavigateToUserPreferencesAutomationScreen = {},
+                onNavigateToUserPreferencesScreen = {},
             )
         }
     }
@@ -534,7 +535,7 @@ private fun LocationPermissionReceivedPreview() {
                 ),
                 animationsEnabled = false,
                 onCancel = {},
-                onNavigateToUserPreferencesAutomationScreen = {},
+                onNavigateToUserPreferencesScreen = {},
             )
         }
     }
@@ -583,7 +584,7 @@ private fun DarkLocationPermissionReceivedPreview() {
                 ),
                 animationsEnabled = false,
                 onCancel = {},
-                onNavigateToUserPreferencesAutomationScreen = {},
+                onNavigateToUserPreferencesScreen = {},
             )
         }
     }
@@ -620,7 +621,7 @@ private fun SucceededPreview() {
                 ),
                 animationsEnabled = false,
                 onCancel = {},
-                onNavigateToUserPreferencesAutomationScreen = {},
+                onNavigateToUserPreferencesScreen = {},
             )
         }
     }
@@ -657,7 +658,7 @@ private fun DarSucceededPreview() {
                 ),
                 animationsEnabled = false,
                 onCancel = {},
-                onNavigateToUserPreferencesAutomationScreen = {},
+                onNavigateToUserPreferencesScreen = {},
             )
         }
     }
@@ -694,7 +695,7 @@ private fun FailedPreview() {
                 ),
                 animationsEnabled = false,
                 onCancel = {},
-                onNavigateToUserPreferencesAutomationScreen = {},
+                onNavigateToUserPreferencesScreen = {},
             )
         }
     }
@@ -731,7 +732,7 @@ private fun DarkFailedPreview() {
                 ),
                 animationsEnabled = false,
                 onCancel = {},
-                onNavigateToUserPreferencesAutomationScreen = {},
+                onNavigateToUserPreferencesScreen = {},
             )
         }
     }

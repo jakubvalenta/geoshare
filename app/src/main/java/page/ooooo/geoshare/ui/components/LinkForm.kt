@@ -226,7 +226,7 @@ fun LinkForm(
         }
         Column(
             Modifier
-                .padding(top = spacing.medium)
+                .padding(vertical = spacing.medium)
                 .background(MaterialTheme.colorScheme.surfaceContainerHigh),
             verticalArrangement = Arrangement.spacedBy(spacing.tiny / 2)
         ) {
@@ -268,7 +268,7 @@ fun LinkForm(
                         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                             BottomSheetDefaults.DragHandle()
                         }
-                        ResultSuccessSheetItem(
+                        ResultSheetItem(
                             headlineText = copyOutput.label(appDetails),
                             supportingText = copyOutput.getDescription(WGS84Point(NaivePoint.example)),
                             icon = copyOutput.getIcon(appDetails),
@@ -316,9 +316,7 @@ fun LinkForm(
                     style = MaterialTheme.typography.bodyLarge,
                 )
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = spacing.windowPadding, vertical = spacing.medium),
+            modifier = Modifier.padding(horizontal = spacing.windowPadding),
             enabled = enabled,
         ) {
             Column {
@@ -327,7 +325,8 @@ fun LinkForm(
                     onValueChange = onSetGroup,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = spacing.windowPadding),
+                        .padding(horizontal = spacing.windowPadding)
+                        .padding(top = spacing.medium),
                     enabled = enabled,
                     label = {
                         Text(stringResource(R.string.links_form_group))
@@ -425,12 +424,10 @@ fun LinkForm(
                 }
             }
         }
-        HorizontalDivider()
+        HorizontalDivider(Modifier.padding(vertical = spacing.medium))
         LargeButton(
             stringResource(R.string.links_form_save),
-            Modifier
-                .padding(top = spacing.medium)
-                .testTag("geoShareLinkFormSave"),
+            Modifier.testTag("geoShareLinkFormSave"),
             enabled = enabled && isValid,
         ) {
             onSaveForm()
@@ -466,10 +463,7 @@ private fun LinkFormCheckbox(
             enabled = enabled,
         )
         Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
-            Text(
-                label,
-                style = MaterialTheme.typography.bodyMedium,
-            )
+            Text(label, style = MaterialTheme.typography.bodyMedium)
             content()
         }
     }

@@ -30,29 +30,26 @@ fun annotatedStringResource(@StringRes id: Int, vararg formatArgs: FormatArg): A
             is Segment.Arg -> {
                 val argument = formatArgs.getOrNull(segment.index) ?: return@forEach
                 when (argument) {
-                    is FormatArg.Text -> {
-                        append(argument.text)
-                    }
-
-                    is FormatArg.Link -> {
-                        withLink(
-                            LinkAnnotation.Clickable(
-                                "link",
-                                styles = TextLinkStyles(
-                                    SpanStyle(
-                                        color = MaterialTheme.colorScheme.tertiary,
-                                        textDecoration = TextDecoration.Underline,
-                                    )
-                                ),
-                            ) {
-                                argument.onClick()
-                            }
-                        ) {
-                            append(argument.text)
-                        }
-                    }
+                    is FormatArg.Text -> append(argument.text)
+                    is FormatArg.Link -> ClickableLink(argument.text, argument.onClick)
                 }
             }
         }
     }
 }
+
+@Composable
+fun AnnotatedString.Builder.ClickableLink(text: String, onClick: () -> Unit) {
+    withLink(
+        LinkAnnotation.Clickable(tag = "link", styles = AnnotatedString.linkStyles) {
+            onClick()
+        }
+    ) {
+        append(text)
+    }
+}
+
+val AnnotatedString.Companion.linkStyles
+    @Composable get() = TextLinkStyles(
+        SpanStyle(color = MaterialTheme.colorScheme.tertiary, textDecoration = TextDecoration.Underline)
+    )

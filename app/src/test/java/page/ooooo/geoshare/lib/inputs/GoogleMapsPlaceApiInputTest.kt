@@ -71,11 +71,20 @@ class GoogleMapsPlaceApiInputTest {
     }
     private val keyStoreTools = FakeKeyStoreTools()
     private val log = FakeLog
+    private val serverRepository: FakeServerRepository = mock {
+        on { getSelectedGoogleMapsPlace() } doReturn server
+    }
     private val uriQuote = FakeUriQuote
     private val userPreferencesRepository = FakeUserPreferencesRepository()
+    private val input = GoogleMapsPlaceApiInput(
+        serverRepository = serverRepository,
+        serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
+        googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
+        uriQuote = uriQuote,
+    )
 
     @Test
-    fun parse_whenServerIsNotConfigured_returnsMatchedInput() = runTest {
+    fun parse_whenServerIsNotConfigured_returnsPointsFromUriAndNextStep() = runTest {
         val serverRepository: FakeServerRepository = mock {
             on { getSelectedGoogleMapsPlace() } doReturn null
         }
@@ -85,181 +94,124 @@ class GoogleMapsPlaceApiInputTest {
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
             uriQuote = uriQuote,
         )
-        val match = "https://www.google.com/maps/search/?query_place_id=$placeId"
         assertEquals(
             ParseResult(
-                next = MatchedInput(FakeInputRepository.googleMapsHtmlInput, match),
+                persistentListOf(GCJ02MainlandChinaPoint(placeId = placeId, source = Source.URI)),
+                next = MatchedInput(
+                    FakeInputRepository.googleMapsHtmlInput,
+                    "https://www.google.com/maps/search/?query_place_id=$placeId"
+                ),
             ),
-            input.fetch(match) { data -> input.parse(data, match) },
+            input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=$placeId"),
         )
     }
 
     @Test
-    fun parse_whenPlaceIdIsInQueryParamAndApiReturnsResult_returnsPoint() = runTest {
-        val serverRepository: FakeServerRepository = mock {
-            on { getSelectedGoogleMapsPlace() } doReturn server
-        }
-        val input = GoogleMapsPlaceApiInput(
-            serverRepository = serverRepository,
-            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
-            googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
-            uriQuote = uriQuote,
-        )
-        val match = "https://www.google.com/maps/search/?query_place_id=$placeId&query=47.5951518,-122.3316393&api=1"
+    fun parse_whenPlaceIdIsFoundInUriAndApiReturnsResult_returnsPointsWithResultAsLastPointCoordinates() = runTest {
         assertEquals(
             ParseResult(
                 persistentListOf(
-                    GCJ02MainlandChinaPoint(50.123456, -120.123456, source = Source.API)
+                    GCJ02MainlandChinaPoint(
+                        50.123456, -120.123456,
+                        placeId = placeId, source = Source.API,
+                    )
                 )
             ),
-            input.fetch(match) { data -> input.parse(data, match) },
+            input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=$placeId"),
+        )
+        assertEquals(
+            ParseResult(
+                persistentListOf(
+                    GCJ02MainlandChinaPoint(
+                        50.123456,
+                        -120.123456,
+                        name = "foo", placeId = placeId, source = Source.API
+                    )
+                )
+            ),
+            input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=$placeId&query=foo"),
         )
     }
 
     @Test
-    fun parse_whenQueryIsNotFoundInUri_returnsNoPoints() = runTest {
-        val serverRepository: FakeServerRepository = mock {
-            on { getSelectedGoogleMapsPlace() } doReturn server
-        }
+    fun parse_whenQueryWithCoordinatesIsFoundInUri_doesNotCallTheApi() = runTest {
+        val engine = MockEngine { throw NotImplementedError() }
         val input = GoogleMapsPlaceApiInput(
             serverRepository = serverRepository,
             serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
             uriQuote = uriQuote,
         )
-        val match = "https://www.google.com/spam"
         assertEquals(
-            ParseResult(),
-            input.fetch(match) { data -> input.parse(data, match) },
+            ParseResult(
+                persistentListOf(
+                    GCJ02MainlandChinaPoint(
+                        47.5951518, -122.3316393,
+                        source = Source.URI,
+                    )
+                )
+            ),
+            input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=$placeId&query=47.5951518,-122.3316393&api=1"),
         )
     }
 
     @Test
-    fun parse_whenQueryIsEmpty_returnsNoPoints() = runTest {
-        val serverRepository: FakeServerRepository = mock {
-            on { getSelectedGoogleMapsPlace() } doReturn server
-        }
-        val input = GoogleMapsPlaceApiInput(
-            serverRepository = serverRepository,
-            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
-            googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
-            uriQuote = uriQuote,
-        )
-        val match = "https://www.google.com/maps/search/?query_place_id="
+    fun parse_whenPlaceIdIsNotFoundInUri_returnsNoPoints() = runTest {
         assertEquals(
             ParseResult(),
-            input.fetch(match) { data -> input.parse(data, match) },
+            input.fetchAndParse("https://www.google.com/spam"),
+        )
+    }
+
+    @Test
+    fun parse_whenPlaceIdIsEmpty_returnsNoPoints() = runTest {
+        assertEquals(
+            ParseResult(),
+            input.fetchAndParse("https://www.google.com/maps/search/?query_place_id="),
         )
     }
 
     @Test(expected = UnknownNetworkException::class)
     fun parse_whenApiReturnsEmptyObject_throwsException() = runTest {
-        val serverRepository: FakeServerRepository = mock {
-            on { getSelectedGoogleMapsPlace() } doReturn server
-        }
-        val input = GoogleMapsPlaceApiInput(
-            serverRepository = serverRepository,
-            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
-            googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
-            uriQuote = uriQuote,
-        )
-        val match = "https://www.google.com/maps/search/?query_place_id=empty-object"
-        input.fetch(match) { data -> input.parse(data, match) }
+        input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=empty-object")
     }
 
     @Test(expected = UnknownNetworkException::class)
     fun parse_whenApiReturnsInvalidResponse_throwsException() = runTest {
-        val serverRepository: FakeServerRepository = mock {
-            on { getSelectedGoogleMapsPlace() } doReturn server
-        }
-        val input = GoogleMapsPlaceApiInput(
-            serverRepository = serverRepository,
-            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
-            googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
-            uriQuote = uriQuote,
-        )
-        val match = "https://www.google.com/maps/search/?query_place_id=invalid"
-        input.fetch(match) { data -> input.parse(data, match) }
+        input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=invalid")
     }
 
     @Test
-    fun parse_whenApiReturns400_returnsNoPoints() = runTest {
-        val serverRepository: FakeServerRepository = mock {
-            on { getSelectedGoogleMapsPlace() } doReturn server
-        }
-        val input = GoogleMapsPlaceApiInput(
-            serverRepository = serverRepository,
-            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
-            googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
-            uriQuote = uriQuote,
-        )
-        val match = "https://www.google.com/maps/search/?query_place_id=bad-request"
+    fun parse_whenApiReturns400_returnsPointsWithoutCoordinates() = runTest {
         assertEquals(
-            ParseResult(),
-            input.fetch(match) { data -> input.parse(data, match) },
+            ParseResult(persistentListOf(GCJ02MainlandChinaPoint(placeId = "bad-request", source = Source.URI))),
+            input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=bad-request"),
         )
     }
 
     @Test
-    fun parse_whenApiReturns404_returnsNoPoints() = runTest {
-        val serverRepository: FakeServerRepository = mock {
-            on { getSelectedGoogleMapsPlace() } doReturn server
-        }
-        val input = GoogleMapsPlaceApiInput(
-            serverRepository = serverRepository,
-            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
-            googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
-            uriQuote = uriQuote,
-        )
-        val match = "https://www.google.com/maps/search/?query_place_id=not-found"
+    fun parse_whenApiReturns404_returnsPointsWithoutCoordinates() = runTest {
         assertEquals(
-            ParseResult(),
-            input.fetch(match) { data -> input.parse(data, match) },
+            ParseResult(persistentListOf(GCJ02MainlandChinaPoint(placeId = "not-found", source = Source.URI))),
+            input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=not-found"),
         )
     }
 
     @Test(expected = ResponseNetworkException::class)
     fun parse_whenApiReturnsOther4xx_throwsException() = runTest {
-        val serverRepository: FakeServerRepository = mock {
-            on { getSelectedGoogleMapsPlace() } doReturn server
-        }
-        val input = GoogleMapsPlaceApiInput(
-            serverRepository = serverRepository,
-            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
-            googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
-            uriQuote = uriQuote,
-        )
-        val match = "https://www.google.com/maps/search/?query_place_id=405"
-        input.fetch(match) { data -> input.parse(data, match) }
+        input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=405")
     }
 
     @Test(expected = SocketTimeoutNetworkException::class)
     fun parse_whenApiThrowsKnownException_throwsNetworkException() = runTest {
-        val serverRepository: FakeServerRepository = mock {
-            on { getSelectedGoogleMapsPlace() } doReturn server
-        }
-        val input = GoogleMapsPlaceApiInput(
-            serverRepository = serverRepository,
-            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
-            googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
-            uriQuote = uriQuote,
-        )
-        val match = "https://www.google.com/maps/search/?query_place_id=exception"
-        input.fetch(match) { data -> input.parse(data, match) }
+        input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=exception")
     }
 
     @Test(expected = UnknownNetworkException::class)
     fun parse_whenApiThrowsUnknownException_throwsUnknownNetworkException() = runTest {
-        val serverRepository: FakeServerRepository = mock {
-            on { getSelectedGoogleMapsPlace() } doReturn server
-        }
-        val input = GoogleMapsPlaceApiInput(
-            serverRepository = serverRepository,
-            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
-            googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
-            uriQuote = uriQuote,
-        )
-        val match = "https://www.google.com/maps/search/?query_place_id=uknown-exception"
-        input.fetch(match) { data -> input.parse(data, match) }
+        input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=uknown-exception")
     }
+
+    private suspend fun GoogleMapsPlaceApiInput.fetchAndParse(match: String): ParseResult =
+        fetch(match) { data -> parse(data, match) }
 }

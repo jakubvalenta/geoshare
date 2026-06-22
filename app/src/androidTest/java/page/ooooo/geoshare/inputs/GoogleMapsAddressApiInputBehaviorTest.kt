@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.inputs
 
 import androidx.test.uiautomator.uiAutomator
+import kotlinx.collections.immutable.persistentListOf
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -15,10 +16,10 @@ import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.getAndAssumeTestServer
 import page.ooooo.geoshare.launchApplication
+import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.testUri
-import page.ooooo.geoshare.testUriAnyCoordinates
 import page.ooooo.geoshare.testUriFails
 import page.ooooo.geoshare.waitForAppToBeVisible
 
@@ -239,6 +240,63 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
             }
         )
 
+        // Directions with waypoints
+        testUri(
+            if (testServer is TestServer.Configured) {
+                persistentListOf(
+                    GCJ02MainlandChinaPoint(name = "Paris,France", source = Source.API),
+                    GCJ02MainlandChinaPoint(
+                        49.6338979, -1.622224,
+                        name = "Cherbourg,France",
+                        source = Source.API,
+                    ),
+                )
+            } else if (htmlParsingSupported) {
+                persistentListOf(
+                    GCJ02MainlandChinaPoint(
+                        48.8575475, 2.3513765,
+                        name = "Paris, France",
+                        source = Source.URI,
+                    ),
+                    GCJ02MainlandChinaPoint(
+                        48.8022585, 2.1297422,
+                        name = "Versailles, 78000 France",
+                        source = Source.URI,
+                    ),
+                    GCJ02MainlandChinaPoint(
+                        48.443854, 1.489012,
+                        name = "Chartres, 28000, France",
+                        source = Source.URI,
+                    ),
+                    GCJ02MainlandChinaPoint(
+                        48.0057867, 0.2015378,
+                        name = "Le Mans, France",
+                        source = Source.URI,
+                    ),
+                    GCJ02MainlandChinaPoint(
+                        49.1820662, -0.3708324,
+                        name = "Caen, 14000, France",
+                        source = Source.URI,
+                    ),
+                    GCJ02MainlandChinaPoint(
+                        49.6338979, -1.622224,
+                        z = 7.0,
+                        name = @Suppress("SpellCheckingInspection") "Cherbourg-en-Cotentin, France",
+                        source = Source.URI,
+                    ),
+                )
+            } else {
+                persistentListOf(
+                    GCJ02MainlandChinaPoint(name = "Paris,France", source = Source.URI),
+                    GCJ02MainlandChinaPoint(name = "Cherbourg,France", source = Source.URI),
+                )
+            },
+            "https://www.google.com/maps/dir/?api=1&origin=Paris,France&destination=Cherbourg,France&travelmode=driving&waypoints=Versailles,France%7CChartres,France%7CLe%2BMans,France%7CCaen,France",
+            fallbackNames = setOf(
+                @Suppress("SpellCheckingInspection") "Cherbourg-en-Cotentin",
+            ),
+        )
+
         // Directions address
         testUri(
             if (testServer is TestServer.Configured) {
@@ -294,7 +352,7 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
             if (testServer is TestServer.Configured) {
                 WGS84Point(47.5951518, -122.3316394, name = "Lumen Field", source = Source.API)
             } else if (htmlParsingSupported) {
-                WGS84Point(name = "Lumen Field", source = Source.URI)
+                WGS84Point(47.5951518, -122.3316394, name = "Lumen Field", source = Source.URI)
             } else {
                 WGS84Point(name = "Lumen Field", source = Source.URI)
             },
@@ -322,8 +380,13 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
                 "https://www.google.com/maps/place//",
             )
         } else if (htmlParsingSupported) {
-            // Google Maps HTML shows coordinates of the IP address that the request came from
-            testUriAnyCoordinates("https://www.google.com/maps/place//")
+            testUriFails(
+                setOf(
+                    "No points found",
+                    @Suppress("SpellCheckingInspection") "Aucun point trouvé",
+                ),
+                "https://www.google.com/maps/place//",
+            )
         } else {
             testUriFails(
                 setOf(

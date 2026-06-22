@@ -1,3 +1,4 @@
 - Added support for Google Navigation URI input.
+- Improved support for Google Maps waypoints with name only.
 - Fixed error 404 when resolving short Google Maps links.
 - Fixed longitude offset of Baidu Map POI links.

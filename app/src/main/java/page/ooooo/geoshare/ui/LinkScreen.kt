@@ -316,6 +316,7 @@ private fun LinkListPane(
                 Modifier
                     .padding(horizontal = spacing.windowPadding)
                     .padding(top = spacing.tinyAdaptive, bottom = spacing.smallAdaptive),
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
         item {
