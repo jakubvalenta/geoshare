@@ -151,7 +151,7 @@ import page.ooooo.geoshare.ui.components.PermissionDialog
 import page.ooooo.geoshare.ui.components.ResultApps
 import page.ooooo.geoshare.ui.components.ResultCoordinates
 import page.ooooo.geoshare.ui.components.ResultError
-import page.ooooo.geoshare.ui.components.ResultSuccessSheet
+import page.ooooo.geoshare.ui.components.ResultSheet
 import page.ooooo.geoshare.ui.components.ResultTitle
 import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
 import page.ooooo.geoshare.ui.components.StyledSupportingPaneScaffold
@@ -789,7 +789,7 @@ private fun MainScreen(
                 .windowInsetsPadding(WindowInsets.safeDrawing),
             sheetState = sheetState,
         ) {
-            ResultSuccessSheet(
+            ResultSheet(
                 points = currentState.points,
                 selectedPointIndex = selectedPointIndex,
                 appDetails = appDetails,

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -15,6 +16,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
+/**
+ * Column with [title] and [content]. When clicking the title, the content appears and disappears.
+ *
+ * The [modifier] applies to title only.
+ */
 @Composable
 fun ExpandablePane(
     expanded: Boolean,
@@ -26,9 +32,9 @@ fun ExpandablePane(
 ) {
     val spacing = LocalSpacing.current
 
-    Column(modifier) {
+    Column(Modifier.fillMaxWidth()) {
         Row(
-            Modifier.toggleable(value = expanded, enabled = enabled, onValueChange = onSetExpanded),
+            modifier.toggleable(value = expanded, enabled = enabled, onValueChange = onSetExpanded),
             horizontalArrangement = Arrangement.spacedBy(spacing.tiny),
             verticalAlignment = Alignment.CenterVertically,
         ) {

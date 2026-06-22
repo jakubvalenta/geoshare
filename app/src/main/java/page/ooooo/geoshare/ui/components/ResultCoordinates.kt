@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -150,10 +151,7 @@ fun ResultCoordinates(
                 color = MaterialTheme.colorScheme.surfaceContainer,
                 contentColor = MaterialTheme.colorScheme.onSurface,
             ) {
-                Column(
-                    Modifier.padding(top = spacing.mediumAdaptive),
-                    verticalArrangement = Arrangement.spacedBy(spacing.tinyAdaptive),
-                ) {
+                Column(Modifier.padding(top = spacing.mediumAdaptive)) {
                     ExpandablePane(
                         expanded = expanded,
                         onSetExpanded = { expanded = it },
@@ -168,21 +166,18 @@ fun ResultCoordinates(
                         },
                         modifier = Modifier.padding(horizontal = spacing.windowPadding),
                     ) {
-                        Column(
-                            Modifier.padding(
-                                top = spacing.mediumAdaptive,
-                                end = 10.dp, // Align with expand/collapse icon
-                            ),
-                            verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive)
-                        ) {
+                        Column(Modifier.padding(top = spacing.tiny)) {
                             points.forEachIndexed { index, point ->
-                                ResultSuccessPoint(
+                                ResultPoint(
                                     point = point,
                                     index = index,
                                     coordinateFormat = coordinateFormat,
                                     coordinateConverter = coordinateConverter,
                                     onSelect = { onSelect(index) },
                                 )
+                                if (index < points.size - 1) {
+                                    HorizontalDivider()
+                                }
                             }
                         }
                     }

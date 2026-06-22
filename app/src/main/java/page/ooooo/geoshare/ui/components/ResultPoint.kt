@@ -1,25 +1,20 @@
 package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
@@ -31,34 +26,24 @@ import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.LocalSpacing
-
-private val iconSize = 16.dp
 
 @Composable
-fun ResultSuccessPoint(
+fun ResultPoint(
     point: Point,
     index: Int,
     coordinateFormat: CoordinateFormat,
     coordinateConverter: CoordinateConverter,
     onSelect: () -> Unit,
 ) {
-    val spacing = LocalSpacing.current
-
-    Box {
-        FlowRow(
-            Modifier
-                .fillMaxWidth()
-                .padding(end = iconSize + spacing.tiny),
-            horizontalArrangement = Arrangement.spacedBy(spacing.small),
-            verticalArrangement = Arrangement.spacedBy(1.dp),
-            itemVerticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                point.cleanName ?: stringResource(R.string.conversion_succeeded_point_number, index + 1),
-                fontStyle = FontStyle.Italic,
-                style = MaterialTheme.typography.bodySmall,
-            )
+    ListItem(
+        headlineContent = {
+            SelectionContainer {
+                Text(
+                    point.cleanName ?: stringResource(R.string.conversion_succeeded_point_number, index + 1)
+                )
+            }
+        },
+        supportingContent = {
             SelectionContainer {
                 Text(
                     when (coordinateFormat) {
@@ -69,20 +54,65 @@ fun ResultSuccessPoint(
                         CoordinateFormat.DEG_MIN_SEC -> CoordinateFormatter.formatDegMinSecCoords(
                             coordinateConverter.toWGS84(point)
                         )
-                    },
-                    style = MaterialTheme.typography.bodySmall
+                    }
                 )
             }
-        }
-        Box(Modifier.align(Alignment.TopEnd)) {
-            IconButton(onSelect, Modifier.size(iconSize)) {
+        },
+        trailingContent = {
+            IconButton(
+                onSelect,
+                Modifier.offset(x = 10.dp), // Align with expand/collapse icon
+            ) {
                 Icon(
                     painterResource(R.drawable.content_copy_24px),
                     contentDescription = stringResource(R.string.nav_menu_content_description),
                 )
             }
-        }
-    }
+        },
+        colors = ListItemDefaults.colors(
+            containerColor = Color.Transparent,
+        ),
+    )
+    // Box {
+    //     FlowRow(
+    //         Modifier
+    //             .fillMaxWidth()
+    //             .padding(end = iconSize + spacing.tiny),
+    //         horizontalArrangement = Arrangement.spacedBy(spacing.small),
+    //         verticalArrangement = Arrangement.spacedBy(1.dp),
+    //         itemVerticalAlignment = Alignment.CenterVertically,
+    //     ) {
+    //         SelectionContainer {
+    //             Text(
+    //                 point.cleanName ?: stringResource(R.string.conversion_succeeded_point_number, index + 1),
+    //                 fontStyle = FontStyle.Italic,
+    //                 style = MaterialTheme.typography.bodySmall,
+    //             )
+    //         }
+    //         SelectionContainer {
+    //             Text(
+    //                 when (coordinateFormat) {
+    //                     CoordinateFormat.DEC -> CoordinateFormatter.formatDecCoords(
+    //                         coordinateConverter.toWGS84(point)
+    //                     )
+    //
+    //                     CoordinateFormat.DEG_MIN_SEC -> CoordinateFormatter.formatDegMinSecCoords(
+    //                         coordinateConverter.toWGS84(point)
+    //                     )
+    //                 },
+    //                 style = MaterialTheme.typography.bodySmall,
+    //             )
+    //         }
+    //     }
+    //     Box(Modifier.align(Alignment.TopEnd)) {
+    //         IconButton(onSelect, Modifier.size(iconSize)) {
+    //             Icon(
+    //                 painterResource(R.drawable.content_copy_24px),
+    //                 contentDescription = stringResource(R.string.nav_menu_content_description),
+    //             )
+    //         }
+    //     }
+    // }
 }
 
 @Preview(showBackground = true)
@@ -93,7 +123,7 @@ private fun DefaultPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            ResultSuccessPoint(
+            ResultPoint(
                 point = WGS84Point(NaivePoint.example),
                 index = 2,
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
@@ -112,7 +142,7 @@ private fun DarkPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            ResultSuccessPoint(
+            ResultPoint(
                 point = WGS84Point(NaivePoint.example),
                 index = 2,
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
@@ -131,7 +161,7 @@ private fun LongNamePreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            ResultSuccessPoint(
+            ResultPoint(
                 point = WGS84Point(NaivePoint.genRandomPoint(name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany")),
                 index = 2,
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
@@ -150,7 +180,7 @@ private fun DarkLongNamePreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            ResultSuccessPoint(
+            ResultPoint(
                 point = WGS84Point(NaivePoint.genRandomPoint(name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany")),
                 index = 2,
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,

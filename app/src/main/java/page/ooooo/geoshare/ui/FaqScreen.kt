@@ -181,7 +181,7 @@ fun FaqScreen(
 }
 
 @Composable
-fun FaqItem(
+private fun FaqItem(
     itemId: FaqItemId,
     expandedItemId: FaqItemId?,
     onSetExpandedItemId: (FaqItemId?) -> Unit,
