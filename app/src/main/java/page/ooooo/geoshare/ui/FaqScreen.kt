@@ -53,7 +53,7 @@ enum class FaqItemId {
     PRIVACY,
 }
 
-private val endOffset = 8.dp
+private val endOffset = 10.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -91,13 +91,14 @@ fun FaqScreen(
                 .padding(start = spacing.windowPadding, end = spacing.windowPadding - endOffset)
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive),
+            verticalArrangement = Arrangement.spacedBy(spacing.medium),
         ) {
             FaqItem(
                 itemId = FaqItemId.HOW_IT_WORKS,
                 expandedItemId = expandedItemId,
                 onSetExpandedItemId = { expandedItemId = it },
                 title = stringResource(R.string.faq_how_headline),
+                modifier = Modifier.padding(top = spacing.small),
             ) {
                 ParagraphText(
                     stringResource(R.string.faq_how_text_1, appName)
@@ -195,6 +196,7 @@ private fun FaqItem(
     expandedItemId: FaqItemId?,
     onSetExpandedItemId: (FaqItemId?) -> Unit,
     title: String,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -209,11 +211,12 @@ private fun FaqItem(
                 style = MaterialTheme.typography.titleMedium,
             )
         },
-        modifier = Modifier.padding(top = spacing.tinyAdaptive),
+        modifier = modifier,
+        color = MaterialTheme.colorScheme.primary,
     ) {
         Column(
-            Modifier.padding(top = spacing.smallAdaptive, end = endOffset),
-            verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive),
+            Modifier.padding(top = spacing.small, end = endOffset),
+            verticalArrangement = Arrangement.spacedBy(spacing.small),
         ) {
             CompositionLocalProvider(
                 LocalTextStyle provides MaterialTheme.typography.bodyMedium.copy(
