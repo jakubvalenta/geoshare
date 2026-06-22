@@ -33,7 +33,7 @@
     <string name="billing_terms_of_service" translatable="false">terms of service</string>
     <string name="conversion_succeeded_check_experimental">Location might be inaccurate due to an experimental extraction method.</string>
     <string name="conversion_succeeded_check_map_center">Location might be a map center, not a pin.</string>
-    <string name="conversion_succeeded_check_name_only">Failed to find coordinates, using place name.</string>
+    <string name="conversion_succeeded_check_name_only">Failed to find coordinates, using a place name.</string>
     <string name="conversion_succeeded_check_name_only_points">Failed to find coordinates for some points.</string>
     <string name="conversion_succeeded_check_srs">Location might be inaccurate due to coordinate system conversion.</string>
     <string name="conversion_succeeded_copy_coordinates">Copy coordinates</string>
@@ -222,7 +222,7 @@
     <string name="faq_how_text_4_preferences_button">preferences</string>
     <string name="faq_location_permission_headline">Location permission</string>
     <string name="faq_location_permission_text">%1$s asks for location permission when launching the TomTom navigation and when sharing a GPX route, because in these cases the app needs to create a GPX route that starts at your current location. The location information is discarded immediately after the creation of the route.</string>
-    <string name="faq_name_only_title">Failed to find coordinates, using place name</string>
+    <string name="faq_name_only_title">Failed to find coordinates, using a place name</string>
     <string name="faq_name_only_text_1">%1$s is able to extract only a place name, e.g. “Mount Kilimanjaro”, from certain map links. When you open this location in another map app, it might show a different place than the original link, because several places with the same name might exist.</string>
     <string name="faq_name_only_text_2">Points identified only by name are not included in GPX routes.</string>
     <string name="faq_privacy_headline">Privacy considerations</string>
