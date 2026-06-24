@@ -5,32 +5,27 @@
     <string name="app_server_url" translatable="false">https://github.com/jakubvalenta/geoshare-server</string>
     <string name="not_available">Not available</string>
     <string name="billing_consume_purchases" translatable="false">consume purchases</string>
-    <string name="billing_feature_all" translatable="false">All features of the basic version</string>
-    <string name="billing_feature_automation_description" translatable="false">Save time by performing an action automatically when a map link is converted to coordinates: open map app, launch navigation (TomTom, Waze, etc.), copy to clipboard, save GPX.</string>
-    <string name="billing_feature_custom_link" translatable="false">Custom web maps</string>
-    <string name="billing_feature_custom_link_description" translatable="false">Open a location in your favorite (or private) web map.</string>
-    <string name="billing_intro_not_purchased" translatable="false">Upgrade to</string>
-    <string name="billing_intro_purchased" translatable="false">You have</string>
-    <string name="billing_manage_subscription" translatable="false">Manage your subscription</string>
-    <string name="billing_manage_subscription_description" translatable="false">Cancel, pause, or change payment method</string>
-    <string name="billing_manage_error" translatable="false">Failed to open Google Play</string>
-    <string name="billing_offers_empty" translatable="false">%1$s is not available in your region</string>
-    <string name="billing_offers_error" translatable="false">Failed to fetch offers</string>
-    <string name="billing_one_time" translatable="false">One time payment</string>
-    <string name="billing_order_history" translatable="false">Order history</string>
-    <string name="billing_pricing" translatable="false">Pricing</string>
-    <string name="billing_pro_feature" translatable="false">Pro feature</string>
-    <string name="billing_purchase_button" translatable="false">Checkout</string>
-    <string name="billing_purchase_error_cancelled" translatable="false">Purchase cancelled</string>
-    <string name="billing_purchase_error_unknown" translatable="false">Failed to make the purchase</string>
-    <string name="billing_purchase_success" translatable="false">Thanks for buying %1$s</string>
-    <string name="billing_refund_description" translatable="false">Refund within 48h since the purchase</string>
-    <string name="billing_setup_error_unknown" translatable="false">Failed to fetch purchases</string>
-    <string name="billing_status_expired" translatable="false">Your subscription expires soon</string>
-    <string name="billing_status_pending" translatable="false">Your payment is pending</string>
-    <string name="billing_subscription_cancel_description" translatable="false">Cancel anytime</string>
-    <string name="billing_subscription_monthly" translatable="false">Monthly subscription</string>
-    <string name="billing_terms_of_service" translatable="false">terms of service</string>
+    <string name="billing_feature_all">All features of the basic version</string>
+    <string name="billing_feature_automation_description">Save time by performing an action automatically when a map link is converted to coordinates: open map app, launch navigation (TomTom, Waze, etc.), copy to clipboard, save GPX.</string>
+    <string name="billing_feature_custom_link">Custom web maps</string>
+    <string name="billing_feature_custom_link_description">Open a location in your favorite (or private) web map.</string>
+    <string name="billing_intro_not_purchased">Upgrade to</string>
+    <string name="billing_intro_purchased">You have</string>
+    <string name="billing_manage_subscription">Manage your subscription</string>
+    <string name="billing_manage_subscription_description">Cancel, pause, or change payment method</string>
+    <string name="billing_offers_empty">%1$s is not available in your region</string>
+    <string name="billing_one_time">One time payment</string>
+    <string name="billing_order_history">Order history</string>
+    <string name="billing_pricing">Pricing</string>
+    <string name="billing_pro_feature">Pro feature</string>
+    <string name="billing_purchase_button">Checkout</string>
+    <string name="billing_purchase_success">Thanks for buying %1$s</string>
+    <string name="billing_refund_description">Refund within 48h since the purchase</string>
+    <string name="billing_status_expired">Your subscription expires soon</string>
+    <string name="billing_status_pending">Your payment is pending</string>
+    <string name="billing_subscription_cancel_description">Cancel anytime</string>
+    <string name="billing_subscription_monthly">Monthly subscription</string>
+    <string name="billing_terms_of_service">terms of service</string>
     <string name="conversion_succeeded_check_experimental">Location might be inaccurate due to an experimental extraction method.</string>
     <string name="conversion_succeeded_check_map_center">Location might be a map center, not a pin.</string>
     <string name="conversion_succeeded_check_name_only">Failed to find coordinates, using a place name.</string>
