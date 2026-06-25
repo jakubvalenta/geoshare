@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="billing_manage_error">Failed to open Google Play</string>
+    <string name="billing_offers_error">Failed to fetch offers</string>
+    <string name="billing_purchase_error_cancelled">Purchase cancelled</string>
+    <string name="billing_purchase_error_unknown">Failed to make purchase</string>
+    <string name="billing_setup_error_unknown">Failed to fetch purchases</string>
     <string name="conversion_failed_unsupported_source">This link is not supported</string>
     <string name="server_list_google_maps_none_description">Extract place name instead of coordinates</string>
 </resources>
