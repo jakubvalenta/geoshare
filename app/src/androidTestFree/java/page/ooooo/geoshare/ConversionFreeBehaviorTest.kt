@@ -30,6 +30,7 @@ class ConversionFreeBehaviorTest {
                 fallbackNames = setOf(
                     @Suppress("SpellCheckingInspection") "Hermannstraße 10, 12049 Berlin-Bezirk Neukölln",
                     @Suppress("SpellCheckingInspection") "Hermannstraße 10, 12049 Berlin-Bezirk Neukölln, Allemagne",
+                    @Suppress("SpellCheckingInspection") "Hermannstraße 10, 12049 Berlin-Bezirk Neukölln, Germany",
                 ),
             )
 
@@ -67,6 +68,7 @@ class ConversionFreeBehaviorTest {
                 fallbackNames = setOf(
                     @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln",
                     @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln, Allemagne",
+                    @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln, Germany",
                 ),
             )
 
@@ -82,8 +84,9 @@ class ConversionFreeBehaviorTest {
                     source = Source.URI,
                 ),
                 fallbackNames = setOf(
-                    @Suppress("SpellCheckingInspection") "Hermannstraße 21, 12049 Berlin-Bezirk Neukölln",
                     @Suppress("SpellCheckingInspection") "Hermannstraße 21, 12049 Berlin, Allemagne",
+                    @Suppress("SpellCheckingInspection") "Hermannstraße 21, 12049 Berlin, Germany",
+                    @Suppress("SpellCheckingInspection") "Hermannstraße 21, 12049 Berlin-Bezirk Neukölln",
                 ),
             )
         }

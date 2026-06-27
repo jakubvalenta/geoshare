@@ -108,6 +108,7 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
                 setOf(
                     @Suppress("SpellCheckingInspection") "Louisenstraße 60, 01099 Neustadt",
                     @Suppress("SpellCheckingInspection") "Louisenstraße 60, 01099 Neustadt, Allemagne",
+                    @Suppress("SpellCheckingInspection") "Louisenstraße 60, 01099 Neustadt, Germany",
                 )
             } else {
                 emptySet()
@@ -119,18 +120,18 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
             if (testServer is TestServer.Configured) {
                 WGS84Point(
                     51.1982447, 6.4389493,
-                    name = @Suppress("SpellCheckingInspection") "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
+                    name = "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
                     source = Source.API,
                 )
             } else if (htmlParsingSupported) {
                 WGS84Point(
                     51.1982447, 6.4389493,
-                    name = @Suppress("SpellCheckingInspection") "Café Heinemann",
+                    name = "Café Heinemann",
                     source = Source.URI,
                 )
             } else {
                 WGS84Point(
-                    name = @Suppress("SpellCheckingInspection") "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
+                    name = "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
                     source = Source.URI,
                 )
             },
@@ -234,6 +235,7 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
                 setOf(
                     @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln",
                     @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln, Allemagne",
+                    @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln, Germany",
                 )
             } else {
                 emptySet()
@@ -306,7 +308,7 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
             } else {
                 WGS84Point(name = "2088 Albion Rd @43.7481,-79.6332", source = Source.URI)
             },
-            @Suppress("SpellCheckingInspection") "https://maps.google.com/maps?f=d&daddr=2088%20Albion%20Rd+@43.7481,-79.6332&doflg=ptm&navigate=yes",
+            "https://maps.google.com/maps?f=d&daddr=2088%20Albion%20Rd+@43.7481,-79.6332&doflg=ptm&navigate=yes",
         )
 
         // Directions with geocode parameter, which can get stuck at intermediate URI with zero coordinates during web parsing
