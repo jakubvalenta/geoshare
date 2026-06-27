@@ -33,7 +33,7 @@ class MagicEarthUriInput @Inject constructor(
             val z = listOf("z", "zoom")
                 .firstNotNullOfOrNull { key -> Z_PATTERN.matchEntire(queryParams[key])?.doubleGroupOrNull() }
 
-            val name = listOf("name", @Suppress("SpellCheckingInspection") "daddr", "q")
+            val name = listOf("name", @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "daddr", "q")
                 .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull() }
 
             LAT_PATTERN.matchEntire(queryParams["lat"])?.doubleGroupOrNull()?.let { lat ->

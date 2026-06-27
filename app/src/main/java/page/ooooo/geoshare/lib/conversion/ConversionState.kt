@@ -47,6 +47,7 @@ import page.ooooo.geoshare.lib.outputs.PointsOutput
 import java.net.MalformedURLException
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 interface ConversionState : State {
@@ -247,7 +248,7 @@ data class PermissionGrantedBasicInput<T>(
                             TAG,
                             "Waiting ${delayMillis}ms before attempt $attemptNumber of $maxAttempts for $matchedInput"
                         )
-                        delay(delayMillis)
+                        delay(delayMillis.milliseconds)
                     }
                     val result = matchedInput.input.fetch(matchedInput.match) { data ->
                         matchedInput.input.parse(data, matchedInput.match)

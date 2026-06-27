@@ -48,6 +48,7 @@ import java.net.UnknownHostException
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
+import kotlin.time.Duration.Companion.seconds
 
 class MockLocationScope(val locationManager: LocationManager, val mockProviderName: String) {
     fun setLocation(lat: Double, lon: Double) {
@@ -64,7 +65,7 @@ class MockLocationScope(val locationManager: LocationManager, val mockProviderNa
 }
 
 const val ELEMENT_DOES_NOT_EXIST_TIMEOUT = 500L
-const val TOAST_TIMEOUT = 5_000L
+val TOAST_TIMEOUT = 5.seconds
 const val MAX_ATTEMPTS = 10
 val NETWORK_TIMEOUT = (1..MAX_ATTEMPTS).fold(CONNECT_TIMEOUT + REQUEST_TIMEOUT) { acc, curr ->
     acc + calcExponentialBackoffMillis(curr) + CONNECT_TIMEOUT + REQUEST_TIMEOUT
@@ -112,14 +113,14 @@ fun UiObject2.toggleDoNotAsk() {
 private fun AccessibilityNodeInfo.isPermissionButtonOnlyThisTime(): Boolean =
     textAsString()?.lowercase() in setOf(
         "only this time",
-        @Suppress("SpellCheckingInspection") "uniquement cette fois-ci",
+        @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "uniquement cette fois-ci",
     )
 
 private fun AccessibilityNodeInfo.isPermissionButtonDoNotAllow(): Boolean =
     textAsString()?.lowercase() in setOf(
         "don't allow",
         "don’t allow", // Notice the different quote character
-        @Suppress("SpellCheckingInspection") "ne pas autoriser"
+        "ne pas autoriser"
     )
 
 fun UiAutomatorTestScope.grantSystemPermission() {
@@ -223,7 +224,7 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
         } else if (expectedPoints.size > 1) {
             setOf("Last point", "Dernier point")
         } else {
-            setOf("Coordinates", @Suppress("SpellCheckingInspection") "Coordonnées")
+            setOf("Coordinates", @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Coordonnées")
         }
         onElement {
             if (viewIdResourceName == "geoShareResultSuccessLastPointName") {
@@ -266,7 +267,11 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
     lastPoint.source.let { expectedSource ->
         onElement { viewIdResourceName == "geoShareResultSuccessLastPointSource_${expectedSource}" }
         if (!(accurate ?: lastPoint.isAccurate())) {
-            onElement { viewIdResourceName == "geoShareResultSuccessLastPointCheckSRS" }
+            onElement {
+                viewIdResourceName ==
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "geoShareResultSuccessLastPointCheckSRS"
+            }
         } else if (expectedSource == Source.JAVASCRIPT) {
             onElement { viewIdResourceName == "geoShareResultSuccessLastPointCheckJavaScript" }
         } else if (expectedSource == Source.MAP_CENTER) {
@@ -308,7 +313,7 @@ fun UiAutomatorTestScope.waitAndAssertGoogleMapsContainsElement(block: Accessibi
     onElementOrNull(3_000L) {
         packageName == PackageNames.GOOGLE_MAPS && textAsString() in setOf(
             "Make it your map",
-            @Suppress("SpellCheckingInspection") "Profitez d'une carte personnalisée"
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Profitez d'une carte personnalisée"
         )
     }?.let {
         onElement {
@@ -348,7 +353,7 @@ fun UiAutomatorTestScope.waitAndAssertTomTomContainsElement(block: Accessibility
     onElementOrNull(5_000L) {
         textAsString() in setOf(
             "Got it",
-            @Suppress("SpellCheckingInspection") "J'ai compris"
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "J'ai compris"
         )
     }?.click()
 
@@ -359,7 +364,7 @@ fun UiAutomatorTestScope.waitAndAssertTomTomContainsElement(block: Accessibility
 fun UiAutomatorTestScope.shareUri(unsafeUriString: String) {
     // Use shell command instead of startActivity() to support Xiaomi
     device.executeShellCommand(
-        @Suppress("SpellCheckingInspection") "am start -a android.intent.action.VIEW -d $unsafeUriString -n ${BuildConfig.APPLICATION_ID}/page.ooooo.geoshare.ConversionActivity ${BuildConfig.APPLICATION_ID}"
+        "am start -a android.intent.action.VIEW -d $unsafeUriString -n ${BuildConfig.APPLICATION_ID}/page.ooooo.geoshare.ConversionActivity ${BuildConfig.APPLICATION_ID}"
     )
 }
 
@@ -398,13 +403,14 @@ fun UiAutomatorTestScope.testUriFails(
     assertConversionFails(expectedMessage, timeoutMs)
 }
 
+/**
+ * Test the conversion of a text source (e.g. coordinates string or Plus Codes) to coordinates.
+ *
+ * Enter the text in the form on the main screen. It would be faster to share the text with the app using
+ * `am start ... android.intent.action.SEND`, but unfortunately that command doesn't work when there are spaces in the
+ * text.
+ */
 fun UiAutomatorTestScope.testText(expectedPoints: Points, unsafeText: String) {
-    // It would be preferable to test sharing of the text with the app, but this shell command doesn't work when
-    // there are spaces in the text. So instead, we type the text in the main form of the app.
-    // device.executeShellCommand(
-    //     "am start -a android.intent.action.SEND -t text/plain -e android.intent.extra.TEXT $unsafeText -n ${BuildConfig.APPLICATION_ID}.debug/${BuildConfig.APPLICATION_ID}.ConversionActivity ${BuildConfig.APPLICATION_ID}.debug"
-    // )
-
     // Go to main form, if we're on the result screen
     onElementOrNull(1_000L) { viewIdResourceName == "geoShareBack" }?.click()
 
@@ -483,13 +489,16 @@ fun UiAutomatorTestScope.chooseFile() {
         onElement {
             textAsString() == "Downloads" ||
                 textAsString()?.startsWith("Files in") == true ||
-                textAsString()?.startsWith(@Suppress("SpellCheckingInspection") "Fichiers dans le dossier") == true
+                textAsString()?.startsWith(
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Fichiers dans le dossier"
+                ) == true
         }
     }
     onElement {
         textAsString()?.lowercase() in setOf(
             "save",
-            @Suppress("SpellCheckingInspection") "enregistrer",
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "enregistrer",
         )
     }.click()
 }
@@ -499,7 +508,7 @@ fun UiAutomatorTestScope.insertOrEditContact(name: String = "GeoShare Test Conta
     onElementOrNull(3_000L) {
         packageName == "com.android.contacts" && contentDescription in setOf(
             "Search contacts",
-            @Suppress("SpellCheckingInspection") "Rechercher dans vos contacts",
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Rechercher dans vos contacts",
         )
     }?.click()
     type(name.split(' ').first())
@@ -511,14 +520,14 @@ fun UiAutomatorTestScope.insertOrEditContact(name: String = "GeoShare Test Conta
         onElementOrNull(3_000L) {
             packageName == "com.android.contacts" && contentDescription in setOf(
                 "stop searching",
-                @Suppress("SpellCheckingInspection") "arrêter la recherche",
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "arrêter la recherche",
             )
         }?.click()
         onElement {
             textAsString() in setOf(
                 "Create new contact",
                 "Create a new contact",
-                @Suppress("SpellCheckingInspection") "Créer un contact",
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Créer un contact",
             )
         }.click()
         onElement { textAsString() in setOf("First name", "Prénom") }.setText(name)
@@ -526,7 +535,7 @@ fun UiAutomatorTestScope.insertOrEditContact(name: String = "GeoShare Test Conta
     onElement {
         textAsString()?.lowercase() in setOf(
             "save",
-            @Suppress("SpellCheckingInspection") "enregistrer",
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "enregistrer",
         )
     }.click()
 }
@@ -561,7 +570,8 @@ fun UiAutomatorTestScope.openContact(name: String = "GeoShare Test Contact") {
 
 fun UiAutomatorTestScope.mockLocation(block: MockLocationScope.() -> Unit) {
     device.executeShellCommand(
-        @Suppress("SpellCheckingInspection") "appops set ${BuildConfig.APPLICATION_ID} android:mock_location allow"
+        @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+        "appops set ${BuildConfig.APPLICATION_ID} android:mock_location allow"
     )
 
     val context: Context = InstrumentationRegistry.getInstrumentation().targetContext

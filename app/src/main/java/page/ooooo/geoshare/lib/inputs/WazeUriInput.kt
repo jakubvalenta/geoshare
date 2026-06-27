@@ -72,7 +72,10 @@ class WazeUriInput @Inject constructor(
             // https://waze.com/ul?ll={lat},{lon}
             (Regex("""ll\.$LAT,$LON""").matchEntire(queryParams["to"])
                 ?: LAT_LON_PATTERN.matchEntire(queryParams["ll"])
-                ?: LAT_LON_PATTERN.matchEntire(queryParams[@Suppress("SpellCheckingInspection") "latlng"])
+                ?: LAT_LON_PATTERN.matchEntire(
+                    queryParams[@Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "latlng"]
+                )
                 )?.toLatLonPoint(Source.URI)?.let {
                     points = persistentListOf(WGS84Point(it, z, name))
                     return@run
@@ -130,6 +133,7 @@ class WazeUriInput @Inject constructor(
     override fun toString() = "WazeUriInput"
 
     private companion object {
-        private const val HASH = @Suppress("SpellCheckingInspection") """[0-9bcdefghjkmnpqrstuvwxyz]+"""
+        private const val HASH =
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") """[0-9bcdefghjkmnpqrstuvwxyz]+"""
     }
 }

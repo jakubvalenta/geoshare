@@ -69,7 +69,7 @@ fun LargeTopAppBarPane(
     actions: @Composable RowScope.() -> Unit = {},
     backIcon: ImageVector = Icons.AutoMirrored.Default.ArrowBack,
     collapsedHeight: Dp = TopAppBarDefaults.LargeAppBarCollapsedHeight,
-    expandedHeight: Dp = TopAppBarDefaults.LargeAppBarExpandedHeight,
+    expandedHeight: Dp = TopAppBarDefaults.LargeAppBarExpandedHeight, // TODO Reduce on Nexus 5
     colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(
         containerColor = Color.Transparent,
         scrolledContainerColor = Color.Transparent,
@@ -171,7 +171,8 @@ private fun DefaultPreview() {
                 LargeTopAppBarPane(
                     title = { maxLines ->
                         Text(
-                            @Suppress("SpellCheckingInspection") "Wikimedia Foundation, Inc., 1 Sansome St #1895, San Francisco, CA 94104, Vereinigte Staaten",
+                            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                            "Wikimedia Foundation, Inc., 1 Sansome St #1895, San Francisco, CA 94104, Vereinigte Staaten",
                             overflow = TextOverflow.Ellipsis,
                             maxLines = maxLines
                         )
@@ -205,7 +206,8 @@ private fun DarkPreview() {
                 LargeTopAppBarPane(
                     title = { maxLines ->
                         Text(
-                            @Suppress("SpellCheckingInspection") "Wikimedia Foundation, Inc., 1 Sansome St #1895, San Francisco, CA 94104, Vereinigte Staaten",
+                            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                            "Wikimedia Foundation, Inc., 1 Sansome St #1895, San Francisco, CA 94104, Vereinigte Staaten",
                             overflow = TextOverflow.Ellipsis,
                             maxLines = maxLines,
                         )

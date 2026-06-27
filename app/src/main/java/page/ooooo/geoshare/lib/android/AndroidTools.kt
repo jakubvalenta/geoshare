@@ -216,9 +216,7 @@ object AndroidTools {
         ).apply {
             putExtra(
                 Intent.EXTRA_EXCLUDE_COMPONENTS, arrayOf(
-                    @Suppress("SpellCheckingInspection")
                     (ComponentName(BuildConfig.APPLICATION_ID, "page.ooooo.geoshare.ConversionActivity")),
-                    @Suppress("SpellCheckingInspection")
                     (ComponentName(BuildConfig.APPLICATION_ID + ".debug", "page.ooooo.geoshare.ConversionActivity")),
                 )
             )
@@ -431,7 +429,8 @@ object AndroidTools {
         try {
             val action = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
                 // Samsung supposedly doesn't allow going to the "Open by default" settings page.
-                Build.MANUFACTURER.lowercase(Locale.ROOT) != "samsung"
+                Build.MANUFACTURER.lowercase(Locale.ROOT) !=
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "samsung"
             ) {
                 Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS
             } else {

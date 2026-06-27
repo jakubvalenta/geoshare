@@ -188,7 +188,7 @@ class AutomationBehaviorTest {
         onElement {
             textAsString() in setOf(
                 "Automatically saved GPX",
-                @Suppress("SpellCheckingInspection") "GPX enregistré automatiquement",
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "GPX enregistré automatiquement",
             )
         }
     }

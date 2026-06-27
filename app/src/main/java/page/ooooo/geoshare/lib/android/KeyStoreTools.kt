@@ -61,7 +61,7 @@ class DefaultKeyStoreTools @Inject constructor(
             KeyProperties.PURPOSE_SIGN or KeyProperties.PURPOSE_VERIFY
         ).run {
             setAlgorithmParameterSpec(
-                ECGenParameterSpec(@Suppress("SpellCheckingInspection") "secp256r1")
+                ECGenParameterSpec(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "secp256r1")
             )
             setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512)
             // Setting attestation challenge triggers the signing of the certificate by the attestation certificate
@@ -84,7 +84,7 @@ class DefaultKeyStoreTools @Inject constructor(
     }
 
     private companion object {
-        private const val KEYSTORE_ALIAS = "geoshare_api"
+        private const val KEYSTORE_ALIAS = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "geoshare_api"
         private const val TAG = "KeyStoreService"
     }
 }

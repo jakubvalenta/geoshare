@@ -85,7 +85,7 @@ class OpenRouteOnePointGpxOutputTest : GeoTest {
         val resFile = resFiles?.first()
         assertFalse(resFile?.path == oldFile.path)
         assertEquals(
-            @Suppress("SpellCheckingInspection")
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
             """<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

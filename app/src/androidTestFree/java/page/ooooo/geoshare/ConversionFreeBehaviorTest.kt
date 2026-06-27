@@ -24,13 +24,17 @@ class ConversionFreeBehaviorTest {
             assertConversionSucceeds(
                 GCJ02Point(
                     52.4848232, 13.4240791,
-                    name = @Suppress("SpellCheckingInspection") "Hermannstraße 10, 12049 Berlin",
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Hermannstraße 10, 12049 Berlin",
                     source = Source.URI,
                 ),
                 fallbackNames = setOf(
-                    @Suppress("SpellCheckingInspection") "Hermannstraße 10, 12049 Berlin-Bezirk Neukölln",
-                    @Suppress("SpellCheckingInspection") "Hermannstraße 10, 12049 Berlin-Bezirk Neukölln, Allemagne",
-                    @Suppress("SpellCheckingInspection") "Hermannstraße 10, 12049 Berlin-Bezirk Neukölln, Germany",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Hermannstraße 10, 12049 Berlin-Bezirk Neukölln",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Hermannstraße 10, 12049 Berlin-Bezirk Neukölln, Allemagne",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Hermannstraße 10, 12049 Berlin-Bezirk Neukölln, Germany",
                 ),
             )
 
@@ -62,13 +66,17 @@ class ConversionFreeBehaviorTest {
             assertConversionSucceeds(
                 GCJ02Point(
                     52.4834254, 13.4245399,
-                    name = @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin",
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Hermannstraße 20, 12049 Berlin",
                     source = Source.URI,
                 ),
                 fallbackNames = setOf(
-                    @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln",
-                    @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln, Allemagne",
-                    @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln, Germany",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln, Allemagne",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln, Germany",
                 ),
             )
 
@@ -80,13 +88,17 @@ class ConversionFreeBehaviorTest {
             assertConversionSucceeds(
                 GCJ02Point(
                     52.4832988, 13.4245179,
-                    name = @Suppress("SpellCheckingInspection") "Hermannstraße 21, 12049 Berlin",
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Hermannstraße 21, 12049 Berlin",
                     source = Source.URI,
                 ),
                 fallbackNames = setOf(
-                    @Suppress("SpellCheckingInspection") "Hermannstraße 21, 12049 Berlin, Allemagne",
-                    @Suppress("SpellCheckingInspection") "Hermannstraße 21, 12049 Berlin, Germany",
-                    @Suppress("SpellCheckingInspection") "Hermannstraße 21, 12049 Berlin-Bezirk Neukölln",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Hermannstraße 21, 12049 Berlin, Allemagne",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Hermannstraße 21, 12049 Berlin, Germany",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Hermannstraße 21, 12049 Berlin-Bezirk Neukölln",
                 ),
             )
         }
@@ -107,7 +119,7 @@ class ConversionFreeBehaviorTest {
             // Shows location search
             assertConversionSucceeds(
                 GCJ02Point(
-                    name = @Suppress("SpellCheckingInspection") "Hermannstr. 30, Berlin",
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Hermannstr. 30, Berlin",
                     source = Source.URI,
                 )
             )
@@ -138,7 +150,7 @@ class ConversionFreeBehaviorTest {
             // Shows location search
             assertConversionSucceeds(
                 GCJ02Point(
-                    name = @Suppress("SpellCheckingInspection") "Hermannstr. 40, Berlin",
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Hermannstr. 40, Berlin",
                     source = Source.URI,
                 )
             )
@@ -150,7 +162,7 @@ class ConversionFreeBehaviorTest {
             // Shows location search
             assertConversionSucceeds(
                 GCJ02Point(
-                    name = @Suppress("SpellCheckingInspection") "Hermannstr. 41, Berlin",
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Hermannstr. 41, Berlin",
                     source = Source.URI,
                 )
             )

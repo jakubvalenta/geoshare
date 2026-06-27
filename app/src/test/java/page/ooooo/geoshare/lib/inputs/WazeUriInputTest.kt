@@ -55,7 +55,7 @@ class WazeUriInputTest : InputTest {
     @Test
     fun match_shortLink() {
         assertEquals("https://waze.com/ul/hu00uswvn3", input.match("https://waze.com/ul/hu00uswvn3"))
-        @Suppress("SpellCheckingInspection") assertEquals(
+        assertEquals(
             "waze.com/ul/hu00uswvn3",
             input.match("waze.com/ul/hu00uswvn3")
         )
@@ -83,7 +83,8 @@ class WazeUriInputTest : InputTest {
     fun match_replacement() {
         assertEquals(
             "https://waze.com/ul/hu00uswvn3",
-            @Suppress("SpellCheckingInspection") input.match("Use Waze to drive to 5 - 22 Boulevard Gambetta: https://waze.com/ul/hu00uswvn3"),
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+            input.match("Use Waze to drive to 5 - 22 Boulevard Gambetta: https://waze.com/ul/hu00uswvn3"),
         )
     }
 

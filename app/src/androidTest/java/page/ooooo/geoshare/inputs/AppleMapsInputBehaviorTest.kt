@@ -32,7 +32,7 @@ class AppleMapsInputBehaviorTest {
         testUri(
             WGS84Point(
                 52.4890246, 13.4295963,
-                name = @Suppress("SpellCheckingInspection") "Reuterplatz",
+                name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Reuterplatz",
                 source = Source.URI,
             ),
             "https://maps.apple.com/place?place-id=I1E40915DF4BA1C96&address=Reuterplatz+3,+12047+Berlin,+Germany&coordinate=52.4890246,13.4295963&name=Reuterplatz&_provider=9902",

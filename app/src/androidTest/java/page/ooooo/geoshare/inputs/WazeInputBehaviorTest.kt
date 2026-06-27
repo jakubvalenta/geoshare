@@ -47,7 +47,7 @@ class WazeInputBehaviorTest {
         // Text
         testText(
             WGS84Point(45.829189, 1.259372, z = 16.0, source = Source.HASH),
-            @Suppress("SpellCheckingInspection")
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
             "Use Waze to drive to 5 - 22 Boulevard Gambetta: https://waze.com/ul/hu00uswvn3",
         )
     }

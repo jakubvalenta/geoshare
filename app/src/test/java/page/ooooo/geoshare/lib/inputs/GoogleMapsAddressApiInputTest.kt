@@ -170,12 +170,14 @@ class GoogleMapsAddressApiInputTest {
                     persistentListOf(
                         GCJ02MainlandChinaPoint(
                             52.4858222, 13.4236883,
-                            name = @Suppress("SpellCheckingInspection") "Hermannstraße 1, 12049 Berlin, Germany",
+                            name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                            "Hermannstraße 1, 12049 Berlin, Germany",
                             source = Source.URI,
                         ),
                         GCJ02MainlandChinaPoint(
                             52.4881038, 13.4255518,
-                            name = @Suppress("SpellCheckingInspection") "Weserstr. 1, 12047 Berlin, Germany",
+                            name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                            "Weserstr. 1, 12047 Berlin, Germany",
                             source = Source.URI,
                         ),
                         GCJ02MainlandChinaPoint(50.123456, -120.123456, z = 16.0, name = query, source = Source.API)

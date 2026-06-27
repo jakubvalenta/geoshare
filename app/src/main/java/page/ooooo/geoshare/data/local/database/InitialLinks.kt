@@ -40,7 +40,7 @@ object InitialLinks : InitialData {
                 1,
                 1,
                 1,
-                @Suppress("SpellCheckingInspection") "https://www.openstreetmap.org/?mlat={lat}&mlon={lon}#map={z}/{lat}/{lon}",
+                "https://www.openstreetmap.org/?mlat={lat}&mlon={lon}#map={z}/{lat}/{lon}",
                 "https://www.openstreetmap.org/search?query={q}",
                 1772395295367,
                 Uuid.parse("a771fd79-291e-4e55-9952-601f87b05bfe").toByteArray(),
@@ -210,13 +210,13 @@ object InitialLinks : InitialData {
             "INSERT INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             arrayOf<Any>(
                 "",
-                @Suppress("SpellCheckingInspection") "KartaView",
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "KartaView",
                 "WGS84",
                 "STREET_VIEW",
                 0,
                 0,
                 0,
-                @Suppress("SpellCheckingInspection") "https://kartaview.org/map/@{lat}%2C{lon},{z}z",
+                "https://kartaview.org/map/@{lat}%2C{lon},{z}z",
                 "",
                 1772579164207,
                 Uuid.parse("7e09855d-d29b-4c18-944f-7fa440db3528").toByteArray(),
@@ -226,7 +226,7 @@ object InitialLinks : InitialData {
             "INSERT INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             arrayOf<Any>(
                 "",
-                @Suppress("SpellCheckingInspection") "Mapilio",
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Mapilio",
                 "WGS84",
                 "STREET_VIEW",
                 0,
@@ -242,7 +242,7 @@ object InitialLinks : InitialData {
             "INSERT INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             arrayOf<Any>(
                 "",
-                @Suppress("SpellCheckingInspection") "Panoramax",
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Panoramax",
                 "WGS84",
                 "STREET_VIEW",
                 0,
@@ -359,13 +359,13 @@ object InitialLinks : InitialData {
                     "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "",
-                        @Suppress("SpellCheckingInspection") "KartaView",
+                        @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "KartaView",
                         "WGS84",
                         "STREET_VIEW",
                         0,
                         0,
                         0,
-                        @Suppress("SpellCheckingInspection") "https://kartaview.org/map/@{lat}%2C{lon},{z}z",
+                        "https://kartaview.org/map/@{lat}%2C{lon},{z}z",
                         "",
                         1772579164207,
                         Uuid.parse("7e09855d-d29b-4c18-944f-7fa440db3528").toByteArray(),
@@ -375,7 +375,7 @@ object InitialLinks : InitialData {
                     "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "",
-                        @Suppress("SpellCheckingInspection") "Mapilio",
+                        @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Mapilio",
                         "WGS84",
                         "STREET_VIEW",
                         0,
@@ -391,7 +391,7 @@ object InitialLinks : InitialData {
                     "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "",
-                        @Suppress("SpellCheckingInspection") "Panoramax",
+                        @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Panoramax",
                         "WGS84",
                         "STREET_VIEW",
                         0,
@@ -486,7 +486,7 @@ object InitialLinks : InitialData {
                 db.execSQL(
                     "UPDATE Link SET coordsUriTemplate = ? WHERE uuid = ? AND coordsUriTemplate = ?",
                     arrayOf<Any>(
-                        @Suppress("SpellCheckingInspection") "https://www.openstreetmap.org/?mlat={lat}&mlon={lon}#map={z}/{lat}/{lon}",
+                        "https://www.openstreetmap.org/?mlat={lat}&mlon={lon}#map={z}/{lat}/{lon}",
                         Uuid.parse("a771fd79-291e-4e55-9952-601f87b05bfe").toByteArray(),
                         "https://www.openstreetmap.org/#map={z}/{lat}/{lon}",
                     )

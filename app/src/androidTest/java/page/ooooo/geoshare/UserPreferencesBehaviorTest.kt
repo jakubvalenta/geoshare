@@ -93,7 +93,10 @@ class UserPreferencesBehaviorTest {
         // Shows a message
         onElement(pollIntervalMs = 50L) {
             textAsString()?.startsWith("The app has been hidden") == true ||
-                textAsString()?.startsWith(@Suppress("SpellCheckingInspection") "L’application a été masquée") == true
+                textAsString()?.startsWith(
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "L’application a été masquée"
+                ) == true
         }
 
         // Does not show the app
@@ -141,7 +144,10 @@ class UserPreferencesBehaviorTest {
         // Shows a message
         onElement(pollIntervalMs = 50L) {
             textAsString()?.startsWith("The web map has been hidden") == true ||
-                textAsString()?.startsWith(@Suppress("SpellCheckingInspection") "La carte web a été masquée") == true
+                textAsString()?.startsWith(
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "La carte web a été masquée"
+                ) == true
         }
 
         // Does not show the link

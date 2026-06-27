@@ -192,7 +192,7 @@ class ConversionBehaviorTest {
         assertConversionFails(
             setOf(
                 "Response error 404",
-                @Suppress("SpellCheckingInspection") "Erreur de réponse 404",
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Erreur de réponse 404",
             ),
         )
     }
@@ -394,7 +394,7 @@ class ConversionBehaviorTest {
                 .scrollToElement(Direction.DOWN) {
                     viewIdResourceName == "geoShareResultSuccessSheetItemHeadline" && textAsString() in setOf(
                         "Save GPX route",
-                        @Suppress("SpellCheckingInspection") "Enregistrer l’itinéraire GPX",
+                        @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Enregistrer l’itinéraire GPX",
                     )
                 }
                 .click()
@@ -407,7 +407,7 @@ class ConversionBehaviorTest {
         onElement {
             textAsString() in setOf(
                 "Saved GPX file",
-                @Suppress("SpellCheckingInspection") "Fichier GPX enregistré",
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Fichier GPX enregistré",
             )
         }
     }
@@ -438,7 +438,7 @@ class ConversionBehaviorTest {
                 .scrollToElement(Direction.DOWN) {
                     viewIdResourceName == "geoShareResultSuccessSheetItemHeadline" && textAsString() in setOf(
                         "Save to contact",
-                        @Suppress("SpellCheckingInspection") "Enregistrer dans les contacts",
+                        @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Enregistrer dans les contacts",
                     )
                 }
                 .click()
@@ -459,7 +459,8 @@ class ConversionBehaviorTest {
         onElement {
             viewIdResourceName == "geoShareConversionErrorMessage" && textAsString() in setOf(
                 "This link is not supported without connecting to the map service",
-                @Suppress("SpellCheckingInspection") "Ce lien n’est pas pris en charge sans connexion au service de cartographie",
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                "Ce lien n’est pas pris en charge sans connexion au service de cartographie",
             )
         }
     }
@@ -469,7 +470,7 @@ class ConversionBehaviorTest {
         onElement {
             viewIdResourceName == "geoShareAppOutput" && textAsString() in setOf(
                 "Navigate",
-                @Suppress("SpellCheckingInspection") "Naviguer"
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Naviguer"
             )
         }.click()
     }

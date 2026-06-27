@@ -24,13 +24,13 @@ object GpxFormatter {
         append("<rte>\n")
         points.filter { it.lat != null && it.lon != null }.forEach { point ->
             point.run {
-                @Suppress("SpellCheckingInspection")
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
                 append("<rtept lat=\"$latStr\" lon=\"$lonStr\"")
             }
             if (point.name != null) {
                 append(">\n")
                 append("    <name>${point.name.escapeHTML()}</name>\n")
-                @Suppress("SpellCheckingInspection")
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
                 append("</rtept>\n")
             } else {
                 append(" />\n")

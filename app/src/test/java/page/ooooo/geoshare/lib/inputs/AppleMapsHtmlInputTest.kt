@@ -15,7 +15,7 @@ class AppleMapsHtmlInputTest : InputTest {
     fun parse_success() = runTest {
         assertEquals(
             ParseResult(persistentListOf(WGS84Point(52.4735927, 13.4050798, source = Source.HTML))),
-            @Suppress("SpellCheckingInspection")
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
             input.parse(
                 """<html>
 <head>

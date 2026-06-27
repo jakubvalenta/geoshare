@@ -66,9 +66,9 @@ class GoogleMapsWebViewInput @Inject constructor(
                 || requestUrlString.endsWith(".ico")
                 || requestUrlString.endsWith(".png")
                 || requestUrlString.endsWith(".svg")
-                || requestUrlString.contains(@Suppress("SpellCheckingInspection") "fonts.gstatic.com/")
-                || requestUrlString.contains(@Suppress("SpellCheckingInspection") "maps.gstatic.com/")
-                || requestUrlString.contains(@Suppress("SpellCheckingInspection") "googleusercontent.com/")
+                || requestUrlString.contains("fonts.gstatic.com/")
+                || requestUrlString.contains("maps.gstatic.com/")
+                || requestUrlString.contains("googleusercontent.com/")
                 || requestUrlString.contains("/gps-cs-s/")
                 || requestUrlString.contains("/ss/")
                 || requestUrlString.contains("/thumbnail")
@@ -82,7 +82,7 @@ class GoogleMapsWebViewInput @Inject constructor(
                 || requestUrlString.contains("/log204")
                 || requestUrlString.contains("google.com/gen_204")
                 || requestUrlString.contains("google.com/log")
-                || requestUrlString.contains(@Suppress("SpellCheckingInspection") "googlesyndication.com/")
+                || requestUrlString.contains("googlesyndication.com/")
 
                 // Something that is requested too many times
                 || requestUrlString.contains("/maps/res/CompactLegend-Roadmap-")

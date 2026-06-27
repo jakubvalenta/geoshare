@@ -62,7 +62,7 @@ object GoogleMapsUriParser {
             // https://maps.google.com/?ll={lat},{lon}
             // https://maps.google.com/?q={lat},{lon}
             listOf(
-                @Suppress("SpellCheckingInspection") "daddr",
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "daddr",
                 "q",
                 "query",
                 "ll",
@@ -92,7 +92,7 @@ object GoogleMapsUriParser {
             // https://maps.google.com/?q={name}&query_place_id={name}
             // https://maps.google.com/?query_place_id={name}
             val query = listOf(
-                @Suppress("SpellCheckingInspection") "daddr",
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "daddr",
                 "q",
                 "query",
             )
@@ -143,7 +143,7 @@ object GoogleMapsUriParser {
             // https://maps.google.com/?ftid={id}
             if (
                 points.lastOrNull()?.hasCoordinates() != true &&
-                !queryParams[@Suppress("SpellCheckingInspection") "ftid"].isNullOrEmpty()
+                !queryParams[@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "ftid"].isNullOrEmpty()
             ) {
                 requiresHtmlParsing = true
             }
@@ -197,7 +197,7 @@ object GoogleMapsUriParser {
                             mutableNaivePoints[mutableNaivePoints.size - 1] =
                                 naivePoint.let { it.copy(z = it.z ?: lastPoint.z, name = lastPoint.name) }
                         } else {
-                            // If we've already found a pont, and it has coordinates, update it with zoom only
+                            // If we've already found a point, and it has coordinates, update it with zoom only
                             mutableNaivePoints[mutableNaivePoints.size - 1] =
                                 lastPoint.copy(z = naivePoint.z)
                         }

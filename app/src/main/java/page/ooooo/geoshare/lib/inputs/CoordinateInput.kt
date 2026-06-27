@@ -126,7 +126,7 @@ class CoordinateInput @Inject constructor() : TextInput, Input.HasRandomUri {
     override fun toString() = "CoordinateInput"
 
     private companion object {
-        private const val CHARS = @Suppress("SpellCheckingInspection") """[\p{Zs},°'′"″NSWE]"""
+        private const val CHARS = """[\p{Zs},°'′"″NSWE]"""
         private const val SPACE = """\p{Zs}*"""
         private const val LAT_SIG = """(-?)"""
         private const val LAT_DEG = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""

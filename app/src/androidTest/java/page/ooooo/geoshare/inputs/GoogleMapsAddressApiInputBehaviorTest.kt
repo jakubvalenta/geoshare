@@ -86,18 +86,21 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
             if (testServer is TestServer.Configured) {
                 WGS84Point(
                     51.0657922, 13.7555827,
-                    name = @Suppress("SpellCheckingInspection") "Louisenstraße 60, 01099 Dresden",
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Louisenstraße 60, 01099 Dresden",
                     source = Source.API,
                 )
             } else if (htmlParsingSupported) {
                 WGS84Point(
                     51.0657922, 13.7555827,
-                    name = @Suppress("SpellCheckingInspection") "Louisenstraße 60, 01099 Dresden",
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Louisenstraße 60, 01099 Dresden",
                     source = Source.URI,
                 )
             } else {
                 WGS84Point(
-                    name = @Suppress("SpellCheckingInspection") "Louisenstraße 60, 01099 Dresden",
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Louisenstraße 60, 01099 Dresden",
                     source = Source.URI,
                 )
             },
@@ -106,9 +109,11 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
                 emptySet()
             } else if (htmlParsingSupported) {
                 setOf(
-                    @Suppress("SpellCheckingInspection") "Louisenstraße 60, 01099 Neustadt",
-                    @Suppress("SpellCheckingInspection") "Louisenstraße 60, 01099 Neustadt, Allemagne",
-                    @Suppress("SpellCheckingInspection") "Louisenstraße 60, 01099 Neustadt, Germany",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Louisenstraße 60, 01099 Neustadt",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Louisenstraße 60, 01099 Neustadt, Allemagne",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Louisenstraße 60, 01099 Neustadt, Germany",
                 )
             } else {
                 emptySet()
@@ -139,7 +144,7 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
             fallbackNames = if (testServer is TestServer.Configured) {
                 emptySet()
             } else if (htmlParsingSupported) {
-                setOf(@Suppress("SpellCheckingInspection") "Konditorei Heinemann")
+                setOf(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Konditorei Heinemann")
             } else {
                 emptySet()
             },
@@ -152,13 +157,15 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
                     // different coordinates than GeoShare Server in this case.
                     WGS84Point(
                         44.4490666, 26.0888873,
-                        name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                        "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
                         source = Source.API,
                     )
                 } else {
                     WGS84Point(
                         44.4490541, 26.0888398,
-                        name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                        "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
                         source = Source.API,
                     )
                 }
@@ -170,7 +177,8 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
                 )
             } else {
                 WGS84Point(
-                    name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
                     source = Source.URI,
                 )
             },
@@ -180,18 +188,20 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
             if (testServer is TestServer.Configured) {
                 WGS84Point(
                     52.4842015, 13.4167277,
-                    name = @Suppress("SpellCheckingInspection") "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
                     source = Source.API,
                 )
             } else if (htmlParsingSupported) {
                 WGS84Point(
                     52.4842015, 13.4167277,
-                    name = @Suppress("SpellCheckingInspection") "Volkspark Hasenheide",
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Volkspark Hasenheide",
                     source = Source.URI,
                 )
             } else {
                 WGS84Point(
-                    name = @Suppress("SpellCheckingInspection") "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
                     source = Source.URI,
                 )
             },
@@ -200,8 +210,8 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
                 emptySet()
             } else if (htmlParsingSupported) {
                 setOf(
-                    @Suppress("SpellCheckingInspection") "Hasenheide Park",
-                    @Suppress("SpellCheckingInspection") "Parc public Hasenheide",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Hasenheide Park",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Parc public Hasenheide",
                 )
             } else {
                 emptySet()
@@ -213,18 +223,19 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
             if (testServer is TestServer.Configured) {
                 WGS84Point(
                     52.4834254, 13.4245399,
-                    name = @Suppress("SpellCheckingInspection") "Hermannstr. 20, Berlin",
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Hermannstr. 20, Berlin",
                     source = Source.API,
                 )
             } else if (htmlParsingSupported) {
                 WGS84Point(
                     52.4834254, 13.4245399,
-                    name = @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin",
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Hermannstraße 20, 12049 Berlin",
                     source = Source.URI,
                 )
             } else {
                 WGS84Point(
-                    name = @Suppress("SpellCheckingInspection") "Hermannstr. 20, Berlin",
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Hermannstr. 20, Berlin",
                     source = Source.URI,
                 )
             },
@@ -233,9 +244,12 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
                 emptySet()
             } else if (htmlParsingSupported) {
                 setOf(
-                    @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln",
-                    @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln, Allemagne",
-                    @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln, Germany",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln, Allemagne",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Hermannstraße 20, 12049 Berlin-Bezirk Neukölln, Germany",
                 )
             } else {
                 emptySet()
@@ -283,7 +297,8 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
                     GCJ02MainlandChinaPoint(
                         49.6338979, -1.622224,
                         z = 7.0,
-                        name = @Suppress("SpellCheckingInspection") "Cherbourg-en-Cotentin, France",
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                        "Cherbourg-en-Cotentin, France",
                         source = Source.URI,
                     ),
                 )
@@ -295,7 +310,7 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
             },
             "https://www.google.com/maps/dir/?api=1&origin=Paris,France&destination=Cherbourg,France&travelmode=driving&waypoints=Versailles,France%7CChartres,France%7CLe%2BMans,France%7CCaen,France",
             fallbackNames = setOf(
-                @Suppress("SpellCheckingInspection") "Cherbourg-en-Cotentin",
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Cherbourg-en-Cotentin",
             ),
         )
 
@@ -317,34 +332,40 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
                 WGS84Point(
                     40.6400258, 22.9589454,
                     z = 6.0,
-                    name = @Suppress("SpellCheckingInspection") "Akropoleos 65, Thessaloniki 546 34, Greece",
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Akropoleos 65, Thessaloniki 546 34, Greece",
                     source = Source.API,
                 )
             } else if (htmlParsingSupported) {
                 WGS84Point(
                     40.6400537, 22.9589055,
                     z = 6.0,
-                    name = @Suppress("SpellCheckingInspection") "Box now Ακροπόλεως 65, Akropoleos 65, Thessaloniki 546 34, Greece",
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Box now Ακροπόλεως 65, Akropoleos 65, Thessaloniki 546 34, Greece",
                     source = Source.URI,
                 )
             } else {
                 WGS84Point(
-                    name = @Suppress("SpellCheckingInspection") "Akropoleos 65, Thessaloniki 546 34, Greece",
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Akropoleos 65, Thessaloniki 546 34, Greece",
                     source = Source.URI,
                 )
             },
             "https://maps.google.com/maps?oe=utf-8&client=firefox-b&um=1&ie=UTF-8&fb=1&gl=fr&sa=X&geocode=KWmqxjsAOagUMaSMgMRdOas1&daddr=Akropoleos+65,+Thessaloniki+546+34,+Gr%C3%A8ce",
             fallbackNames = if (testServer is TestServer.Configured) {
                 setOf(
-                    @Suppress("SpellCheckingInspection") "Akropoleos 65, Thessaloniki 546 34, Grèce",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Akropoleos 65, Thessaloniki 546 34, Grèce",
                 )
             } else if (htmlParsingSupported) {
                 setOf(
-                    @Suppress("SpellCheckingInspection") "Box now Ακροπόλεως 65, Akropoleos 65, Thessaloniki 546 34, Grèce",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Box now Ακροπόλεως 65, Akropoleos 65, Thessaloniki 546 34, Grèce",
                 )
             } else {
                 setOf(
-                    @Suppress("SpellCheckingInspection") "Akropoleos 65, Thessaloniki 546 34, Grèce",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Akropoleos 65, Thessaloniki 546 34, Grèce",
                 )
             },
         )
@@ -365,7 +386,7 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
                 setOf(
                     "Seattle Stadium",
                     "Seattle-Stadion",
-                    @Suppress("SpellCheckingInspection") "Stade de Seattle",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Stade de Seattle",
                 )
             } else {
                 emptySet()
@@ -377,7 +398,7 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
             testUriFails(
                 setOf(
                     "No points found",
-                    @Suppress("SpellCheckingInspection") "Aucun point trouvé",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Aucun point trouvé",
                 ),
                 "https://www.google.com/maps/place//",
             )
@@ -385,7 +406,7 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
             testUriFails(
                 setOf(
                     "No points found",
-                    @Suppress("SpellCheckingInspection") "Aucun point trouvé",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Aucun point trouvé",
                 ),
                 "https://www.google.com/maps/place//",
             )
@@ -393,7 +414,7 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
             testUriFails(
                 setOf(
                     "This link is not supported",
-                    @Suppress("SpellCheckingInspection") "Ce lien n’est pas pris en charge",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Ce lien n’est pas pris en charge",
                 ),
                 "https://www.google.com/maps/place//",
             )

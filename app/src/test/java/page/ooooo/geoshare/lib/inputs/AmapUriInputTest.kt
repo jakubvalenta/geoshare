@@ -138,7 +138,8 @@ class AmapUriInputTest : InputTest {
                 persistentListOf(
                     GCJ02GreaterChinaAndTaiwanPoint(
                         45.8289525077221, 1.266689300537103,
-                        name = @Suppress("SpellCheckingInspection") "利摩日主教座堂,42 Rue Prte Panet, 87000 Limoges, 法国",
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                        "利摩日主教座堂,42 Rue Prte Panet, 87000 Limoges, 法国",
                         source = Source.URI,
                     ),
                 )

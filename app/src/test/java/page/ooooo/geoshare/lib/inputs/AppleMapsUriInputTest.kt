@@ -27,7 +27,6 @@ class AppleMapsUriInputTest : InputTest {
     @Test
     fun match_shortLink() {
         assertEquals("https://maps.apple/p/7E-Brjrk_THN14", input.match("https://maps.apple/p/7E-Brjrk_THN14"))
-        @Suppress("SpellCheckingInspection")
         assertEquals("maps.apple/p/7E-Brjrk_THN14", input.match("maps.apple/p/7E-Brjrk_THN14"))
     }
 
@@ -87,7 +86,7 @@ class AppleMapsUriInputTest : InputTest {
     @Test
     fun parse_place() = runTest {
         assertEquals(
-            @Suppress("SpellCheckingInspection")
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
             ParseResult(
                 persistentListOf(
                     WGS84Point(
@@ -112,7 +111,7 @@ class AppleMapsUriInputTest : InputTest {
     @Test
     fun parse_directionsQuery() = runTest {
         assertEquals(
-            @Suppress("SpellCheckingInspection")
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
             ParseResult(
                 persistentListOf(
                     WGS84Point(
@@ -205,7 +204,7 @@ class AppleMapsUriInputTest : InputTest {
         )
     }
 
-    @Suppress("SpellCheckingInspection")
+    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
     @Test
     fun parse_parameterNameTakesPrecedenceOverQAndAddressAndDaddr() = runTest {
         assertEquals(
@@ -222,7 +221,7 @@ class AppleMapsUriInputTest : InputTest {
         )
     }
 
-    @Suppress("SpellCheckingInspection")
+    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
     @Test
     fun parse_parameterAddressTakesPrecedenceOverQAndDaddr() = runTest {
         assertEquals(
@@ -249,7 +248,7 @@ class AppleMapsUriInputTest : InputTest {
         )
     }
 
-    @Suppress("SpellCheckingInspection")
+    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
     @Test
     fun parse_parameterDaddrTakesPrecedenceOverQ() = runTest {
         assertEquals(
@@ -265,7 +264,7 @@ class AppleMapsUriInputTest : InputTest {
         )
     }
 
-    @Suppress("SpellCheckingInspection")
+    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
     @Test
     fun parse_auidOnly() = runTest {
         assertEquals(
