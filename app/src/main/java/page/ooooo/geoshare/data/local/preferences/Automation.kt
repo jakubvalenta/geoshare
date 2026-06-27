@@ -13,7 +13,6 @@ sealed interface Automation
 object CopyCoordsDecAutomation : Automation
 
 @Serializable
-@Suppress("SpellCheckingInspection")
 @SerialName("COPY_COORDS_NSWE_DEC")
 object CopyCoordsDegMinSecAutomation : Automation
 

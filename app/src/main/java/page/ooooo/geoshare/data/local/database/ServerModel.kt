@@ -16,7 +16,7 @@ import page.ooooo.geoshare.lib.UriQuote
 import java.util.UUID
 import kotlin.uuid.ExperimentalUuidApi
 
-@Suppress("SpellCheckingInspection")
+@Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
 @OptIn(ExperimentalUuidApi::class)
 @Entity
 @Serializable

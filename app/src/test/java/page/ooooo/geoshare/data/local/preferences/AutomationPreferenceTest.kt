@@ -207,7 +207,7 @@ class AutomationPreferenceTest {
     @Test
     fun getValue_forEachOldTypeAndPackageName_returnsAutomation() =
         runTest {
-            @Suppress("DEPRECATION", "SpellCheckingInspection")
+            @Suppress("DEPRECATION")
             for ((testOldAutomationType, expectedAutomation) in mapOf(
                 "COPY_APPLE_MAPS_NAVIGATE_TO_URI" to CopyLinkNavigationAppleMapsUriAutomation,
                 "COPY_APPLE_MAPS_URI" to CopyLinkDisplayAppleMapsUriAutomation,

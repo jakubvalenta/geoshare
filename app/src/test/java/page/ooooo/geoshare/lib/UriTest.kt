@@ -353,14 +353,13 @@ class UriTest {
     @Test
     fun parse_doesNotDecodeSlashInPath() {
         assertEquals(
-            @Suppress("SpellCheckingInspection")
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
             Uri(
                 scheme = "https",
                 host = "www.google.com",
                 path = "/maps/@48.8584,2.2945,3a,75y,90t/data=!3m8!1e1!3m6!1sAF1QipP5ELjVeDJfzgBQBp5XM-HsNU0Ep1k_KgE!2e10!3e11!6shttps:%2F%2Flh5.googleusercontent.com%2Fp%2FAF1QipP5ELjVeDJfzgBQBp5XM-HsNU0Ep1k_KgE%3Dw203-h100-k-no-pi-0-ya293.79999-ro-0-fo100!7i10240!8i5120",
                 uriQuote = uriQuote,
             ),
-            @Suppress("SpellCheckingInspection")
             Uri.parse(
                 "https://www.google.com/maps/@48.8584,2.2945,3a,75y,90t/data=!3m8!1e1!3m6!1sAF1QipP5ELjVeDJfzgBQBp5XM-HsNU0Ep1k_KgE!2e10!3e11!6shttps:%2F%2Flh5.googleusercontent.com%2Fp%2FAF1QipP5ELjVeDJfzgBQBp5XM-HsNU0Ep1k_KgE%3Dw203-h100-k-no-pi-0-ya293.79999-ro-0-fo100!7i10240!8i5120",
                 uriQuote,
@@ -498,7 +497,7 @@ class UriTest {
     @Test
     fun toString_encodesSlashInPath() {
         val uriString =
-            @Suppress("SpellCheckingInspection") "https://www.google.com/maps/place/Steak+no+Don/@34.59539,133.7567242,17z/data=!4m6!3m5!1s0x3551565394d96b57%3A0x1c9bdbc5990908bf!8m2!3d34.5945482!4d133.7583428!16s%2Fg%2F1thfc7pn?entry=tts&g_ep=EgoyMDI1MTEyMy4xIPu8ASoASAFQAw%3D%3D&skid=91023dbe-8ef3-4df9-a0ae-8be48dadb8ab"
+            "https://www.google.com/maps/place/Steak+no+Don/@34.59539,133.7567242,17z/data=!4m6!3m5!1s0x3551565394d96b57%3A0x1c9bdbc5990908bf!8m2!3d34.5945482!4d133.7583428!16s%2Fg%2F1thfc7pn?entry=tts&g_ep=EgoyMDI1MTEyMy4xIPu8ASoASAFQAw%3D%3D&skid=91023dbe-8ef3-4df9-a0ae-8be48dadb8ab"
         assertEquals(
             uriString,
             Uri.parse(uriString, uriQuote).toString()
@@ -525,7 +524,6 @@ class UriTest {
 
     @Test
     fun toString_doesNotEncodeAmpersandInPath() {
-        @Suppress("SpellCheckingInspection")
         val uriString = "google.streetview:cbll=29.9774614,31.1329645"
         assertEquals(
             uriString,

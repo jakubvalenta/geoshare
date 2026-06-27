@@ -26,7 +26,7 @@ class PlusCodeInputBehaviorTest {
         // Global code within mainland China as text
         testText(
             GCJ02Point(39.917312, 116.397078, source = Source.HASH),
-            @Suppress("SpellCheckingInspection") "8PFRW98W+WRG",
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "8PFRW98W+WRG",
         )
     }
 }

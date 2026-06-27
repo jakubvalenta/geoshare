@@ -35,12 +35,22 @@ class AppleMapsUriInput @Inject constructor(
             // Search or place with name
             // https://maps.apple.com/?q={name}
             // https://maps.apple.com/place?place-id={id}...&q={name}
-            val name = listOf("name", "address", @Suppress("SpellCheckingInspection") "daddr", "q")
+            val name = listOf(
+                "name",
+                "address",
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "daddr",
+                "q",
+            )
                 .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull() }
 
             // Coordinates
             // https://maps.apple.com/?ll={lat},{lon}
-            listOf("ll", @Suppress("SpellCheckingInspection") "daddr", "coordinate", "q")
+            listOf(
+                "ll",
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "daddr",
+                "coordinate",
+                "q",
+            )
                 .firstNotNullOfOrNull { key ->
                     LAT_LON_PATTERN.matchEntire(queryParams[key])?.toLatLonPoint(Source.URI)
                 }?.let {
@@ -63,7 +73,7 @@ class AppleMapsUriInput @Inject constructor(
             if (host == "maps.apple" && pathParts.firstOrNull() == "" && pathParts.getOrNull(1) == "p" ||
                 // Place
                 // https://maps.apple.com/place?auid={id}...
-                !queryParams[@Suppress("SpellCheckingInspection") "auid"].isNullOrEmpty() ||
+                !queryParams[@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "auid"].isNullOrEmpty() ||
                 // Place
                 // https://maps.apple.com/place?place-id={id}...
                 !queryParams["place-id"].isNullOrEmpty()

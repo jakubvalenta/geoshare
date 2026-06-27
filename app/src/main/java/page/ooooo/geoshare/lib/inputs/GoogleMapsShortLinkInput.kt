@@ -62,7 +62,6 @@ class GoogleMapsShortLinkInput @Inject constructor(
                 value = "PENDING+987",
                 domain = "www.google.com",
             ),
-            @Suppress("SpellCheckingInspection")
             Cookie(
                 name = "SOCS",
                 value = "CAESHAgBEhJnd3NfMjAyMzA4MTAtMF9SQzIaAmRlIAEaBgiAo_CmBg",

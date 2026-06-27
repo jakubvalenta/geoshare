@@ -52,10 +52,10 @@ class GeoUriUriInputTest : InputTest {
     @Test
     fun match_replacement() {
         assertEquals(
-            @Suppress("SpellCheckingInspection")
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
             "geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)",
             input.match(
-                @Suppress("SpellCheckingInspection")
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
                 "geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)\n" +
                     "https://omaps.app/Umse5f0H8a/Nova_Iorque"
             ),
@@ -124,7 +124,7 @@ class GeoUriUriInputTest : InputTest {
     @Test
     fun parse_coordsAndName() = runTest {
         assertEquals(
-            @Suppress("SpellCheckingInspection")
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
             ParseResult(
                 persistentListOf(
                     WGS84Point(
@@ -135,7 +135,7 @@ class GeoUriUriInputTest : InputTest {
                     )
                 )
             ),
-            @Suppress("SpellCheckingInspection")
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
             input.parse("geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)"),
         )
     }
@@ -143,7 +143,7 @@ class GeoUriUriInputTest : InputTest {
     @Test
     fun parse_coordsAndNameInSeparateQueryParam() = runTest {
         assertEquals(
-            @Suppress("SpellCheckingInspection")
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
             ParseResult(
                 persistentListOf(
                     WGS84Point(
@@ -153,11 +153,11 @@ class GeoUriUriInputTest : InputTest {
                     )
                 )
             ),
-            @Suppress("SpellCheckingInspection")
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
             input.parse("geo:40.7127400,-74.0059965?q=40.7127400,-74.0059965&(Nova%20Iorque)"),
         )
         assertEquals(
-            @Suppress("SpellCheckingInspection")
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
             ParseResult(
                 persistentListOf(
                     WGS84Point(
@@ -168,11 +168,11 @@ class GeoUriUriInputTest : InputTest {
                     )
                 )
             ),
-            @Suppress("SpellCheckingInspection")
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
             input.parse("geo:40.7127400,-74.0059965?q=40.7127400,-74.0059965&z=9.0&(Nova%20Iorque)"),
         )
         assertEquals(
-            @Suppress("SpellCheckingInspection")
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
             ParseResult(
                 persistentListOf(
                     WGS84Point(
@@ -183,7 +183,7 @@ class GeoUriUriInputTest : InputTest {
                     )
                 )
             ),
-            @Suppress("SpellCheckingInspection")
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
             input.parse("geo:40.7127400,-74.0059965?q=40.7127400,-74.0059965&(Nova%20Iorque)&z=9.0"),
         )
     }

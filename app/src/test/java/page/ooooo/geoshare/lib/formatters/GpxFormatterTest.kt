@@ -80,7 +80,8 @@ class GpxFormatterTest {
     @Test
     fun writeGpxRoute_basic() {
         assertEquals(
-            @Suppress("SpellCheckingInspection") """<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+            """<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
@@ -108,7 +109,10 @@ class GpxFormatterTest {
     @Test
     fun writeGpxRoute_escapesName() {
         assertEquals(
-            @Suppress("SpellCheckingInspection") """<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+            @Suppress(
+                "GrazieInspectionRunner",
+                "SpellCheckingInspection"
+            ) """<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">

@@ -13,7 +13,6 @@ class UriQuoteTest {
 
     @Test
     fun encode_encodesPlus() {
-        @Suppress("SpellCheckingInspection")
         assertEquals("foo%2Bbar", uriQuote.encode("foo+bar"))
     }
 

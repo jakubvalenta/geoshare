@@ -102,11 +102,11 @@ class BaiduMapWebViewInput @Inject constructor(
             || requestUrlString.endsWith("/static/common/images/new/loading")
 
             // Map tiles
-            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "bdimg.com/tile/")
+            || requestUrlString.contains("bdimg.com/tile/")
 
             // Tracking
-            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "/alog.min.js")
-            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "map.baidu.com/newmap_test/static/common/images/transparent.gif")
+            || requestUrlString.contains("/alog.min.js")
+            || requestUrlString.contains("map.baidu.com/newmap_test/static/common/images/transparent.gif")
 
     override fun toString() = TAG
 

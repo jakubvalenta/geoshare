@@ -113,7 +113,7 @@ class CoordinateConverterTest : GeoTest {
             ),
         ),
         PointInDifferentSrs(
-            name = @Suppress("SpellCheckingInspection") "Yangshan port island",
+            name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Yangshan port island",
             wgs84 = WGS84Point(
                 30.602829622230516, 122.12885969924668,
                 z = 3.14, name = "foo bar", source = Source.GENERATED,
@@ -132,7 +132,7 @@ class CoordinateConverterTest : GeoTest {
             ),
         ),
         PointInDifferentSrs(
-            name = @Suppress("SpellCheckingInspection") "Daqindao sea",
+            name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Daqindao sea",
             wgs84 = WGS84Point(
                 38.30050979122315, 120.80518963762754,
                 z = 3.14, name = "foo bar", source = Source.GENERATED,

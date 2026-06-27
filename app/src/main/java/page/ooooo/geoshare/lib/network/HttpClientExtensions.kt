@@ -27,7 +27,7 @@ import java.net.SocketException
 import java.net.URL
 
 const val DESKTOP_USER_AGENT =
-    @Suppress("SpellCheckingInspection") "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"
 const val REQUEST_TIMEOUT = 256_000L
 const val CONNECT_TIMEOUT = 128_000L
 const val SOCKET_TIMEOUT = 128_000L

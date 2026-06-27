@@ -127,7 +127,12 @@ private fun LongNamePreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             ResultPoint(
-                point = WGS84Point(NaivePoint.genRandomPoint(name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany")),
+                point = WGS84Point(
+                    NaivePoint.genRandomPoint(
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                        "Reuterstraße 1, Berlin-Neukölln, Germany"
+                    )
+                ),
                 index = 2,
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
                 coordinateConverter = coordinateConverter,
@@ -146,7 +151,12 @@ private fun DarkLongNamePreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             ResultPoint(
-                point = WGS84Point(NaivePoint.genRandomPoint(name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany")),
+                point = WGS84Point(
+                    NaivePoint.genRandomPoint(
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                        "Reuterstraße 1, Berlin-Neukölln, Germany"
+                    )
+                ),
                 index = 2,
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
                 coordinateConverter = coordinateConverter,
@@ -166,7 +176,8 @@ private fun NameOnlyPreview() {
             val coordinateConverter = CoordinateConverter(geometries)
             ResultPoint(
                 point = WGS84Point(
-                    name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany",
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Reuterstraße 1, Berlin-Neukölln, Germany",
                     source = Source.GENERATED
                 ),
                 index = 2,
@@ -188,7 +199,8 @@ private fun DarkNameOnlyPreview() {
             val coordinateConverter = CoordinateConverter(geometries)
             ResultPoint(
                 point = WGS84Point(
-                    name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany",
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Reuterstraße 1, Berlin-Neukölln, Germany",
                     source = Source.GENERATED
                 ),
                 index = 2,

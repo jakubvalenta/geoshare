@@ -11,7 +11,6 @@ sealed interface Segment {
  * Parses a format string such as `"Foo %1$s bar %2$s baz"` into a [SegmentedString] such as
  * `listOf(Segment.Text("Foo"), Segment.Arg(1), Segment.Text("bar"), Segment.Arg(2), Segment.Text("baz")`.
  */
-@Suppress("RedundantInterpolationPrefix")
 fun parseFormatString(input: String): SegmentedString =
     Regex($$"""([^%]+)|%(\d+)\$s""")
         .findAll(input)

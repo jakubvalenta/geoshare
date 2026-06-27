@@ -26,7 +26,6 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
-@Suppress("SpellCheckingInspection")
 @Language("AGSL")
 private val CHECKERED_SHADER = """
     uniform float squareSize;

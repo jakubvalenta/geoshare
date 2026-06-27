@@ -24,7 +24,7 @@ object GoogleMapsUriFormatter {
                 lonStr?.let { lonStr ->
                     "$latStr,$lonStr"
                 }
-            } ?: "0,0").let { @Suppress("SpellCheckingInspection") "cbll=$it" },
+            } ?: "0,0").let { "cbll=$it" },
             uriQuote = uriQuote,
         ).toString()
     }

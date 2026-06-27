@@ -31,7 +31,7 @@ class AmapInputBehaviorTest {
         testUri(
             GCJ02Point(
                 22.29196286774012, 114.17731806635854,
-                name = @Suppress("SpellCheckingInspection") "Haigangcheng F g",
+                name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Haigangcheng F g",
                 source = Source.URI,
             ),
             "https://wb.amap.com/?q=22.29196286774012%2C114.17731806635854%2CHaigangcheng+F+g",
@@ -61,7 +61,8 @@ class AmapInputBehaviorTest {
         testUri(
             WGS84Point(
                 45.8289525077221, 1.266689300537103,
-                name = @Suppress("SpellCheckingInspection") "利摩日主教座堂,42 Rue Prte Panet, 87000 Limoges, 法国",
+                name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                "利摩日主教座堂,42 Rue Prte Panet, 87000 Limoges, 法国",
                 source = Source.URI,
             ),
             "https://wb.amap.com/?p=P0JANYX6NL%2C45.8289525077221%2C1.266689300537103%2C%E5%88%A9%E6%91%A9%E6%97%A5%E4%B8%BB%E6%95%99%E5%BA%A7%E5%A0%82%2C42+Rue+Prte+Panet%2C+87000+Limoges%2C+%E6%B3%95%E5%9B%BD&src=app_C3090",
@@ -71,7 +72,7 @@ class AmapInputBehaviorTest {
     @Test
     fun amapHtml() = uiAutomator {
         runBlocking {
-            assumeDomainResolvable(@Suppress("SpellCheckingInspection") "surl.amap.com")
+            assumeDomainResolvable("surl.amap.com")
         }
 
         // Launch app and close intro

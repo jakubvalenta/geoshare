@@ -18,7 +18,6 @@ class YandexMapsUriInputTest : InputTest {
             "https://yandex.com/maps?whatshere%5Bpoint%5D=144.96315783657045%2C-37.81384550131279&whatshere%5Bzoom%5D=17.852003&ll=144.96315783657042%2C-37.81384550094835&z=17.852003&si=6u8menx2bg23cfx27y7p1je8y8",
             input.match("https://yandex.com/maps?whatshere%5Bpoint%5D=144.96315783657045%2C-37.81384550131279&whatshere%5Bzoom%5D=17.852003&ll=144.96315783657042%2C-37.81384550094835&z=17.852003&si=6u8menx2bg23cfx27y7p1je8y8")
         )
-        @Suppress("SpellCheckingInspection")
         assertEquals(
             "yandex.com/maps?whatshere%5Bpoint%5D=144.96315783657045%2C-37.81384550131279&whatshere%5Bzoom%5D=17.852003&ll=144.96315783657042%2C-37.81384550094835&z=17.852003&si=6u8menx2bg23cfx27y7p1je8y8",
             input.match("yandex.com/maps?whatshere%5Bpoint%5D=144.96315783657045%2C-37.81384550131279&whatshere%5Bzoom%5D=17.852003&ll=144.96315783657042%2C-37.81384550094835&z=17.852003&si=6u8menx2bg23cfx27y7p1je8y8")
@@ -43,7 +42,7 @@ class YandexMapsUriInputTest : InputTest {
     @Test
     fun match_unknownScheme() {
         assertEquals(
-            @Suppress("SpellCheckingInspection") "yandex.com/maps?whatshere%5Bpoint%5D=144.96315783657045%2C-37.81384550131279&whatshere%5Bzoom%5D=17.852003&ll=144.96315783657042%2C-37.81384550094835&z=17.852003&si=6u8menx2bg23cfx27y7p1je8y8",
+            "yandex.com/maps?whatshere%5Bpoint%5D=144.96315783657045%2C-37.81384550131279&whatshere%5Bzoom%5D=17.852003&ll=144.96315783657042%2C-37.81384550094835&z=17.852003&si=6u8menx2bg23cfx27y7p1je8y8",
             input.match("ftp://yandex.com/maps?whatshere%5Bpoint%5D=144.96315783657045%2C-37.81384550131279&whatshere%5Bzoom%5D=17.852003&ll=144.96315783657042%2C-37.81384550094835&z=17.852003&si=6u8menx2bg23cfx27y7p1je8y8"),
         )
     }
@@ -147,7 +146,7 @@ class YandexMapsUriInputTest : InputTest {
             ParseResult(
                 persistentListOf(
                     WGS84Point(
-                        name = @Suppress("SpellCheckingInspection") "keramicheskiy proyezd",
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "keramicheskiy proyezd",
                         source = Source.URI,
                     )
                 ),

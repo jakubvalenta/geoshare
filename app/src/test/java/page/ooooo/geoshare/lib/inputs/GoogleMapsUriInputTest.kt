@@ -111,7 +111,7 @@ class GoogleMapsUriInputTest : InputTest {
                     GCJ02MainlandChinaPoint(53.512825, 57.6891441, source = Source.MAP_CENTER)
                 )
             ),
-            input.parse(@Suppress("SpellCheckingInspection") "https://www.google.com/maps/@53.512825,57.6891441,0a,75y,90t/data=abc?utm_source=mstt_0&g_ep=def"),
+            input.parse("https://www.google.com/maps/@53.512825,57.6891441,0a,75y,90t/data=abc?utm_source=mstt_0&g_ep=def"),
         )
     }
 
@@ -139,7 +139,8 @@ class GoogleMapsUriInputTest : InputTest {
                 persistentListOf(
                     GCJ02MainlandChinaPoint(
                         44.448337599999995, 26.0834555,
-                        name = @Suppress("SpellCheckingInspection") "Strada Occidentului 7, București, Romania",
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                        "Strada Occidentului 7, București, Romania",
                         source = Source.URI,
                     )
                 )
@@ -229,7 +230,7 @@ class GoogleMapsUriInputTest : InputTest {
                     )
                 )
             ),
-            input.parse(@Suppress("SpellCheckingInspection") "https://www.google.com/maps/place/RAI+-+Romantic+%26+Intimate/@44.5190589,25.7489796,11.42z/data=!4m6!3m5!1s0x40b1ffed911b9fcf:0x7394a7e7855d3929!8m2!3d44.4490541!4d26.0888398!16s%2Fg%2F11svmp0zhs"),
+            input.parse("https://www.google.com/maps/place/RAI+-+Romantic+%26+Intimate/@44.5190589,25.7489796,11.42z/data=!4m6!3m5!1s0x40b1ffed911b9fcf:0x7394a7e7855d3929!8m2!3d44.4490541!4d26.0888398!16s%2Fg%2F11svmp0zhs"),
         )
     }
 
@@ -252,7 +253,8 @@ class GoogleMapsUriInputTest : InputTest {
                 persistentListOf(
                     GCJ02MainlandChinaPoint(
                         44.4490541, 26.0888398,
-                        name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098, România",
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                        "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098, România",
                         source = Source.URI,
                     )
                 ),
@@ -312,7 +314,8 @@ class GoogleMapsUriInputTest : InputTest {
             ParseResult(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(
-                        name = @Suppress("SpellCheckingInspection") "Wikimedia Foundation, Inc., 1 Sansome St #1895, San Francisco, CA 94104, Vereinigte Staaten",
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                        "Wikimedia Foundation, Inc., 1 Sansome St #1895, San Francisco, CA 94104, Vereinigte Staaten",
                         source = Source.URI,
                     )
                 ),
@@ -399,7 +402,7 @@ class GoogleMapsUriInputTest : InputTest {
             ParseResult(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(
-                        name = @Suppress("SpellCheckingInspection") "centurylink+field",
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "centurylink+field",
                         source = Source.URI,
                     )
                 ),
@@ -419,7 +422,7 @@ class GoogleMapsUriInputTest : InputTest {
                 persistentListOf(
                     GCJ02MainlandChinaPoint(
                         name = "Lumen Field",
-                        placeId = @Suppress("SpellCheckingInspection") "ChIJKxjxuaNqkFQR3CK6O1HNNqY",
+                        placeId = "ChIJKxjxuaNqkFQR3CK6O1HNNqY",
                         source = Source.URI,
                     )
                 ),
@@ -438,7 +441,7 @@ class GoogleMapsUriInputTest : InputTest {
             ParseResult(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(
-                        placeId = @Suppress("SpellCheckingInspection") "ChIJKxjxuaNqkFQR3CK6O1HNNqY",
+                        placeId = "ChIJKxjxuaNqkFQR3CK6O1HNNqY",
                         source = Source.URI,
                     )
                 ),
@@ -548,12 +551,13 @@ class GoogleMapsUriInputTest : InputTest {
                     GCJ02MainlandChinaPoint(
                         48.83887481689453, 2.2740750312805176,
                         z = 8.0,
-                        name = @Suppress("SpellCheckingInspection") "Hôpital Européen Georges Pompidou Assistance Publique-Hôpitaux de Paris,20 r Leblanc, 75015 Paris",
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                        "Hôpital Européen Georges Pompidou Assistance Publique-Hôpitaux de Paris,20 r Leblanc, 75015 Paris",
                         source = Source.MAP_CENTER,
                     ),
                 )
             ),
-            input.parse(@Suppress("SpellCheckingInspection") "https://www.google.com/maps/dir/My+location/H%c3%b4pital+Europ%c3%a9en+Georges+Pompidou+Assistance+Publique-H%c3%b4pitaux+de+Paris,20+r+Leblanc%2c+75015+Paris/@48.83887481689453,2.2740750312805176,8z/"),
+            input.parse("https://www.google.com/maps/dir/My+location/H%c3%b4pital+Europ%c3%a9en+Georges+Pompidou+Assistance+Publique-H%c3%b4pitaux+de+Paris,20+r+Leblanc%2c+75015+Paris/@48.83887481689453,2.2740750312805176,8z/"),
         )
     }
 
@@ -615,22 +619,25 @@ class GoogleMapsUriInputTest : InputTest {
             ParseResult(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(
-                        name = @Suppress("SpellCheckingInspection") "Hermannstraße 1, 12049 Berlin, Germany",
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                        "Hermannstraße 1, 12049 Berlin, Germany",
                         source = Source.URI,
                     ),
                     GCJ02MainlandChinaPoint(
-                        name = @Suppress("SpellCheckingInspection") "Weserstr. 1, 12047 Berlin, Germany",
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                        "Weserstr. 1, 12047 Berlin, Germany",
                         source = Source.URI,
                     ),
                     GCJ02MainlandChinaPoint(
                         52.4844406, 13.4217121,
                         z = 16.0,
-                        name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany",
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                        "Reuterstraße 1, Berlin-Neukölln, Germany",
                         source = Source.MAP_CENTER,
                     )
                 )
             ),
-            input.parse(@Suppress("SpellCheckingInspection") "https://www.google.com/maps/dir/Hermannstra%C3%9Fe+1,+12049+Berlin,+Germany/Weserstr.+1,+12047+Berlin,+Germany/Reuterstra%C3%9Fe+1,+Berlin-Neuk%C3%B6lln,+Germany/@52.4844406,13.4217121,16z/"),
+            input.parse("https://www.google.com/maps/dir/Hermannstra%C3%9Fe+1,+12049+Berlin,+Germany/Weserstr.+1,+12047+Berlin,+Germany/Reuterstra%C3%9Fe+1,+Berlin-Neuk%C3%B6lln,+Germany/@52.4844406,13.4217121,16z/"),
         )
     }
 
@@ -641,23 +648,26 @@ class GoogleMapsUriInputTest : InputTest {
                 persistentListOf(
                     GCJ02MainlandChinaPoint(
                         52.4858222, 13.4236883,
-                        name = @Suppress("SpellCheckingInspection") "Hermannstraße 1, 12049 Berlin, Germany",
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                        "Hermannstraße 1, 12049 Berlin, Germany",
                         source = Source.URI,
                     ),
                     GCJ02MainlandChinaPoint(
                         52.4881038, 13.4255518,
-                        name = @Suppress("SpellCheckingInspection") "Weserstr. 1, 12047 Berlin, Germany",
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                        "Weserstr. 1, 12047 Berlin, Germany",
                         source = Source.URI,
                     ),
                     GCJ02MainlandChinaPoint(
                         52.4807739, 13.4300356,
-                        name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany",
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                        "Reuterstraße 1, Berlin-Neukölln, Germany",
                         z = 16.0,
                         source = Source.URI,
                     ),
                 )
             ),
-            input.parse(@Suppress("SpellCheckingInspection") "https://www.google.com/maps/dir/Hermannstra%C3%9Fe+1,+12049+Berlin,+Germany/Weserstr.+1,+12047+Berlin,+Germany/Reuterstra%C3%9Fe+1,+Berlin-Neuk%C3%B6lln,+Germany/@52.4844406,13.4217121,16z/data=!3m1!4b1!4m20!4m19!1m5!1m1!1s0x47a84fb831937021:0x28d6914e5ca0f9f5!2m2!1d13.4236883!2d52.4858222!1m5!1m1!1s0x47a84fb7098f1d89:0x74c8a84ad2981e9f!2m2!1d13.4255518!2d52.4881038!1m5!1m1!1s0x47a84fbb7c0791d7:0xf6e39aaedab8b2d9!2m2!1d13.4300356!2d52.4807739!3e2"),
+            input.parse("https://www.google.com/maps/dir/Hermannstra%C3%9Fe+1,+12049+Berlin,+Germany/Weserstr.+1,+12047+Berlin,+Germany/Reuterstra%C3%9Fe+1,+Berlin-Neuk%C3%B6lln,+Germany/@52.4844406,13.4217121,16z/data=!3m1!4b1!4m20!4m19!1m5!1m1!1s0x47a84fb831937021:0x28d6914e5ca0f9f5!2m2!1d13.4236883!2d52.4858222!1m5!1m1!1s0x47a84fb7098f1d89:0x74c8a84ad2981e9f!2m2!1d13.4255518!2d52.4881038!1m5!1m1!1s0x47a84fbb7c0791d7:0xf6e39aaedab8b2d9!2m2!1d13.4300356!2d52.4807739!3e2"),
         )
     }
 
@@ -744,7 +754,7 @@ class GoogleMapsUriInputTest : InputTest {
                     ),
                 )
             ),
-            input.parse(@Suppress("SpellCheckingInspection") "https://www.google.com/maps/dir//The+Station,+1+Mends+St,+South+Perth+WA+6151/@-31.9614112,115.8523381,14z/data=!4m6!4m5!1m0!1m2!1m1!1s0x2a32a529928d7447%3A0x4a1084749ffdee05!3e0!11m1!6b1?entry=ml&utm_campaign=ml-navnp-dr&coh=230964"),
+            input.parse("https://www.google.com/maps/dir//The+Station,+1+Mends+St,+South+Perth+WA+6151/@-31.9614112,115.8523381,14z/data=!4m6!4m5!1m0!1m2!1m1!1s0x2a32a529928d7447%3A0x4a1084749ffdee05!3e0!11m1!6b1?entry=ml&utm_campaign=ml-navnp-dr&coh=230964"),
         )
     }
 
@@ -752,7 +762,7 @@ class GoogleMapsUriInputTest : InputTest {
     fun parse_streetView() = runTest {
         assertEquals(
             ParseResult(persistentListOf(GCJ02MainlandChinaPoint(48.8584, 2.2945, source = Source.MAP_CENTER))),
-            input.parse(@Suppress("SpellCheckingInspection") "https://www.google.com/maps/@48.8584,2.2945,3a,75y,90t/data=!3m8!1e1!3m6!1sAF1QipP5ELjVeDJfzgBQBp5XM-HsNU0Ep1k_KgE!2e10!3e11!6shttps:%2F%2Flh5.googleusercontent.com%2Fp%2FAF1QipP5ELjVeDJfzgBQBp5XM-HsNU0Ep1k_KgE%3Dw203-h100-k-no-pi-0-ya293.79999-ro-0-fo100!7i10240!8i5120"),
+            input.parse("https://www.google.com/maps/@48.8584,2.2945,3a,75y,90t/data=!3m8!1e1!3m6!1sAF1QipP5ELjVeDJfzgBQBp5XM-HsNU0Ep1k_KgE!2e10!3e11!6shttps:%2F%2Flh5.googleusercontent.com%2Fp%2FAF1QipP5ELjVeDJfzgBQBp5XM-HsNU0Ep1k_KgE%3Dw203-h100-k-no-pi-0-ya293.79999-ro-0-fo100!7i10240!8i5120"),
         )
     }
 
@@ -861,7 +871,7 @@ class GoogleMapsUriInputTest : InputTest {
             ParseResult(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(
-                        name = @Suppress("SpellCheckingInspection") "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
+                        name = "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
                         source = Source.URI,
                     )
                 ),
@@ -883,7 +893,7 @@ class GoogleMapsUriInputTest : InputTest {
     }
 
     @Test
-    @Suppress("SpellCheckingInspection")
+    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
     fun parse_ftidOnly() = runTest {
         assertEquals(
             ParseResult(

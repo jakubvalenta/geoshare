@@ -93,7 +93,7 @@ class GoogleMapsPlaceApiInputBehaviorTest(private val testServerParams: TestServ
                 setOf(
                     "Seattle Stadium",
                     "Seattle-Stadion",
-                    @Suppress("SpellCheckingInspection") "Stade de Seattle",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Stade de Seattle",
                 )
             } else {
                 emptySet()

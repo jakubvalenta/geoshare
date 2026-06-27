@@ -75,7 +75,6 @@ private fun decodeGeoHash(
     return NaivePoint(lat, lon, max(z, 0.0).toScale(0), source = Source.HASH)
 }
 
-@Suppress("SpellCheckingInspection")
 private val OPEN_STREET_MAP_HASH_CHAR_MAP = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_~"
     .mapIndexed { i, char -> char to i }.toMap()
 
@@ -99,7 +98,6 @@ fun decodeOpenStreetMapQuadTileHash(hash: String): NaivePoint {
     return naivePoint.copy(z = max(naivePoint.z + relativeZoom, 0.0))
 }
 
-@Suppress("SpellCheckingInspection")
 private val ORGANIC_MAPS_HASH_CHAR_MAP = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
     .mapIndexed { i, char -> char to i }.toMap()
 
@@ -125,7 +123,6 @@ fun decodeGe0Hash(hash: String): NaivePoint {
     return naivePoint.copy(z = zFromHash ?: naivePoint.z)
 }
 
-@Suppress("SpellCheckingInspection")
 private val WAZE_HASH_CHAR_MAP = "0123456789bcdefghjkmnpqrstuvwxyz"
     .mapIndexed { i, char -> char to i }.toMap()
 

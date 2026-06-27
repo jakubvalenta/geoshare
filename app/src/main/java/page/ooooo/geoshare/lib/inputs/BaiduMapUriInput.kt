@@ -29,7 +29,6 @@ class BaiduMapUriInput @Inject constructor(
         ),
     )
 
-    @Suppress("SpellCheckingInspection")
     override suspend fun parse(data: Uri, match: String) = parseResult {
         data.run {
             val parts = data.pathParts.drop(1)
