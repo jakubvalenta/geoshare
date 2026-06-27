@@ -32,7 +32,7 @@ class FakeKeyStoreTools : KeyStoreTools {
      */
     override fun generateKey(): Key {
         val keyPair = KeyPairGenerator.getInstance("EC").run {
-            initialize(ECGenParameterSpec(@Suppress("SpellCheckingInspection") "secp256r1"))
+            initialize(ECGenParameterSpec(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "secp256r1"))
             generateKeyPair()
         }
         val cert = CertificateFactory.getInstance("X.509").run {
@@ -44,7 +44,7 @@ class FakeKeyStoreTools : KeyStoreTools {
     }
 
     companion object {
-        private const val CERT_PEM = @Suppress("SpellCheckingInspection") """
+        private const val CERT_PEM = """
 -----BEGIN CERTIFICATE-----
 MIIBrzCCATagAwIBAgIUZPRFIKvljY6kBKRSwGF1Zr9eWnMwCgYIKoZIzj0EAwIw
 DzENMAsGA1UEAwwEdGVzdDAeFw0yNjA1MjgwOTA0MjFaFw0zNjA1MjUwOTA0MjFa

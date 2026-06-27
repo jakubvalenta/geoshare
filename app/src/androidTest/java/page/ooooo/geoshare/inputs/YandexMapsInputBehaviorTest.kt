@@ -51,7 +51,7 @@ class YandexMapsInputBehaviorTest {
         testUri(
             WGS84Point(
                 55.882227, 37.566898,
-                name = @Suppress("SpellCheckingInspection") "Keramichesky Drive",
+                name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Keramichesky Drive",
                 source = Source.HTML,
             ),
             "https://yandex.ru/maps/213/moscow/geo/keramicheskiy_proyezd/8062907/",

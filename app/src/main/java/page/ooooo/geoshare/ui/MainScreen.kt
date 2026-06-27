@@ -159,6 +159,7 @@ import page.ooooo.geoshare.ui.components.checkeredBackground
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.math.floor
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun MainScreen(
@@ -313,7 +314,7 @@ fun MainScreen(
     LaunchedEffect(currentState) {
         // Wait for 200ms and then show or hide loading indicator. This way we show the loading indicator only if a
         // state lasts longer than 200ms and hide it only if another loading indicator doesn't appear within 200ms.
-        delay(200L)
+        delay(200.milliseconds)
         largeLoadingIndicator = (currentState as? ConversionState.HasLargeLoadingIndicator)?.getLoadingIndicator()
     }
 
@@ -1223,7 +1224,8 @@ private fun SucceededPreview() {
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(
                         NaivePoint.example,
-                        name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                        "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
                     ),
                 ),
                 actionResult = ActionResult.Succeeded,
@@ -1304,7 +1306,8 @@ private fun DarkSucceededPreview() {
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(
                         NaivePoint.example,
-                        name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                        "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
                     ),
                 ),
                 actionResult = ActionResult.Succeeded,
@@ -1385,7 +1388,8 @@ private fun SmallSucceededPreview() {
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(
                         NaivePoint.example,
-                        name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                        "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
                     ),
                 ),
                 actionResult = ActionResult.Succeeded,
@@ -1466,7 +1470,8 @@ private fun TabletSucceededPreview() {
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(
                         NaivePoint.example,
-                        name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                        "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
                     ),
                 ),
                 actionResult = ActionResult.Succeeded,

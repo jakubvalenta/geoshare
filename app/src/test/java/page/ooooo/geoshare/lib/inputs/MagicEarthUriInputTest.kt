@@ -118,7 +118,7 @@ class MagicEarthUriInputTest : InputTest {
     @Test
     fun parse_parameterDestinationAddressTakesPrecedenceOverQ() = runTest {
         assertEquals(
-            @Suppress("SpellCheckingInspection") ParseResult(
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") ParseResult(
                 persistentListOf(
                     WGS84Point(
                         name = "Reuterplatz 3, 12047 Berlin, Germany",
@@ -133,7 +133,7 @@ class MagicEarthUriInputTest : InputTest {
     @Test
     fun parse_parameterNameTakesPrecedenceOverQ() = runTest {
         assertEquals(
-            @Suppress("SpellCheckingInspection") ParseResult(
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") ParseResult(
                 persistentListOf(
                     WGS84Point(
                         name = "Reuterplatz",

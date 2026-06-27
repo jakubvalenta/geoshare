@@ -51,12 +51,12 @@ class YandexMapsUriInput @Inject constructor(
 
     override suspend fun parse(data: Uri, match: String) = parseResult {
         data.run {
-            val z = listOf(@Suppress("SpellCheckingInspection") "whatshere[zoom]", "z")
+            val z = listOf(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "whatshere[zoom]", "z")
                 .firstNotNullOfOrNull { key -> Z_PATTERN.matchEntire(queryParams[key])?.doubleGroupOrNull() }
 
             // Directions
             // https://yandex.com/maps?rtext={lat}%2C{lon}~{lat}%2C{lon}~{lat}%2C{lon}
-            LAT_LON_PATTERN.findAll(queryParams[@Suppress("SpellCheckingInspection") "rtext"])
+            LAT_LON_PATTERN.findAll(queryParams[@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "rtext"])
                 .mapNotNull { m -> m.toLatLonPoint(Source.URI)?.copy(z = z)?.let { WGS84Point(it) } }
                 .toImmutableList()
                 .takeIf { it.isNotEmpty() }
@@ -68,7 +68,7 @@ class YandexMapsUriInput @Inject constructor(
             // Coordinates
             // https://yandex.com/maps?ll={lon},{lat}
             // https://yandex.com/maps?whatshere%5Bpoint%5D={lon}%2C{lat}
-            listOf(@Suppress("SpellCheckingInspection") "whatshere[point]", "ll")
+            listOf(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "whatshere[point]", "ll")
                 .firstNotNullOfOrNull { key ->
                     LON_LAT_PATTERN.matchEntire(queryParams[key])?.toLonLatPoint(Source.URI)
                 }?.let {

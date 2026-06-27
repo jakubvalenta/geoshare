@@ -40,7 +40,7 @@ class MapsMeUriInputTest : InputTest {
             input.match("ftp://ge0.me/AbCMCNp0LO/Madagascar"),
         )
         assertEquals(
-            @Suppress("SpellCheckingInspection") "omaps.app/AbCMCNp0LO/Madagascar",
+            "omaps.app/AbCMCNp0LO/Madagascar",
             input.match("ftp://omaps.app/AbCMCNp0LO/Madagascar"),
         )
         assertEquals(
@@ -113,7 +113,7 @@ class MapsMeUriInputTest : InputTest {
             input.parse("http://ge0.me/AbCMCNp0LO/Madagascar"),
         )
         assertEquals(
-            @Suppress("SpellCheckingInspection") ParseResult(
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") ParseResult(
                 persistentListOf(
                     WGS84Point(
                         40.7127405,

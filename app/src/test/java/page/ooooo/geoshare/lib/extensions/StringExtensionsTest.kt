@@ -27,12 +27,18 @@ class StringExtensionsTest {
 
     @Test
     fun firstGraphemeOrNull_whenStringContainsEmojiWithSkinTone_returnsFirstGraphemeCluster() {
-        assertEquals("\uD83D\uDC4D\uD83C\uDFFD", "👍🏽".firstGraphemeOrNull())
+        assertEquals(
+            @Suppress("SpellCheckingInspection", "GrazieInspectionRunner") "\uD83D\uDC4D\uD83C\uDFFD",
+            "👍🏽".firstGraphemeOrNull()
+        )
     }
 
     @Test
     fun firstGraphemeOrNull_whenStringContainsEmojiFlag_returnsFirstGraphemeCluster() {
-        assertEquals("\uD83C\uDDEC\uD83C\uDDF7", "🇬🇷".firstGraphemeOrNull())
+        assertEquals(
+            @Suppress("SpellCheckingInspection", "GrazieInspectionRunner") "\uD83C\uDDEC\uD83C\uDDF7",
+            "🇬🇷".firstGraphemeOrNull()
+        )
     }
 
     @Test

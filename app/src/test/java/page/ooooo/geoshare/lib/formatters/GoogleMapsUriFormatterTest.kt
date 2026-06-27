@@ -24,7 +24,6 @@ class GoogleMapsUriFormatterTest {
     @Test
     fun formatStreetViewUriString_whenPointHasCoordinatesAndZoom_returnsLinkWithCoordinatesAsQueryAndZoom() {
         assertEquals(
-            @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=50.123456,-120.123456",
             GoogleMapsUriFormatter.formatStreetViewUriString(
                 WGS84Point(50.123456, -120.123456, z = 3.4, source = Source.GENERATED),
@@ -47,7 +46,6 @@ class GoogleMapsUriFormatterTest {
     @Test
     fun formatStreetViewUriString_whenPointHasQueryAndZoom_returnsZeroCoordinates() {
         assertEquals(
-            @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=0,0",
             GoogleMapsUriFormatter.formatStreetViewUriString(
                 WGS84Point(name = "foo bar", z = 3.4, source = Source.GENERATED),
@@ -70,7 +68,6 @@ class GoogleMapsUriFormatterTest {
     @Test
     fun formatStreetViewUriString_whenPointHasCoordinatesAndQueryAndZoom_returnsLinkWithCoordinatesAndZoom() {
         assertEquals(
-            @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=50.123456,-120.123456",
             GoogleMapsUriFormatter.formatStreetViewUriString(
                 WGS84Point(50.123456, -120.123456, name = "foo bar", z = 3.4, source = Source.GENERATED),
@@ -93,7 +90,6 @@ class GoogleMapsUriFormatterTest {
     @Test
     fun formatStreetViewUriString_whenPointHasNeitherPointNorQuery_returnsZeroCoordinates() {
         assertEquals(
-            @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=0,0",
             GoogleMapsUriFormatter.formatStreetViewUriString(
                 WGS84Point(source = Source.GENERATED),
@@ -116,7 +112,6 @@ class GoogleMapsUriFormatterTest {
     @Test
     fun formatStreetViewUriString_whenPointHasCoordinates_returnsLinkWithCoordinatesAsQuery() {
         assertEquals(
-            @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=50.123456,-120.123456",
             GoogleMapsUriFormatter.formatStreetViewUriString(
                 WGS84Point(50.123456, -120.123456, source = Source.GENERATED),

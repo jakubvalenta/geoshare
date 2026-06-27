@@ -42,9 +42,7 @@ class GoogleMapsHtmlInputImpl @Inject constructor(
         val defaultPointLinkPattern = Regex("""/@$LAT,$LON""")
         val defaultPointAppInitStatePattern =
             Regex("""APP_INITIALIZATION_STATE=\[\[\[[\d.-]+,$LON,$LAT""")
-        val genericMetaTagPattern = Regex(
-            @Suppress("SpellCheckingInspection") """<meta content="Google Maps" itemprop="name""""
-        )
+        val genericMetaTagPattern = Regex("""<meta content="Google Maps" itemprop="name"""")
         val uriPattern = Regex("""data-url="([^"]+)"""")
 
         val mutableNaivePoints = mutableListOf<NaivePoint>()

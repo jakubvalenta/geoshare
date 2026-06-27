@@ -19,7 +19,7 @@ import page.ooooo.geoshare.ui.components.ResourceIconDescriptor
 import java.util.UUID
 import kotlin.uuid.ExperimentalUuidApi
 
-@Suppress("SpellCheckingInspection")
+@Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
 @OptIn(ExperimentalUuidApi::class)
 @Entity
 @Serializable

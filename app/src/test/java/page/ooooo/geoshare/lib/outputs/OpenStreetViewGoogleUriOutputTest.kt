@@ -18,7 +18,6 @@ class OpenStreetViewGoogleUriOutputTest : GeoTest {
     @Test
     fun getText_whenPointIsWGS84AndWithinMainlandChinaAndPackageNameRequiresGCJ02MainlandChina_returnsUriWithConvertedCoordinates() {
         assertEquals(
-            @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=31.2285067,121.475524",
             OpenStreetViewGoogleUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
                 .getText(
@@ -31,7 +30,6 @@ class OpenStreetViewGoogleUriOutputTest : GeoTest {
     @Test
     fun getText_whenPointIsGCJ02AndWithinMainlandChinaAndPackageNameRequiresGCJ02MainlandChina_returnsUriWithUnchangedCoordinates() {
         assertEquals(
-            @Suppress("SpellCheckingInspection")
             "google.streetview:cbll=31.2285069,121.4755246",
             OpenStreetViewGoogleUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
                 .getText(

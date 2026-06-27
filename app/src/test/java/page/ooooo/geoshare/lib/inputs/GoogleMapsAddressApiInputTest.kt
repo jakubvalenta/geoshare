@@ -123,7 +123,7 @@ class GoogleMapsAddressApiInputTest {
                         GCJ02MainlandChinaPoint(50.123456, -120.123456, name = query, source = Source.API),
                     )
                 ),
-                input.fetchAndParse(@Suppress("SpellCheckingInspection") "https://www.google.com/maps/dir/?api=1&origin=Paris,France&destination=$query&travelmode=driving&waypoints=Versailles,France%7CChartres,France%7CLe%2BMans,France%7CCaen,France"),
+                input.fetchAndParse("https://www.google.com/maps/dir/?api=1&origin=Paris,France&destination=$query&travelmode=driving&waypoints=Versailles,France%7CChartres,France%7CLe%2BMans,France%7CCaen,France"),
             )
             assertEquals(
                 ParseResult(
@@ -139,7 +139,7 @@ class GoogleMapsAddressApiInputTest {
                         GCJ02MainlandChinaPoint(50.123456, -120.123456, name = query, source = Source.API)
                     )
                 ),
-                input.fetchAndParse(@Suppress("SpellCheckingInspection") "https://maps.google.com?q=$query&ftid=0x47b8ac99b0a68bdd:0x8024629be3e9996&entry=gps&lucs=,94224825,94227247,94227248,47071704,47069508,94218641,94233073,94203019,47084304,94208458,94208447"),
+                input.fetchAndParse("https://maps.google.com?q=$query&ftid=0x47b8ac99b0a68bdd:0x8024629be3e9996&entry=gps&lucs=,94224825,94227247,94227248,47071704,47069508,94218641,94233073,94203019,47084304,94208458,94208447"),
             )
             assertEquals(
                 ParseResult(
@@ -170,18 +170,20 @@ class GoogleMapsAddressApiInputTest {
                     persistentListOf(
                         GCJ02MainlandChinaPoint(
                             52.4858222, 13.4236883,
-                            name = @Suppress("SpellCheckingInspection") "Hermannstraße 1, 12049 Berlin, Germany",
+                            name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                            "Hermannstraße 1, 12049 Berlin, Germany",
                             source = Source.URI,
                         ),
                         GCJ02MainlandChinaPoint(
                             52.4881038, 13.4255518,
-                            name = @Suppress("SpellCheckingInspection") "Weserstr. 1, 12047 Berlin, Germany",
+                            name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                            "Weserstr. 1, 12047 Berlin, Germany",
                             source = Source.URI,
                         ),
                         GCJ02MainlandChinaPoint(50.123456, -120.123456, z = 16.0, name = query, source = Source.API)
                     )
                 ),
-                input.fetchAndParse(@Suppress("SpellCheckingInspection") "https://www.google.com/maps/dir/Hermannstra%C3%9Fe+1,+12049+Berlin,+Germany/Weserstr.+1,+12047+Berlin,+Germany/$query/@52.4844406,13.4217121,16z/data=!3m1!4b1!4m20!4m19!1m5!1m1!1s0x47a84fb831937021:0x28d6914e5ca0f9f5!2m2!1d13.4236883!2d52.4858222!1m5!1m1!1s0x47a84fb7098f1d89:0x74c8a84ad2981e9f!2m2!1d13.4255518!2d52.4881038!1m5!1m1!1s0x47a84fbb7c0791d7:0xf6e39aaedab8b2d9!2m2!1d13.4300356!2d52.4807739!3e2"),
+                input.fetchAndParse("https://www.google.com/maps/dir/Hermannstra%C3%9Fe+1,+12049+Berlin,+Germany/Weserstr.+1,+12047+Berlin,+Germany/$query/@52.4844406,13.4217121,16z/data=!3m1!4b1!4m20!4m19!1m5!1m1!1s0x47a84fb831937021:0x28d6914e5ca0f9f5!2m2!1d13.4236883!2d52.4858222!1m5!1m1!1s0x47a84fb7098f1d89:0x74c8a84ad2981e9f!2m2!1d13.4255518!2d52.4881038!1m5!1m1!1s0x47a84fbb7c0791d7:0xf6e39aaedab8b2d9!2m2!1d13.4300356!2d52.4807739!3e2"),
             )
             assertEquals(
                 ParseResult(

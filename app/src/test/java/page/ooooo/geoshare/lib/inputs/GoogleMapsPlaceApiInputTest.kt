@@ -30,7 +30,7 @@ import java.net.SocketTimeoutException
 
 class GoogleMapsPlaceApiInputTest {
     private val server = FakeGeoShareGoogleMapsAddressServer
-    private val placeId = @Suppress("SpellCheckingInspection") "ChIJKxjxuaNqkFQR3CK6O1HNNqY"
+    private val placeId = "ChIJKxjxuaNqkFQR3CK6O1HNNqY"
     private val engine = MockEngine { request ->
         when (request.url.toString()) {
             server.getUrl(placeId, uriQuote) -> respond(

@@ -232,7 +232,7 @@ private fun DefaultPreview() {
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                         PackageNames.GMAPS_WV to AppDetail(
-                            "GMaps WV",
+                            @Suppress("SpellCheckingInspection", "GrazieInspectionRunner") "GMaps WV",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                         PackageNames.TOMTOM to AppDetail(
@@ -310,7 +310,7 @@ private fun DarkPreview() {
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                         PackageNames.GMAPS_WV to AppDetail(
-                            "GMaps WV",
+                            @Suppress("SpellCheckingInspection", "GrazieInspectionRunner") "GMaps WV",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                         PackageNames.TOMTOM to AppDetail(

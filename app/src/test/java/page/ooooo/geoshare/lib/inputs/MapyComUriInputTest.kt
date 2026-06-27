@@ -30,7 +30,7 @@ class MapyComUriInputTest : InputTest {
             "https://mapy.cz/zakladni?x=14.0184810&y=50.0525078&z=9",
             input.match("https://mapy.cz/zakladni?x=14.0184810&y=50.0525078&z=9")
         )
-        @Suppress("SpellCheckingInspection") assertEquals(
+        assertEquals(
             "mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9",
             input.match("mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9")
         )
@@ -40,7 +40,7 @@ class MapyComUriInputTest : InputTest {
     fun match_shortLink() {
         assertEquals("https://mapy.com/s/jakuhelasu", input.match("https://mapy.com/s/jakuhelasu"))
         assertEquals("https://mapy.cz/s/jakuhelasu", input.match("https://mapy.cz/s/jakuhelasu"))
-        @Suppress("SpellCheckingInspection") assertEquals("mapy.com/s/jakuhelasu", input.match("mapy.com/s/jakuhelasu"))
+        assertEquals("mapy.com/s/jakuhelasu", input.match("mapy.com/s/jakuhelasu"))
     }
 
     @Test
@@ -51,7 +51,7 @@ class MapyComUriInputTest : InputTest {
     @Test
     fun match_unknownScheme() {
         assertEquals(
-            @Suppress("SpellCheckingInspection") "mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9",
+            "mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9",
             input.match("ftp://mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9"),
         )
     }
@@ -60,7 +60,7 @@ class MapyComUriInputTest : InputTest {
     fun match_matchesCoordinatesInText() {
         assertEquals(
             "41.9966006N, 6.1223825W",
-            input.match(@Suppress("SpellCheckingInspection") "Vega de Tera Calle Barrio de Abajo 41.9966006N, 6.1223825W https://mapy.com/s/deduduzeha"),
+            input.match("Vega de Tera Calle Barrio de Abajo 41.9966006N, 6.1223825W https://mapy.com/s/deduduzeha"),
         )
     }
 

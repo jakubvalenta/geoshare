@@ -25,5 +25,5 @@ fun writeFile(parentDir: File, childDir: String, filename: String, block: Append
 }
 
 fun getTimestamp(): String =
-    SimpleDateFormat(@Suppress("SpellCheckingInspection") "yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US)
+    SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US)
         .format(System.currentTimeMillis())

@@ -125,7 +125,7 @@ fun ResultCoordinates(
                 stringResource(R.string.conversion_succeeded_check_srs),
                 Modifier
                     .padding(horizontal = spacing.windowPadding)
-                    .testTag("geoShareResultSuccessLastPointCheckSRS"),
+                    .testTag(@Suppress("SpellCheckingInspection", "GrazieInspectionRunner") "geoShareResultSuccessLastPointCheckSRS"),
             )
         } else if (lastPoint.source == Source.JAVASCRIPT) {
             ResultCoordinatesCheck(
