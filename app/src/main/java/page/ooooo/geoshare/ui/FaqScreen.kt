@@ -208,7 +208,7 @@ private fun FaqItem(
                 style = MaterialTheme.typography.titleMedium,
             )
         },
-        modifier = modifier.padding(start = spacing.windowPadding, end = spacing.windowPadding - 5.dp),
+        modifier = modifier.padding(start = spacing.windowPadding, end = spacing.windowPadding - 4.dp),
         color = MaterialTheme.colorScheme.primary,
     ) {
         Column(
