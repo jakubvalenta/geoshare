@@ -231,7 +231,7 @@
     <string name="conversion_failed_reason_timeout">Tempo esgotado</string>
     <string name="licenses">Licenças</string>
     <string name="links_delete">Apagar</string>
-    <string name="links_delete_text">O mapa da web \"%1$s\" será apagado permanentemente.</string>
+    <string name="links_delete_text">O mapa da web «%1$s» será apagado permanentemente.</string>
     <string name="links_delete_title">Apagar mapa da web?</string>
     <string name="links_description">Os mapas da web permitem abrir coordenadas no navegador. Ative os pré-instalados, ou adicione o seu.</string>
     <string name="links_form_advanced">Avançado</string>
@@ -288,7 +288,7 @@
     <string name="server_attestation">Atestação da chave por hardware</string>
     <string name="server_auth_type">Autenticação</string>
     <string name="server_challenge_url">URL do desafio</string>
-    <string name="server_delete_text">O servidor \"%1$s\" será apagado permanentemente.</string>
+    <string name="server_delete_text">O servidor «%1$s» será apagado permanentemente.</string>
     <string name="server_delete_title">Apagar servidor?</string>
     <string name="server_insert">Adicionar servidor</string>
     <string name="server_invalid">Configurar credenciais</string>
