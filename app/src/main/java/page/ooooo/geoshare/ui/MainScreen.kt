@@ -40,7 +40,6 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
@@ -512,9 +511,9 @@ private fun MainScreen(
                             }
                         },
                         expandedHeight = if (currentState is Initial) {
-                            TopAppBarDefaults.LargeAppBarExpandedHeight + spacing.largeAdaptive
+                            spacing.largeTopAppBarExpandedHeight + spacing.largeAdaptive
                         } else {
-                            TopAppBarDefaults.LargeAppBarExpandedHeight
+                            spacing.largeTopAppBarExpandedHeight
                         },
                     ) {
                         if (!wide) {
@@ -1388,8 +1387,7 @@ private fun SmallSucceededPreview() {
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(
                         NaivePoint.example,
-                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-                        "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
+                        name = "Wikimedia Foundation, Inc.",
                     ),
                 ),
                 actionResult = ActionResult.Succeeded,

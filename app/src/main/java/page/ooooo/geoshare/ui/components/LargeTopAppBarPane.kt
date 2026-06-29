@@ -68,8 +68,8 @@ fun LargeTopAppBarPane(
     onBack: (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
     backIcon: ImageVector = Icons.AutoMirrored.Default.ArrowBack,
-    collapsedHeight: Dp = TopAppBarDefaults.LargeAppBarCollapsedHeight,
-    expandedHeight: Dp = TopAppBarDefaults.LargeAppBarExpandedHeight, // TODO Reduce on Nexus 5
+    collapsedHeight: Dp = LocalSpacing.current.largeTopAppBarCollapsedHeight,
+    expandedHeight: Dp = LocalSpacing.current.largeTopAppBarExpandedHeight,
     colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(
         containerColor = Color.Transparent,
         scrolledContainerColor = Color.Transparent,
@@ -95,7 +95,7 @@ fun LargeTopAppBarPane(
             // than it should. But it's not a big deal, and it saves us some measuring of composables.
             val titleLineHeightPx = with(density) { titleTextStyle.lineHeight.toPx() }
             val headlineTopOffsetPx = with(density) {
-                expandedHeight.toPx() - collapsedHeight.toPx() - titleLineHeightPx - titleBottomPadding.toPx()
+                expandedHeight.toPx() - collapsedHeight.toPx() - titleLineHeightPx
             }
             val titleAlphaSlope = 1 / titleLineHeightPx
             snapshotFlow { listState.firstVisibleItemScrollOffset }
@@ -147,7 +147,7 @@ fun LargeTopAppBarPane(
                         .graphicsLayer { alpha = 1 - titleAlpha },
                     verticalArrangement = Arrangement.Bottom,
                 ) {
-                    CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.headlineMedium) {
+                    CompositionLocalProvider(LocalTextStyle provides titleTextStyle) {
                         title(Int.MAX_VALUE)
                     }
                 }

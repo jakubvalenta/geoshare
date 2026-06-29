@@ -128,7 +128,7 @@ private fun AboutScreen(
             Column(
                 Modifier
                     .padding(horizontal = spacing.windowPadding)
-                    .padding(top = spacing.builtInTopBarHeight)
+                    .padding(top = TopAppBarDefaults.TopAppBarExpandedHeight)
             ) {
                 AboutSupportingPane(
                     donationVisible = donationVisible,

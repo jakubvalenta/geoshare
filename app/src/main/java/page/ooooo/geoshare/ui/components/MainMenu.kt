@@ -32,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
@@ -64,7 +65,7 @@ fun MainMenu(
             modifier = Modifier.testTag("geoShareMainBillingIcon"),
         )
     }
-    Box(Modifier.padding(end = spacing.windowPadding - spacing.builtInTopBarPaddingEnd)) {
+    Box(Modifier.padding(end = spacing.windowPadding - 14.dp)) {
         IconButton(
             { expanded = true },
             Modifier.testTag("geoShareMainMenuButton"),

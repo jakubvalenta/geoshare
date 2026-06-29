@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.ui.theme
 
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -15,10 +16,9 @@ data class Spacing(
     val smallAdaptive: Dp = small,
     val mediumAdaptive: Dp = medium,
     val largeAdaptive: Dp = large,
-    val headlineTopAdaptive: Dp = large,
 
-    val builtInTopBarPaddingEnd: Dp = 8.dp,
-    val builtInTopBarHeight: Dp = 64.dp,
+    val largeTopAppBarCollapsedHeight: Dp = TopAppBarDefaults.LargeAppBarCollapsedHeight,
+    val largeTopAppBarExpandedHeight: Dp = TopAppBarDefaults.LargeAppBarExpandedHeight,
     val windowPadding: Dp = 16.dp,
 )
 
@@ -29,5 +29,6 @@ val smallWindowSpacing = Spacing(
     smallAdaptive = 8.dp,
     mediumAdaptive = 16.dp,
     largeAdaptive = 24.dp,
-    headlineTopAdaptive = 0.dp,
+
+    largeTopAppBarExpandedHeight = 128.dp,
 )

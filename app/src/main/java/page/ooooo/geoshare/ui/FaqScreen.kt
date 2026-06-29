@@ -53,8 +53,6 @@ enum class FaqItemId {
     PRIVACY,
 }
 
-private val endOffset = 10.dp
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FaqScreen(
@@ -88,7 +86,6 @@ fun FaqScreen(
             Modifier
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
-                .padding(start = spacing.windowPadding, end = spacing.windowPadding - endOffset)
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(spacing.medium),
@@ -211,11 +208,13 @@ private fun FaqItem(
                 style = MaterialTheme.typography.titleMedium,
             )
         },
-        modifier = modifier,
+        modifier = modifier.padding(start = spacing.windowPadding, end = spacing.windowPadding - 4.dp),
         color = MaterialTheme.colorScheme.primary,
     ) {
         Column(
-            Modifier.padding(top = spacing.small, end = endOffset),
+            Modifier
+                .padding(horizontal = spacing.windowPadding)
+                .padding(top = spacing.small),
             verticalArrangement = Arrangement.spacedBy(spacing.small),
         ) {
             CompositionLocalProvider(
