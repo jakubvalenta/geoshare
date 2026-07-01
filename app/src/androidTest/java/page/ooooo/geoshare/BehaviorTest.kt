@@ -14,6 +14,7 @@ import androidx.test.uiautomator.UiAutomatorTestScope
 import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.onElement
 import androidx.test.uiautomator.scrollToElement
+import androidx.test.uiautomator.scrollToElementOrNull
 import androidx.test.uiautomator.textAsString
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
@@ -24,6 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.AssumptionViolatedException
@@ -110,33 +112,30 @@ fun UiObject2.toggleDoNotAsk() {
     onElement { viewIdResourceName == "geoShareConfirmationDialogDoNotAskSwitch" }.click()
 }
 
-private fun AccessibilityNodeInfo.isPermissionButtonOnlyThisTime(): Boolean =
+private fun AccessibilityNodeInfo.isGrantPermissionButton(): Boolean =
     textAsString()?.lowercase() in setOf(
+        "allow",
         "only this time",
         @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "uniquement cette fois-ci",
     )
 
-private fun AccessibilityNodeInfo.isPermissionButtonDoNotAllow(): Boolean =
+private fun AccessibilityNodeInfo.isDenyPermissionButton(): Boolean =
     textAsString()?.lowercase() in setOf(
+        "deny",
         "don't allow",
         "don’t allow", // Notice the different quote character
-        "ne pas autoriser"
+        "ne pas autoriser",
     )
 
-fun UiAutomatorTestScope.grantSystemPermission() {
-    onElement { isPermissionButtonOnlyThisTime() }.click()
-}
+fun UiAutomatorTestScope.isSystemPermissionShown(): Boolean =
+    onElementOrNull(3_000L) { isGrantPermissionButton() } != null
 
-fun UiAutomatorTestScope.grantSystemPermissionIfNecessary() {
-    onElementOrNull(3_000L) { isPermissionButtonOnlyThisTime() }?.click()
+fun UiAutomatorTestScope.grantSystemPermission() {
+    onElement { isGrantPermissionButton() }.click()
 }
 
 fun UiAutomatorTestScope.denySystemPermission() {
-    onElement { isPermissionButtonDoNotAllow() }.click()
-}
-
-fun UiAutomatorTestScope.denySystemPermissionIfNecessary() {
-    onElementOrNull(3_000L) { isPermissionButtonDoNotAllow() }?.click()
+    onElement { isDenyPermissionButton() }.click()
 }
 
 fun UiAutomatorTestScope.assumeAppInstalled(packageName: String) {
@@ -346,10 +345,12 @@ fun UiAutomatorTestScope.waitAndAssertTomTomContainsElement(block: Accessibility
     // Wait for TomTom
     onElement(30_000L) { packageName == PackageNames.TOMTOM }
 
-    // If there is location permission dialog, confirm it
-    grantSystemPermissionIfNecessary()
+    // If there is a location permission dialog, confirm it
+    if (isSystemPermissionShown()) {
+        grantSystemPermission()
+    }
 
-    // If there is "Importing GPX tracks" dialog, confirm it
+    // If there is an "Importing GPX tracks" dialog, confirm it
     onElementOrNull(5_000L) {
         textAsString() in setOf(
             "Got it",
@@ -503,26 +504,48 @@ fun UiAutomatorTestScope.chooseFile() {
     }.click()
 }
 
-fun UiAutomatorTestScope.insertOrEditContact(name: String = "GeoShare Test Contact") {
+fun UiAutomatorTestScope.findContact(name: String): UiObject2? {
     // If using the Android open-source contacts app, click the search button
     onElementOrNull(3_000L) {
         packageName == "com.android.contacts" && contentDescription in setOf(
+            "Search",
             "Search contacts",
             @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Rechercher dans vos contacts",
         )
     }?.click()
-    type(name.split(' ').first())
-    val existingContact = onElementOrNull(3_000L) { textAsString() == name }
+
+    // Search contacts
+    val searchField = onElementOrNull(3_000L) {
+        packageName == "com.android.contacts" && viewIdResourceName == "android:id/search_src_text"
+    }
+    val searchTerm = name.split(' ').first()
+    if (searchField != null) {
+        searchField.setText(searchTerm)
+    } else {
+        type(searchTerm)
+    }
+
+    // Scroll to the found contact
+    return onElement { isScrollable }
+        .scrollToElementOrNull(Direction.DOWN, 45_000L) { textAsString() == name && isVisibleToUser }
+}
+
+fun UiAutomatorTestScope.insertOrEditContact(name: String = "GeoShare Test Contact") {
+    val existingContact = findContact(name)
     if (existingContact != null) {
+        // Select an existing contact
         existingContact.click()
     } else {
         // If using the Android open-source contacts app, click the back button
         onElementOrNull(3_000L) {
             packageName == "com.android.contacts" && contentDescription in setOf(
+                "Navigate up",
                 "stop searching",
                 @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "arrêter la recherche",
             )
         }?.click()
+
+        // Create a new contact
         onElement {
             textAsString() in setOf(
                 "Create new contact",
@@ -530,10 +553,18 @@ fun UiAutomatorTestScope.insertOrEditContact(name: String = "GeoShare Test Conta
                 @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Créer un contact",
             )
         }.click()
-        onElement { textAsString() in setOf("First name", "Prénom") }.setText(name)
+
+        // If there is an "Add account" dialog, dismiss it
+        onElementOrNull(3_000L) { textAsString()?.lowercase() == "keep local" }?.click()
+
+        // Fill name
+        onElement { textAsString() in setOf("First name", "Name", "Prénom") }.setText(name)
     }
+
+    // Save the contact
     onElement {
-        textAsString()?.lowercase() in setOf(
+        packageName == "com.android.contacts" && contentDescription == "Save" ||
+            textAsString()?.lowercase() in setOf(
             "save",
             @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "enregistrer",
         )
@@ -544,13 +575,15 @@ fun UiAutomatorTestScope.openContact(name: String = "GeoShare Test Contact") {
     setOf("com.android.contacts", "com.google.android.contacts").first { packageName ->
         launchApplication(packageName)
 
-        // If there is "Allow contacts to send you notifications" dialog, dismiss it
-        denySystemPermissionIfNecessary()
+        // If there is an "Allow contacts to send you notifications" dialog, dismiss it
+        if (isSystemPermissionShown()) {
+            denySystemPermission()
+        }
 
         waitForAppToBeVisible(packageName, 3_000L)
     }
 
-    // If there's a "Some menu items have moved..." popup, close it
+    // If there is a "Some menu items have moved..." popup, close it
     onElementOrNull(3_000L) { packageName == "com.google.android.contacts" && viewIdResourceName == "android:id/closeButton" }
         ?.click()
 
@@ -560,12 +593,36 @@ fun UiAutomatorTestScope.openContact(name: String = "GeoShare Test Contact") {
     } != null
     if (contactDetailOpen) {
         // If the contacts app is already open on the contact detail screen, do nothing
-    } else {
-        // Scroll to the test contact in the list of contacts, and click it
-        onElement { isScrollable }
-            .scrollToElement(Direction.DOWN) { textAsString() == name && isVisibleToUser }
-            .click()
+        return
     }
+
+    // Find contact
+    val contact = findContact(name)
+    assertNotNull(contact)
+    contact?.click()
+
+    // If there are permission dialogs, dismiss them
+    var i = 0
+    while (isSystemPermissionShown() && i < 3) {
+        denySystemPermission()
+        i++
+    }
+}
+
+fun UiAutomatorTestScope.assertContactContainsText(expectedText: String) {
+    // Expand the contact field list
+    with(device) {
+        // Swipe to reveal the "See all" button, because the contacts app crashes, if we click the button when it's
+        // not visible
+        repeat(2) {
+            swipe(displayWidth / 2, displayHeight / 2, displayWidth / 2, 0, 10)
+            quickWaitForStableInActiveWindow() // Wait for the swiping to finish
+        }
+    }
+    onElementOrNull(3_000L) { packageName == "com.android.contacts" && textAsString() == "See all" }?.click()
+
+    // Assert
+    onElement { isScrollable }.scrollToElement(Direction.DOWN) { textAsString() == expectedText }
 }
 
 fun UiAutomatorTestScope.mockLocation(block: MockLocationScope.() -> Unit) {

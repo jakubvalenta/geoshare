@@ -120,7 +120,7 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
             },
         )
 
-        // Short links with coordinates in HTML
+        // Short links with coordinates in HTML (fails on Nexus 5)
         testUri(
             if (testServer is TestServer.Configured) {
                 WGS84Point(
@@ -310,6 +310,7 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
             },
             "https://www.google.com/maps/dir/?api=1&origin=Paris,France&destination=Cherbourg,France&travelmode=driving&waypoints=Versailles,France%7CChartres,France%7CLe%2BMans,France%7CCaen,France",
             fallbackNames = setOf(
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Cherbourg, Frankreich",
                 @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Cherbourg-en-Cotentin",
             ),
         )

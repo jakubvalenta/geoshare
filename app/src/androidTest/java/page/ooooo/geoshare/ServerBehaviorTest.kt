@@ -36,8 +36,14 @@ class ServerBehaviorTest {
         onElement { viewIdResourceName == "geoShareServerListInsert" }.click()
         fillAndSaveServerForm(server)
 
+        // Wait for the toast message to disappear
+        runBlocking {
+            delay(TOAST_TIMEOUT)
+        }
+
         // Shows the new server
-        onElement { viewIdResourceName == "geoShareServerListItem_GoogleMapsAddress_${server.name}" }
+        onElement { viewIdResourceName == "geoShareServerListPane" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerListItem_GoogleMapsAddress_${server.name}" }
     }
 
     @Test
@@ -63,8 +69,14 @@ class ServerBehaviorTest {
         )
         fillAndSaveServerForm(server)
 
+        // Wait for the toast message to disappear
+        runBlocking {
+            delay(TOAST_TIMEOUT)
+        }
+
         // Shows the updated server
-        onElement { viewIdResourceName == "geoShareServerListItem_GoogleMapsAddress_Google Maps Geocode Address edited" }
+        onElement { viewIdResourceName == "geoShareServerListPane" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerListItem_GoogleMapsAddress_Google Maps Geocode Address edited" }
 
         // Go to the server detail again
         onElement { viewIdResourceName == "geoShareServerListItemMenu_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" }.click()
@@ -87,7 +99,7 @@ class ServerBehaviorTest {
         // Does not show the server anymore
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareServerListItemMenu_16b3bb06-3a3b-4853-ac06-c4bf1eb346f8" })
 
-        // Wait for the delete toast to disappear, because it covers the restore button
+        // Wait for the toast message to disappear, because it covers the restore button
         runBlocking {
             delay(TOAST_TIMEOUT)
         }
@@ -116,8 +128,6 @@ fun UiAutomatorTestScope.fillAndSaveServerForm(server: Server) {
     server.urlTemplate.takeIf { it.isNotEmpty() }?.let {
         onElement { viewIdResourceName == "geoShareServerFormUrlTemplate" }.setText(it)
     }
-    quickWaitForStableInActiveWindow() // Wait for IME to appear
-    pressBack() // Hide IME
     onElement { viewIdResourceName == "geoShareServerDetailPane" }.let { pane ->
         when (server.authType) {
             ServerAuthType.API_KEY -> {
@@ -132,7 +142,8 @@ fun UiAutomatorTestScope.fillAndSaveServerForm(server: Server) {
             }
 
             ServerAuthType.ATTESTATION -> {
-                onElement { viewIdResourceName == "geoShareServerFormAuthType_${ServerAuthType.API_KEY}" }.click()
+                pane.scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerFormAuthType_${ServerAuthType.API_KEY}" }
+                    .click()
                 onElement { viewIdResourceName == "geoShareDropdownFieldMenuItem_${ServerAuthType.ATTESTATION}" }.click()
                 server.challengeUrl.takeIf { it.isNotEmpty() }?.let {
                     pane.scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerFormChallengeUrl" }
