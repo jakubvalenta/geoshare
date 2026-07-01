@@ -70,14 +70,10 @@ class LinkBehaviorTest {
             .apply { setText("$text edited") }
         onElement { viewIdResourceName == "geoShareLinkFormCoordsUriTemplate" && textAsString() == "https://maps.apple.com/?daddr={lat}%2C{lon}" }
             .apply { setText("$text&edited=1") }
-        quickWaitForStableInActiveWindow() // Wait for IME to appear
-        pressBack() // Hide IME
         onElement { viewIdResourceName == "geoShareLinkDetailPane" }.apply {
             scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkFormAppEnabled_checked" }.click()
             scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkFormSheetEnabled_checked" }.click()
             scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkFormChipEnabled_unchecked" }.click()
-            quickWaitForStableInActiveWindow() // Wait before checking whether the checkbox has been really checked
-            onElementOrNull(1_000L) { viewIdResourceName == "geoShareLinkFormChipEnabled_unchecked" }?.click() // Check the checkbox again, which is necessary on Xiaomi
             scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkFormSave" }.click()
         }
 
@@ -107,7 +103,7 @@ class LinkBehaviorTest {
         // Does not show link
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareLinkListItem_a5092c63-cf5c-4225-9059-e888ae12e215" })
 
-        // Wait for the delete toast to disappear, because it covers the restore button
+        // Wait for the toast message to disappear, because it covers the restore button
         runBlocking {
             delay(TOAST_TIMEOUT)
         }
@@ -146,16 +142,16 @@ class LinkBehaviorTest {
 
         // Shows pre-installed values
         onElement { viewIdResourceName == "geoShareLinkFormName" && textAsString() == "Magic Earth" }
-        quickWaitForStableInActiveWindow() // Wait for IME to appear
-        pressBack() // Hide IME
         onElement { viewIdResourceName == "geoShareLinkDetailPane" }.apply {
             scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkFormAppEnabled_unchecked" }
             scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkFormSheetEnabled_checked" }
             scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkFormChipEnabled_unchecked" }
         }
 
-        // Go back to list
-        pressBack()
+        // Go back to list, use the save form button, because the device back button might just close the IME
+        onElement { viewIdResourceName == "geoShareLinkDetailPane" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkFormSave" }
+            .click()
 
         // Toggle link
         onElement { viewIdResourceName == "geoShareLinkListItemToggle_b109970a-aef8-4482-9879-52e128fd0e07" }.click()
@@ -166,16 +162,16 @@ class LinkBehaviorTest {
 
         // Shows toggled values
         onElement { viewIdResourceName == "geoShareLinkFormName" && textAsString() == "Magic Earth" }
-        quickWaitForStableInActiveWindow() // Wait for IME to appear
-        pressBack() // Hide IME
         onElement { viewIdResourceName == "geoShareLinkDetailPane" }.apply {
             scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkFormAppEnabled_unchecked" }
             scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkFormSheetEnabled_unchecked" }
             scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkFormChipEnabled_unchecked" }
         }
 
-        // Go back to list
-        pressBack()
+        // Go back to list, use the save form button, because the device back button might just close the IME
+        onElement { viewIdResourceName == "geoShareLinkDetailPane" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkFormSave" }
+            .click()
 
         // Toggle link
         onElement { viewIdResourceName == "geoShareLinkListItemToggle_b109970a-aef8-4482-9879-52e128fd0e07" }.click()
@@ -186,8 +182,6 @@ class LinkBehaviorTest {
 
         // Shows toggled values
         onElement { viewIdResourceName == "geoShareLinkFormName" && textAsString() == "Magic Earth" }
-        quickWaitForStableInActiveWindow() // Wait for IME to appear
-        pressBack() // Hide IME
         onElement { viewIdResourceName == "geoShareLinkDetailPane" }.apply {
             scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkFormAppEnabled_checked" }
             scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkFormSheetEnabled_unchecked" }

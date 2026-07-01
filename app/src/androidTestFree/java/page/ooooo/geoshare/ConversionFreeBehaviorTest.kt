@@ -62,7 +62,7 @@ class ConversionFreeBehaviorTest {
                 confirmDialog()
             }
 
-            // Shows precise location
+            // Shows precise location (fails on Nexus 5)
             assertConversionSucceeds(
                 GCJ02Point(
                     52.4834254, 13.4245399,

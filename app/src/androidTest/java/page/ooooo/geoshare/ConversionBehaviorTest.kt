@@ -70,7 +70,7 @@ class ConversionBehaviorTest {
         // Tap the Google Maps icon
         onElement { viewIdResourceName == "geoShareApp_${PackageNames.GOOGLE_MAPS}" }.click()
 
-        // Google Maps shows precise location
+        // Google Maps shows precise location (fails on Nexus 5)
         waitAndAssertGoogleMapsContainsElement { textAsString() == "Ming&Qing Dynasties Furniture Hall" }
     }
 
@@ -451,8 +451,7 @@ class ConversionBehaviorTest {
         openContact()
 
         // The test contact contains coordinates
-        val expectedCoordinates = CoordinateFormatter.formatDecCoords(point)
-        onElement { textAsString() == expectedCoordinates }
+        assertContactContainsText(CoordinateFormatter.formatDecCoords(point))
     }
 
     private fun UiAutomatorTestScope.assertPermissionDenied() {

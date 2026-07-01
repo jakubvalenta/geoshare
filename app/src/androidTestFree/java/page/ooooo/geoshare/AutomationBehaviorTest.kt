@@ -172,7 +172,9 @@ class AutomationBehaviorTest {
         val automation = SavePointsGpxAutomation
         val serializedString = Json.encodeToString<Automation>(automation)
         onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceAutomation_${serializedString}" }
+            .scrollToElement(Direction.DOWN, 20_000L) {
+                viewIdResourceName == "geoShareUserPreferenceAutomation_${serializedString}"
+            }
             .click()
 
         // Share a geo: URI with the app
@@ -219,7 +221,6 @@ class AutomationBehaviorTest {
         openContact()
 
         // The test contact contains coordinates
-        val expectedCoordinates = CoordinateFormatter.formatDecCoords(point)
-        onElement { textAsString() == expectedCoordinates }
+        assertContactContainsText(CoordinateFormatter.formatDecCoords(point))
     }
 }
