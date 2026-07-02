@@ -2,7 +2,6 @@ package page.ooooo.geoshare.lib.billing
 
 import android.app.Activity
 import android.content.Context
-import android.content.res.Resources
 import androidx.annotation.StringRes
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CoroutineScope
@@ -16,10 +15,7 @@ import page.ooooo.geoshare.lib.Message
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
-class BillingImpl(
-    override val context: Context,
-    private val resources: Resources = context.resources,
-) : Billing {
+class BillingImpl(override val context: Context) : Billing {
     @StringRes
     override val appNameResId = R.string.app_name_pro
     override val features = persistentListOf(AutomationFeature, CustomLinkFeature)
@@ -57,23 +53,25 @@ class BillingImpl(
     }
 
     override suspend fun launchBillingFlow(activity: Activity, offerToken: String) {
+        // Show an error message for a while
+        _message.value = Message("Example error", isError = true)
+        delay(3.seconds)
+
+        // Show pending message for a while
         _message.value = null
-        delay(1.seconds)
         val product = offers.firstOrNull { offer -> offer.token == offerToken }?.let { offer ->
             products.firstOrNull { product -> product.id == offer.productId }
-        }
-        if (product != null) {
-            _status.value = BillingStatus.Pending()
-            delay(3.seconds)
-            _status.value = BillingStatus.Purchased(
-                product,
-                expired = false,
-                refundable = true,
-                token = "demo_purchased",
-            )
-        } else {
-            _message.value = Message(resources.getString(R.string.billing_purchase_error_unknown), isError = true)
-        }
+        } ?: throw NotImplementedError()
+        _status.value = BillingStatus.Pending()
+        delay(3.seconds)
+
+        // Purchase the product
+        _status.value = BillingStatus.Purchased(
+            product,
+            expired = false,
+            refundable = true,
+            token = "demo_purchased",
+        )
     }
 
     override fun manageProduct(activity: Activity, product: BillingProduct) {
@@ -86,12 +84,14 @@ class BillingImpl(
             }
 
             BillingProduct.Type.SUBSCRIPTION -> {
-                // If the status is not expired, make it expired
-                _status.value = (_status.value as? BillingStatus.Purchased)
-                    ?.takeUnless { it.expired }
-                    ?.copy(expired = true)
+                val status = _status.value as? BillingStatus.Purchased
+                _status.value = if (status?.expired == false) {
+                    // If the status is not expired, make it expired
+                    status.copy(expired = true)
+                } else {
                     // If the status is expired, make it not purchased
-                    ?: BillingStatus.NotPurchased()
+                    BillingStatus.NotPurchased()
+                }
             }
         }
     }
