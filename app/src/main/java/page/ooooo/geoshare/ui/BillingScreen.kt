@@ -315,9 +315,8 @@ private fun BillingMainPane(
                 style = MaterialTheme.typography.bodyLarge,
             )
             MainHeadline(
-                billingAppNameResId,
-                billingStatus,
-                Modifier.padding(top = spacing.tinyAdaptive),
+                appNameResId = billingAppNameResId,
+                modifier = Modifier.padding(top = spacing.tinyAdaptive),
                 iconEnabled = false
             )
             CompositionLocalProvider(

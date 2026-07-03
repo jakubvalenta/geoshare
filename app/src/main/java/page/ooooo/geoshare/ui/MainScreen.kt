@@ -885,8 +885,11 @@ private fun MainTitle(
 
         is Initial ->
             MainHeadline(
-                billingAppNameResId = billingAppNameResId,
-                billingStatus = billingStatus,
+                appNameResId = if (billingStatus is BillingStatus.Purchased) {
+                    billingAppNameResId
+                } else {
+                    R.string.app_name
+                },
                 modifier = Modifier.offset(x = -(12).dp),
             )
     }
