@@ -10,9 +10,11 @@
 /.idea/caches
 /.idea/deploymentTargetSelector.xml
 /.idea/gradle.xml
+/.idea/git_toolbox_prj.xml
 /.idea/libraries
 /.idea/modules.xml
 /.idea/navEditor.xml
+/.idea/php.xml
 /.idea/studiobot.xml
 /.idea/workspace.xml
 /build
