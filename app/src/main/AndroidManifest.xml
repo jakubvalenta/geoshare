@@ -321,7 +321,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="maps.apple.com"
+                    android:host="maps.apple"
                     android:scheme="https" />
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -331,7 +331,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="maps.apple"
+                    android:host="maps.apple.com"
                     android:scheme="https" />
             </intent-filter>
             <!-- Baidu Map -->
@@ -383,28 +383,19 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="maps.app.goo.gl"
-                    android:scheme="https" />
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="maps.google.com"
-                    android:scheme="https" />
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
                     android:host="app.goo.gl"
                     android:pathPrefix="/maps"
+                    android:scheme="https" />
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="g.co"
+                    android:pathPrefix="/kgs"
                     android:scheme="https" />
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -436,8 +427,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="www.google.com"
-                    android:pathPrefix="/maps"
+                    android:host="maps.app.goo.gl"
                     android:scheme="https" />
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -447,8 +437,18 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="g.co"
-                    android:pathPrefix="/kgs"
+                    android:host="maps.google.com"
+                    android:scheme="https" />
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="www.google.com"
+                    android:pathPrefix="/maps"
                     android:scheme="https" />
             </intent-filter>
             <!-- Google Navigation URI -->
@@ -607,6 +607,28 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
+                    android:host="osm.org"
+                    android:path="/"
+                    android:scheme="https" />
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="osm.org"
+                    android:pathPrefix="/go/"
+                    android:scheme="https" />
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
                     android:host="www.openstreetmap.org"
                     android:path="/"
                     android:scheme="https" />
@@ -655,28 +677,6 @@
                     android:pathPrefix="/way"
                     android:scheme="https" />
             </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="osm.org"
-                    android:path="/"
-                    android:scheme="https" />
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="osm.org"
-                    android:pathPrefix="/go/"
-                    android:scheme="https" />
-            </intent-filter>
             <!-- OsmAnd -->
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW" />
@@ -708,51 +708,51 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="waze.com"
-                    android:pathPrefix="/live-map"
-                    android:scheme="https" />
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="waze.com"
-                    android:pathPrefix="/ul"
-                    android:scheme="https" />
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="www.waze.com"
-                    android:pathPrefix="/live-map"
-                    android:scheme="https" />
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="www.waze.com"
-                    android:pathPrefix="/ul"
-                    android:scheme="https" />
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
                     android:host="ul.waze.com"
+                    android:pathPrefix="/ul"
+                    android:scheme="https" />
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="waze.com"
+                    android:pathPrefix="/live-map"
+                    android:scheme="https" />
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="waze.com"
+                    android:pathPrefix="/ul"
+                    android:scheme="https" />
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="www.waze.com"
+                    android:pathPrefix="/live-map"
+                    android:scheme="https" />
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="www.waze.com"
                     android:pathPrefix="/ul"
                     android:scheme="https" />
             </intent-filter>
