@@ -55,6 +55,11 @@ sealed interface PointOutput : Output {
     fun getDescription(value: Point, uriQuote: UriQuote = DefaultUriQuote): String? = null
 
     /**
+     * Whether this output can be executed for the given [value]. Outputs that return false are hidden from the UI.
+     */
+    fun isAvailable(value: Point): Boolean = true
+
+    /**
      * Output that takes a single [Point].
      *
      * Example: Copy point coordinates, Open point in an app

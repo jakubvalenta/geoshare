@@ -93,6 +93,7 @@
     <string name="inputs_default_handler">Öffnet standardmäßig in %1$s</string>
     <string name="main_input_uri_paste_content_description">Einfügen</string>
     <string name="conversion_succeeded_copy_coordinates">Koordinaten kopieren</string>
+    <string name="conversion_succeeded_copy_name">Namen kopieren</string>
     <string name="conversion_succeeded_copy_link">Link %1$s kopieren</string>
     <string name="conversion_succeeded_open_app_display">Karte in %1$s anzeigen</string>
     <string name="conversion_succeeded_open_app_navigate_to">In %1$s navigieren</string>
@@ -102,6 +103,7 @@
     <string name="converter_amap_permission_title">Mit Amap verbinden?</string>
     <string name="conversion_automation_copy_link_succeeded">Link wurde automatisch kopiert</string>
     <string name="conversion_automation_copy_succeeded">Koordinaten wurden automatisch kopiert</string>
+    <string name="conversion_automation_copy_name_succeeded">Name wurde automatisch kopiert</string>
     <string name="conversion_automation_open_app_failed">Fehler beim automatischen Öffnen von %1$s</string>
     <string name="conversion_automation_open_app_succeeded">%1$s wurde automatisch geöffnet</string>
     <plurals name="conversion_automation_open_app_waiting">
