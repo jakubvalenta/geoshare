@@ -15,10 +15,10 @@ import javax.inject.Inject
  */
 class CopyNameOutput @Inject constructor() : CopyPointOutput {
     override fun getText(value: Point, uriQuote: UriQuote) =
-        value.name
+        value.cleanName
 
     override fun isAvailable(value: Point) =
-        value.name != null
+        value.hasName()
 
     @Composable
     override fun label(appDetails: AppDetails) =
