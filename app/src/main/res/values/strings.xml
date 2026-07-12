@@ -32,6 +32,7 @@
     <string name="conversion_succeeded_check_name_only_points">Failed to find coordinates for some points.</string>
     <string name="conversion_succeeded_check_srs">Location might be inaccurate due to coordinate system conversion.</string>
     <string name="conversion_succeeded_copy_coordinates">Copy coordinates</string>
+    <string name="conversion_succeeded_copy_name">Copy name</string>
     <string name="conversion_succeeded_copy_link">Copy %1$s link</string>
     <string name="conversion_succeeded_hide">Hide</string>
     <string name="conversion_succeeded_location_failed">Failed to find location</string>
@@ -168,6 +169,7 @@
     <string name="conversion_succeeded_title">Coordinates</string>
     <string name="conversion_automation_copy_link_succeeded">Automatically copied link</string>
     <string name="conversion_automation_copy_succeeded">Automatically copied coordinates</string>
+    <string name="conversion_automation_copy_name_succeeded">Automatically copied name</string>
     <string name="conversion_automation_open_app_failed">Failed to automatically open %1$s</string>
     <string name="conversion_automation_open_app_succeeded">Automatically opened %1$s</string>
     <plurals name="conversion_automation_open_app_waiting">
