@@ -7,7 +7,7 @@
     <string name="nav_back_content_description">Назад на главную</string>
     <string name="intro_title">Введение</string>
     <string name="intro_how_to_share_headline">Как показать местоположение на карте в другом картографическом приложении</string>
-    <string name="intro_how_to_share_google_maps_caption">Поделитесь местоположением из приложения для карт или браузера.</string>
+    <string name="intro_how_to_share_google_maps_caption">Поделитесь местоположением из картографического приложения или браузера.</string>
     <string name="intro_how_to_share_google_maps_screenshot_title">Поделиться с</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Поставлен маркер</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_messaging">Сообщения</string>
@@ -178,7 +178,7 @@
     <string name="faq_how_text_2_item_http">либо HTTP-заголовков,</string>
     <string name="faq_how_text_2_item_html">либо HTML-документа,</string>
     <string name="faq_how_text_2_item_web">либо полной web-страницы, включая JavaScript.</string>
-    <string name="faq_how_text_3">Если вы не разрешаете подключаться к картографическому сервису, то %1$s создаёт geo-ссылку с поисковым запросом вместо координат или прерывает выполнение, в зависимости от конкретной ссылки.</string>
+    <string name="faq_how_text_3">Если вы не разрешаете подключаться к картографическому сервису, то %1$s создаёт geo-ссылку с названием места вместо координат или прерывает выполнение, в зависимости от конкретной ссылки.</string>
     <string name="faq_how_text_4">Чтобы навсегда разрешить или запретить подключение к картографическому сервису вместо постоянного запроса (по умолчанию), перейдите в %1$s приложения.</string>
     <string name="faq_how_text_4_preferences_button">настройки</string>
     <string name="faq_privacy_headline">Вопросы конфиденциальности</string>
@@ -231,7 +231,7 @@
     <string name="links_form_srs">Система координат</string>
     <string name="links_form_type">Значок контекстного меню</string>
     <string name="links_form_uri_template_coords">Шаблон URL</string>
-    <string name="links_form_uri_template_name">Шаблон URL, когда доступен только поисковый запрос</string>
+    <string name="links_form_uri_template_name">Шаблон URL, когда доступно только название места</string>
     <string name="links_insert">Добавить web-карту</string>
     <string name="links_message_deleted">Web-карта удалена</string>
     <string name="links_message_factory_reset">Настройки web-карт восстановлены на значения по умолчанию</string>
@@ -320,4 +320,30 @@
     <string name="server_restore_initial_data_title">Сбросить серверы до настроек по умолчанию?</string>
     <string name="server_update">Редактировать сервер</string>
     <string name="server_url_template">Шаблон URL</string>
+    <string name="billing_feature_all">Все функции базовой версии</string>
+    <string name="billing_feature_automation_description">Экономия времени за счёт автоматического выполнения действий при преобразовании ссылки на карту в координаты: открытие картографического приложения, запуск навигации (TomTom, Waze и т. д.), копирование в буфер обмена, сохранение GPX.</string>
+    <string name="billing_feature_custom_link">Пользовательские web-карты</string>
+    <string name="billing_feature_custom_link_description">Возможность открыть местоположение на вашей любимой (или личной) web-карте.</string>
+    <string name="billing_intro_not_purchased">Перейти на</string>
+    <string name="billing_pricing">Цены</string>
+    <string name="billing_pro_feature">Функция Pro</string>
+    <string name="billing_purchase_button">Оплатить</string>
+    <string name="billing_purchase_success">Спасибо за покупку %1$s</string>
+    <string name="billing_refund_description">Возврат в течение 48 часов с момента платежа</string>
+    <string name="billing_subscription_cancel_description">Отмена в любое время</string>
+    <string name="billing_subscription_monthly">Ежемесячная подписка</string>
+    <string name="billing_terms_of_service">условия обслуживания</string>
+    <string name="conversion_succeeded_check_name_only">Координаты не найдены, используется название места.</string>
+    <string name="conversion_succeeded_check_name_only_points">Для некоторых точек координаты не найдены.</string>
+    <string name="converter_google_navigation_uri_name">Ссылка навигации Google</string>
+    <string name="faq_name_only_title">Координаты не найдены, используется название места</string>
+    <string name="faq_name_only_text_1">%1$s может извлекать только название места (например, «Гора Килиманджаро») из определённых ссылок на карту. Когда вы откроете это место в другом картографическом приложении, оно может показать совсем другое место, а не то, на которое указывает исходная ссылка, поскольку может существовать несколько мест с одинаковым названием.</string>
+    <string name="faq_name_only_text_2">Точки, указанные только названием, не включаются в маршруты GPX.</string>
+    <string name="network_exception_webview">ошибка WebView</string>
+    <string name="billing_intro_purchased">У вас</string>
+    <string name="billing_manage_subscription">Управление подпиской</string>
+    <string name="billing_manage_subscription_description">Отмена, приостановка или изменение способа оплаты</string>
+    <string name="billing_offers_empty">%1$s недоступно в вашем регионе</string>
+    <string name="billing_one_time">Единовременный платёж</string>
+    <string name="billing_order_history">Платёжная история</string>
 </resources>
