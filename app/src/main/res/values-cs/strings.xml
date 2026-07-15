@@ -196,7 +196,7 @@
     <string name="faq_how_text_2_item_http">buď z HTTP hlaviček,</string>
     <string name="faq_how_text_2_item_html">nebo z HTML dokumentu,</string>
     <string name="faq_how_text_2_item_web">nebo z živé webové stránky včetně JavaScriptu.</string>
-    <string name="faq_how_text_3">Když spojení s mapovou službou nepovolíte, tak %1$s vytvoří geo: odkaz vedoucí na vyhledávání místa podle názvu, nebo se zastaví, v závislosti na konkrétním odkazu.</string>
+    <string name="faq_how_text_3">Když spojení s mapovou službou nepovolíte, tak %1$s vytvoří geo: odkaz vedoucí na vyhledávání místa podle názvu, nebo se zastaví, v závislosti na konkrétním odkazu.</string>
     <string name="faq_how_text_4">Pro trvalé povolení nebo zamítnutí spojení s mapovou službou místo ptaní (výchozí nastavení), jděte do %1$s aplikace.</string>
     <string name="faq_how_text_4_preferences_button">nastavení</string>
     <string name="faq_privacy_headline">Ochrana soukromí</string>
