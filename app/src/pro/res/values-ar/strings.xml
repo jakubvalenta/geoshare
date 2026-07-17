@@ -1,3 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="billing_manage_error">فشل في فتح Google Play</string>
+    <string name="billing_offers_error">فشل في استرداد العروض</string>
+    <string name="billing_purchase_error_cancelled">أُلغيَ الشراء</string>
+    <string name="billing_purchase_error_unknown">فشل إتمام عملية الشراء</string>
+    <string name="billing_setup_error_unknown">فشل استرداد قائمة المشتريات</string>
+    <string name="conversion_failed_unsupported_source">هذا الرابط غير مدعوم</string>
+    <string name="server_list_google_maps_none_description">استخرج اسم المكان بدلاً من الإحداثيات</string>
 </resources>
