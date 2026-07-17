@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="conversion_failed_unsupported_source">此链接不受支持</string>
-    <string name="server_list_google_maps_none_description">提取搜索词而非坐标</string>
+    <string name="server_list_google_maps_none_description">提取地名而非坐标</string>
+    <string name="billing_manage_error">无法打开 Google Play</string>
+    <string name="billing_offers_error">无法获取优惠信息</string>
+    <string name="billing_purchase_error_cancelled">购买已取消</string>
+    <string name="billing_purchase_error_unknown">无法进行购买</string>
+    <string name="billing_setup_error_unknown">无法获取购买记录</string>
 </resources>
