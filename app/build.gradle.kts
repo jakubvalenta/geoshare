@@ -21,8 +21,8 @@ android {
         minSdk = 25
         // noinspection EditedTargetSdkVersion
         targetSdk = 37
-        versionCode = 44
-        versionName = "6.4.0"
+        versionCode = 45
+        versionName = "6.5.0"
 
         androidResources {
             @Suppress("UnstableApiUsage")
@@ -103,7 +103,6 @@ aboutLibraries {
 dependencies {
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
-    androidTestImplementation(composeBom)
 
     implementation(libs.aboutlibraries.compose.m3)
     implementation(libs.accompanist.drawableplainter)
@@ -146,6 +145,5 @@ dependencies {
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.uiautomator)
-    androidTestImplementation(libs.kotlinx.coroutines.test)
     androidTestUtil(libs.androidx.test.orchestrator)
 }
