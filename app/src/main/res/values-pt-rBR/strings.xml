@@ -336,7 +336,7 @@
     <string name="conversion_succeeded_check_name_only_points">Falha ao encontrar as coordenadas de alguns pontos.</string>
     <string name="converter_google_navigation_uri_name">URI de navegação do Google</string>
     <string name="faq_name_only_title">Falha ao encontrar coordenadas, usando um nome de lugar</string>
-    <string name="faq_name_only_text_1">O %1$s consegue extrair apenas o nome do lugar, ex. \"Monte Everest\" de alguns links de mapa. Ao abrir essa localização em outro app de mapa, ele pode mostrar um lugar diferente do que o link original, pois vários lugares com o mesmo nome podem existir.</string>
+    <string name="faq_name_only_text_1">O %1$s consegue extrair apenas o nome do lugar, ex. “Monte Everest” de alguns links de mapa. Ao abrir essa localização em outro app de mapa, ele pode mostrar um lugar diferente do que o link original, pois vários lugares com o mesmo nome podem existir.</string>
     <string name="faq_name_only_text_2">Pontos identificados apenas pelo nome não são inclusos em rotas GPX.</string>
     <string name="network_exception_webview">Exceção do WebView</string>
 </resources>
