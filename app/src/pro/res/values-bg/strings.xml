@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="conversion_failed_unsupported_source">Тази връзка не се поддържа</string>
-    <string name="server_list_google_maps_none_description">Извличане на термин за търсене вместо координати</string>
+    <string name="server_list_google_maps_none_description">Извличане на име на място вместо координати</string>
+    <string name="billing_manage_error">Неуспешно отваряне на Google Play</string>
+    <string name="billing_offers_error">Неуспешно извличане на оферти</string>
+    <string name="billing_purchase_error_cancelled">Покупката е анулирана</string>
+    <string name="billing_purchase_error_unknown">Неуспешно извършване на покупка</string>
+    <string name="billing_setup_error_unknown">Неуспешно извличане на покупките</string>
 </resources>
