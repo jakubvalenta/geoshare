@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="conversion_failed_unsupported_source">Це посилання не підтримується</string>
-    <string name="server_list_google_maps_none_description">Витягнути пошуковий запит замість координат</string>
+    <string name="server_list_google_maps_none_description">Витягувати назву місця замість координат</string>
+    <string name="billing_manage_error">Не вдалося відкрити Google Play</string>
+    <string name="billing_offers_error">Не вдалося отримати пропозиції</string>
+    <string name="billing_purchase_error_cancelled">Покупку скасовано</string>
+    <string name="billing_purchase_error_unknown">Не вдалося здійснити покупку</string>
+    <string name="billing_setup_error_unknown">Не вдалося отримати дані про покупки</string>
 </resources>
