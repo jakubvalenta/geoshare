@@ -21,9 +21,6 @@ fun ResultSheetItem(
     icon: IconDescriptor? = null,
 ) {
     ListItem(
-        headlineContent = {
-            Text(headlineText, Modifier.testTag("geoShareResultSuccessSheetItemHeadline"))
-        },
         modifier = Modifier.run {
             if (onClick != null) {
                 clickable(onClick = onClick)
@@ -44,5 +41,7 @@ fun ResultSheetItem(
         leadingContent = icon?.let { { IconFromDescriptor(it, contentDescription = null) } }
             ?: { Spacer(Modifier.size(24.dp)) },
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-    )
+    ) {
+        Text(headlineText, Modifier.testTag("geoShareResultSuccessSheetItemHeadline"))
+    }
 }

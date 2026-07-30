@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.ui
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -73,6 +74,7 @@ class BillingViewModel @Inject constructor(
         }
     }
 
+    @SuppressLint("EmptySuperCall")
     override fun onCleared() {
         super.onCleared()
         billing.endConnection()
