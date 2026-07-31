@@ -24,14 +24,13 @@ map app.
 
 **Supported map links**
 
+- Google Maps
+- Apple Maps
 - 2GIS
 - Amap (AutoNavi)
-- Apple Maps
 - Baidu Map (beta)
 - Cartes IGN
 - CoMaps
-- coordinates
-- Google Maps
 - HERE WeGo
 - Magic Earth
 - Maps.me
@@ -43,6 +42,7 @@ map app.
 - Urbi
 - Waze
 - Yandex Maps
+- coordinates
 
 **Example use cases**
 
