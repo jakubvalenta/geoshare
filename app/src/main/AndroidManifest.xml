@@ -109,7 +109,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="2gis.com.cy"
+                    android:host="2gis.com"
                     android:scheme="https" />
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -119,7 +119,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="2gis.com"
+                    android:host="2gis.com.cy"
                     android:scheme="https" />
             </intent-filter>
             <intent-filter android:autoVerify="false">
