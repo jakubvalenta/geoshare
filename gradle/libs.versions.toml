@@ -24,7 +24,7 @@ kotlinxCollectionsImmutable = "0.5.1"
 kotlinxCoroutinesTest = "1.11.0"
 kotlinxSerializationJson = "1.11.0"
 ksp = "2.3.4"
-ktor = "3.5.1"
+ktor = "3.5.2"
 mockitoKotlin = "6.3.0"
 openLocationCode = "1.0.4"
 
