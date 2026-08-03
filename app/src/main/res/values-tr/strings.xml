@@ -312,7 +312,7 @@
     <string name="billing_pricing">Fiyatlandırma</string>
     <string name="billing_pro_feature">Pro özellik</string>
     <string name="billing_purchase_button">Çıkış yap</string>
-    <string name="billing_purchase_success">%1$s\'yu satın aldığınız için teşekkürler</string>
+    <string name="billing_purchase_success">%1$s’yu satın aldığınız için teşekkürler</string>
     <string name="billing_refund_description">Satın alımdan itibaren 48 saat içinde para iadesi yapılır</string>
     <string name="billing_status_expired">Aboneliğiniz yakında sona erecek</string>
     <string name="billing_status_pending">Ödemeniz beklemede</string>
@@ -321,11 +321,11 @@
     <string name="billing_terms_of_service">hizmet şartları</string>
     <string name="conversion_succeeded_check_name_only">Yer adı kullanılarak koordinat bulunamadı.</string>
     <string name="conversion_succeeded_check_name_only_points">Bazı noktaların koordinatları bulunamadı.</string>
-    <string name="converter_google_navigation_uri_name">Google Navigasyon URI\'si</string>
+    <string name="converter_google_navigation_uri_name">Google Navigasyon URI’si</string>
     <string name="faq_name_only_title">Yer adı kullanılarak koordinat bulunamadı</string>
     <string name="faq_name_only_text_1">%1$s belirli harita bağlantılarından yalnızca yer adını, örneğin \"Kilimanjaro Dağı\"nı çıkarabiliyor. Bu konumu başka bir harita uygulamasında açtığınızda orijinal bağlantıdan farklı bir yer gösterebilir, çünkü aynı ada sahip birden fazla yer olabilir.</string>
     <string name="faq_name_only_text_2">Sadece isimleriyle tanımlanan noktalar GPX rotalarına dahil edilmez.</string>
-    <string name="faq_privacy_text_server">Bazı harita bağlantıları için, %1$s uzak bir sunucu olan açık kaynaklı %3$s\'ı çağırır. Bu sunucu daha sonra harita servis API\'ını (örneğin Google Haritalar API\'ı) çağırır. %2$s harita bağlantılarının kaydını tutmaz. Hız sınırlaması uygulamak için, cihazınızı tanımlayan bir genel anahtarı ve IP adresinizi sınırlı bir süre için ayrı olarak saklar.</string>
+    <string name="faq_privacy_text_server">Bazı harita bağlantıları için, %1$s uzak bir sunucu olan açık kaynaklı %3$s’ı çağırır. Bu sunucu daha sonra harita servis API’ını (örneğin Google Haritalar API’ı) çağırır. %2$s harita bağlantılarının kaydını tutmaz. Hız sınırlaması uygulamak için, cihazınızı tanımlayan bir genel anahtarı ve IP adresinizi sınırlı bir süre için ayrı olarak saklar.</string>
     <string name="faq_privacy_text_html">Bazı harita bağlantıları için, %1$s harita servisinin canlı web sayfasını yükler ve JavaScript kodunu çalıştırır. Bu işlem, izleme komut dosyalarını engelleyen ve çerezleri saklamayan kısıtlı bir ortamda gerçekleşir.</string>
     <string name="network_exception_webview">WebView istisnası</string>
     <string name="server_challenge_url">Challenge URL</string>
