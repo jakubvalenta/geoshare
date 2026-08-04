@@ -15,6 +15,7 @@ object PackageNames {
     const val CONVERSATIONS = "eu.siacs.conversations"
     const val GARMIN_PREFIX = "com.garmin."
     const val GARMIN_EXPLORE = "${GARMIN_PREFIX}android.apps.explore"
+    const val GEOSHARE_PREFIX = "page.ooooo.geoshare."
     const val GMAPS_WV = "us.spotco.maps"
     const val GOOGLE_MAPS = "com.google.android.apps.maps"
     const val HERE_WEGO = "com.here.app.maps"
