@@ -125,7 +125,8 @@ object AndroidTools {
                 Log.e(TAG, "Error when loading info about an installed app", e)
                 null
             }
-            packageName?.takeUnless { it == BuildConfig.APPLICATION_ID }
+            // Exclude GeoShare itself and all its build flavors
+            packageName?.takeUnless { it == BuildConfig.APPLICATION_ID || it.startsWith(PackageNames.GEOSHARE_PREFIX) }
         }
     }
 
