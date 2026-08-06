@@ -32,6 +32,7 @@ class ChipsScope {
 
 @Composable
 fun ScrollableChips(
+    modifier: Modifier = Modifier,
     paddingValues: PaddingValues = PaddingValues(
         horizontal = LocalSpacing.current.windowPadding,
         vertical = LocalSpacing.current.smallAdaptive,
@@ -46,7 +47,7 @@ fun ScrollableChips(
     scope.content()
 
     Row(
-        Modifier
+        modifier
             .padding(top = paddingValues.calculateTopPadding(), bottom = paddingValues.calculateBottomPadding())
             .horizontalScroll(rememberScrollState())
     ) {

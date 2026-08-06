@@ -38,7 +38,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -121,15 +120,7 @@ fun LargeTopAppBarPane(
         },
         navigationIcon = {
             if (onBack != null) {
-                IconButton(
-                    onBack,
-                    Modifier.testTag("geoShareBack"),
-                ) {
-                    Icon(
-                        imageVector = backIcon,
-                        contentDescription = stringResource(R.string.nav_back_content_description),
-                    )
-                }
+                NavigationBackButton(onBack, backIcon)
             }
         },
         actions = actions,

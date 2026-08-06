@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.ManagedVirtualDevice
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
@@ -45,9 +47,12 @@ android {
         }
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        // The following argument makes the Android Test Orchestrator run its "pm clear" command after each test
-        // invocation. This command ensures that the app's state is completely cleared between tests.
-        testInstrumentationRunnerArguments += mapOf("clearPackageData" to "true")
+        testInstrumentationRunnerArguments += mapOf(
+            // Clear app state between tests
+            "clearPackageData" to "true",
+            // Include only normal tests, not screenshots
+            "package" to "page.ooooo.geoshare.tests",
+        )
     }
     buildTypes {
         getByName("release") {
@@ -86,6 +91,18 @@ android {
     }
     testOptions {
         execution = "ANDROIDX_TEST_ORCHESTRATOR"
+        @Suppress("UnstableApiUsage")
+        managedDevices {
+            localDevices {
+                create("mediumPhoneApi37") {
+                    device = "Medium Phone"
+                    apiLevel = 37
+                    systemImageSource = "google"
+                    testedAbi = "x86_64" // Set to suppress warn
+                    pageAlignment = ManagedVirtualDevice.PageAlignment.FORCE_4KB_PAGES // Set to suppress warn
+                }
+            }
+        }
     }
 }
 
@@ -145,5 +162,23 @@ dependencies {
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.uiautomator)
+    androidTestImplementation(libs.fastlane.screengrab)
     androidTestUtil(libs.androidx.test.orchestrator)
+}
+
+tasks.register<Copy>("copyScreenshots") {
+    group = "verification"
+    description = "Copies screenshots from instrument test outputs to docs/screenshots"
+
+    @Suppress("UnstableApiUsage")
+    val deviceNames = android.testOptions.managedDevices.localDevices.names
+
+    for (flavor in android.productFlavors.names) {
+        for (device in deviceNames) {
+            val path = "outputs/managed_device_android_test_additional_output/debug/flavors/$flavor/$device"
+            from(layout.buildDirectory.dir(path))
+        }
+    }
+    into("$rootDir/docs/screenshots")
+    include("**/*.webp")
 }

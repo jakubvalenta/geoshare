@@ -25,6 +25,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -48,6 +49,7 @@ import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
+import page.ooooo.geoshare.lib.outputs.ShareLinkUriOutput
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -84,7 +86,9 @@ fun ResultApps(
             .forEach { (packageName, label, outputs) ->
                 item {
                     AppIcon(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .testTag("geoShareApp_$packageName"),
                         label = label,
                         appDetails = appDetails,
                         outputs = outputs,
@@ -104,7 +108,9 @@ fun ResultApps(
         // Share item
         item {
             AppIcon(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .testTag("geoShareApp_share"),
                 label = null,
                 appDetails = appDetails,
                 outputs = outputsForSharing,
@@ -161,8 +167,11 @@ fun ResultApps(
             outputsForLinks
                 .forEach { (group, outputs) ->
                     item {
+                        val uuid = (outputs.firstOrNull() as? ShareLinkUriOutput)?.link?.uuid
                         AppIcon(
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier
+                                .weight(1f)
+                                .testTag("geoShareApp_$uuid"),
                             label = group,
                             appDetails = appDetails,
                             outputs = outputs,

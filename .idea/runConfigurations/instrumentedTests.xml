@@ -5,7 +5,7 @@
     <option name="TESTING_TYPE" value="1" />
     <option name="METHOD_NAME" value="shareScreen_whenLongLinkIsShared_opensGoogleMaps" />
     <option name="CLASS_NAME" value="page.ooooo.geoshare.ShareActivityBehaviorTest" />
-    <option name="PACKAGE_NAME" value="page.ooooo.geoshare" />
+    <option name="PACKAGE_NAME" value="page.ooooo.geoshare.tests" />
     <option name="TEST_NAME_REGEX" value="" />
     <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
     <option name="EXTRA_OPTIONS" value="" />
@@ -44,7 +44,7 @@
       <option name="ADVANCED_PROFILING_ENABLED" value="false" />
       <option name="STARTUP_PROFILING_ENABLED" value="false" />
       <option name="STARTUP_CPU_PROFILING_ENABLED" value="false" />
-      <option name="STARTUP_CPU_PROFILING_CONFIGURATION_NAME" value="Java/Kotlin Method Sample (legacy)" />
+      <option name="STARTUP_CPU_PROFILING_CONFIGURATION_NAME" value="LeakCanary" />
       <option name="STARTUP_NATIVE_MEMORY_PROFILING_ENABLED" value="false" />
       <option name="NATIVE_MEMORY_SAMPLE_RATE_BYTES" value="2048" />
     </Profilers>

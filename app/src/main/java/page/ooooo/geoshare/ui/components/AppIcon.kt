@@ -52,11 +52,8 @@ import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.outputs.CopyGeoUriOutput
-import page.ooooo.geoshare.lib.outputs.OpenPointOutput
-import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.ShareDisplayGeoUriOutput
-import page.ooooo.geoshare.lib.outputs.ShareLinkUriOutput
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -76,27 +73,17 @@ fun AppIcon(
     val (expanded, setExpanded) = retain { mutableStateOf(false) }
 
     Box(
-        modifier
-            .run {
-                if (enabled) {
-                    combinedClickable(
-                        role = Role.Button,
-                        onLongClick = { setExpanded(true) },
-                        onClick = { outputs.firstOrNull()?.let { onClick(it) } },
-                    )
-                } else {
-                    this
-                }
+        modifier.run {
+            if (enabled) {
+                combinedClickable(
+                    role = Role.Button,
+                    onLongClick = { setExpanded(true) },
+                    onClick = { outputs.firstOrNull()?.let { onClick(it) } },
+                )
+            } else {
+                this
             }
-            .run {
-                outputs.firstOrNull()?.let { firstOutput ->
-                    ((firstOutput as? OpenPointOutput)?.packageName
-                        ?: (firstOutput as? OpenRouteOnePointGpxOutput)?.packageName
-                        ?: (firstOutput as? ShareLinkUriOutput)?.link?.uuid)?.let { id ->
-                        testTag("geoShareApp_$id")
-                    }
-                } ?: this
-            },
+        },
         contentAlignment = Alignment.TopEnd,
     ) {
         Column(

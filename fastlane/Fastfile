@@ -26,6 +26,7 @@ platform :android do
     upload_to_play_store(
       track: "internal",
       release_status: "draft",
+      metadata_path: "./fastlane/metadata_pro/android",
       skip_upload_apk: true,
       skip_upload_aab: true,
       skip_upload_changelogs: true,
@@ -35,7 +36,32 @@ platform :android do
 
   desc "Deploy a new version to Google Play"
   lane :deploy do
-    gradle(task: "clean assembleFreeRelease")
+    gradle(task: "clean assembleProRelease")
     upload_to_play_store
+  end
+
+  desc "Take screenshots for store listing"
+  lane :screenshots do
+    gradle(task: "assembleFreeDebug assembleFreeDebugAndroidTest")
+    screengrab(
+      app_apk_path: 'app/build/outputs/apk/free/debug/app-free-debug.apk',
+      tests_apk_path: 'app/build/outputs/apk/androidTest/free/debug/app-free-debug-androidTest.apk',
+      app_package_name: 'page.ooooo.geoshare.debug',
+      tests_package_name: 'page.ooooo.geoshare.debug.test',
+      use_tests_in_packages: ['page.ooooo.geoshare.metadata'],
+      reinstall_app: true,
+      use_timestamp_suffix: false,
+    )
+    gradle(task: "assembleDemoDebug assembleDemoDebugAndroidTest")
+    screengrab(
+      output_directory: 'fastlane/metadata_pro/android',
+      app_apk_path: 'app/build/outputs/apk/demo/debug/app-demo-debug.apk',
+      tests_apk_path: 'app/build/outputs/apk/androidTest/demo/debug/app-demo-debug-androidTest.apk',
+      app_package_name: 'page.ooooo.geoshare.demo.debug',
+      tests_package_name: 'page.ooooo.geoshare.demo.debug.test',
+      use_tests_in_packages: ['page.ooooo.geoshare.metadata'],
+      reinstall_app: true,
+      use_timestamp_suffix: false,
+    )
   end
 end

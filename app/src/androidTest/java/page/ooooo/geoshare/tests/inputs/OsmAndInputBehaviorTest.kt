@@ -1,0 +1,18 @@
+package page.ooooo.geoshare.tests.inputs
+
+import androidx.test.uiautomator.uiAutomator
+import org.junit.Test
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.tests.testUri
+
+class OsmAndInputBehaviorTest {
+    @Test
+    fun osmAnd() = uiAutomator {
+        // Coordinates
+        testUri(
+            WGS84Point(52.51628, 13.37771, z = 15.0, source = Source.URI),
+            "https://osmand.net/map?pin=52.51628,13.37771#15/52.51628/13.37771",
+        )
+    }
+}

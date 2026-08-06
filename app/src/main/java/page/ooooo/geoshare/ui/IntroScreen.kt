@@ -216,7 +216,7 @@ private fun IntroScreen(
                     if (pagerState.canScrollForward) {
                         TextButton(
                             { onClose() },
-                            Modifier.testTag("geoShareIntroScreenCloseButton"),
+                            Modifier.testTag("geoShareIntroCloseButton"),
                         ) {
                             Text(stringResource(R.string.intro_nav_close))
                         }
@@ -232,7 +232,7 @@ private fun IntroScreen(
                                 onClose()
                             }
                         },
-                        Modifier.testTag("geoShareIntroScreenNextButton"),
+                        Modifier.testTag("geoShareIntroNextButton"),
                     ) {
                         Text(
                             stringResource(
@@ -265,7 +265,8 @@ private fun IntroPage(
                 .fillMaxHeight()
                 .widthIn(max = maxWidth)
                 .padding(horizontal = spacing.windowPadding)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .testTag("geoShareIntroPage_$page"),
         ) {
             Text(
                 headline,

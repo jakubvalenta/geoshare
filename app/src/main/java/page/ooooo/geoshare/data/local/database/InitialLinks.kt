@@ -155,7 +155,7 @@ object InitialLinks : InitialData {
                 "https://maps.apple.com/?daddr={lat}%2C{lon}",
                 "https://maps.apple.com/?daddr={q}",
                 1772395295367,
-                Uuid.parse("a5092c63-cf5c-4225-9059-e888ae12e215").toByteArray(),
+                Uuid.parse(APPLE_MAPS_NAVIGATION_UUID).toByteArray(),
             )
         )
         db.execSQL(
@@ -550,4 +550,6 @@ object InitialLinks : InitialData {
             }
         },
     )
+
+    const val APPLE_MAPS_NAVIGATION_UUID = "a5092c63-cf5c-4225-9059-e888ae12e215"
 }

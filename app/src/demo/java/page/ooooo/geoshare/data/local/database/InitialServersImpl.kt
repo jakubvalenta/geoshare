@@ -37,7 +37,7 @@ object InitialServersImpl : InitialServers {
                 0,
                 0,
                 1779859252618,
-                Uuid.parse("16b3bb06-3a3b-4853-ac06-c4bf1eb346f8").toByteArray(),
+                Uuid.parse(GOOGLE_MAPS_GEOCODE_ADDRESS_UUID).toByteArray(),
             )
         )
         db.execSQL(
@@ -78,7 +78,7 @@ object InitialServersImpl : InitialServers {
                         0,
                         0,
                         1779859252618,
-                        Uuid.parse("16b3bb06-3a3b-4853-ac06-c4bf1eb346f8").toByteArray(),
+                        Uuid.parse(GOOGLE_MAPS_GEOCODE_ADDRESS_UUID).toByteArray(),
                     )
                 )
                 db.execSQL(
@@ -102,4 +102,6 @@ object InitialServersImpl : InitialServers {
             }
         },
     )
+
+    const val GOOGLE_MAPS_GEOCODE_ADDRESS_UUID = "16b3bb06-3a3b-4853-ac06-c4bf1eb346f8"
 }

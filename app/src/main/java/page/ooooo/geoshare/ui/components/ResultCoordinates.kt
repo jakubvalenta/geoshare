@@ -74,7 +74,7 @@ fun ResultCoordinates(
             Modifier
                 .fillMaxWidth()
                 .padding(start = spacing.windowPadding, end = spacing.windowPadding - 10.dp)
-                .testTag("geoShareResultSuccessLastPointSource_${lastPoint.source}"),
+                .testTag("geoShareResultLastPointSource_${lastPoint.source}"),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -92,7 +92,7 @@ fun ResultCoordinates(
                         },
                         Modifier
                             .weight(1f)
-                            .testTag("geoShareResultSuccessLastPointCoordinates"),
+                            .testTag("geoShareResultLastPointCoordinates"),
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 }
@@ -107,12 +107,12 @@ fun ResultCoordinates(
                     },
                     Modifier
                         .weight(1f)
-                        .testTag("geoShareResultSuccessLastPointCheckPlaceName"),
+                        .testTag("geoShareResultCheckNameOnly"),
                 )
             }
             IconButton(
                 { onSelect(points.size - 1) },
-                Modifier.testTag("geoShareResultSuccessLastPointMenu")
+                Modifier.testTag("geoShareResultLastPointMenu")
             ) {
                 Icon(
                     painterResource(R.drawable.content_copy_24px),
@@ -125,21 +125,21 @@ fun ResultCoordinates(
                 stringResource(R.string.conversion_succeeded_check_srs),
                 Modifier
                     .padding(horizontal = spacing.windowPadding)
-                    .testTag(@Suppress("SpellCheckingInspection", "GrazieInspectionRunner") "geoShareResultSuccessLastPointCheckSRS"),
+                    .testTag("geoShareResultCheckSRS"),
             )
         } else if (lastPoint.source == Source.JAVASCRIPT) {
             ResultCoordinatesCheck(
                 stringResource(R.string.conversion_succeeded_check_experimental),
                 Modifier
                     .padding(horizontal = spacing.windowPadding)
-                    .testTag("geoShareResultSuccessLastPointCheckJavaScript"),
+                    .testTag("geoShareResultCheckExperimental"),
             )
         } else if (lastPoint.source == Source.MAP_CENTER) {
             ResultCoordinatesCheck(
                 stringResource(R.string.conversion_succeeded_check_map_center),
                 Modifier
                     .padding(horizontal = spacing.windowPadding)
-                    .testTag("geoShareResultSuccessLastPointCheckMapCenter"),
+                    .testTag("geoShareResultCheckMapCenter"),
             )
         }
         if (outputsForPointChips.isNotEmpty()) {
@@ -172,7 +172,7 @@ fun ResultCoordinates(
                                 Text(
                                     stringResource(R.string.conversion_succeeded_point_all, points.size),
                                     style = MaterialTheme.typography.titleMedium,
-                                    modifier = Modifier.testTag("geoShareResultSuccessPointsHeadline"),
+                                    modifier = Modifier.testTag("geoShareResultPointsHeadline"),
                                 )
                                 if (points.any { !it.hasCoordinates() }) {
                                     ResultCoordinatesCheck(
@@ -185,12 +185,14 @@ fun ResultCoordinates(
                                         },
                                         Modifier
                                             .padding(top = spacing.tiny)
-                                            .testTag("geoShareResultSuccessPointsCheckPlaceName"),
+                                            .testTag("geoShareResultCheckNameOnlyPoints"),
                                     )
                                 }
                             }
                         },
-                        modifier = Modifier.padding(horizontal = spacing.windowPadding),
+                        modifier = Modifier
+                            .padding(horizontal = spacing.windowPadding)
+                            .testTag("geoShareResultPoints"),
                     ) {
                         Column(Modifier.padding(top = spacing.tiny)) {
                             points.forEachIndexed { index, point ->
@@ -208,7 +210,7 @@ fun ResultCoordinates(
                         }
                     }
                     if (outputsForPointsChips.isNotEmpty()) {
-                        ScrollableChips {
+                        ScrollableChips(Modifier.testTag("geoShareResultPointsChips")) {
                             outputsForPointsChips.forEach { output ->
                                 item {
                                     StyledChip(

@@ -76,6 +76,7 @@ class BillingViewModel @Inject constructor(
 
     @SuppressLint("EmptySuperCall")
     override fun onCleared() {
+        @SuppressLint("EmptySuperCall")
         super.onCleared()
         billing.endConnection()
     }
