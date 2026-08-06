@@ -63,7 +63,6 @@
     <string name="conversion_automation_copy_link_succeeded">Bağlantı otomatik olarak kopyalandı</string>
     <string name="conversion_automation_copy_succeeded">Koordinatlar otomatik olarak kopyalandı</string>
     <string name="conversion_automation_open_app_failed">%1$s otomatik olarak açılamadı</string>
-    <string name="conversion_automation_open_app_succeeded">%1$s otomatik olarak açıldı</string>
     <plurals name="conversion_automation_open_app_waiting">
         <item quantity="one">%1$s %2$ds’de otomatik olarak açılıyor</item>
         <item quantity="other">%1$s %2$ds’de otomatik olarak açılıyor</item>

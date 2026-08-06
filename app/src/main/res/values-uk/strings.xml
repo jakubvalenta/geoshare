@@ -99,7 +99,6 @@
     <string name="conversion_automation_copy_link_succeeded">Автоматично скопійоване посилання</string>
     <string name="conversion_automation_copy_succeeded">Автоматично скопійовані координати</string>
     <string name="conversion_automation_open_app_failed">Не вдалося автоматично відкрити %1$s</string>
-    <string name="conversion_automation_open_app_succeeded">Автоматично відкрито %1$s</string>
     <plurals name="conversion_automation_open_app_waiting">
         <item quantity="one">Автоматичне відкриття %1$s через %2$ds</item>
         <item quantity="few">Автоматичні відкриття %1$s через %2$ds</item>

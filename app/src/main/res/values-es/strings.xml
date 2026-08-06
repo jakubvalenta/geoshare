@@ -98,7 +98,6 @@
     <string name="conversion_automation_copy_link_succeeded">El enlace fue copiado automáticamente</string>
     <string name="conversion_automation_copy_succeeded">Coordenadas fueron copiadas automáticamente</string>
     <string name="conversion_automation_open_app_failed">No fue posible abrir automáticamente %1$s</string>
-    <string name="conversion_automation_open_app_succeeded">%1$s fue abierto automáticamente</string>
     <plurals name="conversion_automation_open_app_waiting">
         <item quantity="one">Abriendo automáticamente %1$s en %2$ds</item>
         <item quantity="many">Abriendo automáticamente %1$s en %2$ds</item>

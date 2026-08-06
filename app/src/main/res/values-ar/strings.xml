@@ -102,7 +102,6 @@
     <string name="conversion_automation_copy_link_succeeded">نُسخ الرابط تلقائيًا</string>
     <string name="conversion_automation_copy_succeeded">نُسخ الإحداثيات تلقائيًا</string>
     <string name="conversion_automation_open_app_failed">فشل فتح %1$s تلقائيًا</string>
-    <string name="conversion_automation_open_app_succeeded">فُتح تلقائيًا %1$s</string>
     <plurals name="conversion_automation_open_app_waiting">
         <item quantity="zero">فتح %1$s تلقائيًا في %2$d ثانية</item>
         <item quantity="one">فتح %1$s تلقائيًا في ثانية</item>

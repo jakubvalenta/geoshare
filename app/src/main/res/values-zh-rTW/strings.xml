@@ -95,7 +95,6 @@
     <string name="conversion_automation_copy_link_succeeded">自動複製連結</string>
     <string name="conversion_automation_copy_succeeded">自動複製座標</string>
     <string name="conversion_automation_open_app_failed">自動開啟 %1$s時失敗</string>
-    <string name="conversion_automation_open_app_succeeded">自動開啟 %1$s</string>
     <plurals name="conversion_automation_open_app_waiting">
         <item quantity="other">在%2$d中自動開啟%1$s</item>
     </plurals>

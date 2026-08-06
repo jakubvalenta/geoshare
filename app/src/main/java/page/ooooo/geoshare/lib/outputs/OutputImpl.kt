@@ -42,8 +42,7 @@ sealed interface OpenPointOutput :
     PointOutput.WithoutLocation,
     Output.HasErrorText,
     Output.HasAutomationDelay,
-    Output.HasAutomationErrorText,
-    Output.HasAutomationSuccessText {
+    Output.HasAutomationErrorText {
 
     val packageName: String
 
@@ -72,13 +71,6 @@ sealed interface OpenPointOutput :
         )
 
     @Composable
-    override fun automationSuccessText(appDetails: AppDetails) =
-        stringResource(
-            R.string.conversion_automation_open_app_succeeded,
-            appDetails[packageName]?.label ?: packageName,
-        )
-
-    @Composable
     override fun automationWaitingText(counterSec: Int, appDetails: AppDetails) =
         pluralStringResource(
             R.plurals.conversion_automation_open_app_waiting,
@@ -92,8 +84,7 @@ sealed interface OpenPointsOutput :
     PointsOutput.WithoutLocation,
     Output.HasErrorText,
     Output.HasAutomationDelay,
-    Output.HasAutomationErrorText,
-    Output.HasAutomationSuccessText {
+    Output.HasAutomationErrorText {
 
     val packageName: String
 
@@ -123,13 +114,6 @@ sealed interface OpenPointsOutput :
     override fun automationErrorText(appDetails: AppDetails) =
         stringResource(
             R.string.conversion_automation_open_app_failed,
-            appDetails[packageName]?.label ?: packageName,
-        )
-
-    @Composable
-    override fun automationSuccessText(appDetails: AppDetails) =
-        stringResource(
-            R.string.conversion_automation_open_app_succeeded,
             appDetails[packageName]?.label ?: packageName,
         )
 
