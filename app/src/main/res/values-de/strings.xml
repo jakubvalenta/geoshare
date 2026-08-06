@@ -103,7 +103,6 @@
     <string name="conversion_automation_copy_link_succeeded">Link wurde automatisch kopiert</string>
     <string name="conversion_automation_copy_succeeded">Koordinaten wurden automatisch kopiert</string>
     <string name="conversion_automation_open_app_failed">Fehler beim automatischen Öffnen von %1$s</string>
-    <string name="conversion_automation_open_app_succeeded">%1$s wurde automatisch geöffnet</string>
     <plurals name="conversion_automation_open_app_waiting">
         <item quantity="one">%1$s wird in %2$d s automatisch geöffnet</item>
         <item quantity="other">%1$s wird in %2$d s automatisch geöffnet</item>

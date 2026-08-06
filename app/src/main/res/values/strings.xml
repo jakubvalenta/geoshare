@@ -169,7 +169,6 @@
     <string name="conversion_automation_copy_link_succeeded">Automatically copied link</string>
     <string name="conversion_automation_copy_succeeded">Automatically copied coordinates</string>
     <string name="conversion_automation_open_app_failed">Failed to automatically open %1$s</string>
-    <string name="conversion_automation_open_app_succeeded">Automatically opened %1$s</string>
     <plurals name="conversion_automation_open_app_waiting">
         <item quantity="one">Automatically opening %1$s in %2$ds</item>
         <item quantity="other">Automatically opening %1$s in %2$ds</item>

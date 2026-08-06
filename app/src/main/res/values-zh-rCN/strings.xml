@@ -96,7 +96,6 @@
     <string name="conversion_automation_copy_link_succeeded">已自动复制链接</string>
     <string name="conversion_automation_copy_succeeded">已自动复制坐标</string>
     <string name="conversion_automation_open_app_failed">无法自动打开 %1$s</string>
-    <string name="conversion_automation_open_app_succeeded">已自动打开 %1$s</string>
     <plurals name="conversion_automation_open_app_waiting">
         <item quantity="other">将在 %2$d 秒后自动打开 %1$s</item>
     </plurals>

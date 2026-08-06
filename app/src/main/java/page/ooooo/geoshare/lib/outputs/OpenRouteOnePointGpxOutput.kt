@@ -26,8 +26,7 @@ class OpenRouteOnePointGpxOutput @Inject constructor(
     PointOutput.WithLocation,
     Output.HasErrorText,
     Output.HasAutomationDelay,
-    Output.HasAutomationErrorText,
-    Output.HasAutomationSuccessText {
+    Output.HasAutomationErrorText {
 
     override suspend fun execute(
         location: Point?,
@@ -77,13 +76,6 @@ class OpenRouteOnePointGpxOutput @Inject constructor(
     override fun automationErrorText(appDetails: AppDetails) =
         stringResource(
             R.string.conversion_automation_open_app_failed,
-            appDetails[packageName]?.label ?: packageName,
-        )
-
-    @Composable
-    override fun automationSuccessText(appDetails: AppDetails) =
-        stringResource(
-            R.string.conversion_automation_open_app_succeeded,
             appDetails[packageName]?.label ?: packageName,
         )
 

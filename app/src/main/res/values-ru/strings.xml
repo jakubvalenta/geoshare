@@ -120,7 +120,6 @@
     <string name="conversion_automation_copy_link_succeeded">Ссылка автоматически скопирована</string>
     <string name="conversion_automation_copy_succeeded">Координаты автоматически скопированы</string>
     <string name="conversion_automation_open_app_failed">Не удалось автоматически открыть %1$s</string>
-    <string name="conversion_automation_open_app_succeeded">Автоматически открыт %1$s</string>
     <plurals name="conversion_automation_open_app_waiting">
         <item quantity="one">Автоматическое открытие %1$s через %2$d сек.</item>
         <item quantity="few">Автоматическое открытие %1$s через %2$d сек.</item>

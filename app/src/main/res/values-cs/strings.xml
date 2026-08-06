@@ -98,7 +98,6 @@
     <string name="conversion_automation_copy_link_succeeded">Odkaz byl automaticky zkopírován</string>
     <string name="conversion_automation_copy_succeeded">Souřadnice byly automaticky zkopírovány</string>
     <string name="conversion_automation_open_app_failed">Nepodařilo se automaticky otevřít %1$s</string>
-    <string name="conversion_automation_open_app_succeeded">Aplikace %1$s byla automaticky otevřena</string>
     <plurals name="conversion_automation_open_app_waiting">
         <item quantity="one">Aplikace %1$s se automaticky otevře za %2$d s</item>
         <item quantity="few">Aplikace %1$s se automaticky otevře za %2$d s</item>

@@ -97,7 +97,6 @@
     <string name="conversion_automation_copy_link_succeeded">Link copiado automaticamente</string>
     <string name="conversion_automation_copy_succeeded">Coordenadas copiadas automaticamente</string>
     <string name="conversion_automation_open_app_failed">Falha ao abrir %1$s automaticamente</string>
-    <string name="conversion_automation_open_app_succeeded">%1$s aberto automaticamente</string>
     <plurals name="conversion_automation_open_app_waiting">
         <item quantity="one">Abrindo %1$s automaticamente em %2$ds</item>
         <item quantity="many">Abrindo %1$s automaticamente em %2$ds</item>
