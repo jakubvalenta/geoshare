@@ -9,7 +9,6 @@ import android.location.provider.ProviderProperties
 import android.os.Build
 import android.os.SystemClock
 import android.view.accessibility.AccessibilityNodeInfo
-import androidx.test.core.graphics.writeToTestStorage
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.platform.io.PlatformTestStorageRegistry
 import androidx.test.uiautomator.Direction
@@ -885,6 +884,12 @@ fun UiAutomatorTestScope.disableDarkMode() {
     device.executeShellCommand(
         @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
         "cmd uimode night no"
+    )
+}
+
+fun UiAutomatorTestScope.setAppLocales(locales: String) {
+    device.executeShellCommand(
+        "cmd locale set-app-locales ${BuildConfig.APPLICATION_ID} --user current --locales $locales"
     )
 }
 

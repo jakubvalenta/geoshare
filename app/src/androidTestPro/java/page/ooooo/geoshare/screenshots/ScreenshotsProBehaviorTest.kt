@@ -20,6 +20,7 @@ import page.ooooo.geoshare.tests.goToUserPreferencesDetail
 import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.tests.quickWaitForStableInActiveWindow
 import page.ooooo.geoshare.tests.saveScreenshot
+import page.ooooo.geoshare.tests.setAppLocales
 import page.ooooo.geoshare.tests.shareUri
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
@@ -31,6 +32,7 @@ class ScreenshotsProBehaviorTest {
         fun setup() = uiAutomator {
             enableSystemUIDemoMode()
             enableDarkMode()
+            setAppLocales("en-US")
         }
 
         @AfterClass
