@@ -47,7 +47,7 @@ fun ResultSheet(
     LazyColumn(
         Modifier
             .semantics { testTagsAsResourceId = true }
-            .testTag("geoShareResultSuccessSheet"),
+            .testTag("geoShareResultSheet"),
     ) {
         item {
             ResultSuccessSheetItemGroup(

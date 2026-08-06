@@ -16,7 +16,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -24,7 +23,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
@@ -73,16 +71,17 @@ import page.ooooo.geoshare.lib.billing.FakeSubscriptionOffer
 import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.billing.Offer
 import page.ooooo.geoshare.ui.components.AnimatedMessage
-import page.ooooo.geoshare.ui.components.StyledSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.LargeButton
 import page.ooooo.geoshare.ui.components.MainHeadline
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
+import page.ooooo.geoshare.ui.components.NavigationBackButton
 import page.ooooo.geoshare.ui.components.ScaffoldAction
 import page.ooooo.geoshare.ui.components.SegmentedList
+import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
+import page.ooooo.geoshare.ui.components.StyledSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.TextList
 import page.ooooo.geoshare.ui.components.TextListItem
-import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration
@@ -160,12 +159,7 @@ private fun BillingScreen(
                 TopAppBar(
                     title = {},
                     navigationIcon = {
-                        IconButton(onClick = onBack) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                                contentDescription = stringResource(R.string.nav_back_content_description)
-                            )
-                        }
+                        NavigationBackButton(onBack)
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent,

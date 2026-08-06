@@ -2,6 +2,7 @@
 
 package page.ooooo.geoshare.data
 
+import page.ooooo.geoshare.data.local.database.InitialLinks
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
@@ -204,7 +205,7 @@ class OutputRepository @Inject constructor(
                 }
 
             is CopyLinkNavigationAppleMapsUriAutomation ->
-                getLinkByUUID(UUID.fromString("a5092c63-cf5c-4225-9059-e888ae12e215"))?.let { link ->
+                getLinkByUUID(UUID.fromString(InitialLinks.APPLE_MAPS_NAVIGATION_UUID))?.let { link ->
                     CopyLinkUriOutput(link, coordinateConverter)
                 }
 

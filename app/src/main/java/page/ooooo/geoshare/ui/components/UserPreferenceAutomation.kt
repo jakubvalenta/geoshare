@@ -126,12 +126,7 @@ fun UserPreferenceAutomationControls(
     ) {
         userPreferenceOptionsControl(
             userPreference = AutomationPreference,
-            optionGroups = AutomationPreference.getOptionGroups(
-                apps,
-                appDetails,
-                values.hiddenApps,
-                links
-            ),
+            optionGroups = AutomationPreference.getOptionGroups(apps, appDetails, values.hiddenApps, links),
             values = values,
             enabled = AutomationFeature in billingFeatures && billingStatus is BillingStatus.Purchased,
             itemTestTag = { option ->

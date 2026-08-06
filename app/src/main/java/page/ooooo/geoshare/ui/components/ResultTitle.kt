@@ -117,10 +117,11 @@ fun ResultTitle(
                 }
                 ResultMessageText(
                     targetState.output.automationWaitingText(counterSec, appDetails),
-                    Modifier.testTag("geoShareResultSuccessAutomationCounter"),
+                    Modifier.testTag("geoShareResultAutomationCounter"),
                 )
                 FilledIconButton(
                     onCancel,
+                    Modifier.testTag("geoShareResultAutomationCancel"),
                     colors = IconButtonDefaults.filledIconButtonColors(
                         containerColor = MaterialTheme.colorScheme.tertiary,
                         contentColor = MaterialTheme.colorScheme.onTertiary,
@@ -136,13 +137,14 @@ fun ResultTitle(
             is ActionSucceeded -> ResultMessageRow {
                 ResultMessageText(
                     targetState.output.successText(appDetails),
-                    Modifier.testTag("geoShareResultSuccessMessage"),
+                    Modifier.testTag("geoShareResultMessageSuccess"),
                 )
             }
 
             is ActionFailed -> ResultMessageRow {
                 ResultMessageText(
                     targetState.output.errorText(appDetails),
+                    Modifier.testTag("geoShareResultMessageError"),
                     containerColor = MaterialTheme.colorScheme.errorContainer,
                     contentColor = MaterialTheme.colorScheme.onErrorContainer,
                 )
@@ -151,13 +153,14 @@ fun ResultTitle(
             is ActionAutomationSucceeded -> ResultMessageRow {
                 ResultMessageText(
                     targetState.output.automationSuccessText(appDetails),
-                    Modifier.testTag("geoShareResultSuccessMessage"),
+                    Modifier.testTag("geoShareResultMessageSuccess"),
                 )
             }
 
             is ActionAutomationFailed -> ResultMessageRow {
                 ResultMessageText(
                     targetState.output.automationErrorText(appDetails),
+                    Modifier.testTag("geoShareResultMessageError"),
                     containerColor = MaterialTheme.colorScheme.errorContainer,
                     contentColor = MaterialTheme.colorScheme.onErrorContainer,
                 )
@@ -166,6 +169,7 @@ fun ResultTitle(
             is LocationFindingFailed -> ResultMessageRow {
                 ResultMessageText(
                     stringResource(R.string.conversion_succeeded_location_failed),
+                    Modifier.testTag("geoShareResultMessageError"),
                     containerColor = MaterialTheme.colorScheme.errorContainer,
                     contentColor = MaterialTheme.colorScheme.onErrorContainer,
                 )
@@ -174,7 +178,7 @@ fun ResultTitle(
             is ConversionState.HasSmallLoadingIndicator -> ResultMessageRow {
                 ResultMessageText(
                     targetState.getLoadingIndicator().message,
-                    Modifier.testTag("geoShareResultSuccessSmallLoadingIndicatorMessage"),
+                    Modifier.testTag("geoShareResultSmallLoadingIndicatorMessage"),
                 )
                 FilledIconButton(
                     onCancel,

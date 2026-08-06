@@ -21,6 +21,7 @@
 /captures
 /local.properties
 README.html
+fastlane/**/screenshots.html
 fastlane/Appfile
 fastlane/README.md
 fastlane/report.xml

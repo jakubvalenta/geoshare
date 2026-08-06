@@ -15,6 +15,7 @@ import page.ooooo.geoshare.data.di.FakeMagicEarthNavigationLink
 import page.ooooo.geoshare.data.di.FakeOpenStreetMapDisplayLink
 import page.ooooo.geoshare.data.di.FakeOpenStreetMapNavigationLink
 import page.ooooo.geoshare.data.di.defaultFakeLinks
+import page.ooooo.geoshare.data.local.database.InitialLinks
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.database.findByUUID
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
@@ -443,7 +444,7 @@ class OutputRepositoryTest {
                 ShareRouteGpxOutput(coordinateConverter),
             ),
             listOf(
-                CopyLinkUriAutomation(UUID.fromString("a5092c63-cf5c-4225-9059-e888ae12e215")),
+                CopyLinkUriAutomation(UUID.fromString(InitialLinks.APPLE_MAPS_NAVIGATION_UUID)),
                 CopyLinkUriAutomation(UUID.fromString("ce900ea1-2c5d-4641-82f3-a5429a68d603")),
                 CopyCoordsDecAutomation,
                 CopyCoordsDegMinSecAutomation,
@@ -468,7 +469,7 @@ class OutputRepositoryTest {
                     getLinkByUUID = {
                         when (it) {
                             UUID.fromString("ce900ea1-2c5d-4641-82f3-a5429a68d603") -> FakeAppleMapsDisplayLink
-                            UUID.fromString("a5092c63-cf5c-4225-9059-e888ae12e215") -> FakeAppleMapsNavigationLink
+                            UUID.fromString(InitialLinks.APPLE_MAPS_NAVIGATION_UUID) -> FakeAppleMapsNavigationLink
                             UUID.fromString("7bd96da4-beba-4a30-9dbd-b437a49a1dc0") -> FakeGoogleMapsDisplayLink
                             UUID.fromString("64b0b360-24ec-4113-9056-314223c6e19a") -> FakeGoogleMapsNavigationLink
                             UUID.fromString("9d7cd113-ce01-4b8b-82fe-856956b8b20a") -> FakeGoogleMapsStreetViewLink

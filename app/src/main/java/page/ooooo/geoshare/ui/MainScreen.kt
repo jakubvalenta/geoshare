@@ -878,7 +878,7 @@ private fun MainTitle(
                     } else {
                         stringResource(R.string.conversion_succeeded_title)
                     },
-                Modifier.testTag("geoShareResultSuccessLastPointName"),
+                Modifier.testTag("geoShareResultLastPointName"),
                 overflow = TextOverflow.Ellipsis,
                 maxLines = maxLines,
             )
@@ -918,7 +918,8 @@ private fun MainLoadingIndicator(
             onCancel,
             Modifier
                 .align(Alignment.CenterHorizontally)
-                .padding(vertical = spacing.small),
+                .padding(vertical = spacing.small)
+                .testTag("geoShareMainLoadingIndicatorCancel"),
             colors = ButtonDefaults.elevatedButtonColors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                 contentColor = MaterialTheme.colorScheme.onSurface,

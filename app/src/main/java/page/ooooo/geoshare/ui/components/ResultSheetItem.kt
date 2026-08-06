@@ -32,7 +32,7 @@ fun ResultSheetItem(
             {
                 Text(
                     text,
-                    Modifier.testTag("geoShareResultSuccessSheetItemDescription"),
+                    Modifier.testTag("geoShareResultSheetItemDescription"),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -42,6 +42,6 @@ fun ResultSheetItem(
             ?: { Spacer(Modifier.size(24.dp)) },
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
     ) {
-        Text(headlineText, Modifier.testTag("geoShareResultSuccessSheetItemHeadline"))
+        Text(headlineText, Modifier.testTag("geoShareResultSheetItemHeadline"))
     }
 }

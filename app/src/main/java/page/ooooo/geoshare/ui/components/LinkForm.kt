@@ -40,8 +40,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -190,7 +188,7 @@ fun LinkForm(
             ) to stringResource(R.string.links_form_test_china),
         ).let { testPointsWithName ->
             Column(verticalArrangement = Arrangement.spacedBy(spacing.small)) {
-                ScrollableChips(PaddingValues(horizontal = LocalSpacing.current.windowPadding)) {
+                ScrollableChips(paddingValues = PaddingValues(horizontal = LocalSpacing.current.windowPadding)) {
                     testPointsWithName.forEach { (point, name) ->
                         item {
                             SuggestionChip(
@@ -234,8 +232,8 @@ fun LinkForm(
                 value = appEnabled,
                 onCheckedChange = onSetAppEnabled,
                 label = stringResource(R.string.links_form_enabled_option_app),
+                modifier = Modifier.testTag("geoShareLinkFormAppEnabled"),
                 enabled = enabled,
-                testTag = "geoShareLinkFormAppEnabled",
             ) {
                 Box(
                     Modifier
@@ -260,8 +258,8 @@ fun LinkForm(
                 value = sheetEnabled,
                 onCheckedChange = onSetSheetEnabled,
                 label = stringResource(R.string.links_form_enabled_option_sheet),
+                modifier = Modifier.testTag("geoShareLinkFormSheetEnabled"),
                 enabled = enabled,
-                testTag = "geoShareLinkFormSheetEnabled",
             ) {
                 Surface(shape = BottomSheetDefaults.ExpandedShape) {
                     Column {
@@ -281,8 +279,8 @@ fun LinkForm(
                 value = chipEnabled,
                 onCheckedChange = onSetChipEnabled,
                 label = stringResource(R.string.links_form_enabled_option_chip),
+                modifier = Modifier.testTag("geoShareLinkFormChipEnabled"),
                 enabled = enabled,
-                testTag = "geoShareLinkFormChipEnabled",
             ) {
                 Surface(
                     Modifier.fillMaxWidth(),
@@ -316,7 +314,9 @@ fun LinkForm(
                     style = MaterialTheme.typography.bodyLarge,
                 )
             },
-            modifier = Modifier.padding(horizontal = spacing.windowPadding),
+            modifier = Modifier
+                .padding(horizontal = spacing.windowPadding)
+                .testTag("geoShareLinkFormAdvanced"),
             enabled = enabled,
         ) {
             Column {
@@ -361,6 +361,7 @@ fun LinkForm(
                         .padding(top = spacing.medium),
                     enabled = enabled,
                     label = { Text(stringResource(R.string.links_form_srs)) },
+                    testTagPrefix = "geoShareLinkFormSRS",
                 )
                 TextField(
                     value = nameUriTemplate,
@@ -440,14 +441,14 @@ private fun LinkFormCheckbox(
     value: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     label: String,
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    testTag: String? = null,
     content: @Composable () -> Unit,
 ) {
     val spacing = LocalSpacing.current
 
     Row(
-        Modifier
+        modifier
             .padding(spacing.small)
             .toggleable(value = value, enabled = enabled, role = Role.Checkbox, onValueChange = onCheckedChange),
         horizontalArrangement = Arrangement.spacedBy(spacing.small),
@@ -455,11 +456,6 @@ private fun LinkFormCheckbox(
         Checkbox(
             checked = value,
             onCheckedChange = null,
-            modifier = Modifier.semantics {
-                if (testTag != null) {
-                    this.testTag = if (value) "${testTag}_checked" else "${testTag}_unchecked"
-                }
-            },
             enabled = enabled,
         )
         Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {

@@ -103,6 +103,7 @@ fun MainMenu(
             )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.faq_title)) },
+                modifier = Modifier.testTag("geoShareMainMenuFaq"),
                 onClick = {
                     expanded = false
                     onNavigateToFaqScreen(null)
@@ -155,6 +156,7 @@ fun MainMenu(
             }
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.about_title)) },
+                modifier = Modifier.testTag("geoShareMainMenuAbout"),
                 onClick = {
                     expanded = false
                     onNavigateToAboutScreen()
