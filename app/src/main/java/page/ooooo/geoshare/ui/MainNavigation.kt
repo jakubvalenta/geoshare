@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.ui
 
+import android.util.Log
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,6 +44,8 @@ object ServerRoute
 @Serializable
 data class UserPreferencesRoute(val groupId: UserPreferenceGroupId? = null)
 
+private const val TAG = "MainNavigation"
+
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun MainNavigation(
@@ -54,6 +57,17 @@ fun MainNavigation(
 ) {
     val navController = rememberNavController()
     val introShown by introViewModel.shown.collectAsStateWithLifecycle()
+    val source = conversionViewModel.source
+
+    /**
+     * Go to main screen if we're on another screen and a new map link has been shared with the app.
+     */
+    LaunchedEffect(source) {
+        if (navController.currentBackStackEntry != MainRoute) {
+            Log.d(TAG, "Navigating to main screen")
+            navController.navigate(MainRoute)
+        }
+    }
 
     LaunchedEffect(introEnabled, introShown) {
         if (introEnabled && !introShown) {
