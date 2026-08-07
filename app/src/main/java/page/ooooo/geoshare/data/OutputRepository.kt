@@ -105,36 +105,38 @@ class OutputRepository @Inject constructor(
         )
 
     fun getOutputsForApps(apps: DataTypes, hiddenApps: Set<String>?): Map<String, List<Output>> =
-        apps.filterKeys { hiddenApps?.contains(it) != true }.mapValues { (packageName, dataTypes) ->
-            buildList {
-                if (DataType.GEO_URI in dataTypes) {
-                    add(OpenDisplayGeoUriOutput(packageName, coordinateConverter))
-                }
-                if (DataType.CARTES_IGN_URL in dataTypes) {
-                    add(OpenDisplayCartesIGNUrlOutput(packageName, coordinateConverter))
-                }
-                if (DataType.MAGIC_EARTH_URI in dataTypes) {
-                    add(OpenDisplayMagicEarthUriOutput(packageName, coordinateConverter))
-                    add(OpenNavigationMagicEarthUriOutput(packageName, coordinateConverter))
-                }
-                if (DataType.GOOGLE_NAVIGATION_URI in dataTypes) {
-                    add(OpenNavigationGoogleUriOutput(packageName, coordinateConverter))
-                }
-                if (DataType.GOOGLE_STREET_VIEW_URI in dataTypes) {
-                    add(OpenStreetViewGoogleUriOutput(packageName, coordinateConverter))
-                }
-                if (DataType.GPX_DATA in dataTypes) {
-                    add(OpenRouteGpxOutput(packageName, coordinateConverter))
-                    add(OpenPointsGpxOutput(packageName, coordinateConverter))
-                }
-                if (DataType.GPX_ONE_POINT_DATA in dataTypes) {
-                    add(OpenRouteOnePointGpxOutput(packageName, coordinateConverter))
-                }
-                if (DataType.SEND_PLAIN_TEXT in dataTypes) {
-                    add(SendPointOutput(packageName, coordinateConverter))
+        apps
+            .filterKeys { hiddenApps?.contains(it) != true }
+            .mapValues { (packageName, dataTypes) ->
+                buildList {
+                    if (DataType.GEO_URI in dataTypes) {
+                        add(OpenDisplayGeoUriOutput(packageName, coordinateConverter))
+                    }
+                    if (DataType.CARTES_IGN_URL in dataTypes) {
+                        add(OpenDisplayCartesIGNUrlOutput(packageName, coordinateConverter))
+                    }
+                    if (DataType.MAGIC_EARTH_URI in dataTypes) {
+                        add(OpenDisplayMagicEarthUriOutput(packageName, coordinateConverter))
+                        add(OpenNavigationMagicEarthUriOutput(packageName, coordinateConverter))
+                    }
+                    if (DataType.GOOGLE_NAVIGATION_URI in dataTypes) {
+                        add(OpenNavigationGoogleUriOutput(packageName, coordinateConverter))
+                    }
+                    if (DataType.GOOGLE_STREET_VIEW_URI in dataTypes) {
+                        add(OpenStreetViewGoogleUriOutput(packageName, coordinateConverter))
+                    }
+                    if (DataType.GPX_DATA in dataTypes) {
+                        add(OpenRouteGpxOutput(packageName, coordinateConverter))
+                        add(OpenPointsGpxOutput(packageName, coordinateConverter))
+                    }
+                    if (DataType.GPX_ONE_POINT_DATA in dataTypes) {
+                        add(OpenRouteOnePointGpxOutput(packageName, coordinateConverter))
+                    }
+                    if (DataType.SEND_PLAIN_TEXT in dataTypes) {
+                        add(SendPointOutput(packageName, coordinateConverter))
+                    }
                 }
             }
-        }
 
     fun getOutputsForLinks(links: List<Link>): Map<String?, List<Output>> =
         links

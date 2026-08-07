@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.shape.CircleShape
@@ -49,6 +51,7 @@ import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
+import page.ooooo.geoshare.lib.outputs.SendPointOutput
 import page.ooooo.geoshare.lib.outputs.ShareLinkUriOutput
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -76,10 +79,114 @@ fun ResultApps(
             }
         )
     }
+    val (outputsForMapApps, outputsForMessagingApps) = outputsForApps.entries.partition { (_, outputs) ->
+        outputs.size != 1 || outputs[0] !is SendPointOutput
+    }
+
+    // Map apps
+    ResultAppsGrid(
+        outputsForApps = outputsForMapApps,
+        appDetails = appDetails,
+        iconSize = iconSize,
+        onClick = onClick,
+        onHideApp = onHideApp,
+    ) {
+        // Share item
+        item {
+            AppIcon(
+                modifier = Modifier
+                    .weight(1f)
+                    .testTag("geoShareApp_share"),
+                label = null,
+                appDetails = appDetails,
+                outputs = outputsForSharing,
+                onClick = onClick,
+            ) {
+                Surface(
+                    Modifier.requiredSize(iconSize),
+                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    shape = CircleShape,
+                ) {
+                    outputsForSharing.firstOrNull()?.let { firstOutput ->
+                        firstOutput.getIcon(appDetails)?.let { icon ->
+                            IconFromDescriptor(icon, contentDescription = firstOutput.label(appDetails), size = 24.dp)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Messaging apps
+    if (outputsForMessagingApps.isNotEmpty()) {
+        ResultAppsHeadline(stringResource(R.string.output_send))
+        ResultAppsGrid(
+            outputsForApps = outputsForMessagingApps,
+            appDetails = appDetails,
+            iconSize = iconSize,
+            onClick = onClick,
+            onHideApp = onHideApp,
+        )
+    }
+
+    // Links
+    if (outputsForLinks.isNotEmpty()) {
+        ResultAppsHeadline(stringResource(R.string.links_title)) {
+            IconButton({ onNavigateToLinkScreen() }) {
+                Icon(
+                    Icons.Default.Add,
+                    contentDescription = stringResource(R.string.conversion_succeeded_apps_links_configure),
+                    Modifier.requiredSize(24.dp),
+                )
+            }
+        }
+        ResultAppsLinksGrid(
+            outputsForLinks = outputsForLinks,
+            appDetails = appDetails,
+            iconSize = iconSize,
+            onClick = onClick,
+            onDisableLinkGroup = onDisableLinkGroup,
+        )
+    }
+}
+
+@Composable
+private fun ResultAppsHeadline(text: String, extra: (@Composable RowScope.() -> Unit)? = null) {
+    val spacing = LocalSpacing.current
+
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .height(50.dp)
+            .padding(
+                start = spacing.windowPadding,
+                top = spacing.tinyAdaptive,
+                end = spacing.windowPadding - 8.dp, // Align with last point menu
+            ),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text,
+            Modifier.semantics { heading() },
+            style = MaterialTheme.typography.titleMedium,
+        )
+        extra?.invoke(this)
+    }
+}
+
+@Composable
+private fun ResultAppsGrid(
+    outputsForApps: List<Map.Entry<String, List<Output>>>,
+    appDetails: AppDetails,
+    iconSize: Dp,
+    onClick: (output: Output) -> Unit,
+    onHideApp: (packageName: String) -> Unit,
+    extra: (GridScope.() -> Unit)? = null,
+) {
     val spacing = LocalSpacing.current
 
     Grid(Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.smallAdaptive)) {
-        // Apps
         outputsForApps
             .map { (packageName, outputs) -> Triple(packageName, appDetails[packageName]?.label, outputs) }
             .sortedWith(compareBy(nullsLast()) { (_, label) -> label })
@@ -105,93 +212,48 @@ fun ResultApps(
                     }
                 }
             }
-        // Share item
-        item {
-            AppIcon(
-                modifier = Modifier
-                    .weight(1f)
-                    .testTag("geoShareApp_share"),
-                label = null,
-                appDetails = appDetails,
-                outputs = outputsForSharing,
-                onClick = onClick,
-            ) {
-                Surface(
-                    Modifier.requiredSize(iconSize),
-                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    shape = CircleShape,
-                ) {
-                    outputsForSharing.firstOrNull()?.let { firstOutput ->
-                        firstOutput.getIcon(appDetails)?.let { icon ->
-                            IconFromDescriptor(
-                                icon,
-                                contentDescription = firstOutput.label(appDetails),
-                                size = 24.dp
-                            )
-                        }
-                    }
-                }
-            }
-        }
+        extra?.invoke(this)
     }
+}
 
-    if (outputsForLinks.isNotEmpty()) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = spacing.windowPadding,
-                    top = spacing.tinyAdaptive,
-                    end = spacing.windowPadding - 8.dp, // Align with last point menu
-                ),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                stringResource(R.string.links_title),
-                Modifier.semantics { heading() },
-                style = MaterialTheme.typography.titleMedium,
-            )
-            IconButton(
-                { onNavigateToLinkScreen() },
-            ) {
-                Icon(
-                    Icons.Default.Add,
-                    contentDescription = stringResource(R.string.conversion_succeeded_apps_links_configure),
-                    Modifier.requiredSize(24.dp),
-                )
-            }
-        }
-        Grid(Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.smallAdaptive)) {
-            // Links
-            outputsForLinks
-                .forEach { (group, outputs) ->
-                    item {
-                        val uuid = (outputs.firstOrNull() as? ShareLinkUriOutput)?.link?.uuid
-                        AppIcon(
-                            modifier = Modifier
-                                .weight(1f)
-                                .testTag("geoShareApp_$uuid"),
-                            label = group,
-                            appDetails = appDetails,
-                            outputs = outputs,
-                            onClick = onClick,
-                            onHide = { onDisableLinkGroup(group) },
-                        ) {
-                            outputs.firstOrNull()?.getIcon(appDetails)?.let {
-                                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
-                                    IconFromDescriptor(
-                                        it,
-                                        contentDescription = null,
-                                        size = iconSize,
-                                        inverseContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                                    )
-                                }
+@Composable
+private fun ResultAppsLinksGrid(
+    outputsForLinks: Map<String?, List<Output>>,
+    appDetails: AppDetails,
+    iconSize: Dp,
+    onClick: (output: Output) -> Unit,
+    onDisableLinkGroup: (group: String?) -> Unit,
+) {
+    val spacing = LocalSpacing.current
+
+    Grid(Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.smallAdaptive)) {
+        outputsForLinks
+            .forEach { (group, outputs) ->
+                item {
+                    val uuid = (outputs.firstOrNull() as? ShareLinkUriOutput)?.link?.uuid
+                    AppIcon(
+                        modifier = Modifier
+                            .weight(1f)
+                            .testTag("geoShareApp_$uuid"),
+                        label = group,
+                        appDetails = appDetails,
+                        outputs = outputs,
+                        onClick = onClick,
+                        onHide = { onDisableLinkGroup(group) },
+                    ) {
+                        outputs.firstOrNull()?.getIcon(appDetails)?.let {
+                            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
+                                IconFromDescriptor(
+                                    it,
+                                    contentDescription = null,
+                                    size = iconSize,
+                                    inverseContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                                )
                             }
                         }
                     }
                 }
-        }
+            }
     }
 }
 
@@ -214,6 +276,10 @@ private fun DefaultPreview() {
                     appDetails = mapOf(
                         PackageNames.COMAPS_FDROID to AppDetail(
                             "CoMaps",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        PackageNames.CONVERSATIONS to AppDetail(
+                            "Conversations",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                         PackageNames.ORGANIC_MAPS to AppDetail(
@@ -252,6 +318,7 @@ private fun DefaultPreview() {
                     outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
                             PackageNames.COMAPS_FDROID to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            PackageNames.CONVERSATIONS to setOf(DataType.SEND_PLAIN_TEXT),
                             PackageNames.GMAPS_WV to setOf(DataType.GEO_URI),
                             PackageNames.GOOGLE_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                             PackageNames.HERE_WEGO to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
@@ -261,7 +328,7 @@ private fun DefaultPreview() {
                             PackageNames.OSMAND_PLUS to setOf(DataType.GPX_DATA),
                             PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
                         ),
-                        emptySet(),
+                        hiddenApps = emptySet(),
                     ),
                     outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
                     outputsForSharing = outputRepository.getOutputsForSharing(),
@@ -294,6 +361,10 @@ private fun DarkPreview() {
                             "CoMaps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
+                        PackageNames.CONVERSATIONS to AppDetail(
+                            "Conversations",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
                         PackageNames.ORGANIC_MAPS to AppDetail(
                             "Organic Maps",
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
@@ -330,6 +401,7 @@ private fun DarkPreview() {
                     outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
                             PackageNames.COMAPS_FDROID to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            PackageNames.CONVERSATIONS to setOf(DataType.SEND_PLAIN_TEXT),
                             PackageNames.GMAPS_WV to setOf(DataType.GEO_URI),
                             PackageNames.GOOGLE_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                             PackageNames.HERE_WEGO to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
@@ -339,7 +411,7 @@ private fun DarkPreview() {
                             PackageNames.OSMAND_PLUS to setOf(DataType.GPX_DATA),
                             PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
                         ),
-                        emptySet(),
+                        hiddenApps = emptySet(),
                     ),
                     outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
                     outputsForSharing = outputRepository.getOutputsForSharing(),
@@ -372,7 +444,7 @@ private fun LoadingPreview() {
                             PackageNames.COMAPS_FDROID to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                             PackageNames.ORGANIC_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                         ),
-                        emptySet(),
+                        hiddenApps = emptySet(),
                     ),
                     outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
                     outputsForSharing = outputRepository.getOutputsForSharing(),
@@ -380,7 +452,8 @@ private fun LoadingPreview() {
                     onDisableLinkGroup = {},
                     onExecute = {},
                     onHideApp = {},
-                ) {}
+                    onNavigateToLinkScreen = {},
+                )
             }
         }
     }
@@ -405,7 +478,7 @@ private fun DarkLoadingPreview() {
                             PackageNames.COMAPS_FDROID to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                             PackageNames.ORGANIC_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                         ),
-                        emptySet(),
+                        hiddenApps = emptySet(),
                     ),
                     outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
                     outputsForSharing = outputRepository.getOutputsForSharing(),
@@ -413,7 +486,8 @@ private fun DarkLoadingPreview() {
                     onDisableLinkGroup = {},
                     onExecute = {},
                     onHideApp = {},
-                ) {}
+                    onNavigateToLinkScreen = {},
+                )
             }
         }
     }
@@ -440,7 +514,8 @@ private fun EmptyPreview() {
                     onDisableLinkGroup = {},
                     onExecute = {},
                     onHideApp = {},
-                ) {}
+                    onNavigateToLinkScreen = {},
+                )
             }
         }
     }
@@ -467,7 +542,8 @@ private fun DarkEmptyPreview() {
                     onDisableLinkGroup = {},
                     onExecute = {},
                     onHideApp = {},
-                ) {}
+                    onNavigateToLinkScreen = {},
+                )
             }
         }
     }
