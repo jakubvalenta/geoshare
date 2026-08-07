@@ -893,6 +893,17 @@ fun UiAutomatorTestScope.setAppLocales(locales: String) {
     )
 }
 
+inline fun <T> UiAutomatorTestScope.withNetworkOff(block: () -> T): T {
+    device.executeShellCommand("svc wifi disable")
+    device.executeShellCommand("svc data disable")
+    try {
+        return block()
+    } finally {
+        device.executeShellCommand("svc wifi enable")
+        device.executeShellCommand("svc data enable")
+    }
+}
+
 /**
  * Take screenshot and write it to [androidx.test.platform.io.PlatformTestStorage] under [name].
  */

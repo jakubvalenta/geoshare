@@ -74,19 +74,20 @@ class ScreenshotsProBehaviorTest {
         // Conversion - Error - Unsupported source place list
         shareUri("https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg")
         onElement { viewIdResourceName == "geoShareConversionErrorMessage" }
-        saveScreenshot("conversion_error_unsupported_source_place_list")
+        saveScreenshot("main_strings/conversion_error_unsupported_source_place_list")
+        saveScreenshot("pro_strings/conversion_error_unsupported_source")
 
         // Conversion - Check - Name only
         shareUri("https://www.google.com/maps/place/Hermannstr.+20,+Berlin/")
         onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
         onElement { viewIdResourceName == "geoShareResultLastPointName" }
-        saveScreenshot("conversion_result_check_name_only")
+        saveScreenshot("main_strings/conversion_result_check_name_only")
 
         // Conversion - Check - Points name only
         shareUri("https://www.google.com/maps/dir/?api=1&origin=Paris,France&destination=Cherbourg,France&travelmode=driving&waypoints=Versailles,France%7CChartres,France%7CLe%2BMans,France%7CCaen,France")
         onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
         onElement { viewIdResourceName == "geoShareResultLastPointName" }
-        saveScreenshot("conversion_result_check_points_name_only")
+        saveScreenshot("main_strings/conversion_result_check_points_name_only")
 
         goBackToMainForm()
     }
@@ -95,7 +96,7 @@ class ScreenshotsProBehaviorTest {
         // Servers - List - Page 1
         goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
         quickWaitForStableInActiveWindow()
-        saveScreenshot("servers_list_pro_page_1")
+        saveScreenshot("pro_strings/servers_list_pro_page_1")
 
         goBackToMainForm()
     }

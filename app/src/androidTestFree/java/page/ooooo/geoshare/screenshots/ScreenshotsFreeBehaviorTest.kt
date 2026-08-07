@@ -56,6 +56,7 @@ import page.ooooo.geoshare.tests.setAppLocales
 import page.ooooo.geoshare.tests.setMainInput
 import page.ooooo.geoshare.tests.shareUri
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
+import page.ooooo.geoshare.tests.withNetworkOff
 import page.ooooo.geoshare.ui.FaqItemId
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 import java.util.UUID
@@ -132,17 +133,17 @@ class ScreenshotsFreeBehaviorTest {
         // Intro - How to show a map location
         onElement { viewIdResourceName == "geoShareIntroPage_0" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("intro_how_to_show_a_map_location")
+        saveScreenshot("main_strings/intro_how_to_show_a_map_location")
 
         // Intro - Open links in GeoShare - Page 1
         onElement { viewIdResourceName == "geoShareIntroNextButton" }.click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("intro_open_links_in_geo_share_page_1")
+        saveScreenshot("main_strings/intro_open_links_in_geo_share_page_1")
 
         // Intro - Open links in GeoShare - Page 2
         onElement { viewIdResourceName == "geoShareIntroPage_1" }.scroll(Direction.DOWN, 2f)
         quickWaitForStableInActiveWindow()
-        saveScreenshot("intro_open_links_in_geo_share_page_2")
+        saveScreenshot("main_strings/intro_open_links_in_geo_share_page_2")
 
         onElement { viewIdResourceName == "geoShareIntroNextButton" }.click() // Finish intro
     }
@@ -150,17 +151,17 @@ class ScreenshotsFreeBehaviorTest {
     fun testMain() = uiAutomator {
         // Main
         quickWaitForStableInActiveWindow()
-        saveScreenshot("main")
+        saveScreenshot("main_strings/main")
 
         // Main - Error - Missing URL
         onElement { viewIdResourceName == "geoShareMainSubmitButton" }.click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("main_error_missing_url")
+        saveScreenshot("main_strings/main_error_missing_url")
 
         // Main - Menu
         onElement { viewIdResourceName == "geoShareMainMenuButton" }.click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("main_menu")
+        saveScreenshot("main_strings/main_menu")
 
         pressBack() // Close main menu
     }
@@ -170,12 +171,12 @@ class ScreenshotsFreeBehaviorTest {
         onElement { viewIdResourceName == "geoShareMainMenuButton" }.click()
         onElement { viewIdResourceName == "geoShareMainMenuAbout" }.click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("about")
+        saveScreenshot("main_strings/about")
 
         // Licenses
         onElement { textAsString() == "Licenses" }.click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("licenses")
+        saveScreenshot("main_strings/licenses")
         pressBack() // Go back to about screen
 
         goBackToMainForm()
@@ -193,7 +194,7 @@ class ScreenshotsFreeBehaviorTest {
         setMainInput()
         onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareResultMessageSuccess" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("automation_copy_coords_success")
+        saveScreenshot("main_strings/automation_copy_coords_success")
 
         // Automation - Open app - Waiting
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
@@ -202,7 +203,7 @@ class ScreenshotsFreeBehaviorTest {
         setMainInput()
         onElement { viewIdResourceName == "geoShareResultAutomationCounter" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("automation_open_app_waiting")
+        saveScreenshot("main_strings/automation_open_app_waiting")
         onElement { viewIdResourceName == "geoShareResultAutomationCancel" }.click()
 
         // Automation - Copy link - Success
@@ -212,7 +213,7 @@ class ScreenshotsFreeBehaviorTest {
         setMainInput()
         onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareResultMessageSuccess" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("automation_copy_link_success")
+        saveScreenshot("main_strings/automation_copy_link_success")
 
         // Automation - Save GPX - Waiting
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
@@ -221,12 +222,12 @@ class ScreenshotsFreeBehaviorTest {
         setMainInput()
         onElement { viewIdResourceName == "geoShareResultAutomationCounter" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("automation_save_gpx_waiting")
+        saveScreenshot("main_strings/automation_save_gpx_waiting")
 
         // Automation - Save GPX - Success
         chooseFile()
         onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareResultMessageSuccess" }
-        saveScreenshot("automation_save_gpx_success")
+        saveScreenshot("main_strings/automation_save_gpx_success")
 
         // Reset automation
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
@@ -248,14 +249,14 @@ class ScreenshotsFreeBehaviorTest {
         setMainInput()
         onElement { viewIdResourceName == "geoShareResultAutomationCounter" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("automation_share_waiting")
+        saveScreenshot("main_strings/automation_share_waiting")
         runBlocking {
             delay(5.seconds) // Wait for the automation waiting to finish
         }
         pressBack() // Close the system share menu
 
         // Automation - Share - Success
-        saveScreenshot("automation_share_success") // Don't wait, because the message will disappear fast
+        saveScreenshot("main_strings/automation_share_success") // Don't wait, because the message will disappear fast
 
         // Automation - Share GPX route - Waiting
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
@@ -264,14 +265,14 @@ class ScreenshotsFreeBehaviorTest {
         setMainInput()
         onElement { viewIdResourceName == "geoShareResultAutomationCounter" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("automation_share_gpx_route_waiting")
+        saveScreenshot("main_strings/automation_share_gpx_route_waiting")
         runBlocking {
             delay(5.seconds) // Wait for the automation waiting to finish
         }
         pressBack() // Close the system share menu
 
         // Automation - Share GPX route - Success
-        saveScreenshot("automation_share_gpx_route_success") // Don't wait, because the message will disappear fast
+        saveScreenshot("main_strings/automation_share_gpx_route_success") // Don't wait, because the message will disappear fast
 
         // Reset automation
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
@@ -285,20 +286,20 @@ class ScreenshotsFreeBehaviorTest {
         shareUri("https://www.google.com/maps/spam")
         onElement { viewIdResourceName == "geoShareConversionErrorMessage" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("conversion_error_parse_error")
+        saveScreenshot("main_strings/conversion_error_parse_error")
 
         // Conversion - Error - Unshorten error
         shareUri("https://maps.app.goo.gl/spam")
         onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
         onElement { viewIdResourceName == "geoShareConversionErrorMessage" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("conversion_error_unshorten_error")
+        saveScreenshot("main_strings/conversion_error_unshorten_error")
 
         // Conversion - Error - Unsupported map service
         shareUri("spam")
         onElement { viewIdResourceName == "geoShareConversionErrorMessage" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("conversion_error_unsupported_map_service")
+        saveScreenshot("main_strings/conversion_error_unsupported_map_service")
 
         goBackToMainForm()
     }
@@ -307,23 +308,24 @@ class ScreenshotsFreeBehaviorTest {
         val uriString = "https://www.openstreetmap.org/relation/910699"
         shareUri(uriString)
 
-        // Conversion - Permission
-        onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }.let { dialog ->
-            quickWaitForStableInActiveWindow()
-            saveScreenshot("conversion_permission")
-            dialog.confirmDialog()
-        }
+        withNetworkOff {
+            // Conversion - Permission
+            onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }.let { dialog ->
+                quickWaitForStableInActiveWindow()
+                saveScreenshot("main_strings/conversion_permission")
+                dialog.confirmDialog()
+            }
 
-        onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareMainLoadingIndicatorCancel" }.let { cancelButton ->
             // Conversion - Loading indicator
+            onElement(20_000) { viewIdResourceName == "geoShareMainLoadingIndicatorDescription" }
             quickWaitForStableInActiveWindow()
-            saveScreenshot("conversion_loading_indicator")
+            saveScreenshot("main_strings/conversion_loading_indicator")
 
             // Conversion - Error - Canceled
-            cancelButton.click()
+            onElement { viewIdResourceName == "geoShareMainLoadingIndicatorCancel" }.click()
             onElement { viewIdResourceName == "geoShareConversionErrorMessage" }
             quickWaitForStableInActiveWindow()
-            saveScreenshot("conversion_error_cancelled")
+            saveScreenshot("main_strings/conversion_error_cancelled")
         }
 
         // Conversion - Error - Permission denied
@@ -331,7 +333,7 @@ class ScreenshotsFreeBehaviorTest {
         onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }.dismissDialog()
         onElement { viewIdResourceName == "geoShareConversionErrorMessage" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("conversion_error_permission_denied")
+        saveScreenshot("main_strings/conversion_error_permission_denied")
 
         goBackToMainForm()
     }
@@ -351,12 +353,12 @@ class ScreenshotsFreeBehaviorTest {
             }
             .longClick()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("conversion_result_app_google_maps")
+        saveScreenshot("main_strings/conversion_result_app_google_maps")
 
         // Conversion - Result - Message - App hidden
         onElement { viewIdResourceName == "geoShareAppHide" }.click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("conversion_result_message_app_hidden")
+        saveScreenshot("main_strings/conversion_result_message_app_hidden")
         runBlocking {
             delay(3.seconds) // Wait for the message to disappear
         }
@@ -368,7 +370,7 @@ class ScreenshotsFreeBehaviorTest {
             }
             .longClick()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("conversion_result_share")
+        saveScreenshot("main_strings/conversion_result_share")
         pressBack() // Close app menu
 
         // Conversion - Result - Web map
@@ -378,12 +380,12 @@ class ScreenshotsFreeBehaviorTest {
             }
             .longClick()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("conversion_result_web_map")
+        saveScreenshot("main_strings/conversion_result_web_map")
 
         // Conversion - Result - Message - Web map hidden
         onElement { viewIdResourceName == "geoShareAppHide" }.click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("conversion_result_message_web_map_hidden")
+        saveScreenshot("main_strings/conversion_result_message_web_map_hidden")
         runBlocking {
             delay(3.seconds) // Wait for the message to disappear
         }
@@ -405,7 +407,7 @@ class ScreenshotsFreeBehaviorTest {
             }
             .longClick()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("conversion_result_app_messaging")
+        saveScreenshot("main_strings/conversion_result_app_messaging")
         pressBack() // Close app menu
 
         goBackToMainForm()
@@ -425,7 +427,7 @@ class ScreenshotsFreeBehaviorTest {
             }
             .longClick()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("conversion_result_app_osmand")
+        saveScreenshot("main_strings/conversion_result_app_osmand")
         pressBack() // Close app menu
 
         goBackToMainForm()
@@ -437,19 +439,19 @@ class ScreenshotsFreeBehaviorTest {
         onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
         onElement { viewIdResourceName == "geoShareResultLastPointName" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("conversion_result_check_experimental")
+        saveScreenshot("main_strings/conversion_result_check_experimental")
 
         // Conversion - Check - Map center
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
         onElement { viewIdResourceName == "geoShareResultLastPointName" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("conversion_result_check_map_center")
+        saveScreenshot("main_strings/conversion_result_check_map_center")
 
         // Conversion - Check - SRS
         shareUri("https://www.google.com/maps/place/Forbidden+City/@39.9165742,116.3945834,17z/data=!4m7!3m6!1s0x35f052e94515d43d:0x674e2bd4dd3079f!8m2!3d39.9168038!4d116.3971621!15sCg5mb3JiaWRkZW4gY2l0eVoQIg5mb3JiaWRkZW4gY2l0eZIBEnRvdXJpc3RfYXR0cmFjdGlvbuABAA!16zL20vMGowYjI?entry=tts&g_ep=EgoyMDI2MDMwOS4wIPu8ASoASAFQAw%3D%3D&skid=5f340da1-a0d3-4b1c-bc05-7f90cfbd502a")
         onElement { viewIdResourceName == "geoShareResultLastPointName" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("conversion_result_check_srs")
+        saveScreenshot("main_strings/conversion_result_check_srs")
 
         goBackToMainForm()
     }
@@ -468,7 +470,7 @@ class ScreenshotsFreeBehaviorTest {
         launchNavigationInApp(PackageNames.TOMTOM)
         onElement(20_000L) { viewIdResourceName == "geoShareLocationRationaleDialog" }.let { dialog ->
             quickWaitForStableInActiveWindow()
-            saveScreenshot("conversion_result_location_rationale") // TODO
+            saveScreenshot("main_strings/conversion_result_location_rationale")
             dialog.confirmDialog()
         }
 
@@ -478,7 +480,7 @@ class ScreenshotsFreeBehaviorTest {
         onMainScrollablePane().scroll(Direction.UP, 3f) // Scroll up to see message
         onElement { viewIdResourceName == "geoShareResultSmallLoadingIndicatorMessage" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("conversion_result_location_loading_indicator")
+        saveScreenshot("main_strings/conversion_result_location_loading_indicator")
 
         // Conversion - Message - Error
         mockLocation {
@@ -487,7 +489,7 @@ class ScreenshotsFreeBehaviorTest {
         runBlocking {
             delay(2.seconds)
         }
-        saveScreenshot("conversion_result_message_error")
+        saveScreenshot("main_strings/conversion_result_message_error")
 
         goBackToMainForm()
     }
@@ -503,7 +505,7 @@ class ScreenshotsFreeBehaviorTest {
         // Conversion - Result
         onElement { viewIdResourceName == "geoShareResultLastPointName" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("conversion_result")
+        saveScreenshot("main_strings/conversion_result")
 
         // Conversion - Result - Message - Copy success
         onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
@@ -518,14 +520,14 @@ class ScreenshotsFreeBehaviorTest {
                 .click()
         }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("conversion_result_message_copy_success")
+        saveScreenshot("main_strings/conversion_result_message_copy_success")
 
         // Conversion - Result - Sheet - Page 1
         onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
         val sheet = onElement { viewIdResourceName == "geoShareResultSheet" }
         sheet.expandSheet()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("conversion_result_sheet_page_1")
+        saveScreenshot("main_strings/conversion_result_sheet_page_1")
 
         // Conversion - Result - Sheet - Page 2
         sheet.longScrollSheet() // Speed up scrolling to the item, which is at the bottom of the sheet
@@ -536,7 +538,7 @@ class ScreenshotsFreeBehaviorTest {
             )
         }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("conversion_result_sheet_page_2")
+        saveScreenshot("main_strings/conversion_result_sheet_page_2")
 
         // Conversion - Result - Save GPX - File chooser
         sheet.onElement {
@@ -547,18 +549,18 @@ class ScreenshotsFreeBehaviorTest {
         }
             .click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("conversion_result_save_gpx_file_chooser")
+        saveScreenshot("main_strings/conversion_result_save_gpx_file_chooser")
 
         // Conversion - Result - Message - Save GPX success
-        chooseFile()
+        chooseFile() // TODO Tests sometimes fail here
         onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareResultMessageSuccess" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("conversion_result_message_save_gpx_success")
+        saveScreenshot("main_strings/conversion_result_message_save_gpx_success")
 
         // Conversion - Result - Points
         onElement { viewIdResourceName == "geoShareResultPoints" }.click() // Expand points pane
         quickWaitForStableInActiveWindow()
-        saveScreenshot("conversion_result_points")
+        saveScreenshot("main_strings/conversion_result_points")
         onElement { viewIdResourceName == "geoShareResultPoints" }.click() // Collapse points pane
         quickWaitForStableInActiveWindow() // Wait for the points pane to collapse
 
@@ -566,7 +568,7 @@ class ScreenshotsFreeBehaviorTest {
         onElement { viewIdResourceName == "geoShareResultPointsChips" }
             .scroll(Direction.RIGHT, 10f) // Notice that we assume the language is LTR and swipe to the right
         quickWaitForStableInActiveWindow()
-        saveScreenshot("conversion_result_save_gpx")
+        saveScreenshot("main_strings/conversion_result_save_gpx")
 
         goBackToMainForm()
     }
@@ -576,51 +578,55 @@ class ScreenshotsFreeBehaviorTest {
         onElement { viewIdResourceName == "geoShareMainMenuButton" }.click()
         onElement { viewIdResourceName == "geoShareMainMenuFaq" }.click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("faq_list")
+        saveScreenshot("main_strings/faq_list")
 
         // FAQ - How it works
         onElement { viewIdResourceName == "geoShareFaqItem_${FaqItemId.HOW_IT_WORKS}" }.click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("faq_how_it_works")
+        saveScreenshot("main_strings/faq_how_it_works")
 
         // FAQ - Location permission
         onElement { viewIdResourceName == "geoShareFaqItem_${FaqItemId.LOCATION_PERMISSION}" }.click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("faq_location_permission")
+        saveScreenshot("main_strings/faq_location_permission")
 
         // FAQ - Name only
         onElement { viewIdResourceName == "geoShareFaqItem_${FaqItemId.NAME_ONLY}" }.click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("faq_name_only")
+        saveScreenshot("main_strings/faq_name_only")
 
         // FAQ - Privacy
         onElement { viewIdResourceName == "geoShareFaqItem_${FaqItemId.PRIVACY}" }.click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("faq_privacy_considerations")
+        saveScreenshot("main_strings/faq_privacy_considerations")
 
         goBackToMainForm()
     }
 
     fun testInputs() = uiAutomator {
         // Supported maps - Recent
+        goToUserPreferencesDetail(UserPreferenceGroupId.DEVELOPER_OPTIONS)
+        onElement { viewIdResourceName == "geoShareUserPreferenceChangelogShownForVersionCode" }
+            .setText("44")
+        goBackToMainForm()
         goToInputList()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("supported_maps_recent")
+        saveScreenshot("main_strings/supported_maps_recent")
 
         // Supported maps - All - Page 1
         onElement { viewIdResourceName == "geoShareInputListPane" }
             .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareInputsDocumentationAll_${InputDocumentationGroup.OSM_AND}" }
-        saveScreenshot("supported_maps_all_page_1")
+        saveScreenshot("main_strings/supported_maps_all_page_1")
 
         // Supported maps - All - Page 2
         onElement { viewIdResourceName == "geoShareInputListPane" }
             .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareInputsDocumentationAll_${InputDocumentationGroup.GEO_URI}" }
-        saveScreenshot("supported_maps_all_page_2")
+        saveScreenshot("main_strings/supported_maps_all_page_2")
 
         // Supported maps - Detail - Coordinates
         onElement { viewIdResourceName == "geoShareInputsDocumentationAll_${InputDocumentationGroup.COORDINATES}" }.click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("supported_maps_detail_coordinates")
+        saveScreenshot("main_strings/supported_maps_detail_coordinates")
         goBackToElement { viewIdResourceName == "geoShareInputListPane" }
 
         // Supported maps - Detail
@@ -628,7 +634,7 @@ class ScreenshotsFreeBehaviorTest {
             .scrollToElement(Direction.UP) { viewIdResourceName == "geoShareInputsDocumentationAll_${InputDocumentationGroup.APPLE_MAPS}" }
             .click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("supported_maps_detail")
+        saveScreenshot("main_strings/supported_maps_detail")
 
         goBackToMainForm()
     }
@@ -637,7 +643,7 @@ class ScreenshotsFreeBehaviorTest {
         // Web maps - List
         goToUserPreferencesDetail(UserPreferenceGroupId.LINKS)
         quickWaitForStableInActiveWindow()
-        saveScreenshot("web_maps_list")
+        saveScreenshot("main_strings/web_maps_list")
 
         // Web maps - Reset - Button
         onElement { viewIdResourceName == "geoShareLinkListPane" }
@@ -645,17 +651,17 @@ class ScreenshotsFreeBehaviorTest {
         onElement { viewIdResourceName == "geoShareLinkListPane" }
             // Scroll again, because only now can the lazy column pane scroll all the way to the bottom
             .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkRestoreInitialButton" }
-        saveScreenshot("web_maps_reset_button")
+        saveScreenshot("main_strings/web_maps_reset_button")
 
         // Web maps - Reset - Dialog
         onElement { viewIdResourceName == "geoShareLinkRestoreInitialButton" }.click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("web_maps_reset_dialog")
+        saveScreenshot("main_strings/web_maps_reset_dialog")
 
         // Web maps - Message - Reset
         onElement { viewIdResourceName == "geoShareLinkRestoreInitialDialog" }.confirmDialog()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("web_maps_message_reset")
+        saveScreenshot("main_strings/web_maps_message_reset")
 
         // Web maps - Insert
         onElement { viewIdResourceName == "geoShareLinkListPane" }
@@ -664,7 +670,7 @@ class ScreenshotsFreeBehaviorTest {
         quickWaitForStableInActiveWindow()
         pressBack() // Hide IME
         quickWaitForStableInActiveWindow()
-        saveScreenshot("web_maps_insert")
+        saveScreenshot("main_strings/web_maps_insert")
 
         // Web maps - Message - Insert
         val link = Link(
@@ -674,7 +680,7 @@ class ScreenshotsFreeBehaviorTest {
         fillLinkForm(link)
         saveLinkForm()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("web_maps_message_insert")
+        saveScreenshot("main_strings/web_maps_message_insert")
         runBlocking {
             delay(3.seconds) // Wait for the message to disappear
         }
@@ -685,12 +691,12 @@ class ScreenshotsFreeBehaviorTest {
         quickWaitForStableInActiveWindow()
         pressBack() // Hide IME
         quickWaitForStableInActiveWindow()
-        saveScreenshot("web_maps_detail_page_1")
+        saveScreenshot("main_strings/web_maps_detail_page_1")
 
         // Web maps - Detail - Page 2
         onElement { viewIdResourceName == "geoShareLinkDetailPane" }
             .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkFormSave" }
-        saveScreenshot("web_maps_detail_page_2")
+        saveScreenshot("main_strings/web_maps_detail_page_2")
 
         // Web maps - Detail - Advanced
         onElement { viewIdResourceName == "geoShareLinkDetailPane" }
@@ -698,19 +704,19 @@ class ScreenshotsFreeBehaviorTest {
             .click()
         quickWaitForStableInActiveWindow()
         onElement { viewIdResourceName == "geoShareLinkDetailPane" }.scroll(Direction.DOWN, 5f)
-        saveScreenshot("web_maps_detail_advanced")
+        saveScreenshot("main_strings/web_maps_detail_advanced")
 
         // Web maps - Detail - Advanced - Coordinate system
         onElement { viewIdResourceName == "geoShareLinkDetailPane" }
             .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkFormSRS_${Srs.WGS84}" }
             .click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("web_maps_detail_advanced_coordinate_system")
+        saveScreenshot("main_strings/web_maps_detail_advanced_coordinate_system")
 
         // Web maps - Message - Update
         saveLinkForm()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("web_maps_message_update")
+        saveScreenshot("main_strings/web_maps_message_update")
         runBlocking {
             delay(3.seconds) // Wait for the message to disappear
         }
@@ -720,12 +726,12 @@ class ScreenshotsFreeBehaviorTest {
         onElement { viewIdResourceName == "geoShareLinkListItemMenuDetail_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
         onElement { viewIdResourceName == "geoShareLinkDetailDelete" }.click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("web_maps_delete_dialog")
+        saveScreenshot("main_strings/web_maps_delete_dialog")
 
         // Web maps - Message - Delete
         onElement { viewIdResourceName == "geoShareLinkDeleteDialog" }.confirmDialog()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("web_maps_message_delete")
+        saveScreenshot("main_strings/web_maps_message_delete")
 
         goBackToMainForm()
     }
@@ -739,47 +745,47 @@ class ScreenshotsFreeBehaviorTest {
         onElement { viewIdResourceName == "geoShareMainMenuButton" }.click()
         onElement { viewIdResourceName == "geoShareMainMenuUserPreferences" }.click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("preferences_list")
+        saveScreenshot("main_strings/preferences_list")
 
         // Preferences - Apps
         goToUserPreferencesDetail(UserPreferenceGroupId.HIDDEN_APPS)
         quickWaitForStableInActiveWindow()
-        saveScreenshot("preferences_apps")
+        saveScreenshot("main_strings/preferences_apps")
         onElement { viewIdResourceName == "geoShareVisibleAppToggle_${PackageNames.GOOGLE_MAPS}" }.click()
         goBackToElement { viewIdResourceName == "geoShareUserPreferencesListPane" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("preferences_apps_visible_count")
+        saveScreenshot("main_strings/preferences_apps_visible_count")
         goToUserPreferencesDetail(UserPreferenceGroupId.HIDDEN_APPS)
         onElement { viewIdResourceName == "geoShareVisibleAppToggle_${PackageNames.GOOGLE_MAPS}" }.click() // Make the app visible again to not affect other tests
 
         // Preferences - Automation
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
         quickWaitForStableInActiveWindow()
-        saveScreenshot("preferences_automation_page_1")
+        saveScreenshot("main_strings/preferences_automation_page_1")
         onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
             // Scroll by percent not to element, because scrolling to element is unreliable, due to the lazy list loading
             .scroll(Direction.DOWN, 3f)
-        saveScreenshot("preferences_automation_page_2")
+        saveScreenshot("main_strings/preferences_automation_page_2")
 
         // Preferences - Automation
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION_DELAY)
         quickWaitForStableInActiveWindow()
-        saveScreenshot("preferences_automation_delay")
+        saveScreenshot("main_strings/preferences_automation_delay")
 
         // Preferences - Connection permission
         goToUserPreferencesDetail(UserPreferenceGroupId.CONNECTION_PERMISSION)
         quickWaitForStableInActiveWindow()
-        saveScreenshot("preferences_connection_permission")
+        saveScreenshot("main_strings/preferences_connection_permission")
 
         // Preferences - Coordinate format
         goToUserPreferencesDetail(UserPreferenceGroupId.COORDINATE_FORMAT)
         quickWaitForStableInActiveWindow()
-        saveScreenshot("preferences_coordinate_format")
+        saveScreenshot("main_strings/preferences_coordinate_format")
 
         // Preferences - Developer options
         goToUserPreferencesDetail(UserPreferenceGroupId.DEVELOPER_OPTIONS)
         quickWaitForStableInActiveWindow()
-        saveScreenshot("preferences_developer_options")
+        saveScreenshot("main_strings/preferences_developer_options")
 
         goBackToMainForm()
     }
@@ -788,7 +794,7 @@ class ScreenshotsFreeBehaviorTest {
         // Servers - List - Page 1
         goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
         quickWaitForStableInActiveWindow()
-        saveScreenshot("servers_list_free_page_1")
+        saveScreenshot("main_strings/servers_list_free_page_1")
 
         // Servers - List - Page 2
         onElement { viewIdResourceName == "geoShareServerListPane" }
@@ -796,17 +802,17 @@ class ScreenshotsFreeBehaviorTest {
         onElement { viewIdResourceName == "geoShareServerListPane" }
             // Scroll again, because only now can the lazy column pane scroll all the way to the bottom
             .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerRestoreInitialButton" }
-        saveScreenshot("servers_list_free_page_2")
+        saveScreenshot("main_strings/servers_list_free_page_2")
 
         // Servers - Reset dialog
         onElement { viewIdResourceName == "geoShareServerRestoreInitialButton" }.click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("servers_reset_dialog")
+        saveScreenshot("main_strings/servers_reset_dialog")
 
         // Servers - Message - Reset
         onElement { viewIdResourceName == "geoShareServerRestoreInitialDialog" }.confirmDialog()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("servers_message_reset")
+        saveScreenshot("main_strings/servers_message_reset")
         runBlocking {
             delay(3.seconds) // Wait for the message to disappear
         }
@@ -818,7 +824,7 @@ class ScreenshotsFreeBehaviorTest {
         quickWaitForStableInActiveWindow()
         pressBack() // Hide IME
         quickWaitForStableInActiveWindow()
-        saveScreenshot("servers_insert_api_key")
+        saveScreenshot("main_strings/servers_insert_api_key")
 
         // Servers - Insert - Attestation
         fillServerForm(
@@ -832,12 +838,12 @@ class ScreenshotsFreeBehaviorTest {
             )
         )
         quickWaitForStableInActiveWindow()
-        saveScreenshot("servers_insert_attestation")
+        saveScreenshot("main_strings/servers_insert_attestation")
 
         // Servers - Message - Insert
         saveServerForm()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("servers_message_insert")
+        saveScreenshot("main_strings/servers_message_insert")
         runBlocking {
             delay(3.seconds) // Wait for the message to disappear
         }
@@ -857,12 +863,12 @@ class ScreenshotsFreeBehaviorTest {
         quickWaitForStableInActiveWindow()
         pressBack() // Hide IME
         quickWaitForStableInActiveWindow()
-        saveScreenshot("servers_update")
+        saveScreenshot("main_strings/servers_update")
 
         // Servers - Message - Update
         saveServerForm()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("servers_message_update")
+        saveScreenshot("main_strings/servers_message_update")
         runBlocking {
             delay(3.seconds) // Wait for the message to disappear
         }
@@ -872,7 +878,7 @@ class ScreenshotsFreeBehaviorTest {
         onElement { viewIdResourceName == "geoShareServerListItemMenuDetail_${InitialServersImpl.GOOGLE_MAPS_GEOCODE_ADDRESS_UUID}" }.click()
         onElement { viewIdResourceName == "geoShareServerDetailDelete" }.click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("servers_delete_dialog")
+        saveScreenshot("main_strings/servers_delete_dialog")
 
         // Servers - Message - Delete
         onElement { viewIdResourceName == "geoShareServerDeleteDialog" }.confirmDialog()
