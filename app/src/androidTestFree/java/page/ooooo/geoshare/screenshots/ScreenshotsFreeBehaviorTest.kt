@@ -917,7 +917,7 @@ class ScreenshotsFreeBehaviorTest {
         // Servers - Message - Delete
         onElement { viewIdResourceName == "geoShareServerDeleteDialog" }.confirmDialog()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("servers_message_delete")
+        saveScreenshot("main_strings/servers_message_delete")
 
         goBackToMainForm()
     }

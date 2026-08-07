@@ -9,6 +9,7 @@ import android.location.provider.ProviderProperties
 import android.os.Build
 import android.os.SystemClock
 import android.view.accessibility.AccessibilityNodeInfo
+import androidx.core.graphics.scale
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.platform.io.PlatformTestStorageRegistry
 import androidx.test.uiautomator.Direction
@@ -58,6 +59,7 @@ import java.net.UnknownHostException
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
+import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
 
 class MockLocationScope(val locationManager: LocationManager, val mockProviderName: String) {
@@ -907,10 +909,11 @@ inline fun <T> UiAutomatorTestScope.withNetworkOff(block: () -> T): T {
 /**
  * Take screenshot and write it to [androidx.test.platform.io.PlatformTestStorage] under [name].
  */
-fun UiAutomatorTestScope.saveScreenshot(name: String) {
+fun UiAutomatorTestScope.saveScreenshot(name: String, scale: Float = 0.5f) {
     uiAutomation.takeScreenshot().apply {
         PlatformTestStorageRegistry.getInstance().openOutputFile("$name.webp").use {
-            compress(Bitmap.CompressFormat.WEBP_LOSSLESS, 100, it)
+            scale((scale * width).roundToInt(), (scale * height).roundToInt(), false)
+                .compress(Bitmap.CompressFormat.WEBP_LOSSLESS, 100, it)
         }
     }
 }
