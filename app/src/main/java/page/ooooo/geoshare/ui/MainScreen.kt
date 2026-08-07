@@ -930,7 +930,9 @@ private fun MainLoadingIndicator(
         loadingIndicator.description?.let { description ->
             Text(
                 description,
-                Modifier.padding(bottom = spacing.small),
+                Modifier
+                    .padding(bottom = spacing.small)
+                    .testTag("geoShareMainLoadingIndicatorDescription"),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyMedium,
             )

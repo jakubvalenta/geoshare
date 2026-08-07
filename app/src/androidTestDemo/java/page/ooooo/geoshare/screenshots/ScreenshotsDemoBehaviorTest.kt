@@ -69,22 +69,22 @@ class ScreenshotsDemoBehaviorTest {
         onElement { viewIdResourceName == "geoShareMainBillingIcon" }.click()
         onElement { viewIdResourceName == "geoShareBillingPurchaseButton" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("billing_not_purchased")
+        saveScreenshot("main_strings/billing_not_purchased")
 
         // Billing - Message - Pending
         onElement { viewIdResourceName == "geoShareBillingOffer_${Offer.Period.ONE_TIME}" }.click()
         onElement { viewIdResourceName == "geoShareBillingPurchaseButton" && isEnabled }.click()
         onElement { textAsString() == "Example error" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("billing_message_error")
+        saveScreenshot("pro_strings/billing_message_error")
         onElement { viewIdResourceName == "geoShareBillingStatusPending" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("billing_message_pending")
+        saveScreenshot("main_strings/billing_message_pending")
 
         // Billing - Purchased - One time
         onElement { viewIdResourceName == "geoShareBillingStatusPurchased" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("billing_purchased_one_time")
+        saveScreenshot("main_strings/billing_purchased_one_time")
         onElement { viewIdResourceName == "geoShareBillingManageButtonOneTime" }.click() // Refund product
 
         // Billing - Purchased - Subscription
@@ -96,13 +96,13 @@ class ScreenshotsDemoBehaviorTest {
         }
         onElement { viewIdResourceName == "geoShareBillingStatusPurchased" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("billing_purchased_subscription")
+        saveScreenshot("main_strings/billing_purchased_subscription")
 
         // Billing - Message - Expiration
         onElement { viewIdResourceName == "geoShareBillingManageButtonSubscription" }.click() // Expire subscription
         onElement { viewIdResourceName == "geoShareBillingStatusExpired" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("billing_message_expiration")
+        saveScreenshot("main_strings/billing_message_expiration")
         onElement { viewIdResourceName == "geoShareBillingManageButtonSubscription" }.click() // Cancel subscription
 
         goBackToMainForm()
@@ -113,12 +113,12 @@ class ScreenshotsDemoBehaviorTest {
         onElement { viewIdResourceName == "geoShareMainMenuButton" }.click()
         onElement { viewIdResourceName == "geoShareMainMenuUserPreferences" }.click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("preferences_automation_billing_badge")
+        saveScreenshot("main_strings/preferences_automation_billing_badge")
 
         // Preferences - Automation - Billing wall
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
         quickWaitForStableInActiveWindow()
-        saveScreenshot("preferences_automation_billing_wall")
+        saveScreenshot("main_strings/preferences_automation_billing_wall")
 
         goBackToMainForm()
     }

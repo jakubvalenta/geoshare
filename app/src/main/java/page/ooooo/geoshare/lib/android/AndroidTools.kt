@@ -378,7 +378,7 @@ object AndroidTools {
             ?.let { WGS84Point(it.latitude, it.longitude, source = Source.GPS_SENSOR) }
 
     suspend fun getLocation(context: Context): Point? {
-        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val locationManager = context.getSystemService(LocationManager::class.java)
         return try {
             val lastKnownLocation = getLastKnownLocation(locationManager)
             if (lastKnownLocation != null) {
