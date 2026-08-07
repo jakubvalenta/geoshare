@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.screenshots
 
 import androidx.test.uiautomator.Direction
-import androidx.test.uiautomator.onElement
 import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
@@ -48,6 +47,7 @@ import page.ooooo.geoshare.tests.launchNavigationInApp
 import page.ooooo.geoshare.tests.longScrollSheet
 import page.ooooo.geoshare.tests.mockLocation
 import page.ooooo.geoshare.tests.onMainScrollablePane
+import page.ooooo.geoshare.tests.onSheetItem
 import page.ooooo.geoshare.tests.quickWaitForStableInActiveWindow
 import page.ooooo.geoshare.tests.saveLinkForm
 import page.ooooo.geoshare.tests.saveScreenshot
@@ -545,7 +545,7 @@ class ScreenshotsFreeBehaviorTest {
         saveScreenshot("main_strings/conversion_result_sheet_page_2")
 
         // Conversion - Result - Save GPX - File chooser
-        sheet.onElement {
+        sheet.onSheetItem {
             textAsString() in setOf(
                 "Save GPX route",
                 @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Enregistrer l’itinéraire GPX",
@@ -556,7 +556,7 @@ class ScreenshotsFreeBehaviorTest {
         saveScreenshot("main_strings/conversion_result_save_gpx_file_chooser")
 
         // Conversion - Result - Message - Save GPX success
-        chooseFile() // TODO Tests sometimes fail here
+        chooseFile()
         onElement(pollIntervalMs = 50) { viewIdResourceName == "geoShareResultMessageSuccess" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_message_save_gpx_success")

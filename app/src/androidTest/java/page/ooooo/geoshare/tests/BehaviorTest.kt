@@ -533,6 +533,9 @@ fun UiObject2.longScrollSheet(direction: Direction = Direction.DOWN) {
     scroll(direction, 10f)
 }
 
+fun UiObject2.onSheetItem(block: AccessibilityNodeInfo.() -> Boolean): UiObject2 =
+    onElement { viewIdResourceName == "geoShareResultSheetItemHeadline" && block() }
+
 fun UiObject2.scrollToSheetItem(
     direction: Direction = Direction.DOWN,
     block: AccessibilityNodeInfo.() -> Boolean,
@@ -541,10 +544,11 @@ fun UiObject2.scrollToSheetItem(
 
 fun UiAutomatorTestScope.chooseFile() {
     if (onElementOrNull(3_000) { textAsString() == "Recent" } != null) {
-        // If we happen to be in the Recent directory, go to Downloads, because it's not possible to save to Recent
+        // If we happen to be in the Recent folder, go to Downloads, because it's not possible to save a file to Recent
         device.click(50, 100) // Tap the hamburger menu
         onElement { textAsString() == "Downloads" }.click()
     } else {
+        // Check that we're in the Downloads folder
         onElement {
             textAsString() == "Downloads" ||
                 textAsString()?.startsWith("Files in") == true ||
