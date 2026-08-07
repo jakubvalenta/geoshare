@@ -49,6 +49,7 @@ import page.ooooo.geoshare.lib.outputs.CopyCoordsDecOutput
 import page.ooooo.geoshare.lib.outputs.CopyCoordsDegMinSecOutput
 import page.ooooo.geoshare.lib.outputs.CopyGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.CopyLinkUriOutput
+import page.ooooo.geoshare.lib.outputs.CopyNameOutput
 import page.ooooo.geoshare.lib.outputs.NoopOutput
 import page.ooooo.geoshare.lib.outputs.OpenDisplayCartesIGNUrlOutput
 import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
@@ -87,6 +88,7 @@ class OutputRepositoryTest {
                 CopyCoordsDecOutput(coordinateConverter),
                 CopyCoordsDegMinSecOutput(coordinateConverter),
                 CopyGeoUriOutput(coordinateConverter),
+                CopyNameOutput(),
                 CopyLinkUriOutput(FakeAppleMapsDisplayLink, coordinateConverter),
                 CopyLinkUriOutput(FakeAppleMapsNavigationLink, coordinateConverter),
                 CopyLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter),
