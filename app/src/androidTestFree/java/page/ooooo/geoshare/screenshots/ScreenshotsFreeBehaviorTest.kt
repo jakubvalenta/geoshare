@@ -19,7 +19,9 @@ import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyLinkUriAutomation
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation
+import page.ooooo.geoshare.data.local.preferences.OpenPointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
+import page.ooooo.geoshare.data.local.preferences.SendPointAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareRouteGpxAutomation
 import page.ooooo.geoshare.lib.android.PackageNames
@@ -110,6 +112,8 @@ class ScreenshotsFreeBehaviorTest {
 
         // Then test preferences, because they've not been changed by other tests yet
         testPreferences()
+        testPreferencesAutomationMessaging()
+        testPreferencesAutomationOsmAnd()
 
         // Then test all other screens in alphabetical order
         testAbout()
@@ -761,13 +765,15 @@ class ScreenshotsFreeBehaviorTest {
         // Preferences - Automation
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
         quickWaitForStableInActiveWindow()
-        saveScreenshot("main_strings/preferences_automation_page_1")
+        saveScreenshot("main_strings/preferences_automation")
+
+        // Preferences - Automation - Web maps
         onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
             // Scroll by percent not to element, because scrolling to element is unreliable, due to the lazy list loading
             .scroll(Direction.DOWN, 3f)
-        saveScreenshot("main_strings/preferences_automation_page_2")
+        saveScreenshot("main_strings/preferences_automation_web_maps")
 
-        // Preferences - Automation
+        // Preferences - Automation delay
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION_DELAY)
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/preferences_automation_delay")
@@ -786,6 +792,34 @@ class ScreenshotsFreeBehaviorTest {
         goToUserPreferencesDetail(UserPreferenceGroupId.DEVELOPER_OPTIONS)
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/preferences_developer_options")
+
+        goBackToMainForm()
+    }
+
+    fun testPreferencesAutomationMessaging() = uiAutomator {
+        if (!isAppInstalled(PackageNames.CONVERSATIONS)) {
+            return@uiAutomator
+        }
+
+        // Preferences - Automation - Messaging
+        goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
+        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
+        scrollToAutomationItem(SendPointAutomation(PackageNames.CONVERSATIONS))
+        saveScreenshot("main_strings/preferences_automation_messaging")
+
+        goBackToMainForm()
+    }
+
+    fun testPreferencesAutomationOsmAnd() = uiAutomator {
+        if (!isAppInstalled(PackageNames.OSMAND_PLUS)) {
+            return@uiAutomator
+        }
+
+        // Preferences - Automation - OsmAnd
+        goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
+        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
+        scrollToAutomationItem(OpenPointsGpxAutomation(PackageNames.OSMAND_PLUS))
+        saveScreenshot("main_strings/preferences_automation_osm_and")
 
         goBackToMainForm()
     }
