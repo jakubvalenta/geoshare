@@ -206,7 +206,7 @@
     <string name="output_gpx_route_open_in">Ouvrir l’itinéraire GPX dans %1$s</string>
     <string name="output_gpx_route_save">Enregistrer l’itinéraire GPX</string>
     <string name="output_gpx_route_share_automation_failed">Échec du partage automatique du fichier GPX</string>
-    <string name="output_open_display">Point de démonstration</string>
+    <string name="output_open_display">Afficher le point</string>
     <string name="output_open_navigation">Naviguer</string>
     <string name="output_open_street_view">Street view</string>
     <string name="output_open_link">Ouvrir le lien %1$s</string>
@@ -271,7 +271,7 @@
     <string name="output_save_to_contact">Enregistrer dans les contacts</string>
     <string name="output_save_to_contact_automation_failed">Échec de l’enregistrement automatique des coordonnées</string>
     <string name="output_save_to_contact_failed">Échec de l’enregistrement du point de contact</string>
-    <string name="output_send">Point d’envoi</string>
+    <string name="output_send">Envoyer le point</string>
     <string name="output_send_via">Envoyer le point via %1$s</string>
     <string name="conversion_failed_reason_exception">Exception inconnue</string>
     <string name="faq_how_text_2_item_api">ou l’API du service de cartographie,</string>
