@@ -51,8 +51,6 @@ import kotlin.time.Duration.Companion.seconds
 
 object AndroidTools {
 
-    const val TAG = "AndroidTools"
-
     fun getIntentUriString(intent: Intent): String? =
         when (val intentAction = intent.action) {
             Intent.ACTION_VIEW -> {
@@ -126,7 +124,7 @@ object AndroidTools {
                 null
             }
             // Exclude GeoShare itself and all its build flavors
-            packageName?.takeUnless { it == BuildConfig.APPLICATION_ID || it.startsWith(PackageNames.GEOSHARE_PREFIX) }
+            packageName?.takeUnless { it == PackageNames.GEOSHARE || it.startsWith(PackageNames.GEOSHARE_PREFIX) }
         }
     }
 
@@ -468,4 +466,6 @@ object AndroidTools {
         }
         return true
     }
+
+    private const val TAG = "AndroidTools"
 }
