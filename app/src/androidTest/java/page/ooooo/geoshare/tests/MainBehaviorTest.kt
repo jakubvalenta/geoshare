@@ -26,7 +26,7 @@ class MainBehaviorTest {
         onElement { viewIdResourceName == "geoShareApp_${PackageNames.GOOGLE_MAPS}" }.click()
 
         // Wait for Google Maps
-        onElement(20_000L) { packageName == PackageNames.GOOGLE_MAPS }
+        onElement(20_000) { packageName == PackageNames.GOOGLE_MAPS }
 
         // Go back to app
         launchApplication()

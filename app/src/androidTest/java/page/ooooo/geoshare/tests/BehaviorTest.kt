@@ -88,7 +88,7 @@ fun UiAutomatorTestScope.launchApplication(packageName: String = BuildConfig.APP
 
 fun UiAutomatorTestScope.waitForAppToBeVisible(
     packageName: String = BuildConfig.APPLICATION_ID,
-    timeoutMs: Long = 10_000L,
+    timeoutMs: Long = 10_000,
 ) {
     waitForAppToBeVisible(packageName, timeoutMs)
 }
@@ -101,11 +101,11 @@ fun closeApplication() {
 
 fun UiAutomatorTestScope.closeIntro() {
     quickWaitForStableInActiveWindow() // Wait for the intro to render, otherwise closing it can fail even with large timeout
-    onElementOrNull(3_000L) { viewIdResourceName == "geoShareIntroCloseButton" }?.click()
+    onElementOrNull(3_000) { viewIdResourceName == "geoShareIntroCloseButton" }?.click()
 }
 
 fun UiAutomatorTestScope.quickWaitForStableInActiveWindow() {
-    waitForStableInActiveWindow(stableTimeoutMs = 1_000L, stableIntervalMs = 100L, requireStableScreenshot = false)
+    waitForStableInActiveWindow(stableTimeoutMs = 1_000, stableIntervalMs = 100, requireStableScreenshot = false)
 }
 
 fun UiObject2.confirmDialog() {
@@ -136,7 +136,7 @@ private fun AccessibilityNodeInfo.isDenyPermissionButton(): Boolean =
     )
 
 fun UiAutomatorTestScope.isSystemPermissionShown(): Boolean =
-    onElementOrNull(3_000L) { isGrantPermissionButton() } != null
+    onElementOrNull(3_000) { isGrantPermissionButton() } != null
 
 fun UiAutomatorTestScope.grantSystemPermission() {
     onElement { isGrantPermissionButton() }.click()
@@ -158,7 +158,7 @@ fun UiAutomatorTestScope.assumeAppInstalled(packageName: String) {
 
 suspend fun assumeDomainResolvable(
     @Suppress("SameParameterValue") domain: String,
-    timeoutMs: Long = 1_000L,
+    timeoutMs: Long = 1_000,
 ) {
     // Use futures, because InetAddress.getByName() is not cancellable using Kotlin's withTimeout()
     val executor = Executors.newSingleThreadExecutor()
@@ -313,10 +313,10 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
 
 fun UiAutomatorTestScope.waitAndAssertGoogleMapsContainsElement(block: AccessibilityNodeInfo.() -> Boolean) {
     // Wait for Google Maps
-    onElement(20_000L) { packageName == PackageNames.GOOGLE_MAPS }
+    onElement(20_000) { packageName == PackageNames.GOOGLE_MAPS }
 
     // If there is a Google Maps sign in screen, skip it
-    onElementOrNull(3_000L) {
+    onElementOrNull(3_000) {
         packageName == PackageNames.GOOGLE_MAPS && textAsString() in setOf(
             "Make it your map",
             @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Profitez d'une carte personnalisée"
@@ -331,7 +331,7 @@ fun UiAutomatorTestScope.waitAndAssertGoogleMapsContainsElement(block: Accessibi
     }
 
     // Verify Google Maps content
-    onElement(20_000L) { packageName == PackageNames.GOOGLE_MAPS && this.block() }
+    onElement(20_000) { packageName == PackageNames.GOOGLE_MAPS && this.block() }
 }
 
 fun UiAutomatorTestScope.assertConversionFails(expectedMessage: Set<String>, timeoutMs: Long = NETWORK_TIMEOUT) {
@@ -350,7 +350,7 @@ fun UiAutomatorTestScope.assertConversionFails(expectedMessage: Set<String>, tim
 
 fun UiAutomatorTestScope.waitAndAssertTomTomContainsElement(block: AccessibilityNodeInfo.() -> Boolean) {
     // Wait for TomTom
-    onElement(30_000L) { packageName == PackageNames.TOMTOM }
+    onElement(30_000) { packageName == PackageNames.TOMTOM }
 
     // If there is a location permission dialog, confirm it
     if (isSystemPermissionShown()) {
@@ -358,7 +358,7 @@ fun UiAutomatorTestScope.waitAndAssertTomTomContainsElement(block: Accessibility
     }
 
     // If there is an "Importing GPX tracks" dialog, confirm it
-    onElementOrNull(5_000L) {
+    onElementOrNull(5_000) {
         textAsString() in setOf(
             "Got it",
             @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "J'ai compris"
@@ -509,7 +509,7 @@ fun UiAutomatorTestScope.onMainScrollablePane(): UiObject2 = onElement {
  */
 fun UiAutomatorTestScope.scrollToAutomationItem(automation: Automation): UiObject2 =
     onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
-        .scrollToElement(Direction.DOWN, 20_000L) {
+        .scrollToElement(Direction.DOWN, 20_000) {
             viewIdResourceName == "geoShareUserPreferenceAutomation_${Json.encodeToString<Automation>(automation)}"
         }
 
@@ -538,7 +538,7 @@ fun UiObject2.scrollToSheetItem(
     scrollToElement(direction) { viewIdResourceName == "geoShareResultSheetItemHeadline" && block() }
 
 fun UiAutomatorTestScope.chooseFile() {
-    if (onElementOrNull(3_000L) { textAsString() == "Recent" } != null) {
+    if (onElementOrNull(3_000) { textAsString() == "Recent" } != null) {
         // If we happen to be in the Recent directory, go to Downloads, because it's not possible to save to Recent
         device.click(50, 100) // Tap the hamburger menu
         onElement { textAsString() == "Downloads" }.click()
@@ -562,7 +562,7 @@ fun UiAutomatorTestScope.chooseFile() {
 
 fun UiAutomatorTestScope.findContact(name: String): UiObject2? {
     // If using the Android open-source contacts app, click the search button
-    onElementOrNull(3_000L) {
+    onElementOrNull(3_000) {
         packageName == "com.android.contacts" && contentDescription in setOf(
             "Search",
             "Search contacts",
@@ -571,7 +571,7 @@ fun UiAutomatorTestScope.findContact(name: String): UiObject2? {
     }?.click()
 
     // Search contacts
-    val searchField = onElementOrNull(3_000L) {
+    val searchField = onElementOrNull(3_000) {
         packageName == "com.android.contacts" && viewIdResourceName == "android:id/search_src_text"
     }
     val searchTerm = name.split(' ').first()
@@ -582,14 +582,14 @@ fun UiAutomatorTestScope.findContact(name: String): UiObject2? {
     }
 
     // Return the found contact if it's immediately visible
-    val foundContact = onElementOrNull(3_000L) { textAsString() == name && isVisibleToUser }
+    val foundContact = onElementOrNull(3_000) { textAsString() == name && isVisibleToUser }
     if (foundContact != null) {
         return foundContact
     }
 
     // Scroll to the found contact
-    return onElementOrNull(3_000L) { isScrollable }
-        ?.scrollToElementOrNull(Direction.DOWN, 45_000L) { textAsString() == name && isVisibleToUser }
+    return onElementOrNull(3_000) { isScrollable }
+        ?.scrollToElementOrNull(Direction.DOWN, 45_000) { textAsString() == name && isVisibleToUser }
 }
 
 fun UiAutomatorTestScope.insertOrEditContact(name: String = "GeoShare Test Contact") {
@@ -599,7 +599,7 @@ fun UiAutomatorTestScope.insertOrEditContact(name: String = "GeoShare Test Conta
         existingContact.click()
     } else {
         // If using the Android open-source contacts app, click the back button
-        onElementOrNull(3_000L) {
+        onElementOrNull(3_000) {
             packageName == "com.android.contacts" && contentDescription in setOf(
                 "Navigate up",
                 "stop searching",
@@ -617,7 +617,7 @@ fun UiAutomatorTestScope.insertOrEditContact(name: String = "GeoShare Test Conta
         }.click()
 
         // If there is an "Add account" dialog, dismiss it
-        onElementOrNull(3_000L) { textAsString()?.lowercase() == "keep local" }?.click()
+        onElementOrNull(3_000) { textAsString()?.lowercase() == "keep local" }?.click()
 
         // Fill name
         onElement { textAsString() in setOf("First name", "Name", "Prénom") }.setText(name)
@@ -642,14 +642,14 @@ fun UiAutomatorTestScope.openContact(name: String = "GeoShare Test Contact") {
             denySystemPermission()
         }
 
-        waitForAppToBeVisible(packageName, 3_000L)
+        waitForAppToBeVisible(packageName, 3_000)
     }
 
     // If there is a "Some menu items have moved..." popup, close it
-    onElementOrNull(3_000L) { packageName == "com.google.android.contacts" && viewIdResourceName == "android:id/closeButton" }
+    onElementOrNull(3_000) { packageName == "com.google.android.contacts" && viewIdResourceName == "android:id/closeButton" }
         ?.click()
 
-    val contactDetailOpen = onElementOrNull(3_000L) {
+    val contactDetailOpen = onElementOrNull(3_000) {
         packageName == "com.android.contacts" && viewIdResourceName == "com.android.contacts:id/menu_edit" ||
             packageName == "com.google.android.contacts" && viewIdResourceName == "com.google.android.contacts:id/menu_insert_or_edit"
     } != null
@@ -681,7 +681,7 @@ fun UiAutomatorTestScope.assertContactContainsText(expectedText: String) {
             quickWaitForStableInActiveWindow() // Wait for the swiping to finish
         }
     }
-    onElementOrNull(3_000L) { packageName == "com.android.contacts" && textAsString() == "See all" }?.click()
+    onElementOrNull(3_000) { packageName == "com.android.contacts" && textAsString() == "See all" }?.click()
 
     // Assert
     onElement { isScrollable }.scrollToElement(Direction.DOWN) { textAsString() == expectedText }

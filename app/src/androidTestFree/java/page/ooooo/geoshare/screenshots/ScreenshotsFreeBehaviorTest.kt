@@ -19,7 +19,9 @@ import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyLinkUriAutomation
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation
+import page.ooooo.geoshare.data.local.preferences.OpenPointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
+import page.ooooo.geoshare.data.local.preferences.SendPointAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareRouteGpxAutomation
 import page.ooooo.geoshare.lib.android.PackageNames
@@ -110,6 +112,8 @@ class ScreenshotsFreeBehaviorTest {
 
         // Then test preferences, because they've not been changed by other tests yet
         testPreferences()
+        testPreferencesAutomationMessaging()
+        testPreferencesAutomationOsmAnd()
 
         // Then test all other screens in alphabetical order
         testAbout()
@@ -192,7 +196,7 @@ class ScreenshotsFreeBehaviorTest {
         scrollToAutomationItem(CopyCoordsDecAutomation).click()
         goBackToMainForm()
         setMainInput()
-        onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareResultMessageSuccess" }
+        onElement(pollIntervalMs = 50) { viewIdResourceName == "geoShareResultMessageSuccess" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/automation_copy_coords_success")
 
@@ -211,7 +215,7 @@ class ScreenshotsFreeBehaviorTest {
         scrollToAutomationItem(CopyLinkUriAutomation(UUID.fromString(InitialLinks.APPLE_MAPS_NAVIGATION_UUID))).click()
         goBackToMainForm()
         setMainInput()
-        onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareResultMessageSuccess" }
+        onElement(pollIntervalMs = 50) { viewIdResourceName == "geoShareResultMessageSuccess" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/automation_copy_link_success")
 
@@ -226,7 +230,7 @@ class ScreenshotsFreeBehaviorTest {
 
         // Automation - Save GPX - Success
         chooseFile()
-        onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareResultMessageSuccess" }
+        onElement(pollIntervalMs = 50) { viewIdResourceName == "geoShareResultMessageSuccess" }
         saveScreenshot("main_strings/automation_save_gpx_success")
 
         // Reset automation
@@ -348,7 +352,7 @@ class ScreenshotsFreeBehaviorTest {
         // Conversion - Result - App - Google Maps
         quickWaitForStableInActiveWindow() // Wait for the result to render
         onMainScrollablePane()
-            .scrollToElement(Direction.DOWN, 3_000L) {
+            .scrollToElement(Direction.DOWN, 3_000) {
                 viewIdResourceName == "geoShareApp_${PackageNames.GOOGLE_MAPS}"
             }
             .longClick()
@@ -365,7 +369,7 @@ class ScreenshotsFreeBehaviorTest {
 
         // Conversion - Result - Share
         onMainScrollablePane()
-            .scrollToElement(Direction.DOWN, 3_000L) {
+            .scrollToElement(Direction.DOWN, 3_000) {
                 viewIdResourceName == "geoShareApp_share"
             }
             .longClick()
@@ -375,7 +379,7 @@ class ScreenshotsFreeBehaviorTest {
 
         // Conversion - Result - Web map
         onMainScrollablePane()
-            .scrollToElement(Direction.DOWN, 3_000L) {
+            .scrollToElement(Direction.DOWN, 3_000) {
                 viewIdResourceName == "geoShareApp_ce900ea1-2c5d-4641-82f3-a5429a68d603"
             }
             .longClick()
@@ -402,7 +406,7 @@ class ScreenshotsFreeBehaviorTest {
 
         // Conversion - Result - App - Messaging
         onMainScrollablePane()
-            .scrollToElement(Direction.DOWN, 3_000L) {
+            .scrollToElement(Direction.DOWN, 3_000) {
                 viewIdResourceName == "geoShareApp_${PackageNames.CONVERSATIONS}"
             }
             .longClick()
@@ -422,7 +426,7 @@ class ScreenshotsFreeBehaviorTest {
 
         // Conversion - Result - App - OsmAnd
         onMainScrollablePane()
-            .scrollToElement(Direction.DOWN, 3_000L) {
+            .scrollToElement(Direction.DOWN, 3_000) {
                 viewIdResourceName == "geoShareApp_${PackageNames.OSMAND_PLUS}"
             }
             .longClick()
@@ -468,7 +472,7 @@ class ScreenshotsFreeBehaviorTest {
             // Scroll by percents, because it's more reliable than scrolling to the app icon
             .scroll(Direction.DOWN, 2f)
         launchNavigationInApp(PackageNames.TOMTOM)
-        onElement(20_000L) { viewIdResourceName == "geoShareLocationRationaleDialog" }.let { dialog ->
+        onElement(20_000) { viewIdResourceName == "geoShareLocationRationaleDialog" }.let { dialog ->
             quickWaitForStableInActiveWindow()
             saveScreenshot("main_strings/conversion_result_location_rationale")
             dialog.confirmDialog()
@@ -553,7 +557,7 @@ class ScreenshotsFreeBehaviorTest {
 
         // Conversion - Result - Message - Save GPX success
         chooseFile() // TODO Tests sometimes fail here
-        onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareResultMessageSuccess" }
+        onElement(pollIntervalMs = 50) { viewIdResourceName == "geoShareResultMessageSuccess" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_message_save_gpx_success")
 
@@ -761,13 +765,15 @@ class ScreenshotsFreeBehaviorTest {
         // Preferences - Automation
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
         quickWaitForStableInActiveWindow()
-        saveScreenshot("main_strings/preferences_automation_page_1")
+        saveScreenshot("main_strings/preferences_automation")
+
+        // Preferences - Automation - Web maps
         onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
             // Scroll by percent not to element, because scrolling to element is unreliable, due to the lazy list loading
             .scroll(Direction.DOWN, 3f)
-        saveScreenshot("main_strings/preferences_automation_page_2")
+        saveScreenshot("main_strings/preferences_automation_web_maps")
 
-        // Preferences - Automation
+        // Preferences - Automation delay
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION_DELAY)
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/preferences_automation_delay")
@@ -786,6 +792,34 @@ class ScreenshotsFreeBehaviorTest {
         goToUserPreferencesDetail(UserPreferenceGroupId.DEVELOPER_OPTIONS)
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/preferences_developer_options")
+
+        goBackToMainForm()
+    }
+
+    fun testPreferencesAutomationMessaging() = uiAutomator {
+        if (!isAppInstalled(PackageNames.CONVERSATIONS)) {
+            return@uiAutomator
+        }
+
+        // Preferences - Automation - Messaging
+        goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
+        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
+        scrollToAutomationItem(SendPointAutomation(PackageNames.CONVERSATIONS))
+        saveScreenshot("main_strings/preferences_automation_messaging")
+
+        goBackToMainForm()
+    }
+
+    fun testPreferencesAutomationOsmAnd() = uiAutomator {
+        if (!isAppInstalled(PackageNames.OSMAND_PLUS)) {
+            return@uiAutomator
+        }
+
+        // Preferences - Automation - OsmAnd
+        goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
+        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
+        scrollToAutomationItem(OpenPointsGpxAutomation(PackageNames.OSMAND_PLUS))
+        saveScreenshot("main_strings/preferences_automation_osm_and")
 
         goBackToMainForm()
     }

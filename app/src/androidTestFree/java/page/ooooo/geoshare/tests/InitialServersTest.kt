@@ -69,8 +69,8 @@ class InitialServersTest : InitialDataTest {
         Assert.assertEquals(expectedItems.size, actualItems.size)
         for ((expectedItem, actualItem) in expectedItems.zip(actualItems)) {
             Assert.assertEquals(
-                expectedItem.copy(createdAt = 0L, uid = 0),
-                actualItem.copy(createdAt = 0L, uid = 0),
+                expectedItem.copy(createdAt = 0, uid = 0),
+                actualItem.copy(createdAt = 0, uid = 0),
             )
         }
     }
