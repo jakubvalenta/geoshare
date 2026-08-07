@@ -83,7 +83,7 @@ class ConversionBehaviorTest {
         shareUri("https://maps.apple/p/7E-Brjrk_THN14")
 
         // Grant connection permission
-        onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
+        onElement(20_000) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
 
         // Shows precise location
         assertConversionSucceeds(
@@ -108,7 +108,7 @@ class ConversionBehaviorTest {
         shareUri("https://maps.apple/p/7E-Brjrk_THN14")
 
         // Grant connection permission and check "Don't ask me again"
-        onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
+        onElement(20_000) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
             toggleDoNotAsk()
             confirmDialog()
         }
@@ -138,7 +138,7 @@ class ConversionBehaviorTest {
         shareUri("https://maps.apple/p/7E-Brjrk_THN14")
 
         // Deny connection permission
-        onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.dismissDialog()
+        onElement(20_000) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.dismissDialog()
 
         // Shows permission denied error
         assertPermissionDenied()
@@ -160,7 +160,7 @@ class ConversionBehaviorTest {
         shareUri("https://maps.apple/p/7E-Brjrk_THN14")
 
         // Deny connection permission
-        onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
+        onElement(20_000) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
             toggleDoNotAsk()
             dismissDialog()
         }
@@ -185,7 +185,7 @@ class ConversionBehaviorTest {
         shareUri("https://maps.app.goo.gl/spam")
 
         // Grant connection permission
-        onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
+        onElement(20_000) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
 
         // Error is visible
         assertConversionFails(
@@ -207,7 +207,7 @@ class ConversionBehaviorTest {
             shareUri("https://maps.apple.com/place?place-id=I7BA098CC17989C16&_provider=9902")
 
             // Grant connection permission
-            onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
+            onElement(20_000) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
 
             // Shows precise location
             assertConversionSucceeds(WGS84Point(52.4697882, 13.4257989, source = Source.HTML))
@@ -231,7 +231,7 @@ class ConversionBehaviorTest {
             shareUri("https://maps.apple.com/place?place-id=I1CBDEBCF5A275CB2&_provider=9902")
 
             // Grant connection permission and check "Don't ask me again"
-            onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
+            onElement(20_000) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
                 toggleDoNotAsk()
                 confirmDialog()
             }
@@ -258,7 +258,7 @@ class ConversionBehaviorTest {
             shareUri("https://maps.apple.com/place?place-id=I8D204FAB527CE0EB&_provider=9902")
 
             // Deny connection permission
-            onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.dismissDialog()
+            onElement(20_000) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.dismissDialog()
 
             // Shows permission denied error
             assertPermissionDenied()
@@ -281,7 +281,7 @@ class ConversionBehaviorTest {
             shareUri("https://maps.apple.com/place?place-id=I5ECF0E5A2703FCD1&_provider=9902")
 
             // Deny connection permission
-            onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
+            onElement(20_000) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
                 toggleDoNotAsk()
                 dismissDialog()
             }
@@ -334,13 +334,13 @@ class ConversionBehaviorTest {
             launchNavigationInApp(PackageNames.TOMTOM)
 
             // Dismiss the location rationale dialog
-            onElement(20_000L) { viewIdResourceName == "geoShareLocationRationaleDialog" }.dismissDialog()
+            onElement(20_000) { viewIdResourceName == "geoShareLocationRationaleDialog" }.dismissDialog()
 
             // Launch navigation in TomTom again
             launchNavigationInApp(PackageNames.TOMTOM)
 
             // Confirm location rationale
-            onElement(20_000L) { viewIdResourceName == "geoShareLocationRationaleDialog" }.confirmDialog()
+            onElement(20_000) { viewIdResourceName == "geoShareLocationRationaleDialog" }.confirmDialog()
 
             // Deny location permission
             denySystemPermission()
@@ -349,7 +349,7 @@ class ConversionBehaviorTest {
             launchNavigationInApp(PackageNames.TOMTOM)
 
             // Confirm location rationale
-            onElement(20_000L) { viewIdResourceName == "geoShareLocationRationaleDialog" }.confirmDialog()
+            onElement(20_000) { viewIdResourceName == "geoShareLocationRationaleDialog" }.confirmDialog()
 
             // Grant location permission
             waitForStableInActiveWindow() // Wait, otherwise tapping the location permission grant button does nothing
@@ -396,7 +396,7 @@ class ConversionBehaviorTest {
         chooseFile()
 
         // Shows success message
-        onElement {
+        onElement(pollIntervalMs = 50) {
             textAsString() in setOf(
                 "Saved GPX file",
                 @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Fichier GPX enregistré",

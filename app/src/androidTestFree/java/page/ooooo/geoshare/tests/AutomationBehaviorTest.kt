@@ -35,7 +35,7 @@ class AutomationBehaviorTest {
         shareUri()
 
         // Shows automation success message
-        onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareResultMessageSuccess" }
+        onElement(pollIntervalMs = 50) { viewIdResourceName == "geoShareResultMessageSuccess" }
 
         // Shows automation preferences button
         onElement { viewIdResourceName == "geoShareResultAutomationButton" }
@@ -61,10 +61,10 @@ class AutomationBehaviorTest {
         onElement { viewIdResourceName == "geoShareResultAutomationCounter" }
 
         // Google Maps doesn't open while the counter is running
-        assertNull(onElementOrNull(3_000L) { packageName == PackageNames.GOOGLE_MAPS })
+        assertNull(onElementOrNull(3_000) { packageName == PackageNames.GOOGLE_MAPS })
 
         // Google Maps opens
-        onElement(20_000L) { packageName == PackageNames.GOOGLE_MAPS }
+        onElement(20_000) { packageName == PackageNames.GOOGLE_MAPS }
 
         // Go back to app
         launchApplication()
@@ -121,7 +121,7 @@ class AutomationBehaviorTest {
             onElement { viewIdResourceName == "geoShareResultAutomationCounter" }
 
             // Confirm location rationale
-            onElement(20_000L) { viewIdResourceName == "geoShareLocationRationaleDialog" }.confirmDialog()
+            onElement(20_000) { viewIdResourceName == "geoShareLocationRationaleDialog" }.confirmDialog()
 
             // Grant location permission
             waitForStableInActiveWindow() // Wait, otherwise tapping the location permission grant button does nothing
@@ -161,7 +161,7 @@ class AutomationBehaviorTest {
         chooseFile()
 
         // Shows automation success message
-        onElement {
+        onElement(pollIntervalMs = 50) {
             textAsString() in setOf(
                 "Automatically saved GPX",
                 @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "GPX enregistré automatiquement",

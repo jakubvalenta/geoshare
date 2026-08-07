@@ -199,7 +199,7 @@ class BillingDemoBehaviorTest {
         onElement { viewIdResourceName == "geoShareMainSubmitButton" }.click()
 
         // Shows automation success message
-        onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareResultMessageSuccess" }
+        onElement(pollIntervalMs = 50) { viewIdResourceName == "geoShareResultMessageSuccess" }
     }
 
     @Test

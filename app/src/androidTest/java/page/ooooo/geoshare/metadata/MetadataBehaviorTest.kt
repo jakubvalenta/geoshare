@@ -65,7 +65,7 @@ class MetadataBehaviorTest {
 
         // Connection permission dialog
         shareUri("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")
-        val dialog = onElement(20_000L) { viewIdResourceName == "geoShareConnectionPermissionDialog" }
+        val dialog = onElement(20_000) { viewIdResourceName == "geoShareConnectionPermissionDialog" }
         Screengrab.screenshot("4")
 
         // Result screen

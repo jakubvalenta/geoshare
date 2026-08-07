@@ -196,7 +196,7 @@ class ScreenshotsFreeBehaviorTest {
         scrollToAutomationItem(CopyCoordsDecAutomation).click()
         goBackToMainForm()
         setMainInput()
-        onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareResultMessageSuccess" }
+        onElement(pollIntervalMs = 50) { viewIdResourceName == "geoShareResultMessageSuccess" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/automation_copy_coords_success")
 
@@ -215,7 +215,7 @@ class ScreenshotsFreeBehaviorTest {
         scrollToAutomationItem(CopyLinkUriAutomation(UUID.fromString(InitialLinks.APPLE_MAPS_NAVIGATION_UUID))).click()
         goBackToMainForm()
         setMainInput()
-        onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareResultMessageSuccess" }
+        onElement(pollIntervalMs = 50) { viewIdResourceName == "geoShareResultMessageSuccess" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/automation_copy_link_success")
 
@@ -230,7 +230,7 @@ class ScreenshotsFreeBehaviorTest {
 
         // Automation - Save GPX - Success
         chooseFile()
-        onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareResultMessageSuccess" }
+        onElement(pollIntervalMs = 50) { viewIdResourceName == "geoShareResultMessageSuccess" }
         saveScreenshot("main_strings/automation_save_gpx_success")
 
         // Reset automation
@@ -352,7 +352,7 @@ class ScreenshotsFreeBehaviorTest {
         // Conversion - Result - App - Google Maps
         quickWaitForStableInActiveWindow() // Wait for the result to render
         onMainScrollablePane()
-            .scrollToElement(Direction.DOWN, 3_000L) {
+            .scrollToElement(Direction.DOWN, 3_000) {
                 viewIdResourceName == "geoShareApp_${PackageNames.GOOGLE_MAPS}"
             }
             .longClick()
@@ -369,7 +369,7 @@ class ScreenshotsFreeBehaviorTest {
 
         // Conversion - Result - Share
         onMainScrollablePane()
-            .scrollToElement(Direction.DOWN, 3_000L) {
+            .scrollToElement(Direction.DOWN, 3_000) {
                 viewIdResourceName == "geoShareApp_share"
             }
             .longClick()
@@ -379,7 +379,7 @@ class ScreenshotsFreeBehaviorTest {
 
         // Conversion - Result - Web map
         onMainScrollablePane()
-            .scrollToElement(Direction.DOWN, 3_000L) {
+            .scrollToElement(Direction.DOWN, 3_000) {
                 viewIdResourceName == "geoShareApp_ce900ea1-2c5d-4641-82f3-a5429a68d603"
             }
             .longClick()
@@ -406,7 +406,7 @@ class ScreenshotsFreeBehaviorTest {
 
         // Conversion - Result - App - Messaging
         onMainScrollablePane()
-            .scrollToElement(Direction.DOWN, 3_000L) {
+            .scrollToElement(Direction.DOWN, 3_000) {
                 viewIdResourceName == "geoShareApp_${PackageNames.CONVERSATIONS}"
             }
             .longClick()
@@ -426,7 +426,7 @@ class ScreenshotsFreeBehaviorTest {
 
         // Conversion - Result - App - OsmAnd
         onMainScrollablePane()
-            .scrollToElement(Direction.DOWN, 3_000L) {
+            .scrollToElement(Direction.DOWN, 3_000) {
                 viewIdResourceName == "geoShareApp_${PackageNames.OSMAND_PLUS}"
             }
             .longClick()
@@ -472,7 +472,7 @@ class ScreenshotsFreeBehaviorTest {
             // Scroll by percents, because it's more reliable than scrolling to the app icon
             .scroll(Direction.DOWN, 2f)
         launchNavigationInApp(PackageNames.TOMTOM)
-        onElement(20_000L) { viewIdResourceName == "geoShareLocationRationaleDialog" }.let { dialog ->
+        onElement(20_000) { viewIdResourceName == "geoShareLocationRationaleDialog" }.let { dialog ->
             quickWaitForStableInActiveWindow()
             saveScreenshot("main_strings/conversion_result_location_rationale")
             dialog.confirmDialog()
@@ -557,7 +557,7 @@ class ScreenshotsFreeBehaviorTest {
 
         // Conversion - Result - Message - Save GPX success
         chooseFile() // TODO Tests sometimes fail here
-        onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareResultMessageSuccess" }
+        onElement(pollIntervalMs = 50) { viewIdResourceName == "geoShareResultMessageSuccess" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_message_save_gpx_success")
 

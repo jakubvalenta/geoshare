@@ -51,7 +51,7 @@ class LinkBehaviorTest {
         onMainScrollablePane()
             // Swipe instead of scrolling, because we need to check the message before it disappears
             .swipe(Direction.DOWN, 1f)
-        onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareResultMessageSuccess" }
+        onElement(pollIntervalMs = 50) { viewIdResourceName == "geoShareResultMessageSuccess" }
     }
 
     @Test
