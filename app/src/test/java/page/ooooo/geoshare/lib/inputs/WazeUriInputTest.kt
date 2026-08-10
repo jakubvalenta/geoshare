@@ -67,6 +67,15 @@ class WazeUriInputTest : InputTest {
     }
 
     @Test
+    fun match_shortLinkInText() {
+        assertEquals(
+            "https://waze.com/ul/hu00uswvn3",
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+            input.match("Use Waze to drive to 5 - 22 Boulevard Gambetta: https://waze.com/ul/hu00uswvn3"),
+        )
+    }
+
+    @Test
     fun match_unknownHost() {
         assertNull(input.match("https://www.example.com/ul?ll=45.6906304,-120.810983&z=10"))
     }
@@ -76,15 +85,6 @@ class WazeUriInputTest : InputTest {
         assertEquals(
             "waze.com/ul?ll=45.6906304,-120.810983&z=10",
             input.match("ftp://waze.com/ul?ll=45.6906304,-120.810983&z=10"),
-        )
-    }
-
-    @Test
-    fun match_replacement() {
-        assertEquals(
-            "https://waze.com/ul/hu00uswvn3",
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-            input.match("Use Waze to drive to 5 - 22 Boulevard Gambetta: https://waze.com/ul/hu00uswvn3"),
         )
     }
 
