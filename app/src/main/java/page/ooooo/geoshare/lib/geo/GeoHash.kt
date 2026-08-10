@@ -14,7 +14,7 @@ private enum class GeoHashRoundingMode { LEFT, MIDDLE }
 private fun decodeGeoHash(
     hash: String,
     charMap: Map<Char, Int>,
-    digitBitCount: Int,
+    numberBitCount: Int,
     bitOrder: GeoHashBitOrder = GeoHashBitOrder.LON_LAT,
     roundingMode: GeoHashRoundingMode = GeoHashRoundingMode.LEFT,
     yCellCountAdjustment: (yBitCount: Int) -> Double = { 0.0 },
@@ -32,9 +32,9 @@ private fun decodeGeoHash(
         GeoHashBitOrder.LAT_LON -> 1
     }
     hash.forEach { char ->
-        charMap[char]?.let { digit ->
-            for (i in digitBitCount - 1 downTo 0) {
-                val bit = (digit shr i) and 1
+        charMap[char]?.let { number ->
+            for (i in numberBitCount - 1 downTo 0) {
+                val bit = (number shr i) and 1
                 if (bitCount and 1 == lonPosition) {
                     x = x shl 1 or bit
                     xBitCount++
@@ -70,7 +70,7 @@ private fun decodeGeoHash(
 
     // Adjust zoom by a magic constant that OpenStreetMap uses for their short links; the constant was designed for
     // base64 hashes, so we need to multiply it to make it work for base32 hashes too
-    z += zoomAdjustmentConst * (digitBitCount.toDouble() / 6.0)
+    z += zoomAdjustmentConst * (numberBitCount.toDouble() / 6.0)
 
     return NaivePoint(lat, lon, max(z, 0.0).toScale(0), source = Source.HASH)
 }
@@ -82,7 +82,7 @@ private val OPEN_STREET_MAP_HASH_CHAR_MAP = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghi
  * See https://wiki.openstreetmap.org/wiki/Shortlink#How_the_encoding_works
  */
 fun decodeOpenStreetMapQuadTileHash(hash: String): NaivePoint {
-    val naivePoint = decodeGeoHash(hash = hash, charMap = OPEN_STREET_MAP_HASH_CHAR_MAP, digitBitCount = 6)
+    val naivePoint = decodeGeoHash(hash = hash, charMap = OPEN_STREET_MAP_HASH_CHAR_MAP, numberBitCount = 6)
     if (naivePoint.z == null) {
         return naivePoint
     }
@@ -112,7 +112,7 @@ fun decodeGe0Hash(hash: String): NaivePoint {
             ""
         },
         charMap = ORGANIC_MAPS_HASH_CHAR_MAP,
-        digitBitCount = 6,
+        numberBitCount = 6,
         bitOrder = GeoHashBitOrder.LAT_LON,
         roundingMode = GeoHashRoundingMode.MIDDLE,
         yCellCountAdjustment = { yBitCount -> -(2.0.pow(yBitCount - 30)) },
@@ -132,17 +132,40 @@ private val WAZE_HASH_CHAR_MAP = "0123456789bcdefghjkmnpqrstuvwxyz"
 fun decodeWazeGeoHash(hash: String) = decodeGeoHash(
     hash = hash,
     charMap = WAZE_HASH_CHAR_MAP,
-    digitBitCount = 5,
+    numberBitCount = 5,
     roundingMode = GeoHashRoundingMode.MIDDLE,
 )
 
 private val MAPY_COM_CHAR_MAP = "0ABCD2EFGH4IJKLMN6OPQRST8UVWXYZ-1abcd3efgh5ijklmn7opqrst9uvwxyz."
     .mapIndexed { i, char -> char to i }.toMap()
 
+/**
+ * Decode the hash that Mapy.com uses to store a list of coordinates.
+ *
+ * The hash starts by the absolute coordinates of the first point. Then follow the coordinates of the second point as a
+ * relative offset from the first point. Then follow the coordinates of the third point as a relative offset from the
+ * second point, etc.
+ *
+ * Each coordinate can be described by a different number of characters, either 5, 3, or 2 characters. The information
+ * about the size of each coordinate is stored in the first two bits of the coordinate number.
+ *
+ * So this hash:
+ *
+ * ```
+ * 9gz-HxYH7ngonA6
+ * ```
+ *
+ * Is composed of:
+ *
+ * - `9gz-H` = 1st point x (`9` determines that coordinate is 5 characters long)
+ * - `xYH7n` = 1st point y (`x` determines that coordinate is 5 characters long)
+ * - `gon` = 2nd point x as an offset from the 1st point x (`g` determines that the coordinate is 3 characters long)
+ * - `A6` = 2nd point y as an offset from the 1st point y (`A` determines that the coordinate is 2 characters long)
+ */
 fun decodeMapyComGeoHash(
     hash: String,
     charMap: Map<Char, Int> = MAPY_COM_CHAR_MAP,
-    digitBitCount: Int = 6,
+    numberBitCount: Int = 6,
 ): List<NaivePoint> = buildList {
     var x = 0
     var y = 0
@@ -150,18 +173,18 @@ fun decodeMapyComGeoHash(
     var readingXCoord = true
 
     hash.forEach { char ->
-        charMap[char]?.let { digit ->
+        charMap[char]?.let { number ->
             if (charsToRead > 0) {
-                // The reading of a coordinate is in progress
+                // Reading of a coordinate is in progress
                 charsToRead--
                 if (readingXCoord) {
-                    x += digit shl (digitBitCount * charsToRead)
+                    x += number shl (numberBitCount * charsToRead)
                     if (charsToRead == 0) {
                         // Reading of the x coordinate has finished, switch to reading the y coordinate
                         readingXCoord = false
                     }
                 } else {
-                    y += digit shl (digitBitCount * charsToRead)
+                    y += number shl (numberBitCount * charsToRead)
                     if (charsToRead == 0) {
                         // Reading of the y coordinate has finished, switch to reading the x coordinate, and add both
                         // coordinates to result
@@ -176,35 +199,35 @@ fun decodeMapyComGeoHash(
                     }
                 }
             } else {
-                // Start reading new coordinate first determine the type of the coordinate from its first digit
-                if (digit >= 48) {
+                // Start reading a coordinate; first determine the type of the coordinate from its first number
+                if (number >= 48) {
                     // Coordinate type is a 5-character coordinate
                     if (readingXCoord) {
-                        // Subtract 48 from the digit, so that we drop the first two bits, which are used only to
+                        // Subtract 48 from the number, so that we drop the first two bits, which are used only to
                         // determine the coordinate type
-                        x = (digit - 48) shl (digitBitCount * 4)
+                        x = (number - 48) shl (numberBitCount * 4)
                     } else {
-                        y = (digit - 48) shl (digitBitCount * 4)
+                        y = (number - 48) shl (numberBitCount * 4)
                     }
                     charsToRead = 4
-                } else if (digit >= 32) {
+                } else if (number >= 32) {
                     // Coordinate type is a 3-character offset from the previous coordinate
                     if (readingXCoord) {
-                        // Subtract 32 from the digit, so that we drop the first two bits, which are used only to
-                        // determine the coordinate type then subtract a large number, so that the offset can be
+                        // Subtract 32 from the number, so that we drop the first two bits, which are used only to
+                        // determine the coordinate type; then subtract a large number, so that the offset can be
                         // negative
-                        x += ((digit - 32) shl (digitBitCount * 2)) - 32_768
+                        x += ((number - 32) shl (numberBitCount * 2)) - 32_768
                     } else {
-                        y += ((digit - 32) shl (digitBitCount * 2)) - 32_768
+                        y += ((number - 32) shl (numberBitCount * 2)) - 32_768
                     }
                     charsToRead = 2
                 } else {
                     // Coordinate type is a 2-character offset from the previous coordinate
                     if (readingXCoord) {
                         // Subtract a large number, so that the offset can be negative
-                        x += (digit shl digitBitCount) - 1024
+                        x += (number shl numberBitCount) - 1024
                     } else {
-                        y += (digit shl digitBitCount) - 1024
+                        y += (number shl numberBitCount) - 1024
                     }
                     charsToRead = 1
                 }
