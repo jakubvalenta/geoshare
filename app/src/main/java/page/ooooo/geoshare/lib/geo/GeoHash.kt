@@ -136,6 +136,83 @@ fun decodeWazeGeoHash(hash: String) = decodeGeoHash(
     roundingMode = GeoHashRoundingMode.MIDDLE,
 )
 
+private val MAPY_COM_CHAR_MAP = "0ABCD2EFGH4IJKLMN6OPQRST8UVWXYZ-1abcd3efgh5ijklmn7opqrst9uvwxyz."
+    .mapIndexed { i, char -> char to i }.toMap()
+
+fun decodeMapyComGeoHash(
+    hash: String,
+    charMap: Map<Char, Int> = MAPY_COM_CHAR_MAP,
+    digitBitCount: Int = 6,
+): List<NaivePoint> = buildList {
+    var x = 0
+    var y = 0
+    var charsToRead = 0
+    var readingXCoord = true
+
+    hash.forEach { char ->
+        charMap[char]?.let { digit ->
+            if (charsToRead > 0) {
+                // The reading of a coordinate is in progress
+                charsToRead--
+                if (readingXCoord) {
+                    x += digit shl (digitBitCount * charsToRead)
+                    if (charsToRead == 0) {
+                        // Reading of the x coordinate has finished, switch to reading the y coordinate
+                        readingXCoord = false
+                    }
+                } else {
+                    y += digit shl (digitBitCount * charsToRead)
+                    if (charsToRead == 0) {
+                        // Reading of the y coordinate has finished, switch to reading the x coordinate, and add both
+                        // coordinates to result
+                        readingXCoord = true
+                        add(
+                            NaivePoint(
+                                lat = (y / (1 shl 28).toDouble()) * 180 - 90,
+                                lon = (x / (1 shl 28).toDouble()) * 360 - 180,
+                                source = Source.HASH,
+                            )
+                        )
+                    }
+                }
+            } else {
+                // Start reading new coordinate first determine the type of the coordinate from its first digit
+                if (digit >= 48) {
+                    // Coordinate type is a 5-character coordinate
+                    if (readingXCoord) {
+                        // Subtract 48 from the digit, so that we drop the first two bits, which are used only to
+                        // determine the coordinate type
+                        x = (digit - 48) shl (digitBitCount * 4)
+                    } else {
+                        y = (digit - 48) shl (digitBitCount * 4)
+                    }
+                    charsToRead = 4
+                } else if (digit >= 32) {
+                    // Coordinate type is a 3-character offset from the previous coordinate
+                    if (readingXCoord) {
+                        // Subtract 32 from the digit, so that we drop the first two bits, which are used only to
+                        // determine the coordinate type then subtract a large number, so that the offset can be
+                        // negative
+                        x += ((digit - 32) shl (digitBitCount * 2)) - 32_768
+                    } else {
+                        y += ((digit - 32) shl (digitBitCount * 2)) - 32_768
+                    }
+                    charsToRead = 2
+                } else {
+                    // Coordinate type is a 2-character offset from the previous coordinate
+                    if (readingXCoord) {
+                        // Subtract a large number, so that the offset can be negative
+                        x += (digit shl digitBitCount) - 1024
+                    } else {
+                        y += (digit shl digitBitCount) - 1024
+                    }
+                    charsToRead = 1
+                }
+            }
+        }
+    }
+}
+
 /**
  * See https://github.com/google/open-location-code
  */

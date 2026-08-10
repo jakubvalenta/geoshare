@@ -1,1 +1,2 @@
+- Added Mapy.com navigation link support.
 - Improve result screen by putting messaging apps in its own section.

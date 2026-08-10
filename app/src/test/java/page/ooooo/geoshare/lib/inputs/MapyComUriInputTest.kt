@@ -134,6 +134,21 @@ class MapyComUriInputTest : InputTest {
     }
 
     @Test
+    fun parse_navigation() = runTest {
+        assertEquals(
+            ParseResult(
+                persistentListOf(
+                    WGS84Point(52.468305230140686, 13.430708348751068, source = Source.HASH),
+                    WGS84Point(52.423603534698486, 13.521436750888824, source = Source.HASH),
+                    WGS84Point(52.41917721927166, 13.543593138456345, source = Source.HASH),
+                    WGS84Point(52.40594454109669, 13.620681166648865, source = Source.HASH),
+                )
+            ),
+            input.parse(uriString = "https://mapy.com/en/turisticka?planovani-trasy&rc=9eJ.Ex5-GG9eY14x5Ls1jBHe8t9emdXcI5&rs=osm&rs=osm&rs=osm&rs=pubt&ri=20227705&ri=120789104&ri=81032078&ri=28872262&mrp=%7B%22c%22%3A121%2C%22dt%22%3A%22%22%2C%22d%22%3Atrue%7D&xc=%5B%5D&rbf=alf&x=13.4308032&y=52.4684951&z=18"),
+        )
+    }
+
+    @Test
     fun parse_place() = runTest {
         assertEquals(
             ParseResult(persistentListOf(WGS84Point(50.0992553, 14.4336590, z = 19.0, source = Source.URI))),

@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
@@ -9,6 +10,7 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.geo.decodeMapyComGeoHash
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -29,6 +31,13 @@ class MapyComUriInput @Inject constructor(
 
     override suspend fun parse(data: Uri, match: String) = parseResult {
         data.run {
+            // Navigation
+            // https://mapy.com/...?rc={hash}
+            queryParams["rc"].takeIf { !it.isNullOrEmpty() }?.let { hash ->
+                points = decodeMapyComGeoHash(hash).map { WGS84Point(it) }.toImmutableList()
+                return@run
+            }
+
             // Coordinates -- use this part of the text, because it's more precise than the URL
             // e.g. `Vega de Tera 41.9966006N, 6.1223825W https://mapy.com/s/deduduzeha`
             Regex(COORDS).matchEntire(pathParts.firstOrNull())?.let { m ->
