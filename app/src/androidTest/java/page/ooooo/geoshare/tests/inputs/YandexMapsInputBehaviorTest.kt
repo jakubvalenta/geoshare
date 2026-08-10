@@ -15,7 +15,7 @@ import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
 class YandexMapsInputBehaviorTest {
     @Test
-    fun yandexMaps() = uiAutomator {
+    fun yandexMaps_offline() = uiAutomator {
         // Coordinates
         testUri(
             WGS84Point(-37.81384550094835, 144.96315783657042, z = 17.852003, source = Source.URI),
@@ -30,7 +30,7 @@ class YandexMapsInputBehaviorTest {
     }
 
     @Test
-    fun yandexMapsHtml() = uiAutomator {
+    fun yandexMaps_online() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("yandex.com")
         }

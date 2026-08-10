@@ -8,7 +8,7 @@ import page.ooooo.geoshare.tests.testUri
 
 class OsmAndInputBehaviorTest {
     @Test
-    fun osmAnd() = uiAutomator {
+    fun osmAnd_offline() = uiAutomator {
         // Coordinates
         testUri(
             WGS84Point(52.51628, 13.37771, z = 15.0, source = Source.URI),

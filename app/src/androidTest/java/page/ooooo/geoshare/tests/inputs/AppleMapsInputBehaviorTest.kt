@@ -16,7 +16,7 @@ import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
 class AppleMapsInputBehaviorTest {
     @Test
-    fun appleMaps() = uiAutomator {
+    fun appleMaps_offline() = uiAutomator {
         // Launch app and close intro
         launchApplication()
         waitForAppToBeVisible()
@@ -58,7 +58,7 @@ class AppleMapsInputBehaviorTest {
     }
 
     @Test
-    fun appleMapsHtml() = uiAutomator {
+    fun appleMaps_online() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("maps.apple.com")
         }

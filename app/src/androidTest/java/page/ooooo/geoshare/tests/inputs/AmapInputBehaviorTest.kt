@@ -16,7 +16,7 @@ import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
 class AmapInputBehaviorTest {
     @Test
-    fun amap() = uiAutomator {
+    fun amap_offline() = uiAutomator {
         // Coordinates within mainland China
         testUri(
             GCJ02Point(
@@ -70,7 +70,7 @@ class AmapInputBehaviorTest {
     }
 
     @Test
-    fun amapHtml() = uiAutomator {
+    fun amap_online() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("surl.amap.com")
         }

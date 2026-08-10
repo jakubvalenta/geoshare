@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.tests.inputs
 
 import androidx.test.uiautomator.uiAutomator
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import page.ooooo.geoshare.tests.assumeDomainResolvable
@@ -15,26 +16,22 @@ import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
 class MapyComInputBehaviorTest {
     @Test
-    fun mapyCom() = uiAutomator {
-        // Coordinates
+    fun mapyCom_offline() = uiAutomator {
+        // Coordinates with international domain
         testUri(
-            WGS84Point(50.0525078, 14.0184810, z = 9.0, source = Source.URI),
+            WGS84Point(50.0525078, 14.0184810, z = 9.0, source = Source.MAP_CENTER),
             "https://mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9",
         )
-        testUri(
-            WGS84Point(50.0525078, 14.0184810, z = 9.0, source = Source.URI),
-            "https://mapy.cz?x=14.0184810&y=50.0525078&z=9",
-        )
 
-        // Place
+        // Coordinates with local domain
         testUri(
-            WGS84Point(50.0992553, 14.4336590, z = 19.0, source = Source.URI),
-            "https://mapy.com/en/zakladni?source=firm&id=13362491&x=14.4336590&y=50.0992553&z=19",
+            WGS84Point(50.0525078, 14.0184810, z = 9.0, source = Source.MAP_CENTER),
+            "https://mapy.cz?x=14.0184810&y=50.0525078&z=9",
         )
     }
 
     @Test
-    fun mapyComHtml() = uiAutomator {
+    fun mapyCom_online() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("mapy.com")
         }
@@ -47,12 +44,18 @@ class MapyComInputBehaviorTest {
 
         // Short link
         testUri(
-            WGS84Point(50.0831498, 14.4549515, z = 17.0, source = Source.URI),
+            WGS84Point(50.0831498, 14.4549515, z = 17.0, source = Source.MAP_CENTER),
             "https://mapy.com/s/jakuhelasu",
         )
+
+        // Navigation
         testUri(
-            WGS84Point(50.0858554, 14.4624724, z = 17.0, source = Source.URI),
-            "https://mapy.cz/s/jetucaputu",
+            persistentListOf(
+                WGS84Point(44.669848904013634, -63.578297942876816, z = 19.0, source = Source.HASH),
+                WGS84Point(44.645654037594795, -63.60516831278801, z = 19.0, source = Source.HASH),
+                WGS84Point(44.658605083823204, -63.61712023615837, z = 19.0, source = Source.HASH),
+            ),
+            "https://mapy.com/s/dufokujobu"
         )
     }
 }
