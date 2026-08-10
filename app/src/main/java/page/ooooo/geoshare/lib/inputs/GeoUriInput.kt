@@ -37,34 +37,35 @@ class GeoUriInput @Inject constructor(
         data.run {
             val z = Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()
 
-            // Name in separate param
-            // ?q={lat},{lon}&({name})
+            // Name in separate query param
+            // ?q=...&({name})
             val name = queryParams
                 .filter { (key, value) -> key != "q" && key != "z" && value.isEmpty() }
                 .firstNotNullOfOrNull { (key) -> Regex(NAME_REGEX).matchEntire(key)?.groupOrNull() }
-            // Query
-            // ?q={name}
-                ?: Q_PARAM_PATTERN.matchEntire(queryParams["q"])?.groupOrNull()
 
             // Pin without name
             // ?q={lat},{lon}
             // Pin with name
             // ?q={lat},{lon}({name})
-            Regex("""$LAT$COORD_SEP$LON(?:$NAME_REGEX)?""").matchEntire(queryParams["q"])
+            Regex("""$LAT$COORD_SEP$LON(?:$NAME_REGEX)?.*""").matchEntire(queryParams["q"])
                 ?.toLatLonNamePoint(Source.URI)?.let {
                     points = persistentListOf(WGS84Point(it, z, name))
                     return@run
                 }
 
+            // Query unless it contained coordinates
+            // ?q={name}
+            val query = Q_PARAM_PATTERN.matchEntire(queryParams["q"])?.groupOrNull()
+
             // Coordinates
             // geo:{lat},{lon}
-            LAT_LON_PATTERN.matchEntire(pathParts.firstOrNull())?.toLatLonPoint(Source.URI)?.let {
-                points = persistentListOf(WGS84Point(it, z, name))
+            Regex("""$LAT_LON_PATTERN.*""").matchEntire(pathParts.firstOrNull())?.toLatLonPoint(Source.URI)?.let {
+                points = persistentListOf(WGS84Point(it, z, name ?: query))
                 return@run
             }
 
-            if (name != null) {
-                points = persistentListOf(WGS84Point(z = z, name = name, source = Source.URI))
+            if (name != null || query != null) {
+                points = persistentListOf(WGS84Point(z = z, name = name ?: query, source = Source.URI))
             }
         }
     }

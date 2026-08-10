@@ -36,7 +36,7 @@ class MapsMeInputBehaviorTest {
                 40.7127405, -74.005997,
                 z = 9.0,
                 name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Nova Iorque",
-                source = Source.HASH
+                source = Source.HASH,
             ),
             "https://omaps.app/Umse5f0H8a/Nova_Iorque",
         )
@@ -53,15 +53,6 @@ class MapsMeInputBehaviorTest {
             "América do Norte, Lancer, Saskatchewan, Canadá\n" +
                 "http://ge0.me/ApYSV0YTAl/América_do_Norte\n" +
                 "(51.000001, -108.999988)",
-        )
-
-        // Text, which will get parsed by GeoUriInput, because it contains a geo: URI that precedes the short link
-        testText(
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-            WGS84Point(40.7127400, -74.0059965, z = 9.0, name = "Nova Iorque", source = Source.URI),
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-            "Organic Maps: geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)\n" +
-                "https://omaps.app/Umse5f0H8a/Nova_Iorque",
         )
     }
 }

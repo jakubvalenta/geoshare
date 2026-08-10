@@ -13,7 +13,7 @@ class GeoUriUriInputTest : InputTest {
     private val input = FakeInputRepository.geoUriInput
 
     @Test
-    fun match_valid() {
+    fun match_uri() {
         assertEquals(
             "geo:50.123456,-120.123456?q=foo%20bar&z=3.4",
             input.match("geo:50.123456,-120.123456?q=foo%20bar&z=3.4")
@@ -21,6 +21,26 @@ class GeoUriUriInputTest : InputTest {
         assertEquals(
             "geo:52.47254,13.4345?q=52.47254,13.4345(My%20place)",
             input.match("geo:52.47254,13.4345?q=52.47254,13.4345(My%20place)")
+        )
+    }
+
+    @Test
+    fun match_uriInText() {
+        assertEquals(
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+            "geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)",
+            input.match(
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                "geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)\n" +
+                    "https://omaps.app/Umse5f0H8a/Nova_Iorque"
+            ),
+        )
+        assertEquals(
+            "geo:52.0553846,-2.7151898 into your maps app to see this location.",
+            input.match(
+                "Follow this link https://comaps.at/ItdwBgeWW1/Hereford or paste these coordinates " +
+                    "geo:52.0553846,-2.7151898 into your maps app to see this location."
+            ),
         )
     }
 
@@ -47,19 +67,6 @@ class GeoUriUriInputTest : InputTest {
     @Test
     fun match_unknownPath() {
         assertEquals("geo:example?q=foo%20bar&z=3.4", input.match("geo:example?q=foo%20bar&z=3.4"))
-    }
-
-    @Test
-    fun match_replacement() {
-        assertEquals(
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-            "geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)",
-            input.match(
-                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-                "geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)\n" +
-                    "https://omaps.app/Umse5f0H8a/Nova_Iorque"
-            ),
-        )
     }
 
     @Test
@@ -201,6 +208,18 @@ class GeoUriUriInputTest : InputTest {
         assertEquals(
             ParseResult(persistentListOf(WGS84Point(45.4786785, 9.2473799, source = Source.URI))),
             input.parse("geo:0,0?q=45.4786785,%209.2473799"),
+        )
+    }
+
+    @Test
+    fun parse_coordsWithTrailingGarbage() = runTest {
+        assertEquals(
+            ParseResult(persistentListOf(WGS84Point(52.0553846, -2.7151898, source = Source.URI))),
+            input.parse("geo:52.0553846,-2.7151898 into your maps app to see this location."),
+        )
+        assertEquals(
+            ParseResult(persistentListOf(WGS84Point(52.0553846, -2.7151898, source = Source.URI))),
+            input.parse("geo:0,0?q=52.0553846,-2.7151898 into your maps app to see this location."),
         )
     }
 }
