@@ -16,7 +16,7 @@ import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
 class OpenStreetMapInputBehaviorTest {
     @Test
-    fun openStreetMap() = uiAutomator {
+    fun openStreetMap_offline() = uiAutomator {
         // Map center
         testUri(
             WGS84Point(51.49, -0.13, z = 16.0, source = Source.MAP_CENTER),
@@ -43,7 +43,7 @@ class OpenStreetMapInputBehaviorTest {
     }
 
     @Test
-    fun openStreetMapHtml() = uiAutomator {
+    fun openStreetMap_online() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("www.openstreetmap.org")
         }

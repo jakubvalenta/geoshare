@@ -11,7 +11,7 @@ import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
 class CoordinateInputBehaviorTest {
     @Test
-    fun coordinates() = uiAutomator {
+    fun coordinates_offline() = uiAutomator {
         // Launch app and close intro
         launchApplication()
         waitForAppToBeVisible()

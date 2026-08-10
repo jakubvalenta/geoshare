@@ -16,7 +16,7 @@ import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
 class WazeInputBehaviorTest {
     @Test
-    fun waze() = uiAutomator {
+    fun waze_offline() = uiAutomator {
         // Launch app and close intro
         launchApplication()
         waitForAppToBeVisible()
@@ -53,7 +53,7 @@ class WazeInputBehaviorTest {
     }
 
     @Test
-    fun wazeHtml() = uiAutomator {
+    fun waze_online() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("waze.com")
         }

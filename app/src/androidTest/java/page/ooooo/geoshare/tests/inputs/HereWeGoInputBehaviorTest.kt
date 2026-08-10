@@ -8,7 +8,7 @@ import page.ooooo.geoshare.tests.testUri
 
 class HereWeGoInputBehaviorTest {
     @Test
-    fun hereWeGo() = uiAutomator {
+    fun hereWeGo_offline() = uiAutomator {
         // Coordinates
         testUri(
             WGS84Point(50.21972, -0.68453, z = 6.93, source = Source.MAP_CENTER),

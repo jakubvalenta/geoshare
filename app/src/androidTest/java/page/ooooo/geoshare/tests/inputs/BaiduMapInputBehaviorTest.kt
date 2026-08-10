@@ -19,7 +19,7 @@ import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
 class BaiduMapInputBehaviorTest {
     @Test
-    fun baiduMap() = uiAutomator {
+    fun baiduMap_offline() = uiAutomator {
         // Map center
         testUri(
             BD09MCPoint(3317203.0, 13520653.0, 13.0, source = Source.MAP_CENTER),
@@ -103,7 +103,7 @@ class BaiduMapInputBehaviorTest {
     }
 
     @Test
-    fun baiduMapHtml() = uiAutomator {
+    fun baiduMap_online() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("map.baidu.com")
         }

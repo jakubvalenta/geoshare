@@ -73,7 +73,7 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
     }
 
     @Test
-    fun testGoogleMapsAddressApiInput() = uiAutomator {
+    fun googleMapsAddressApiInput_online() = uiAutomator {
         // Launch app and close intro
         launchApplication()
         waitForAppToBeVisible()

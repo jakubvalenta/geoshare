@@ -8,7 +8,7 @@ import page.ooooo.geoshare.tests.testUri
 
 class MagicEarthInputBehaviorTest {
     @Test
-    fun magicEarth() = uiAutomator {
+    fun magicEarth_offline() = uiAutomator {
         // Coordinates
         testUri(
             WGS84Point(48.85649, 2.35216, source = Source.URI),

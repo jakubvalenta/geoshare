@@ -70,7 +70,7 @@ class GoogleMapsPlaceApiInputBehaviorTest(private val testServerParams: TestServ
     }
 
     @Test
-    fun testGoogleMapsPlaceApiInput() = uiAutomator {
+    fun googleMapsPlaceApiInput_online() = uiAutomator {
         // Launch app and close intro
         launchApplication()
         waitForAppToBeVisible()

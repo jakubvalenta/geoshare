@@ -8,7 +8,7 @@ import page.ooooo.geoshare.tests.testUri
 
 class GoogleNavigationUriInputBehaviorTest {
     @Test
-    fun googleNavigationUri() = uiAutomator {
+    fun googleNavigationUri_offline() = uiAutomator {
         // Coordinates
         testUri(
             WGS84Point(50.123456, -120.123456, source = Source.URI),

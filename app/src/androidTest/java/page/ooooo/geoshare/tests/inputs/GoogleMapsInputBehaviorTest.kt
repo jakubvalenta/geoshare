@@ -28,7 +28,7 @@ class GoogleMapsInputBehaviorTest {
     private val htmlParsingSupported = BuildConfig.FLAVOR == "free"
 
     @Test
-    fun googleMapsUriInput() = uiAutomator {
+    fun googleMapsUriInput_offline() = uiAutomator {
         // Coordinates in data
         testUri(
             WGS84Point(
@@ -127,7 +127,7 @@ class GoogleMapsInputBehaviorTest {
     }
 
     @Test
-    fun googleMapsShortLinkInput() = uiAutomator {
+    fun googleMapsShortLinkInput_online() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("maps.google.com")
         }
@@ -152,7 +152,7 @@ class GoogleMapsInputBehaviorTest {
     }
 
     @Test
-    fun googleMapsHtmlInput() = uiAutomator {
+    fun googleMapsHtmlInput_online() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("maps.google.com")
         }
@@ -189,7 +189,7 @@ class GoogleMapsInputBehaviorTest {
     }
 
     @Test
-    fun googleMapsHtmlInput_googleSearch() = uiAutomator {
+    fun googleMapsHtmlInput_online_googleSearch() = uiAutomator {
         assumeTrue(
             "This test currently fails, because Google returns a captcha, even though we only run the test on a real device",
             false,
@@ -210,7 +210,7 @@ class GoogleMapsInputBehaviorTest {
     }
 
     @Test
-    fun googleMapsPlaceListInput() = uiAutomator {
+    fun googleMapsPlaceListInput_online() = uiAutomator {
         // Launch app and close intro
         launchApplication()
         waitForAppToBeVisible()

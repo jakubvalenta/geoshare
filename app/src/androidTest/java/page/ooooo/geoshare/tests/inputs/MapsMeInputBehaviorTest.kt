@@ -12,7 +12,7 @@ import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
 class MapsMeInputBehaviorTest {
     @Test
-    fun mapsMe() = uiAutomator {
+    fun mapsMe_offline() = uiAutomator {
         // Launch app and close intro
         launchApplication()
         waitForAppToBeVisible()

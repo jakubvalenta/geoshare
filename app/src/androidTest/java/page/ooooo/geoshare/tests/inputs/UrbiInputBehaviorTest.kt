@@ -15,7 +15,7 @@ import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
 class UrbiInputBehaviorTest {
     @Test
-    fun urbi() = uiAutomator {
+    fun urbi_offline() = uiAutomator {
         // Point with marker
         testUri(
             WGS84Point(25.25915, 55.225263, z = 12.77, source = Source.URI),
@@ -24,7 +24,7 @@ class UrbiInputBehaviorTest {
     }
 
     @Test
-    fun urbiHtml() = uiAutomator {
+    fun urbi_online() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("go.2gis.com")
         }

@@ -10,7 +10,7 @@ import page.ooooo.geoshare.tests.testUri
 
 class PlusCodeInputBehaviorTest {
     @Test
-    fun plusCode() = uiAutomator {
+    fun plusCode_offline() = uiAutomator {
         // Global code as URL https://plus.codes
         testUri(
             WGS84Point(14.917313, -23.5113130, source = Source.HASH),
