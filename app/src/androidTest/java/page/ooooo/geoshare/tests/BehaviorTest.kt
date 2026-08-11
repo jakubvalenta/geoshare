@@ -587,7 +587,9 @@ fun UiAutomatorTestScope.findContact(name: String): UiObject2? {
 
     // Search contacts
     val searchField = onElementOrNull(3_000) {
-        packageName == "com.android.contacts" && viewIdResourceName == "android:id/search_src_text"
+        packageName == "com.android.contacts" &&
+            (viewIdResourceName == "android:id/search_src_text" ||
+                viewIdResourceName == "com.android.contacts:id/search_view")
     }
     val searchTerm = name.split(' ').first()
     if (searchField != null) {
