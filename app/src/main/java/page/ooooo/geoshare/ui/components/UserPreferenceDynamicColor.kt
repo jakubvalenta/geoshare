@@ -17,14 +17,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.datastore.preferences.core.MutablePreferences
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
-import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
-import page.ooooo.geoshare.data.local.preferences.Permission
+import page.ooooo.geoshare.data.local.preferences.DynamicColorPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun UserPreferenceConnectionPermissionListItem(
+fun UserPreferenceDynamicColorListItem(
     index: Int,
     count: Int,
     selected: Boolean,
@@ -38,21 +37,21 @@ fun UserPreferenceConnectionPermissionListItem(
         shapes = ListItemDefaults.segmentedShapes(index, count),
         modifier = modifier,
         supportingContent = {
-            ConnectionPermissionPreferenceValue(
-                value = ConnectionPermissionPreference.getValue(values),
+            DynamicColorPreferenceValue(
+                value = DynamicColorPreference.getValue(values),
             )
         },
         colors = segmentedListColors(),
     ) {
         Text(
-            stringResource(R.string.user_preferences_connection_title),
+            stringResource(R.string.user_preferences_dynamic_color_title),
             style = MaterialTheme.typography.bodyLarge,
         )
     }
 }
 
 @Composable
-fun UserPreferenceConnectionPermissionControls(
+fun UserPreferenceDynamicColorControls(
     billingAppNameResId: Int,
     onBack: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
@@ -61,41 +60,35 @@ fun UserPreferenceConnectionPermissionControls(
     wide: Boolean,
 ) {
     UserPreferenceControls(
-        titleResId = R.string.user_preferences_connection_title,
-        description = {
-            stringResource(
-                R.string.user_preferences_connection_description,
-                stringResource(R.string.app_name),
-            )
-        },
+        titleResId = R.string.user_preferences_dynamic_color_title,
         billingAppNameResId = billingAppNameResId,
         wide = wide,
         onBack = onBack,
         onNavigateToBillingScreen = onNavigateToBillingScreen,
     ) {
         userPreferenceOptionsControl(
-            userPreference = ConnectionPermissionPreference,
+            userPreference = DynamicColorPreference,
             values = values,
             onValueChange = onValueChange,
-            optionGroups = ConnectionPermissionPreference.getOptionGroups(),
-            itemTestTag = { option -> "geoShareUserPreferenceConnectionPermission_${option}" },
+            optionGroups = DynamicColorPreference.getOptionGroups(),
         ) { option, modifier ->
-            ConnectionPermissionPreferenceValue(option, modifier)
+            Column(modifier) {
+                DynamicColorPreferenceValue(option)
+            }
         }
     }
 }
 
 @Composable
-private fun ConnectionPermissionPreferenceValue(value: Permission, modifier: Modifier = Modifier) {
+private fun DynamicColorPreferenceValue(value: Boolean) {
     Text(
         stringResource(
-            when (value) {
-                Permission.ALWAYS -> R.string.user_preferences_connection_option_always
-                Permission.ASK -> R.string.user_preferences_connection_option_ask
-                Permission.NEVER -> R.string.user_preferences_connection_option_never
+            if (value) {
+                R.string.yes
+            } else {
+                R.string.no
             }
-        ),
-        modifier,
+        )
     )
 }
 
@@ -105,7 +98,7 @@ private fun ListItemPreview() {
     AppTheme {
         Surface {
             Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
-                UserPreferenceConnectionPermissionListItem(
+                UserPreferenceDynamicColorListItem(
                     index = 0,
                     count = 1,
                     selected = false,
@@ -123,7 +116,7 @@ private fun DarkListItemPreview() {
     AppTheme {
         Surface {
             Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
-                UserPreferenceConnectionPermissionListItem(
+                UserPreferenceDynamicColorListItem(
                     index = 0,
                     count = 1,
                     selected = false,
@@ -140,7 +133,7 @@ private fun DarkListItemPreview() {
 private fun ControlsPreview() {
     AppTheme {
         Surface {
-            UserPreferenceConnectionPermissionControls(
+            UserPreferenceDynamicColorControls(
                 billingAppNameResId = R.string.app_name_pro,
                 onBack = {},
                 onNavigateToBillingScreen = {},
@@ -157,7 +150,7 @@ private fun ControlsPreview() {
 private fun DarkControlsPreview() {
     AppTheme {
         Surface {
-            UserPreferenceConnectionPermissionControls(
+            UserPreferenceDynamicColorControls(
                 billingAppNameResId = R.string.app_name_pro,
                 onBack = {},
                 onNavigateToBillingScreen = {},
@@ -174,7 +167,7 @@ private fun DarkControlsPreview() {
 private fun TabletControlsPreview() {
     AppTheme {
         Surface {
-            UserPreferenceConnectionPermissionControls(
+            UserPreferenceDynamicColorControls(
                 billingAppNameResId = R.string.app_name_pro,
                 onBack = {},
                 onNavigateToBillingScreen = {},

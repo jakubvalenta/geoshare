@@ -35,6 +35,7 @@ import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.preferences.Automation
+import page.ooooo.geoshare.data.local.preferences.DynamicColorPreference
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.android.AppDetails
@@ -59,6 +60,8 @@ import page.ooooo.geoshare.ui.components.UserPreferenceCoordinateFormatControls
 import page.ooooo.geoshare.ui.components.UserPreferenceCoordinateFormatListItem
 import page.ooooo.geoshare.ui.components.UserPreferenceDeveloperOptionsControls
 import page.ooooo.geoshare.ui.components.UserPreferenceDeveloperOptionsListItem
+import page.ooooo.geoshare.ui.components.UserPreferenceDynamicColorControls
+import page.ooooo.geoshare.ui.components.UserPreferenceDynamicColorListItem
 import page.ooooo.geoshare.ui.components.UserPreferenceHiddenAppsControls
 import page.ooooo.geoshare.ui.components.UserPreferenceHiddenAppsListItem
 import page.ooooo.geoshare.ui.components.UserPreferenceLinksListItem
@@ -69,6 +72,7 @@ import java.util.UUID
 
 @Keep
 enum class UserPreferenceGroupId {
+    APPEARANCE_DYNAMIC_COLOR,
     AUTOMATION,
     AUTOMATION_DELAY,
     CONNECTION_PERMISSION,
@@ -355,6 +359,31 @@ private fun UserPreferenceListPane(
                 )
             }
         }
+        if (DynamicColorPreference.isAvailable()) {
+            item {
+                SegmentedListLabel(
+                    stringResource(R.string.user_preferences_section_appearance),
+                    modifier = Modifier.padding(horizontal = spacing.windowPadding),
+                )
+            }
+            item {
+                Column(
+                    modifier = Modifier
+                        .selectableGroup()
+                        .padding(horizontal = spacing.windowPadding),
+                    verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+                ) {
+                    UserPreferenceDynamicColorListItem(
+                        index = 1,
+                        count = 1,
+                        selected = currentGroupId == UserPreferenceGroupId.APPEARANCE_DYNAMIC_COLOR,
+                        values = values,
+                        modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.APPEARANCE_DYNAMIC_COLOR}"),
+                        onClick = { onNavigateToGroup(UserPreferenceGroupId.APPEARANCE_DYNAMIC_COLOR) },
+                    )
+                }
+            }
+        }
         if (BuildConfig.DEBUG) {
             item {
                 SegmentedListLabel(
@@ -399,6 +428,15 @@ private fun UserPreferenceDetailPane(
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
     when (currentGroupId) {
+        UserPreferenceGroupId.APPEARANCE_DYNAMIC_COLOR -> UserPreferenceDynamicColorControls(
+            billingAppNameResId = billingAppNameResId,
+            onBack = onBack,
+            onNavigateToBillingScreen = onNavigateToBillingScreen,
+            onValueChange = onValueChange,
+            values = values,
+            wide = wide,
+        )
+
         UserPreferenceGroupId.AUTOMATION -> UserPreferenceAutomationControls(
             appDetails = appDetails,
             apps = apps,
@@ -471,7 +509,7 @@ private fun UserPreferenceDetailPane(
 
 // Previews
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, device = "spec:width=1080px,height=3000px,dpi=440")
 @Composable
 private fun DefaultPreview() {
     AppTheme {
@@ -500,7 +538,11 @@ private fun DefaultPreview() {
     }
 }
 
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(
+    showBackground = true,
+    device = "spec:width=1080px,height=3000px,dpi=440",
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
 @Composable
 private fun DarkPreview() {
     AppTheme {

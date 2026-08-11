@@ -42,8 +42,8 @@ fun UserPreferenceHiddenAppsListItem(
     index: Int,
     count: Int,
     apps: DataTypes,
-    values: UserPreferencesValues,
     selected: Boolean,
+    values: UserPreferencesValues,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
@@ -155,7 +155,6 @@ fun UserPreferenceHiddenAppsControls(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Preview(showBackground = true)
 @Composable
 private fun ListItemPreview() {
@@ -179,7 +178,6 @@ private fun ListItemPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DarkListItemPreview() {
@@ -203,7 +201,6 @@ private fun DarkListItemPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Preview(showBackground = true)
 @Composable
 private fun AllListItemPreview() {
@@ -233,7 +230,6 @@ private fun AllListItemPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DarkAllListItemPreview() {
@@ -263,7 +259,6 @@ private fun DarkAllListItemPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Preview(showBackground = true)
 @Composable
 private fun NoneListItemPreview() {
@@ -287,7 +282,6 @@ private fun NoneListItemPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DarkNoneListItemPreview() {

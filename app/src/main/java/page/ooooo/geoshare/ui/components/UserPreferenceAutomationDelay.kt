@@ -130,7 +130,6 @@ private fun AutomationDelayPreferenceValue(value: Duration) {
     Text(pluralStringResource(R.plurals.seconds, seconds, seconds))
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Preview(showBackground = true)
 @Composable
 private fun ListItemPreview() {
@@ -161,7 +160,6 @@ private fun ListItemPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DarkListItemPreview() {

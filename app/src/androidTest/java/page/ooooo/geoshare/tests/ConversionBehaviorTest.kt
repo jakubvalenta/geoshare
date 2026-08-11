@@ -34,7 +34,7 @@ class ConversionBehaviorTest {
         assertConversionSucceeds(WGS84Point(52.5067296, 13.2599309, z = 11.0, source = Source.MAP_CENTER))
 
         // Tap the Google Maps icon
-        onElement { viewIdResourceName == "geoShareApp_${PackageNames.GOOGLE_MAPS}" }.click()
+        clickAppIcon(PackageNames.GOOGLE_MAPS)
 
         // Google Maps shows precise location
         waitAndAssertGoogleMapsContainsElement { textAsString() in setOf("Westend", "Berlin-Westend") }
@@ -67,7 +67,7 @@ class ConversionBehaviorTest {
         assertConversionSucceeds(expectedPoint)
 
         // Tap the Google Maps icon
-        onElement { viewIdResourceName == "geoShareApp_${PackageNames.GOOGLE_MAPS}" }.click()
+        clickAppIcon(PackageNames.GOOGLE_MAPS)
 
         // Google Maps shows precise location (fails on Nexus 5)
         waitAndAssertGoogleMapsContainsElement { textAsString() == "Ming&Qing Dynasties Furniture Hall" }
@@ -310,7 +310,7 @@ class ConversionBehaviorTest {
             onMainScrollablePane()
                 // Scroll by percents, because it's more reliable than scrolling to the app icon
                 .scroll(Direction.DOWN, 2f)
-            onElement { viewIdResourceName == "geoShareApp_${messagingAppPackageName}" }.click()
+            clickAppIcon(messagingAppPackageName)
 
             // Opens the messaging app
             onElement { packageName == messagingAppPackageName }

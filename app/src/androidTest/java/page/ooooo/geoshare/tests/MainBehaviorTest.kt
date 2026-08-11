@@ -23,7 +23,7 @@ class MainBehaviorTest {
         )
 
         // Tap the Google Maps icon
-        onElement { viewIdResourceName == "geoShareApp_${PackageNames.GOOGLE_MAPS}" }.click()
+        clickAppIcon(PackageNames.GOOGLE_MAPS)
 
         // Wait for Google Maps
         onElement(20_000) { packageName == PackageNames.GOOGLE_MAPS }

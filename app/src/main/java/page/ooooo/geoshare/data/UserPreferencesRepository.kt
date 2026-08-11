@@ -42,6 +42,7 @@ class DefaultUserPreferencesRepository @Inject constructor(
                 changelogShownForVersionCode = ChangelogShownForVersionCodePreference.getValue(it),
                 connectionPermission = ConnectionPermissionPreference.getValue(it),
                 coordinateFormat = CoordinateFormatPreference.getValue(it),
+                dynamicColor = DynamicColorPreference.getValue(it),
                 hiddenApps = HiddenAppsPreference.getValue(it),
                 introShownForVersionCode = IntroShowForVersionCodePreference.getValue(it),
             )
