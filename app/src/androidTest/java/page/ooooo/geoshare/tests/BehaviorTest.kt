@@ -453,6 +453,15 @@ fun UiAutomatorTestScope.testText(expectedPoints: Points, unsafeText: String) {
 fun UiAutomatorTestScope.testText(expectedPoint: Point, unsafeText: String) =
     testText(persistentListOf(expectedPoint), unsafeText)
 
+/**
+ * Clicks an app icon on the conversion result screen.
+ *
+ * Uses custom point of the click, so that we don't accidentally hit the context menu icon, which happens on Nexus 5.
+ */
+fun UiAutomatorTestScope.clickAppIcon(id: String) {
+    onElement { viewIdResourceName == "geoShareApp_$id" }.click(android.graphics.Point(10, 10))
+}
+
 fun UiAutomatorTestScope.goToInputList() {
     // If we're on the main screen, use the main menu
     onElementOrNull(1_000) { viewIdResourceName == "geoShareMainMenuButton" }?.let { mainMenu ->
