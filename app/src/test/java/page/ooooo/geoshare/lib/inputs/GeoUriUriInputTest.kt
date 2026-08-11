@@ -164,6 +164,18 @@ class GeoUriUriInputTest : InputTest {
             @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
             input.parse("geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)"),
         )
+        assertEquals(
+            ParseResult(
+                persistentListOf(
+                    WGS84Point(
+                        25.0016, 121.50005,
+                        name = "麥當勞 中和中心 McDonald's S99",
+                        source = Source.URI,
+                    )
+                )
+            ),
+            input.parse("geo:25.0016,121.50005?q=25.0016%2C121.50005%20(%E9%BA%A5%E7%95%B6%E5%8B%9E%20%E4%B8%AD%E5%92%8C%E4%B8%AD%E5%BF%83%20McDonald's%20S99)&mode=n")
+        )
     }
 
     @Test

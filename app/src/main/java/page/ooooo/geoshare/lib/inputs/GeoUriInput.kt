@@ -47,7 +47,7 @@ class GeoUriInput @Inject constructor(
             // ?q={lat},{lon}
             // Pin with name
             // ?q={lat},{lon}({name})
-            Regex("""$LAT$COORD_SEP$LON(?:$NAME_REGEX)?.*""").matchEntire(queryParams["q"])
+            Regex("""$LAT$COORD_SEP$LON\s?(?:$NAME_REGEX)?.*""").matchEntire(queryParams["q"])
                 ?.toLatLonNamePoint(Source.URI)?.let {
                     points = persistentListOf(WGS84Point(it, z, name))
                     return@run
