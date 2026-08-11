@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.data.local.preferences
 
+import android.os.Build
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -345,6 +346,30 @@ object CachedServerTokenPreference : TextPreference<CachedServerToken?> {
     private const val TAG = "CachedServerTokenPreference"
 }
 
+object DynamicColorPreference : OptionsPreference<Boolean> {
+    val key = stringPreferencesKey("dynamic_color")
+    override val default = false
+    val loading = default
+
+    override fun getValue(values: UserPreferencesValues) = values.dynamicColor
+
+    override fun getValue(preferences: Preferences, log: Log) =
+        preferences[key]?.toBooleanStrict() ?: default
+
+    override fun setValue(preferences: MutablePreferences, value: Boolean, log: Log) {
+        preferences[key] = value.toString()
+    }
+
+    fun getOptionGroups(): List<List<Boolean>> = listOf(
+        listOf(
+            true,
+            false,
+        ),
+    )
+
+    fun isAvailable(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+}
+
 /**
  * A set of strings stored as a JSON array.
  */
@@ -412,6 +437,7 @@ data class UserPreferencesValues(
     val changelogShownForVersionCode: Int? = ChangelogShownForVersionCodePreference.loading,
     val connectionPermission: Permission = ConnectionPermissionPreference.loading,
     val coordinateFormat: CoordinateFormat = CoordinateFormatPreference.loading,
+    val dynamicColor: Boolean = DynamicColorPreference.loading,
     val hiddenApps: Set<String>? = HiddenAppsPreference.loading,
     val introShownForVersionCode: Int? = IntroShowForVersionCodePreference.loading,
 )

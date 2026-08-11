@@ -16,6 +16,7 @@ import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyLinkUriAutomation
+import page.ooooo.geoshare.data.local.preferences.DynamicColorPreference
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenPointsGpxAutomation
@@ -745,11 +746,22 @@ class ScreenshotsFreeBehaviorTest {
             return@uiAutomator
         }
 
-        // Preferences (initial values, before the user changes anything)
+        // Preferences - List (initial values, before the user changes anything)
         onElement { viewIdResourceName == "geoShareMainMenuButton" }.click()
         onElement { viewIdResourceName == "geoShareMainMenuUserPreferences" }.click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/preferences_list")
+
+        // Preferences - List - Page 2
+        onElement { viewIdResourceName == "geoShareUserPreferencesListPane" }.scroll(Direction.DOWN, 1f)
+        saveScreenshot("main_strings/preferences_list_page_2")
+
+        if (DynamicColorPreference.isAvailable()) {
+            // Preferences - Appearance - Dynamic color
+            goToUserPreferencesDetail(UserPreferenceGroupId.APPEARANCE_DYNAMIC_COLOR)
+            quickWaitForStableInActiveWindow()
+            saveScreenshot("main_strings/preferences_dynamic_color")
+        }
 
         // Preferences - Apps
         goToUserPreferencesDetail(UserPreferenceGroupId.HIDDEN_APPS)
