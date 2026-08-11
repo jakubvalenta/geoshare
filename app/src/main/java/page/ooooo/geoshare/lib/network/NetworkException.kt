@@ -3,6 +3,7 @@ package page.ooooo.geoshare.lib.network
 import android.content.res.Resources
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.request
+import io.ktor.http.HttpHeaders
 import page.ooooo.geoshare.R
 
 sealed class NetworkException(cause: Throwable) : Exception(cause) {
@@ -16,19 +17,23 @@ sealed class RecoverableNetworkException(cause: Throwable) : NetworkException(ca
 sealed class UnrecoverableNetworkException(cause: Throwable) : NetworkException(cause)
 
 class UnresolvedAddressNetworkException(cause: Throwable) : RecoverableNetworkException(cause) {
-    override fun getMessage(resources: Resources) = resources.getString(R.string.network_exception_unresolved_address)
+    override fun getMessage(resources: Resources) =
+        resources.getString(R.string.network_exception_unresolved_address)
 }
 
 class RequestTimeoutNetworkException(cause: Throwable) : RecoverableNetworkException(cause) {
-    override fun getMessage(resources: Resources) = resources.getString(R.string.network_exception_request_timeout)
+    override fun getMessage(resources: Resources) =
+        resources.getString(R.string.network_exception_request_timeout)
 }
 
 class SocketTimeoutNetworkException(cause: Throwable) : RecoverableNetworkException(cause) {
-    override fun getMessage(resources: Resources) = resources.getString(R.string.network_exception_socket_timeout)
+    override fun getMessage(resources: Resources) =
+        resources.getString(R.string.network_exception_socket_timeout)
 }
 
 class ConnectTimeoutNetworkException(cause: Throwable) : RecoverableNetworkException(cause) {
-    override fun getMessage(resources: Resources) = resources.getString(R.string.network_exception_connect_timeout)
+    override fun getMessage(resources: Resources) =
+        resources.getString(R.string.network_exception_connect_timeout)
 }
 
 class ConnectionClosedNetworkException(cause: Throwable) : RecoverableNetworkException(cause) {
@@ -36,7 +41,8 @@ class ConnectionClosedNetworkException(cause: Throwable) : RecoverableNetworkExc
 }
 
 class ConnectionRefusedNetworkException(cause: Throwable) : RecoverableNetworkException(cause) {
-    override fun getMessage(resources: Resources) = resources.getString(R.string.network_exception_connect_exception)
+    override fun getMessage(resources: Resources) =
+        resources.getString(R.string.network_exception_connect_exception)
 }
 
 class ServerResponseNetworkException(val response: HttpResponse, cause: Throwable) :
@@ -54,20 +60,28 @@ class ResponseNetworkException(val response: HttpResponse, cause: Throwable) : U
 
 class TooManyRequestsNetworkException(val response: HttpResponse, cause: Throwable) :
     UnrecoverableNetworkException(cause) {
-    override fun getMessage(resources: Resources) = resources.getString(R.string.network_exception_too_many_requests)
+    override fun getMessage(resources: Resources) =
+        response.headers[HttpHeaders.RetryAfter]
+            ?.toIntOrNull()
+            ?.let { retryAfter ->
+                resources.getString(R.string.network_exception_too_many_requests_wait, retryAfter)
+            }
+            ?: resources.getString(R.string.network_exception_too_many_requests)
 
     override fun getDetails() = "Request URL: ${response.request.url}"
 }
 
 class UnauthorizedNetworkException(val response: HttpResponse, cause: Throwable) :
     UnrecoverableNetworkException(cause) {
-    override fun getMessage(resources: Resources) = resources.getString(R.string.network_exception_unauthorized)
+    override fun getMessage(resources: Resources) =
+        resources.getString(R.string.network_exception_unauthorized)
 
     override fun getDetails() = "Request URL: ${response.request.url}"
 }
 
 class UnknownNetworkException(cause: Throwable) : UnrecoverableNetworkException(cause) {
-    override fun getMessage(resources: Resources) = resources.getString(R.string.network_exception_unknown)
+    override fun getMessage(resources: Resources) =
+        resources.getString(R.string.network_exception_unknown)
 
     override fun getDetails() = cause?.stackTraceToString()
 }
@@ -78,5 +92,6 @@ class MissingHeaderNetworkException : UnrecoverableNetworkException(Throwable())
 }
 
 class WebViewNetworkException : RecoverableNetworkException(Throwable()) {
-    override fun getMessage(resources: Resources) = resources.getString(R.string.network_exception_webview)
+    override fun getMessage(resources: Resources) =
+        resources.getString(R.string.network_exception_webview)
 }

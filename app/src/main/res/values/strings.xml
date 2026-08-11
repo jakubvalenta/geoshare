@@ -300,6 +300,7 @@
     <string name="network_exception_server_response_error">Server response error %1$d</string>
     <string name="network_exception_socket_timeout">Socket timeout</string>
     <string name="network_exception_too_many_requests">Too many requests</string>
+    <string name="network_exception_too_many_requests_wait">Too many requests, wait for %1$ds</string>
     <string name="network_exception_unknown">Unknown error</string>
     <string name="network_exception_unauthorized">Unauthorized</string>
     <string name="network_exception_unresolved_address">Unresolved address</string>
