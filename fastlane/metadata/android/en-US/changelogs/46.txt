@@ -1,3 +1,4 @@
 - Added support for Mapy.com navigation links.
 - Improved result screen by putting messaging apps in their own section.
 - Fixed support for links in text shared from CoMaps.
+- Fixed support for geo: URIs with name.
