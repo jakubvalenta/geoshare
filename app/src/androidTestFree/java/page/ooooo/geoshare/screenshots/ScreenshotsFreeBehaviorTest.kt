@@ -381,19 +381,12 @@ class ScreenshotsFreeBehaviorTest {
         // Conversion - Result - Web map
         onMainScrollablePane()
             .scrollToElement(Direction.DOWN, 3_000) {
-                viewIdResourceName == "geoShareApp_${InitialLinks.APPLE_MAPS_DISPLAY_UUID}"
+                viewIdResourceName == "geoShareApp_${InitialLinks.GOOGLE_MAPS_DISPLAY_UUID}"
             }
             .longClick()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_web_map")
-
-        // Conversion - Result - Message - Web map hidden
-        onElement { viewIdResourceName == "geoShareAppHide" }.click()
-        quickWaitForStableInActiveWindow()
-        saveScreenshot("main_strings/conversion_result_message_web_map_hidden")
-        runBlocking {
-            delay(3.seconds) // Wait for the message to disappear
-        }
+        pressBack() // Close app menu
 
         goBackToMainForm()
     }
@@ -645,6 +638,21 @@ class ScreenshotsFreeBehaviorTest {
     }
 
     fun testLinks() = uiAutomator {
+        shareUri()
+
+        // Conversion - Result - Message - Web map hidden
+        onMainScrollablePane()
+            .scrollToElement(Direction.DOWN, 3_000) {
+                viewIdResourceName == "geoShareApp_${InitialLinks.APPLE_MAPS_DISPLAY_UUID}"
+            }
+            .longClick()
+        onElement { viewIdResourceName == "geoShareAppHide" }.click()
+        quickWaitForStableInActiveWindow()
+        saveScreenshot("main_strings/conversion_result_message_web_map_hidden")
+        runBlocking {
+            delay(3.seconds) // Wait for the message to disappear
+        }
+
         // Web maps - List
         goToUserPreferencesDetail(UserPreferenceGroupId.LINKS)
         quickWaitForStableInActiveWindow()
