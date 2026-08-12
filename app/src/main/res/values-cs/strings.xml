@@ -344,4 +344,7 @@
     <string name="faq_name_only_text_1">%1$s dokáže z určitých odkazů přečíst pouze název místa, např. „Mount Kilimanjaro“. Když tuto polohu otevřete v jiné mapové aplikaci, může se zobrazit jiné místo než v původním odkazu, protože může existovat více míst se stejným názvem.</string>
     <string name="faq_name_only_text_2">Body identifikované pouze názvem nejsou zahrnuty do GPX tras.</string>
     <string name="network_exception_webview">Výjimka WebView</string>
+    <string name="user_preferences_dynamic_color_title">Dynamická barva</string>
+    <string name="user_preferences_section_appearance">Vzhled</string>
+    <string name="network_exception_too_many_requests_wait">Příliš mnoho požadavků, počkejte %1$d s</string>
 </resources>
