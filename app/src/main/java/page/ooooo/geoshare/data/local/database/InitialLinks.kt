@@ -75,7 +75,7 @@ object InitialLinks : InitialData {
                 "https://www.google.com/maps/search/?api=1&query={lat}%2C{lon}",
                 "https://www.google.com/maps/search/?api=1&query={q}",
                 1772395295367,
-                Uuid.parse("7bd96da4-beba-4a30-9dbd-b437a49a1dc0").toByteArray(),
+                Uuid.parse(GOOGLE_MAPS_DISPLAY_UUID).toByteArray(),
             )
         )
         db.execSQL(
@@ -92,6 +92,22 @@ object InitialLinks : InitialData {
                 "https://www.google.com/maps/dir/?api=1&destination={q}",
                 1772395295367,
                 Uuid.parse("64b0b360-24ec-4113-9056-314223c6e19a").toByteArray(),
+            )
+        )
+        db.execSQL(
+            "INSERT INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            arrayOf<Any>(
+                "Google Maps",
+                "Google Maps search",
+                "GCJ02_MAINLAND_CHINA",
+                "SEARCH",
+                1,
+                0,
+                1,
+                "https://www.google.com/maps/search/?api=1&query={q}",
+                "https://www.google.com/maps/search/?api=1&query={q}",
+                1786537384232,
+                Uuid.parse("bdd9982d-8441-41b6-81a5-abce959a09b3").toByteArray(),
             )
         )
         db.execSQL(
@@ -139,7 +155,7 @@ object InitialLinks : InitialData {
                 "https://maps.apple.com/?ll={lat}%2C{lon}&z={z}&q={name}",
                 "https://maps.apple.com/?q={q}",
                 1772395295367,
-                Uuid.parse("ce900ea1-2c5d-4641-82f3-a5429a68d603").toByteArray(),
+                Uuid.parse(APPLE_MAPS_DISPLAY_UUID).toByteArray(),
             )
         )
         db.execSQL(
@@ -459,7 +475,7 @@ object InitialLinks : InitialData {
                     "UPDATE Link SET srs = ? WHERE uuid = ? AND srs = ?",
                     arrayOf<Any>(
                         "GCJ02_MAINLAND_CHINA",
-                        Uuid.parse("7bd96da4-beba-4a30-9dbd-b437a49a1dc0").toByteArray(),
+                        Uuid.parse(GOOGLE_MAPS_DISPLAY_UUID).toByteArray(),
                         "GCJ02",
                     )
                 )
@@ -549,7 +565,29 @@ object InitialLinks : InitialData {
                 )
             }
         },
+        object : Migration(8, 9) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    arrayOf<Any>(
+                        "Google Maps",
+                        "Google Maps search",
+                        "GCJ02_MAINLAND_CHINA",
+                        "SEARCH",
+                        1,
+                        0,
+                        1,
+                        "https://www.google.com/maps/search/?api=1&query={q}",
+                        "https://www.google.com/maps/search/?api=1&query={q}",
+                        1786537384232,
+                        Uuid.parse("bdd9982d-8441-41b6-81a5-abce959a09b3").toByteArray(),
+                    )
+                )
+            }
+        },
     )
 
+    const val GOOGLE_MAPS_DISPLAY_UUID = "7bd96da4-beba-4a30-9dbd-b437a49a1dc0"
+    const val APPLE_MAPS_DISPLAY_UUID = "ce900ea1-2c5d-4641-82f3-a5429a68d603"
     const val APPLE_MAPS_NAVIGATION_UUID = "a5092c63-cf5c-4225-9059-e888ae12e215"
 }

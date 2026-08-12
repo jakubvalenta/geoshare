@@ -381,19 +381,12 @@ class ScreenshotsFreeBehaviorTest {
         // Conversion - Result - Web map
         onMainScrollablePane()
             .scrollToElement(Direction.DOWN, 3_000) {
-                viewIdResourceName == "geoShareApp_ce900ea1-2c5d-4641-82f3-a5429a68d603"
+                viewIdResourceName == "geoShareApp_${InitialLinks.GOOGLE_MAPS_DISPLAY_UUID}"
             }
             .longClick()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_web_map")
-
-        // Conversion - Result - Message - Web map hidden
-        onElement { viewIdResourceName == "geoShareAppHide" }.click()
-        quickWaitForStableInActiveWindow()
-        saveScreenshot("main_strings/conversion_result_message_web_map_hidden")
-        runBlocking {
-            delay(3.seconds) // Wait for the message to disappear
-        }
+        pressBack() // Close app menu
 
         goBackToMainForm()
     }
@@ -645,6 +638,22 @@ class ScreenshotsFreeBehaviorTest {
     }
 
     fun testLinks() = uiAutomator {
+        shareUri()
+
+        // Conversion - Result - Message - Web map hidden
+        quickWaitForStableInActiveWindow() // Wait for the result to render
+        onMainScrollablePane()
+            .scrollToElement(Direction.DOWN, 3_000) {
+                viewIdResourceName == "geoShareApp_${InitialLinks.APPLE_MAPS_DISPLAY_UUID}"
+            }
+            .longClick()
+        onElement { viewIdResourceName == "geoShareAppHide" }.click()
+        quickWaitForStableInActiveWindow()
+        saveScreenshot("main_strings/conversion_result_message_web_map_hidden")
+        runBlocking {
+            delay(3.seconds) // Wait for the message to disappear
+        }
+
         // Web maps - List
         goToUserPreferencesDetail(UserPreferenceGroupId.LINKS)
         quickWaitForStableInActiveWindow()
@@ -691,8 +700,8 @@ class ScreenshotsFreeBehaviorTest {
         }
 
         // Web maps - Detail - Page 1
-        onElement { viewIdResourceName == "geoShareLinkListItemMenu_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
-        onElement { viewIdResourceName == "geoShareLinkListItemMenuDetail_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItemMenu_${InitialLinks.APPLE_MAPS_NAVIGATION_UUID}" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItemMenuDetail_${InitialLinks.APPLE_MAPS_NAVIGATION_UUID}" }.click()
         quickWaitForStableInActiveWindow()
         pressBack() // Hide IME
         quickWaitForStableInActiveWindow()
@@ -727,8 +736,8 @@ class ScreenshotsFreeBehaviorTest {
         }
 
         // Web maps - Delete dialog
-        onElement { viewIdResourceName == "geoShareLinkListItemMenu_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
-        onElement { viewIdResourceName == "geoShareLinkListItemMenuDetail_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItemMenu_${InitialLinks.APPLE_MAPS_NAVIGATION_UUID}" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItemMenuDetail_${InitialLinks.APPLE_MAPS_NAVIGATION_UUID}" }.click()
         onElement { viewIdResourceName == "geoShareLinkDetailDelete" }.click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/web_maps_delete_dialog")

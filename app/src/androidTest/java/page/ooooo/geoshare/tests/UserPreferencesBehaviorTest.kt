@@ -8,6 +8,7 @@ import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import page.ooooo.geoshare.data.local.database.InitialLinks
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
@@ -129,7 +130,7 @@ class UserPreferencesBehaviorTest {
         // Hide a link
         onMainScrollablePane()
             .scrollToElement(Direction.DOWN, timeoutMs = 3_000) {
-                viewIdResourceName == "geoShareApp_ce900ea1-2c5d-4641-82f3-a5429a68d603"
+                viewIdResourceName == "geoShareApp_${InitialLinks.APPLE_MAPS_DISPLAY_UUID}"
             }
             .longClick()
         onElement { viewIdResourceName == "geoShareAppHide" }.click()
@@ -147,21 +148,21 @@ class UserPreferencesBehaviorTest {
         waitForStableInActiveWindow(stableIntervalMs = 3_000) // Wait for the app to get hidden
         assertNull(
             onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) {
-                viewIdResourceName == "geoShareApp_ce900ea1-2c5d-4641-82f3-a5429a68d603"
+                viewIdResourceName == "geoShareApp_${InitialLinks.APPLE_MAPS_DISPLAY_UUID}"
             }
         )
 
         // Make the link visible in preferences
         goToUserPreferencesDetail(UserPreferenceGroupId.LINKS)
         onElement { viewIdResourceName == "geoShareLinkListPane" }
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkListItemToggle_ce900ea1-2c5d-4641-82f3-a5429a68d603" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkListItemToggle_${InitialLinks.APPLE_MAPS_DISPLAY_UUID}" }
             .click()
 
         // Shows the link
         goBackToElement { viewIdResourceName == "geoShareMainPane" }
         onMainScrollablePane()
             .scrollToElement(Direction.DOWN, timeoutMs = 3_000) {
-                viewIdResourceName == "geoShareApp_ce900ea1-2c5d-4641-82f3-a5429a68d603"
+                viewIdResourceName == "geoShareApp_${InitialLinks.APPLE_MAPS_DISPLAY_UUID}"
             }
     }
 }

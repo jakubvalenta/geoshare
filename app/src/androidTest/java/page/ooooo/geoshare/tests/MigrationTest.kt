@@ -72,7 +72,7 @@ class MigrationTest {
                     "https://www.google.com/maps/search/?api=1&query={lat}%2C{lon}",
                     "https://www.google.com/maps/search/?api=1&query={q}",
                     1772395295367L,
-                    Uuid.parse("7bd96da4-beba-4a30-9dbd-b437a49a1dc0").toByteArray(),
+                    Uuid.parse(InitialLinks.GOOGLE_MAPS_DISPLAY_UUID).toByteArray(),
                 )
             )
             db.execSQL(
@@ -120,7 +120,7 @@ class MigrationTest {
                     "https://maps.apple.com/?ll={lat}%2C{lon}&z={z}&q={name}",
                     "https://maps.apple.com/?q={q}",
                     1772395295367L,
-                    Uuid.parse("ce900ea1-2c5d-4641-82f3-a5429a68d603").toByteArray(),
+                    Uuid.parse(InitialLinks.APPLE_MAPS_DISPLAY_UUID).toByteArray(),
                 )
             )
             db.execSQL(

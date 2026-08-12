@@ -1,4 +1,5 @@
 - Added support for Mapy.com navigation links.
+- Added option to open or copy a Google Maps search link.
 - Added dynamic color preference.
 - Improved result screen by putting messaging apps in their own section.
 - Fixed support for links in text shared from CoMaps.

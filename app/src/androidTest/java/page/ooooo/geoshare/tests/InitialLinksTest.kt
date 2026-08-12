@@ -48,7 +48,7 @@ class InitialLinksTest : InitialDataTest {
                 sheetEnabled = true,
                 coordsUriTemplate = "https://www.google.com/maps/search/?api=1&query={lat}%2C{lon}",
                 nameUriTemplate = "https://www.google.com/maps/search/?api=1&query={q}",
-                uuid = UUID.fromString("7bd96da4-beba-4a30-9dbd-b437a49a1dc0"),
+                uuid = UUID.fromString(InitialLinks.GOOGLE_MAPS_DISPLAY_UUID),
             ),
             Link(
                 group = "Google Maps",
@@ -59,6 +59,16 @@ class InitialLinksTest : InitialDataTest {
                 coordsUriTemplate = "https://www.google.com/maps/dir/?api=1&destination={lat}%2C{lon}",
                 nameUriTemplate = "https://www.google.com/maps/dir/?api=1&destination={q}",
                 uuid = UUID.fromString("64b0b360-24ec-4113-9056-314223c6e19a"),
+            ),
+            Link(
+                group = "Google Maps",
+                name = "Google Maps search",
+                srs = Srs.GCJ02_MAINLAND_CHINA,
+                type = LinkType.SEARCH,
+                sheetEnabled = true,
+                coordsUriTemplate = "https://www.google.com/maps/search/?api=1&query={q}",
+                nameUriTemplate = "https://www.google.com/maps/search/?api=1&query={q}",
+                uuid = UUID.fromString("bdd9982d-8441-41b6-81a5-abce959a09b3"),
             ),
             Link(
                 group = "Google Maps",
@@ -84,7 +94,7 @@ class InitialLinksTest : InitialDataTest {
                 sheetEnabled = true,
                 coordsUriTemplate = "https://maps.apple.com/?ll={lat}%2C{lon}&z={z}&q={name}",
                 nameUriTemplate = "https://maps.apple.com/?q={q}",
-                uuid = UUID.fromString("ce900ea1-2c5d-4641-82f3-a5429a68d603"),
+                uuid = UUID.fromString(InitialLinks.APPLE_MAPS_DISPLAY_UUID),
             ),
             Link(
                 group = "Apple Maps",
