@@ -338,4 +338,6 @@
     <string name="faq_name_only_text_1">%1$s ne peut extraire qu’un nom de lieu, par exemple « Mont Kilimandjaro », à partir de certains liens vers des cartes. Lorsque vous ouvrez ce lieu dans une autre application cartographique, il se peut que celle-ci affiche un lieu différent de celui du lien d’origine, car il peut exister plusieurs lieux portant le même nom.</string>
     <string name="faq_name_only_text_2">Les points identifiés uniquement par leur nom ne sont pas inclus dans les itinéraires GPX.</string>
     <string name="network_exception_webview">Exception WebView</string>
+    <string name="user_preferences_dynamic_color_title">Couleur dynamique</string>
+    <string name="user_preferences_section_appearance">Apparence</string>
 </resources>
