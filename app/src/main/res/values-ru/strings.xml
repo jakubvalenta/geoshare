@@ -345,4 +345,7 @@
     <string name="billing_offers_empty">%1$s недоступно в вашем регионе</string>
     <string name="billing_one_time">Единовременный платёж</string>
     <string name="billing_order_history">Платёжная история</string>
+    <string name="network_exception_too_many_requests_wait">слишком много запросов, пауза %1$d сек.</string>
+    <string name="user_preferences_dynamic_color_title">Динамический цвет</string>
+    <string name="user_preferences_section_appearance">Внешний вид</string>
 </resources>
