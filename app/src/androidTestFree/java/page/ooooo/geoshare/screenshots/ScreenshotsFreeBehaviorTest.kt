@@ -641,6 +641,7 @@ class ScreenshotsFreeBehaviorTest {
         shareUri()
 
         // Conversion - Result - Message - Web map hidden
+        quickWaitForStableInActiveWindow() // Wait for the result to render
         onMainScrollablePane()
             .scrollToElement(Direction.DOWN, 3_000) {
                 viewIdResourceName == "geoShareApp_${InitialLinks.APPLE_MAPS_DISPLAY_UUID}"
