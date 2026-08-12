@@ -359,4 +359,7 @@
     <string name="faq_name_only_text_1">لا يستطيع %1$s استخراج سوى اسم المكان، على سبيل المثال «جبل كليمنجارو»، من بعض روابط الخرائط. وعندما تفتح هذا الموقع في تطبيق خرائط آخر، قد يظهر لك مكان مختلف عن الرابط الأصلي، لأن هناك عدة أماكن تحمل الاسم نفسه.</string>
     <string name="faq_name_only_text_2">لا يتم تضمين النقاط التي حُدّدت بالاسم فقط في مسارات GPX.</string>
     <string name="network_exception_webview">استثناء WebView</string>
+    <string name="network_exception_too_many_requests_wait">طلبات كثيرة، انتظر %1$d ث</string>
+    <string name="user_preferences_dynamic_color_title">لون ديناميكي</string>
+    <string name="user_preferences_section_appearance">المظهر</string>
 </resources>
