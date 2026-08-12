@@ -66,8 +66,8 @@ class InitialLinksTest : InitialDataTest {
                 srs = Srs.GCJ02_MAINLAND_CHINA,
                 type = LinkType.SEARCH,
                 sheetEnabled = true,
-                coordsUriTemplate = "https://www.google.com/maps/search/?query={q}",
-                nameUriTemplate = "https://www.google.com/maps/search/?query={q}",
+                coordsUriTemplate = "https://www.google.com/maps/search/?api=1&query={q}",
+                nameUriTemplate = "https://www.google.com/maps/search/?api=1&query={q}",
                 uuid = UUID.fromString("bdd9982d-8441-41b6-81a5-abce959a09b3"),
             ),
             Link(
