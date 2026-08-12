@@ -2,6 +2,7 @@ package page.ooooo.geoshare.tests
 
 import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.UiAutomatorTestScope
+import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.Dispatchers
@@ -314,6 +315,31 @@ class ConversionBehaviorTest {
 
         // Opens the messaging app
         onElement { packageName == messagingAppPackageName }
+    }
+
+    @Test
+    fun opensGoogleMapsSearchLink() = uiAutomator {
+        // Launch application and close intro
+        launchApplication()
+        waitForAppToBeVisible()
+        closeIntro()
+
+        // Share a geo: URI with the app
+        val query = "foo"
+        shareUri("geo:?q=$query")
+
+        // Click the link
+        onMainScrollablePane()
+            .scrollToElement(Direction.DOWN, timeoutMs = 3_000) {
+                viewIdResourceName == "geoShareApp_${InitialLinks.GOOGLE_MAPS_DISPLAY_UUID}"
+            }
+            .longClick()
+        onElement {
+            viewIdResourceName == "geoShareAppOutput" && textAsString()?.contains("Google Maps search") == true
+        }.click()
+
+        // Google Maps shows the search query
+        waitAndAssertGoogleMapsContainsElement { textAsString() == query }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
