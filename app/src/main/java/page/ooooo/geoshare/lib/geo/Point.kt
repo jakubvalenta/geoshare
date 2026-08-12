@@ -19,6 +19,8 @@ sealed interface Point {
         get() = lon?.toScale(7)?.toTrimmedString()
     val zStr: String?
         get() = z?.toScale(7)?.toTrimmedString()
+    val zOrDefaultStr: String
+        get() = (z ?: 16.0).toScale(7).toTrimmedString()
     val cleanName: String?
         get() = name?.replace('+', ' ')
 
