@@ -192,12 +192,12 @@ class OutputRepository @Inject constructor(
                 }
 
             is CopyLinkDisplayAppleMapsUriAutomation ->
-                getLinkByUUID(UUID.fromString("ce900ea1-2c5d-4641-82f3-a5429a68d603"))?.let { link ->
+                getLinkByUUID(UUID.fromString(InitialLinks.APPLE_MAPS_DISPLAY_UUID))?.let { link ->
                     CopyLinkUriOutput(link, coordinateConverter)
                 }
 
             is CopyLinkDisplayGoogleMapsUriAutomation ->
-                getLinkByUUID(UUID.fromString("7bd96da4-beba-4a30-9dbd-b437a49a1dc0"))?.let { link ->
+                getLinkByUUID(UUID.fromString(InitialLinks.GOOGLE_MAPS_DISPLAY_UUID))?.let { link ->
                     CopyLinkUriOutput(link, coordinateConverter)
                 }
 

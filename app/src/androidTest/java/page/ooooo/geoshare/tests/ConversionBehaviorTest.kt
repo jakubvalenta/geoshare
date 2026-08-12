@@ -10,6 +10,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
+import page.ooooo.geoshare.data.local.database.InitialLinks
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
@@ -299,22 +300,20 @@ class ConversionBehaviorTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun opensMessagingApp() = uiAutomator {
-        runBlocking {
-            val messagingAppPackageName = PackageNames.CONVERSATIONS
-            assumeAppInstalled(messagingAppPackageName)
+        val messagingAppPackageName = PackageNames.CONVERSATIONS
+        assumeAppInstalled(messagingAppPackageName)
 
-            // Share a URI with the app
-            shareUri()
+        // Share a URI with the app
+        shareUri()
 
-            // Tap the messaging app icon
-            onMainScrollablePane()
-                // Scroll by percents, because it's more reliable than scrolling to the app icon
-                .scroll(Direction.DOWN, 2f)
-            clickAppIcon(messagingAppPackageName)
+        // Tap the messaging app icon
+        onMainScrollablePane()
+            // Scroll by percents, because it's more reliable than scrolling to the app icon
+            .scroll(Direction.DOWN, 2f)
+        clickAppIcon(messagingAppPackageName)
 
-            // Opens the messaging app
-            onElement { packageName == messagingAppPackageName }
-        }
+        // Opens the messaging app
+        onElement { packageName == messagingAppPackageName }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

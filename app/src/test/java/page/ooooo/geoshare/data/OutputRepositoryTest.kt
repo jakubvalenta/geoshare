@@ -445,13 +445,13 @@ class OutputRepositoryTest {
             ),
             listOf(
                 CopyLinkUriAutomation(UUID.fromString(InitialLinks.APPLE_MAPS_NAVIGATION_UUID)),
-                CopyLinkUriAutomation(UUID.fromString("ce900ea1-2c5d-4641-82f3-a5429a68d603")),
+                CopyLinkUriAutomation(UUID.fromString(InitialLinks.APPLE_MAPS_DISPLAY_UUID)),
                 CopyCoordsDecAutomation,
                 CopyCoordsDegMinSecAutomation,
                 CopyGeoUriAutomation,
                 CopyLinkUriAutomation(UUID.fromString("64b0b360-24ec-4113-9056-314223c6e19a")),
                 CopyLinkUriAutomation(UUID.fromString("9d7cd113-ce01-4b8b-82fe-856956b8b20a")),
-                CopyLinkUriAutomation(UUID.fromString("7bd96da4-beba-4a30-9dbd-b437a49a1dc0")),
+                CopyLinkUriAutomation(UUID.fromString(InitialLinks.GOOGLE_MAPS_DISPLAY_UUID)),
                 CopyLinkUriAutomation(UUID.fromString("ee4f961c-44b0-4cb6-baad-1ed28edb8ec7")),
                 CopyLinkUriAutomation(UUID.fromString("b109970a-aef8-4482-9879-52e128fd0e07")),
                 NoopAutomation,
@@ -468,9 +468,9 @@ class OutputRepositoryTest {
                     automation = automation,
                     getLinkByUUID = {
                         when (it) {
-                            UUID.fromString("ce900ea1-2c5d-4641-82f3-a5429a68d603") -> FakeAppleMapsDisplayLink
+                            UUID.fromString(InitialLinks.APPLE_MAPS_DISPLAY_UUID) -> FakeAppleMapsDisplayLink
                             UUID.fromString(InitialLinks.APPLE_MAPS_NAVIGATION_UUID) -> FakeAppleMapsNavigationLink
-                            UUID.fromString("7bd96da4-beba-4a30-9dbd-b437a49a1dc0") -> FakeGoogleMapsDisplayLink
+                            UUID.fromString(InitialLinks.GOOGLE_MAPS_DISPLAY_UUID) -> FakeGoogleMapsDisplayLink
                             UUID.fromString("64b0b360-24ec-4113-9056-314223c6e19a") -> FakeGoogleMapsNavigationLink
                             UUID.fromString("9d7cd113-ce01-4b8b-82fe-856956b8b20a") -> FakeGoogleMapsStreetViewLink
                             UUID.fromString("b109970a-aef8-4482-9879-52e128fd0e07") -> FakeMagicEarthDisplayLink

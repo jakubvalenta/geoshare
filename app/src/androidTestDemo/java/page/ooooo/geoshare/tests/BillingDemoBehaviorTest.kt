@@ -216,8 +216,8 @@ class BillingDemoBehaviorTest {
         onElement { viewIdResourceName == "geoShareCustomLinkFeatureBadge" }
 
         // Go to link detail
-        onElement { viewIdResourceName == "geoShareLinkListItemMenu_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
-        onElement { viewIdResourceName == "geoShareLinkListItemMenuDetail_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItemMenu_${InitialLinks.APPLE_MAPS_NAVIGATION_UUID}" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItemMenuDetail_${InitialLinks.APPLE_MAPS_NAVIGATION_UUID}" }.click()
 
         // Go to billing screen using the feature wall
         onElement { viewIdResourceName == "geoShareCustomLinkFeatureWall" }.click()
@@ -244,7 +244,7 @@ class BillingDemoBehaviorTest {
         }
 
         // Shows updated link
-        onElement { viewIdResourceName == "geoShareLinkListItem_a5092c63-cf5c-4225-9059-e888ae12e215" }
+        onElement { viewIdResourceName == "geoShareLinkListItem_${InitialLinks.APPLE_MAPS_NAVIGATION_UUID}" }
         onElement { textAsString() == "Apple Maps navigation edited" }
 
         // Does not show feature badge

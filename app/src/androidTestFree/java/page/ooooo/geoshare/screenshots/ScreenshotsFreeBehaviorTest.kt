@@ -381,7 +381,7 @@ class ScreenshotsFreeBehaviorTest {
         // Conversion - Result - Web map
         onMainScrollablePane()
             .scrollToElement(Direction.DOWN, 3_000) {
-                viewIdResourceName == "geoShareApp_ce900ea1-2c5d-4641-82f3-a5429a68d603"
+                viewIdResourceName == "geoShareApp_${InitialLinks.APPLE_MAPS_DISPLAY_UUID}"
             }
             .longClick()
         quickWaitForStableInActiveWindow()
@@ -691,8 +691,8 @@ class ScreenshotsFreeBehaviorTest {
         }
 
         // Web maps - Detail - Page 1
-        onElement { viewIdResourceName == "geoShareLinkListItemMenu_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
-        onElement { viewIdResourceName == "geoShareLinkListItemMenuDetail_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItemMenu_${InitialLinks.APPLE_MAPS_NAVIGATION_UUID}" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItemMenuDetail_${InitialLinks.APPLE_MAPS_NAVIGATION_UUID}" }.click()
         quickWaitForStableInActiveWindow()
         pressBack() // Hide IME
         quickWaitForStableInActiveWindow()
@@ -727,8 +727,8 @@ class ScreenshotsFreeBehaviorTest {
         }
 
         // Web maps - Delete dialog
-        onElement { viewIdResourceName == "geoShareLinkListItemMenu_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
-        onElement { viewIdResourceName == "geoShareLinkListItemMenuDetail_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItemMenu_${InitialLinks.APPLE_MAPS_NAVIGATION_UUID}" }.click()
+        onElement { viewIdResourceName == "geoShareLinkListItemMenuDetail_${InitialLinks.APPLE_MAPS_NAVIGATION_UUID}" }.click()
         onElement { viewIdResourceName == "geoShareLinkDetailDelete" }.click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/web_maps_delete_dialog")
