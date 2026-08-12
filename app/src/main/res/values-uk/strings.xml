@@ -345,4 +345,7 @@
     <string name="faq_name_only_text_1">%1$s може витягувати з певних посилань на мапи лише назву місця, наприклад, «гора Кіліманджаро». Коли ви відкриєте це місце в іншому мапографічному застосунку, воно може відрізнятися від того, що було в оригінальному посиланні, оскільки може існувати кілька місць з однаковою назвою.</string>
     <string name="faq_name_only_text_2">Точки, ідентифіковані лише за назвою, не включаються до маршрутів GPX.</string>
     <string name="network_exception_webview">Виняток WebView</string>
+    <string name="network_exception_too_many_requests_wait">Забагато запитів, зачекайте %1$d с</string>
+    <string name="user_preferences_dynamic_color_title">Динамічні кольори</string>
+    <string name="user_preferences_section_appearance">Вигляд</string>
 </resources>
