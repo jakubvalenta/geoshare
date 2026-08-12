@@ -2,5 +2,6 @@
 - Added option to open or copy a Google Maps search link.
 - Added dynamic color preference.
 - Improved result screen by putting messaging apps in their own section.
+- Improved intro screen by mentioning Android private space.
 - Fixed support for links in text shared from CoMaps.
 - Fixed support for geo: URIs with name.
