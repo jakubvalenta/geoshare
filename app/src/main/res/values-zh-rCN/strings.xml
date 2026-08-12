@@ -300,7 +300,7 @@
     <string name="server_list_description">允许地图服务连接时，%1$s 使用 API 服务器来转换某些链接到坐标。选择用官方服务器（搭配自己的凭证）、代理服务器还是不使用。</string>
     <string name="billing_feature_automation_description">地图链接转换为坐标时自动执行一系列操作以节约时间：打开地图应用、启动导航应用（TomTom、Waze 等）、复制到剪贴板、保存 GPX。</string>
     <string name="conversion_succeeded_check_name_only">无法找到坐标，使用地名。</string>
-    <string name="conversion_succeeded_check_name_only_points">未能找到某些点的坐标。</string>
+    <string name="conversion_succeeded_check_name_only_points">无法找到某些点的坐标。</string>
     <string name="faq_name_only_text_2">GPX 路线中不包括仅根据名称识别的点。</string>
     <string name="billing_feature_custom_link_description">在喜爱的（或私密的）web 地图中打开位置。</string>
     <string name="billing_feature_all">基础版全部功能</string>
@@ -324,4 +324,7 @@
     <string name="faq_name_only_title">无法找到坐标，使用地名</string>
     <string name="faq_name_only_text_1">%1$s 只能从某些地图链接中提取地名，例如“乞力马扎罗山”。当您在其他地图应用中打开此位置时，它可能会显示与原始链接不同的位置，因为可能存在多个同名地点。</string>
     <string name="network_exception_webview">WebView 异常</string>
+    <string name="network_exception_too_many_requests_wait">请求过多，请等待 %1$d 秒</string>
+    <string name="user_preferences_dynamic_color_title">动态配色</string>
+    <string name="user_preferences_section_appearance">外观</string>
 </resources>
