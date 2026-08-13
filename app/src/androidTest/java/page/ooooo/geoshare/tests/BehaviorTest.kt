@@ -148,6 +148,13 @@ fun UiAutomatorTestScope.denySystemPermission() {
     onElement { isDenyPermissionButton() }.click()
 }
 
+fun UiAutomatorTestScope.clickSystemShareMenuIfShown(appLabel: String) {
+    onElementOrNull(1_000L) {
+        packageName != BuildConfig.APPLICATION_ID && // Make sure we don't accidentally click a similar text in our app
+            textAsString() == appLabel
+    }?.click()
+}
+
 fun UiAutomatorTestScope.isAppInstalled(packageName: String): Boolean =
     device.executeShellCommand("pm path $packageName").isNotEmpty()
 
@@ -587,9 +594,21 @@ fun UiAutomatorTestScope.findContact(name: String): UiObject2? {
 
     // Search contacts
     val searchField = onElementOrNull(3_000) {
-        packageName == "com.android.contacts" &&
-            (viewIdResourceName == "android:id/search_src_text" ||
-                viewIdResourceName == "com.android.contacts:id/search_view")
+        when (packageName) {
+            "com.android.contacts" -> when (viewIdResourceName) {
+                "android:id/search_src_text" -> true
+                "com.android.contacts:id/search_view" -> true
+                else -> false
+            }
+
+            "com.google.android.contacts" -> when (viewIdResourceName) {
+                "com.google.android.contacts:id/contact_search_bar" -> true
+                "com.google.android.contacts:id/open_search_bar" -> true
+                else -> false
+            }
+
+            else -> false
+        }
     }
     val searchTerm = name.split(' ').first()
     if (searchField != null) {

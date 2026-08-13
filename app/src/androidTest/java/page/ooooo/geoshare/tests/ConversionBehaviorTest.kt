@@ -339,6 +339,7 @@ class ConversionBehaviorTest {
         }.click()
 
         // Google Maps shows the search query
+        clickSystemShareMenuIfShown("Maps")
         waitAndAssertGoogleMapsContainsElement { textAsString() == query }
     }
 
