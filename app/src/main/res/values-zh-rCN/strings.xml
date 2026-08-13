@@ -39,7 +39,7 @@
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[首先，转到设置 ➞ 应用 ➞ 地图 ➞ <i>默认打开</i>，并关闭在此应用中打开链接。]]></string>
     <string name="main_input_uri_supporting_text">例如：https://maps.app.goo.gl/… 或 maps.apple.com/…</string>
     <string name="intro_settings_activity_not_found">无法打开设置</string>
-    <string name="intro_open_by_default_app_note">如果部分链接显示为灰色，则其他 Google 应用已设置为默认打开它们。您可以找到这些应用并关闭在应用中打开链接，就像我们为 Google 地图所做的那样。</string>
+    <string name="intro_open_by_default_app_note">如果部分链接显示为灰色，则其他 Google 应用已设置为默认打开它们。您可以找到这些应用并关闭在应用中打开链接，就像我们为 Google 地图所做的那样。如果您使用此 Android 功能，还请检查私密空间中安装的应用。</string>
     <string name="main_create_geo_uri">显示坐标</string>
     <string name="conversion_error_report">报告问题</string>
     <string name="conversion_permission_common_grant">确定</string>
