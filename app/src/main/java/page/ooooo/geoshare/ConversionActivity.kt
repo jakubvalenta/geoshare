@@ -7,16 +7,20 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import page.ooooo.geoshare.ui.BillingViewModel
 import page.ooooo.geoshare.ui.ConversionViewModel
 import page.ooooo.geoshare.ui.MainNavigation
+import page.ooooo.geoshare.ui.UserPreferenceViewModel
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @AndroidEntryPoint
 class ConversionActivity : ComponentActivity() {
     private val billingViewModel: BillingViewModel by viewModels()
     private val conversionViewModel: ConversionViewModel by viewModels()
+    private val userPreferenceViewModel: UserPreferenceViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,7 +30,10 @@ class ConversionActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            AppTheme {
+            val userPreferencesValues by userPreferenceViewModel.values.collectAsStateWithLifecycle()
+
+            // See MainActivity.onCreate()
+            AppTheme(dynamicColor = userPreferencesValues.dynamicColor) {
                 MainNavigation(billingViewModel, conversionViewModel, introEnabled = false, onFinish = { finish() })
             }
         }
