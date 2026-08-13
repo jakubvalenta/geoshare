@@ -7,6 +7,7 @@ import androidx.test.uiautomator.uiAutomator
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertNull
 import org.junit.Test
+import page.ooooo.geoshare.data.local.database.InitialLinks
 import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.lib.billing.Offer
