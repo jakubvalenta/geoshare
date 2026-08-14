@@ -98,6 +98,22 @@ class OpenStreetMapUriInputTest : InputTest {
     }
 
     @Test
+    fun parse_pin() = runTest {
+        assertEquals(
+            ParseResult(persistentListOf(WGS84Point(51.0528, 51.0528, z = 16.0, source = Source.URI))),
+            input.parse("https://www.openstreetmap.org/?mlat=51.0528&mlon=51.0528&zoom=16"),
+        )
+    }
+
+    @Test
+    fun parse_pinTakesPrecedenceOverCoordinates() = runTest {
+        assertEquals(
+            ParseResult(persistentListOf(WGS84Point(51.0528, 51.0528, z = 16.0, source = Source.URI))),
+            input.parse("https://www.openstreetmap.org/?lat=51.49&lon=-0.13&mlat=51.0528&mlon=51.0528&zoom=16"),
+        )
+    }
+
+    @Test
     fun parse_mapCenter() = runTest {
         assertEquals(
             ParseResult(persistentListOf(WGS84Point(51.49, -0.13, z = 16.0, source = Source.MAP_CENTER))),
@@ -106,7 +122,7 @@ class OpenStreetMapUriInputTest : InputTest {
     }
 
     @Test
-    fun parse_coordinatesEncoded() = runTest {
+    fun parse_mapCenterEncoded() = runTest {
         assertEquals(
             ParseResult(persistentListOf(WGS84Point(51.49, -0.13, z = 16.0, source = Source.MAP_CENTER))),
             input.parse("https://www.openstreetmap.org/#map%3D16%2F51.49%2F-0.13"),
