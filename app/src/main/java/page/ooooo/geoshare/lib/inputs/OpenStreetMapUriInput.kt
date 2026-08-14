@@ -56,14 +56,22 @@ class OpenStreetMapUriInput @Inject constructor(
 
             // Coordinates
             // https://www.openstreetmap.org/?lat={lat}&lon={lon}&zoom={z}
-            LAT_PATTERN.matchEntire(queryParams["lat"])?.doubleGroupOrNull()?.let { lat ->
-                LON_PATTERN.matchEntire(queryParams["lon"])?.doubleGroupOrNull()?.let { lon ->
-                    val z = listOf("z", "zoom")
-                        .firstNotNullOfOrNull { key -> Z_PATTERN.matchEntire(queryParams[key])?.doubleGroupOrNull() }
-                    points = persistentListOf(WGS84Point(lat, lon, z, source = Source.URI))
-                    return@run
+            // Pin
+            // https://www.openstreetmap.org/?mlat={lat}&mlon={lon}&zoom={z}
+            listOf(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "mlat", "lat")
+                .firstNotNullOfOrNull { key -> LAT_PATTERN.matchEntire(queryParams[key])?.doubleGroupOrNull() }
+                ?.let { lat ->
+                    listOf(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "mlon", "lon")
+                        .firstNotNullOfOrNull { key -> LON_PATTERN.matchEntire(queryParams[key])?.doubleGroupOrNull() }
+                        ?.let { lon ->
+                            val z = listOf("z", "zoom")
+                                .firstNotNullOfOrNull { key ->
+                                    Z_PATTERN.matchEntire(queryParams[key])?.doubleGroupOrNull()
+                                }
+                            points = persistentListOf(WGS84Point(lat, lon, z, source = Source.URI))
+                            return@run
+                        }
                 }
-            }
 
             // Directions
             // https://www.openstreetmap.org/directions?to={lat},{lon}
