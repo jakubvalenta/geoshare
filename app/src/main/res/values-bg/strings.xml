@@ -21,7 +21,7 @@
     <string name="intro_how_to_share_google_maps_content_description">Екранна снимка на екрана за споделяне на Google Карти</string>
     <string name="intro_open_by_default_app_button">Отворете настройките на %1$s</string>
     <string name="intro_open_by_default_app_caption"><![CDATA[След това отидете на Настройки ➞ Приложения ➞ %1$s ➞ <i>Отваряне по подразбиране</i>, включете отварянето на връзки в това приложение и докоснете <i>Добавяне на връзки</i>.]]></string>
-    <string name="intro_open_by_default_app_note">Ако някои връзки са сиви, други приложения на Google са настроени да ги отварят по подразбиране. Можете да намерите тези приложения и да изключите отварянето на връзки за тях, както направихме за Google Карти.</string>
+    <string name="intro_open_by_default_app_note">Ако някои връзки са сиви, други приложения за карти са настроени да ги отварят по подразбиране. Можете да намерите тези приложения и да изключите отварянето на връзки за тях, както направихме за Google Maps. Проверете също приложенията, инсталирани в личното пространство, ако използвате тази функция на Android.</string>
     <string name="intro_nav_close">Затвори</string>
     <string name="intro_settings_activity_not_found">Неуспешно отваряне на настройките</string>
     <string name="conversion_permission_common_deny">Отказ</string>
@@ -331,4 +331,7 @@
     <string name="faq_name_only_text_1">%1$s може да извлича само име на място, например „Планината Килиманджаро“, от определени връзки към картата. Когато отворите това местоположение в друго приложение за карти, то може да показва различно място от оригиналната връзка, тъй като може да съществуват няколко места с едно и също име.</string>
     <string name="faq_name_only_text_2">Точките, обозначени само по име, не са включени в GPX маршрутите.</string>
     <string name="network_exception_webview">Изключение за WebView</string>
+    <string name="network_exception_too_many_requests_wait">Твърде много заявки, изчакайте %1$ds</string>
+    <string name="user_preferences_dynamic_color_title">Динамичен цвят</string>
+    <string name="user_preferences_section_appearance">Външен вид</string>
 </resources>
