@@ -199,10 +199,10 @@
     <string name="faq_privacy_text">Mümkün olduğunda, %1$s harita bağlantılarını çevrimdışı olarak dönüştürür. Harita bağlantısı çevrimiçi dönüştürme gerektiriyorsa, uygulama harita servisine (Google Haritalar, Apple Haritalar vb.) bağlanmadan önce size soracaktır. Bağlantıya izin verirseniz, harita servisi harita bağlantısını alacak ve IP adresinizi okuyabilecektir.</string>
     <string name="faq_how_text_1">%1$s, harita bağlantılarını diğer harita uygulamaları tarafından açılabilecek geo: bağlantılarına dönüştürür. Bir geo: bağlantısı oluşturmak için coğrafi koordinatlar gereklidir. %1$s bunları harita URL’sinden çıkarır.</string>
     <string name="faq_how_text_2">Ancak, tüm harita URL’leri koordinat içermez. Bu gibi durumlarda, %1$s sizden harita servisine (Google Haritalar, Apple Haritalar vb.) bağlanmak ve koordinatları almak için izin isteyecektir:</string>
-    <string name="faq_how_text_3">Harita servisine bağlanmaya izin vermezseniz, %1$s koordinatlar yerine bir arama terimi içeren bir geo: bağlantısı oluşturur veya çalışmayı durdurur, söz konusu bağlantıya bağlı olarak.</string>
+    <string name="faq_how_text_3">Harita servisine bağlanmaya izin vermezseniz, %1$s koordinatlar yerine yer adıyla bir geo: bağlantısı oluşturur veya söz konusu bağlantıya bağlı olarak durur.</string>
     <string name="faq_how_text_4">Harita servisine bağlanmayı her zaman sormak (varsayılan) yerine kalıcı olarak izin vermek veya reddetmek için uygulamanın %1$s bölümüne gidin.</string>
     <string name="conversion_succeeded_apps_links_configure">Web haritalarını yapılandırın</string>
-    <string name="intro_open_by_default_app_note">Bazı bağlantılar gri renkteyse, diğer harita uygulamaları varsayılan olarak bu bağlantıları açacak şekilde ayarlanmıştır. Bu uygulamaları bulabilir ve tıpkı Google Haritalar için yaptığımız gibi, bu uygulamalar için bağlantıların açılmasını kapatabilirsiniz.</string>
+    <string name="intro_open_by_default_app_note">Bazı bağlantılar gri renkteyse, diğer harita uygulamaları varsayılan olarak bu bağlantıları açacak şekilde ayarlanmıştır. Bu uygulamaları bulabilir ve tıpkı Google Haritalar için yaptığımız gibi, bu uygulamalar için bağlantıların açılmasını kapatabilirsiniz. Ayrıca, bu Android özelliğini kullanıyorsanız özel alana yüklenmiş uygulamaları da kontrol edin.</string>
     <string name="links_form_enabled_option_app">Uygulamalar listesinde göster</string>
     <string name="user_preferences_apps_message_hidden">Uygulama gizlendi. Tercihler bölümünden tekrar gösterebilirsiniz.</string>
     <string name="user_preferences_apps_title">Uygulamalar</string>
@@ -235,7 +235,7 @@
     <string name="links_form_srs">Koordinat sistemi</string>
     <string name="links_form_type">Bağlam menüsü simgesi</string>
     <string name="links_form_uri_template_coords">URL şablonu</string>
-    <string name="links_form_uri_template_name">Yalnızca arama terimi mevcut olduğunda kullanılan URL şablonu</string>
+    <string name="links_form_uri_template_name">Yalnızca yer adı mevcut olduğunda kullanılan URL şablonu</string>
     <string name="links_insert">Web haritası ekle</string>
     <string name="links_message_deleted">Web haritası silindi</string>
     <string name="links_message_disabled_group">Web haritası gizlendi. Tercihlerden tekrar gösterebilirsiniz.</string>
@@ -331,4 +331,7 @@
     <string name="server_list_description">Harita servis bağlantısına izin verildiğinde, %1$s belirli bağlantıları koordinatlara dönüştürmek için API sunucularını kullanır. Kendi kimlik bilgilerinizle resmi sunucuları, proxy sunucularını kullanmayı veya hiçbirini kullanmamayı seçebilirsiniz.</string>
     <string name="server_list_search_title">Ara</string>
     <string name="server_name">Ad</string>
+    <string name="network_exception_too_many_requests_wait">Çok fazla istek, %1$d sn bekleyin</string>
+    <string name="user_preferences_dynamic_color_title">Dinamik renk</string>
+    <string name="user_preferences_section_appearance">Görünüm</string>
 </resources>
