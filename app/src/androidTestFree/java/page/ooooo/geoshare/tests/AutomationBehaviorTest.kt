@@ -16,6 +16,8 @@ import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.SendPointAutomation
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
+import page.ooooo.geoshare.lib.geo.NaivePoint
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 import kotlin.time.Duration.Companion.seconds
 
@@ -181,7 +183,8 @@ class AutomationBehaviorTest {
         scrollToAutomationItem(SavePointToContactAutomation).click()
 
         // Share a unique URI with the app
-        val point = shareRandomUri()
+        val point = WGS84Point(NaivePoint.genRandomPoint())
+        sharePoint(point)
 
         // Insert or edit the test contact
         insertOrEditContact()
