@@ -20,57 +20,85 @@ class ActionRanTest {
     private val action = output.toAction(points)
 
     @Test
-    fun transition_whenAutomationIsFalseAndResultIsSucceeded_returnsActionSucceededOrFinished() = runTest {
-        for (actionResult in setOf(ActionResult.Succeeded, ActionResult.SucceededAndFinish)) {
+    fun transition_whenAutomationIsFalseAndResultIsSucceededAndOutputHasSuccessText_returnsActionSucceeded() = runTest {
+        for (actionResult in setOf(ActionResult.Succeeded, ActionResult.SucceededAndOpenedApp)) {
             val action = output.toAction(points)
             assertEquals(
                 ActionSucceeded(source, points, actionResult, output),
                 ActionRan(source, points, action, actionResult, isAutomation = false).transition(),
             )
-            assertEquals(
-                ActionFinished(source, points, actionResult),
-                ActionRan(source, points, NoopAction, actionResult, isAutomation = false).transition(),
-            )
         }
     }
 
     @Test
-    fun transition_whenAutomationIsFalseAndResultIsFailed_returnsActionFailedOrFinished() = runTest {
+    fun transition_whenAutomationIsFalseAndResultIsSucceededAndOutputDoesNotHaveSuccessText_returnsActionFinished() =
+        runTest {
+            for (actionResult in setOf(ActionResult.Succeeded, ActionResult.SucceededAndOpenedApp)) {
+                assertEquals(
+                    ActionFinished(source, points, actionResult),
+                    ActionRan(source, points, NoopAction, actionResult, isAutomation = false).transition(),
+                )
+            }
+        }
+
+    @Test
+    fun transition_whenAutomationIsFalseAndResultIsFailedAndOutputHasErrorText_returnsActionFailed() = runTest {
         val actionResult = ActionResult.Failed
         assertEquals(
             ActionFailed(source, points, actionResult, output),
             ActionRan(source, points, action, actionResult, isAutomation = false).transition(),
         )
-        assertEquals(
-            ActionFinished(source, points, actionResult),
-            ActionRan(source, points, NoopAction, actionResult, isAutomation = false).transition(),
-        )
     }
 
     @Test
-    fun transition_whenAutomationIsTrueAndResultIsSucceeded_returnsActionAutomationSucceededOrFinished() = runTest {
-        for (actionResult in setOf(ActionResult.Succeeded, ActionResult.SucceededAndFinish)) {
+    fun transition_whenAutomationIsFalseAndResultIsFailedAndOutputDoesNotHaveErrorText_returnsActionFinished() =
+        runTest {
+            val actionResult = ActionResult.Failed
             assertEquals(
-                ActionAutomationSucceeded(source, points, actionResult, output),
-                ActionRan(source, points, action, actionResult, isAutomation = true).transition(),
+                ActionFinished(source, points, actionResult),
+                ActionRan(source, points, NoopAction, actionResult, isAutomation = false).transition(),
             )
+        }
+
+    @Test
+    fun transition_whenAutomationIsTrueAndResultIsSucceededAndOutputHasAutomationSuccessText_returnsActionAutomationSucceeded() =
+        runTest {
+            for (actionResult in setOf(ActionResult.Succeeded, ActionResult.SucceededAndOpenedApp)) {
+                assertEquals(
+                    ActionAutomationSucceeded(source, points, actionResult, output),
+                    ActionRan(source, points, action, actionResult, isAutomation = true).transition(),
+                )
+            }
+        }
+
+    @Test
+    fun transition_whenAutomationIsTrueAndResultIsSucceededAndOutputDoesNotHaveAutomationSuccessText_returnsActionAutomationFinished() =
+        runTest {
+            for (actionResult in setOf(ActionResult.Succeeded, ActionResult.SucceededAndOpenedApp)) {
+                assertEquals(
+                    ActionFinished(source, points, actionResult),
+                    ActionRan(source, points, NoopAction, actionResult, isAutomation = true).transition(),
+                )
+            }
+        }
+
+    @Test
+    fun transition_whenAutomationIsTrueAndResultIsFailedAndOutputHasAutomationErrorText_returnsActionAutomationFailed() =
+        runTest {
+            val actionResult = ActionResult.Failed
             assertEquals(
                 ActionFinished(source, points, actionResult),
                 ActionRan(source, points, NoopAction, actionResult, isAutomation = true).transition(),
             )
         }
-    }
 
     @Test
-    fun transition_whenAutomationIsTrueAndResultIsFailed_returnsActionAutomationFailedOrFinished() = runTest {
-        val actionResult = ActionResult.Failed
-        assertEquals(
-            ActionAutomationFailed(source, points, actionResult, output),
-            ActionRan(source, points, action, actionResult, isAutomation = true).transition(),
-        )
-        assertEquals(
-            ActionFinished(source, points, actionResult),
-            ActionRan(source, points, NoopAction, actionResult, isAutomation = true).transition(),
-        )
-    }
+    fun transition_whenAutomationIsTrueAndResultIsFailedAndOutputDoesNotHaveAutomationErrorText_returnsActionAutomationFinished() =
+        runTest {
+            val actionResult = ActionResult.Failed
+            assertEquals(
+                ActionFinished(source, points, actionResult),
+                ActionRan(source, points, NoopAction, actionResult, isAutomation = true).transition(),
+            )
+        }
 }

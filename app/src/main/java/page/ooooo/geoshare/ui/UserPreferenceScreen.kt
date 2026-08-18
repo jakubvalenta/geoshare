@@ -62,6 +62,8 @@ import page.ooooo.geoshare.ui.components.UserPreferenceDeveloperOptionsControls
 import page.ooooo.geoshare.ui.components.UserPreferenceDeveloperOptionsListItem
 import page.ooooo.geoshare.ui.components.UserPreferenceDynamicColorControls
 import page.ooooo.geoshare.ui.components.UserPreferenceDynamicColorListItem
+import page.ooooo.geoshare.ui.components.UserPreferenceFinishControls
+import page.ooooo.geoshare.ui.components.UserPreferenceFinishListItem
 import page.ooooo.geoshare.ui.components.UserPreferenceHiddenAppsControls
 import page.ooooo.geoshare.ui.components.UserPreferenceHiddenAppsListItem
 import page.ooooo.geoshare.ui.components.UserPreferenceLinksListItem
@@ -78,6 +80,7 @@ enum class UserPreferenceGroupId {
     CONNECTION_PERMISSION,
     COORDINATE_FORMAT,
     DEVELOPER_OPTIONS,
+    FINISH,
     HIDDEN_APPS,
     LINKS,
     SERVERS,
@@ -334,7 +337,7 @@ private fun UserPreferenceListPane(
             ) {
                 UserPreferenceHiddenAppsListItem(
                     index = 0,
-                    count = 3,
+                    count = 4,
                     apps = apps,
                     selected = currentGroupId == UserPreferenceGroupId.HIDDEN_APPS,
                     values = values,
@@ -343,19 +346,27 @@ private fun UserPreferenceListPane(
                 )
                 UserPreferenceLinksListItem(
                     index = 1,
-                    count = 3,
+                    count = 4,
                     links = links,
                     selected = currentGroupId == UserPreferenceGroupId.LINKS,
                     modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.LINKS}"),
                     onClick = onNavigateToLinkScreen,
                 )
                 UserPreferenceCoordinateFormatListItem(
-                    index = 1,
-                    count = 2,
+                    index = 2,
+                    count = 4,
                     selected = currentGroupId == UserPreferenceGroupId.COORDINATE_FORMAT,
                     values = values,
                     modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.COORDINATE_FORMAT}"),
                     onClick = { onNavigateToGroup(UserPreferenceGroupId.COORDINATE_FORMAT) },
+                )
+                UserPreferenceFinishListItem(
+                    index = 3,
+                    count = 4,
+                    selected = currentGroupId == UserPreferenceGroupId.FINISH,
+                    values = values,
+                    modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.FINISH}"),
+                    onClick = { onNavigateToGroup(UserPreferenceGroupId.FINISH) },
                 )
             }
         }
@@ -374,7 +385,7 @@ private fun UserPreferenceListPane(
                     verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
                 ) {
                     UserPreferenceDynamicColorListItem(
-                        index = 1,
+                        index = 0,
                         count = 1,
                         selected = currentGroupId == UserPreferenceGroupId.APPEARANCE_DYNAMIC_COLOR,
                         values = values,
@@ -490,6 +501,15 @@ private fun UserPreferenceDetailPane(
             wide = wide,
         )
 
+        UserPreferenceGroupId.FINISH -> UserPreferenceFinishControls(
+            billingAppNameResId = billingAppNameResId,
+            onBack = onBack,
+            onNavigateToBillingScreen = onNavigateToBillingScreen,
+            onValueChange = onValueChange,
+            values = values,
+            wide = wide,
+        )
+
         UserPreferenceGroupId.HIDDEN_APPS -> UserPreferenceHiddenAppsControls(
             appDetails = appDetails,
             apps = apps,
@@ -509,7 +529,7 @@ private fun UserPreferenceDetailPane(
 
 // Previews
 
-@Preview(showBackground = true, device = "spec:width=1080px,height=3000px,dpi=440")
+@Preview(showBackground = true, device = "spec:width=1080px,height=3200px,dpi=440")
 @Composable
 private fun DefaultPreview() {
     AppTheme {
@@ -540,7 +560,7 @@ private fun DefaultPreview() {
 
 @Preview(
     showBackground = true,
-    device = "spec:width=1080px,height=3000px,dpi=440",
+    device = "spec:width=1080px,height=3200px,dpi=440",
     uiMode = Configuration.UI_MODE_NIGHT_YES,
 )
 @Composable

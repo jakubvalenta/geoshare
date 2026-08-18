@@ -51,7 +51,7 @@ sealed interface OpenPointOutput :
     override suspend fun execute(value: Point, actionContext: ActionContext) =
         getText(value, actionContext.uriQuote)?.let { uriString ->
             actionContext.androidTools.openApp(actionContext.context, packageName, uriString)
-        }.let { success -> if (success == true) ActionResult.SucceededAndFinish else ActionResult.Failed }
+        }.let { success -> if (success == true) ActionResult.SucceededAndOpenedApp else ActionResult.Failed }
 
     override fun getIcon(appDetails: AppDetails) =
         appDetails[packageName]?.let { DrawableIconDescriptor(it.icon) }
@@ -95,7 +95,7 @@ sealed interface OpenPointsOutput :
             writePoints(value, this)
         }?.let { file ->
             actionContext.androidTools.openAppFile(actionContext.context, packageName, file)
-        }.let { success -> if (success == true) ActionResult.SucceededAndFinish else ActionResult.Failed }
+        }.let { success -> if (success == true) ActionResult.SucceededAndOpenedApp else ActionResult.Failed }
 
     override fun getIcon(appDetails: AppDetails) =
         appDetails[packageName]?.let { DrawableIconDescriptor(it.icon) }
@@ -171,7 +171,7 @@ sealed interface SharePointOutput :
     override suspend fun execute(value: Point, actionContext: ActionContext) =
         getText(value, actionContext.uriQuote)?.let { uriString ->
             actionContext.androidTools.openChooser(actionContext.context, uriString)
-        }.let { success -> if (success == true) ActionResult.SucceededAndFinish else ActionResult.Failed }
+        }.let { success -> if (success == true) ActionResult.SucceededAndOpenedApp else ActionResult.Failed }
 
     @Composable
     override fun errorText(appDetails: AppDetails) =
@@ -204,7 +204,7 @@ sealed interface SharePointsOutput :
             writePoints(value, this)
         }?.let { file ->
             actionContext.androidTools.openChooserFile(actionContext.context, file)
-        }.let { success -> if (success == true) ActionResult.SucceededAndFinish else ActionResult.Failed }
+        }.let { success -> if (success == true) ActionResult.SucceededAndOpenedApp else ActionResult.Failed }
 
     override fun getMenuIcon(appDetails: AppDetails) =
         ResourceIconDescriptor(R.drawable.route_24px)

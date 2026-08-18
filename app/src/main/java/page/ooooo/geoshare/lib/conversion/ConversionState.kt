@@ -645,7 +645,7 @@ data class ActionRan(
     override suspend fun transition(): State = action.output.let { output ->
         if (!isAutomation) {
             when (actionResult) {
-                ActionResult.Succeeded, ActionResult.SucceededAndFinish ->
+                ActionResult.Succeeded, ActionResult.SucceededAndOpenedApp ->
                     if (output is Output.HasSuccessText) {
                         ActionSucceeded(source, points, actionResult, output)
                     } else {
@@ -661,7 +661,7 @@ data class ActionRan(
             }
         } else {
             when (actionResult) {
-                ActionResult.Succeeded, ActionResult.SucceededAndFinish ->
+                ActionResult.Succeeded, ActionResult.SucceededAndOpenedApp ->
                     if (output is Output.HasAutomationSuccessText) {
                         ActionAutomationSucceeded(source, points, actionResult, output)
                     } else {

@@ -90,6 +90,7 @@ import page.ooooo.geoshare.data.di.FakeLinkRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
+import page.ooooo.geoshare.data.local.preferences.Finish
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.Attempt
 import page.ooooo.geoshare.lib.Message
@@ -226,8 +227,15 @@ fun MainScreen(
                         resources = resources,
                     )
                     val actionResult = currentState.action.execute(actionContext)
-                    if (actionResult == ActionResult.SucceededAndFinish) {
-                        onFinish()
+                    when (userPreferencesValues.finish) {
+                        Finish.AFTER_OPENING_APP -> when (actionResult) {
+                            ActionResult.Succeeded -> {}
+                            ActionResult.SucceededAndOpenedApp -> onFinish()
+                            ActionResult.Failed -> {}
+                        }
+
+                        Finish.ALWAYS -> onFinish()
+                        Finish.NEVER -> {}
                     }
                     conversionViewModel.finishBasicAction(actionResult)
                 }
@@ -255,8 +263,15 @@ fun MainScreen(
                         resources = resources,
                     )
                     val actionResult = currentState.action.execute(currentState.uri, actionContext)
-                    if (actionResult == ActionResult.SucceededAndFinish) {
-                        onFinish()
+                    when (userPreferencesValues.finish) {
+                        Finish.AFTER_OPENING_APP -> when (actionResult) {
+                            ActionResult.Succeeded -> {}
+                            ActionResult.SucceededAndOpenedApp -> onFinish()
+                            ActionResult.Failed -> {}
+                        }
+
+                        Finish.ALWAYS -> onFinish()
+                        Finish.NEVER -> {}
                     }
                     conversionViewModel.finishFileAction(actionResult)
                 }
@@ -297,8 +312,15 @@ fun MainScreen(
                         resources = resources,
                     )
                     val actionResult = currentState.action.execute(currentState.location, actionContext)
-                    if (actionResult == ActionResult.SucceededAndFinish) {
-                        onFinish()
+                    when (userPreferencesValues.finish) {
+                        Finish.AFTER_OPENING_APP -> when (actionResult) {
+                            ActionResult.Succeeded -> {}
+                            ActionResult.SucceededAndOpenedApp -> onFinish()
+                            ActionResult.Failed -> {}
+                        }
+
+                        Finish.ALWAYS -> onFinish()
+                        Finish.NEVER -> {}
                     }
                     conversionViewModel.finishLocationAction(actionResult)
                 }

@@ -346,6 +346,34 @@ object CachedServerTokenPreference : TextPreference<CachedServerToken?> {
     private const val TAG = "CachedServerTokenPreference"
 }
 
+object FinishPreference : OptionsPreference<Finish> {
+    val key = stringPreferencesKey("finish")
+    override val default = Finish.AFTER_OPENING_APP
+    val loading = Finish.NEVER
+
+    override fun getValue(values: UserPreferencesValues) = values.finish
+
+    override fun getValue(preferences: Preferences, log: Log) = preferences[key]?.let {
+        try {
+            Finish.valueOf(it)
+        } catch (_: IllegalArgumentException) {
+            null
+        }
+    } ?: default
+
+    override fun setValue(preferences: MutablePreferences, value: Finish, log: Log) {
+        preferences[key] = value.name
+    }
+
+    fun getOptionGroups(): List<List<Finish>> = listOf(
+        listOf(
+            Finish.AFTER_OPENING_APP,
+            Finish.ALWAYS,
+            Finish.NEVER,
+        ),
+    )
+}
+
 object DynamicColorPreference : OptionsPreference<Boolean> {
     val key = stringPreferencesKey("dynamic_color")
     override val default = false
@@ -438,6 +466,7 @@ data class UserPreferencesValues(
     val connectionPermission: Permission = ConnectionPermissionPreference.loading,
     val coordinateFormat: CoordinateFormat = CoordinateFormatPreference.loading,
     val dynamicColor: Boolean = DynamicColorPreference.loading,
+    val finish: Finish = FinishPreference.loading,
     val hiddenApps: Set<String>? = HiddenAppsPreference.loading,
     val introShownForVersionCode: Int? = IntroShowForVersionCodePreference.loading,
 )

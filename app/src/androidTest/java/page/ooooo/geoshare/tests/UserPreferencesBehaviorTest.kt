@@ -67,6 +67,16 @@ class UserPreferencesBehaviorTest {
     }
 
     @Test
+    fun whenFinishIsAlways_appClosesAfterCopyingCoordinates() = uiAutomator {
+        // TODO
+    }
+
+    @Test
+    fun whenFinishIsNever_appDoesNotCloseAfterOpeningMapApp() = uiAutomator {
+        // TODO
+    }
+
+    @Test
     fun whenAppIsHidden_itIsNotShownOnResultScreen() = uiAutomator {
         assumeAppInstalled(PackageNames.OSMAND_PLUS)
 

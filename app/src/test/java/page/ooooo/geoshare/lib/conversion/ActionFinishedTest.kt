@@ -14,7 +14,7 @@ class ActionFinishedTest {
 
     @Test
     fun transition_returnsNull() = runTest {
-        val state = ActionFinished(source, points, ActionResult.SucceededAndFinish)
+        val state = ActionFinished(source, points, ActionResult.SucceededAndOpenedApp)
         assertNull(state.transition())
     }
 }
