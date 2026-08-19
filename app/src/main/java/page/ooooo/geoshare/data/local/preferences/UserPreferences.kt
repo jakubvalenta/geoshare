@@ -348,7 +348,7 @@ object CachedServerTokenPreference : TextPreference<CachedServerToken?> {
 
 object FinishPreference : OptionsPreference<Finish> {
     val key = stringPreferencesKey("finish")
-    override val default = Finish.AFTER_OPENING_APP
+    override val default = Finish.AFTER_ACTION_SUCCEEDED_AND_OPENED_APP
     val loading = Finish.NEVER
 
     override fun getValue(values: UserPreferencesValues) = values.finish
@@ -367,8 +367,8 @@ object FinishPreference : OptionsPreference<Finish> {
 
     fun getOptionGroups(): List<List<Finish>> = listOf(
         listOf(
-            Finish.AFTER_OPENING_APP,
-            Finish.ALWAYS,
+            Finish.AFTER_ACTION_SUCCEEDED_AND_OPENED_APP,
+            Finish.AFTER_ACTION_SUCCEEDED,
             Finish.NEVER,
         ),
     )

@@ -154,7 +154,7 @@ class ConversionViewModel @Inject constructor(
 
     fun cancelFileUriRequest() {
         (stateContext.currentState as? FileUriRequested)?.apply {
-            transition { ActionFinished(source, points, ActionResult.Failed) }
+            transition { ActionFinished(source, points, ActionResult.FAILED) }
         }
     }
 
@@ -192,7 +192,7 @@ class ConversionViewModel @Inject constructor(
 
     fun cancelLocationFinding() {
         (stateContext.currentState as? LocationPermissionReceived)?.apply {
-            transition { ActionFinished(source, points, ActionResult.Failed) }
+            transition { ActionFinished(source, points, ActionResult.FAILED) }
         }
     }
 

@@ -22,7 +22,7 @@ class ActionFailedTest {
     private val source = "https://maps.google.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val output = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-    private val actionResult = ActionResult.Failed
+    private val actionResult = ActionResult.FAILED
 
     @Test
     fun transition_whenExecutionIsNotCancelled_waitsAndReturnsActionFinished() = runTest {

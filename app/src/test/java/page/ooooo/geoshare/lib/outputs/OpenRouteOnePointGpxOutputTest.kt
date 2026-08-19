@@ -46,7 +46,7 @@ class OpenRouteOnePointGpxOutputTest : GeoTest {
             value = WGS84Point(1.0, 2.0, name = "My destination", source = Source.GENERATED),
             actionContext = mockActionContext(parentDir),
         )
-        assertEquals(ActionResult.Failed, actionResult)
+        assertEquals(ActionResult.FAILED, actionResult)
     }
 
     @Test
@@ -60,7 +60,7 @@ class OpenRouteOnePointGpxOutputTest : GeoTest {
             value = WGS84Point(1.0, 2.0, name = "My destination", source = Source.GENERATED),
             actionContext = mockActionContext(parentDir),
         )
-        assertEquals(ActionResult.Failed, actionResult)
+        assertEquals(ActionResult.FAILED, actionResult)
     }
 
     @Test
@@ -79,7 +79,7 @@ class OpenRouteOnePointGpxOutputTest : GeoTest {
             value = WGS84Point(1.0, 2.0, name = "My destination", source = Source.GENERATED),
             actionContext = mockActionContext(parentDir),
         )
-        assertEquals(ActionResult.SucceededAndOpenedApp, actionResult)
+        assertEquals(ActionResult.SUCCEEDED_AND_OPENED_APP, actionResult)
         val resFiles = childDir.listFiles()
         assertEquals(1, resFiles?.size)
         val resFile = resFiles?.first()

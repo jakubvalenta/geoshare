@@ -100,7 +100,7 @@ val defaultFakeUserPreferences = UserPreferencesValues(
     changelogShownForVersionCode = 22,
     connectionPermission = Permission.ALWAYS,
     coordinateFormat = CoordinateFormat.DEC,
-    finish = Finish.AFTER_OPENING_APP,
+    finish = Finish.AFTER_ACTION_SUCCEEDED_AND_OPENED_APP,
     hiddenApps = emptySet(),
     introShownForVersionCode = 0,
 )

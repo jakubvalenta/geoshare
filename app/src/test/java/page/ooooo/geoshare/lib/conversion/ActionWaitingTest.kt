@@ -65,7 +65,7 @@ class ActionWaitingTest {
         }
         assertEquals(
             res,
-            ActionFinished(source, points, ActionResult.Failed),
+            ActionFinished(source, points, ActionResult.FAILED),
         )
     }
 }

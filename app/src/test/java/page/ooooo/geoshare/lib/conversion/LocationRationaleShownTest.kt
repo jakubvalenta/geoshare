@@ -31,7 +31,7 @@ class LocationRationaleShownTest {
     fun deny_returnsActionFinished() = runTest {
         val state = LocationRationaleShown(source, points, action, isAutomation = false)
         assertEquals(
-            ActionFinished(source, points, ActionResult.Failed),
+            ActionFinished(source, points, ActionResult.FAILED),
             state.deny(false),
         )
     }

@@ -35,7 +35,7 @@ class SendPointOutput @Inject constructor(
     override suspend fun execute(value: Point, actionContext: ActionContext) =
         getText(value, actionContext.uriQuote)?.let { text ->
             actionContext.androidTools.sendViaApp(actionContext.context, packageName, text)
-        }.let { success -> if (success == true) ActionResult.SucceededAndOpenedApp else ActionResult.Failed }
+        }.let { success -> if (success == true) ActionResult.SUCCEEDED_AND_OPENED_APP else ActionResult.FAILED }
 
     @Composable
     override fun label(appDetails: AppDetails) =

@@ -86,11 +86,11 @@ fun UserPreferenceFinishControls(
 private fun FinishPreferenceValue(value: Finish) {
     Text(
         when (value) {
-            Finish.AFTER_OPENING_APP ->
-                stringResource(R.string.user_preferences_finish_after_opening_app)
+            Finish.AFTER_ACTION_SUCCEEDED ->
+                stringResource(R.string.user_preferences_finish_after_action_succeeded)
 
-            Finish.ALWAYS ->
-                stringResource(R.string.user_preferences_finish_always)
+            Finish.AFTER_ACTION_SUCCEEDED_AND_OPENED_APP ->
+                stringResource(R.string.user_preferences_finish_after_action_succeeded_and_opened_app)
 
             Finish.NEVER ->
                 stringResource(R.string.user_preferences_finish_never)

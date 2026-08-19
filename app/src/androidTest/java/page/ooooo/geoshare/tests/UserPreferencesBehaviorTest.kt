@@ -70,7 +70,7 @@ class UserPreferencesBehaviorTest {
     }
 
     @Test
-    fun whenFinishIsAlways_appClosesItselfAfterCopyingCoordinates() = uiAutomator {
+    fun whenFinishIsAfterActionSucceeded_appClosesItselfAfterCopyingCoordinates() = uiAutomator {
         // Share a unique URI with the app
         val point = WGS84Point(NaivePoint.genRandomPoint())
         sharePoint(point)
@@ -103,7 +103,7 @@ class UserPreferencesBehaviorTest {
 
         // Set finish preference to Always
         goToUserPreferencesDetail(UserPreferenceGroupId.FINISH)
-        onElement { viewIdResourceName == "geoShareUserPreferenceFinish_${Finish.ALWAYS}" }.click()
+        onElement { viewIdResourceName == "geoShareUserPreferenceFinish_${Finish.AFTER_ACTION_SUCCEEDED}" }.click()
 
         // Go back to result screen
         goBackToElement { viewIdResourceName == "geoShareResultLastPointCoordinates" }

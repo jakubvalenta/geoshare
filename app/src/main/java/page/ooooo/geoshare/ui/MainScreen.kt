@@ -228,13 +228,13 @@ fun MainScreen(
                     )
                     val actionResult = currentState.action.execute(actionContext)
                     when (userPreferencesValues.finish) {
-                        Finish.AFTER_OPENING_APP -> when (actionResult) {
-                            ActionResult.Succeeded -> {}
-                            ActionResult.SucceededAndOpenedApp -> onFinish()
-                            ActionResult.Failed -> {}
+                        Finish.AFTER_ACTION_SUCCEEDED_AND_OPENED_APP -> when (actionResult) {
+                            ActionResult.SUCCEEDED -> {}
+                            ActionResult.SUCCEEDED_AND_OPENED_APP -> onFinish()
+                            ActionResult.FAILED -> {}
                         }
 
-                        Finish.ALWAYS -> onFinish()
+                        Finish.AFTER_ACTION_SUCCEEDED -> onFinish()
                         Finish.NEVER -> {}
                     }
                     conversionViewModel.finishBasicAction(actionResult)
@@ -264,13 +264,13 @@ fun MainScreen(
                     )
                     val actionResult = currentState.action.execute(currentState.uri, actionContext)
                     when (userPreferencesValues.finish) {
-                        Finish.AFTER_OPENING_APP -> when (actionResult) {
-                            ActionResult.Succeeded -> {}
-                            ActionResult.SucceededAndOpenedApp -> onFinish()
-                            ActionResult.Failed -> {}
+                        Finish.AFTER_ACTION_SUCCEEDED_AND_OPENED_APP -> when (actionResult) {
+                            ActionResult.SUCCEEDED -> {}
+                            ActionResult.SUCCEEDED_AND_OPENED_APP -> onFinish()
+                            ActionResult.FAILED -> {}
                         }
 
-                        Finish.ALWAYS -> onFinish()
+                        Finish.AFTER_ACTION_SUCCEEDED -> onFinish()
                         Finish.NEVER -> {}
                     }
                     conversionViewModel.finishFileAction(actionResult)
@@ -313,13 +313,13 @@ fun MainScreen(
                     )
                     val actionResult = currentState.action.execute(currentState.location, actionContext)
                     when (userPreferencesValues.finish) {
-                        Finish.AFTER_OPENING_APP -> when (actionResult) {
-                            ActionResult.Succeeded -> {}
-                            ActionResult.SucceededAndOpenedApp -> onFinish()
-                            ActionResult.Failed -> {}
+                        Finish.AFTER_ACTION_SUCCEEDED_AND_OPENED_APP -> when (actionResult) {
+                            ActionResult.SUCCEEDED -> {}
+                            ActionResult.SUCCEEDED_AND_OPENED_APP -> onFinish()
+                            ActionResult.FAILED -> {}
                         }
 
-                        Finish.ALWAYS -> onFinish()
+                        Finish.AFTER_ACTION_SUCCEEDED -> onFinish()
                         Finish.NEVER -> {}
                     }
                     conversionViewModel.finishLocationAction(actionResult)
@@ -1255,7 +1255,7 @@ private fun SucceededPreview() {
                         "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
                     ),
                 ),
-                actionResult = ActionResult.Succeeded,
+                actionResult = ActionResult.SUCCEEDED,
             ),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
@@ -1337,7 +1337,7 @@ private fun DarkSucceededPreview() {
                         "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
                     ),
                 ),
-                actionResult = ActionResult.Succeeded,
+                actionResult = ActionResult.SUCCEEDED,
             ),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
@@ -1418,7 +1418,7 @@ private fun SmallSucceededPreview() {
                         name = "Wikimedia Foundation, Inc.",
                     ),
                 ),
-                actionResult = ActionResult.Succeeded,
+                actionResult = ActionResult.SUCCEEDED,
             ),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
@@ -1500,7 +1500,7 @@ private fun TabletSucceededPreview() {
                         "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
                     ),
                 ),
-                actionResult = ActionResult.Succeeded,
+                actionResult = ActionResult.SUCCEEDED,
             ),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,

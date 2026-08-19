@@ -40,7 +40,7 @@ class OpenRouteOnePointGpxOutput @Inject constructor(
             }?.let { file ->
                 actionContext.androidTools.openAppFile(actionContext.context, packageName, file)
             }
-        }.let { success -> if (success == true) ActionResult.SucceededAndOpenedApp else ActionResult.Failed }
+        }.let { success -> if (success == true) ActionResult.SUCCEEDED_AND_OPENED_APP else ActionResult.FAILED }
 
     @Composable
     override fun label(appDetails: AppDetails) =

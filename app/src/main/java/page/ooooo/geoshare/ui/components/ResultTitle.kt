@@ -273,7 +273,7 @@ private fun ActionFinishedPreview() {
                 currentState = ActionFinished(
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    actionResult = ActionResult.Succeeded,
+                    actionResult = ActionResult.SUCCEEDED,
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
@@ -307,7 +307,7 @@ private fun DarkActionFinishedPreview() {
                 currentState = ActionFinished(
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    actionResult = ActionResult.Succeeded,
+                    actionResult = ActionResult.SUCCEEDED,
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
@@ -342,7 +342,7 @@ private fun ActionFinishedFeatureNotAvailablePreview() {
                     currentState = ActionFinished(
                         source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         points = persistentListOf(WGS84Point(NaivePoint.example)),
-                        actionResult = ActionResult.Succeeded,
+                        actionResult = ActionResult.SUCCEEDED,
                     ),
                     appDetails = mapOf(
                         PackageNames.OSMAND_PLUS to AppDetail(
@@ -374,7 +374,7 @@ private fun DarkActionFinishedFeatureNotAvailablePreview() {
                     currentState = ActionFinished(
                         source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         points = persistentListOf(WGS84Point(NaivePoint.example)),
-                        actionResult = ActionResult.Succeeded,
+                        actionResult = ActionResult.SUCCEEDED,
                     ),
                     appDetails = mapOf(
                         PackageNames.OSMAND_PLUS to AppDetail(
@@ -608,7 +608,7 @@ private fun SucceededPreview() {
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     output = SavePointsGpxOutput(coordinateConverter),
-                    actionResult = ActionResult.Succeeded,
+                    actionResult = ActionResult.SUCCEEDED,
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
@@ -645,7 +645,7 @@ private fun DarSucceededPreview() {
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     output = SavePointsGpxOutput(coordinateConverter),
-                    actionResult = ActionResult.Succeeded,
+                    actionResult = ActionResult.SUCCEEDED,
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
@@ -682,7 +682,7 @@ private fun FailedPreview() {
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     output = SavePointsGpxOutput(coordinateConverter),
-                    actionResult = ActionResult.Failed,
+                    actionResult = ActionResult.FAILED,
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
@@ -719,7 +719,7 @@ private fun DarkFailedPreview() {
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     output = SavePointsGpxOutput(coordinateConverter),
-                    actionResult = ActionResult.Failed,
+                    actionResult = ActionResult.FAILED,
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(

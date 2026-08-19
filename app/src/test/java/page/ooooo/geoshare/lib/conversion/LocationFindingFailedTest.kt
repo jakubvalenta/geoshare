@@ -16,7 +16,7 @@ import kotlin.time.measureTime
 class LocationFindingFailedTest {
     private val source = "https://maps.apple.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-    private val actionResult = ActionResult.Failed
+    private val actionResult = ActionResult.FAILED
 
     @Test
     fun locationFindingFailed_executionIsNotCancelled_waitsAndReturnsActionFinished() = runTest {

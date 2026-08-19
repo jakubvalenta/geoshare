@@ -563,7 +563,7 @@ data class ActionWaiting(
         }
         ActionReady(source, points, action, isAutomation)
     } catch (_: CancellationException) {
-        ActionFinished(source, points, ActionResult.Failed)
+        ActionFinished(source, points, ActionResult.FAILED)
     }
 
     override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
@@ -645,14 +645,14 @@ data class ActionRan(
     override suspend fun transition(): State = action.output.let { output ->
         if (!isAutomation) {
             when (actionResult) {
-                ActionResult.Succeeded, ActionResult.SucceededAndOpenedApp ->
+                ActionResult.SUCCEEDED, ActionResult.SUCCEEDED_AND_OPENED_APP ->
                     if (output is Output.HasSuccessText) {
                         ActionSucceeded(source, points, actionResult, output)
                     } else {
                         ActionFinished(source, points, actionResult)
                     }
 
-                ActionResult.Failed ->
+                ActionResult.FAILED ->
                     if (output is Output.HasErrorText) {
                         ActionFailed(source, points, actionResult, output)
                     } else {
@@ -661,14 +661,14 @@ data class ActionRan(
             }
         } else {
             when (actionResult) {
-                ActionResult.Succeeded, ActionResult.SucceededAndOpenedApp ->
+                ActionResult.SUCCEEDED, ActionResult.SUCCEEDED_AND_OPENED_APP ->
                     if (output is Output.HasAutomationSuccessText) {
                         ActionAutomationSucceeded(source, points, actionResult, output)
                     } else {
                         ActionFinished(source, points, actionResult)
                     }
 
-                ActionResult.Failed ->
+                ActionResult.FAILED ->
                     if (output is Output.HasAutomationErrorText) {
                         ActionAutomationFailed(source, points, actionResult, output)
                     } else {
@@ -825,7 +825,7 @@ data class LocationRationaleShown(
         LocationRationaleConfirmed(source, points, action, isAutomation)
 
     override suspend fun deny(doNotAsk: Boolean): State =
-        ActionFinished(source, points, ActionResult.Failed)
+        ActionFinished(source, points, ActionResult.FAILED)
 
     override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
 
@@ -873,7 +873,7 @@ data class LocationReceived(
     val location: Point?,
 ) : ConversionState, ConversionState.HasResult {
     override suspend fun transition(): State = if (location == null) {
-        LocationFindingFailed(source, points, ActionResult.Failed)
+        LocationFindingFailed(source, points, ActionResult.FAILED)
     } else {
         LocationActionReady(source, points, action, isAutomation, location)
     }

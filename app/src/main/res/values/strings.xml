@@ -356,11 +356,11 @@
     <string name="user_preferences_apps_message_hidden">The app has been hidden. You can show it again in preferences.</string>
     <string name="user_preferences_apps_title">Apps</string>
     <string name="user_preferences_dynamic_color_title">Dynamic color</string>
-    <string name="user_preferences_finish_title">Closing</string>
+    <string name="user_preferences_finish_after_action_succeeded">Close the app after sharing a link with it and performing any action (opening a map app, copying coordinates, saving GPX, etc.)</string>
+    <string name="user_preferences_finish_after_action_succeeded_and_opened_app">Close the app after sharing a link with it and opening a map app</string>
     <string name="user_preferences_finish_description">Choose when the app should automatically close itself. A closed app doesn’t appear after using the back gesture.</string>
-    <string name="user_preferences_finish_after_opening_app">Close the app after sharing a link with it and opening a map app</string>
-    <string name="user_preferences_finish_always">Close the app after sharing a link with it and performing any action (opening a map app, copying coordinates, saving GPX, etc.)</string>
     <string name="user_preferences_finish_never">Don’t automatically close the app</string>
+    <string name="user_preferences_finish_title">Closing</string>
     <string name="user_preferences_section_appearance">Appearance</string>
     <string name="user_preferences_section_input">Input</string>
     <string name="user_preferences_section_output">Output</string>

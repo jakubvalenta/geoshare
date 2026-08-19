@@ -21,7 +21,7 @@ class ActionSucceededTest {
     private val source = "https://maps.google.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val output = SavePointsGpxOutput(coordinateConverter)
-    private val actionResult = ActionResult.SucceededAndOpenedApp
+    private val actionResult = ActionResult.SUCCEEDED_AND_OPENED_APP
 
     @Test
     fun transition_whenExecutionIsNotCancelled_waitsAndReturnsActionFinished() = runTest {

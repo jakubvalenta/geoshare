@@ -21,7 +21,7 @@ class ActionRanTest {
 
     @Test
     fun transition_whenAutomationIsFalseAndResultIsSucceededAndOutputHasSuccessText_returnsActionSucceeded() = runTest {
-        for (actionResult in setOf(ActionResult.Succeeded, ActionResult.SucceededAndOpenedApp)) {
+        for (actionResult in setOf(ActionResult.SUCCEEDED, ActionResult.SUCCEEDED_AND_OPENED_APP)) {
             val action = output.toAction(points)
             assertEquals(
                 ActionSucceeded(source, points, actionResult, output),
@@ -33,7 +33,7 @@ class ActionRanTest {
     @Test
     fun transition_whenAutomationIsFalseAndResultIsSucceededAndOutputDoesNotHaveSuccessText_returnsActionFinished() =
         runTest {
-            for (actionResult in setOf(ActionResult.Succeeded, ActionResult.SucceededAndOpenedApp)) {
+            for (actionResult in setOf(ActionResult.SUCCEEDED, ActionResult.SUCCEEDED_AND_OPENED_APP)) {
                 assertEquals(
                     ActionFinished(source, points, actionResult),
                     ActionRan(source, points, NoopAction, actionResult, isAutomation = false).transition(),
@@ -43,7 +43,7 @@ class ActionRanTest {
 
     @Test
     fun transition_whenAutomationIsFalseAndResultIsFailedAndOutputHasErrorText_returnsActionFailed() = runTest {
-        val actionResult = ActionResult.Failed
+        val actionResult = ActionResult.FAILED
         assertEquals(
             ActionFailed(source, points, actionResult, output),
             ActionRan(source, points, action, actionResult, isAutomation = false).transition(),
@@ -53,7 +53,7 @@ class ActionRanTest {
     @Test
     fun transition_whenAutomationIsFalseAndResultIsFailedAndOutputDoesNotHaveErrorText_returnsActionFinished() =
         runTest {
-            val actionResult = ActionResult.Failed
+            val actionResult = ActionResult.FAILED
             assertEquals(
                 ActionFinished(source, points, actionResult),
                 ActionRan(source, points, NoopAction, actionResult, isAutomation = false).transition(),
@@ -63,7 +63,7 @@ class ActionRanTest {
     @Test
     fun transition_whenAutomationIsTrueAndResultIsSucceededAndOutputHasAutomationSuccessText_returnsActionAutomationSucceeded() =
         runTest {
-            for (actionResult in setOf(ActionResult.Succeeded, ActionResult.SucceededAndOpenedApp)) {
+            for (actionResult in setOf(ActionResult.SUCCEEDED, ActionResult.SUCCEEDED_AND_OPENED_APP)) {
                 assertEquals(
                     ActionAutomationSucceeded(source, points, actionResult, output),
                     ActionRan(source, points, action, actionResult, isAutomation = true).transition(),
@@ -74,7 +74,7 @@ class ActionRanTest {
     @Test
     fun transition_whenAutomationIsTrueAndResultIsSucceededAndOutputDoesNotHaveAutomationSuccessText_returnsActionAutomationFinished() =
         runTest {
-            for (actionResult in setOf(ActionResult.Succeeded, ActionResult.SucceededAndOpenedApp)) {
+            for (actionResult in setOf(ActionResult.SUCCEEDED, ActionResult.SUCCEEDED_AND_OPENED_APP)) {
                 assertEquals(
                     ActionFinished(source, points, actionResult),
                     ActionRan(source, points, NoopAction, actionResult, isAutomation = true).transition(),
@@ -85,7 +85,7 @@ class ActionRanTest {
     @Test
     fun transition_whenAutomationIsTrueAndResultIsFailedAndOutputHasAutomationErrorText_returnsActionAutomationFailed() =
         runTest {
-            val actionResult = ActionResult.Failed
+            val actionResult = ActionResult.FAILED
             assertEquals(
                 ActionFinished(source, points, actionResult),
                 ActionRan(source, points, NoopAction, actionResult, isAutomation = true).transition(),
@@ -95,7 +95,7 @@ class ActionRanTest {
     @Test
     fun transition_whenAutomationIsTrueAndResultIsFailedAndOutputDoesNotHaveAutomationErrorText_returnsActionAutomationFinished() =
         runTest {
-            val actionResult = ActionResult.Failed
+            val actionResult = ActionResult.FAILED
             assertEquals(
                 ActionFinished(source, points, actionResult),
                 ActionRan(source, points, NoopAction, actionResult, isAutomation = true).transition(),
