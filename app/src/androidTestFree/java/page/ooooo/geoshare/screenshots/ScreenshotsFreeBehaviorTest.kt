@@ -761,30 +761,16 @@ class ScreenshotsFreeBehaviorTest {
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/preferences_list")
 
-        // Preferences - List - Page 2
-        onElement { viewIdResourceName == "geoShareUserPreferencesListPane" }.scroll(Direction.DOWN, 1f)
-        saveScreenshot("main_strings/preferences_list_page_2")
-
-        if (DynamicColorPreference.isAvailable()) {
-            // Preferences - Appearance - Dynamic color
-            goToUserPreferencesDetail(UserPreferenceGroupId.APPEARANCE_DYNAMIC_COLOR)
-            quickWaitForStableInActiveWindow()
-            saveScreenshot("main_strings/preferences_dynamic_color")
-        }
-
-        // Preferences - Apps
-        goToUserPreferencesDetail(UserPreferenceGroupId.HIDDEN_APPS)
+        // Preferences - Connection permission
+        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferenceGroupId.CONNECTION_PERMISSION}" }
+            .click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("main_strings/preferences_apps")
-        onElement { viewIdResourceName == "geoShareVisibleAppToggle_${PackageNames.GOOGLE_MAPS}" }.click()
+        saveScreenshot("main_strings/preferences_connection_permission")
         goBackToElement { viewIdResourceName == "geoShareUserPreferencesListPane" }
-        quickWaitForStableInActiveWindow()
-        saveScreenshot("main_strings/preferences_apps_visible_count")
-        goToUserPreferencesDetail(UserPreferenceGroupId.HIDDEN_APPS)
-        onElement { viewIdResourceName == "geoShareVisibleAppToggle_${PackageNames.GOOGLE_MAPS}" }.click() // Make the app visible again to not affect other tests
 
         // Preferences - Automation
-        goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
+        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferenceGroupId.AUTOMATION}" }
+            .click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/preferences_automation")
 
@@ -793,26 +779,63 @@ class ScreenshotsFreeBehaviorTest {
             // Scroll by percent not to element, because scrolling to element is unreliable, due to the lazy list loading
             .scroll(Direction.DOWN, 3f)
         saveScreenshot("main_strings/preferences_automation_web_maps")
+        goBackToElement { viewIdResourceName == "geoShareUserPreferencesListPane" }
 
         // Preferences - Automation delay
-        goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION_DELAY)
+        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferenceGroupId.AUTOMATION_DELAY}" }
+            .click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/preferences_automation_delay")
+        goBackToElement { viewIdResourceName == "geoShareUserPreferencesListPane" }
 
-        // Preferences - Connection permission
-        goToUserPreferencesDetail(UserPreferenceGroupId.CONNECTION_PERMISSION)
+        // Preferences - List - Page 2
+        onElement { viewIdResourceName == "geoShareUserPreferencesListPane" }.scroll(Direction.DOWN, 1f)
+        saveScreenshot("main_strings/preferences_list_page_2")
+
+        // Preferences - Apps
+        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferenceGroupId.HIDDEN_APPS}" }
+            .click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("main_strings/preferences_connection_permission")
+        saveScreenshot("main_strings/preferences_apps")
+        onElement { viewIdResourceName == "geoShareVisibleAppToggle_${PackageNames.GOOGLE_MAPS}" }.click()
+        goBackToElement { viewIdResourceName == "geoShareUserPreferencesListPane" }
+        quickWaitForStableInActiveWindow()
+        saveScreenshot("main_strings/preferences_apps_visible_count")
+        goBackToElement { viewIdResourceName == "geoShareUserPreferencesListPane" }
+        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferenceGroupId.HIDDEN_APPS}" }
+            .click()
+        onElement { viewIdResourceName == "geoShareVisibleAppToggle_${PackageNames.GOOGLE_MAPS}" }.click() // Make the app visible again to not affect other tests
+        goBackToElement { viewIdResourceName == "geoShareUserPreferencesListPane" }
 
         // Preferences - Coordinate format
-        goToUserPreferencesDetail(UserPreferenceGroupId.COORDINATE_FORMAT)
+        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferenceGroupId.COORDINATE_FORMAT}" }
+            .click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/preferences_coordinate_format")
+        goBackToElement { viewIdResourceName == "geoShareUserPreferencesListPane" }
+
+        // Preferences - Finish
+        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferenceGroupId.FINISH}" }
+            .click()
+        quickWaitForStableInActiveWindow()
+        saveScreenshot("main_strings/preferences_finish")
+        goBackToElement { viewIdResourceName == "geoShareUserPreferencesListPane" }
+
+        if (DynamicColorPreference.isAvailable()) {
+            // Preferences - Appearance - Dynamic color
+            onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferenceGroupId.APPEARANCE_DYNAMIC_COLOR}" }
+                .click()
+            quickWaitForStableInActiveWindow()
+            saveScreenshot("main_strings/preferences_dynamic_color")
+            goBackToElement { viewIdResourceName == "geoShareUserPreferencesListPane" }
+        }
 
         // Preferences - Developer options
-        goToUserPreferencesDetail(UserPreferenceGroupId.DEVELOPER_OPTIONS)
+        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferenceGroupId.DEVELOPER_OPTIONS}" }
+            .click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/preferences_developer_options")
+        goBackToElement { viewIdResourceName == "geoShareUserPreferencesListPane" }
 
         goBackToMainForm()
     }
