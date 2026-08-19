@@ -1,1 +1,2 @@
+- Added preference to choose when the app should automatically close itself.
 - Fixed support for OpenStreetMap links with pin.
