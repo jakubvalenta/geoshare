@@ -45,7 +45,6 @@ import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
-import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
@@ -385,10 +384,8 @@ fun UiAutomatorTestScope.shareUri(unsafeUriString: String = "geo:52.47254,13.434
     )
 }
 
-fun UiAutomatorTestScope.shareRandomUri(): WGS84Point {
-    val point = WGS84Point(NaivePoint.genRandomPoint())
+fun UiAutomatorTestScope.sharePoint(point: WGS84Point) {
     shareUri(GeoUriFormatter.formatGeoUriString(point))
-    return point
 }
 
 fun UiAutomatorTestScope.configureConnectionPermissionPreference(permission: Permission) {

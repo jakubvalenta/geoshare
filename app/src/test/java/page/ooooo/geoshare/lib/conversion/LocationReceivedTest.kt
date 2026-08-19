@@ -22,7 +22,7 @@ class LocationReceivedTest {
     fun transition_whenLocationIsNull_returnsLocationFindingFailed() = runTest {
         val state = LocationReceived(source, points, action, isAutomation = false, location = null)
         assertEquals(
-            LocationFindingFailed(source, points, ActionResult.Failed),
+            LocationFindingFailed(source, points, ActionResult.FAILED),
             state.transition(),
         )
     }

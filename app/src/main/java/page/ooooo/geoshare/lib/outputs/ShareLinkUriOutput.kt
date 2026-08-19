@@ -27,7 +27,7 @@ class ShareLinkUriOutput @Inject constructor(
     override suspend fun execute(value: Point, actionContext: ActionContext) =
         getText(value, actionContext.uriQuote)?.let { uriString ->
             AndroidTools.openWebUri(actionContext.context, uriString)
-        }.let { success -> if (success == true) ActionResult.SucceededAndFinish else ActionResult.Failed }
+        }.let { success -> if (success == true) ActionResult.SUCCEEDED_AND_OPENED_APP else ActionResult.FAILED }
 
     @Composable
     override fun label(appDetails: AppDetails) =

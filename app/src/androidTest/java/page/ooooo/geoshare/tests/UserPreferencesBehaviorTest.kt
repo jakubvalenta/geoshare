@@ -10,12 +10,15 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.data.local.database.InitialLinks
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
+import page.ooooo.geoshare.data.local.preferences.Finish
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
 class UserPreferencesBehaviorTest {
@@ -64,6 +67,129 @@ class UserPreferencesBehaviorTest {
             ),
             coordinates.text,
         )
+    }
+
+    @Test
+    fun whenFinishIsAfterActionSucceeded_appClosesItselfAfterCopyingCoordinates() = uiAutomator {
+        // Share a unique URI with the app
+        val point = WGS84Point(NaivePoint.genRandomPoint())
+        sharePoint(point)
+
+        // Shows result coordinates
+        onElement {
+            viewIdResourceName == "geoShareResultLastPointCoordinates" &&
+                textAsString() == CoordinateFormatter.formatDecCoords(point)
+        }
+
+        // Copy coordinates
+        onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
+        onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
+            expandSheet()
+            scrollToSheetItem(Direction.UP) {
+                textAsString() in setOf(
+                    "Copy coordinates",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Copier les coordonnées",
+                )
+            }
+                .click()
+        }
+        quickWaitForStableInActiveWindow()
+
+        // App still shows coordinates
+        onElement {
+            viewIdResourceName == "geoShareResultLastPointCoordinates" &&
+                textAsString() == CoordinateFormatter.formatDecCoords(point)
+        }
+
+        // Set finish preference to Always
+        goToUserPreferencesDetail(UserPreferenceGroupId.FINISH)
+        onElement { viewIdResourceName == "geoShareUserPreferenceFinish_${Finish.AFTER_ACTION_SUCCEEDED}" }.click()
+
+        // Go back to result screen
+        goBackToElement { viewIdResourceName == "geoShareResultLastPointCoordinates" }
+
+        // Copy coordinates again
+        onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
+        onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
+            expandSheet()
+            scrollToSheetItem(Direction.UP) {
+                textAsString() in setOf(
+                    "Copy coordinates",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Copier les coordonnées",
+                )
+            }
+                .click()
+        }
+        quickWaitForStableInActiveWindow()
+
+        // App is not visible
+        assertNull(
+            onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) {
+                viewIdResourceName == "geoShareResultLastPointCoordinates" &&
+                    textAsString() == CoordinateFormatter.formatDecCoords(point)
+            }
+        )
+    }
+
+    @Test
+    fun whenFinishIsNever_appDoesNotCloseItselfAfterOpeningMapApp() = uiAutomator {
+        assumeAppInstalled(PackageNames.GOOGLE_MAPS)
+
+        // Share a unique URI with the app
+        val point = WGS84Point(NaivePoint.genRandomPoint())
+        sharePoint(point)
+
+        // Shows result coordinates
+        onElement {
+            viewIdResourceName == "geoShareResultLastPointCoordinates" &&
+                textAsString() == CoordinateFormatter.formatDecCoords(point)
+        }
+
+        // Open Google Maps
+        clickAppIcon(PackageNames.GOOGLE_MAPS)
+
+        // Wait for Google Maps
+        onElement(20_000) { packageName == PackageNames.GOOGLE_MAPS }
+
+        // Go back
+        pressBack()
+        quickWaitForStableInActiveWindow()
+        pressBack()
+
+        // App is not visible
+        assertNull(
+            onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) {
+                viewIdResourceName == "geoShareResultLastPointCoordinates" &&
+                    textAsString() == CoordinateFormatter.formatDecCoords(point)
+            }
+        )
+
+        // Share the URI with the app again
+        sharePoint(point)
+
+        // Set finish preference to Never
+        goToUserPreferencesDetail(UserPreferenceGroupId.FINISH)
+        onElement { viewIdResourceName == "geoShareUserPreferenceFinish_${Finish.NEVER}" }.click()
+
+        // Go back to result screen
+        goBackToElement { viewIdResourceName == "geoShareResultLastPointCoordinates" }
+
+        // Open Google Maps
+        clickAppIcon(PackageNames.GOOGLE_MAPS)
+
+        // Wait for Google Maps
+        onElement(20_000) { packageName == PackageNames.GOOGLE_MAPS }
+
+        // Go back
+        pressBack()
+        quickWaitForStableInActiveWindow()
+        pressBack()
+
+        // App is visible and still shows the result
+        onElement {
+            viewIdResourceName == "geoShareResultLastPointCoordinates" &&
+                textAsString() == CoordinateFormatter.formatDecCoords(point)
+        }
     }
 
     @Test

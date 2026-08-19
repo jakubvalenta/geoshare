@@ -20,6 +20,7 @@ import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePr
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormatPreference
+import page.ooooo.geoshare.data.local.preferences.Finish
 import page.ooooo.geoshare.data.local.preferences.HiddenAppsPreference
 import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
@@ -99,6 +100,7 @@ val defaultFakeUserPreferences = UserPreferencesValues(
     changelogShownForVersionCode = 22,
     connectionPermission = Permission.ALWAYS,
     coordinateFormat = CoordinateFormat.DEC,
+    finish = Finish.AFTER_ACTION_SUCCEEDED_AND_OPENED_APP,
     hiddenApps = emptySet(),
     introShownForVersionCode = 0,
 )

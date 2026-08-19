@@ -563,7 +563,7 @@ data class ActionWaiting(
         }
         ActionReady(source, points, action, isAutomation)
     } catch (_: CancellationException) {
-        ActionFinished(source, points, ActionResult.Failed)
+        ActionCompleted(source, points, ActionResult.FAILED)
     }
 
     override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
@@ -645,34 +645,34 @@ data class ActionRan(
     override suspend fun transition(): State = action.output.let { output ->
         if (!isAutomation) {
             when (actionResult) {
-                ActionResult.Succeeded, ActionResult.SucceededAndFinish ->
+                ActionResult.SUCCEEDED, ActionResult.SUCCEEDED_AND_OPENED_APP ->
                     if (output is Output.HasSuccessText) {
                         ActionSucceeded(source, points, actionResult, output)
                     } else {
-                        ActionFinished(source, points, actionResult)
+                        ActionCompleted(source, points, actionResult)
                     }
 
-                ActionResult.Failed ->
+                ActionResult.FAILED ->
                     if (output is Output.HasErrorText) {
                         ActionFailed(source, points, actionResult, output)
                     } else {
-                        ActionFinished(source, points, actionResult)
+                        ActionCompleted(source, points, actionResult)
                     }
             }
         } else {
             when (actionResult) {
-                ActionResult.Succeeded, ActionResult.SucceededAndFinish ->
+                ActionResult.SUCCEEDED, ActionResult.SUCCEEDED_AND_OPENED_APP ->
                     if (output is Output.HasAutomationSuccessText) {
                         ActionAutomationSucceeded(source, points, actionResult, output)
                     } else {
-                        ActionFinished(source, points, actionResult)
+                        ActionCompleted(source, points, actionResult)
                     }
 
-                ActionResult.Failed ->
+                ActionResult.FAILED ->
                     if (output is Output.HasAutomationErrorText) {
                         ActionAutomationFailed(source, points, actionResult, output)
                     } else {
-                        ActionFinished(source, points, actionResult)
+                        ActionCompleted(source, points, actionResult)
                     }
             }
         }
@@ -698,7 +698,7 @@ data class ActionSucceeded(
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return ActionFinished(source, points, actionResult)
+        return ActionCompleted(source, points, actionResult)
     }
 
     override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
@@ -720,7 +720,7 @@ data class ActionAutomationSucceeded(
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return ActionFinished(source, points, actionResult)
+        return ActionCompleted(source, points, actionResult)
     }
 
     override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
@@ -742,7 +742,7 @@ data class ActionFailed(
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return ActionFinished(source, points, actionResult)
+        return ActionCompleted(source, points, actionResult)
     }
 
     override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
@@ -764,7 +764,7 @@ data class ActionAutomationFailed(
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return ActionFinished(source, points, actionResult)
+        return ActionCompleted(source, points, actionResult)
     }
 
     override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
@@ -774,7 +774,7 @@ data class ActionAutomationFailed(
     }
 }
 
-data class ActionFinished(
+data class ActionCompleted(
     override val source: String,
     override val points: Points,
     val actionResult: ActionResult,
@@ -782,7 +782,7 @@ data class ActionFinished(
     override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
 
     private companion object {
-        private const val TAG = "ActionFinished"
+        private const val TAG = "ActionCompleted"
     }
 }
 
@@ -825,7 +825,7 @@ data class LocationRationaleShown(
         LocationRationaleConfirmed(source, points, action, isAutomation)
 
     override suspend fun deny(doNotAsk: Boolean): State =
-        ActionFinished(source, points, ActionResult.Failed)
+        ActionCompleted(source, points, ActionResult.FAILED)
 
     override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
 
@@ -873,7 +873,7 @@ data class LocationReceived(
     val location: Point?,
 ) : ConversionState, ConversionState.HasResult {
     override suspend fun transition(): State = if (location == null) {
-        LocationFindingFailed(source, points, ActionResult.Failed)
+        LocationFindingFailed(source, points, ActionResult.FAILED)
     } else {
         LocationActionReady(source, points, action, isAutomation, location)
     }
@@ -897,7 +897,7 @@ data class LocationFindingFailed(
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return ActionFinished(source, points, actionResult)
+        return ActionCompleted(source, points, actionResult)
     }
 
     override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
