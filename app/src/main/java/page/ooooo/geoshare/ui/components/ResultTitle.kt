@@ -56,7 +56,7 @@ import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.conversion.ActionAutomationFailed
 import page.ooooo.geoshare.lib.conversion.ActionAutomationSucceeded
 import page.ooooo.geoshare.lib.conversion.ActionFailed
-import page.ooooo.geoshare.lib.conversion.ActionFinished
+import page.ooooo.geoshare.lib.conversion.ActionCompleted
 import page.ooooo.geoshare.lib.conversion.ActionSucceeded
 import page.ooooo.geoshare.lib.conversion.ActionWaiting
 import page.ooooo.geoshare.lib.conversion.ConversionState
@@ -264,13 +264,13 @@ private fun RowScope.ResultMessageText(
 
 @Preview(showBackground = true)
 @Composable
-private fun ActionFinishedPreview() {
+private fun ActionCompletedPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultTitle(
-                currentState = ActionFinished(
+                currentState = ActionCompleted(
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     actionResult = ActionResult.SUCCEEDED,
@@ -298,13 +298,13 @@ private fun ActionFinishedPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkActionFinishedPreview() {
+private fun DarkActionCompletedPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultTitle(
-                currentState = ActionFinished(
+                currentState = ActionCompleted(
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     actionResult = ActionResult.SUCCEEDED,
@@ -332,14 +332,14 @@ private fun DarkActionFinishedPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun ActionFinishedFeatureNotAvailablePreview() {
+private fun ActionCompletedFeatureNotAvailablePreview() {
     AppTheme {
         Surface {
             Column {
                 val context = LocalContext.current
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultTitle(
-                    currentState = ActionFinished(
+                    currentState = ActionCompleted(
                         source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         points = persistentListOf(WGS84Point(NaivePoint.example)),
                         actionResult = ActionResult.SUCCEEDED,
@@ -364,14 +364,14 @@ private fun ActionFinishedFeatureNotAvailablePreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkActionFinishedFeatureNotAvailablePreview() {
+private fun DarkActionCompletedFeatureNotAvailablePreview() {
     AppTheme {
         Surface {
             Column {
                 val context = LocalContext.current
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultTitle(
-                    currentState = ActionFinished(
+                    currentState = ActionCompleted(
                         source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         points = persistentListOf(WGS84Point(NaivePoint.example)),
                         actionResult = ActionResult.SUCCEEDED,

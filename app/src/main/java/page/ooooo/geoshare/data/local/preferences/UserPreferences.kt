@@ -346,6 +346,30 @@ object CachedServerTokenPreference : TextPreference<CachedServerToken?> {
     private const val TAG = "CachedServerTokenPreference"
 }
 
+object DynamicColorPreference : OptionsPreference<Boolean> {
+    val key = stringPreferencesKey("dynamic_color")
+    override val default = false
+    val loading = default
+
+    override fun getValue(values: UserPreferencesValues) = values.dynamicColor
+
+    override fun getValue(preferences: Preferences, log: Log) =
+        preferences[key]?.toBooleanStrict() ?: default
+
+    override fun setValue(preferences: MutablePreferences, value: Boolean, log: Log) {
+        preferences[key] = value.toString()
+    }
+
+    fun getOptionGroups(): List<List<Boolean>> = listOf(
+        listOf(
+            true,
+            false,
+        ),
+    )
+
+    fun isAvailable(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+}
+
 object FinishPreference : OptionsPreference<Finish> {
     val key = stringPreferencesKey("finish")
     override val default = Finish.AFTER_ACTION_SUCCEEDED_AND_OPENED_APP
@@ -372,30 +396,6 @@ object FinishPreference : OptionsPreference<Finish> {
             Finish.NEVER,
         ),
     )
-}
-
-object DynamicColorPreference : OptionsPreference<Boolean> {
-    val key = stringPreferencesKey("dynamic_color")
-    override val default = false
-    val loading = default
-
-    override fun getValue(values: UserPreferencesValues) = values.dynamicColor
-
-    override fun getValue(preferences: Preferences, log: Log) =
-        preferences[key]?.toBooleanStrict() ?: default
-
-    override fun setValue(preferences: MutablePreferences, value: Boolean, log: Log) {
-        preferences[key] = value.toString()
-    }
-
-    fun getOptionGroups(): List<List<Boolean>> = listOf(
-        listOf(
-            true,
-            false,
-        ),
-    )
-
-    fun isAvailable(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 }
 
 /**

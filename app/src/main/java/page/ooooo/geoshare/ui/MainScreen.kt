@@ -90,8 +90,8 @@ import page.ooooo.geoshare.data.di.FakeLinkRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
-import page.ooooo.geoshare.data.local.preferences.Finish
 import page.ooooo.geoshare.data.local.preferences.Permission
+import page.ooooo.geoshare.data.local.preferences.shouldAppFinish
 import page.ooooo.geoshare.lib.Attempt
 import page.ooooo.geoshare.lib.Message
 import page.ooooo.geoshare.lib.android.AndroidTools
@@ -104,7 +104,7 @@ import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.CustomLinkFeature
 import page.ooooo.geoshare.lib.billing.Feature
-import page.ooooo.geoshare.lib.conversion.ActionFinished
+import page.ooooo.geoshare.lib.conversion.ActionCompleted
 import page.ooooo.geoshare.lib.conversion.BasicActionReady
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
 import page.ooooo.geoshare.lib.conversion.ConversionState
@@ -221,23 +221,12 @@ fun MainScreen(
                 // Basic action
 
                 is BasicActionReady -> {
-                    val actionContext = ActionContext(
-                        context = context,
-                        clipboard = clipboard,
-                        resources = resources,
-                    )
+                    val actionContext = ActionContext(context = context, clipboard = clipboard, resources = resources)
                     val actionResult = currentState.action.execute(actionContext)
-                    when (userPreferencesValues.finish) {
-                        Finish.AFTER_ACTION_SUCCEEDED_AND_OPENED_APP -> when (actionResult) {
-                            ActionResult.SUCCEEDED -> {}
-                            ActionResult.SUCCEEDED_AND_OPENED_APP -> onFinish()
-                            ActionResult.FAILED -> {}
-                        }
-
-                        Finish.AFTER_ACTION_SUCCEEDED -> onFinish()
-                        Finish.NEVER -> {}
+                    if (userPreferencesValues.finish.shouldAppFinish(actionResult)) {
+                        onFinish()
                     }
-                    conversionViewModel.finishBasicAction(actionResult)
+                    conversionViewModel.completeBasicAction(actionResult)
                 }
 
                 // File action
@@ -257,23 +246,12 @@ fun MainScreen(
                 }
 
                 is FileActionReady -> {
-                    val actionContext = ActionContext(
-                        context = context,
-                        clipboard = clipboard,
-                        resources = resources,
-                    )
+                    val actionContext = ActionContext(context = context, clipboard = clipboard, resources = resources)
                     val actionResult = currentState.action.execute(currentState.uri, actionContext)
-                    when (userPreferencesValues.finish) {
-                        Finish.AFTER_ACTION_SUCCEEDED_AND_OPENED_APP -> when (actionResult) {
-                            ActionResult.SUCCEEDED -> {}
-                            ActionResult.SUCCEEDED_AND_OPENED_APP -> onFinish()
-                            ActionResult.FAILED -> {}
-                        }
-
-                        Finish.AFTER_ACTION_SUCCEEDED -> onFinish()
-                        Finish.NEVER -> {}
+                    if (userPreferencesValues.finish.shouldAppFinish(actionResult)) {
+                        onFinish()
                     }
-                    conversionViewModel.finishFileAction(actionResult)
+                    conversionViewModel.completeFileAction(actionResult)
                 }
 
                 // Location action
@@ -306,23 +284,12 @@ fun MainScreen(
                 }
 
                 is LocationActionReady -> {
-                    val actionContext = ActionContext(
-                        context = context,
-                        clipboard = clipboard,
-                        resources = resources,
-                    )
+                    val actionContext = ActionContext(context = context, clipboard = clipboard, resources = resources)
                     val actionResult = currentState.action.execute(currentState.location, actionContext)
-                    when (userPreferencesValues.finish) {
-                        Finish.AFTER_ACTION_SUCCEEDED_AND_OPENED_APP -> when (actionResult) {
-                            ActionResult.SUCCEEDED -> {}
-                            ActionResult.SUCCEEDED_AND_OPENED_APP -> onFinish()
-                            ActionResult.FAILED -> {}
-                        }
-
-                        Finish.AFTER_ACTION_SUCCEEDED -> onFinish()
-                        Finish.NEVER -> {}
+                    if (userPreferencesValues.finish.shouldAppFinish(actionResult)) {
+                        onFinish()
                     }
-                    conversionViewModel.finishLocationAction(actionResult)
+                    conversionViewModel.completeLocationAction(actionResult)
                 }
             }
         }
@@ -1245,7 +1212,7 @@ private fun SucceededPreview() {
             coordinateConverter = coordinateConverter,
         )
         MainScreen(
-            currentState = ActionFinished(
+            currentState = ActionCompleted(
                 source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
@@ -1327,7 +1294,7 @@ private fun DarkSucceededPreview() {
             coordinateConverter = coordinateConverter,
         )
         MainScreen(
-            currentState = ActionFinished(
+            currentState = ActionCompleted(
                 source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
@@ -1409,7 +1376,7 @@ private fun SmallSucceededPreview() {
             coordinateConverter = coordinateConverter,
         )
         MainScreen(
-            currentState = ActionFinished(
+            currentState = ActionCompleted(
                 source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
@@ -1490,7 +1457,7 @@ private fun TabletSucceededPreview() {
             coordinateConverter = coordinateConverter,
         )
         MainScreen(
-            currentState = ActionFinished(
+            currentState = ActionCompleted(
                 source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),

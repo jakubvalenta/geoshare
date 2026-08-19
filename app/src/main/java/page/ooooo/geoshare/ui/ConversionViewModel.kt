@@ -26,7 +26,7 @@ import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.billing.Billing
-import page.ooooo.geoshare.lib.conversion.ActionFinished
+import page.ooooo.geoshare.lib.conversion.ActionCompleted
 import page.ooooo.geoshare.lib.conversion.ActionRan
 import page.ooooo.geoshare.lib.conversion.ActionReady
 import page.ooooo.geoshare.lib.conversion.BasicActionReady
@@ -138,7 +138,7 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
-    fun finishBasicAction(actionResult: ActionResult) {
+    fun completeBasicAction(actionResult: ActionResult) {
         (stateContext.currentState as? BasicActionReady)?.apply {
             transition { ActionRan(source, points, action, actionResult, isAutomation) }
         }
@@ -154,11 +154,11 @@ class ConversionViewModel @Inject constructor(
 
     fun cancelFileUriRequest() {
         (stateContext.currentState as? FileUriRequested)?.apply {
-            transition { ActionFinished(source, points, ActionResult.FAILED) }
+            transition { ActionCompleted(source, points, ActionResult.FAILED) }
         }
     }
 
-    fun finishFileAction(actionResult: ActionResult) {
+    fun completeFileAction(actionResult: ActionResult) {
         (stateContext.currentState as? FileActionReady)?.apply {
             transition { ActionRan(source, points, action, actionResult, isAutomation) }
         }
@@ -192,11 +192,11 @@ class ConversionViewModel @Inject constructor(
 
     fun cancelLocationFinding() {
         (stateContext.currentState as? LocationPermissionReceived)?.apply {
-            transition { ActionFinished(source, points, ActionResult.FAILED) }
+            transition { ActionCompleted(source, points, ActionResult.FAILED) }
         }
     }
 
-    fun finishLocationAction(actionResult: ActionResult) {
+    fun completeLocationAction(actionResult: ActionResult) {
         (stateContext.currentState as? LocationActionReady)?.apply {
             transition { ActionRan(source, points, action, actionResult, isAutomation) }
         }
