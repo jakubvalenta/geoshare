@@ -120,7 +120,7 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
             },
         )
 
-        // Short links with coordinates in HTML (fails on Nexus 5)
+        // Short links with coordinates in HTML
         testUri(
             if (testServer is TestServer.Configured) {
                 WGS84Point(

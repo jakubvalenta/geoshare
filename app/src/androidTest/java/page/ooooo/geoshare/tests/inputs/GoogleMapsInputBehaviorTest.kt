@@ -164,7 +164,6 @@ class GoogleMapsInputBehaviorTest {
         configureConnectionPermissionPreference(Permission.ALWAYS)
 
         if (htmlParsingSupported) {
-            // Fails on Nexus 5
             testUri(
                 persistentListOf(
                     WGS84Point(

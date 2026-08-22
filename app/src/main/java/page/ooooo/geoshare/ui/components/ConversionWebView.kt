@@ -234,20 +234,22 @@ fun ConversionWebView(
         },
         onRelease = { webView ->
             webView.apply {
-                webView.stopLoading()
+                // Destroy the WebView to stop it making network connections in the background and to free memory. Some
+                // of the method calls might be unnecessary, but we do it all just it case. Notice that we don't call
+                // pauseTimers(), because that for some reason causes the page to not load properly when recreating the
+                // WebView later. We have observed this behavior, and it is also described at
+                // https://stackoverflow.com/a/17458577.
+
+                stopLoading()
 
                 // Neutralize callbacks before any teardown
-                webView.webViewClient = WebViewClient()
-                webView.webChromeClient = null
-                webView.removeJavascriptInterface("Android")
+                webViewClient = WebViewClient()
+                webChromeClient = null
+                removeJavascriptInterface("Android")
 
-                // Destroy the WebView but don't call pauseTimers(), because that for some reason causes the page to not
-                // load properly when later recreating the WebView. This behavior has been observed and is also
-                // described here: https://stackoverflow.com/a/17458577.
-                // TODO Add instrumented test for WebView recreation
-                webView.onPause()
-                webView.removeAllViews()
-                webView.destroy()
+                onPause()
+                removeAllViews()
+                destroy()
             }
         },
     )

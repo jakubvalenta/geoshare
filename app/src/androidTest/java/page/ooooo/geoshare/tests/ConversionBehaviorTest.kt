@@ -71,8 +71,13 @@ class ConversionBehaviorTest {
         // Tap the Google Maps icon
         clickAppIcon(PackageNames.GOOGLE_MAPS)
 
-        // Google Maps shows precise location (fails on Nexus 5)
-        waitAndAssertGoogleMapsContainsElement { textAsString() == "Ming&Qing Dynasties Furniture Hall" }
+        // Google Maps shows precise location
+        waitAndAssertGoogleMapsContainsElement {
+            textAsString() in setOf(
+                "Ming&Qing Dynasties Furniture Hall",
+                """31°13'42.6"N 121°28'31.9"E""", // Sometimes shown on Nexus 5 instead of place name
+            )
+        }
     }
 
     @Test

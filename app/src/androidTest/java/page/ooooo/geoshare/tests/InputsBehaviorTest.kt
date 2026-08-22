@@ -1,5 +1,7 @@
 package page.ooooo.geoshare.tests
 
+import androidx.test.uiautomator.Direction
+import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -76,7 +78,13 @@ class InputsBehaviorTest {
         goToInputList()
 
         // Shows documentations added since version 19
-        onElement { viewIdResourceName == "geoShareInputsDocumentationRecent_${InputDocumentationGroup.HERE_WEGO}" }
-        onElement { viewIdResourceName == "geoShareInputsDocumentationRecent_${InputDocumentationGroup.MAGIC_EARTH}" }
+        onElement { viewIdResourceName == "geoShareInputListPane" }.apply {
+            scrollToElement(Direction.DOWN) {
+                viewIdResourceName == "geoShareInputsDocumentationRecent_${InputDocumentationGroup.HERE_WEGO}"
+            }
+            scrollToElement(Direction.DOWN) {
+                viewIdResourceName == "geoShareInputsDocumentationRecent_${InputDocumentationGroup.MAGIC_EARTH}"
+            }
+        }
     }
 }

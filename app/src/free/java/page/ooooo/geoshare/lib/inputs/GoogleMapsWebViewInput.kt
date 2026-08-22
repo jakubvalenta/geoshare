@@ -1,9 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
-import android.util.Log
 import android.webkit.WebSettings
 import androidx.annotation.StringRes
-import org.json.JSONObject
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.network.DESKTOP_USER_AGENT
 import javax.inject.Inject
@@ -20,13 +18,23 @@ class GoogleMapsWebViewInput @Inject constructor(
     override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
     /**
-     * Extracts the URL of the page, but only if the JavaScript of the page has changed the URL.
+     * Extracts the URL of the page.
      *
-     * TODO Document why startsWith()
+     * Returns undefined if the URL doesn't contain coordinates, so that the extraction is retried until the page
+     * JavaScript changes the URL into one with coordinates.
+     *
+     * The check whether the URL contains coordinates is very simple, because we don't want to reimplement the whole URI
+     * parsing here, and because we know that:
+     *
+     * - The URL will most probably be in format `/@{lat},{lon},{z}z`
+     * - The URL could plausibly be in format `/data=...!3d{lat}!4d{lon}`
+     * - The URL is unlikely to be in another format such as `/?ll={lat},{lon}`
      */
     // language=JavaScript
     override fun getUnsafeExtractionJavaScript(match: String) = """
-        () => !location.href.startsWith(${JSONObject.quote(match)}) ? location.href : undefined;
+        () => location.href.includes("/@") || location.href.includes("!2d") || location.href.includes("!4d")
+            ? location.href
+            : undefined;
     """.trimIndent()
 
     override suspend fun parse(data: String, match: String) = parseResult {
