@@ -2,7 +2,6 @@ package page.ooooo.geoshare.tests
 
 import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.UiAutomatorTestScope
-import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.Dispatchers
@@ -324,6 +323,8 @@ class ConversionBehaviorTest {
 
     @Test
     fun opensGoogleMapsSearchLink() = uiAutomator {
+        assumeAppInstalled(PackageNames.GOOGLE_MAPS)
+
         // Launch application and close intro
         launchApplication()
         waitForAppToBeVisible()
@@ -335,10 +336,9 @@ class ConversionBehaviorTest {
 
         // Click the link
         onMainScrollablePane()
-            .scrollToElement(Direction.DOWN, timeoutMs = 3_000) {
-                viewIdResourceName == "geoShareApp_${InitialLinks.GOOGLE_MAPS_DISPLAY_UUID}"
-            }
-            .longClick()
+            // Scroll by percents, because it's more reliable than scrolling to the app icon
+            .scroll(Direction.DOWN, 2f)
+        onElement { viewIdResourceName == "geoShareApp_${InitialLinks.GOOGLE_MAPS_DISPLAY_UUID}" }.longClick()
         onElement {
             viewIdResourceName == "geoShareAppOutput" && textAsString()?.contains("Google Maps search") == true
         }.click()

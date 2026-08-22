@@ -44,8 +44,10 @@ class LinkBehaviorTest {
             .scroll(Direction.DOWN, 2f)
         onElement { viewIdResourceName == "geoShareAppLabel" && textAsString() == "My New Maps" }.longClick()
         onElement {
-            viewIdResourceName == "geoShareAppOutput" &&
-                textAsString() in setOf("Copy My New Maps link", "Copier le lien My New Maps")
+            viewIdResourceName == "geoShareAppOutput" && textAsString() in setOf(
+                "Copy My New Maps link",
+                "Copier le lien My New Maps",
+            )
         }.click()
 
         // Shows success message
