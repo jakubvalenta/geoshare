@@ -334,4 +334,9 @@
     <string name="network_exception_too_many_requests_wait">Твърде много заявки, изчакайте %1$ds</string>
     <string name="user_preferences_dynamic_color_title">Динамичен цвят</string>
     <string name="user_preferences_section_appearance">Външен вид</string>
+    <string name="user_preferences_finish_after_action_succeeded">Затворете приложението, след като споделите връзка с него и извършите каквото и да е действие (отваряне на приложение за карта, копиране на координати, запазване на GPX и др.)</string>
+    <string name="user_preferences_finish_after_action_succeeded_and_opened_app">Затворете приложението, след като споделите линк с него и отворите приложение за карти</string>
+    <string name="user_preferences_finish_description">Изберете кога приложението да се затваря автоматично. Затворено приложение не се показва след използване на жеста за връщане назад.</string>
+    <string name="user_preferences_finish_never">Не затваряй приложението автоматично</string>
+    <string name="user_preferences_finish_title">Затваряне</string>
 </resources>
