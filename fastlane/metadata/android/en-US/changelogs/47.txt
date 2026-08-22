@@ -1,3 +1,4 @@
 - Added preference to choose when the app should automatically close itself.
+- Added support for sharing Google Maps country domain links (e.g. google.co.uk) with the app.
 - Fixed Google Maps timeout.
 - Fixed OpenStreetMap links with pin.
