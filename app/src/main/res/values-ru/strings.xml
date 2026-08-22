@@ -136,10 +136,10 @@
     <string name="conversion_automation_share_failed">Не удалось автоматически поделиться ссылкой</string>
     <string name="conversion_automation_share_succeeded">Поделились ссылкой автоматически</string>
     <plurals name="conversion_automation_share_waiting">
-        <item quantity="one">Поделимся ссылкой автоматически через %1$d сек.</item>
-        <item quantity="few">Поделимся ссылкой автоматически через %1$d сек.</item>
-        <item quantity="many">Поделимся ссылкой автоматически через %1$d сек.</item>
-        <item quantity="other">Поделимся ссылкой автоматически через %1$d сек.</item>
+        <item quantity="one">Автоматический обмен ссылкой через %1$d сек.</item>
+        <item quantity="few">Автоматический обмен ссылкой через %1$d сек.</item>
+        <item quantity="many">Автоматический обмен ссылкой через %1$d сек.</item>
+        <item quantity="other">Автоматический обмен ссылкой через %1$d сек.</item>
     </plurals>
     <string name="conversion_loading_indicator_description" tools:ignore="PluralsCandidate">Попытка %1$d из %2$d по причине: %3$s</string>
     <string name="faq_location_permission_headline">Разрешение местоположения</string>
@@ -348,4 +348,9 @@
     <string name="network_exception_too_many_requests_wait">слишком много запросов, пауза %1$d сек.</string>
     <string name="user_preferences_dynamic_color_title">Динамический цвет</string>
     <string name="user_preferences_section_appearance">Внешний вид</string>
+    <string name="user_preferences_finish_description">Выберите, когда приложение должно автоматически закрываться. Закрытое приложение не появляется после использования жеста «назад».</string>
+    <string name="user_preferences_finish_never">Не закрывать приложение автоматически</string>
+    <string name="user_preferences_finish_title">Закрытие</string>
+    <string name="user_preferences_finish_after_action_succeeded">Закрывать приложение после обмена с ним ссылкой и выполнения какого-либо действия (запуск картографического приложения, копирование координат, сохранение GPX и т.д.)</string>
+    <string name="user_preferences_finish_after_action_succeeded_and_opened_app">Закрывать приложение после обмена с ним ссылкой и запуска картографического приложения</string>
 </resources>
