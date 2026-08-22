@@ -362,4 +362,9 @@
     <string name="network_exception_too_many_requests_wait">طلبات كثيرة، انتظر %1$d ث</string>
     <string name="user_preferences_dynamic_color_title">لون ديناميكي</string>
     <string name="user_preferences_section_appearance">المظهر</string>
+    <string name="user_preferences_finish_after_action_succeeded">أغلق التطبيق بعد مشاركة رابط من خلاله والقيام بأي إجراء (فتح تطبيق خرائط، نسخ الإحداثيات، حفظ ملف GPX، إلخ)</string>
+    <string name="user_preferences_finish_after_action_succeeded_and_opened_app">أغلِق التطبيق بعد مشاركة رابط من خلاله وفتح تطبيق خرائط</string>
+    <string name="user_preferences_finish_description">اختر متى يجب أن يُغلق التطبيق نفسه تلقائيًا. لا يظهر التطبيق المغلق بعد استخدام إيماءة الرجوع.</string>
+    <string name="user_preferences_finish_never">لا تغلق التطبيق تلقائيًا</string>
+    <string name="user_preferences_finish_title">يغلق</string>
 </resources>
