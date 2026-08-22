@@ -20,8 +20,8 @@ class DebugWebViewInput @Inject constructor() : WebViewInput {
     override val loadingIndicatorTitleResId = R.string.converter_debug_loading_indicator_title
 
     // language=JavaScript
-    override val unsafeExtractionJavascript = """
-        () => window.location.href !== 'about:blank' ? window.location.href : undefined;
+    override fun getUnsafeExtractionJavaScript(match: String) = """
+        () => location.href;
     """.trimIndent()
 
     override suspend fun parse(data: String, match: String) = parseResult {

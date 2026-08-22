@@ -45,7 +45,7 @@ class GoogleMapsPlaceListInputImpl @Inject constructor(
      * ```
      */
     // language=JavaScript
-    override val unsafeExtractionJavascript = $$"""
+    override fun getUnsafeExtractionJavaScript(match: String) = $$"""
         () => {
             function findPointsInAppInitState(obj) {
                 const MAX_PRECISION = 17;

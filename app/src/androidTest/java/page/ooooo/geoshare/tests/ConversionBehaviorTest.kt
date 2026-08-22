@@ -2,7 +2,6 @@ package page.ooooo.geoshare.tests
 
 import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.UiAutomatorTestScope
-import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.Dispatchers
@@ -71,8 +70,13 @@ class ConversionBehaviorTest {
         // Tap the Google Maps icon
         clickAppIcon(PackageNames.GOOGLE_MAPS)
 
-        // Google Maps shows precise location (fails on Nexus 5)
-        waitAndAssertGoogleMapsContainsElement { textAsString() == "Ming&Qing Dynasties Furniture Hall" }
+        // Google Maps shows precise location
+        waitAndAssertGoogleMapsContainsElement {
+            textAsString() in setOf(
+                "Ming&Qing Dynasties Furniture Hall",
+                """31°13'42.6"N 121°28'31.9"E""", // Sometimes shown on Nexus 5 instead of place name
+            )
+        }
     }
 
     @Test
@@ -319,6 +323,8 @@ class ConversionBehaviorTest {
 
     @Test
     fun opensGoogleMapsSearchLink() = uiAutomator {
+        assumeAppInstalled(PackageNames.GOOGLE_MAPS)
+
         // Launch application and close intro
         launchApplication()
         waitForAppToBeVisible()
@@ -330,10 +336,9 @@ class ConversionBehaviorTest {
 
         // Click the link
         onMainScrollablePane()
-            .scrollToElement(Direction.DOWN, timeoutMs = 3_000) {
-                viewIdResourceName == "geoShareApp_${InitialLinks.GOOGLE_MAPS_DISPLAY_UUID}"
-            }
-            .longClick()
+            // Scroll by percents, because it's more reliable than scrolling to the app icon
+            .scroll(Direction.DOWN, 2f)
+        onElement { viewIdResourceName == "geoShareApp_${InitialLinks.GOOGLE_MAPS_DISPLAY_UUID}" }.longClick()
         onElement {
             viewIdResourceName == "geoShareAppOutput" && textAsString()?.contains("Google Maps search") == true
         }.click()

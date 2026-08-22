@@ -18,25 +18,23 @@ class GoogleMapsWebViewInput @Inject constructor(
     override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
     /**
-     * Extracts the final URL of the page.
+     * Extracts the URL of the page.
      *
-     * When the extraction is first called, it remembers the URL of the page. Then if in a subsequent extraction call
-     * the URL is different, it returns the new URL. This way we wait for the JavaScript of the page to change the URL
-     * and don't erroneously consider the extraction done before the JavaScript fully ran.
+     * Returns undefined if the URL doesn't contain coordinates, so that the extraction is retried until the page
+     * JavaScript changes the URL into one with coordinates.
+     *
+     * The check whether the URL contains coordinates is very simple, because we don't want to reimplement the whole URI
+     * parsing here, and because we know that:
+     *
+     * - The URL will most probably be in format `/@{lat},{lon},{z}z`
+     * - The URL could plausibly be in format `/data=...!3d{lat}!4d{lon}`
+     * - The URL is unlikely to be in another format such as `/?ll={lat},{lon}`
      */
     // language=JavaScript
-    override val unsafeExtractionJavascript = """
-        () => {
-            const url = window.location.href;
-            if (url !== 'about:blank') {
-                if (window.__firstUrl === undefined) {
-                    window.__firstUrl = url;
-                } else if (window.__firstUrl !== url) {
-                    return url;
-                }
-            }
-            return undefined;
-        };
+    override fun getUnsafeExtractionJavaScript(match: String) = """
+        () => location.href.includes("/@") || location.href.includes("!2d") || location.href.includes("!4d")
+            ? location.href
+            : undefined;
     """.trimIndent()
 
     override suspend fun parse(data: String, match: String) = parseResult {
@@ -86,6 +84,5 @@ class GoogleMapsWebViewInput @Inject constructor(
 
                 // Something that is requested too many times
                 || requestUrlString.contains("/maps/res/CompactLegend-Roadmap-")
-
     }
 }

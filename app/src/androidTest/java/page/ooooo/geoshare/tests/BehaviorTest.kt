@@ -327,7 +327,7 @@ fun UiAutomatorTestScope.waitAndAssertGoogleMapsContainsElement(block: Accessibi
     onElementOrNull(3_000) {
         packageName == PackageNames.GOOGLE_MAPS && textAsString() in setOf(
             "Make it your map",
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Profitez d'une carte personnalisée"
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Profitez d'une carte personnalisée",
         )
     }?.let {
         onElement {
@@ -369,7 +369,7 @@ fun UiAutomatorTestScope.waitAndAssertTomTomContainsElement(block: Accessibility
     onElementOrNull(5_000) {
         textAsString() in setOf(
             "Got it",
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "J'ai compris"
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "J'ai compris",
         )
     }?.click()
 
@@ -533,7 +533,7 @@ fun UiAutomatorTestScope.launchNavigationInApp(@Suppress("SameParameterValue") p
     onElement {
         viewIdResourceName == "geoShareAppOutput" && textAsString() in setOf(
             "Navigate",
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Naviguer"
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Naviguer",
         )
     }.click()
 }
