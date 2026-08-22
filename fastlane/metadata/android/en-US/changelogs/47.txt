@@ -1,2 +1,3 @@
 - Added preference to choose when the app should automatically close itself.
+- Added support for opening Google Maps links on country domains (e.g. google.de).
 - Fixed support for OpenStreetMap links with pin.
