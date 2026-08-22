@@ -341,9 +341,9 @@
     <string name="user_preferences_dynamic_color_title">Couleur dynamique</string>
     <string name="user_preferences_section_appearance">Apparence</string>
     <string name="network_exception_too_many_requests_wait">Trop de requêtes, veuillez patienter %1$ds</string>
-    <string name="user_preferences_finish_after_action_succeeded">Fermez l\'application après avoir partagé un lien via celle-ci et effectué une action (ouverture d\'une application de cartographie, copie de coordonnées, enregistrement d\'un fichier GPX, etc.)</string>
-    <string name="user_preferences_finish_after_action_succeeded_and_opened_app">Fermez l\'application après avoir partagé un lien via celle-ci et ouvert une application de cartographie</string>
-    <string name="user_preferences_finish_description">Choisissez à quel moment l\'application doit se fermer automatiquement. Une application fermée n\'apparaît pas lorsque vous utilisez le geste « Retour ».</string>
-    <string name="user_preferences_finish_never">Ne fermez pas automatiquement l\'application</string>
+    <string name="user_preferences_finish_after_action_succeeded">Fermez l’application après avoir partagé un lien via celle-ci et effectué une action (ouverture d’une application de cartographie, copie de coordonnées, enregistrement d’un fichier GPX, etc.)</string>
+    <string name="user_preferences_finish_after_action_succeeded_and_opened_app">Fermez l’application après avoir partagé un lien via celle-ci et ouvert une application de cartographie</string>
+    <string name="user_preferences_finish_description">Choisissez à quel moment l’application doit se fermer automatiquement. Une application fermée n’apparaît pas lorsque vous utilisez le geste « Retour ».</string>
+    <string name="user_preferences_finish_never">Ne fermez pas automatiquement l’application</string>
     <string name="user_preferences_finish_title">Fermeture</string>
 </resources>
