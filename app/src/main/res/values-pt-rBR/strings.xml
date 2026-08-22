@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="intro_open_by_default_app_note">Se alguns links não podem ser selecionados, significa que outros apps do Google estão configurados para abri-los por padrão. Você pode desativar a abertura de links neles, como fizemos para o Google Maps.</string>
+    <string name="intro_open_by_default_app_note">Se alguns links não podem ser selecionados, significa que outros apps do Google estão configurados para abri-los por padrão. Você pode desativar a abertura de links neles, como fizemos para o Google Maps. Confira os apps no espaço privado, caso use este recurso do Android.</string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="intro_how_to_share_app_caption"><![CDATA[Selecione <i>%1$s</i> e o app permitirá que você abra a mesma localização em qualquer app de mapa instalado.]]></string>
     <string name="intro_title">Introdução</string>
@@ -338,4 +338,7 @@
     <string name="faq_name_only_text_1">O %1$s consegue extrair apenas o nome do lugar, ex. “Monte Everest” de alguns links de mapa. Ao abrir essa localização em outro app de mapa, ele pode mostrar um lugar diferente do que o link original, pois vários lugares com o mesmo nome podem existir.</string>
     <string name="faq_name_only_text_2">Pontos identificados apenas pelo nome não são inclusos em rotas GPX.</string>
     <string name="network_exception_webview">Exceção do WebView</string>
+    <string name="network_exception_too_many_requests_wait">Solicitações demais, aguarde por %1$ds</string>
+    <string name="user_preferences_dynamic_color_title">Cores dinâmicas</string>
+    <string name="user_preferences_section_appearance">Aparência</string>
 </resources>
