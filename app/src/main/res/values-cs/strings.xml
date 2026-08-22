@@ -347,4 +347,9 @@
     <string name="user_preferences_dynamic_color_title">Dynamická barva</string>
     <string name="user_preferences_section_appearance">Vzhled</string>
     <string name="network_exception_too_many_requests_wait">Příliš mnoho požadavků, počkejte %1$d s</string>
+    <string name="user_preferences_finish_after_action_succeeded">Zavřít aplikaci po sdílení odkazu s ní a provedení jakékoli akce (otevření mapové aplikace, zkopírování souřadnic, uložení GPX atd.)</string>
+    <string name="user_preferences_finish_after_action_succeeded_and_opened_app">Zavřít aplikaci po sdílení odkazu s ní a otevření mapové aplikace</string>
+    <string name="user_preferences_finish_description">Zvolte, kdy se má aplikace automaticky zavřít. Zavřená aplikace se nezobrazí po provedení gesta „zpět“.</string>
+    <string name="user_preferences_finish_never">Nezavírat aplikaci automaticky</string>
+    <string name="user_preferences_finish_title">Zavírání</string>
 </resources>
