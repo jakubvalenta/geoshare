@@ -327,4 +327,9 @@
     <string name="network_exception_too_many_requests_wait">请求过多，请等待 %1$d 秒</string>
     <string name="user_preferences_dynamic_color_title">动态配色</string>
     <string name="user_preferences_section_appearance">外观</string>
+    <string name="user_preferences_finish_title">关闭</string>
+    <string name="user_preferences_finish_never">不自动关闭应用</string>
+    <string name="user_preferences_finish_description">选择应用何时自动关闭。关闭后的应用在使用返回手势后不会显示。</string>
+    <string name="user_preferences_finish_after_action_succeeded_and_opened_app">在通过该应用分享链接并打开地图应用后关闭应用</string>
+    <string name="user_preferences_finish_after_action_succeeded">在通过该应用分享链接并执行任何操作（打开地图应用、复制坐标、保存 GPX 等）后关闭应用</string>
 </resources>
