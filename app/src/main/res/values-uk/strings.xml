@@ -348,4 +348,9 @@
     <string name="network_exception_too_many_requests_wait">Забагато запитів, зачекайте %1$d с</string>
     <string name="user_preferences_dynamic_color_title">Динамічні кольори</string>
     <string name="user_preferences_section_appearance">Вигляд</string>
+    <string name="user_preferences_finish_after_action_succeeded">Закривати застосунок після того, як ви поділилися з ним посиланням і виконали будь-яку дію (відкриття мапи, копіювання координат, збереження GPX тощо)</string>
+    <string name="user_preferences_finish_after_action_succeeded_and_opened_app">Закрити застосунок після того, як поділитеся посиланням через нього та відкриєте мапу</string>
+    <string name="user_preferences_finish_description">Виберіть, коли застосунок має автоматично закриватися. Закритий застосунок не з’являється після використання жесту «Назад».</string>
+    <string name="user_preferences_finish_never">Не закривати застосунок автоматично</string>
+    <string name="user_preferences_finish_title">Закриття</string>
 </resources>
