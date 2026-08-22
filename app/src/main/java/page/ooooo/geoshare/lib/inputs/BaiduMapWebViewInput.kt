@@ -31,7 +31,7 @@ class BaiduMapWebViewInput @Inject constructor(
      * Notice that we don't take coordinates from `_appStateFromUrl.loc`, because these have a longitude offset.
      */
     // language=JavaScript
-    override val unsafeExtractionJavascript = """
+    override fun getUnsafeExtractionJavaScript(match: String) = """
         () => {
             function deepGet(obj, ...keys) {
                 return keys.reduce((acc, key) => {

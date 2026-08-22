@@ -952,8 +952,8 @@ private fun MainWebView(
         )
         ConversionWebView(
             unsafeUrl = matchedInput.match,
-            unsafeExtractionJavascript = matchedInput.input.unsafeExtractionJavascript,
-            pendingData = pendingData,
+            unsafeExtractionJavascript = matchedInput.input.getUnsafeExtractionJavaScript(matchedInput.match),
+            pendingExtractionResult = pendingData,
             extendWebSettings = { matchedInput.input.extendWebSettings(it) },
             shouldInterceptRequest = { matchedInput.input.shouldInterceptRequest(it) },
         )

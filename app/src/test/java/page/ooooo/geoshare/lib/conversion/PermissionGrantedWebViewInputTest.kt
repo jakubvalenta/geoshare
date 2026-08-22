@@ -44,7 +44,8 @@ class PermissionGrantedWebViewInputTest {
         override val permissionTitleResId = R.string.converter_google_maps_permission_title
         override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
         override val timeout = 7.seconds
-        override val unsafeExtractionJavascript = "undefined"
+
+        override fun getUnsafeExtractionJavaScript(match: String) = "undefined"
 
         override suspend fun parse(data: String, match: String) =
             result.copy(next = next.copy(match = data)) // Store data in MatchedInput, so we can test it
@@ -254,7 +255,8 @@ class PermissionGrantedWebViewInputTest {
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
             override val timeout = 7.seconds
-            override val unsafeExtractionJavascript = "undefined"
+
+            override fun getUnsafeExtractionJavaScript(match: String) = "undefined"
 
             override suspend fun parse(data: String, match: String) =
                 throw CancellationException()

@@ -33,12 +33,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.onEach
 import page.ooooo.geoshare.lib.network.WebViewNetworkException
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+private const val JAVA_SCRIPT_INTERFACE_NAME = "Android"
 private const val TAG = "ConversionWebView"
 
 @OptIn(FlowPreview::class)
@@ -47,7 +47,7 @@ private const val TAG = "ConversionWebView"
 fun ConversionWebView(
     unsafeUrl: String,
     unsafeExtractionJavascript: String,
-    pendingData: CompletableDeferred<String>,
+    pendingExtractionResult: CompletableDeferred<String>,
     extendWebSettings: (settings: WebSettings) -> Unit,
     shouldInterceptRequest: (requestUrlString: String) -> Boolean,
     // Set window size minus a common browser chrome size, so the numbers seem real, in case a web page checks
@@ -72,25 +72,23 @@ fun ConversionWebView(
     val safeUrl = remember(unsafeUrl) {
         allowedUrlPatterns.firstNotNullOfOrNull { pattern -> Regex(pattern).matchEntire(unsafeUrl)?.value }
     }
+    val extractionResultFlow = remember(safeUrl) { MutableStateFlow<String?>(null) }
 
-    // Store the extraction result. Then call the extraction settle callback. Call it only after the result hasn't
-    // changed in a while, because:
-    // 1. The first extraction often doesn't lead to the final result. For example when extracting the page URL, the
-    //    first URL is not the final one. It can take the page a few seconds to set the final page URL.
-    // 2. Quick calls to the settle callback would make a ConversionState transition crash, because each new transition
-    //    cancels any running transition.
-    val dataFlow = remember(safeUrl) { MutableStateFlow<String?>(null) }
-    LaunchedEffect(dataFlow) {
-        dataFlow
+    /**
+     * Stores the extraction result by completing the [pendingExtractionResult] deferred variable.
+     *
+     * It stores the result only after it hasn't changed in a while, because the first extraction often doesn't lead to
+     * the final result. For example when extracting the page URL, the first URL is not the final one. It can take the
+     * page JavaScript a few seconds to set the final page URL.
+     */
+    LaunchedEffect(extractionResultFlow) {
+        extractionResultFlow
             .filterNotNull()
-            .onEach { data ->
-                Log.d(TAG, "Extracted $data")
-            }
             .distinctUntilChanged()
             .debounce(settleTimeout)
-            .collect { data ->
-                Log.i(TAG, "Extraction settled at $data after $settleTimeout")
-                pendingData.complete(data)
+            .collect { extractionResult ->
+                Log.i(TAG, "Extraction settled at $extractionResult")
+                pendingExtractionResult.complete(extractionResult)
             }
     }
 
@@ -135,8 +133,10 @@ fun ConversionWebView(
                 extendWebSettings(settings)
 
                 webChromeClient = object : WebChromeClient() {
-                    override fun onConsoleMessage(cm: ConsoleMessage): Boolean =
-                        // Return true for messages that should be excluded from logcat
+                    /**
+                     * Returns true for messages that should be excluded from logcat
+                     */
+                    override fun onConsoleMessage(cm: ConsoleMessage) =
                         (cm.messageLevel() != ConsoleMessage.MessageLevel.ERROR &&
                             cm.messageLevel() != ConsoleMessage.MessageLevel.WARNING) ||
                             cm.message().startsWith("Mixed Content")
@@ -146,21 +146,25 @@ fun ConversionWebView(
                     object {
                         @Suppress("unused")
                         @JavascriptInterface
-                        fun onExtractSuccess(data: String) {
-                            dataFlow.value = data
+                        fun onExtractSuccess(extractionResult: String) {
+                            Log.d(TAG, "Extracted $extractionResult")
+                            extractionResultFlow.value = extractionResult
                         }
 
                         @Suppress("unused")
                         @JavascriptInterface
                         fun onExtractFailure() {
-                            Log.w(TAG, "Extraction failure")
-                            pendingData.completeExceptionally(WebViewNetworkException())
+                            Log.w(TAG, "Extraction failed")
+                            pendingExtractionResult.completeExceptionally(WebViewNetworkException())
                         }
                     },
-                    "Android",
+                    JAVA_SCRIPT_INTERFACE_NAME,
                 )
 
                 webViewClient = object : WebViewClient() {
+                    /**
+                     * Runs extraction repeatedly every [extractionInterval]
+                     */
                     override fun onPageFinished(view: WebView?, url: String?) {
                         super.onPageFinished(view, url)
 
@@ -169,19 +173,27 @@ fun ConversionWebView(
                             """
                                 (() => {
                                     const extract = $unsafeExtractionJavascript;
-                                    window.setInterval(
-                                        () => {
-                                            if (location.protocol === 'chrome-error:') {
-                                                Android.onExtractFailure();
-                                            } else {
-                                                const data = extract();
-                                                if (data !== null && data !== undefined) {
-                                                    Android.onExtractSuccess(data);
-                                                }
+                                    function extractAndCallback() {
+                                        try {
+                                            switch (location.protocol) {
+                                                case 'about:':
+                                                    // Try again if the page is about:blank
+                                                    break;
+                                                case 'chrome-error:':
+                                                    $JAVA_SCRIPT_INTERFACE_NAME.onExtractFailure();
+                                                    break;
+                                                default:
+                                                    const extractionResult = extract();
+                                                    if (extractionResult !== null && extractionResult !== undefined) {
+                                                        $JAVA_SCRIPT_INTERFACE_NAME.onExtractSuccess(extractionResult);
+                                                    }
                                             }
-                                        },
-                                        ${extractionInterval.inWholeMilliseconds}
-                                    );
+                                        } catch (ex) {
+                                            console.error("Extraction exception", ex);
+                                        }
+                                    }
+                                    extractAndCallback();
+                                    window.setInterval(extractAndCallback, ${extractionInterval.inWholeMilliseconds});
                                 })();
                             """.trimIndent(),
                             null,
@@ -194,10 +206,9 @@ fun ConversionWebView(
                     ): WebResourceResponse? {
                         request?.url?.toString()?.let { requestUrlString ->
                             if (shouldInterceptRequest(requestUrlString)) {
-                                Log.d(TAG, "Blocked request $requestUrlString")
                                 return WebResourceResponse("text/plain", "utf-8", null)
                             }
-                            Log.d(TAG, "Allowed request $requestUrlString")
+                            // In development, you can log requests with Log.d(TAG, "Allowed request $requestUrlString")
                         }
                         return super.shouldInterceptRequest(view, request)
                     }
@@ -210,27 +221,34 @@ fun ConversionWebView(
         },
         modifier = Modifier.requiredSize(size),
         update = { webView ->
-            if (safeUrl != null && webView.url != safeUrl) {
-                webView.loadUrl(safeUrl)
+            webView.apply {
+                if (safeUrl != null && url != safeUrl) {
+                    loadUrl(safeUrl)
+                }
             }
         },
         onReset = { webView ->
-            webView.stopLoading()
-            webView.loadUrl("about:blank")
-            webView.clearHistory()
+            webView.apply {
+                clearHistory()
+            }
         },
         onRelease = { webView ->
-            webView.stopLoading()
+            webView.apply {
+                webView.stopLoading()
 
-            // Neutralize callbacks before any teardown
-            webView.webViewClient = WebViewClient()
-            webView.webChromeClient = null
-            webView.removeJavascriptInterface("Android")
+                // Neutralize callbacks before any teardown
+                webView.webViewClient = WebViewClient()
+                webView.webChromeClient = null
+                webView.removeJavascriptInterface("Android")
 
-            webView.onPause()
-            webView.pauseTimers()
-            webView.removeAllViews()
-            webView.destroy()
+                // Destroy the WebView but don't call pauseTimers(), because that for some reason causes the page to not
+                // load properly when later recreating the WebView. This behavior has been observed and is also
+                // described here: https://stackoverflow.com/a/17458577.
+                // TODO Add instrumented test for WebView recreation
+                webView.onPause()
+                webView.removeAllViews()
+                webView.destroy()
+            }
         },
     )
 }

@@ -42,7 +42,8 @@ interface BasicInput<T> : Input {
  */
 interface WebViewInput : Input, Input.HasPermission {
     val timeout: Duration get() = 60.seconds
-    val unsafeExtractionJavascript: String
+
+    fun getUnsafeExtractionJavaScript(match: String): String
 
     suspend fun parse(data: String, match: String): ParseResult
 
