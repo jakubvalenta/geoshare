@@ -25,6 +25,26 @@ class GoogleMapsUriInputTest : InputTest {
     }
 
     @Test
+    fun match_countryDomain() {
+        assertEquals(
+            "https://www.google.de/maps/place/47.7677N+12.3741E",
+            input.match("https://www.google.de/maps/place/47.7677N+12.3741E")
+        )
+        assertEquals(
+            "https://google.de/maps/@52.5067296,13.2599309,6z",
+            input.match("https://google.de/maps/@52.5067296,13.2599309,6z")
+        )
+        assertEquals(
+            "https://maps.google.co.uk/maps/@52.5067296,13.2599309,6z",
+            input.match("https://maps.google.co.uk/maps/@52.5067296,13.2599309,6z")
+        )
+        assertEquals(
+            "https://www.google.com.br/maps/@52.5067296,13.2599309,6z",
+            input.match("https://www.google.com.br/maps/@52.5067296,13.2599309,6z")
+        )
+    }
+
+    @Test
     fun match_urlWithSpace() {
         assertEquals(
             "https://maps.google.com/maps?f=d&daddr=2088 Albion Rd+@43.7481,-79.6332",
