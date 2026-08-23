@@ -18,7 +18,7 @@ class GoogleSearchUriInput @Inject constructor(
         Regex("""((?:https?://)?(?:(?:www\.)?google.com/(?:search|share)$URI_REST|share\.google[/?#]$URI_REST))""")
 
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
-        warningMessage = resources.getString(R.string.input_google_search_error_not_supported)
+        warningMessage = resources.getString(R.string.conversion_failed_unsupported_source_google_search)
     }
 
     override fun toString() = "GoogleSearchUriInput"

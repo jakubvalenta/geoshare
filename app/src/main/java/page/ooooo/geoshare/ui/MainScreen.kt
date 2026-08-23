@@ -1715,7 +1715,7 @@ private fun WarningPreview() {
         MainScreen(
             currentState = ConversionFailed(
                 source = "https://share.google/diIxnYa8dIA6dZfpy",
-                message = stringResource(R.string.input_google_search_error_not_supported),
+                message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
                 warning = true,
             ),
             appDetails = emptyMap(),
@@ -1774,7 +1774,7 @@ private fun DarkWarningPreview() {
         MainScreen(
             currentState = ConversionFailed(
                 source = "https://share.google/diIxnYa8dIA6dZfpy",
-                message = stringResource(R.string.input_google_search_error_not_supported),
+                message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
                 warning = true,
             ),
             appDetails = emptyMap(),

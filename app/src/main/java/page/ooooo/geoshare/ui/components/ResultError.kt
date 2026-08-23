@@ -290,7 +290,7 @@ private fun WarningPreview() {
         ) {
             ResultError(
                 source = "https://share.google/diIxnYa8dIA6dZfpy",
-                message = stringResource(R.string.input_google_search_error_not_supported),
+                message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
                 details = null,
                 warning = true,
                 onNavigateToInputsScreen = {},
@@ -310,7 +310,7 @@ private fun DarkWarningPreview() {
         ) {
             ResultError(
                 source = "https://share.google/diIxnYa8dIA6dZfpy",
-                message = stringResource(R.string.input_google_search_error_not_supported),
+                message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
                 details = null,
                 warning = true,
                 onNavigateToInputsScreen = {},

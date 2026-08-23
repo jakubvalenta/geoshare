@@ -54,7 +54,6 @@
     <string name="donation_description">Does this app save you time?</string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="nav_back_content_description">Back to main screen</string>
-    <string name="input_google_search_error_not_supported">Google Search links are not supported</string>
     <string name="intro_title">Intro</string>
     <string name="intro_how_to_share_headline">How to show a map location in another map app</string>
     <string name="intro_how_to_share_google_maps_caption">Share a location from your map app or web browser.</string>
@@ -254,6 +253,7 @@
     <string name="copying_finished">Copied to clipboard</string>
     <string name="conversion_failed_connection_permission_denied">This link is not supported without connecting to the map service</string>
     <string name="conversion_failed_unsupported_service">Unsupported map service</string>
+    <string name="conversion_failed_unsupported_source_google_search">Google Search links are not supported</string>
     <string name="conversion_failed_unsupported_source_place_list">Place lists are not supported</string>
     <string name="conversion_failed_cancelled">Cancelled</string>
     <string name="inputs_all">All map services</string>

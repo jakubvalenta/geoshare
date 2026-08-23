@@ -12,7 +12,7 @@ import page.ooooo.geoshare.data.di.FakeInputRepository
 class GoogleSearchUriInputTest : InputTest {
     override val resources: Resources = mock {
         on {
-            getString(R.string.input_google_search_error_not_supported)
+            getString(R.string.conversion_failed_unsupported_source_google_search)
         } doReturn "Google Search links are not supported"
     }
     private val input = FakeInputRepository.googleSearchUriInput
@@ -36,7 +36,7 @@ class GoogleSearchUriInputTest : InputTest {
     @Test
     fun parse_returnsWarning() = runBlocking {
         assertEquals(
-            ParseResult.Warning(resources.getString(R.string.input_google_search_error_not_supported)),
+            ParseResult.Warning(resources.getString(R.string.conversion_failed_unsupported_source_google_search)),
             input.parse("https://share.google/foo")
         )
     }
