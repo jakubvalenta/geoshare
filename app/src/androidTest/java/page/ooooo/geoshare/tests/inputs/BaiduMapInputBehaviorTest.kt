@@ -17,7 +17,7 @@ import page.ooooo.geoshare.tests.retryTest
 import page.ooooo.geoshare.tests.testUri
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
-class BaiduMapInputBehaviorTest {
+class BaiduMapInputBehaviorTest : InputBehaviorTest {
     @Test
     fun baiduMap_offline() = uiAutomator {
         // Map center

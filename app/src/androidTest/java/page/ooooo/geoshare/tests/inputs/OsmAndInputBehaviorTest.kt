@@ -6,7 +6,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.tests.testUri
 
-class OsmAndInputBehaviorTest {
+class OsmAndInputBehaviorTest : InputBehaviorTest {
     @Test
     fun osmAnd_offline() = uiAutomator {
         // Coordinates

@@ -14,7 +14,7 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.tests.testUri
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
-class AmapInputBehaviorTest {
+class AmapInputBehaviorTest : InputBehaviorTest {
     @Test
     fun amap_offline() = uiAutomator {
         // Coordinates within mainland China

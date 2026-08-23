@@ -14,7 +14,7 @@ import page.ooooo.geoshare.tests.testText
 import page.ooooo.geoshare.tests.testUri
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
-class AppleMapsInputBehaviorTest {
+class AppleMapsInputBehaviorTest : InputBehaviorTest {
     @Test
     fun appleMaps_offline() = uiAutomator {
         // Launch app and close intro

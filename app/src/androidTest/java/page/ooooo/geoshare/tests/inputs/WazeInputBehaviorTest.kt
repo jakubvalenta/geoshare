@@ -14,7 +14,7 @@ import page.ooooo.geoshare.tests.testText
 import page.ooooo.geoshare.tests.testUri
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
-class WazeInputBehaviorTest {
+class WazeInputBehaviorTest : InputBehaviorTest {
     @Test
     fun waze_offline() = uiAutomator {
         // Launch app and close intro

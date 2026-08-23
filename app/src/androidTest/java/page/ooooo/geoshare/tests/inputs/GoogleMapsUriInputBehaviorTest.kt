@@ -2,31 +2,13 @@ package page.ooooo.geoshare.tests.inputs
 
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.runBlocking
-import org.junit.Assume.assumeTrue
 import org.junit.Test
-import page.ooooo.geoshare.BuildConfig
-import page.ooooo.geoshare.tests.assumeDomainResolvable
-import page.ooooo.geoshare.tests.assumeNotEmulator
-import page.ooooo.geoshare.tests.closeIntro
-import page.ooooo.geoshare.tests.configureConnectionPermissionPreference
-import page.ooooo.geoshare.data.local.preferences.Permission
-import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.tests.testUri
-import page.ooooo.geoshare.tests.testUriFails
-import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
-class GoogleMapsInputBehaviorTest {
-    /**
-     * Stores whether the current build variant supports HTML parsing or not. This way we can have one test class for
-     * both build variants and all the tested links in one function.
-     */
-    @Suppress("KotlinConstantConditions", "SimplifyBooleanWithConstants")
-    private val htmlParsingSupported = BuildConfig.FLAVOR == "free"
-
+class GoogleMapsUriInputBehaviorTest : InputBehaviorTest {
     @Test
     fun googleMapsUriInput_offline() = uiAutomator {
         // Coordinates in data
@@ -124,121 +106,5 @@ class GoogleMapsInputBehaviorTest {
             WGS84Point(52.5067296, 13.2599309, source = Source.MAP_CENTER),
             "https://www.google.com/maps?center=52.5067296,13.2599309",
         )
-    }
-
-    @Test
-    fun googleMapsShortLinkInput_online() = uiAutomator {
-        runBlocking {
-            assumeDomainResolvable("maps.google.com")
-        }
-
-        // Launch app and close intro
-        launchApplication()
-        waitForAppToBeVisible()
-        closeIntro()
-        configureConnectionPermissionPreference(Permission.ALWAYS)
-
-        // Short link within western Japan
-        testUri(
-            WGS84Point(34.5945482, 133.7583428, z = 17.0, name = "Steak no Don", source = Source.URI),
-            "https://maps.app.goo.gl/mBtbC6qXLK2baGTV9",
-        )
-
-        // Short link within mainland China
-        testUri(
-            GCJ02Point(39.920439, 116.331538, source = Source.URI),
-            "https://maps.app.goo.gl/FP3EV7tTUKYbmcVp7",
-        )
-    }
-
-    @Test
-    fun googleMapsHtmlInput_online() = uiAutomator {
-        runBlocking {
-            assumeDomainResolvable("maps.google.com")
-        }
-
-        // Launch app and close intro
-        launchApplication()
-        waitForAppToBeVisible()
-        closeIntro()
-        configureConnectionPermissionPreference(Permission.ALWAYS)
-
-        if (htmlParsingSupported) {
-            testUri(
-                persistentListOf(
-                    WGS84Point(
-                        30.0598138, 31.2144658,
-                        z = 17.0,
-                        name = "The National Circus in Giza",
-                        source = Source.URI,
-                    ),
-                ),
-                "https://maps.google.com/maps?client=firefox-b-m&um=1&ie=UTF-8&fb=1&gl=eg&sa=X&ftid=0x1458411f8f55adbb:0xbc693e01227e010d",
-                fallbackNames = setOf("السيرك القومى بالجيزة\u202D"),
-            )
-        } else {
-            testUriFails(
-                setOf(
-                    "This link is not supported",
-                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Ce lien n’est pas pris en charge",
-                ),
-                "https://maps.google.com/maps?client=firefox-b-m&um=1&ie=UTF-8&fb=1&gl=eg&sa=X&ftid=0x1458411f8f55adbb:0xbc693e01227e010d",
-            )
-        }
-    }
-
-    @Test
-    fun googleMapsHtmlInput_online_googleSearch() = uiAutomator {
-        assumeTrue(
-            "This test currently fails, because Google returns a captcha, even though we only run the test on a real device",
-            false,
-        )
-        assumeNotEmulator()
-
-        // Launch app and close intro
-        launchApplication()
-        waitForAppToBeVisible()
-        closeIntro()
-        configureConnectionPermissionPreference(Permission.ALWAYS)
-
-        // Google Search
-        testUri(
-            WGS84Point(27.765028, -15.600889, source = Source.JAVASCRIPT),
-            "https://g.co/kgs/91UYXud",
-        )
-    }
-
-    @Test
-    fun googleMapsPlaceListInput_online() = uiAutomator {
-        // Launch app and close intro
-        launchApplication()
-        waitForAppToBeVisible()
-        closeIntro()
-        configureConnectionPermissionPreference(Permission.ALWAYS)
-
-        if (htmlParsingSupported) {
-            testUri(
-                persistentListOf(
-                    WGS84Point(59.1293656, 11.4585672, source = Source.JAVASCRIPT),
-                    WGS84Point(59.4154007, 11.659710599999999, source = Source.JAVASCRIPT),
-                    WGS84Point(59.3443991, 11.672637, source = Source.JAVASCRIPT),
-                    WGS84Point(59.2557409, 11.5857853, source = Source.JAVASCRIPT),
-                    WGS84Point(59.1579458, 11.7337507, source = Source.JAVASCRIPT),
-                    WGS84Point(59.229344899999994, 11.6892173, source = Source.JAVASCRIPT),
-                    WGS84Point(59.2999243, 11.6587237, source = Source.JAVASCRIPT),
-                    WGS84Point(59.147731699999994, 11.550661199999999, source = Source.JAVASCRIPT),
-                ),
-                "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg",
-            )
-        } else {
-            testUriFails(
-                setOf(
-                    "Place lists are not supported",
-                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-                    "Les listes de lieux ne sont pas prises en charge",
-                ),
-                "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg",
-            )
-        }
     }
 }

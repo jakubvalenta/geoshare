@@ -10,7 +10,7 @@ import page.ooooo.geoshare.tests.testText
 import page.ooooo.geoshare.tests.testUri
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
-class GeoUriInputBehaviorTest {
+class GeoUriInputBehaviorTest : InputBehaviorTest {
     @Test
     fun geoUri_offline() = uiAutomator {
         // Launch app and close intro

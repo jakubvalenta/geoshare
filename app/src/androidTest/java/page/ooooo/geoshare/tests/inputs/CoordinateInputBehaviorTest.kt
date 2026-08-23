@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.tests.testText
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
-class CoordinateInputBehaviorTest {
+class CoordinateInputBehaviorTest : InputBehaviorTest {
     @Test
     fun coordinates_offline() = uiAutomator {
         // Launch app and close intro
