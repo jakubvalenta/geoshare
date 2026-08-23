@@ -31,20 +31,18 @@ class GoogleNavigationUriInput @Inject constructor(
     private val googleMapsAddressApiInput: dagger.Lazy<GoogleMapsAddressApiInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
-    override val pattern = Regex("""(google.navigation:$URI_REST)""")
-    override val documentation = InputDocumentation(
-        group = InputDocumentationGroup.GOOGLE_NAVIGATION_URI,
-        items = listOf(
-            InputDocumentationItem.Text(45) {
-                stringResource(
-                    R.string.example,
-                    GoogleMapsUriFormatter.formatNavigationUriString(
-                        GCJ02MainlandChinaPoint(NaivePoint.example), uriQuote
-                    )
+    override val group = InputGroup.GOOGLE_NAVIGATION_URI
+    override val changelog = persistentListOf(
+        InputChangelogItem.Text(45) {
+            stringResource(
+                R.string.example,
+                GoogleMapsUriFormatter.formatNavigationUriString(
+                    GCJ02MainlandChinaPoint(NaivePoint.example), uriQuote
                 )
-            },
-        ),
+            )
+        },
     )
+    override val pattern = Regex("""(google.navigation:$URI_REST)""")
 
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         data.run {

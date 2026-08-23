@@ -446,7 +446,7 @@ object AndroidTools {
         clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("Geographic coordinates", text)))
 
     suspend fun pasteFromClipboard(clipboard: Clipboard): String =
-        clipboard.getClipEntry()?.clipData?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.text?.toString() ?: ""
+        clipboard.getClipEntry()?.clipData?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.text?.toString().orEmpty()
 
     fun openFileUri(context: Context, uri: Uri, block: Appendable.() -> Unit): Boolean {
         val outputStream = try {

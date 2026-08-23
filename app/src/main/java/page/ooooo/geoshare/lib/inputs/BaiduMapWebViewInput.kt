@@ -18,7 +18,6 @@ import javax.inject.Singleton
 class BaiduMapWebViewInput @Inject constructor(
     private val log: Log,
 ) : WebViewInput {
-
     @Serializable
     private data class ExtractedPoint(val lat: Double?, val lon: Double?, val z: Double?, val name: String?)
 

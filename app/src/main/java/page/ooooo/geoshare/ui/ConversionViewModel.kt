@@ -205,7 +205,7 @@ class ConversionViewModel @Inject constructor(
     // Lifecycle
 
     fun onCreateOrNewIntent(intent: Intent) {
-        source = AndroidTools.getIntentUriString(intent) ?: ""
+        source = AndroidTools.getIntentUriString(intent).orEmpty()
         start()
     }
 

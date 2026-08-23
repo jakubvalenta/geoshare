@@ -22,33 +22,31 @@ class YandexMapsUriInput @Inject constructor(
     private val yandexMapsHtmlInput: dagger.Lazy<YandexMapsHtmlInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
-    override val pattern = Regex("""((?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/$URI_REST)""")
-    override val documentation = InputDocumentation(
-        group = InputDocumentationGroup.YANDEX_MAPS,
-        items = listOf(
-            InputDocumentationItem.Url(20, "https://ya.ru/maps"),
-            InputDocumentationItem.Url(22, "https://yandex.az/maps"),
-            InputDocumentationItem.Url(22, "https://yandex.by/maps"),
-            InputDocumentationItem.Url(22, "https://yandex.co.il/maps"),
-            InputDocumentationItem.Url(20, "https://yandex.com/maps"),
-            InputDocumentationItem.Url(22, "https://yandex.com.am/maps"),
-            InputDocumentationItem.Url(22, "https://yandex.com.ge/maps"),
-            InputDocumentationItem.Url(22, "https://yandex.com.tr/maps"),
-            InputDocumentationItem.Url(22, "https://yandex.ee/maps"),
-            InputDocumentationItem.Url(22, "https://yandex.eu/maps"),
-            InputDocumentationItem.Url(22, "https://yandex.fr/maps"),
-            InputDocumentationItem.Url(22, "https://yandex.kg/maps"),
-            InputDocumentationItem.Url(22, "https://yandex.kz/maps"),
-            InputDocumentationItem.Url(22, "https://yandex.lt/maps"),
-            InputDocumentationItem.Url(22, "https://yandex.lv/maps"),
-            InputDocumentationItem.Url(22, "https://yandex.md/maps"),
-            InputDocumentationItem.Url(22, "https://yandex.ru/maps"),
-            InputDocumentationItem.Url(22, "https://yandex.tj/maps"),
-            InputDocumentationItem.Url(22, "https://yandex.tm/maps"),
-            InputDocumentationItem.Url(22, "https://yandex.ua/maps"),
-            InputDocumentationItem.Url(22, "https://yandex.uz/maps"),
-        ),
+    override val group = InputGroup.YANDEX_MAPS
+    override val changelog = persistentListOf(
+        InputChangelogItem.Url(20, "https://ya.ru/maps"),
+        InputChangelogItem.Url(22, "https://yandex.az/maps"),
+        InputChangelogItem.Url(22, "https://yandex.by/maps"),
+        InputChangelogItem.Url(22, "https://yandex.co.il/maps"),
+        InputChangelogItem.Url(20, "https://yandex.com/maps"),
+        InputChangelogItem.Url(22, "https://yandex.com.am/maps"),
+        InputChangelogItem.Url(22, "https://yandex.com.ge/maps"),
+        InputChangelogItem.Url(22, "https://yandex.com.tr/maps"),
+        InputChangelogItem.Url(22, "https://yandex.ee/maps"),
+        InputChangelogItem.Url(22, "https://yandex.eu/maps"),
+        InputChangelogItem.Url(22, "https://yandex.fr/maps"),
+        InputChangelogItem.Url(22, "https://yandex.kg/maps"),
+        InputChangelogItem.Url(22, "https://yandex.kz/maps"),
+        InputChangelogItem.Url(22, "https://yandex.lt/maps"),
+        InputChangelogItem.Url(22, "https://yandex.lv/maps"),
+        InputChangelogItem.Url(22, "https://yandex.md/maps"),
+        InputChangelogItem.Url(22, "https://yandex.ru/maps"),
+        InputChangelogItem.Url(22, "https://yandex.tj/maps"),
+        InputChangelogItem.Url(22, "https://yandex.tm/maps"),
+        InputChangelogItem.Url(22, "https://yandex.ua/maps"),
+        InputChangelogItem.Url(22, "https://yandex.uz/maps"),
     )
+    override val pattern = Regex("""((?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/$URI_REST)""")
 
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         data.run {

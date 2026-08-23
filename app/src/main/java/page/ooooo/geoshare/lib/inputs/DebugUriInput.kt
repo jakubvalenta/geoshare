@@ -17,10 +17,6 @@ class DebugUriInput @Inject constructor(
     override val uriQuote: UriQuote,
 ) : UriInput {
     override val pattern = Regex("""((?:https?://)?(?:www\.)?example\.com(?:/\S+|$))""")
-    override val documentation = InputDocumentation(
-        group = InputDocumentationGroup.DEBUG,
-        items = emptyList(),
-    )
 
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         next = MatchedInput(debugWebViewInput.get(), match)

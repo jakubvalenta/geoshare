@@ -26,22 +26,19 @@ import javax.inject.Singleton
  */
 @Singleton
 class PlusCodeInput @Inject constructor() : TextInput, Input.HasRandomUri {
+    override val group = InputGroup.PLUS_CODE
+    override val changelog = persistentListOf(
+        InputChangelogItem.Url(39, "https://plus.codes"),
+        InputChangelogItem.Text(39) {
+            stringResource(
+                R.string.example,
+                PlusCodeFormatter.formatPlusCode(WGS84Point(NaivePoint.example)).orEmpty()
+            )
+        },
+    )
     override val pattern = Regex(
         """(?:^|\s|https://www\.google\.com/maps/place/|https://plus\.codes/)($GLOBAL_CODE)(?:\s|/|$)""",
         RegexOption.IGNORE_CASE,
-    )
-
-    override val documentation = InputDocumentation(
-        group = InputDocumentationGroup.PLUS_CODE,
-        items = listOf(
-            InputDocumentationItem.Url(39, "https://plus.codes"),
-            InputDocumentationItem.Text(39) {
-                stringResource(
-                    R.string.example,
-                    PlusCodeFormatter.formatPlusCode(WGS84Point(NaivePoint.example)) ?: ""
-                )
-            },
-        ),
     )
 
     override suspend fun parse(

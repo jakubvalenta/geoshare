@@ -31,7 +31,6 @@ class GoogleMapsPlaceApiInput @Inject constructor(
     private val serverRepository: ServerRepository,
     private val uriQuote: UriQuote,
 ) : BasicInput<Uri>, Input.HasPermission {
-
     @StringRes
     override val permissionTitleResId = R.string.converter_google_maps_permission_title
 

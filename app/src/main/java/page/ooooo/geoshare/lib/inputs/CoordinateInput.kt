@@ -17,17 +17,16 @@ import javax.inject.Singleton
 
 @Singleton
 class CoordinateInput @Inject constructor() : TextInput, Input.HasRandomUri {
-    override val pattern = Regex("""([\d.\-\p{Zs},°'′"″NSWE]*\d[\d.\-\p{Zs},°'′"″NSWE]*)""")
-    override val documentation = InputDocumentation(
-        group = InputDocumentationGroup.COORDINATES,
-        items = listOf(
-            InputDocumentationItem.Text(20) {
-                stringResource(
-                    R.string.example, CoordinateFormatter.formatDegMinSecCoords(WGS84Point(NaivePoint.example))
-                )
-            },
-        ),
+    override val group = InputGroup.COORDINATES
+    override val changelog = persistentListOf(
+        InputChangelogItem.Text(20) {
+            stringResource(
+                R.string.example,
+                CoordinateFormatter.formatDegMinSecCoords(WGS84Point(NaivePoint.example))
+            )
+        },
     )
+    override val pattern = Regex("""([\d.\-\p{Zs},°'′"″NSWE]*\d[\d.\-\p{Zs},°'′"″NSWE]*)""")
 
     override suspend fun parse(data: String, match: String, resources: Resources) = parseResult {
         // Decimal

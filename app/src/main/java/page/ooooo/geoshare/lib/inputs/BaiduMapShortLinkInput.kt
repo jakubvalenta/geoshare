@@ -3,6 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import android.content.res.Resources
 import androidx.annotation.StringRes
 import io.ktor.client.engine.HttpClientEngine
+import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
@@ -17,11 +18,9 @@ class BaiduMapShortLinkInput @Inject constructor(
     override val log: Log,
     override val uriQuote: UriQuote,
 ) : HeadLocationHeaderInput {
-    override val documentation = InputDocumentation(
-        group = InputDocumentationGroup.BAIDU_MAP,
-        items = listOf(
-            InputDocumentationItem.Url(35, "https://j.map.baidu.com"),
-        ),
+    override val group = InputGroup.BAIDU_MAP
+    override val changelog = persistentListOf(
+        InputChangelogItem.Url(35, "https://j.map.baidu.com"),
     )
     override val pattern = Regex("""((?:https?://)?j\.map\.baidu\.com/\S+)""")
 

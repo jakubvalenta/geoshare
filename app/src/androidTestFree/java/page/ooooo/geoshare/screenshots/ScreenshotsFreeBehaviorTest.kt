@@ -26,7 +26,7 @@ import page.ooooo.geoshare.data.local.preferences.ShareDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareRouteGpxAutomation
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.Srs
-import page.ooooo.geoshare.lib.inputs.InputDocumentationGroup
+import page.ooooo.geoshare.lib.inputs.InputGroupId
 import page.ooooo.geoshare.tests.assumeDomainResolvable
 import page.ooooo.geoshare.tests.chooseFile
 import page.ooooo.geoshare.tests.confirmDialog
@@ -619,23 +619,23 @@ class ScreenshotsFreeBehaviorTest {
 
         // Supported maps - All - Page 1
         onElement { viewIdResourceName == "geoShareInputListPane" }
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareInputsDocumentationAll_${InputDocumentationGroup.OSM_AND}" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareInputListAll_${InputGroupId.OSM_AND}" }
         saveScreenshot("main_strings/supported_maps_all_page_1")
 
         // Supported maps - All - Page 2
         onElement { viewIdResourceName == "geoShareInputListPane" }
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareInputsDocumentationAll_${InputDocumentationGroup.GEO_URI}" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareInputListAll_${InputGroupId.GEO_URI}" }
         saveScreenshot("main_strings/supported_maps_all_page_2")
 
         // Supported maps - Detail - Coordinates
-        onElement { viewIdResourceName == "geoShareInputsDocumentationAll_${InputDocumentationGroup.COORDINATES}" }.click()
+        onElement { viewIdResourceName == "geoShareInputListAll_${InputGroupId.COORDINATES}" }.click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/supported_maps_detail_coordinates")
         goBackToElement { viewIdResourceName == "geoShareInputListPane" }
 
         // Supported maps - Detail
         onElement { viewIdResourceName == "geoShareInputListPane" }
-            .scrollToElement(Direction.UP) { viewIdResourceName == "geoShareInputsDocumentationAll_${InputDocumentationGroup.APPLE_MAPS}" }
+            .scrollToElement(Direction.UP) { viewIdResourceName == "geoShareInputListAll_${InputGroupId.APPLE_MAPS}" }
             .click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/supported_maps_detail")

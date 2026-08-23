@@ -26,36 +26,34 @@ class UrbiUriInput @Inject constructor(
     private val urbiHtmlInput: dagger.Lazy<UrbiHtmlInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
+    override val group = InputGroup.URBI
+    override val changelog = persistentListOf(
+        InputChangelogItem.Url(27, "https://2gis.ae/"),
+        InputChangelogItem.Url(27, "https://2gis.am/"),
+        InputChangelogItem.Url(27, "https://2gis.az/"),
+        InputChangelogItem.Url(27, "https://2gis.cl/"),
+        InputChangelogItem.Url(27, "https://2gis.com.cy/"),
+        InputChangelogItem.Url(27, "https://2gis.com/"),
+        InputChangelogItem.Url(27, "https://2gis.cz/"),
+        InputChangelogItem.Url(27, "https://2gis.it/"),
+        InputChangelogItem.Url(27, "https://2gis.kg/"),
+        InputChangelogItem.Url(27, "https://2gis.kz/"),
+        InputChangelogItem.Url(27, "https://2gis.ru/"),
+        InputChangelogItem.Url(27, "https://2gis.uz/"),
+        InputChangelogItem.Url(27, "https://go.2gis.com/"),
+        InputChangelogItem.Url(27, "https://go.urbi.ae/"),
+        InputChangelogItem.Url(27, "https://maps.urbi.ae/"),
+        InputChangelogItem.Url(27, "https://urbi-bh.com/"),
+        InputChangelogItem.Url(27, "https://urbi-eg.com/"),
+        InputChangelogItem.Url(27, "https://urbi-kw.com/"),
+        InputChangelogItem.Url(27, "https://urbi-om.com/"),
+        InputChangelogItem.Url(27, "https://urbi-qa.com/"),
+        InputChangelogItem.Url(27, "https://urbi-sa.com/"),
+        InputChangelogItem.Url(27, "https://urbi.bh/"),
+        InputChangelogItem.Url(27, "https://urbi.qa/"),
+    )
     override val pattern =
         Regex("""((?:https?://)?(?:www\.)?(?:(?:go|maps)\.)?(?:2gis|urbi|urbi-[a-z]{2})(?:\.[a-z]{2,3})?\.[a-z]{2,3}/$URI_REST)""")
-    override val documentation = InputDocumentation(
-        group = InputDocumentationGroup.URBI,
-        items = listOf(
-            InputDocumentationItem.Url(27, "https://2gis.ae/"),
-            InputDocumentationItem.Url(27, "https://2gis.am/"),
-            InputDocumentationItem.Url(27, "https://2gis.az/"),
-            InputDocumentationItem.Url(27, "https://2gis.cl/"),
-            InputDocumentationItem.Url(27, "https://2gis.com.cy/"),
-            InputDocumentationItem.Url(27, "https://2gis.com/"),
-            InputDocumentationItem.Url(27, "https://2gis.cz/"),
-            InputDocumentationItem.Url(27, "https://2gis.it/"),
-            InputDocumentationItem.Url(27, "https://2gis.kg/"),
-            InputDocumentationItem.Url(27, "https://2gis.kz/"),
-            InputDocumentationItem.Url(27, "https://2gis.ru/"),
-            InputDocumentationItem.Url(27, "https://2gis.uz/"),
-            InputDocumentationItem.Url(27, "https://go.2gis.com/"),
-            InputDocumentationItem.Url(27, "https://go.urbi.ae/"),
-            InputDocumentationItem.Url(27, "https://maps.urbi.ae/"),
-            InputDocumentationItem.Url(27, "https://urbi-bh.com/"),
-            InputDocumentationItem.Url(27, "https://urbi-eg.com/"),
-            InputDocumentationItem.Url(27, "https://urbi-kw.com/"),
-            InputDocumentationItem.Url(27, "https://urbi-om.com/"),
-            InputDocumentationItem.Url(27, "https://urbi-qa.com/"),
-            InputDocumentationItem.Url(27, "https://urbi-sa.com/"),
-            InputDocumentationItem.Url(27, "https://urbi.bh/"),
-            InputDocumentationItem.Url(27, "https://urbi.qa/"),
-        ),
-    )
 
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         data.run {

@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
+import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.formatters.UriFormatter
@@ -28,16 +29,14 @@ class GoogleMapsUriInput @Inject constructor(
     private val googleMapsPlaceListInput: dagger.Lazy<GoogleMapsPlaceListInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
+    override val group = InputGroup.GOOGLE_MAPS
+    override val changelog = persistentListOf(
+        InputChangelogItem.Url(5, "https://maps.google.com"),
+        InputChangelogItem.Url(5, "https://google.com/maps"),
+        InputChangelogItem.Url(5, "https://www.google.com/maps"),
+    )
     override val pattern =
         Regex("""((?:https?://)?(?:(?:www|maps)\.)?google(?:\.[a-z]{2,3})?\.[a-z]{2,3}[/?#]$URI_REST)""")
-    override val documentation = InputDocumentation(
-        group = InputDocumentationGroup.GOOGLE_MAPS,
-        items = listOf(
-            InputDocumentationItem.Url(5, "https://maps.google.com"),
-            InputDocumentationItem.Url(5, "https://google.com/maps"),
-            InputDocumentationItem.Url(5, "https://www.google.com/maps"),
-        ),
-    )
 
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         val googleMapsParseResult = GoogleMapsUriParser.parse(data)
