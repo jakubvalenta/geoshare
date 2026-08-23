@@ -1,15 +1,18 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class WazeUriInputTest : InputTest {
+    override val resources: Resources = mock()
     private val input = FakeInputRepository.wazeUriInput
 
     @Test
@@ -110,22 +113,22 @@ class WazeUriInputTest : InputTest {
 
     @Test
     fun parse_unknownPathOrParams() = runTest {
-        assertEquals(ParseResult(), input.parse("https://waze.com"))
-        assertEquals(ParseResult(), input.parse("https://waze.com/"))
-        assertEquals(ParseResult(), input.parse("https://waze.com/ul"))
-        assertEquals(ParseResult(), input.parse("https://waze.com/ul/?spam=1"))
-        assertEquals(ParseResult(), input.parse("https://waze.com/live-map"))
-        assertEquals(ParseResult(), input.parse("https://waze.com/live-map/?spam=1"))
+        assertEquals(ParseResult.Success(), input.parse("https://waze.com"))
+        assertEquals(ParseResult.Success(), input.parse("https://waze.com/"))
+        assertEquals(ParseResult.Success(), input.parse("https://waze.com/ul"))
+        assertEquals(ParseResult.Success(), input.parse("https://waze.com/ul/?spam=1"))
+        assertEquals(ParseResult.Success(), input.parse("https://waze.com/live-map"))
+        assertEquals(ParseResult.Success(), input.parse("https://waze.com/live-map/?spam=1"))
     }
 
     @Test
     fun parse_coordinates() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(45.6906304, -120.810983, z = 10.0, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(45.6906304, -120.810983, z = 10.0, source = Source.URI))),
             input.parse("https://waze.com/ul?ll=45.6906304,-120.810983&z=10"),
         )
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(45.69063040, -120.81098300, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(45.69063040, -120.81098300, source = Source.URI))),
             input.parse("https://ul.waze.com/ul?ll=45.69063040%2C-120.81098300&navigate=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location"),
         )
     }
@@ -133,11 +136,11 @@ class WazeUriInputTest : InputTest {
     @Test
     fun parse_directionsCoordinates() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(45.6906304, -120.810983, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(45.6906304, -120.810983, source = Source.URI))),
             input.parse("https://www.waze.com/live-map/directions?to=ll.45.6906304,-120.810983"),
         )
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(45.829189, 1.259372, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(45.829189, 1.259372, source = Source.URI))),
             input.parse("https://www.waze.com/live-map/directions?latlng=45.829189%2C1.259372"),
         )
     }
@@ -145,7 +148,7 @@ class WazeUriInputTest : InputTest {
     @Test
     fun parse_directionsPlace() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     FakeInputRepository.wazeHtmlInput,
                     "https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020"
@@ -154,7 +157,7 @@ class WazeUriInputTest : InputTest {
             input.parse("https://www.waze.com/live-map/directions?place=w.2884104.28644432.6709020"),
         )
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     FakeInputRepository.wazeHtmlInput,
                     "https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020"
@@ -163,7 +166,7 @@ class WazeUriInputTest : InputTest {
             input.parse("https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020"),
         )
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     FakeInputRepository.wazeHtmlInput,
                     "https://www.waze.com/live-map/directions/cn-tower-front-st-w-301-toronto?to=place.w.2884104.28644432.6709020"
@@ -172,7 +175,7 @@ class WazeUriInputTest : InputTest {
             input.parse("https://www.waze.com/live-map/directions/cn-tower-front-st-w-301-toronto?to=place.w.2884104.28644432.6709020"),
         )
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     FakeInputRepository.wazeHtmlInput,
                     "https://www.waze.com/live-map/directions/potsdam-bb-de?to=place.ChIJt9Y6hM31qEcRm-yqC5j4ZcU&from=place.ChIJAVkDPzdOqEcRcDteW0YgIQQ"
@@ -185,7 +188,7 @@ class WazeUriInputTest : InputTest {
     @Test
     fun parse_place() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     FakeInputRepository.wazeHtmlInput,
                     "https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020"
@@ -194,7 +197,7 @@ class WazeUriInputTest : InputTest {
             input.parse("https://ul.waze.com/ul?venue_id=2884104.28644432.6709020&overview=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location"),
         )
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     FakeInputRepository.wazeHtmlInput,
                     "https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020"
@@ -207,7 +210,7 @@ class WazeUriInputTest : InputTest {
     @Test
     fun parse_search() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(name = "66 Acacia Avenue", source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(name = "66 Acacia Avenue", source = Source.URI))),
             input.parse("https://waze.com/ul?q=66%20Acacia%20Avenue"),
         )
     }
@@ -215,15 +218,15 @@ class WazeUriInputTest : InputTest {
     @Test
     fun parse_shortLink() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(45.829189, 1.259372, z = 16.0, source = Source.HASH))),
+            ParseResult.Success(persistentListOf(WGS84Point(45.829189, 1.259372, z = 16.0, source = Source.HASH))),
             input.parse("https://waze.com/ul/hu00uswvn3"),
         )
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(45.829189, 1.259372, z = 16.0, source = Source.HASH))),
+            ParseResult.Success(persistentListOf(WGS84Point(45.829189, 1.259372, z = 16.0, source = Source.HASH))),
             input.parse("https://www.waze.com/ul/hu00uswvn3"),
         )
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(45.829189, 1.259372, z = 16.0, source = Source.HASH))),
+            ParseResult.Success(persistentListOf(WGS84Point(45.829189, 1.259372, z = 16.0, source = Source.HASH))),
             input.parse("https://www.waze.com/live-map?h=u00uswvn3"),
         )
     }
@@ -231,7 +234,7 @@ class WazeUriInputTest : InputTest {
     @Test
     fun parse_shortLinkNegative() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(19.402564, -99.165666, z = 16.0, source = Source.HASH))),
+            ParseResult.Success(persistentListOf(WGS84Point(19.402564, -99.165666, z = 16.0, source = Source.HASH))),
             input.parse("https://waze.com/ul/h9g3qrkju0"),
         )
     }

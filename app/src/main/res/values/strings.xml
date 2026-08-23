@@ -54,6 +54,7 @@
     <string name="donation_description">Does this app save you time?</string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="nav_back_content_description">Back to main screen</string>
+    <string name="input_google_search_error_not_supported">Google Search links are not supported</string>
     <string name="intro_title">Intro</string>
     <string name="intro_how_to_share_headline">How to show a map location in another map app</string>
     <string name="intro_how_to_share_google_maps_caption">Share a location from your map app or web browser.</string>

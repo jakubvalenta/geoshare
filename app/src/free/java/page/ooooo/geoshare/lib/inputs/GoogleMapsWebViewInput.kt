@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import android.webkit.WebSettings
 import androidx.annotation.StringRes
 import page.ooooo.geoshare.R
@@ -37,7 +38,7 @@ class GoogleMapsWebViewInput @Inject constructor(
             : undefined;
     """.trimIndent()
 
-    override suspend fun parse(data: String, match: String) = parseResult {
+    override suspend fun parse(data: String, match: String, resources: Resources) = parseResult {
         next = MatchedInput(googleMapsUriInput.get(), data)
     }
 

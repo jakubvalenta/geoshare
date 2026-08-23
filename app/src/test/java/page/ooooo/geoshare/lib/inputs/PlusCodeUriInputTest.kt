@@ -1,15 +1,18 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assume.assumeTrue
 import org.junit.Test
+import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 
 class PlusCodeUriInputTest : InputTest {
+    override val resources: Resources = mock()
     private val input = FakeInputRepository.plusCodeInput
 
     @Test
@@ -140,13 +143,13 @@ class PlusCodeUriInputTest : InputTest {
 
     @Test
     fun parse_unknown() = runTest {
-        assertEquals(ParseResult(), input.parse("spam"))
+        assertEquals(ParseResult.Success(), input.parse("spam"))
     }
 
     @Test
     fun parse_globalCode() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(-1.289938, 36.820313, source = Source.HASH)
                 )
@@ -154,7 +157,15 @@ class PlusCodeUriInputTest : InputTest {
             input.parse(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "6GCRPR6C+24"),
         )
         assertEquals(
-            ParseResult(persistentListOf(GCJ02MainlandChinaPoint(14.917313, -23.5113130, source = Source.HASH))),
+            ParseResult.Success(
+                persistentListOf(
+                    GCJ02MainlandChinaPoint(
+                        14.917313,
+                        -23.5113130,
+                        source = Source.HASH
+                    )
+                )
+            ),
             input.parse("796RWF8Q+WF"),
         )
     }
@@ -162,7 +173,7 @@ class PlusCodeUriInputTest : InputTest {
     @Test
     fun parse_globalCodeUriEncoded() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(42.578438, 1.895563, source = Source.HASH)
                 )
@@ -174,7 +185,7 @@ class PlusCodeUriInputTest : InputTest {
     @Test
     fun parse_globalCodeWithinMainlandChina() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(39.917312, 116.397078, source = Source.HASH)
                 )
@@ -186,7 +197,7 @@ class PlusCodeUriInputTest : InputTest {
     @Test
     fun parse_globalCodeWithinWesternJapan() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(34.594538, 133.758328, source = Source.HASH)
                 )
@@ -197,17 +208,17 @@ class PlusCodeUriInputTest : InputTest {
 
     @Test
     fun parse_localCodeWithoutLocality_returnsNoPoints() = runTest {
-        assertEquals(ParseResult(), input.parse("8F+GG"))
-        assertEquals(ParseResult(), input.parse("6C8F+GG"))
-        assertEquals(ParseResult(), input.parse("WF8Q+WF"))
-        assertEquals(ParseResult(), input.parse("28WR+CW"))
+        assertEquals(ParseResult.Success(), input.parse("8F+GG"))
+        assertEquals(ParseResult.Success(), input.parse("6C8F+GG"))
+        assertEquals(ParseResult.Success(), input.parse("WF8Q+WF"))
+        assertEquals(ParseResult.Success(), input.parse("28WR+CW"))
     }
 
     @Test
     fun parse_localCodeWithLocality() = runTest {
         assumeTrue("Local Plus Codes are not implemented yet", false)
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(0.0, 0.0, source = Source.HASH)
                 )
@@ -215,7 +226,7 @@ class PlusCodeUriInputTest : InputTest {
             input.parse(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "WF8Q+WF Praia, Cabo Verde"),
         )
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(0.0, 0.0, source = Source.HASH)
                 )

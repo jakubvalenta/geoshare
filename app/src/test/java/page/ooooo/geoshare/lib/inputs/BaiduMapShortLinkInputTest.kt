@@ -1,11 +1,14 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
 
 class BaiduMapShortLinkInputTest : InputTest {
+    override val resources: Resources = mock()
     private val input = FakeInputRepository.baiduMapShortLinkInput
 
     @Test
@@ -27,7 +30,7 @@ class BaiduMapShortLinkInputTest : InputTest {
     @Test
     fun parse_returnsNextStep() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     FakeInputRepository.baiduMapUriInput,
                     "https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13392211,3619117,17z"

@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.formatters.UriFormatter
@@ -34,7 +35,7 @@ class GoogleMapsUriInput @Inject constructor(
         ),
     )
 
-    override suspend fun parse(data: Uri, match: String) = parseResult {
+    override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         val googleMapsParseResult = GoogleMapsUriParser.parse(data)
         points = googleMapsParseResult.points
         next = if (googleMapsParseResult.isPlaceList) {

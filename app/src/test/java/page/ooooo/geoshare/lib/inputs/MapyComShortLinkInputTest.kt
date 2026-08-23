@@ -1,12 +1,15 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
 
 class MapyComShortLinkInputTest : InputTest {
+    override val resources: Resources = mock()
     private val input = FakeInputRepository.mapyComShortLinkInput
 
     @Test
@@ -31,7 +34,7 @@ class MapyComShortLinkInputTest : InputTest {
     @Test
     fun parse_returnsNextStep() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     FakeInputRepository.mapyComUriInput,
                     "https://mapy.com/en/turisticka?source=base&id=1723771&x=14.4549515&y=50.0831498&z=17"

@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
@@ -46,6 +47,7 @@ class PlusCodeInput @Inject constructor() : TextInput, Input.HasRandomUri {
     override suspend fun parse(
         data: String,
         match: String,
+        resources: Resources,
     ) = parseResult {
         // URL-decode code string if it was extracted from a URL
         val codeString = data.replace("%2B", "+")

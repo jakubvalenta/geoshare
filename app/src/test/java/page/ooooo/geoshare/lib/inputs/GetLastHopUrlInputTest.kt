@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respondError
@@ -47,6 +48,7 @@ class GetLastHopUrlInputTest {
         override suspend fun parse(
             data: Uri,
             match: String,
+            resources: Resources,
         ) = throw NotImplementedError()
     }
     private val nextInput = FakeInputRepository.osmAndUriInput
@@ -55,7 +57,7 @@ class GetLastHopUrlInputTest {
     fun whenMatchIsInvalidURL_throwsMalformedURLException() = runTest {
         val match = "https://[invalid:ipv6]/"
         input.fetch(match) {
-            ParseResult()
+            ParseResult.Success()
         }
     }
 
@@ -63,9 +65,9 @@ class GetLastHopUrlInputTest {
     fun whenMatchHasScheme_makesGetRequestWithFollowRedirectTrueAndReturnsRequestUrl() = runTest {
         val match = "https://maps.google.com/hop-one"
         assertEquals(
-            ParseResult(next = MatchedInput(nextInput, "https://maps.google.com/redirected")),
+            ParseResult.Success(next = MatchedInput(nextInput, "https://maps.google.com/redirected")),
             input.fetch(match) { data ->
-                ParseResult(
+                ParseResult.Success(
                     next = MatchedInput(
                         nextInput,
                         data.toString()
@@ -82,9 +84,9 @@ class GetLastHopUrlInputTest {
     fun whenMatchHasNoScheme_makesGetRequestToUrlWithHttpsSchemeAndReturnsRequestUrl() = runTest {
         val match = "maps.google.com/hop-one"
         assertEquals(
-            ParseResult(next = MatchedInput(nextInput, "https://maps.google.com/redirected")),
+            ParseResult.Success(next = MatchedInput(nextInput, "https://maps.google.com/redirected")),
             input.fetch(match) { data ->
-                ParseResult(
+                ParseResult.Success(
                     next = MatchedInput(
                         nextInput,
                         data.toString()
@@ -98,9 +100,9 @@ class GetLastHopUrlInputTest {
     fun whenHttpClientRespondsRequestUrlAsRelativeUrl_returnsItAsAbsoluteUrl() = runTest {
         val match = "https://maps.google.com/hop-one"
         assertEquals(
-            ParseResult(next = MatchedInput(nextInput, "https://maps.google.com/redirected")),
+            ParseResult.Success(next = MatchedInput(nextInput, "https://maps.google.com/redirected")),
             input.fetch(match) { data ->
-                ParseResult(
+                ParseResult.Success(
                     next = MatchedInput(
                         nextInput,
                         data.toString()
@@ -114,7 +116,7 @@ class GetLastHopUrlInputTest {
     fun whenHttpClientRespondsError_throwsNetworkException() = runTest {
         val match = "https://maps.google.com/not-found"
         input.fetch(match) {
-            ParseResult()
+            ParseResult.Success()
         }
     }
 }

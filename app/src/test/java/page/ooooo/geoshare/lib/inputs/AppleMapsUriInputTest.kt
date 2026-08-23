@@ -1,10 +1,12 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
@@ -13,6 +15,7 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
  * See https://developer.apple.com/library/archive/featuredarticles/iPhoneURLScheme_Reference/MapLinks/MapLinks.html
  */
 class AppleMapsUriInputTest : InputTest {
+    override val resources: Resources = mock()
     private val input = FakeInputRepository.appleMapsUriInput
 
     @Test
@@ -70,15 +73,15 @@ class AppleMapsUriInputTest : InputTest {
 
     @Test
     fun parse_unknownPathOrParams() = runTest {
-        assertEquals(ParseResult(), input.parse("https://maps.apple.com"))
-        assertEquals(ParseResult(), input.parse("https://maps.apple.com/"))
-        assertEquals(ParseResult(), input.parse("https://maps.apple.com/?spam=1"))
+        assertEquals(ParseResult.Success(), input.parse("https://maps.apple.com"))
+        assertEquals(ParseResult.Success(), input.parse("https://maps.apple.com/"))
+        assertEquals(ParseResult.Success(), input.parse("https://maps.apple.com/?spam=1"))
     }
 
     @Test
     fun parse_coordinates() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(50.894967, 4.341626, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(50.894967, 4.341626, source = Source.URI))),
             input.parse("https://maps.apple.com/?ll=50.894967,4.341626"),
         )
     }
@@ -87,7 +90,7 @@ class AppleMapsUriInputTest : InputTest {
     fun parse_place() = runTest {
         assertEquals(
             @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         52.4890246, 13.4295963,
@@ -103,7 +106,7 @@ class AppleMapsUriInputTest : InputTest {
     @Test
     fun parse_directionsCoordinates() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(50.894967, 4.341626, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(50.894967, 4.341626, source = Source.URI))),
             input.parse("https://maps.apple.com/?daddr=50.894967,4.341626"),
         )
     }
@@ -112,7 +115,7 @@ class AppleMapsUriInputTest : InputTest {
     fun parse_directionsQuery() = runTest {
         assertEquals(
             @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         name = "Reuterplatz 3, 12047 Berlin, Germany",
@@ -127,7 +130,7 @@ class AppleMapsUriInputTest : InputTest {
     @Test
     fun parse_view() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         52.49115540927951, 13.42595574770533,
@@ -142,7 +145,7 @@ class AppleMapsUriInputTest : InputTest {
     @Test
     fun parse_searchQuery() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(name = "Central Park", source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(name = "Central Park", source = Source.URI))),
             input.parse("https://maps.apple.com/?q=Central+Park"),
         )
     }
@@ -150,7 +153,7 @@ class AppleMapsUriInputTest : InputTest {
     @Test
     fun parse_searchLocation() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(50.894967, 4.341626, source = Source.MAP_CENTER))),
+            ParseResult.Success(persistentListOf(WGS84Point(50.894967, 4.341626, source = Source.MAP_CENTER))),
             input.parse("https://maps.apple.com/?sll=50.894967,4.341626"),
         )
     }
@@ -158,7 +161,7 @@ class AppleMapsUriInputTest : InputTest {
     @Test
     fun parse_searchLocationAndQueryAndZoom_returnsPointAndQueryAndZoom() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         50.894967, 4.341626,
@@ -175,7 +178,7 @@ class AppleMapsUriInputTest : InputTest {
     @Test
     fun parse_searchLocationAndQueryAndInvalidZoom_returnsPointAndQuery() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         50.894967, 4.341626,
@@ -191,15 +194,15 @@ class AppleMapsUriInputTest : InputTest {
     @Test
     fun parse_parameterLLTakesPrecedenceOverCenterAndSllAndCoordinate() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(-17.2165721, -149.9470294, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(-17.2165721, -149.9470294, source = Source.URI))),
             input.parse("https://maps.apple.com/?ll=-17.2165721,-149.9470294&center=52.49115540927951,13.42595574770533"),
         )
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(-17.2165721, -149.9470294, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(-17.2165721, -149.9470294, source = Source.URI))),
             input.parse("https://maps.apple.com/?ll=-17.2165721,-149.9470294&sll=52.49115540927951,13.42595574770533&"),
         )
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(-17.2165721, -149.9470294, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(-17.2165721, -149.9470294, source = Source.URI))),
             input.parse("https://maps.apple.com/?ll=-17.2165721,-149.9470294&&coordinate=52.49115540927951,13.42595574770533"),
         )
     }
@@ -208,15 +211,15 @@ class AppleMapsUriInputTest : InputTest {
     @Test
     fun parse_parameterNameTakesPrecedenceOverQAndAddressAndDaddr() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(name = "Reuterplatz", source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(name = "Reuterplatz", source = Source.URI))),
             input.parse("https://maps.apple.com/?name=Reuterplatz&q=Reuterplatz+3,+12047+Berlin,+Germany"),
         )
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(name = "Reuterplatz", source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(name = "Reuterplatz", source = Source.URI))),
             input.parse("https://maps.apple.com/?name=Reuterplatz&address=Reuterplatz+3,+12047+Berlin,+Germany"),
         )
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(name = "Reuterplatz", source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(name = "Reuterplatz", source = Source.URI))),
             input.parse("https://maps.apple.com/?name=Reuterplatz&daddr=Reuterplatz+3,+12047+Berlin,+Germany"),
         )
     }
@@ -225,7 +228,7 @@ class AppleMapsUriInputTest : InputTest {
     @Test
     fun parse_parameterAddressTakesPrecedenceOverQAndDaddr() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         name = "Reuterplatz 3, 12047 Berlin, Germany",
@@ -236,7 +239,7 @@ class AppleMapsUriInputTest : InputTest {
             input.parse("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&q=Reuterplatz"),
         )
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         name = "Reuterplatz 3, 12047 Berlin, Germany",
@@ -252,7 +255,7 @@ class AppleMapsUriInputTest : InputTest {
     @Test
     fun parse_parameterDaddrTakesPrecedenceOverQ() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         name = "Reuterplatz 3, 12047 Berlin, Germany",
@@ -268,7 +271,7 @@ class AppleMapsUriInputTest : InputTest {
     @Test
     fun parse_auidOnly() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(),
                 next = MatchedInput(
                     FakeInputRepository.appleMapsHtmlInput,
@@ -282,7 +285,7 @@ class AppleMapsUriInputTest : InputTest {
     @Test
     fun parse_placeIdOnly() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(),
                 next = MatchedInput(
                     FakeInputRepository.appleMapsHtmlInput,
@@ -296,7 +299,7 @@ class AppleMapsUriInputTest : InputTest {
     @Test
     fun parse_placeIdAndQuery() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(WGS84Point(name = "Central Park", source = Source.URI)),
                 next = MatchedInput(
                     FakeInputRepository.appleMapsHtmlInput,
@@ -310,7 +313,7 @@ class AppleMapsUriInputTest : InputTest {
     @Test
     fun parse_shortLink() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     FakeInputRepository.appleMapsHtmlInput,
                     "https://maps.apple/p/7E-Brjrk_THN14"

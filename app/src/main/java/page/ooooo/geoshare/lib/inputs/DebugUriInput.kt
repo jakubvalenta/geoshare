@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import javax.inject.Inject
@@ -21,7 +22,7 @@ class DebugUriInput @Inject constructor(
         items = emptyList(),
     )
 
-    override suspend fun parse(data: Uri, match: String) = parseResult {
+    override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         next = MatchedInput(debugWebViewInput.get(), match)
     }
 

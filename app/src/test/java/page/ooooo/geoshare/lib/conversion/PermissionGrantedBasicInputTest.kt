@@ -42,7 +42,7 @@ class PermissionGrantedBasicInputTest {
         override suspend fun fetch(match: String, block: suspend (String) -> ParseResult) =
             block("$match-data")
 
-        override suspend fun parse(data: String, match: String) =
+        override suspend fun parse(data: String, match: String, resources: Resources) =
             result.copy(next = next.copy(match = data)) // Store data in MatchedInput, so we can test it
 
         override val permissionTitleResId = R.string.converter_google_maps_permission_title
@@ -51,14 +51,15 @@ class PermissionGrantedBasicInputTest {
     private val matchedInput = MatchedInput<BasicInput<String>>(input, source)
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val next = MatchedInput(FakeInputRepository.debugUriInput, source)
-    private val result = ParseResult(points, next)
+    private val result = ParseResult.Success(points, next)
     private val oldPoints = persistentListOf(WGS84Point(3.0, 4.0, source = Source.GENERATED))
-    private val oldResult = ParseResult(oldPoints)
+    private val oldResult = ParseResult.Success(oldPoints)
     private val results: Results = mapOf(MatchedInput(FakeInputRepository.debugUriInput, source) to oldResult)
     private val permission = Permission.ALWAYS
     private val lastCause = ConnectionClosedNetworkException(EOFException())
     private val maxAttempts = 3
     private val resources: Resources = mock {
+        on { getString(R.string.conversion_failed_unsupported_source_place_list) } doReturn "Place lists are not supported"
         on { getString(R.string.converter_google_maps_loading_indicator_title) } doReturn "Connecting to Google..."
         on { getString(R.string.conversion_failed_cancelled) } doReturn "Cancelled"
         on { getString(R.string.conversion_failed_reason_invalid_url) } doReturn "Invalid URL"
@@ -79,7 +80,7 @@ class PermissionGrantedBasicInputTest {
     }
 
     @Test
-    fun transition_whenInputFetchSucceeds_returnsDataParsed() = runTest {
+    fun transition_whenInputFetchSucceedsAndParseReturnsSuccess_returnsDataParsed() = runTest {
         val state = PermissionGrantedBasicInput(
             stateContext,
             source,
@@ -103,12 +104,45 @@ class PermissionGrantedBasicInputTest {
     }
 
     @Test
+    fun transition_whenInputFetchSucceedsAndParseReturnsWarning_returnsConversionFailed() =
+        runTest {
+            val input = object : BasicInput<String> {
+                override suspend fun fetch(match: String, block: suspend (String) -> ParseResult) =
+                    block("$match-data")
+
+                override suspend fun parse(data: String, match: String, resources: Resources) =
+                    ParseResult.Warning(
+                        resources.getString(R.string.conversion_failed_unsupported_source_place_list)
+                    )
+            }
+            val matchedInput = MatchedInput<BasicInput<String>>(input, source)
+            val state = PermissionGrantedBasicInput(
+                stateContext,
+                source,
+                matchedInput,
+                permission,
+                results,
+                lastAttempt = null,
+                maxAttempts,
+                dispatcher = testScheduler,
+            )
+            assertEquals(
+                ConversionFailed(
+                    source,
+                    resources.getString(R.string.conversion_failed_unsupported_source_place_list),
+                    warning = true,
+                ),
+                state.transition(),
+            )
+        }
+
+    @Test
     fun transition_whenInputFetchThrowsCancellationException_returnsConversionFailed() = runTest {
         val input = object : BasicInput<String> {
             override suspend fun fetch(match: String, block: suspend (String) -> ParseResult) =
                 throw CancellationException()
 
-            override suspend fun parse(data: String, match: String) =
+            override suspend fun parse(data: String, match: String, resources: Resources) =
                 throw NotImplementedError()
         }
         val matchedInput = MatchedInput<BasicInput<String>>(input, source)
@@ -134,7 +168,7 @@ class PermissionGrantedBasicInputTest {
             override suspend fun fetch(match: String, block: suspend (String) -> ParseResult) =
                 throw MalformedURLException()
 
-            override suspend fun parse(data: String, match: String) =
+            override suspend fun parse(data: String, match: String, resources: Resources) =
                 throw NotImplementedError()
         }
         val matchedInput = MatchedInput<BasicInput<String>>(input, source)
@@ -164,7 +198,7 @@ class PermissionGrantedBasicInputTest {
             override suspend fun fetch(match: String, block: suspend (String) -> ParseResult) =
                 throw cause
 
-            override suspend fun parse(data: String, match: String) =
+            override suspend fun parse(data: String, match: String, resources: Resources) =
                 throw NotImplementedError()
         }
         val matchedInput = MatchedInput<BasicInput<String>>(input, source)
@@ -202,7 +236,7 @@ class PermissionGrantedBasicInputTest {
             override suspend fun fetch(match: String, block: suspend (String) -> ParseResult) =
                 throw cause
 
-            override suspend fun parse(data: String, match: String) =
+            override suspend fun parse(data: String, match: String, resources: Resources) =
                 throw NotImplementedError()
         }
         val matchedInput = MatchedInput<BasicInput<String>>(input, source)
@@ -241,7 +275,7 @@ class PermissionGrantedBasicInputTest {
                 override suspend fun fetch(match: String, block: suspend (String) -> ParseResult) =
                     throw NotImplementedError()
 
-                override suspend fun parse(data: String, match: String) =
+                override suspend fun parse(data: String, match: String, resources: Resources) =
                     throw NotImplementedError()
             }
             val matchedInput = MatchedInput<BasicInput<String>>(input, source)
@@ -286,7 +320,7 @@ class PermissionGrantedBasicInputTest {
             override suspend fun fetch(match: String, block: suspend (String) -> ParseResult) =
                 throw cause
 
-            override suspend fun parse(data: String, match: String) =
+            override suspend fun parse(data: String, match: String, resources: Resources) =
                 throw NotImplementedError()
         }
         val matchedInput = MatchedInput<BasicInput<String>>(input, source)

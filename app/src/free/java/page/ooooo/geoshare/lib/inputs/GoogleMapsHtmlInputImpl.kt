@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import androidx.annotation.StringRes
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.utils.io.ByteReadChannel
@@ -36,7 +37,7 @@ class GoogleMapsHtmlInputImpl @Inject constructor(
     override val cookies = GoogleMapsShortLinkInput.COOKIES
     override val userAgent = GoogleMapsShortLinkInput.USER_AGENT
 
-    override suspend fun parse(data: ByteReadChannel, match: String) = parseResult {
+    override suspend fun parse(data: ByteReadChannel, match: String, resources: Resources) = parseResult {
         val directionsPreviewPattern = Regex("""%213d$LAT%214d$LON""")
         val pointPattern = Regex("""\[(?:null,null,|null,\[)$LAT,$LON]""")
         val defaultPointLinkPattern = Regex("""/@$LAT,$LON""")

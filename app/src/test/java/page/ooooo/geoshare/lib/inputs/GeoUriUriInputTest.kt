@@ -1,15 +1,18 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class GeoUriUriInputTest : InputTest {
+    override val resources: Resources = mock()
     private val input = FakeInputRepository.geoUriInput
 
     @Test
@@ -90,14 +93,14 @@ class GeoUriUriInputTest : InputTest {
 
     @Test
     fun parse_unknownPathOrParams() = runTest {
-        assertEquals(ParseResult(), input.parse("geo:"))
-        assertEquals(ParseResult(), input.parse("geo:?spam=1"))
+        assertEquals(ParseResult.Success(), input.parse("geo:"))
+        assertEquals(ParseResult.Success(), input.parse("geo:?spam=1"))
     }
 
     @Test
     fun parse_coordsAndQueryAndZoom() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         50.123456, -120.123456,
@@ -114,7 +117,7 @@ class GeoUriUriInputTest : InputTest {
     @Test
     fun parse_queryOnly() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(name = "foo bar", source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(name = "foo bar", source = Source.URI))),
             input.parse("geo:?q=foo%20bar"),
         )
     }
@@ -122,7 +125,7 @@ class GeoUriUriInputTest : InputTest {
     @Test
     fun parse_pinWithoutName() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(40.7127400, -74.0059965, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(40.7127400, -74.0059965, source = Source.URI))),
             input.parse("geo:50.123456,-120.123456?q=40.7127400,-74.0059965"),
         )
     }
@@ -130,7 +133,7 @@ class GeoUriUriInputTest : InputTest {
     @Test
     fun parse_pinWithoutNameAndWithSpace() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(45.4786785, 9.2473799, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(45.4786785, 9.2473799, source = Source.URI))),
             input.parse("geo:0,0?q=45.4786785,%209.2473799"),
         )
     }
@@ -138,11 +141,11 @@ class GeoUriUriInputTest : InputTest {
     @Test
     fun parse_pinWithoutNameAndWithTrailingGarbage() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(52.0553846, -2.7151898, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(52.0553846, -2.7151898, source = Source.URI))),
             input.parse("geo:52.0553846,-2.7151898 into your maps app to see this location."),
         )
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(52.0553846, -2.7151898, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(52.0553846, -2.7151898, source = Source.URI))),
             input.parse("geo:0,0?q=52.0553846,-2.7151898 into your maps app to see this location."),
         )
     }
@@ -151,7 +154,7 @@ class GeoUriUriInputTest : InputTest {
     fun parse_pinWithName() = runTest {
         assertEquals(
             @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         40.7127400, -74.0059965,
@@ -165,7 +168,7 @@ class GeoUriUriInputTest : InputTest {
             input.parse("geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)"),
         )
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         25.0016, 121.50005,
@@ -182,7 +185,7 @@ class GeoUriUriInputTest : InputTest {
     fun parse_pinWithNameInSeparateQueryParam() = runTest {
         assertEquals(
             @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         40.7127400, -74.0059965,
@@ -196,7 +199,7 @@ class GeoUriUriInputTest : InputTest {
         )
         assertEquals(
             @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         40.7127400, -74.0059965,
@@ -211,7 +214,7 @@ class GeoUriUriInputTest : InputTest {
         )
         assertEquals(
             @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         40.7127400, -74.0059965,

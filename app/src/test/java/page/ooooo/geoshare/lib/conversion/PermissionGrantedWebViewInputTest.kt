@@ -47,20 +47,21 @@ class PermissionGrantedWebViewInputTest {
 
         override fun getUnsafeExtractionJavaScript(match: String) = "undefined"
 
-        override suspend fun parse(data: String, match: String) =
+        override suspend fun parse(data: String, match: String, resources: Resources) =
             result.copy(next = next.copy(match = data)) // Store data in MatchedInput, so we can test it
     }
     private val matchedInput = MatchedInput<WebViewInput>(input, source)
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val next = MatchedInput(FakeInputRepository.debugUriInput, source)
-    private val result = ParseResult(points, next)
+    private val result = ParseResult.Success(points, next)
     private val oldPoints = persistentListOf(WGS84Point(3.0, 4.0, source = Source.GENERATED))
-    private val oldResult = ParseResult(oldPoints)
+    private val oldResult = ParseResult.Success(oldPoints)
     private val results: Results = mapOf(MatchedInput(FakeInputRepository.debugUriInput, source) to oldResult)
     private val permission = Permission.ALWAYS
     private val lastCause = ConnectionClosedNetworkException(EOFException())
     private val maxAttempts = 3
     private val resources: Resources = mock {
+        on { getString(R.string.conversion_failed_unsupported_source_place_list) } doReturn "Place lists are not supported"
         on { getString(R.string.converter_google_maps_loading_indicator_title) } doReturn "Connecting to Google..."
         on { getString(R.string.conversion_failed_cancelled) } doReturn "Cancelled"
         on { getString(R.string.conversion_failed_reason_timeout) } doReturn "Timeout"
@@ -80,7 +81,7 @@ class PermissionGrantedWebViewInputTest {
     }
 
     @Test
-    fun transition_whenPendingDataIsCompleted_returnsDataParsed() = runTest {
+    fun transition_whenPendingDataIsCompletedAndParseReturnsSuccess_returnsDataParsed() = runTest {
         val state = PermissionGrantedWebViewInput(
             stateContext, source, matchedInput, permission, results, dispatcher = testScheduler
         )
@@ -101,6 +102,40 @@ class PermissionGrantedWebViewInputTest {
             res,
         )
     }
+
+    @Test
+    fun transition_whenPendingDataIsCompletedAndParseReturnsFailure_returnsDataParsed() =
+        runTest {
+            val input = object : WebViewInput {
+                override val permissionTitleResId = R.string.converter_google_maps_permission_title
+                override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
+
+                override fun getUnsafeExtractionJavaScript(match: String) = "undefined"
+
+                override suspend fun parse(data: String, match: String, resources: Resources) =
+                    ParseResult.Warning(
+                        resources.getString(R.string.conversion_failed_unsupported_source_place_list)
+                    )
+            }
+            val matchedInput = MatchedInput<WebViewInput>(input, source)
+            val state = PermissionGrantedWebViewInput(
+                stateContext, source, matchedInput, permission, results, dispatcher = testScheduler
+            )
+            var res: State? = null
+            launch {
+                res = state.transition()
+            }
+            state.pendingData.complete("$source-data")
+            advanceUntilIdle()
+            assertEquals(
+                ConversionFailed(
+                    source,
+                    resources.getString(R.string.conversion_failed_unsupported_source_place_list),
+                    warning = true,
+                ),
+                res,
+            )
+        }
 
     @Test
     fun transition_whenPendingDataIsCompletedWithRecoverableNetworkExceptionAndLastAttemptIsNull_retries() = runTest {
@@ -258,7 +293,7 @@ class PermissionGrantedWebViewInputTest {
 
             override fun getUnsafeExtractionJavaScript(match: String) = "undefined"
 
-            override suspend fun parse(data: String, match: String) =
+            override suspend fun parse(data: String, match: String, resources: Resources) =
                 throw CancellationException()
         }
         val matchedInput = MatchedInput<WebViewInput>(input, source)

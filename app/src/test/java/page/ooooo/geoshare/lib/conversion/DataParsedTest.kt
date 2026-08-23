@@ -14,7 +14,6 @@ import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.MatchedInput
-import page.ooooo.geoshare.lib.inputs.NoopInput
 import page.ooooo.geoshare.lib.inputs.ParseResult
 
 class DataParsedTest {
@@ -22,7 +21,6 @@ class DataParsedTest {
     private val resources: Resources = mock {
         on { getString(R.string.conversion_failed_connection_permission_denied) } doReturn "This link is not supported without connecting to the map service"
         on { getString(R.string.conversion_failed_reason_no_points) } doReturn "no points found"
-        on { getString(R.string.conversion_failed_unsupported_source_place_list) } doReturn "Place lists are not supported"
     }
     private val source = "https://maps.google.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
@@ -36,7 +34,7 @@ class DataParsedTest {
     @Test
     fun transition_whenLastPointHasCoordinates_returnsConversionSucceeded() = runTest {
         val results: Results = mapOf(
-            matchedInput to ParseResult(points),
+            matchedInput to ParseResult.Success(points),
         )
         val state = DataParsed(stateContext, source, matchedInput, permission = null, results)
         assertEquals(
@@ -53,12 +51,12 @@ class DataParsedTest {
                 MatchedInput(
                     FakeInputRepository.debugUriInput,
                     "1"
-                ) to ParseResult(persistentListOf(WGS84Point(name = "bar", source = Source.URI))),
+                ) to ParseResult.Success(persistentListOf(WGS84Point(name = "bar", source = Source.URI))),
                 MatchedInput(
                     FakeInputRepository.debugUriInput,
                     "2"
-                ) to ParseResult(persistentListOf(WGS84Point(z = 3.14, source = Source.HTML))),
-                MatchedInput(FakeInputRepository.debugUriInput, "3") to ParseResult(
+                ) to ParseResult.Success(persistentListOf(WGS84Point(z = 3.14, source = Source.HTML))),
+                MatchedInput(FakeInputRepository.debugUriInput, "3") to ParseResult.Success(
                     persistentListOf(
                         WGS84Point(
                             5.0,
@@ -67,8 +65,8 @@ class DataParsedTest {
                         )
                     )
                 ),
-                MatchedInput(FakeInputRepository.debugUriInput, "4") to ParseResult(),
-                matchedInput to ParseResult(points),
+                MatchedInput(FakeInputRepository.debugUriInput, "4") to ParseResult.Success(),
+                matchedInput to ParseResult.Success(points),
             )
             val state = DataParsed(stateContext, source, matchedInput, permission = null, results)
             assertEquals(
@@ -84,12 +82,12 @@ class DataParsedTest {
                 MatchedInput(
                     FakeInputRepository.debugUriInput,
                     "1"
-                ) to ParseResult(persistentListOf(WGS84Point(name = "bar", source = Source.URI))),
+                ) to ParseResult.Success(persistentListOf(WGS84Point(name = "bar", source = Source.URI))),
                 MatchedInput(
                     FakeInputRepository.debugUriInput,
                     "2"
-                ) to ParseResult(persistentListOf(WGS84Point(z = 3.14, source = Source.HTML))),
-                MatchedInput(FakeInputRepository.debugUriInput, "3") to ParseResult(
+                ) to ParseResult.Success(persistentListOf(WGS84Point(z = 3.14, source = Source.HTML))),
+                MatchedInput(FakeInputRepository.debugUriInput, "3") to ParseResult.Success(
                     persistentListOf(
                         WGS84Point(
                             5.0,
@@ -98,8 +96,8 @@ class DataParsedTest {
                         )
                     )
                 ),
-                MatchedInput(FakeInputRepository.debugUriInput, "4") to ParseResult(),
-                matchedInput to ParseResult(points),
+                MatchedInput(FakeInputRepository.debugUriInput, "4") to ParseResult.Success(),
+                matchedInput to ParseResult.Success(points),
             )
             val state = DataParsed(stateContext, source, matchedInput, permission = null, results)
             assertEquals(
@@ -118,7 +116,7 @@ class DataParsedTest {
     fun transition_whenLastPointHasNameOnlyAndNext_returnsInputFound() = runTest {
         val points = persistentListOf(WGS84Point(name = "bar", source = Source.GENERATED))
         val next = MatchedInput(FakeInputRepository.googleMapsUriInput, source)
-        val results: Results = mapOf(matchedInput to ParseResult(points, next))
+        val results: Results = mapOf(matchedInput to ParseResult.Success(points, next))
         val permission = Permission.ALWAYS
         val state = DataParsed(stateContext, source, matchedInput, permission, results)
         assertEquals(
@@ -132,8 +130,8 @@ class DataParsedTest {
         val points = persistentListOf(WGS84Point(name = "bar", source = Source.GENERATED))
         val oldMatchedInput = MatchedInput(FakeInputRepository.googleMapsUriInput, source)
         val results: Results = mapOf(
-            oldMatchedInput to ParseResult(next = matchedInput),
-            matchedInput to ParseResult(points, oldMatchedInput),
+            oldMatchedInput to ParseResult.Success(next = matchedInput),
+            matchedInput to ParseResult.Success(points, oldMatchedInput),
         )
         val permission = Permission.ALWAYS
         val state = DataParsed(stateContext, source, matchedInput, permission, results)
@@ -149,7 +147,7 @@ class DataParsedTest {
     @Test
     fun transition_whenLastPointHasNameOnly_returnsConversionSucceeded() = runTest {
         val points = persistentListOf(WGS84Point(name = "bar", source = Source.GENERATED))
-        val results: Results = mapOf(matchedInput to ParseResult(points))
+        val results: Results = mapOf(matchedInput to ParseResult.Success(points))
         val state = DataParsed(stateContext, source, matchedInput, permission = null, results)
         assertEquals(
             ConversionSucceeded(stateContext, source, points),
@@ -160,7 +158,7 @@ class DataParsedTest {
     @Test
     fun transition_whenLastPointIsEmpty_returnsConversionFailed() = runTest {
         val points = persistentListOf(WGS84Point(source = Source.GENERATED))
-        val results: Results = mapOf(matchedInput to ParseResult(points))
+        val results: Results = mapOf(matchedInput to ParseResult.Success(points))
         val state = DataParsed(stateContext, source, matchedInput, permission = null, results)
         assertEquals(
             ConversionFailed(
@@ -174,7 +172,7 @@ class DataParsedTest {
     @Test
     fun transition_whenPointsAreEmpty_returnsConversionFailed() = runTest {
         val points = persistentListOf<WGS84Point>()
-        val results: Results = mapOf(matchedInput to ParseResult(points))
+        val results: Results = mapOf(matchedInput to ParseResult.Success(points))
         val state = DataParsed(stateContext, source, matchedInput, permission = null, results)
         assertEquals(
             ConversionFailed(
@@ -190,8 +188,8 @@ class DataParsedTest {
         val points = persistentListOf<WGS84Point>()
         val oldPoints = persistentListOf<WGS84Point>()
         val results: Results = mapOf(
-            MatchedInput(FakeInputRepository.debugUriInput, "1") to ParseResult(oldPoints),
-            matchedInput to ParseResult(points),
+            MatchedInput(FakeInputRepository.debugUriInput, "1") to ParseResult.Success(oldPoints),
+            matchedInput to ParseResult.Success(points),
         )
         val state = DataParsed(stateContext, source, matchedInput, permission = null, results)
         assertEquals(
@@ -208,8 +206,8 @@ class DataParsedTest {
         val points = persistentListOf<WGS84Point>()
         val oldPoints = persistentListOf<WGS84Point>()
         val results: Results = mapOf(
-            MatchedInput(FakeInputRepository.debugUriInput, "1") to ParseResult(oldPoints),
-            matchedInput to ParseResult(points),
+            MatchedInput(FakeInputRepository.debugUriInput, "1") to ParseResult.Success(oldPoints),
+            matchedInput to ParseResult.Success(points),
         )
         val state = DataParsed(stateContext, source, matchedInput, permission = Permission.NEVER, results)
         assertEquals(
@@ -226,8 +224,8 @@ class DataParsedTest {
         val points = persistentListOf<WGS84Point>()
         val oldPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
         val results: Results = mapOf(
-            MatchedInput(FakeInputRepository.debugUriInput, "1") to ParseResult(oldPoints),
-            matchedInput to ParseResult(points),
+            MatchedInput(FakeInputRepository.debugUriInput, "1") to ParseResult.Success(oldPoints),
+            matchedInput to ParseResult.Success(points),
         )
         val state = DataParsed(stateContext, source, matchedInput, permission = null, results)
         assertEquals(
@@ -244,8 +242,8 @@ class DataParsedTest {
         val points = persistentListOf<WGS84Point>()
         val oldPoints = persistentListOf(WGS84Point(name = "bar", source = Source.GENERATED))
         val results: Results = mapOf(
-            MatchedInput(FakeInputRepository.debugUriInput, "1") to ParseResult(oldPoints),
-            matchedInput to ParseResult(points),
+            MatchedInput(FakeInputRepository.debugUriInput, "1") to ParseResult.Success(oldPoints),
+            matchedInput to ParseResult.Success(points),
         )
         val state = DataParsed(stateContext, source, matchedInput, permission = null, results)
         assertEquals(
@@ -261,8 +259,8 @@ class DataParsedTest {
             val oldPoints = persistentListOf(WGS84Point(name = "bar", source = Source.GENERATED))
             val oldNext = matchedInput
             val results: Results = mapOf(
-                MatchedInput(FakeInputRepository.debugUriInput, "1") to ParseResult(oldPoints, oldNext),
-                matchedInput to ParseResult(points),
+                MatchedInput(FakeInputRepository.debugUriInput, "1") to ParseResult.Success(oldPoints, oldNext),
+                matchedInput to ParseResult.Success(points),
             )
             val state = DataParsed(stateContext, source, matchedInput, permission = null, results)
             assertEquals(
@@ -276,8 +274,8 @@ class DataParsedTest {
         val points = persistentListOf<WGS84Point>()
         val oldPoints = persistentListOf(WGS84Point(z = 3.14, source = Source.GENERATED))
         val results: Results = mapOf(
-            MatchedInput(FakeInputRepository.debugUriInput, "1") to ParseResult(oldPoints),
-            matchedInput to ParseResult(points),
+            MatchedInput(FakeInputRepository.debugUriInput, "1") to ParseResult.Success(oldPoints),
+            matchedInput to ParseResult.Success(points),
         )
         val state = DataParsed(stateContext, source, matchedInput, permission = null, results)
         assertEquals(
@@ -288,24 +286,4 @@ class DataParsedTest {
             state.transition(),
         )
     }
-
-    @Test
-    fun transition_whenLastPointIsEmptyAndInputHasCustomErrorMessage_returnsConversionFailedWithCustomErrorMessage() =
-        runTest {
-            val input = object : NoopInput {
-                override fun getErrorMessage(resources: Resources) =
-                    resources.getString(R.string.conversion_failed_unsupported_source_place_list)
-            }
-            val matchedInput = MatchedInput(input, source)
-            val points = persistentListOf(WGS84Point(source = Source.GENERATED))
-            val results: Results = mapOf(matchedInput to ParseResult(points))
-            val state = DataParsed(stateContext, source, matchedInput, permission = null, results)
-            assertEquals(
-                ConversionFailed(
-                    source,
-                    resources.getString(R.string.conversion_failed_unsupported_source_place_list),
-                ),
-                state.transition(),
-            )
-        }
 }

@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
 import page.ooooo.geoshare.lib.Uri
@@ -38,7 +39,7 @@ class WazeUriInput @Inject constructor(
         ),
     )
 
-    override suspend fun parse(data: Uri, match: String) = parseResult {
+    override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         data.run {
             // Short link
             // https://waze.com/ul/h{hash}
