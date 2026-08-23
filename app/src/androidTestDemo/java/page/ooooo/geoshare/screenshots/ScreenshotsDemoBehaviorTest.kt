@@ -43,7 +43,7 @@ class ScreenshotsDemoBehaviorTest {
     }
 
     /**
-     * Take all screenshots in one big test method.
+     * Takes all screenshots in one big test method.
      *
      * See `ScreenshotsFreeBehaviorTest`.
      */
