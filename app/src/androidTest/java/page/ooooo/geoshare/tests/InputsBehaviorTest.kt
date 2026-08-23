@@ -5,7 +5,7 @@ import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert.assertNull
 import org.junit.Test
-import page.ooooo.geoshare.lib.inputs.InputDocumentationGroup
+import page.ooooo.geoshare.lib.inputs.InputGroupId
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
 class InputsBehaviorTest {
@@ -55,12 +55,12 @@ class InputsBehaviorTest {
         // Go to the inputs screen
         goToInputList()
 
-        // Does not show recently added documentations
-        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareInputsDocumentationRecent_${InputDocumentationGroup.MAPY_COM}" })
+        // Does not show recently added input groups
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareInputListRecent_${InputGroupId.MAPY_COM}" })
 
-        // Shows all documentations
-        onElement { viewIdResourceName == "geoShareInputsDocumentationAll_${InputDocumentationGroup.AMAP}" }
-        onElement { viewIdResourceName == "geoShareInputsDocumentationAll_${InputDocumentationGroup.APPLE_MAPS}" }
+        // Shows all input groups
+        onElement { viewIdResourceName == "geoShareInputListAll_${InputGroupId.AMAP}" }
+        onElement { viewIdResourceName == "geoShareInputListAll_${InputGroupId.APPLE_MAPS}" }
 
         // Go to main screen
         goBackToMainForm()
@@ -77,13 +77,13 @@ class InputsBehaviorTest {
         // Go to the inputs screen
         goToInputList()
 
-        // Shows documentations added since version 19
+        // Shows input groups added since version 19
         onElement { viewIdResourceName == "geoShareInputListPane" }.apply {
             scrollToElement(Direction.DOWN) {
-                viewIdResourceName == "geoShareInputsDocumentationRecent_${InputDocumentationGroup.HERE_WEGO}"
+                viewIdResourceName == "geoShareInputListRecent_${InputGroupId.HERE_WEGO}"
             }
             scrollToElement(Direction.DOWN) {
-                viewIdResourceName == "geoShareInputsDocumentationRecent_${InputDocumentationGroup.MAGIC_EARTH}"
+                viewIdResourceName == "geoShareInputListRecent_${InputGroupId.MAGIC_EARTH}"
             }
         }
     }

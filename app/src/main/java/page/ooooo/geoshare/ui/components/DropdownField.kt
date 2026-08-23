@@ -50,7 +50,7 @@ fun <T> DropdownField(
             onExpandedChange = { expanded = !expanded },
         ) {
             TextField(
-                value = options[value] ?: "",
+                value = options[value].orEmpty(),
                 onValueChange = { newText ->
                     options.firstNotNullOfOrNull { (value, text) ->
                         if (text == newText) {

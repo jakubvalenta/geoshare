@@ -24,15 +24,16 @@ import javax.inject.Singleton
 class GeoUriInput @Inject constructor(
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
-    override val pattern = Regex("""(geo:$URI_REST)""")
-    override val documentation = InputDocumentation(
-        group = InputDocumentationGroup.GEO_URI,
-        items = listOf(
-            InputDocumentationItem.Text(3) {
-                stringResource(R.string.example, GeoUriFormatter.formatGeoUriString(WGS84Point(NaivePoint.example)))
-            },
-        ),
+    override val group = InputGroup.GEO_URI
+    override val changelog = persistentListOf(
+        InputChangelogItem.Text(3) {
+            stringResource(
+                R.string.example,
+                GeoUriFormatter.formatGeoUriString(WGS84Point(NaivePoint.example))
+            )
+        },
     )
+    override val pattern = Regex("""(geo:$URI_REST)""")
 
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         data.run {

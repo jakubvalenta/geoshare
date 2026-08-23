@@ -22,16 +22,14 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 class HereWeGoUriInput @Inject constructor(
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
-    override val pattern = Regex("""((?:https?://)?(?:share|wego)\.here\.com/$URI_REST)""")
-    override val documentation = InputDocumentation(
-        group = InputDocumentationGroup.HERE_WEGO,
-        items = listOf(
-            InputDocumentationItem.Url(20, "https://share.here.com/l/"),
-            InputDocumentationItem.Url(20, "https://share.here.com/p/"),
-            InputDocumentationItem.Url(20, "https://wego.here.com/"),
-            InputDocumentationItem.Url(20, "https://wego.here.com/p/"),
-        ),
+    override val group = InputGroup.HERE_WEGO
+    override val changelog = persistentListOf(
+        InputChangelogItem.Url(20, "https://share.here.com/l/"),
+        InputChangelogItem.Url(20, "https://share.here.com/p/"),
+        InputChangelogItem.Url(20, "https://wego.here.com/"),
+        InputChangelogItem.Url(20, "https://wego.here.com/p/"),
     )
+    override val pattern = Regex("""((?:https?://)?(?:share|wego)\.here\.com/$URI_REST)""")
 
     @OptIn(ExperimentalEncodingApi::class)
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {

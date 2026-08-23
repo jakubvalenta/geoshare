@@ -31,7 +31,9 @@ object GeoUriFormatter {
                     val q = latStr?.let { latStr ->
                         lonStr?.let { lonStr ->
                             when (flavor.pin) {
-                                GeoUriFlavor.PinFlavor.COORDS_AND_NAME_IN_Q -> "$latStr,$lonStr${name?.let { "($it)" } ?: ""}"
+                                GeoUriFlavor.PinFlavor.COORDS_AND_NAME_IN_Q ->
+                                    "$latStr,$lonStr${name?.let { "($it)" }.orEmpty()}"
+
                                 GeoUriFlavor.PinFlavor.COORDS_ONLY_IN_Q -> "$latStr,$lonStr"
                                 GeoUriFlavor.PinFlavor.NAME_ONLY_IN_Q -> name
                                 GeoUriFlavor.PinFlavor.NOT_AVAILABLE -> null

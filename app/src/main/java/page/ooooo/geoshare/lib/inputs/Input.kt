@@ -2,13 +2,16 @@ package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
 import android.webkit.WebSettings
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.lib.geo.Point
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 sealed interface Input {
     @Suppress("SameReturnValue")
-    val documentation: InputDocumentation? get() = null
+    val group: InputGroup? get() = null
+    val changelog: ImmutableList<InputChangelogItem> get() = persistentListOf()
 
     fun match(source: String): String? = null
 

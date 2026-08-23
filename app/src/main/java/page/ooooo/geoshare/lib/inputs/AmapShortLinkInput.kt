@@ -3,6 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import android.content.res.Resources
 import androidx.annotation.StringRes
 import io.ktor.client.engine.HttpClientEngine
+import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
@@ -17,13 +18,11 @@ class AmapShortLinkInput @Inject constructor(
     override val log: Log,
     override val uriQuote: UriQuote,
 ) : HeadLocationHeaderInput {
-    override val pattern = Regex("""((?:https?://)?surl\.amap\.com/\S+)""")
-    override val documentation = InputDocumentation(
-        group = InputDocumentationGroup.AMAP,
-        items = listOf(
-            InputDocumentationItem.Url(27, "https://surl.amap.com/"),
-        ),
+    override val group = InputGroup.AMAP
+    override val changelog = persistentListOf(
+        InputChangelogItem.Url(27, "https://surl.amap.com/"),
     )
+    override val pattern = Regex("""((?:https?://)?surl\.amap\.com/\S+)""")
 
     @StringRes
     override val permissionTitleResId = R.string.converter_amap_permission_title

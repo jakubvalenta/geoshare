@@ -21,14 +21,11 @@ class BaiduMapUriInput @Inject constructor(
     private val baiduMapWebViewInput: dagger.Lazy<BaiduMapWebViewInput>,
     override val uriQuote: UriQuote,
 ) : UriInput {
-    override val pattern = Regex("""((?:https?://)?(?:j\.)?map\.baidu\.com/$URI_REST)""")
-
-    override val documentation = InputDocumentation(
-        group = InputDocumentationGroup.BAIDU_MAP,
-        items = listOf(
-            InputDocumentationItem.Url(33, "https://map.baidu.com"),
-        ),
+    override val group = InputGroup.BAIDU_MAP
+    override val changelog = persistentListOf(
+        InputChangelogItem.Url(33, "https://map.baidu.com"),
     )
+    override val pattern = Regex("""((?:https?://)?(?:j\.)?map\.baidu\.com/$URI_REST)""")
 
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         data.run {

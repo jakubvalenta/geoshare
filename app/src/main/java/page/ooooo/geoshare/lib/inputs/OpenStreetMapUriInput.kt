@@ -21,19 +21,17 @@ class OpenStreetMapUriInput @Inject constructor(
     private val openStreetMapApiInput: dagger.Lazy<OpenStreetMapApiInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
-    override val pattern = Regex("""((?:https?://)?(?:www\.)?(?:openstreetmap|osm)\.org/$URI_REST)""")
-    override val documentation = InputDocumentation(
-        group = InputDocumentationGroup.OPEN_STREET_MAP,
-        items = listOf(
-            InputDocumentationItem.Url(20, "https://www.openstreetmap.org/"),
-            InputDocumentationItem.Url(31, "https://www.openstreetmap.org/directions"),
-            InputDocumentationItem.Url(23, "https://www.openstreetmap.org/node"),
-            InputDocumentationItem.Url(23, "https://www.openstreetmap.org/relation"),
-            InputDocumentationItem.Url(23, "https://www.openstreetmap.org/way"),
-            InputDocumentationItem.Url(23, "https://osm.org/"),
-            InputDocumentationItem.Url(23, "https://osm.org/go/"),
-        ),
+    override val group = InputGroup.OPEN_STREET_MAP
+    override val changelog = persistentListOf(
+        InputChangelogItem.Url(20, "https://www.openstreetmap.org/"),
+        InputChangelogItem.Url(31, "https://www.openstreetmap.org/directions"),
+        InputChangelogItem.Url(23, "https://www.openstreetmap.org/node"),
+        InputChangelogItem.Url(23, "https://www.openstreetmap.org/relation"),
+        InputChangelogItem.Url(23, "https://www.openstreetmap.org/way"),
+        InputChangelogItem.Url(23, "https://osm.org/"),
+        InputChangelogItem.Url(23, "https://osm.org/go/"),
     )
+    override val pattern = Regex("""((?:https?://)?(?:www\.)?(?:openstreetmap|osm)\.org/$URI_REST)""")
 
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         data.run {

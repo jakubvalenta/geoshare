@@ -20,16 +20,14 @@ import javax.inject.Singleton
 class MapyComUriInput @Inject constructor(
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
-    override val pattern = Regex("""($COORDS|(?:https?://)?(?:(?:hapticke|www)\.)?mapy\.[a-z]{2,3}[/?]$URI_REST)""")
-    override val documentation = InputDocumentation(
-        group = InputDocumentationGroup.MAPY_COM,
-        items = listOf(
-            InputDocumentationItem.Url(23, "https://mapy.com"),
-            InputDocumentationItem.Url(23, "https://mapy.cz"),
-            InputDocumentationItem.Url(23, "https://www.mapy.com"),
-            InputDocumentationItem.Url(23, "https://www.mapy.cz"),
-        ),
+    override val group = InputGroup.MAPY_COM
+    override val changelog = persistentListOf(
+        InputChangelogItem.Url(23, "https://mapy.com"),
+        InputChangelogItem.Url(23, "https://mapy.cz"),
+        InputChangelogItem.Url(23, "https://www.mapy.com"),
+        InputChangelogItem.Url(23, "https://www.mapy.cz"),
     )
+    override val pattern = Regex("""($COORDS|(?:https?://)?(?:(?:hapticke|www)\.)?mapy\.[a-z]{2,3}[/?]$URI_REST)""")
 
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         data.run {
