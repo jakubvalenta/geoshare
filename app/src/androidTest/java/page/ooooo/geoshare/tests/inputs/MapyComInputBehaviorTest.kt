@@ -14,7 +14,7 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.tests.testUri
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
-class MapyComInputBehaviorTest {
+class MapyComInputBehaviorTest : InputBehaviorTest {
     @Test
     fun mapyCom_offline() = uiAutomator {
         // Coordinates with international domain

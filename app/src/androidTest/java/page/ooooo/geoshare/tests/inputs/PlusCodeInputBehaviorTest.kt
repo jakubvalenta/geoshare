@@ -8,7 +8,7 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.tests.testText
 import page.ooooo.geoshare.tests.testUri
 
-class PlusCodeInputBehaviorTest {
+class PlusCodeInputBehaviorTest : InputBehaviorTest {
     @Test
     fun plusCode_offline() = uiAutomator {
         // Global code as URL https://plus.codes

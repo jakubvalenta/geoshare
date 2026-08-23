@@ -86,15 +86,15 @@ class ScreenshotsFreeBehaviorTest {
     }
 
     /**
-     * Take all screenshots in one big test method.
+     * Takes all screenshots in one big test method.
      *
-     * This method is not split into several smaller methods annotated by [Test], because AndroidJunitRunner's
+     * This method is not split into several smaller methods annotated with [Test], because AndroidJunitRunner's
      * `clearPackageData` setting (which we set in build.gradle) clears all files from
-     * `build/outputs/(connected|managed_device)_android_test_additional_output` after each test method. We want all
+     * `build/outputs/(connected|managed_device)_android_test_additional_output` after each test method. But we want all
      * screenshot files to be kept there, so that we can later copy them to `docs/screenshots`.
      *
-     * This method is however internally split into several smaller non-test methods, so that developers can easily
-     * comment out parts of it during debugging.
+     * This method is however internally split into several smaller methods not annotated with [Test], so that they can
+     * be conveniently commented out during development.
      */
     @Test
     fun screenshots() = uiAutomator {
@@ -305,6 +305,12 @@ class ScreenshotsFreeBehaviorTest {
         onElement { viewIdResourceName == "geoShareConversionErrorMessage" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_error_unsupported_map_service")
+
+        // Conversion - Error - Unsupported source Google Search
+        shareUri("https://share.google/diIxnYa8dIA6dZfpy")
+        onElement { viewIdResourceName == "geoShareConversionErrorMessage" }
+        quickWaitForStableInActiveWindow()
+        saveScreenshot("main_strings/conversion_error_unsupported_source_google_search")
 
         goBackToMainForm()
     }

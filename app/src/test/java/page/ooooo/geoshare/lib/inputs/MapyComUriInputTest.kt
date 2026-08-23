@@ -9,7 +9,11 @@ import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
+import android.content.res.Resources
+import org.mockito.kotlin.mock
+
 class MapyComUriInputTest : InputTest {
+    override val resources: Resources = mock()
     private val input = FakeInputRepository.mapyComUriInput
 
     @Test
@@ -86,17 +90,26 @@ class MapyComUriInputTest : InputTest {
 
     @Test
     fun parse_unknownPathOrParams() = runTest {
-        assertEquals(ParseResult(), input.parse("https://mapy.com"))
-        assertEquals(ParseResult(), input.parse("https://mapy.com/en"))
-        assertEquals(ParseResult(), input.parse("https://mapy.com/en/"))
-        assertEquals(ParseResult(), input.parse("https://mapy.com/en/zakladni"))
-        assertEquals(ParseResult(), input.parse("https://mapy.com/en/zakladni?spam=1"))
+        assertEquals(ParseResult.Success(), input.parse("https://mapy.com"))
+        assertEquals(ParseResult.Success(), input.parse("https://mapy.com/en"))
+        assertEquals(ParseResult.Success(), input.parse("https://mapy.com/en/"))
+        assertEquals(ParseResult.Success(), input.parse("https://mapy.com/en/zakladni"))
+        assertEquals(ParseResult.Success(), input.parse("https://mapy.com/en/zakladni?spam=1"))
     }
 
     @Test
     fun parse_coordinates() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(50.0525078, 14.0184810, z = 9.0, source = Source.MAP_CENTER))),
+            ParseResult.Success(
+                persistentListOf(
+                    WGS84Point(
+                        50.0525078,
+                        14.0184810,
+                        z = 9.0,
+                        source = Source.MAP_CENTER
+                    )
+                )
+            ),
             input.parse("https://mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9"),
         )
     }
@@ -104,7 +117,16 @@ class MapyComUriInputTest : InputTest {
     @Test
     fun parse_coordinatesCsLanguage() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(50.0525078, 14.0184810, z = 9.0, source = Source.MAP_CENTER))),
+            ParseResult.Success(
+                persistentListOf(
+                    WGS84Point(
+                        50.0525078,
+                        14.0184810,
+                        z = 9.0,
+                        source = Source.MAP_CENTER
+                    )
+                )
+            ),
             input.parse("https://mapy.com/cs/zakladni?x=14.0184810&y=50.0525078&z=9"),
         )
     }
@@ -112,7 +134,16 @@ class MapyComUriInputTest : InputTest {
     @Test
     fun parse_coordinatesCzDomain() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(50.0525078, 14.0184810, z = 9.0, source = Source.MAP_CENTER))),
+            ParseResult.Success(
+                persistentListOf(
+                    WGS84Point(
+                        50.0525078,
+                        14.0184810,
+                        z = 9.0,
+                        source = Source.MAP_CENTER
+                    )
+                )
+            ),
             input.parse("https://mapy.cz/en/zakladni?x=14.0184810&y=50.0525078&z=9"),
         )
     }
@@ -120,7 +151,16 @@ class MapyComUriInputTest : InputTest {
     @Test
     fun parse_coordinatesOutdoorType() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(50.0525078, 14.0184810, z = 9.0, source = Source.MAP_CENTER))),
+            ParseResult.Success(
+                persistentListOf(
+                    WGS84Point(
+                        50.0525078,
+                        14.0184810,
+                        z = 9.0,
+                        source = Source.MAP_CENTER
+                    )
+                )
+            ),
             input.parse("https://mapy.com/en/turisticka?x=14.0184810&y=50.0525078&z=9"),
         )
     }
@@ -128,7 +168,16 @@ class MapyComUriInputTest : InputTest {
     @Test
     fun parse_coordinatesMissingType() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(50.0525078, 14.0184810, z = 9.0, source = Source.MAP_CENTER))),
+            ParseResult.Success(
+                persistentListOf(
+                    WGS84Point(
+                        50.0525078,
+                        14.0184810,
+                        z = 9.0,
+                        source = Source.MAP_CENTER
+                    )
+                )
+            ),
             input.parse("https://mapy.com/?x=14.0184810&y=50.0525078&z=9"),
         )
     }
@@ -136,7 +185,7 @@ class MapyComUriInputTest : InputTest {
     @Test
     fun parse_navigation() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(52.468305230140686, 13.430708348751068, z = 18.0, source = Source.HASH),
                     WGS84Point(52.423603534698486, 13.521436750888824, z = 18.0, source = Source.HASH),
@@ -151,7 +200,16 @@ class MapyComUriInputTest : InputTest {
     @Test
     fun parse_place() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(50.0992553, 14.4336590, z = 19.0, source = Source.MAP_CENTER))),
+            ParseResult.Success(
+                persistentListOf(
+                    WGS84Point(
+                        50.0992553,
+                        14.4336590,
+                        z = 19.0,
+                        source = Source.MAP_CENTER
+                    )
+                )
+            ),
             input.parse("https://mapy.com/en/zakladni?source=firm&id=13362491&x=14.4336590&y=50.0992553&z=19"),
         )
     }
@@ -159,7 +217,7 @@ class MapyComUriInputTest : InputTest {
     @Test
     fun parse_placeWithId_returnsIdAndIgnoresXAndY() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(50.123878020645904, 14.410104923846461, z = 17.0, source = Source.URI)
                 )
@@ -171,11 +229,11 @@ class MapyComUriInputTest : InputTest {
     @Test
     fun parse_textCoordinates() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(41.9966006, -6.1223825, source = Source.TEXT))),
+            ParseResult.Success(persistentListOf(WGS84Point(41.9966006, -6.1223825, source = Source.TEXT))),
             input.parse(uriString = "41.9966006N, 6.1223825W"),
         )
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(-41.9966006, 6.1223825, source = Source.TEXT))),
+            ParseResult.Success(persistentListOf(WGS84Point(-41.9966006, 6.1223825, source = Source.TEXT))),
             input.parse(uriString = "41.9966006S, 6.1223825E"),
         )
     }

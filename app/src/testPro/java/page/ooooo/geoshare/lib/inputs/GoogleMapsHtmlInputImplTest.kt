@@ -13,26 +13,26 @@ import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 
 class GoogleMapsHtmlInputImplTest : InputTest {
+    override val resources: Resources = mock {
+        on { getString(R.string.conversion_failed_unsupported_source) } doReturn "This link is not supported"
+    }
     private val query = "Cherbourg, France"
     private val uriQuote = FakeUriQuote
     private val input = GoogleMapsHtmlInputImpl(uriQuote)
-    private val resources: Resources = mock {
-        on { getString(R.string.conversion_failed_unsupported_source) } doReturn "This link is not supported"
-    }
 
     @Test
-    fun parse_returnsPointsFromUri() = runTest {
+    fun parse_whenUriHasPoints_returnsPoints() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(GCJ02MainlandChinaPoint(name = query, source = Source.URI))),
+            ParseResult.Success(persistentListOf(GCJ02MainlandChinaPoint(name = query, source = Source.URI))),
             input.fetchAndParse("https://maps.google.com/?q=$query"),
         )
     }
 
     @Test
-    fun getErrorMessage_returnsCustomMessage() = runTest {
-        assertEquals("This link is not supported", input.getErrorMessage(resources))
+    fun parse_whenUriDoesNotHavePoints_returnsWarning() = runTest {
+        assertEquals(
+            ParseResult.Warning(resources.getString(R.string.conversion_failed_unsupported_source)),
+            input.fetchAndParse("https://maps.google.com/spam"),
+        )
     }
-
-    private suspend fun GoogleMapsHtmlInputImpl.fetchAndParse(match: String): ParseResult =
-        fetch(match) { data -> parse(data, match) }
 }

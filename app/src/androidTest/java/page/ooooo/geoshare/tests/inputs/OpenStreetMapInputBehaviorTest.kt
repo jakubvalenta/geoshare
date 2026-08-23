@@ -14,7 +14,7 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.tests.testUri
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
-class OpenStreetMapInputBehaviorTest {
+class OpenStreetMapInputBehaviorTest : InputBehaviorTest {
     @Test
     fun openStreetMap_offline() = uiAutomator {
         // Map center

@@ -6,25 +6,24 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import page.ooooo.geoshare.BuildConfig
+import page.ooooo.geoshare.data.local.database.ServerAuthType
+import page.ooooo.geoshare.data.local.preferences.Permission
+import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.tests.TestServer
 import page.ooooo.geoshare.tests.TestServerParams
 import page.ooooo.geoshare.tests.closeIntro
 import page.ooooo.geoshare.tests.configureConnectionPermissionPreference
 import page.ooooo.geoshare.tests.configureServer
-import page.ooooo.geoshare.data.local.database.ServerAuthType
-import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.tests.getAndAssumeTestServer
 import page.ooooo.geoshare.tests.launchApplication
-import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
-import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.tests.testUri
 import page.ooooo.geoshare.tests.testUriFails
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
 @RunWith(Parameterized::class)
-class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestServerParams) {
+class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestServerParams) : InputBehaviorTest {
     private lateinit var testServer: TestServer
 
     companion object {
@@ -59,13 +58,6 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
             TestServerParams.None,
         )
     }
-
-    /**
-     * Stores whether the current build variant supports HTML parsing or not. This way we can have one test class for
-     * both build variants and all the tested links in one function.
-     */
-    @Suppress("KotlinConstantConditions", "SimplifyBooleanWithConstants")
-    private val htmlParsingSupported = BuildConfig.FLAVOR == "free"
 
     @Before
     fun setUp() {
@@ -395,30 +387,12 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
         )
 
         // No points found
-        if (testServer is TestServer.Configured) {
-            testUriFails(
-                setOf(
-                    "No points found",
-                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Aucun point trouvé",
-                ),
-                "https://www.google.com/maps/place//",
-            )
-        } else if (htmlParsingSupported) {
-            testUriFails(
-                setOf(
-                    "No points found",
-                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Aucun point trouvé",
-                ),
-                "https://www.google.com/maps/place//",
-            )
-        } else {
-            testUriFails(
-                setOf(
-                    "This link is not supported",
-                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Ce lien n’est pas pris en charge",
-                ),
-                "https://www.google.com/maps/place//",
-            )
-        }
+        testUriFails(
+            setOf(
+                "No points found",
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Aucun point trouvé",
+            ),
+            "https://www.google.com/maps/place//",
+        )
     }
 }

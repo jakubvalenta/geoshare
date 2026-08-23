@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import androidx.annotation.StringRes
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.utils.io.ByteReadChannel
@@ -28,7 +29,7 @@ class YandexMapsHtmlInput @Inject constructor(
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_yandex_maps_loading_indicator_title
 
-    override suspend fun parse(data: ByteReadChannel, match: String) = parseResult {
+    override suspend fun parse(data: ByteReadChannel, match: String, resources: Resources) = parseResult {
         val pointPattern = Regex("""pt=$LON%2C$LAT""")
         val namePattern = Regex("""itemProp="name"[^>]*>([^<]+)""")
 

@@ -427,6 +427,7 @@ private fun MainScreen(
     val coroutineScope = rememberCoroutineScope()
     val mainContainerColor = when (currentState) {
         is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null -> MaterialTheme.colorScheme.surfaceContainer
+        is ConversionState.HasError if currentState.warning -> MaterialTheme.colorScheme.surfaceContainerHighest
         is ConversionState.HasError -> MaterialTheme.colorScheme.errorContainer
         is ConversionState.HasResult -> MaterialTheme.colorScheme.secondaryContainer
         else -> MaterialTheme.colorScheme.surface
@@ -521,6 +522,7 @@ private fun MainScreen(
                                             source = currentState.source,
                                             message = currentState.message,
                                             details = currentState.details,
+                                            warning = currentState.warning,
                                             onNavigateToInputsScreen = onNavigateToInputsScreen,
                                             onRetry = onRetry,
                                         )
@@ -632,6 +634,7 @@ private fun MainScreen(
                                                 source = currentState.source,
                                                 message = currentState.message,
                                                 details = currentState.details,
+                                                warning = currentState.warning,
                                                 onNavigateToInputsScreen = onNavigateToInputsScreen,
                                                 onRetry = onRetry,
                                             )
@@ -1655,6 +1658,124 @@ private fun TabletErrorPreview() {
             currentState = ConversionFailed(
                 source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 message = stringResource(R.string.conversion_failed_reason_no_points),
+            ),
+            appDetails = emptyMap(),
+            billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+            billingStatus = BillingStatus.Purchased(
+                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                expired = false,
+                refundable = true,
+                token = "test_purchased",
+            ),
+            changelogShown = true,
+            coordinateConverter = coordinateConverter,
+            coordinateFormat = CoordinateFormat.DEC,
+            inputRepository = FakeInputRepository,
+            largeLoadingIndicator = null,
+            linkMessage = null,
+            outputsForApps = emptyMap(),
+            outputsForLinks = emptyMap(),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = emptyList(),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = emptyList(),
+            outputsForSharing = emptyList(),
+            source = "",
+            userPreferenceMessage = null,
+            onCancel = {},
+            onDeny = {},
+            onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
+            onGrant = {},
+            onHideApp = {},
+            onNavigateToAboutScreen = {},
+            onNavigateToBillingScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinkScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+            onReset = {},
+            onRetry = {},
+            onExecute = {},
+            onStart = {},
+        ) {}
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun WarningPreview() {
+    AppTheme {
+        val context = LocalContext.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        MainScreen(
+            currentState = ConversionFailed(
+                source = "https://share.google/diIxnYa8dIA6dZfpy",
+                message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
+                warning = true,
+            ),
+            appDetails = emptyMap(),
+            billingAppNameResId = R.string.app_name,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+            billingStatus = BillingStatus.Purchased(
+                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                expired = false,
+                refundable = true,
+                token = "test_purchased",
+            ),
+            changelogShown = true,
+            coordinateConverter = coordinateConverter,
+            coordinateFormat = CoordinateFormat.DEC,
+            inputRepository = FakeInputRepository,
+            largeLoadingIndicator = null,
+            linkMessage = null,
+            outputsForApps = emptyMap(),
+            outputsForLinks = emptyMap(),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = emptyList(),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = emptyList(),
+            outputsForSharing = emptyList(),
+            source = "",
+            userPreferenceMessage = null,
+            onCancel = {},
+            onDeny = {},
+            onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
+            onGrant = {},
+            onHideApp = {},
+            onNavigateToAboutScreen = {},
+            onNavigateToBillingScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinkScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+            onReset = {},
+            onRetry = {},
+            onExecute = {},
+            onStart = {},
+        ) {}
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkWarningPreview() {
+    AppTheme {
+        val context = LocalContext.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        MainScreen(
+            currentState = ConversionFailed(
+                source = "https://share.google/diIxnYa8dIA6dZfpy",
+                message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
+                warning = true,
             ),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,

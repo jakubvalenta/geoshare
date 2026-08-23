@@ -1,20 +1,23 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class YandexMapsHtmlInputTest : InputTest {
+    override val resources: Resources = mock()
     private val input = FakeInputRepository.yandexMapsHtmlInput
 
     @Test
     fun parse_containsCoordinates_returnsPoint() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         55.882227, 37.566898,
@@ -33,6 +36,6 @@ class YandexMapsHtmlInputTest : InputTest {
 
     @Test
     fun parse_doesNotContainCoordinates_returnsNoPoints() = runTest {
-        assertEquals(ParseResult(), input.parse("""<html></html>"""))
+        assertEquals(ParseResult.Success(), input.parse("""<html></html>"""))
     }
 }

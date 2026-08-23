@@ -60,6 +60,7 @@ interface ConversionState : State {
     interface HasError : HasSource {
         val message: String
         val details: String?
+        val warning: Boolean
     }
 
     interface HasResult : HasSource {
@@ -86,7 +87,7 @@ class Initial : ConversionState {
     override fun toString() = "Initial"
 }
 
-typealias Results = Map<MatchedInput<*>, ParseResult>
+typealias Results = Map<MatchedInput<*>, ParseResult.Success>
 
 data class SourceReceived(
     val stateContext: ConversionStateContext,
@@ -201,7 +202,9 @@ data class PermissionGranted(
                 )
 
             is NoopInput ->
-                DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to ParseResult()))
+                DataParsed(
+                    stateContext, source, matchedInput, permission, results + (matchedInput to ParseResult.Success())
+                )
         }
 
     override fun toString() =
@@ -250,10 +253,21 @@ data class PermissionGrantedBasicInput<T>(
                         )
                         delay(delayMillis.milliseconds)
                     }
-                    val result = matchedInput.input.fetch(matchedInput.match) { data ->
-                        matchedInput.input.parse(data, matchedInput.match)
+                    when (
+                        val result = matchedInput.input.fetch(matchedInput.match) { data ->
+                            matchedInput.input.parse(data, matchedInput.match, stateContext.resources)
+                        }
+                    ) {
+                        is ParseResult.Success -> DataParsed(
+                            stateContext,
+                            source,
+                            matchedInput,
+                            permission,
+                            results + (matchedInput to result),
+                        )
+
+                        is ParseResult.Warning -> ConversionFailed(source, result.message, warning = true)
                     }
-                    DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to result))
                 }
             } catch (_: MalformedURLException) {
                 ConversionFailed(
@@ -337,8 +351,17 @@ data class PermissionGrantedWebViewInput(
                     val data = withTimeout(matchedInput.input.timeout) {
                         pendingData.await()
                     }
-                    val result = matchedInput.input.parse(data, matchedInput.match)
-                    DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to result))
+                    when (val result = matchedInput.input.parse(data, matchedInput.match, stateContext.resources)) {
+                        is ParseResult.Success -> DataParsed(
+                            stateContext,
+                            source,
+                            matchedInput,
+                            permission,
+                            results + (matchedInput to result),
+                        )
+
+                        is ParseResult.Warning -> ConversionFailed(source, result.message, warning = true)
+                    }
                 }
             } catch (tr: RecoverableNetworkException) {
                 val attempt = Attempt(attemptNumber, tr)
@@ -389,7 +412,13 @@ data class PermissionDenied(
     val results: Results,
 ) : ConversionState, ConversionState.HasSource {
     override suspend fun transition() =
-        DataParsed(stateContext, source, matchedInput, Permission.NEVER, results + (matchedInput to ParseResult()))
+        DataParsed(
+            stateContext,
+            source,
+            matchedInput,
+            Permission.NEVER,
+            results + (matchedInput to ParseResult.Success())
+        )
 
     override fun toString() = "$TAG(source=$source, matchedInput=$matchedInput, results=$results)"
 
@@ -418,7 +447,10 @@ data class DataParsed(
                         TAG,
                         "Failed to extract point with coordinates from $matchedInput and next matched input creates a loop"
                     )
-                    ConversionFailed(source, matchedInput.input.getErrorMessage(stateContext.resources))
+                    ConversionFailed(
+                        source,
+                        stateContext.resources.getString(R.string.conversion_failed_reason_no_points),
+                    )
                 } else {
                     stateContext.log.i(
                         TAG, "Failed to extract point with coordinates from $matchedInput, going to next matched input"
@@ -442,7 +474,10 @@ data class DataParsed(
                 stateContext.log.i(
                     TAG, "Failed to extract point from $matchedInput"
                 )
-                ConversionFailed(source, matchedInput.input.getErrorMessage(stateContext.resources))
+                ConversionFailed(
+                    source,
+                    stateContext.resources.getString(R.string.conversion_failed_reason_no_points),
+                )
             }
         }
 
@@ -540,8 +575,9 @@ data class ConversionFailed(
     override val source: String,
     override val message: String,
     override val details: String? = null,
+    override val warning: Boolean = false,
 ) : ConversionState, ConversionState.HasError {
-    override fun toString() = "$TAG(source=$source, message=$message)"
+    override fun toString() = "$TAG(source=$source, message=$message, warning=$warning)"
 
     private companion object {
         private const val TAG = "ConversionFailed"

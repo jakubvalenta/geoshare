@@ -1,16 +1,19 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assume.assumeTrue
 import org.junit.Test
+import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
 import page.ooooo.geoshare.lib.geo.Source
 
 class BaiduMapUriInputTest : InputTest {
+    override val resources: Resources = mock()
     private val input = FakeInputRepository.baiduMapUriInput
 
     @Test
@@ -73,7 +76,7 @@ class BaiduMapUriInputTest : InputTest {
     @Test
     fun parse_center() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(BD09MCPoint(3317203.0, 13520653.0, 13.0, source = Source.MAP_CENTER))),
+            ParseResult.Success(persistentListOf(BD09MCPoint(3317203.0, 13520653.0, 13.0, source = Source.MAP_CENTER))),
             input.parse("https://map.baidu.com/@13520653,3317203,13z"),
         )
     }
@@ -81,7 +84,7 @@ class BaiduMapUriInputTest : InputTest {
     @Test
     fun parse_coordinates() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     BD09MCPoint(
                         3619117.0, 13392211.0,
@@ -98,7 +101,7 @@ class BaiduMapUriInputTest : InputTest {
     @Test
     fun parse_poi() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     BD09MCPoint(
                         3315902.2199999997, 13502918.375,
@@ -115,7 +118,7 @@ class BaiduMapUriInputTest : InputTest {
     @Test
     fun parse_sharedCoordinates() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     FakeInputRepository.baiduMapWebViewInput,
                     "https://map.baidu.com/?poiShareId=p8cdf0522067cf66173901fc9e4"
@@ -128,7 +131,7 @@ class BaiduMapUriInputTest : InputTest {
     @Test
     fun parse_sharedPOIParamS_returnsSupportsWebParsing() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     FakeInputRepository.baiduMapWebViewInput,
                     "https://map.baidu.com/?newmap=1&s=inf%26uid%3D2c2bd9487c142391100daa62&sharecallbackflag=poiDetailPage"
@@ -141,7 +144,7 @@ class BaiduMapUriInputTest : InputTest {
     @Test
     fun parse_sharedPOIParamUid_returnsSupportsWebParsing() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     FakeInputRepository.baiduMapWebViewInput,
                     "https://map.baidu.com/?shareurl=1&poiShareUid=fef3b5922f87e66c63180999"
@@ -154,7 +157,7 @@ class BaiduMapUriInputTest : InputTest {
     @Test
     fun parse_mobilePlaceDetailWithoutCoords_returnsSupportsWebParsing() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     FakeInputRepository.baiduMapWebViewInput,
                     "https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=p8cdf0522067cf66173901fc9e4/act=read_share&vt=map&da_from=weixin&openna=1"
@@ -167,7 +170,7 @@ class BaiduMapUriInputTest : InputTest {
     @Test
     fun parse_mobilePlaceDetailWithCoords_returnsSucceeded() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(BD09MCPoint(3619117.0, 13392211.0, source = Source.URI))
             ),
             input.parse("https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=p8cdf0522067cf66173901fc9e4/act=read_share&vt=map&da_from=weixin&openna=1&sharegeo=13392211%2C3619117")
@@ -177,7 +180,7 @@ class BaiduMapUriInputTest : InputTest {
     @Test
     fun parse_directionsOnePointNoParams() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     BD09MCPoint(
                         name = "广东省广州市越秀区大塘街道中山三路东昌大街2号",
@@ -194,7 +197,7 @@ class BaiduMapUriInputTest : InputTest {
     @Test
     fun parse_directionsTwoPoints() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     BD09MCPoint(
                         2629182.88, 12613508.26,
@@ -217,7 +220,7 @@ class BaiduMapUriInputTest : InputTest {
     @Test
     fun parse_directionsTwoPointsNoParams() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     BD09MCPoint(name = "广东省广州市越秀区白云街道烟雨路", source = Source.URI),
                     BD09MCPoint(name = "广东省广州市越秀区大塘街道中山三路东昌大街2号", source = Source.URI),
@@ -232,7 +235,7 @@ class BaiduMapUriInputTest : InputTest {
     @Test
     fun parse_directionsThreePoints() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     BD09MCPoint(
                         2629184.09, 12613508.26,
@@ -260,7 +263,7 @@ class BaiduMapUriInputTest : InputTest {
     @Test
     fun parse_directionsThreePointsNoParams() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     BD09MCPoint(name = "广东省广州市越秀区白云街道烟雨路", source = Source.URI),
                     BD09MCPoint(name = "广东省广州市越秀区梅花村街道泰兴直街35号", source = Source.URI),
@@ -276,7 +279,7 @@ class BaiduMapUriInputTest : InputTest {
     @Test
     fun parse_directionsFourPoints() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     BD09MCPoint(
                         2629182.88, 12613508.26,
@@ -309,7 +312,7 @@ class BaiduMapUriInputTest : InputTest {
     @Test
     fun parse_directionsFourPointsNoParams() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     BD09MCPoint(name = "广东省广州市越秀区白云街道烟雨路", source = Source.URI),
                     BD09MCPoint(name = "广东省广州市越秀区梅花村街道泰兴直街35号", source = Source.URI),
@@ -328,7 +331,7 @@ class BaiduMapUriInputTest : InputTest {
         // TODO Add support for Baidu Map search URLs
         assumeTrue(false)
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     BD09MCPoint(
                         4047017.0, 14571495.0,

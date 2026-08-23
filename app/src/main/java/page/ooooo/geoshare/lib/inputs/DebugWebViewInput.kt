@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import androidx.annotation.StringRes
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
@@ -24,7 +25,7 @@ class DebugWebViewInput @Inject constructor() : WebViewInput {
         () => location.href;
     """.trimIndent()
 
-    override suspend fun parse(data: String, match: String) = parseResult {
+    override suspend fun parse(data: String, match: String, resources: Resources) = parseResult {
         points = persistentListOf(WGS84Point(NaivePoint.genRandomPoint()))
     }
 }

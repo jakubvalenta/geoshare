@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.formatters.UriFormatter
@@ -14,6 +15,10 @@ import javax.inject.Singleton
  * but only puts it in the point name. The reason is that Plus Codes are handled by [PlusCodeInput], which has higher
  * priority in [page.ooooo.geoshare.data.InputRepository], so Google Maps URIs containing Plus Codes should never reach
  * [GoogleMapsUriInput].
+ *
+ * It the URI is a Google Search URI, e.g. https://www.google.com/search..., it returns no points. The reason is that
+ * Google Search URIs are handled by [GoogleSearchUriInput], which has higher priority in
+ * [page.ooooo.geoshare.data.InputRepository], so Google Search URIs should never reach [GoogleMapsUriInput].
  */
 @Singleton
 class GoogleMapsUriInput @Inject constructor(
@@ -34,7 +39,7 @@ class GoogleMapsUriInput @Inject constructor(
         ),
     )
 
-    override suspend fun parse(data: Uri, match: String) = parseResult {
+    override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         val googleMapsParseResult = GoogleMapsUriParser.parse(data)
         points = googleMapsParseResult.points
         next = if (googleMapsParseResult.isPlaceList) {

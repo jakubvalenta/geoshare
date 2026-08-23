@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import androidx.annotation.StringRes
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.cookies.ConstantCookiesStorage
@@ -39,7 +40,7 @@ class GoogleMapsShortLinkInput @Inject constructor(
     override val cookies = COOKIES
     override val userAgent = USER_AGENT
 
-    override suspend fun parse(data: Uri, match: String) = parseResult {
+    override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         data.run {
             // Google Maps Go
             // https://maps.app.goo.gl/?link={url}

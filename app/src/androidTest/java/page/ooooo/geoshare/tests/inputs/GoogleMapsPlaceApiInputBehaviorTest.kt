@@ -5,23 +5,22 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import page.ooooo.geoshare.BuildConfig
+import page.ooooo.geoshare.data.local.database.ServerAuthType
+import page.ooooo.geoshare.data.local.preferences.Permission
+import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.tests.TestServer
 import page.ooooo.geoshare.tests.TestServerParams
 import page.ooooo.geoshare.tests.closeIntro
 import page.ooooo.geoshare.tests.configureConnectionPermissionPreference
 import page.ooooo.geoshare.tests.configureServer
-import page.ooooo.geoshare.data.local.database.ServerAuthType
-import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.tests.getAndAssumeTestServer
 import page.ooooo.geoshare.tests.launchApplication
-import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.tests.testUri
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
 @RunWith(Parameterized::class)
-class GoogleMapsPlaceApiInputBehaviorTest(private val testServerParams: TestServerParams) {
+class GoogleMapsPlaceApiInputBehaviorTest(private val testServerParams: TestServerParams) : InputBehaviorTest {
     private lateinit var testServer: TestServer
 
     companion object {
@@ -56,13 +55,6 @@ class GoogleMapsPlaceApiInputBehaviorTest(private val testServerParams: TestServ
             TestServerParams.None,
         )
     }
-
-    /**
-     * Stores whether the current build variant supports HTML parsing or not. This way we can have one test class for
-     * both build variants and all the tested links in one function.
-     */
-    @Suppress("KotlinConstantConditions", "SimplifyBooleanWithConstants")
-    private val htmlParsingSupported = BuildConfig.FLAVOR == "free"
 
     @Before
     fun setUp() {

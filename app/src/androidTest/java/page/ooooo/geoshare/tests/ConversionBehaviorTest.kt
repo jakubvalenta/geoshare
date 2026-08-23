@@ -22,7 +22,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class ConversionBehaviorTest {
     @Test
-    fun whenFullUriIsShared_showsPointAndAllowsOpeningGoogleMaps() = uiAutomator {
+    fun whenLinkIsShared_showsPointAndAllowsOpeningGoogleMaps() = uiAutomator {
         assumeAppInstalled(PackageNames.GOOGLE_MAPS)
         runBlocking {
             assumeDomainResolvable("maps.google.com")

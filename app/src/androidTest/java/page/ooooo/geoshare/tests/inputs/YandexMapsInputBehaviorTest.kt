@@ -13,7 +13,7 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.tests.testUri
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
-class YandexMapsInputBehaviorTest {
+class YandexMapsInputBehaviorTest : InputBehaviorTest {
     @Test
     fun yandexMaps_offline() = uiAutomator {
         // Coordinates

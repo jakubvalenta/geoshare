@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -17,6 +18,7 @@ class UriInputTest {
         override suspend fun parse(
             data: Uri,
             match: String,
+            resources: Resources,
         ) = throw NotImplementedError()
     }
     private val nextInput = FakeInputRepository.osmAndUriInput
@@ -31,9 +33,9 @@ class UriInputTest {
     fun fetch_whenDataIsValidUrl_returnsUri() = runTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
-            ParseResult(next = MatchedInput(nextInput, match)),
+            ParseResult.Success(next = MatchedInput(nextInput, match)),
             input.fetch(match) { data ->
-                ParseResult(
+                ParseResult.Success(
                     next = MatchedInput(nextInput, data.toString()) // Store data in MatchedInput, so we can test it
                 )
             }
@@ -44,9 +46,9 @@ class UriInputTest {
     fun fetch_whenDataIsInvalidUrl_returnsUri() = runTest {
         val match = "https://[invalid:ipv6]/"
         assertEquals(
-            ParseResult(next = MatchedInput(nextInput, match)),
+            ParseResult.Success(next = MatchedInput(nextInput, match)),
             input.fetch(match) { data ->
-                ParseResult(
+                ParseResult.Success(
                     next = MatchedInput(nextInput, data.toString()) // Store data in MatchedInput, so we can test it
                 )
             }

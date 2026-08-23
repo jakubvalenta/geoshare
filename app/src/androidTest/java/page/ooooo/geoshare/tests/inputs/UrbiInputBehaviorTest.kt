@@ -13,7 +13,7 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.tests.testUri
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
-class UrbiInputBehaviorTest {
+class UrbiInputBehaviorTest : InputBehaviorTest {
     @Test
     fun urbi_offline() = uiAutomator {
         // Point with marker

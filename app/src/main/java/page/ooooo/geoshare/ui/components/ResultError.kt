@@ -39,6 +39,7 @@ fun ResultError(
     source: String,
     message: String,
     details: String?,
+    warning: Boolean,
     initialExpanded: Boolean = false,
     onNavigateToInputsScreen: () -> Unit,
     onRetry: () -> Unit,
@@ -118,23 +119,25 @@ fun ResultError(
             }
         }
         ScrollableChips {
-            item {
-                StyledChip(
-                    stringResource(R.string.conversion_error_retry),
-                    icon = {
-                        Icon(Icons.Default.Refresh, null)
-                    },
-                    onClick = {
-                        setIsRetrying(true)
-                        onRetry()
-                    },
-                )
-            }
-            item {
-                StyledChip(
-                    stringResource(R.string.conversion_error_report),
-                ) {
-                    uriHandler.openUri("https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml")
+            if (!warning) {
+                item {
+                    StyledChip(
+                        stringResource(R.string.conversion_error_retry),
+                        icon = {
+                            Icon(Icons.Default.Refresh, null)
+                        },
+                        onClick = {
+                            setIsRetrying(true)
+                            onRetry()
+                        },
+                    )
+                }
+                item {
+                    StyledChip(
+                        stringResource(R.string.conversion_error_report),
+                    ) {
+                        uriHandler.openUri("https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml")
+                    }
                 }
             }
             item {
@@ -162,9 +165,10 @@ private fun DefaultPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultError(
-                source = "https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398",
+                source = "41°24′12.2″N 2°10′26.5″E",
                 message = stringResource(R.string.conversion_failed_reason_no_points),
-                details = null,
+                details = NotImplementedError().stackTraceToString(),
+                warning = false,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -181,47 +185,10 @@ private fun DarkPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultError(
-                source = "https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398",
-                message = stringResource(R.string.conversion_failed_reason_no_points),
-                details = null,
-                onNavigateToInputsScreen = {},
-                onRetry = {},
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun CoordinatesPreview() {
-    AppTheme {
-        Surface(
-            color = MaterialTheme.colorScheme.errorContainer,
-            contentColor = MaterialTheme.colorScheme.onErrorContainer,
-        ) {
-            ResultError(
                 source = "41°24′12.2″N 2°10′26.5″E",
                 message = stringResource(R.string.conversion_failed_reason_no_points),
                 details = NotImplementedError().stackTraceToString(),
-                onNavigateToInputsScreen = {},
-                onRetry = {},
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkCoordinatesPreview() {
-    AppTheme {
-        Surface(
-            color = MaterialTheme.colorScheme.errorContainer,
-            contentColor = MaterialTheme.colorScheme.onErrorContainer,
-        ) {
-            ResultError(
-                source = "41°24′12.2″N 2°10′26.5″E",
-                message = stringResource(R.string.conversion_failed_reason_no_points),
-                details = NotImplementedError().stackTraceToString(),
+                warning = false,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -241,6 +208,7 @@ private fun ExpandedPreview() {
                 source = "41°24′12.2″N 2°10′26.5″E",
                 message = stringResource(R.string.conversion_failed_reason_no_points),
                 details = NotImplementedError().stackTraceToString(),
+                warning = false,
                 initialExpanded = true,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
@@ -261,6 +229,7 @@ private fun DarkExpandedPreview() {
                 source = "41°24′12.2″N 2°10′26.5″E",
                 message = stringResource(R.string.conversion_failed_reason_no_points),
                 details = NotImplementedError().stackTraceToString(),
+                warning = false,
                 initialExpanded = true,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
@@ -271,7 +240,7 @@ private fun DarkExpandedPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun EmptyPreview() {
+private fun EmptySourcePreview() {
     AppTheme {
         Surface(
             color = MaterialTheme.colorScheme.errorContainer,
@@ -281,6 +250,7 @@ private fun EmptyPreview() {
                 source = "",
                 message = stringResource(R.string.conversion_failed_reason_no_points),
                 details = null,
+                warning = false,
                 initialExpanded = false,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
@@ -291,7 +261,7 @@ private fun EmptyPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkEmptyPreview() {
+private fun DarkEmptySourcePreview() {
     AppTheme {
         Surface(
             color = MaterialTheme.colorScheme.errorContainer,
@@ -301,7 +271,48 @@ private fun DarkEmptyPreview() {
                 source = "",
                 message = stringResource(R.string.conversion_failed_reason_no_points),
                 details = null,
+                warning = false,
                 initialExpanded = false,
+                onNavigateToInputsScreen = {},
+                onRetry = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun WarningPreview() {
+    AppTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.surfaceContainerHighest,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+        ) {
+            ResultError(
+                source = "https://share.google/diIxnYa8dIA6dZfpy",
+                message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
+                details = null,
+                warning = true,
+                onNavigateToInputsScreen = {},
+                onRetry = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkWarningPreview() {
+    AppTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.surfaceContainerHighest,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+        ) {
+            ResultError(
+                source = "https://share.google/diIxnYa8dIA6dZfpy",
+                message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
+                details = null,
+                warning = true,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )

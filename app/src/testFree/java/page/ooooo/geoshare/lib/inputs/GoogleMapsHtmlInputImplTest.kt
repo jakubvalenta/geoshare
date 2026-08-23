@@ -11,7 +11,11 @@ import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 
+import android.content.res.Resources
+import org.mockito.kotlin.mock
+
 class GoogleMapsHtmlInputImplTest : InputTest {
+    override val resources: Resources = mock()
     private val googleMapsWebViewInput = GoogleMapsWebViewInput(
         googleMapsUriInput = { FakeInputRepository.googleMapsUriInput },
     )
@@ -26,7 +30,7 @@ class GoogleMapsHtmlInputImplTest : InputTest {
     @Test
     fun parse_link() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(44.4490541, 26.0888398, source = Source.JAVASCRIPT)
                 )
@@ -49,7 +53,7 @@ class GoogleMapsHtmlInputImplTest : InputTest {
     @Test
     fun parse_appInitializationStateOnly() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(52.484201500000005, 13.416727700000001, source = Source.JAVASCRIPT)
                 )
@@ -63,7 +67,7 @@ class GoogleMapsHtmlInputImplTest : InputTest {
     @Test
     fun parse_whenHtmlContainsGenericMetaTagAndAppInitState_returnsNextStep() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     googleMapsWebViewInput,
                     "https://www.google.com/maps/place/Berlin,+Germany/"
@@ -80,7 +84,7 @@ class GoogleMapsHtmlInputImplTest : InputTest {
     @Test
     fun parse_directionsPreview() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(43.7481, -79.6332, source = Source.HTML)
                 )
@@ -95,7 +99,7 @@ class GoogleMapsHtmlInputImplTest : InputTest {
     @Test
     fun parse_placeList() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(59.1293656, 11.4585672, source = Source.JAVASCRIPT),
                     GCJ02MainlandChinaPoint(59.4154007, 11.659710599999999, source = Source.JAVASCRIPT),
@@ -121,7 +125,7 @@ class GoogleMapsHtmlInputImplTest : InputTest {
     @Test
     fun parse_placeListHighPrecision() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(5.5592846, -0.19743059999999998, source = Source.JAVASCRIPT)
                 )
@@ -135,7 +139,7 @@ class GoogleMapsHtmlInputImplTest : InputTest {
     @Test
     fun parse_myMaps() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(52.49016, 13.434500000000071, source = Source.JAVASCRIPT),
                     GCJ02MainlandChinaPoint(52.49534999999999, 13.431890000000067, source = Source.JAVASCRIPT),
@@ -165,7 +169,7 @@ class GoogleMapsHtmlInputImplTest : InputTest {
     @Test
     fun parse_placeListOnePoint() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(59.1293656, 11.4585672, source = Source.JAVASCRIPT)
                 )
@@ -188,7 +192,7 @@ class GoogleMapsHtmlInputImplTest : InputTest {
     @Test
     fun parse_htmlDoesNotMatch_returnsNextStep() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     googleMapsWebViewInput,
                     "https://www.google.com/maps/place/Berlin,+Germany/"
@@ -201,7 +205,7 @@ class GoogleMapsHtmlInputImplTest : InputTest {
     @Test
     fun parse_googleSearchHtmlDoesNotContainUrl_returnsNextStep() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     googleMapsWebViewInput,
                     "https://www.google.com/maps/place/Berlin,+Germany/"
@@ -214,7 +218,7 @@ class GoogleMapsHtmlInputImplTest : InputTest {
     @Test
     fun parse_googleSearchHtmlContainsRelativeUrl_returnsNextStepWithAbsoluteUrl() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     FakeInputRepository.googleMapsUriInput,
                     "https://www.google.com/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705%3A0xa9ea51361ed84bda?sa=X&ved=2ahUKEwiY7vv80aeKAxU41QIHHSgBOlsQ4kB6BAgHEAA&hl=de&gl=de"
@@ -238,7 +242,7 @@ class GoogleMapsHtmlInputImplTest : InputTest {
     @Test
     fun parse_googleSearchHtmlContainsAbsoluteUrl_returnsNextStep() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(FakeInputRepository.googleMapsUriInput, "https://www.example.com/foo")
             ),
             input.parse("""<html><a href="" data-url="https://www.example.com/foo"></a></html>"""),
@@ -248,7 +252,7 @@ class GoogleMapsHtmlInputImplTest : InputTest {
     @Test
     fun parse_googleSearchHtmlContainsInvalidUrl_returnsNextStep() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(FakeInputRepository.googleMapsUriInput, "https://example.com//spam")
             ),
             input.parse("""<html><a href="" data-url="spam"></a></html>"""),

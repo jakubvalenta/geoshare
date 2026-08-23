@@ -5,16 +5,19 @@ import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
-data class ParseResult(
-    val points: Points = persistentListOf(),
-    val next: MatchedInput<*>? = null,
-)
+sealed interface ParseResult {
+    data class Success(val points: Points = persistentListOf(), val next: MatchedInput<*>? = null) : ParseResult
+    data class Warning(val message: String) : ParseResult
+}
 
 class ParseResultScope {
     var points: Points = persistentListOf()
     var next: MatchedInput<*>? = null
+    var warningMessage: String? = null
 
-    internal fun build() = ParseResult(points, next)
+    internal fun build() =
+        warningMessage?.let { warningMessage -> ParseResult.Warning(warningMessage) }
+            ?: ParseResult.Success(points, next)
 }
 
 suspend fun parseResult(block: suspend ParseResultScope.() -> Unit): ParseResult =
@@ -24,9 +27,9 @@ suspend fun parseResult(block: suspend ParseResultScope.() -> Unit): ParseResult
  * Returns the newest result from a list sorted from newest to oldest. If the newest result doesn't have a zoom or name,
  * it tries to find a zoom and name in older results, and copies them to the newest result.
  */
-fun List<ParseResult>.merge(): ParseResult {
+fun List<ParseResult.Success>.merge(): ParseResult.Success {
     // Find points in the newest result or older results
-    val newestResult = firstOrNull() ?: return ParseResult()
+    val newestResult = firstOrNull() ?: return ParseResult.Success()
     if (size <= 1) return newestResult
     val newestPoint = newestResult.points.lastOrNull()
     val anyPoint = newestPoint ?: firstNotNullOfOrNull { it.points.firstOrNull() } ?: return newestResult

@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondError
@@ -28,7 +29,9 @@ import page.ooooo.geoshare.lib.network.SocketTimeoutNetworkException
 import page.ooooo.geoshare.lib.network.UnknownNetworkException
 import java.net.SocketTimeoutException
 
-class GoogleMapsPlaceApiInputTest {
+class GoogleMapsPlaceApiInputTest : InputTest {
+    override val resources: Resources = mock()
+
     private val server = FakeGeoShareGoogleMapsAddressServer
     private val placeId = "ChIJKxjxuaNqkFQR3CK6O1HNNqY"
     private val engine = MockEngine { request ->
@@ -95,7 +98,7 @@ class GoogleMapsPlaceApiInputTest {
             uriQuote = uriQuote,
         )
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(GCJ02MainlandChinaPoint(placeId = placeId, source = Source.URI)),
                 next = MatchedInput(
                     FakeInputRepository.googleMapsHtmlInput,
@@ -109,7 +112,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test
     fun parse_whenPlaceIdIsFoundInUriAndApiReturnsResult_returnsPointsWithResultAsLastPointCoordinates() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(
                         50.123456, -120.123456,
@@ -120,7 +123,7 @@ class GoogleMapsPlaceApiInputTest {
             input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=$placeId"),
         )
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(
                         50.123456,
@@ -143,7 +146,7 @@ class GoogleMapsPlaceApiInputTest {
             uriQuote = uriQuote,
         )
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(
                         47.5951518, -122.3316393,
@@ -158,7 +161,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test
     fun parse_whenPlaceIdIsNotFoundInUri_returnsNoPoints() = runTest {
         assertEquals(
-            ParseResult(),
+            ParseResult.Success(),
             input.fetchAndParse("https://www.google.com/spam"),
         )
     }
@@ -166,7 +169,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test
     fun parse_whenPlaceIdIsEmpty_returnsNoPoints() = runTest {
         assertEquals(
-            ParseResult(),
+            ParseResult.Success(),
             input.fetchAndParse("https://www.google.com/maps/search/?query_place_id="),
         )
     }
@@ -184,7 +187,14 @@ class GoogleMapsPlaceApiInputTest {
     @Test
     fun parse_whenApiReturns400_returnsPointsWithoutCoordinates() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(GCJ02MainlandChinaPoint(placeId = "bad-request", source = Source.URI))),
+            ParseResult.Success(
+                persistentListOf(
+                    GCJ02MainlandChinaPoint(
+                        placeId = "bad-request",
+                        source = Source.URI
+                    )
+                )
+            ),
             input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=bad-request"),
         )
     }
@@ -192,7 +202,7 @@ class GoogleMapsPlaceApiInputTest {
     @Test
     fun parse_whenApiReturns404_returnsPointsWithoutCoordinates() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(GCJ02MainlandChinaPoint(placeId = "not-found", source = Source.URI))),
+            ParseResult.Success(persistentListOf(GCJ02MainlandChinaPoint(placeId = "not-found", source = Source.URI))),
             input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=not-found"),
         )
     }
@@ -211,7 +221,4 @@ class GoogleMapsPlaceApiInputTest {
     fun parse_whenApiThrowsUnknownException_throwsUnknownNetworkException() = runTest {
         input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=uknown-exception")
     }
-
-    private suspend fun GoogleMapsPlaceApiInput.fetchAndParse(match: String): ParseResult =
-        fetch(match) { data -> parse(data, match) }
 }
