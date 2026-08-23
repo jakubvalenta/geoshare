@@ -82,10 +82,20 @@ class GoogleMapsUriInputTest : InputTest {
     }
 
     @Test
-    fun match_googleSearch_doesNotMatch() {
+    fun match_googleSearchShortLink() {
         assertNull(input.match("https://share.google/foo"))
-        assertNull(input.match("https://www.google.com/share.google?q=foo"))
-        assertNull(input.match("https://www.google.com/search?foo"))
+    }
+
+    @Test
+    fun match_googleSearchFullUrl() {
+        assertEquals(
+            "https://www.google.com/share.google?q=foo",
+            input.match("https://www.google.com/share.google?q=foo"),
+        )
+        assertEquals(
+            "https://www.google.com/search?foo",
+            input.match("https://www.google.com/search?foo"),
+        )
     }
 
     @Test
@@ -1010,6 +1020,18 @@ class GoogleMapsUriInputTest : InputTest {
                 )
             ),
             input.parse("maps.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=12345?entry=ttu&g_ep=678910"),
+        )
+    }
+
+    @Test
+    fun parse_googleSearchFullUrl_returnsNoPoints() = runTest {
+        assertEquals(
+            ParseResult.Success(),
+            input.parse("https://www.google.com/share.google?q=foo"),
+        )
+        assertEquals(
+            ParseResult.Success(),
+            input.parse("https://www.google.com/search?foo"),
         )
     }
 }
