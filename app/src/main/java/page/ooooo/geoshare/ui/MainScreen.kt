@@ -15,16 +15,13 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -34,14 +31,11 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.contentColorFor
-import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -426,7 +420,6 @@ private fun MainScreen(
     onStart: () -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
-    val coroutineScope = rememberCoroutineScope()
     val mainContainerColor = when (currentState) {
         is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null -> MaterialTheme.colorScheme.surfaceContainer
         is ConversionState.HasError if currentState.warning -> MaterialTheme.colorScheme.surfaceContainerHighest
@@ -439,7 +432,6 @@ private fun MainScreen(
 
     val (errorMessageResId, setErrorMessageResId) = retain { mutableStateOf<Int?>(null) }
     val (selectedPointIndex, setSelectedPointIndex) = retain { mutableStateOf<Int?>(null) }
-    val sheetState = rememberBottomSheetState(SheetValue.Hidden)
     val snackbarHostState = remember { SnackbarHostState() }
 
     BackHandler(currentState !is Initial) {
@@ -771,30 +763,15 @@ private fun MainScreen(
     }
 
     if (currentState is ConversionState.HasResult && selectedPointIndex != null) {
-        ModalBottomSheet(
-            onDismissRequest = { setSelectedPointIndex(null) },
-            modifier = Modifier
-                // Set and consume insets to prevent unclickable items when the sheet is expanded (probably a bug in
-                // Compose Material 3)
-                .windowInsetsPadding(WindowInsets.safeDrawing),
-            sheetState = sheetState,
-        ) {
-            ResultSheet(
-                points = currentState.points,
-                selectedPointIndex = selectedPointIndex,
-                appDetails = appDetails,
-                outputsForPoint = outputsForPoint,
-                outputsForPoints = outputsForPoints,
-                onExecute = onExecute,
-                onHide = {
-                    coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            setSelectedPointIndex(null)
-                        }
-                    }
-                },
-            )
-        }
+        ResultSheet(
+            points = currentState.points,
+            selectedPointIndex = selectedPointIndex,
+            appDetails = appDetails,
+            outputsForPoint = outputsForPoint,
+            outputsForPoints = outputsForPoints,
+            onExecute = onExecute,
+            onSelectPointIndex = setSelectedPointIndex,
+        )
     }
 
     when (currentState) {
