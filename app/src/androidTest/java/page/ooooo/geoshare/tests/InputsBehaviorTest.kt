@@ -16,7 +16,7 @@ class InputsBehaviorTest {
         waitForAppToBeVisible()
 
         // Go to the second intro page
-        onElement { viewIdResourceName == "geoShareIntroPage0HeadingText" }
+        onElement { viewIdResourceName == "geoShareIntroPage0Headline" }
         onElement { viewIdResourceName == "geoShareIntroNextButton" }.click()
 
         // Relaunch app
@@ -26,7 +26,7 @@ class InputsBehaviorTest {
 
         // Intro is still visible; go through all intro pages
         for (page in 0..1) {
-            onElement { viewIdResourceName == "geoShareIntroPage${page}HeadingText" }
+            onElement { viewIdResourceName == "geoShareIntroPage${page}Headline" }
             onElement { viewIdResourceName == "geoShareIntroNextButton" }.click()
         }
 

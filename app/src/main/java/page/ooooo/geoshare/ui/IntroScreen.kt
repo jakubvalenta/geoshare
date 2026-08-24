@@ -91,6 +91,7 @@ fun IntroScreen(
 @Composable
 private fun IntroScreen(
     initialPage: Int = 0,
+    pageCount: Int = 2,
     onClose: () -> Unit,
     onShowOpenByDefaultSettings: () -> Unit,
     onShowOpenByDefaultSettingsForPackage: (packageName: String) -> Unit,
@@ -99,7 +100,6 @@ private fun IntroScreen(
     val coroutineScope = rememberCoroutineScope()
     val spacing = LocalSpacing.current
 
-    val pageCount = 2
     val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { pageCount })
     val animatedProgress by animateFloatAsState(
         targetValue = (pagerState.currentPage + 1f) / pageCount,
@@ -272,7 +272,7 @@ private fun IntroPage(
                 headline,
                 Modifier
                     .padding(vertical = spacing.smallAdaptive)
-                    .testTag("geoShareIntroPage${page}HeadingText"),
+                    .testTag("geoShareIntroPage${page}Headline"),
                 style = MaterialTheme.typography.headlineSmall,
             )
             Column(verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive)) {
