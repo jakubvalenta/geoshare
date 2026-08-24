@@ -365,5 +365,12 @@
     <string name="user_preferences_section_appearance">Appearance</string>
     <string name="user_preferences_section_input">Input</string>
     <string name="user_preferences_section_output">Output</string>
+    <string name="welcome_completed_headline">Congratulations</string>
+    <string name="welcome_completed_text">You have completed the tutorial.</string>
+    <string name="welcome_copy">Copy a map link to clipboard. Here’s one:</string>
+    <string name="welcome_headline">Welcome</string>
+    <string name="welcome_paste">Paste the link in the form.</string>
+    <string name="welcome_submit">Tap %1$s.</string>
+    <string name="welcome_text">This tutorial will teach you how to use %1$s:</string>
     <string name="yes">Yes</string>
 </resources>

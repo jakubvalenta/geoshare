@@ -11,11 +11,12 @@ import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
+import androidx.compose.ui.text.withStyle
 import page.ooooo.geoshare.lib.Segment
 import page.ooooo.geoshare.lib.parseFormatString
 
 sealed interface FormatArg {
-    data class Text(val text: String) : FormatArg
+    data class Text(val text: String, val style: SpanStyle? = null) : FormatArg
     data class Link(val text: String, val onClick: () -> Unit) : FormatArg
 }
 
@@ -30,8 +31,17 @@ fun annotatedStringResource(@StringRes id: Int, vararg formatArgs: FormatArg): A
             is Segment.Arg -> {
                 val argument = formatArgs.getOrNull(segment.index) ?: return@forEach
                 when (argument) {
-                    is FormatArg.Text -> append(argument.text)
-                    is FormatArg.Link -> ClickableLink(argument.text, argument.onClick)
+                    is FormatArg.Text ->
+                        if (argument.style != null) {
+                            withStyle(argument.style) {
+                                append(argument.text)
+                            }
+                        } else {
+                            append(argument.text)
+                        }
+
+                    is FormatArg.Link ->
+                        ClickableLink(argument.text, argument.onClick)
                 }
             }
         }

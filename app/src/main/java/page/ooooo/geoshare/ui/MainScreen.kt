@@ -151,6 +151,7 @@ import page.ooooo.geoshare.ui.components.ResultSheet
 import page.ooooo.geoshare.ui.components.ResultTitle
 import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
 import page.ooooo.geoshare.ui.components.StyledSupportingPaneScaffold
+import page.ooooo.geoshare.ui.components.WelcomeSheet
 import page.ooooo.geoshare.ui.components.checkeredBackground
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -170,6 +171,7 @@ fun MainScreen(
     billingViewModel: BillingViewModel,
     conversionViewModel: ConversionViewModel,
     inputViewModel: InputViewModel = hiltViewModel(),
+    introViewModel: IntroViewModel = hiltViewModel(),
     outputViewModel: OutputViewModel = hiltViewModel(),
     linkViewModel: LinkViewModel = hiltViewModel(),
     userPreferenceViewModel: UserPreferenceViewModel = hiltViewModel(),
@@ -186,6 +188,7 @@ fun MainScreen(
     val billingFeatures = billingViewModel.billingFeatures
     val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
     val changelogShown by inputViewModel.changelogShown.collectAsStateWithLifecycle()
+    val introShown by introViewModel.shown.collectAsStateWithLifecycle()
     val linkMessage by linkViewModel.message.collectAsStateWithLifecycle()
     val outputsForApps by outputViewModel.outputsForApps.collectAsStateWithLifecycle()
     val outputsForLinks by outputViewModel.outputsForLinks.collectAsStateWithLifecycle()
@@ -321,21 +324,23 @@ fun MainScreen(
         outputsForPoints = outputsForPoints,
         outputsForPointsChips = outputsForPointsChips,
         outputsForSharing = outputsForSharing,
-        source = conversionViewModel.source,
+        source = conversionViewModel.source, // FIXME Recomposition
         userPreferenceMessage = userPreferencesMessage,
+        welcomeVisible = !introShown,
         onCancel = {
             locationJob?.cancel()
             conversionViewModel.cancel()
         },
+        onCloseWelcome = { introViewModel.setShown() },
         onDeny = { doNotAsk -> conversionViewModel.deny(doNotAsk) },
         onDisableLinkGroup = { group -> linkViewModel.disableGroup(resources, group) },
         onDismissLinkMessage = { linkViewModel.dismissMessage() },
         onDismissUserPreferenceMessage = { userPreferenceViewModel.dismissMessage() },
-        onGrant = { doNotAsk -> conversionViewModel.grant(doNotAsk) },
         onExecute = { action ->
             conversionViewModel.cancel()
             conversionViewModel.startAction(action)
         },
+        onGrant = { doNotAsk -> conversionViewModel.grant(doNotAsk) },
         onHideApp = { packageName -> userPreferenceViewModel.hideApp(resources, packageName) },
         onNavigateToAboutScreen = {
             conversionViewModel.cancel()
@@ -399,11 +404,14 @@ private fun MainScreen(
     outputsForSharing: List<Output>,
     source: StateFlow<String>,
     userPreferenceMessage: Message?,
+    welcomeVisible: Boolean,
     onCancel: () -> Unit,
+    onCloseWelcome: () -> Unit,
     onDeny: (Boolean) -> Unit,
     onDisableLinkGroup: (String?) -> Unit,
     onDismissLinkMessage: () -> Unit,
     onDismissUserPreferenceMessage: () -> Unit,
+    onExecute: (Action<*>) -> Unit,
     onGrant: (Boolean) -> Unit,
     onHideApp: (String) -> Unit,
     onNavigateToAboutScreen: () -> Unit,
@@ -415,7 +423,6 @@ private fun MainScreen(
     onNavigateToUserPreferencesScreen: (groupId: UserPreferenceGroupId?) -> Unit,
     onReset: () -> Unit,
     onRetry: () -> Unit,
-    onExecute: (Action<*>) -> Unit,
     onSetSource: (String) -> Unit,
     onStart: () -> Unit,
 ) {
@@ -454,176 +461,65 @@ private fun MainScreen(
         }
     }
 
-    Scaffold(
-        snackbarHost = {
-            MessageSnackbarHost(snackbarHostState)
-        },
-    ) {
-        StyledSupportingPaneScaffold(
-            mainPane = { innerPadding, wide ->
-                Column(Modifier.weight(1f)) {
-                    LargeTopAppBarPane(
-                        modifier = Modifier.testTag("geoShareMainPane"),
-                        title = { maxLines ->
-                            MainTitle(
-                                currentState = currentState,
-                                billingAppNameResId = billingAppNameResId,
-                                billingStatus = billingStatus,
-                                largeLoadingIndicator = largeLoadingIndicator,
-                                maxLines = maxLines,
-                            )
-                        },
-                        onBack = if (currentState !is Initial) {
-                            onReset
-                        } else {
-                            null
-                        },
-                        actions = {
-                            if (!wide) {
-                                MainMenu(
+    Box(Modifier.fillMaxSize()) {
+        Scaffold(
+            snackbarHost = {
+                MessageSnackbarHost(snackbarHostState)
+            },
+        ) {
+            StyledSupportingPaneScaffold(
+                mainPane = { innerPadding, wide ->
+                    Column(Modifier.weight(1f)) {
+                        LargeTopAppBarPane(
+                            modifier = Modifier.testTag("geoShareMainPane"),
+                            title = { maxLines ->
+                                MainTitle(
                                     currentState = currentState,
                                     billingAppNameResId = billingAppNameResId,
                                     billingStatus = billingStatus,
-                                    changelogShown = changelogShown,
-                                    onNavigateToAboutScreen = onNavigateToAboutScreen,
-                                    onNavigateToBillingScreen = onNavigateToBillingScreen,
-                                    onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                    onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                    onNavigateToIntroScreen = onNavigateToIntroScreen,
-                                    onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
+                                    largeLoadingIndicator = largeLoadingIndicator,
+                                    maxLines = maxLines,
                                 )
-                            }
-                        },
-                        expandedHeight = if (currentState is Initial) {
-                            spacing.largeTopAppBarExpandedHeight + spacing.largeAdaptive
-                        } else {
-                            spacing.largeTopAppBarExpandedHeight
-                        },
-                    ) {
-                        if (!wide) {
-                            when (currentState) {
-                                is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
-                                    item {
-                                        MainLoadingIndicator(
-                                            loadingIndicator = largeLoadingIndicator,
-                                            onCancel = onCancel,
-                                        )
-                                    }
-
-                                is ConversionState.HasError ->
-                                    item {
-                                        ResultError(
-                                            source = currentState.source,
-                                            message = currentState.message,
-                                            details = currentState.details,
-                                            warning = currentState.warning,
-                                            onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                            onRetry = onRetry,
-                                        )
-                                    }
-
-                                is ConversionState.HasResult -> {
-                                    item {
-                                        ResultCoordinates(
-                                            points = currentState.points,
-                                            appDetails = appDetails,
-                                            coordinateConverter = coordinateConverter,
-                                            coordinateFormat = coordinateFormat,
-                                            outputsForPointChips = outputsForPointChips,
-                                            outputsForPointsChips = outputsForPointsChips,
-                                            onExecute = onExecute,
-                                            onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                            onSelect = { index ->
-                                                onCancel()
-                                                setSelectedPointIndex(index)
-                                            },
-                                        )
-                                    }
-                                    item {
-                                        Column(
-                                            // This column must not have weight(1f), otherwise the last row of app icons gets shrunk
-                                            Modifier
-                                                .fillMaxWidth()
-                                                .background(MaterialTheme.colorScheme.surface)
-                                        ) {
-                                            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                                                ResultTitle(
-                                                    currentState = currentState,
-                                                    appDetails = appDetails,
-                                                    billingFeatures = billingFeatures,
-                                                    billingStatus = billingStatus,
-                                                    modifier = Modifier
-                                                        .padding(horizontal = spacing.windowPadding)
-                                                        .padding(top = spacing.largeAdaptive),
-                                                    onCancel = onCancel,
-                                                    onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
-                                                )
-                                                ResultApps(
-                                                    appDetails = appDetails,
-                                                    outputsForApps = outputsForApps,
-                                                    outputsForLinks = outputsForLinks,
-                                                    outputsForSharing = outputsForSharing,
-                                                    points = currentState.points,
-                                                    onDisableLinkGroup = onDisableLinkGroup,
-                                                    onExecute = onExecute,
-                                                    onHideApp = onHideApp,
-                                                    onNavigateToLinkScreen = onNavigateToLinkScreen,
-                                                )
-                                            }
-                                        }
-                                    }
+                            },
+                            onBack = if (currentState !is Initial) {
+                                onReset
+                            } else {
+                                null
+                            },
+                            actions = {
+                                if (!wide) {
+                                    MainMenu(
+                                        currentState = currentState,
+                                        billingAppNameResId = billingAppNameResId,
+                                        billingStatus = billingStatus,
+                                        changelogShown = changelogShown,
+                                        onNavigateToAboutScreen = onNavigateToAboutScreen,
+                                        onNavigateToBillingScreen = onNavigateToBillingScreen,
+                                        onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                        onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                        onNavigateToIntroScreen = onNavigateToIntroScreen,
+                                        onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
+                                    )
                                 }
-
-                                is Initial -> {
-                                    item {
-                                        MainForm(
-                                            source = source,
-                                            errorMessageResId = errorMessageResId,
-                                            onSetErrorMessageResId = setErrorMessageResId,
-                                            onSetSource = onSetSource,
-                                            onSubmit = onStart,
-                                        )
-                                    }
-                                    item {
-                                        MainHelp(
-                                            inputRepository = inputRepository,
-                                            modifier = Modifier.padding(top = spacing.largeAdaptive),
-                                            onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                            onNavigateToIntroScreen = onNavigateToIntroScreen,
-                                            onSetErrorMessageResId = setErrorMessageResId,
-                                            onSetSource = onSetSource,
-                                        )
-                                    }
-                                }
-                            }
-                        } else if (currentState is Initial) {
-                            item {
-                                MainForm(
-                                    source = source,
-                                    errorMessageResId = errorMessageResId,
-                                    onSetErrorMessageResId = setErrorMessageResId,
-                                    onSetSource = onSetSource,
-                                    onSubmit = onStart,
-                                )
-                            }
-                        } else {
-                            item {
-                                Card(
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = mainContainerColor,
-                                        contentColor = mainContentColor,
-                                    ),
-                                ) {
-                                    Spacer(Modifier.height(spacing.mediumAdaptive))
-
-                                    when (currentState) {
-                                        is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
+                            },
+                            expandedHeight = if (currentState is Initial) {
+                                spacing.largeTopAppBarExpandedHeight + spacing.largeAdaptive
+                            } else {
+                                spacing.largeTopAppBarExpandedHeight
+                            },
+                        ) {
+                            if (!wide) {
+                                when (currentState) {
+                                    is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
+                                        item {
                                             MainLoadingIndicator(
                                                 loadingIndicator = largeLoadingIndicator,
                                                 onCancel = onCancel,
                                             )
+                                        }
 
-                                        is ConversionState.HasError ->
+                                    is ConversionState.HasError ->
+                                        item {
                                             ResultError(
                                                 source = currentState.source,
                                                 message = currentState.message,
@@ -632,8 +528,10 @@ private fun MainScreen(
                                                 onNavigateToInputsScreen = onNavigateToInputsScreen,
                                                 onRetry = onRetry,
                                             )
+                                        }
 
-                                        is ConversionState.HasResult -> {
+                                    is ConversionState.HasResult -> {
+                                        item {
                                             ResultCoordinates(
                                                 points = currentState.points,
                                                 appDetails = appDetails,
@@ -649,116 +547,236 @@ private fun MainScreen(
                                                 },
                                             )
                                         }
+                                        item {
+                                            Column(
+                                                // This column must not have weight(1f), otherwise the last row of app icons gets shrunk
+                                                Modifier
+                                                    .fillMaxWidth()
+                                                    .background(MaterialTheme.colorScheme.surface)
+                                            ) {
+                                                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                                                    ResultTitle(
+                                                        currentState = currentState,
+                                                        appDetails = appDetails,
+                                                        billingFeatures = billingFeatures,
+                                                        billingStatus = billingStatus,
+                                                        modifier = Modifier
+                                                            .padding(horizontal = spacing.windowPadding)
+                                                            .padding(top = spacing.largeAdaptive),
+                                                        onCancel = onCancel,
+                                                        onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
+                                                    )
+                                                    ResultApps(
+                                                        appDetails = appDetails,
+                                                        outputsForApps = outputsForApps,
+                                                        outputsForLinks = outputsForLinks,
+                                                        outputsForSharing = outputsForSharing,
+                                                        points = currentState.points,
+                                                        onDisableLinkGroup = onDisableLinkGroup,
+                                                        onExecute = onExecute,
+                                                        onHideApp = onHideApp,
+                                                        onNavigateToLinkScreen = onNavigateToLinkScreen,
+                                                    )
+                                                }
+                                            }
+                                        }
                                     }
+
+                                    is Initial -> {
+                                        item {
+                                            MainForm(
+                                                source = source,
+                                                errorMessageResId = errorMessageResId,
+                                                onSetErrorMessageResId = setErrorMessageResId,
+                                                onSetSource = onSetSource,
+                                                onSubmit = onStart,
+                                            )
+                                        }
+                                        item {
+                                            MainHelp(
+                                                inputRepository = inputRepository,
+                                                modifier = Modifier.padding(top = spacing.largeAdaptive),
+                                                onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                                onNavigateToIntroScreen = onNavigateToIntroScreen,
+                                                onSetErrorMessageResId = setErrorMessageResId,
+                                                onSetSource = onSetSource,
+                                            )
+                                        }
+                                    }
+                                }
+                            } else if (currentState is Initial) {
+                                item {
+                                    MainForm(
+                                        source = source,
+                                        errorMessageResId = errorMessageResId,
+                                        onSetErrorMessageResId = setErrorMessageResId,
+                                        onSetSource = onSetSource,
+                                        onSubmit = onStart,
+                                    )
+                                }
+                            } else {
+                                item {
+                                    Card(
+                                        colors = CardDefaults.cardColors(
+                                            containerColor = mainContainerColor,
+                                            contentColor = mainContentColor,
+                                        ),
+                                    ) {
+                                        Spacer(Modifier.height(spacing.mediumAdaptive))
+
+                                        when (currentState) {
+                                            is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
+                                                MainLoadingIndicator(
+                                                    loadingIndicator = largeLoadingIndicator,
+                                                    onCancel = onCancel,
+                                                )
+
+                                            is ConversionState.HasError ->
+                                                ResultError(
+                                                    source = currentState.source,
+                                                    message = currentState.message,
+                                                    details = currentState.details,
+                                                    warning = currentState.warning,
+                                                    onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                                    onRetry = onRetry,
+                                                )
+
+                                            is ConversionState.HasResult -> {
+                                                ResultCoordinates(
+                                                    points = currentState.points,
+                                                    appDetails = appDetails,
+                                                    coordinateConverter = coordinateConverter,
+                                                    coordinateFormat = coordinateFormat,
+                                                    outputsForPointChips = outputsForPointChips,
+                                                    outputsForPointsChips = outputsForPointsChips,
+                                                    onExecute = onExecute,
+                                                    onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                                    onSelect = { index ->
+                                                        onCancel()
+                                                        setSelectedPointIndex(index)
+                                                    },
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        Column(
+                            Modifier
+                                .weight(1f)
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.surface)
+                        ) {
+                            if (currentState is PermissionGrantedWebViewInput) {
+                                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                                    MainWebView(
+                                        matchedInput = currentState.matchedInput,
+                                        pendingData = currentState.pendingData,
+                                    )
                                 }
                             }
                         }
                     }
 
-                    Column(
-                        Modifier
-                            .weight(1f)
-                            .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.surface)
-                    ) {
-                        if (currentState is PermissionGrantedWebViewInput) {
-                            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                                MainWebView(
-                                    matchedInput = currentState.matchedInput,
-                                    pendingData = currentState.pendingData,
-                                )
-                            }
-                        }
-                    }
-                }
-
-                if (currentState is ConversionState.HasSource) {
-                    MainCopySourceButton(
-                        source = currentState.source,
-                        innerPadding = innerPadding,
-                        containerColor = if (!wide) {
-                            MaterialTheme.colorScheme.surfaceContainer
-                        } else {
-                            Color.Transparent
-                        },
-                    )
-                } else {
-                    Spacer(Modifier.padding(innerPadding))
-                }
-            },
-            supportingPane = { wide ->
-                LargeTopAppBarPane(
-                    modifier = Modifier.testTag("geoShareMainSupportingPane"),
-                    title = if (currentState is ConversionState.HasResult) {
-                        {
-                            ResultTitle(
-                                currentState = currentState,
-                                appDetails = appDetails,
-                                billingFeatures = billingFeatures,
-                                billingStatus = billingStatus,
-                                onCancel = onCancel,
-                                onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
-                            )
-                        }
+                    if (currentState is ConversionState.HasSource) {
+                        MainCopySourceButton(
+                            source = currentState.source,
+                            innerPadding = innerPadding,
+                            containerColor = if (!wide) {
+                                MaterialTheme.colorScheme.surfaceContainer
+                            } else {
+                                Color.Transparent
+                            },
+                        )
                     } else {
-                        null
-                    },
-                    actions = {
-                        if (wide) {
-                            MainMenu(
-                                currentState = currentState,
-                                billingAppNameResId = billingAppNameResId,
-                                billingStatus = billingStatus,
-                                changelogShown = changelogShown,
-                                onNavigateToAboutScreen = onNavigateToAboutScreen,
-                                onNavigateToBillingScreen = onNavigateToBillingScreen,
-                                onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                onNavigateToIntroScreen = onNavigateToIntroScreen,
-                                onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
-                            )
-                        }
-                    },
-                ) {
-                    when (currentState) {
-                        is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null -> {}
-
-                        is ConversionState.HasResult ->
-                            item {
-                                ResultApps(
+                        Spacer(Modifier.padding(innerPadding))
+                    }
+                },
+                supportingPane = { wide ->
+                    LargeTopAppBarPane(
+                        modifier = Modifier.testTag("geoShareMainSupportingPane"),
+                        title = if (currentState is ConversionState.HasResult) {
+                            {
+                                ResultTitle(
+                                    currentState = currentState,
                                     appDetails = appDetails,
-                                    outputsForApps = outputsForApps,
-                                    outputsForLinks = outputsForLinks,
-                                    outputsForSharing = outputsForSharing,
-                                    points = currentState.points,
-                                    onDisableLinkGroup = onDisableLinkGroup,
-                                    onExecute = onExecute,
-                                    onHideApp = onHideApp,
-                                    onNavigateToLinkScreen = onNavigateToLinkScreen,
+                                    billingFeatures = billingFeatures,
+                                    billingStatus = billingStatus,
+                                    onCancel = onCancel,
+                                    onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
                                 )
                             }
-
-                        is Initial ->
-                            item {
-                                MainHelp(
-                                    inputRepository = inputRepository,
-                                    modifier = Modifier.padding(top = spacing.largeAdaptive),
+                        } else {
+                            null
+                        },
+                        actions = {
+                            if (wide) {
+                                MainMenu(
+                                    currentState = currentState,
+                                    billingAppNameResId = billingAppNameResId,
+                                    billingStatus = billingStatus,
+                                    changelogShown = changelogShown,
+                                    onNavigateToAboutScreen = onNavigateToAboutScreen,
+                                    onNavigateToBillingScreen = onNavigateToBillingScreen,
+                                    onNavigateToFaqScreen = onNavigateToFaqScreen,
                                     onNavigateToInputsScreen = onNavigateToInputsScreen,
                                     onNavigateToIntroScreen = onNavigateToIntroScreen,
-                                    onSetErrorMessageResId = setErrorMessageResId,
-                                    onSetSource = onSetSource,
+                                    onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
                                 )
                             }
+                        },
+                    ) {
+                        when (currentState) {
+                            is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null -> {}
+
+                            is ConversionState.HasResult ->
+                                item {
+                                    ResultApps(
+                                        appDetails = appDetails,
+                                        outputsForApps = outputsForApps,
+                                        outputsForLinks = outputsForLinks,
+                                        outputsForSharing = outputsForSharing,
+                                        points = currentState.points,
+                                        onDisableLinkGroup = onDisableLinkGroup,
+                                        onExecute = onExecute,
+                                        onHideApp = onHideApp,
+                                        onNavigateToLinkScreen = onNavigateToLinkScreen,
+                                    )
+                                }
+
+                            is Initial ->
+                                item {
+                                    MainHelp(
+                                        inputRepository = inputRepository,
+                                        modifier = Modifier.padding(top = spacing.largeAdaptive),
+                                        onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                        onNavigateToIntroScreen = onNavigateToIntroScreen,
+                                        onSetErrorMessageResId = setErrorMessageResId,
+                                        onSetSource = onSetSource,
+                                    )
+                                }
+                        }
                     }
-                }
-            },
-            colors = StyledPaneScaffoldDefaults.colors(
-                mainContainerColor = mainContainerColor,
-                mainContentColor = mainContentColor,
-                wideMainContainerColor = Color.Transparent,
-                wideMainContentColor = MaterialTheme.colorScheme.onSurface,
-            ),
-            shouldAutoFocusCurrentDestination = false,
+                },
+                colors = StyledPaneScaffoldDefaults.colors(
+                    mainContainerColor = mainContainerColor,
+                    mainContentColor = mainContentColor,
+                    wideMainContainerColor = Color.Transparent,
+                    wideMainContentColor = MaterialTheme.colorScheme.onSurface,
+                ),
+                shouldAutoFocusCurrentDestination = false,
+            )
+        }
+
+        WelcomeSheet(
+            initialVisible = welcomeVisible,
+            conversionSucceeded = currentState is ConversionState.HasResult,
+            source = source,
+            onClose = onCloseWelcome,
+            onNavigateToIntroScreen = onNavigateToIntroScreen,
+            onTextMatchesInput = { source -> inputRepository.all.firstOrNull { it.match(source) != null } != null },
         )
     }
 
@@ -1011,8 +1029,11 @@ private fun DefaultPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
+            welcomeVisible = true,
             onCancel = {},
+            onCloseWelcome = {},
             onDeny = {},
+            onExecute = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
@@ -1027,7 +1048,6 @@ private fun DefaultPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
             onStart = {},
         )
@@ -1062,8 +1082,11 @@ private fun DarkPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
+            welcomeVisible = true,
             onCancel = {},
+            onCloseWelcome = {},
             onDeny = {},
+            onExecute = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
@@ -1078,7 +1101,6 @@ private fun DarkPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
             onStart = {},
         )
@@ -1113,8 +1135,11 @@ private fun SmallPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
+            welcomeVisible = true,
             onCancel = {},
+            onCloseWelcome = {},
             onDeny = {},
+            onExecute = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
@@ -1129,7 +1154,6 @@ private fun SmallPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
             onStart = {},
         )
@@ -1164,8 +1188,11 @@ private fun TabletPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
+            welcomeVisible = true,
             onCancel = {},
+            onCloseWelcome = {},
             onDeny = {},
+            onExecute = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
@@ -1180,7 +1207,6 @@ private fun TabletPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
             onStart = {},
         )
@@ -1247,8 +1273,11 @@ private fun SucceededPreview() {
             outputsForSharing = outputRepository.getOutputsForSharing(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
+            welcomeVisible = false,
             onCancel = {},
+            onCloseWelcome = {},
             onDeny = {},
+            onExecute = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
@@ -1263,7 +1292,6 @@ private fun SucceededPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
             onStart = {},
         )
@@ -1330,8 +1358,11 @@ private fun DarkSucceededPreview() {
             outputsForSharing = outputRepository.getOutputsForSharing(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
+            welcomeVisible = false,
             onCancel = {},
+            onCloseWelcome = {},
             onDeny = {},
+            onExecute = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
@@ -1346,7 +1377,6 @@ private fun DarkSucceededPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
             onStart = {},
         )
@@ -1412,8 +1442,11 @@ private fun SmallSucceededPreview() {
             outputsForSharing = outputRepository.getOutputsForSharing(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
+            welcomeVisible = false,
             onCancel = {},
+            onCloseWelcome = {},
             onDeny = {},
+            onExecute = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
@@ -1428,7 +1461,6 @@ private fun SmallSucceededPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
             onStart = {},
         )
@@ -1495,8 +1527,11 @@ private fun TabletSucceededPreview() {
             outputsForSharing = outputRepository.getOutputsForSharing(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
+            welcomeVisible = false,
             onCancel = {},
+            onCloseWelcome = {},
             onDeny = {},
+            onExecute = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
@@ -1511,7 +1546,6 @@ private fun TabletSucceededPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
             onStart = {},
         )
@@ -1554,8 +1588,11 @@ private fun ErrorPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
+            welcomeVisible = false,
             onCancel = {},
+            onCloseWelcome = {},
             onDeny = {},
+            onExecute = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
@@ -1570,7 +1607,6 @@ private fun ErrorPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
             onStart = {},
         )
@@ -1613,8 +1649,11 @@ private fun DarkErrorPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
+            welcomeVisible = false,
             onCancel = {},
+            onCloseWelcome = {},
             onDeny = {},
+            onExecute = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
@@ -1629,7 +1668,6 @@ private fun DarkErrorPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
             onStart = {},
         )
@@ -1672,8 +1710,11 @@ private fun TabletErrorPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
+            welcomeVisible = false,
             onCancel = {},
+            onCloseWelcome = {},
             onDeny = {},
+            onExecute = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
@@ -1688,7 +1729,6 @@ private fun TabletErrorPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
             onStart = {},
         )
@@ -1732,8 +1772,11 @@ private fun WarningPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
+            welcomeVisible = false,
             onCancel = {},
+            onCloseWelcome = {},
             onDeny = {},
+            onExecute = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
@@ -1748,7 +1791,6 @@ private fun WarningPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
             onStart = {},
         )
@@ -1792,8 +1834,11 @@ private fun DarkWarningPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
+            welcomeVisible = false,
             onCancel = {},
+            onCloseWelcome = {},
             onDeny = {},
+            onExecute = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
@@ -1808,7 +1853,6 @@ private fun DarkWarningPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
             onStart = {},
         )
@@ -1868,8 +1912,11 @@ private fun LoadingIndicatorPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
+            welcomeVisible = false,
             onCancel = {},
+            onCloseWelcome = {},
             onDeny = {},
+            onExecute = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
@@ -1884,7 +1931,6 @@ private fun LoadingIndicatorPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
             onStart = {},
         )
@@ -1944,8 +1990,11 @@ private fun DarkLoadingIndicatorPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
+            welcomeVisible = false,
             onCancel = {},
+            onCloseWelcome = {},
             onDeny = {},
+            onExecute = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
@@ -1960,7 +2009,6 @@ private fun DarkLoadingIndicatorPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
             onStart = {},
         )
@@ -2020,8 +2068,11 @@ private fun TabletLoadingIndicatorPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
+            welcomeVisible = false,
             onCancel = {},
+            onCloseWelcome = {},
             onDeny = {},
+            onExecute = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
@@ -2036,7 +2087,6 @@ private fun TabletLoadingIndicatorPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
             onStart = {},
         )
@@ -2093,8 +2143,11 @@ private fun WebViewPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
+            welcomeVisible = false,
             onCancel = {},
+            onCloseWelcome = {},
             onDeny = {},
+            onExecute = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
@@ -2109,7 +2162,6 @@ private fun WebViewPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
             onStart = {},
         )
@@ -2166,8 +2218,11 @@ private fun DarkWebViewPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
+            welcomeVisible = false,
             onCancel = {},
+            onCloseWelcome = {},
             onDeny = {},
+            onExecute = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
@@ -2182,7 +2237,6 @@ private fun DarkWebViewPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
             onStart = {},
         )
@@ -2239,8 +2293,11 @@ private fun TabletWebViewPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
+            welcomeVisible = false,
             onCancel = {},
+            onCloseWelcome = {},
             onDeny = {},
+            onExecute = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
@@ -2255,7 +2312,6 @@ private fun TabletWebViewPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
             onStart = {},
         )
@@ -2309,8 +2365,11 @@ private fun EmptyPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
+            welcomeVisible = false,
             onCancel = {},
+            onCloseWelcome = {},
             onDeny = {},
+            onExecute = {},
             onDisableLinkGroup = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
@@ -2325,7 +2384,6 @@ private fun EmptyPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
             onStart = {},
         )

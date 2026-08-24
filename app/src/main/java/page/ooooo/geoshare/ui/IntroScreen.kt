@@ -62,10 +62,7 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
-fun IntroScreen(
-    onClose: () -> Unit,
-    viewModel: IntroViewModel,
-) {
+fun IntroScreen(onClose: () -> Unit) {
     val context = LocalContext.current
     val settingsLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
@@ -74,10 +71,7 @@ fun IntroScreen(
     }
 
     IntroScreen(
-        onClose = {
-            viewModel.setShown()
-            onClose()
-        },
+        onClose = onClose,
         onShowOpenByDefaultSettings = {
             AndroidTools.showOpenByDefaultSettings(context, settingsLauncher)
         },
