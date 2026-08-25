@@ -19,7 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.ZeroCornerSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -123,7 +123,7 @@ private fun WelcomeCard(
     conversionSucceeded: Boolean,
     initialLinkCopied: Boolean = false,
     outputsForApps: Map<String, List<Output>>,
-    stepCount: Int = 3,
+    stepCount: Int = 4,
     source: StateFlow<String>,
     sourceComesFromIntent: StateFlow<Boolean>,
     onClose: () -> Unit,
@@ -162,7 +162,7 @@ private fun WelcomeCard(
     var linkCopied by remember { mutableStateOf(initialLinkCopied) }
     val completedIndex = remember(conversionSucceeded, sourceIsNotEmpty, linkCopied) {
         if (sourceComesFromIntent) {
-            32
+            3
         } else if (conversionSucceeded) {
             2
         } else if (sourceIsNotEmpty) {
@@ -193,10 +193,7 @@ private fun WelcomeCard(
 
     ElevatedCard(
         Modifier.fillMaxWidth(), // TODO Apply window padding
-        shape = MaterialTheme.shapes.large.copy(
-            bottomStart = ZeroCornerSize,
-            bottomEnd = ZeroCornerSize,
-        ),
+        shape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.tertiaryContainer,
         ),
@@ -233,6 +230,7 @@ private fun WelcomeCard(
                     Modifier.padding(top = spacing.small),
                     verticalArrangement = Arrangement.spacedBy(spacing.small)
                 ) {
+                    // TODO Show only one step at a time
                     WelcomeStep(
                         index = 0,
                         completedIndex = completedIndex,
@@ -303,7 +301,7 @@ private fun WelcomeCard(
                 onClose,
                 Modifier
                     .align(Alignment.TopEnd)
-                    .offset(x = (-3).dp, y = 5.dp)
+                    .offset(x = (-3).dp, y = 3.dp)
                     .alpha(0.8f),
                 colors = IconButtonDefaults.filledIconButtonColors(
                     containerColor = MaterialTheme.colorScheme.tertiary,
