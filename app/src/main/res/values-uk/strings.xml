@@ -353,4 +353,5 @@
     <string name="user_preferences_finish_description">Виберіть, коли застосунок має автоматично закриватися. Закритий застосунок не з’являється після використання жесту «Назад».</string>
     <string name="user_preferences_finish_never">Не закривати застосунок автоматично</string>
     <string name="user_preferences_finish_title">Закриття</string>
+    <string name="conversion_failed_unsupported_source_google_search">Посилання на Google Пошук не підтримуються</string>
 </resources>
