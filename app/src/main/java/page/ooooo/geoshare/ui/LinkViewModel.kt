@@ -2,24 +2,25 @@ package page.ooooo.geoshare.ui
 
 import android.content.res.Resources
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
-import androidx.lifecycle.viewmodel.compose.saveable
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.local.database.Link
+import page.ooooo.geoshare.data.local.database.LinkType
 import page.ooooo.geoshare.lib.Message
+import page.ooooo.geoshare.lib.geo.Srs
 import javax.inject.Inject
 
 @OptIn(SavedStateHandleSaveableApi::class)
@@ -51,42 +52,43 @@ class LinkViewModel @Inject constructor(
      * - -1: insert screen
      * - other number: update screen for this object uid
      */
-    var destination by savedStateHandle.saveable { mutableStateOf<Int?>(null) }
+    private val _destination = savedStateHandle.getMutableStateFlow<Int?>("linkDestination", null)
+    val destination = _destination.asStateFlow()
 
     /**
      * Navigate to the list, insert, or update screen; and reset or prefill the form.
      */
     suspend fun navigateTo(destination: Int?) {
         Log.d(TAG, "navigateTo($destination)")
-        if (this.destination == destination) {
+        if (_destination.value == destination) {
             // Do nothing, so that we don't overwrite values restored after process death for no reason
         } else if (destination == null || destination == -1) {
             withMutableSnapshot {
-                this.destination = destination
-                this.group = default.group
-                this.name = default.name
-                this.srs = default.srs
-                this.type = default.type
-                this.appEnabled = default.appEnabled
-                this.chipEnabled = default.chipEnabled
-                this.sheetEnabled = default.sheetEnabled
-                this.coordsUriTemplate = default.coordsUriTemplate
-                this.nameUriTemplate = default.nameUriTemplate
+                _destination.value = destination
+                _group.value = default.group
+                _name.value = default.name
+                _srs.value = default.srs
+                _type.value = default.type
+                _appEnabled.value = default.appEnabled
+                _chipEnabled.value = default.chipEnabled
+                _sheetEnabled.value = default.sheetEnabled
+                _coordsUriTemplate.value = default.coordsUriTemplate
+                _nameUriTemplate.value = default.nameUriTemplate
             }
         } else {
             val item = linkRepository.getByUid(destination)
             if (item != null) {
                 withMutableSnapshot {
-                    this.destination = destination
-                    this.group = item.group
-                    this.name = item.name
-                    this.srs = item.srs
-                    this.type = item.type
-                    this.appEnabled = item.appEnabled
-                    this.chipEnabled = item.chipEnabled
-                    this.sheetEnabled = item.sheetEnabled
-                    this.coordsUriTemplate = item.coordsUriTemplate
-                    this.nameUriTemplate = item.nameUriTemplate
+                    _destination.value = destination
+                    _group.value = item.group
+                    _name.value = item.name
+                    _srs.value = item.srs
+                    _type.value = item.type
+                    _appEnabled.value = item.appEnabled
+                    _chipEnabled.value = item.chipEnabled
+                    _sheetEnabled.value = item.sheetEnabled
+                    _coordsUriTemplate.value = item.coordsUriTemplate
+                    _nameUriTemplate.value = item.nameUriTemplate
                 }
             }
         }
@@ -94,31 +96,42 @@ class LinkViewModel @Inject constructor(
 
     // Form
 
-    var group by savedStateHandle.saveable { mutableStateOf(default.group) }
-    var name by savedStateHandle.saveable { mutableStateOf(default.name) }
-    var srs by savedStateHandle.saveable { mutableStateOf(default.srs) }
-    var type by savedStateHandle.saveable { mutableStateOf(default.type) }
-    var appEnabled by savedStateHandle.saveable { mutableStateOf(default.appEnabled) }
-    var chipEnabled by savedStateHandle.saveable { mutableStateOf(default.chipEnabled) }
-    var sheetEnabled by savedStateHandle.saveable { mutableStateOf(default.sheetEnabled) }
-    var coordsUriTemplate by savedStateHandle.saveable { mutableStateOf(default.coordsUriTemplate) }
-    var nameUriTemplate by savedStateHandle.saveable { mutableStateOf(default.nameUriTemplate) }
+    private val _group = savedStateHandle.getMutableStateFlow("linkGroup", default.group)
+    val group: StateFlow<String> = _group.asStateFlow()
+    private val _name = savedStateHandle.getMutableStateFlow("linkName", default.name)
+    val name: StateFlow<String> = _name.asStateFlow()
+    private val _srs = savedStateHandle.getMutableStateFlow("linkSrs", default.srs)
+    val srs: StateFlow<Srs> = _srs.asStateFlow()
+    private val _type = savedStateHandle.getMutableStateFlow("linkType", default.type)
+    val type: StateFlow<LinkType> = _type.asStateFlow()
+    private val _appEnabled = savedStateHandle.getMutableStateFlow("linkAppEnabled", default.appEnabled)
+    val appEnabled: StateFlow<Boolean> = _appEnabled.asStateFlow()
+    private val _chipEnabled = savedStateHandle.getMutableStateFlow("linkChipEnabled", default.chipEnabled)
+    val chipEnabled: StateFlow<Boolean> = _chipEnabled.asStateFlow()
+    private val _sheetEnabled = savedStateHandle.getMutableStateFlow("linkSheetEnabled", default.sheetEnabled)
+    val sheetEnabled: StateFlow<Boolean> = _sheetEnabled.asStateFlow()
+    private val _coordsUriTemplate = savedStateHandle.getMutableStateFlow(
+        "linkCoordsUriTemplate", default.coordsUriTemplate
+    )
+    val coordsUriTemplate: StateFlow<String> = _coordsUriTemplate.asStateFlow()
+    private val _nameUriTemplate = savedStateHandle.getMutableStateFlow("linkNameUriTemplate", default.nameUriTemplate)
+    val nameUriTemplate: StateFlow<String> = _nameUriTemplate.asStateFlow()
 
     fun saveForm(resources: Resources) {
-        destination?.let { destination ->
+        _destination.value?.let { destination ->
             if (destination == -1) {
                 viewModelScope.launch(Dispatchers.IO) {
                     linkRepository.insert(
                         Link(
-                            group = group,
-                            name = name,
-                            srs = srs,
-                            type = type,
-                            appEnabled = appEnabled,
-                            chipEnabled = chipEnabled,
-                            sheetEnabled = sheetEnabled,
-                            coordsUriTemplate = coordsUriTemplate,
-                            nameUriTemplate = nameUriTemplate,
+                            group = _group.value,
+                            name = _name.value,
+                            srs = _srs.value,
+                            type = _type.value,
+                            appEnabled = _appEnabled.value,
+                            chipEnabled = _chipEnabled.value,
+                            sheetEnabled = _sheetEnabled.value,
+                            coordsUriTemplate = _coordsUriTemplate.value,
+                            nameUriTemplate = _nameUriTemplate.value,
                         )
                     )
                     _message.value = Message(resources.getString(R.string.links_message_inserted))
@@ -131,15 +144,15 @@ class LinkViewModel @Inject constructor(
                     if (item != null) {
                         linkRepository.update(
                             item.copy(
-                                group = group,
-                                name = name,
-                                srs = srs,
-                                type = type,
-                                appEnabled = appEnabled,
-                                chipEnabled = chipEnabled,
-                                sheetEnabled = sheetEnabled,
-                                coordsUriTemplate = coordsUriTemplate,
-                                nameUriTemplate = nameUriTemplate,
+                                group = _group.value,
+                                name = _name.value,
+                                srs = _srs.value,
+                                type = _type.value,
+                                appEnabled = _appEnabled.value,
+                                chipEnabled = _chipEnabled.value,
+                                sheetEnabled = _sheetEnabled.value,
+                                coordsUriTemplate = _coordsUriTemplate.value,
+                                nameUriTemplate = _nameUriTemplate.value,
                             )
                         )
                         _message.value = Message(resources.getString(R.string.links_message_updated))
@@ -154,7 +167,7 @@ class LinkViewModel @Inject constructor(
     // Methods
 
     fun delete(resources: Resources) {
-        destination?.let { destination ->
+        _destination.value?.let { destination ->
             if (destination != -1) {
                 val item = all.value.firstOrNull { it.uid == destination }
                 if (item != null) {
@@ -185,6 +198,42 @@ class LinkViewModel @Inject constructor(
             linkRepository.disableGroup(group)
             _message.value = Message(resources.getString(R.string.links_message_disabled_group))
         }
+    }
+
+    fun setGroup(newGroup: String) {
+        _group.value = newGroup
+    }
+
+    fun setName(newName: String) {
+        _name.value = newName
+    }
+
+    fun setSrs(newSrs: Srs) {
+        _srs.value = newSrs
+    }
+
+    fun setType(newType: LinkType) {
+        _type.value = newType
+    }
+
+    fun setAppEnabled(newAppEnabled: Boolean) {
+        _appEnabled.value = newAppEnabled
+    }
+
+    fun setSheetEnabled(newSheetEnabled: Boolean) {
+        _sheetEnabled.value = newSheetEnabled
+    }
+
+    fun setChipEnabled(newChipEnabled: Boolean) {
+        _chipEnabled.value = newChipEnabled
+    }
+
+    fun setNameUriTemplate(newNameUriTemplate: String) {
+        _nameUriTemplate.value = newNameUriTemplate
+    }
+
+    fun setCoordsUriTemplate(newCoordsUriTemplate: String) {
+        _coordsUriTemplate.value = newCoordsUriTemplate
     }
 
     fun restoreInitialData(resources: Resources) {

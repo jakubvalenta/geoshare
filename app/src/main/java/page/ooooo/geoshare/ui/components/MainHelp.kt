@@ -31,7 +31,7 @@ fun MainHelp(
     onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
-    onUpdateInput: (newSource: String) -> Unit,
+    onSetSource: (newSource: String) -> Unit,
 ) {
     val resources = LocalResources.current
     val spacing = LocalSpacing.current
@@ -64,7 +64,7 @@ fun MainHelp(
                 .shuffled()
                 .firstNotNullOfOrNull { (it as? Input.HasRandomUri)?.genRandomUri(randomPoint) }
                 ?.let { newSource ->
-                    onUpdateInput(newSource)
+                    onSetSource(newSource)
                     onSetErrorMessageResId(null)
                 }
         }) {
@@ -90,7 +90,7 @@ private fun DefaultPreview() {
                 onNavigateToInputsScreen = {},
                 onNavigateToIntroScreen = {},
                 onSetErrorMessageResId = {},
-                onUpdateInput = {},
+                onSetSource = {},
             )
         }
     }
@@ -106,7 +106,7 @@ private fun DarkPreview() {
                 onNavigateToInputsScreen = {},
                 onNavigateToIntroScreen = {},
                 onSetErrorMessageResId = {},
-                onUpdateInput = {},
+                onSetSource = {},
             )
         }
     }
