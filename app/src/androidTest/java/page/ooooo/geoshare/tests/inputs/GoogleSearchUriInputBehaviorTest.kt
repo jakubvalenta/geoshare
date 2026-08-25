@@ -19,7 +19,8 @@ class GoogleSearchUriInputBehaviorTest : InputBehaviorTest {
         testUriFails(
             setOf(
                 "Google Search links are not supported",
-                // TODO Add French translation
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                "Les liens vers la recherche Google ne sont pas pris en charge",
             ),
             "https://share.google/diIxnYa8dIA6dZfpy",
         )
@@ -28,7 +29,8 @@ class GoogleSearchUriInputBehaviorTest : InputBehaviorTest {
         testUriFails(
             setOf(
                 "Google Search links are not supported",
-                // TODO Add French translation
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                "Les liens vers la recherche Google ne sont pas pris en charge",
             ),
             "https://www.google.com/search?q=Caf%C3%A9+Paari",
         )
