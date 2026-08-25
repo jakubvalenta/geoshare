@@ -13,7 +13,7 @@ import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.DataType
-import page.ooooo.geoshare.lib.android.DataTypes
+import page.ooooo.geoshare.lib.android.Apps
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -203,7 +203,7 @@ object AutomationPreference : OptionsPreference<Automation> {
     }
 
     fun getOptionGroups(
-        apps: DataTypes,
+        apps: Apps,
         appDetails: AppDetails,
         hiddenApps: Set<String>?,
         links: List<Link>,
@@ -230,29 +230,29 @@ object AutomationPreference : OptionsPreference<Automation> {
         apps
             .filterKeys { hiddenApps?.contains(it) != true }
             .toSortedMap(compareBy(nullsLast()) { packageName -> appDetails[packageName]?.label })
-            .flatMap { (packageName, dataTypes) ->
+            .flatMap { (packageName, app) ->
                 buildList {
-                    if (DataType.GEO_URI in dataTypes) {
+                    if (DataType.GEO_URI in app.dataTypes) {
                         add(OpenDisplayGeoUriAutomation(packageName))
                     }
-                    if (DataType.MAGIC_EARTH_URI in dataTypes) {
+                    if (DataType.MAGIC_EARTH_URI in app.dataTypes) {
                         add(OpenDisplayMagicEarthUriAutomation(packageName))
                         add(OpenNavigationMagicEarthUriAutomation(packageName))
                     }
-                    if (DataType.GOOGLE_NAVIGATION_URI in dataTypes) {
+                    if (DataType.GOOGLE_NAVIGATION_URI in app.dataTypes) {
                         add(OpenNavigationGoogleUriAutomation(packageName))
                     }
-                    if (DataType.GOOGLE_STREET_VIEW_URI in dataTypes) {
+                    if (DataType.GOOGLE_STREET_VIEW_URI in app.dataTypes) {
                         add(OpenStreetViewGoogleUriAutomation(packageName))
                     }
-                    if (DataType.GPX_DATA in dataTypes) {
+                    if (DataType.GPX_DATA in app.dataTypes) {
                         add(OpenRouteGpxAutomation(packageName))
                         add(OpenPointsGpxAutomation(packageName))
                     }
-                    if (DataType.GPX_ONE_POINT_DATA in dataTypes) {
+                    if (DataType.GPX_ONE_POINT_DATA in app.dataTypes) {
                         add(OpenRouteOnePointGpxAutomation(packageName))
                     }
-                    if (DataType.SEND_PLAIN_TEXT in dataTypes) {
+                    if (DataType.SEND_PLAIN_TEXT in app.dataTypes) {
                         add(SendPointAutomation(packageName))
                     }
                 }
@@ -438,7 +438,7 @@ object HiddenAppsPreference : SetPreference {
 
     override fun getValue(values: UserPreferencesValues) = values.hiddenApps
 
-    fun getOptions(apps: DataTypes): Set<String> = apps.keys
+    fun getOptions(apps: Apps): Set<String> = apps.keys
 }
 
 object IntroShowForVersionCodePreference : NullableIntPreference {

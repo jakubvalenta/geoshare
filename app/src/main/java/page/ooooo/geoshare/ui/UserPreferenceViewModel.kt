@@ -17,6 +17,8 @@ import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.HiddenAppsPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.Message
+import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.Apps
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,13 +30,13 @@ class UserPreferenceViewModel @Inject constructor(
     private val _message = MutableStateFlow<Message?>(null)
     val message: StateFlow<Message?> = _message
 
-    val apps = appsRepository.apps
+    val apps: StateFlow<Apps> = appsRepository.apps
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
             emptyMap(),
         )
-    val appDetails = appsRepository.appDetails
+    val appDetails: StateFlow<AppDetails> = appsRepository.appDetails
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),

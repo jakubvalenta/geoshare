@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.ui.components
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
@@ -43,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -57,6 +59,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.android.AndroidTools
+import page.ooooo.geoshare.lib.android.AppDetail
+import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -65,12 +70,12 @@ import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun BoxScope.WelcomeSheet(
+    appDetails: AppDetails,
     initialVisible: Boolean,
     conversionSucceeded: Boolean,
     initialLinkCopied: Boolean = false,
     source: StateFlow<String>,
     onClose: () -> Unit,
-    onNavigateToIntroScreen: () -> Unit,
     onTextMatchesInput: (text: String) -> Boolean,
 ) {
     var visible by remember { mutableStateOf(initialVisible) }
@@ -84,6 +89,7 @@ fun BoxScope.WelcomeSheet(
         exit = slideOutVertically(targetOffsetY = { fullHeight -> fullHeight }),
     ) {
         WelcomeCard(
+            appDetails = appDetails,
             conversionSucceeded = conversionSucceeded,
             initialLinkCopied = initialLinkCopied,
             source = source,
@@ -91,7 +97,6 @@ fun BoxScope.WelcomeSheet(
                 visible = false
                 onClose()
             },
-            onNavigateToIntroScreen = onNavigateToIntroScreen,
             onTextMatchesInput = onTextMatchesInput,
         )
     }
@@ -99,18 +104,33 @@ fun BoxScope.WelcomeSheet(
 
 @Composable
 private fun WelcomeCard(
+    appDetails: AppDetails,
     conversionSucceeded: Boolean,
     initialLinkCopied: Boolean = false,
     stepCount: Int = 3,
     source: StateFlow<String>,
     onClose: () -> Unit,
-    onNavigateToIntroScreen: () -> Unit,
     onTextMatchesInput: (text: String) -> Boolean,
 ) {
     val appName = stringResource(R.string.app_name)
     val clipboard = LocalClipboard.current
+    val context = LocalContext.current
     val spacing = LocalSpacing.current
 
+    val exampleAppDetail = setOf(
+        PackageNames.GOOGLE_MAPS,
+        PackageNames.OSMAND_PLUS,
+        PackageNames.COMAPS_FDROID,
+        PackageNames.ORGANIC_MAPS,
+        PackageNames.MAPY_COM,
+        PackageNames.HERE_WEGO,
+        PackageNames.MAGIC_EARTH,
+        PackageNames.MAPS_ME,
+    ).firstNotNullOfOrNull { packageName -> appDetails[packageName] }
+    val exampleUriString = UriFormatter.formatUriString(
+        WGS84Point.Kilimanjaro,
+        "https://maps.google.com/?q={lat}%2C{lon}",
+    ).orEmpty()
     val source by source.collectAsStateWithLifecycle()
     val sourceIsNotEmpty = remember(source) { source.isNotEmpty() }
     var linkCopied by remember { mutableStateOf(initialLinkCopied) }
@@ -155,7 +175,7 @@ private fun WelcomeCard(
         elevation = CardDefaults.cardElevation(10.dp),
     ) {
         Box {
-            Column(Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.medium)) {
+            Column(Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.small + spacing.tiny)) {
                 Text(
                     if (!completed) {
                         stringResource(R.string.welcome_headline, appName)
@@ -184,10 +204,7 @@ private fun WelcomeCard(
                             ParagraphText(stringResource(R.string.welcome_copy))
                             SelectionContainer {
                                 Text(
-                                    UriFormatter.formatUriString(
-                                        WGS84Point.Kilimanjaro,
-                                        "https://maps.google.com/?q={lat}%2C{lon}",
-                                    ).orEmpty(),
+                                    exampleUriString,
                                     fontStyle = FontStyle.Italic
                                 )
                             }
@@ -207,19 +224,22 @@ private fun WelcomeCard(
                             )
                         )
                     }
-                    if (completed) {
-                        Button(
-                            onClick = {
-                                onClose()
-                                onNavigateToIntroScreen()
-                            },
-                            Modifier.align(Alignment.CenterHorizontally),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.tertiary,
-                                contentColor = MaterialTheme.colorScheme.onTertiary,
-                            ),
-                        ) {
-                            Text(stringResource(R.string.main_navigate_to_intro))
+                    WelcomeStep(index = 3, completedStep = completedStep) {
+                        Column {
+                            ParagraphText(stringResource(R.string.welcome_share, appName))
+                            if (exampleAppDetail != null) {
+                                Button(
+                                    {
+                                        AndroidTools.openApp(context, exampleAppDetail.packageName, exampleUriString)
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.tertiary,
+                                        contentColor = MaterialTheme.colorScheme.onTertiary,
+                                    ),
+                                ) {
+                                    Text(stringResource(R.string.launch_app, exampleAppDetail.label))
+                                }
+                            }
                         }
                     }
                 }
@@ -229,7 +249,7 @@ private fun WelcomeCard(
                 Modifier
                     .align(Alignment.TopEnd)
                     .offset(x = (-3).dp, y = 5.dp)
-                    .alpha(0.5f),
+                    .alpha(0.8f),
                 colors = IconButtonDefaults.filledIconButtonColors(
                     containerColor = MaterialTheme.colorScheme.tertiary,
                     contentColor = MaterialTheme.colorScheme.onTertiary,
@@ -264,6 +284,7 @@ private fun WelcomeStep(
                     0 -> painterResource(R.drawable.counter_1_24px)
                     1 -> painterResource(R.drawable.counter_2_24px)
                     2 -> painterResource(R.drawable.counter_3_24px)
+                    3 -> painterResource(R.drawable.counter_4_24px)
                     else -> null
                 }?.let { painter -> Icon(painter, contentDescription = null) }
             }
@@ -285,12 +306,20 @@ private fun FirstStepPreview() {
                     .consumeWindowInsets(innerPadding)
                     .fillMaxSize(),
             ) {
+                val context = LocalContext.current
+                @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
+                    appDetails = mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
                     initialVisible = true,
                     conversionSucceeded = false,
                     source = MutableStateFlow(""),
                     onClose = {},
-                    onNavigateToIntroScreen = {},
                     onTextMatchesInput = { false },
                 )
             }
@@ -309,36 +338,20 @@ private fun DarkFirstStepPreview() {
                     .consumeWindowInsets(innerPadding)
                     .fillMaxSize(),
             ) {
+                val context = LocalContext.current
+                @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
+                    appDetails = mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
                     initialVisible = true,
                     conversionSucceeded = false,
                     source = MutableStateFlow(""),
                     onClose = {},
-                    onNavigateToIntroScreen = {},
-                    onTextMatchesInput = { false },
-                )
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true, device = Devices.NEXUS_5)
-@Composable
-private fun SmallFirstStepPreview() {
-    AppTheme {
-        Scaffold { innerPadding ->
-            Box(
-                Modifier
-                    .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding)
-                    .fillMaxSize(),
-            ) {
-                WelcomeSheet(
-                    initialVisible = true,
-                    conversionSucceeded = false,
-                    source = MutableStateFlow(""),
-                    onClose = {},
-                    onNavigateToIntroScreen = {},
                     onTextMatchesInput = { false },
                 )
             }
@@ -357,12 +370,20 @@ private fun TabletFirstStepPreview() {
                     .consumeWindowInsets(innerPadding)
                     .fillMaxSize(),
             ) {
+                val context = LocalContext.current
+                @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
+                    appDetails = mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
                     initialVisible = true,
                     conversionSucceeded = false,
                     source = MutableStateFlow(""),
                     onClose = {},
-                    onNavigateToIntroScreen = {},
                     onTextMatchesInput = { false },
                 )
             }
@@ -381,13 +402,21 @@ private fun SecondStepPreview() {
                     .consumeWindowInsets(innerPadding)
                     .fillMaxSize(),
             ) {
+                val context = LocalContext.current
+                @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
+                    appDetails = mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
                     initialVisible = true,
                     conversionSucceeded = false,
                     initialLinkCopied = true,
                     source = MutableStateFlow(""),
                     onClose = {},
-                    onNavigateToIntroScreen = {},
                     onTextMatchesInput = { false },
                 )
             }
@@ -406,13 +435,21 @@ private fun DarkSecondStepPreview() {
                     .consumeWindowInsets(innerPadding)
                     .fillMaxSize(),
             ) {
+                val context = LocalContext.current
+                @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
+                    appDetails = mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
                     initialVisible = true,
                     conversionSucceeded = false,
                     initialLinkCopied = true,
                     source = MutableStateFlow(""),
                     onClose = {},
-                    onNavigateToIntroScreen = {},
                     onTextMatchesInput = { false },
                 )
             }
@@ -431,12 +468,20 @@ private fun ThirdStepPreview() {
                     .consumeWindowInsets(innerPadding)
                     .fillMaxSize(),
             ) {
+                val context = LocalContext.current
+                @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
+                    appDetails = mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
                     initialVisible = true,
                     conversionSucceeded = false,
                     source = MutableStateFlow("foo"),
                     onClose = {},
-                    onNavigateToIntroScreen = {},
                     onTextMatchesInput = { false },
                 )
             }
@@ -455,12 +500,20 @@ private fun DarkThirdStepPreview() {
                     .consumeWindowInsets(innerPadding)
                     .fillMaxSize(),
             ) {
+                val context = LocalContext.current
+                @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
+                    appDetails = mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
                     initialVisible = true,
                     conversionSucceeded = false,
                     source = MutableStateFlow("foo"),
                     onClose = {},
-                    onNavigateToIntroScreen = {},
                     onTextMatchesInput = { false },
                 )
             }
@@ -479,12 +532,20 @@ private fun CompletedPreview() {
                     .consumeWindowInsets(innerPadding)
                     .fillMaxSize(),
             ) {
+                val context = LocalContext.current
+                @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
+                    appDetails = mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
                     initialVisible = true,
                     conversionSucceeded = true,
                     source = MutableStateFlow(""),
                     onClose = {},
-                    onNavigateToIntroScreen = {},
                     onTextMatchesInput = { false },
                 )
             }
@@ -503,12 +564,20 @@ private fun DarkCompletedPreview() {
                     .consumeWindowInsets(innerPadding)
                     .fillMaxSize(),
             ) {
+                val context = LocalContext.current
+                @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
+                    appDetails = mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
                     initialVisible = true,
                     conversionSucceeded = true,
                     source = MutableStateFlow(""),
                     onClose = {},
-                    onNavigateToIntroScreen = {},
                     onTextMatchesInput = { false },
                 )
             }

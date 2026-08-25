@@ -373,4 +373,6 @@
     <string name="welcome_submit">Tap %1$s.</string>
     <string name="welcome_text">This tutorial will teach you how to use %1$s:</string>
     <string name="yes">Yes</string>
+    <string name="welcome_share">Open a map app and share a location with %1$s.</string>
+    <string name="launch_app">Launch %1$s</string>
 </resources>

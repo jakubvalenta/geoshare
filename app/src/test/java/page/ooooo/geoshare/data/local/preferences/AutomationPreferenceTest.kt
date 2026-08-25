@@ -18,6 +18,7 @@ import page.ooooo.geoshare.data.di.FakeOpenStreetMapDisplayLink
 import page.ooooo.geoshare.data.di.FakeOpenStreetMapNavigationLink
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.lib.FakeLog
+import page.ooooo.geoshare.lib.android.App
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.PackageNames
@@ -77,16 +78,33 @@ class AutomationPreferenceTest {
             AutomationPreference
                 .getOptionGroups(
                     apps = mapOf(
-                        PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
-                        PackageNames.SIGNAL to setOf(DataType.SEND_PLAIN_TEXT),
-                        PackageNames.TEST to setOf(DataType.GEO_URI),
-                        PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
+                        PackageNames.MAGIC_EARTH to App(
+                            packageName = PackageNames.MAGIC_EARTH,
+                            dataTypes = setOf(DataType.MAGIC_EARTH_URI)
+                        ),
+                        PackageNames.SIGNAL to App(
+                            packageName = PackageNames.SIGNAL,
+                            dataTypes = setOf(DataType.SEND_PLAIN_TEXT)
+                        ),
+                        PackageNames.TEST to App(packageName = PackageNames.TEST, dataTypes = setOf(DataType.GEO_URI)),
+                        PackageNames.TOMTOM to App(
+                            packageName = PackageNames.TOMTOM,
+                            dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
+                        ),
                     ),
                     appDetails = mapOf(
-                        PackageNames.MAGIC_EARTH to AppDetail("Magic Earth", mock()),
-                        PackageNames.SIGNAL to AppDetail("Signal", mock()),
-                        PackageNames.TEST to AppDetail("ZZZ sort last", mock()),
-                        PackageNames.TOMTOM to AppDetail("TomTom", mock()),
+                        PackageNames.MAGIC_EARTH to AppDetail(
+                            packageName = PackageNames.MAGIC_EARTH,
+                            label = "Magic Earth",
+                            mock()
+                        ),
+                        PackageNames.SIGNAL to AppDetail(packageName = PackageNames.SIGNAL, label = "Signal", mock()),
+                        PackageNames.TEST to AppDetail(
+                            packageName = PackageNames.TEST,
+                            label = "ZZZ sort last",
+                            mock()
+                        ),
+                        PackageNames.TOMTOM to AppDetail(packageName = PackageNames.TOMTOM, label = "TomTom", mock()),
                     ),
                     hiddenApps = emptySet(),
                     links = defaultFakeLinks,
@@ -125,14 +143,28 @@ class AutomationPreferenceTest {
             AutomationPreference
                 .getOptionGroups(
                     apps = mapOf(
-                        PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
-                        PackageNames.TEST to setOf(DataType.GEO_URI),
-                        PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
+                        PackageNames.MAGIC_EARTH to App(
+                            packageName = PackageNames.MAGIC_EARTH,
+                            dataTypes = setOf(DataType.MAGIC_EARTH_URI)
+                        ),
+                        PackageNames.TEST to App(packageName = PackageNames.TEST, dataTypes = setOf(DataType.GEO_URI)),
+                        PackageNames.TOMTOM to App(
+                            packageName = PackageNames.TOMTOM,
+                            dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
+                        ),
                     ),
                     appDetails = mapOf(
-                        PackageNames.MAGIC_EARTH to AppDetail("Magic Earth", mock()),
-                        PackageNames.TEST to AppDetail("ZZZ sort last", mock()),
-                        PackageNames.TOMTOM to AppDetail("TomTom", mock()),
+                        PackageNames.MAGIC_EARTH to AppDetail(
+                            packageName = PackageNames.MAGIC_EARTH,
+                            label = "Magic Earth",
+                            mock()
+                        ),
+                        PackageNames.TEST to AppDetail(
+                            packageName = PackageNames.TEST,
+                            label = "ZZZ sort last",
+                            mock()
+                        ),
+                        PackageNames.TOMTOM to AppDetail(packageName = PackageNames.TOMTOM, label = "TomTom", mock()),
                     ),
                     hiddenApps = setOf(PackageNames.MAGIC_EARTH),
                     links = emptyList(),
@@ -158,14 +190,24 @@ class AutomationPreferenceTest {
     fun getValue_forEachSerializedString_returnsAutomation() {
         AutomationPreference.getOptionGroups(
             apps = mapOf(
-                PackageNames.TEST to setOf(DataType.GEO_URI),
-                PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
-                PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
+                PackageNames.TEST to App(packageName = PackageNames.TEST, dataTypes = setOf(DataType.GEO_URI)),
+                PackageNames.MAGIC_EARTH to App(
+                    packageName = PackageNames.MAGIC_EARTH,
+                    dataTypes = setOf(DataType.MAGIC_EARTH_URI)
+                ),
+                PackageNames.TOMTOM to App(
+                    packageName = PackageNames.TOMTOM,
+                    dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
+                ),
             ),
             appDetails = mapOf(
-                PackageNames.MAGIC_EARTH to AppDetail("Magic Earth", mock()),
-                PackageNames.TEST to AppDetail("ZZZ sort last", mock()),
-                PackageNames.TOMTOM to AppDetail("TomTom", mock()),
+                PackageNames.MAGIC_EARTH to AppDetail(
+                    packageName = PackageNames.MAGIC_EARTH,
+                    label = "Magic Earth",
+                    mock()
+                ),
+                PackageNames.TEST to AppDetail(packageName = PackageNames.TEST, label = "ZZZ sort last", mock()),
+                PackageNames.TOMTOM to AppDetail(packageName = PackageNames.TOMTOM, label = "TomTom", mock()),
             ),
             hiddenApps = emptySet(),
             links = defaultFakeLinks,

@@ -88,8 +88,9 @@ object AndroidTools {
         }
         return try {
             AppDetail(
-                applicationInfo.loadLabel(packageManager).toString(),
-                applicationInfo.loadIcon(packageManager),
+                packageName = packageName,
+                label = applicationInfo.loadLabel(packageManager).toString(),
+                icon = applicationInfo.loadIcon(packageManager),
             )
         } catch (e: Exception) {
             Log.e(TAG, "Error when loading info about an app", e)
@@ -104,7 +105,7 @@ object AndroidTools {
      */
     suspend fun queryAppDetails(
         packageManager: PackageManager,
-        apps: DataTypes,
+        apps: Apps,
     ): AppDetails = withContext(Dispatchers.Default) {
         apps.mapValues { (packageName) -> queryAppDetails(packageManager, packageName) }
     }
@@ -136,8 +137,8 @@ object AndroidTools {
         PackageNames.WHATSAPP,
     )
 
-    fun queryApps(packageManager: PackageManager): DataTypes =
-        buildMap<String, MutableSet<DataType>> {
+    fun queryApps(packageManager: PackageManager): Apps =
+        buildMap {
             for (packageName in queryPackageNames(
                 packageManager,
                 Intent(Intent.ACTION_VIEW, "geo:".toUri()),
@@ -198,7 +199,7 @@ object AndroidTools {
                     getOrPut(packageName) { mutableSetOf() }.add(DataType.SEND_PLAIN_TEXT)
                 }
             }
-        }
+        }.mapValues { (packageName, dataTypes) -> App(packageName = packageName, dataTypes = dataTypes) }
 
     private fun startActivity(context: Context, intent: Intent): Boolean =
         try {

@@ -38,7 +38,7 @@ import page.ooooo.geoshare.data.local.preferences.SharePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareRouteGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareStreetViewGoogleUriAutomation
 import page.ooooo.geoshare.lib.android.DataType
-import page.ooooo.geoshare.lib.android.DataTypes
+import page.ooooo.geoshare.lib.android.Apps
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.outputs.CopyCoordsDecOutput
 import page.ooooo.geoshare.lib.outputs.CopyCoordsDegMinSecOutput
@@ -104,35 +104,35 @@ class OutputRepository @Inject constructor(
             SavePointsGpxOutput(coordinateConverter),
         )
 
-    fun getOutputsForApps(apps: DataTypes, hiddenApps: Set<String>?): Map<String, List<Output>> =
+    fun getOutputsForApps(apps: Apps, hiddenApps: Set<String>?): Map<String, List<Output>> =
         apps
             .filterKeys { hiddenApps?.contains(it) != true }
-            .mapValues { (packageName, dataTypes) ->
+            .mapValues { (packageName, app) ->
                 buildList {
-                    if (DataType.GEO_URI in dataTypes) {
+                    if (DataType.GEO_URI in app.dataTypes) {
                         add(OpenDisplayGeoUriOutput(packageName, coordinateConverter))
                     }
-                    if (DataType.CARTES_IGN_URL in dataTypes) {
+                    if (DataType.CARTES_IGN_URL in app.dataTypes) {
                         add(OpenDisplayCartesIGNUrlOutput(packageName, coordinateConverter))
                     }
-                    if (DataType.MAGIC_EARTH_URI in dataTypes) {
+                    if (DataType.MAGIC_EARTH_URI in app.dataTypes) {
                         add(OpenDisplayMagicEarthUriOutput(packageName, coordinateConverter))
                         add(OpenNavigationMagicEarthUriOutput(packageName, coordinateConverter))
                     }
-                    if (DataType.GOOGLE_NAVIGATION_URI in dataTypes) {
+                    if (DataType.GOOGLE_NAVIGATION_URI in app.dataTypes) {
                         add(OpenNavigationGoogleUriOutput(packageName, coordinateConverter))
                     }
-                    if (DataType.GOOGLE_STREET_VIEW_URI in dataTypes) {
+                    if (DataType.GOOGLE_STREET_VIEW_URI in app.dataTypes) {
                         add(OpenStreetViewGoogleUriOutput(packageName, coordinateConverter))
                     }
-                    if (DataType.GPX_DATA in dataTypes) {
+                    if (DataType.GPX_DATA in app.dataTypes) {
                         add(OpenRouteGpxOutput(packageName, coordinateConverter))
                         add(OpenPointsGpxOutput(packageName, coordinateConverter))
                     }
-                    if (DataType.GPX_ONE_POINT_DATA in dataTypes) {
+                    if (DataType.GPX_ONE_POINT_DATA in app.dataTypes) {
                         add(OpenRouteOnePointGpxOutput(packageName, coordinateConverter))
                     }
-                    if (DataType.SEND_PLAIN_TEXT in dataTypes) {
+                    if (DataType.SEND_PLAIN_TEXT in app.dataTypes) {
                         add(SendPointOutput(packageName, coordinateConverter))
                     }
                 }
