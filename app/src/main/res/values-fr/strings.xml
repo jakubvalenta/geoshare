@@ -346,4 +346,5 @@
     <string name="user_preferences_finish_description">Choisissez à quel moment l’application doit se fermer automatiquement. Une application fermée n’apparaît pas lorsque vous utilisez le geste « Retour ».</string>
     <string name="user_preferences_finish_never">Ne fermez pas automatiquement l’application</string>
     <string name="user_preferences_finish_title">Fermeture</string>
+    <string name="conversion_failed_unsupported_source_google_search">Les liens vers la recherche Google ne sont pas pris en charge</string>
 </resources>
