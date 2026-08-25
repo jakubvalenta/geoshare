@@ -10,6 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -19,6 +20,9 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeGeoShareGoogleMapsAddressServer
 import page.ooooo.geoshare.data.di.FakeGoogleMapsAddressServer
@@ -30,14 +34,14 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ServerForm(
-    apiKey: String,
-    apiKeyHeader: String,
-    authType: ServerAuthType,
-    challengeUrl: String,
-    loginUrl: String,
-    name: String,
-    registerUrl: String,
-    urlTemplate: String,
+    apiKey: StateFlow<String>,
+    apiKeyHeader: StateFlow<String>,
+    authType: StateFlow<ServerAuthType>,
+    challengeUrl: StateFlow<String>,
+    loginUrl: StateFlow<String>,
+    name: StateFlow<String>,
+    registerUrl: StateFlow<String>,
+    urlTemplate: StateFlow<String>,
     onSaveForm: () -> Unit,
     onSetApiKey: (String) -> Unit,
     onSetApiKeyHeader: (String) -> Unit,
@@ -50,6 +54,15 @@ fun ServerForm(
     modifier: Modifier = Modifier,
 ) {
     val spacing = LocalSpacing.current
+
+    val name by name.collectAsStateWithLifecycle()
+    val urlTemplate by urlTemplate.collectAsStateWithLifecycle()
+    val authType by authType.collectAsStateWithLifecycle()
+    val apiKey by apiKey.collectAsStateWithLifecycle()
+    val apiKeyHeader by apiKeyHeader.collectAsStateWithLifecycle()
+    val challengeUrl by challengeUrl.collectAsStateWithLifecycle()
+    val loginUrl by loginUrl.collectAsStateWithLifecycle()
+    val registerUrl by registerUrl.collectAsStateWithLifecycle()
     val item = remember(apiKey, apiKeyHeader, authType, challengeUrl, loginUrl, name, registerUrl, urlTemplate) {
         Server(
             name = name,
@@ -217,14 +230,14 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             ServerForm(
-                apiKey = "",
-                apiKeyHeader = "",
-                authType = ServerAuthType.ATTESTATION,
-                challengeUrl = "",
-                loginUrl = "",
-                name = "",
-                registerUrl = "",
-                urlTemplate = "",
+                apiKey = MutableStateFlow(""),
+                apiKeyHeader = MutableStateFlow(""),
+                authType = MutableStateFlow(ServerAuthType.ATTESTATION),
+                challengeUrl = MutableStateFlow(""),
+                loginUrl = MutableStateFlow(""),
+                name = MutableStateFlow(""),
+                registerUrl = MutableStateFlow(""),
+                urlTemplate = MutableStateFlow(""),
                 onSaveForm = {},
                 onSetApiKey = {},
                 onSetApiKeyHeader = {},
@@ -245,14 +258,14 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             ServerForm(
-                apiKey = "",
-                apiKeyHeader = "",
-                authType = ServerAuthType.ATTESTATION,
-                challengeUrl = "",
-                loginUrl = "",
-                name = "",
-                registerUrl = "",
-                urlTemplate = "",
+                apiKey = MutableStateFlow(""),
+                apiKeyHeader = MutableStateFlow(""),
+                authType = MutableStateFlow(ServerAuthType.ATTESTATION),
+                challengeUrl = MutableStateFlow(""),
+                loginUrl = MutableStateFlow(""),
+                name = MutableStateFlow(""),
+                registerUrl = MutableStateFlow(""),
+                urlTemplate = MutableStateFlow(""),
                 onSaveForm = {},
                 onSetApiKey = {},
                 onSetApiKeyHeader = {},
@@ -274,14 +287,14 @@ private fun UpdateApiKeyPreview() {
         Surface {
             val item = FakeGoogleMapsAddressServer
             ServerForm(
-                apiKey = item.apiKey,
-                apiKeyHeader = item.apiKeyHeader,
-                authType = item.authType,
-                challengeUrl = item.challengeUrl,
-                loginUrl = item.loginUrl,
-                name = item.name,
-                registerUrl = item.registerUrl,
-                urlTemplate = item.urlTemplate,
+                apiKey = MutableStateFlow(item.apiKey),
+                apiKeyHeader = MutableStateFlow(item.apiKeyHeader),
+                authType = MutableStateFlow(item.authType),
+                challengeUrl = MutableStateFlow(item.challengeUrl),
+                loginUrl = MutableStateFlow(item.loginUrl),
+                name = MutableStateFlow(item.name),
+                registerUrl = MutableStateFlow(item.registerUrl),
+                urlTemplate = MutableStateFlow(item.urlTemplate),
                 onSaveForm = {},
                 onSetApiKey = {},
                 onSetApiKeyHeader = {},
@@ -303,14 +316,14 @@ private fun DarkUpdateApiKeyPreview() {
         Surface {
             val item = FakeGoogleMapsAddressServer
             ServerForm(
-                apiKey = item.apiKey,
-                apiKeyHeader = item.apiKeyHeader,
-                authType = item.authType,
-                challengeUrl = item.challengeUrl,
-                loginUrl = item.loginUrl,
-                name = item.name,
-                registerUrl = item.registerUrl,
-                urlTemplate = item.urlTemplate,
+                apiKey = MutableStateFlow(item.apiKey),
+                apiKeyHeader = MutableStateFlow(item.apiKeyHeader),
+                authType = MutableStateFlow(item.authType),
+                challengeUrl = MutableStateFlow(item.challengeUrl),
+                loginUrl = MutableStateFlow(item.loginUrl),
+                name = MutableStateFlow(item.name),
+                registerUrl = MutableStateFlow(item.registerUrl),
+                urlTemplate = MutableStateFlow(item.urlTemplate),
                 onSaveForm = {},
                 onSetApiKey = {},
                 onSetApiKeyHeader = {},
@@ -332,14 +345,14 @@ private fun UpdateAttestationPreview() {
         Surface {
             val item = FakeGeoShareGoogleMapsAddressServer
             ServerForm(
-                apiKey = item.apiKey,
-                apiKeyHeader = item.apiKeyHeader,
-                authType = item.authType,
-                challengeUrl = item.challengeUrl,
-                loginUrl = item.loginUrl,
-                name = item.name,
-                registerUrl = item.registerUrl,
-                urlTemplate = item.urlTemplate,
+                apiKey = MutableStateFlow(item.apiKey),
+                apiKeyHeader = MutableStateFlow(item.apiKeyHeader),
+                authType = MutableStateFlow(item.authType),
+                challengeUrl = MutableStateFlow(item.challengeUrl),
+                loginUrl = MutableStateFlow(item.loginUrl),
+                name = MutableStateFlow(item.name),
+                registerUrl = MutableStateFlow(item.registerUrl),
+                urlTemplate = MutableStateFlow(item.urlTemplate),
                 onSaveForm = {},
                 onSetApiKey = {},
                 onSetApiKeyHeader = {},
@@ -361,14 +374,14 @@ private fun DarkUpdateExpandedPreview() {
         Surface {
             val item = FakeGeoShareGoogleMapsAddressServer
             ServerForm(
-                apiKey = item.apiKey,
-                apiKeyHeader = item.apiKeyHeader,
-                authType = item.authType,
-                challengeUrl = item.challengeUrl,
-                loginUrl = item.loginUrl,
-                name = item.name,
-                registerUrl = item.registerUrl,
-                urlTemplate = item.urlTemplate,
+                apiKey = MutableStateFlow(item.apiKey),
+                apiKeyHeader = MutableStateFlow(item.apiKeyHeader),
+                authType = MutableStateFlow(item.authType),
+                challengeUrl = MutableStateFlow(item.challengeUrl),
+                loginUrl = MutableStateFlow(item.loginUrl),
+                name = MutableStateFlow(item.name),
+                registerUrl = MutableStateFlow(item.registerUrl),
+                urlTemplate = MutableStateFlow(item.urlTemplate),
                 onSaveForm = {},
                 onSetApiKey = {},
                 onSetApiKeyHeader = {},
