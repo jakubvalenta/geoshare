@@ -284,7 +284,7 @@
     <string name="server_url_template">URL 模板</string>
     <string name="server_login_url">登录 URL</string>
     <string name="server_list_search_none_description">搜索将不可用</string>
-    <string name="conversion_failed_unsupported_source_place_list">地点列表不受支持</string>
+    <string name="conversion_failed_unsupported_source_place_list">不支持地点列表</string>
     <string name="server_api_key_supporting_text">为了避免意外成本，请使用具有严格服务限制和配额的密钥。</string>
     <string name="server_attestation">硬件支持的密钥认证</string>
     <string name="server_auth_type">身份验证</string>
@@ -332,4 +332,5 @@
     <string name="user_preferences_finish_description">选择应用何时自动关闭。关闭后的应用在使用返回手势后不会显示。</string>
     <string name="user_preferences_finish_after_action_succeeded_and_opened_app">在通过该应用分享链接并打开地图应用后关闭应用</string>
     <string name="user_preferences_finish_after_action_succeeded">在通过该应用分享链接并执行任何操作（打开地图应用、复制坐标、保存 GPX 等）后关闭应用</string>
+    <string name="conversion_failed_unsupported_source_google_search">不支持 Google 搜索链接</string>
 </resources>
