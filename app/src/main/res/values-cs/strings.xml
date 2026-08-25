@@ -352,4 +352,5 @@
     <string name="user_preferences_finish_description">Zvolte, kdy se má aplikace automaticky zavřít. Zavřená aplikace se nezobrazí po provedení gesta „zpět“.</string>
     <string name="user_preferences_finish_never">Nezavírat aplikaci automaticky</string>
     <string name="user_preferences_finish_title">Zavírání</string>
+    <string name="conversion_failed_unsupported_source_google_search">Odkazy z vyhledávače Google nejsou podporovány</string>
 </resources>
