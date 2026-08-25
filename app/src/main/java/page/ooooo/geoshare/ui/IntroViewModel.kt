@@ -17,9 +17,9 @@ import javax.inject.Inject
 class IntroViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
 ) : ViewModel() {
-    val shown: StateFlow<Boolean> =
+    val welcomeVisible: StateFlow<Boolean> =
         userPreferencesRepository.values
-            .map { values -> values.introShownForVersionCode != IntroShowForVersionCodePreference.default }
+            .map { values -> values.introShownForVersionCode == IntroShowForVersionCodePreference.default }
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),

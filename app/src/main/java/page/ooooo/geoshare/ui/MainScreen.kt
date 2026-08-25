@@ -189,7 +189,6 @@ fun MainScreen(
     val billingFeatures = billingViewModel.billingFeatures
     val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
     val changelogShown by inputViewModel.changelogShown.collectAsStateWithLifecycle()
-    val introShown by introViewModel.shown.collectAsStateWithLifecycle()
     val linkMessage by linkViewModel.message.collectAsStateWithLifecycle()
     val outputsForApps by outputViewModel.outputsForApps.collectAsStateWithLifecycle()
     val outputsForLinks by outputViewModel.outputsForLinks.collectAsStateWithLifecycle()
@@ -325,9 +324,9 @@ fun MainScreen(
         outputsForPoints = outputsForPoints,
         outputsForPointsChips = outputsForPointsChips,
         outputsForSharing = outputsForSharing,
-        source = conversionViewModel.source, // FIXME Recomposition
+        source = conversionViewModel.source,
         userPreferenceMessage = userPreferencesMessage,
-        welcomeVisible = !introShown,
+        welcomeVisible = introViewModel.welcomeVisible,
         onCancel = {
             locationJob?.cancel()
             conversionViewModel.cancel()
@@ -405,7 +404,7 @@ private fun MainScreen(
     outputsForSharing: List<Output>,
     source: StateFlow<String>,
     userPreferenceMessage: Message?,
-    welcomeVisible: Boolean,
+    welcomeVisible: StateFlow<Boolean>,
     onCancel: () -> Unit,
     onCloseWelcome: () -> Unit,
     onDeny: (Boolean) -> Unit,
@@ -603,6 +602,9 @@ private fun MainScreen(
                                                 onSetSource = onSetSource,
                                             )
                                         }
+                                        item {
+                                            Text("welcomeVisible=$welcomeVisible") // FIXME Remove debug code
+                                        }
                                     }
                                 }
                             } else if (currentState is Initial) {
@@ -747,7 +749,7 @@ private fun MainScreen(
                                     )
                                 }
 
-                            is Initial ->
+                            is Initial -> {
                                 item {
                                     MainHelp(
                                         inputRepository = inputRepository,
@@ -758,6 +760,10 @@ private fun MainScreen(
                                         onSetSource = onSetSource,
                                     )
                                 }
+                                item {
+                                    Text("welcomeVisible=$welcomeVisible") // FIXME Remove debug code
+                                }
+                            }
                         }
                     }
                 },
@@ -772,9 +778,9 @@ private fun MainScreen(
         }
 
         WelcomeSheet(
-            appDetails = appDetails,
-            initialVisible = welcomeVisible,
+            visible = welcomeVisible,
             conversionSucceeded = currentState is ConversionState.HasResult,
+            outputsForApps = outputsForApps,
             source = source,
             onClose = onCloseWelcome,
             onTextMatchesInput = { source -> inputRepository.all.firstOrNull { it.match(source) != null } != null },
@@ -1030,7 +1036,7 @@ private fun DefaultPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
-            welcomeVisible = true,
+            welcomeVisible = MutableStateFlow(true),
             onCancel = {},
             onCloseWelcome = {},
             onDeny = {},
@@ -1083,7 +1089,7 @@ private fun DarkPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
-            welcomeVisible = true,
+            welcomeVisible = MutableStateFlow(true),
             onCancel = {},
             onCloseWelcome = {},
             onDeny = {},
@@ -1136,7 +1142,7 @@ private fun SmallPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
-            welcomeVisible = true,
+            welcomeVisible = MutableStateFlow(true),
             onCancel = {},
             onCloseWelcome = {},
             onDeny = {},
@@ -1189,7 +1195,7 @@ private fun TabletPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
-            welcomeVisible = true,
+            welcomeVisible = MutableStateFlow(true),
             onCancel = {},
             onCloseWelcome = {},
             onDeny = {},
@@ -1301,7 +1307,7 @@ private fun SucceededPreview() {
             outputsForSharing = outputRepository.getOutputsForSharing(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
-            welcomeVisible = false,
+            welcomeVisible = MutableStateFlow(false),
             onCancel = {},
             onCloseWelcome = {},
             onDeny = {},
@@ -1413,7 +1419,7 @@ private fun DarkSucceededPreview() {
             outputsForSharing = outputRepository.getOutputsForSharing(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
-            welcomeVisible = false,
+            welcomeVisible = MutableStateFlow(false),
             onCancel = {},
             onCloseWelcome = {},
             onDeny = {},
@@ -1524,7 +1530,7 @@ private fun SmallSucceededPreview() {
             outputsForSharing = outputRepository.getOutputsForSharing(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
-            welcomeVisible = false,
+            welcomeVisible = MutableStateFlow(false),
             onCancel = {},
             onCloseWelcome = {},
             onDeny = {},
@@ -1636,7 +1642,7 @@ private fun TabletSucceededPreview() {
             outputsForSharing = outputRepository.getOutputsForSharing(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
-            welcomeVisible = false,
+            welcomeVisible = MutableStateFlow(false),
             onCancel = {},
             onCloseWelcome = {},
             onDeny = {},
@@ -1697,7 +1703,7 @@ private fun ErrorPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
-            welcomeVisible = false,
+            welcomeVisible = MutableStateFlow(false),
             onCancel = {},
             onCloseWelcome = {},
             onDeny = {},
@@ -1758,7 +1764,7 @@ private fun DarkErrorPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
-            welcomeVisible = false,
+            welcomeVisible = MutableStateFlow(false),
             onCancel = {},
             onCloseWelcome = {},
             onDeny = {},
@@ -1819,7 +1825,7 @@ private fun TabletErrorPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
-            welcomeVisible = false,
+            welcomeVisible = MutableStateFlow(false),
             onCancel = {},
             onCloseWelcome = {},
             onDeny = {},
@@ -1881,7 +1887,7 @@ private fun WarningPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
-            welcomeVisible = false,
+            welcomeVisible = MutableStateFlow(false),
             onCancel = {},
             onCloseWelcome = {},
             onDeny = {},
@@ -1943,7 +1949,7 @@ private fun DarkWarningPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
-            welcomeVisible = false,
+            welcomeVisible = MutableStateFlow(false),
             onCancel = {},
             onCloseWelcome = {},
             onDeny = {},
@@ -2021,7 +2027,7 @@ private fun LoadingIndicatorPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
-            welcomeVisible = false,
+            welcomeVisible = MutableStateFlow(false),
             onCancel = {},
             onCloseWelcome = {},
             onDeny = {},
@@ -2099,7 +2105,7 @@ private fun DarkLoadingIndicatorPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
-            welcomeVisible = false,
+            welcomeVisible = MutableStateFlow(false),
             onCancel = {},
             onCloseWelcome = {},
             onDeny = {},
@@ -2177,7 +2183,7 @@ private fun TabletLoadingIndicatorPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
-            welcomeVisible = false,
+            welcomeVisible = MutableStateFlow(false),
             onCancel = {},
             onCloseWelcome = {},
             onDeny = {},
@@ -2252,7 +2258,7 @@ private fun WebViewPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
-            welcomeVisible = false,
+            welcomeVisible = MutableStateFlow(false),
             onCancel = {},
             onCloseWelcome = {},
             onDeny = {},
@@ -2327,7 +2333,7 @@ private fun DarkWebViewPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
-            welcomeVisible = false,
+            welcomeVisible = MutableStateFlow(false),
             onCancel = {},
             onCloseWelcome = {},
             onDeny = {},
@@ -2402,7 +2408,7 @@ private fun TabletWebViewPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
-            welcomeVisible = false,
+            welcomeVisible = MutableStateFlow(false),
             onCancel = {},
             onCloseWelcome = {},
             onDeny = {},
@@ -2474,7 +2480,7 @@ private fun EmptyPreview() {
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
             userPreferenceMessage = null,
-            welcomeVisible = false,
+            welcomeVisible = MutableStateFlow(false),
             onCancel = {},
             onCloseWelcome = {},
             onDeny = {},

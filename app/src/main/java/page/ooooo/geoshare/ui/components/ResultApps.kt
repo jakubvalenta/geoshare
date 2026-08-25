@@ -72,7 +72,11 @@ fun ResultApps(
     onNavigateToLinkScreen: () -> Unit,
 ) {
     val lastPoint = points.lastOrNull() ?: return
-    val onClick = { output: Output ->
+    val (outputsForMapApps, outputsForMessagingApps) = outputsForApps.entries.partition { (_, outputs) ->
+        outputs.size != 1 || outputs[0] !is SendPointOutput
+    }
+
+    fun onClick(output: Output) {
         onExecute(
             when (output) {
                 is PointOutput -> output.toAction(lastPoint)
@@ -80,16 +84,13 @@ fun ResultApps(
             }
         )
     }
-    val (outputsForMapApps, outputsForMessagingApps) = outputsForApps.entries.partition { (_, outputs) ->
-        outputs.size != 1 || outputs[0] !is SendPointOutput
-    }
 
     // Map apps
     ResultAppsGrid(
         outputsForApps = outputsForMapApps,
         appDetails = appDetails,
         iconSize = iconSize,
-        onClick = onClick,
+        onClick = { onClick(it) },
         onHideApp = onHideApp,
     ) {
         // Share item
@@ -101,7 +102,7 @@ fun ResultApps(
                 label = null,
                 appDetails = appDetails,
                 outputs = outputsForSharing,
-                onClick = onClick,
+                onClick = { onClick(it) },
             ) {
                 Surface(
                     Modifier.requiredSize(iconSize),
@@ -125,7 +126,7 @@ fun ResultApps(
             outputsForApps = outputsForMessagingApps,
             appDetails = appDetails,
             iconSize = iconSize,
-            onClick = onClick,
+            onClick = { onClick(it) },
             onHideApp = onHideApp,
         )
     }
@@ -145,7 +146,7 @@ fun ResultApps(
             outputsForLinks = outputsForLinks,
             appDetails = appDetails,
             iconSize = iconSize,
-            onClick = onClick,
+            onClick = { onClick(it) },
             onDisableLinkGroup = onDisableLinkGroup,
         )
     }

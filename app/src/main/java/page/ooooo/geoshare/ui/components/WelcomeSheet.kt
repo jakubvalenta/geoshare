@@ -39,12 +39,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -57,28 +59,36 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.lib.android.AndroidTools
-import page.ooooo.geoshare.lib.android.AppDetail
-import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.App
+import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.outputs.ActionContext
+import page.ooooo.geoshare.lib.outputs.BasicAction
+import page.ooooo.geoshare.lib.outputs.Output
+import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun BoxScope.WelcomeSheet(
-    appDetails: AppDetails,
-    initialVisible: Boolean,
+    visible: StateFlow<Boolean>,
     conversionSucceeded: Boolean,
     initialLinkCopied: Boolean = false,
     source: StateFlow<String>,
+    outputsForApps: Map<String, List<Output>>,
     onClose: () -> Unit,
     onTextMatchesInput: (text: String) -> Boolean,
 ) {
-    var visible by remember { mutableStateOf(initialVisible) }
+    val visible by visible.collectAsStateWithLifecycle()
 
     AnimatedVisibility(
         visible,
@@ -89,14 +99,11 @@ fun BoxScope.WelcomeSheet(
         exit = slideOutVertically(targetOffsetY = { fullHeight -> fullHeight }),
     ) {
         WelcomeCard(
-            appDetails = appDetails,
             conversionSucceeded = conversionSucceeded,
             initialLinkCopied = initialLinkCopied,
             source = source,
-            onClose = {
-                visible = false
-                onClose()
-            },
+            outputsForApps = outputsForApps,
+            onClose = onClose,
             onTextMatchesInput = onTextMatchesInput,
         )
     }
@@ -104,9 +111,9 @@ fun BoxScope.WelcomeSheet(
 
 @Composable
 private fun WelcomeCard(
-    appDetails: AppDetails,
     conversionSucceeded: Boolean,
     initialLinkCopied: Boolean = false,
+    outputsForApps: Map<String, List<Output>>,
     stepCount: Int = 3,
     source: StateFlow<String>,
     onClose: () -> Unit,
@@ -115,9 +122,16 @@ private fun WelcomeCard(
     val appName = stringResource(R.string.app_name)
     val clipboard = LocalClipboard.current
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val resources = LocalResources.current
     val spacing = LocalSpacing.current
 
-    val exampleAppDetail = setOf(
+    val examplePoint = WGS84Point.Kilimanjaro
+
+    /**
+     * An action that opens a point in the first map app from a list of common apps that is installed.
+     */
+    val exampleAppAction: BasicAction<*>? = setOf(
         PackageNames.GOOGLE_MAPS,
         PackageNames.OSMAND_PLUS,
         PackageNames.COMAPS_FDROID,
@@ -126,11 +140,12 @@ private fun WelcomeCard(
         PackageNames.HERE_WEGO,
         PackageNames.MAGIC_EARTH,
         PackageNames.MAPS_ME,
-    ).firstNotNullOfOrNull { packageName -> appDetails[packageName] }
-    val exampleUriString = UriFormatter.formatUriString(
-        WGS84Point.Kilimanjaro,
-        "https://maps.google.com/?q={lat}%2C{lon}",
-    ).orEmpty()
+    ).firstNotNullOfOrNull { packageName ->
+        outputsForApps[packageName]
+            ?.firstNotNullOfOrNull { it as? PointOutput }
+            ?.let { it.toAction(examplePoint) as? BasicAction }
+    }
+
     val source by source.collectAsStateWithLifecycle()
     val sourceIsNotEmpty = remember(source) { source.isNotEmpty() }
     var linkCopied by remember { mutableStateOf(initialLinkCopied) }
@@ -204,7 +219,9 @@ private fun WelcomeCard(
                             ParagraphText(stringResource(R.string.welcome_copy))
                             SelectionContainer {
                                 Text(
-                                    exampleUriString,
+                                    UriFormatter.formatUriString(
+                                        examplePoint, "https://maps.google.com/?q={lat}%2C{lon}"
+                                    ).orEmpty(),
                                     fontStyle = FontStyle.Italic
                                 )
                             }
@@ -227,17 +244,24 @@ private fun WelcomeCard(
                     WelcomeStep(index = 3, completedStep = completedStep) {
                         Column {
                             ParagraphText(stringResource(R.string.welcome_share, appName))
-                            if (exampleAppDetail != null) {
+                            if (exampleAppAction != null) {
                                 Button(
                                     {
-                                        AndroidTools.openApp(context, exampleAppDetail.packageName, exampleUriString)
+                                        val actionContext = ActionContext(
+                                            context = context,
+                                            clipboard = clipboard,
+                                            resources = resources,
+                                        )
+                                        coroutineScope.launch {
+                                            exampleAppAction.execute(actionContext)
+                                        }
                                     },
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = MaterialTheme.colorScheme.tertiary,
                                         contentColor = MaterialTheme.colorScheme.onTertiary,
                                     ),
                                 ) {
-                                    Text(stringResource(R.string.launch_app, exampleAppDetail.label))
+                                    Text(stringResource(R.string.welcome_open_app))
                                 }
                             }
                         }
@@ -307,17 +331,24 @@ private fun FirstStepPreview() {
                     .fillMaxSize(),
             ) {
                 val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
+                val outputRepository = OutputRepository(
+                    coordinateConverter = coordinateConverter,
+                )
                 @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
-                    appDetails = mapOf(
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    ),
-                    initialVisible = true,
+                    visible = MutableStateFlow(true),
                     conversionSucceeded = false,
+                    outputsForApps = outputRepository.getOutputsForApps(
+                        mapOf(
+                            PackageNames.OSMAND_PLUS to App(
+                                packageName = PackageNames.OSMAND_PLUS,
+                                dataTypes = setOf(DataType.GEO_URI)
+                            ),
+                        ),
+                        hiddenApps = emptySet(),
+                    ),
                     source = MutableStateFlow(""),
                     onClose = {},
                     onTextMatchesInput = { false },
@@ -339,17 +370,24 @@ private fun DarkFirstStepPreview() {
                     .fillMaxSize(),
             ) {
                 val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
+                val outputRepository = OutputRepository(
+                    coordinateConverter = coordinateConverter,
+                )
                 @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
-                    appDetails = mapOf(
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    ),
-                    initialVisible = true,
+                    visible = MutableStateFlow(true),
                     conversionSucceeded = false,
+                    outputsForApps = outputRepository.getOutputsForApps(
+                        mapOf(
+                            PackageNames.OSMAND_PLUS to App(
+                                packageName = PackageNames.OSMAND_PLUS,
+                                dataTypes = setOf(DataType.GEO_URI)
+                            ),
+                        ),
+                        hiddenApps = emptySet(),
+                    ),
                     source = MutableStateFlow(""),
                     onClose = {},
                     onTextMatchesInput = { false },
@@ -371,17 +409,24 @@ private fun TabletFirstStepPreview() {
                     .fillMaxSize(),
             ) {
                 val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
+                val outputRepository = OutputRepository(
+                    coordinateConverter = coordinateConverter,
+                )
                 @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
-                    appDetails = mapOf(
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    ),
-                    initialVisible = true,
+                    visible = MutableStateFlow(true),
                     conversionSucceeded = false,
+                    outputsForApps = outputRepository.getOutputsForApps(
+                        mapOf(
+                            PackageNames.OSMAND_PLUS to App(
+                                packageName = PackageNames.OSMAND_PLUS,
+                                dataTypes = setOf(DataType.GEO_URI)
+                            ),
+                        ),
+                        hiddenApps = emptySet(),
+                    ),
                     source = MutableStateFlow(""),
                     onClose = {},
                     onTextMatchesInput = { false },
@@ -403,18 +448,25 @@ private fun SecondStepPreview() {
                     .fillMaxSize(),
             ) {
                 val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
+                val outputRepository = OutputRepository(
+                    coordinateConverter = coordinateConverter,
+                )
                 @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
-                    appDetails = mapOf(
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    ),
-                    initialVisible = true,
+                    visible = MutableStateFlow(true),
                     conversionSucceeded = false,
                     initialLinkCopied = true,
+                    outputsForApps = outputRepository.getOutputsForApps(
+                        mapOf(
+                            PackageNames.OSMAND_PLUS to App(
+                                packageName = PackageNames.OSMAND_PLUS,
+                                dataTypes = setOf(DataType.GEO_URI)
+                            ),
+                        ),
+                        hiddenApps = emptySet(),
+                    ),
                     source = MutableStateFlow(""),
                     onClose = {},
                     onTextMatchesInput = { false },
@@ -436,18 +488,25 @@ private fun DarkSecondStepPreview() {
                     .fillMaxSize(),
             ) {
                 val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
+                val outputRepository = OutputRepository(
+                    coordinateConverter = coordinateConverter,
+                )
                 @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
-                    appDetails = mapOf(
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    ),
-                    initialVisible = true,
+                    visible = MutableStateFlow(true),
                     conversionSucceeded = false,
                     initialLinkCopied = true,
+                    outputsForApps = outputRepository.getOutputsForApps(
+                        mapOf(
+                            PackageNames.OSMAND_PLUS to App(
+                                packageName = PackageNames.OSMAND_PLUS,
+                                dataTypes = setOf(DataType.GEO_URI)
+                            ),
+                        ),
+                        hiddenApps = emptySet(),
+                    ),
                     source = MutableStateFlow(""),
                     onClose = {},
                     onTextMatchesInput = { false },
@@ -469,17 +528,24 @@ private fun ThirdStepPreview() {
                     .fillMaxSize(),
             ) {
                 val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
+                val outputRepository = OutputRepository(
+                    coordinateConverter = coordinateConverter,
+                )
                 @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
-                    appDetails = mapOf(
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    ),
-                    initialVisible = true,
+                    visible = MutableStateFlow(true),
                     conversionSucceeded = false,
+                    outputsForApps = outputRepository.getOutputsForApps(
+                        mapOf(
+                            PackageNames.OSMAND_PLUS to App(
+                                packageName = PackageNames.OSMAND_PLUS,
+                                dataTypes = setOf(DataType.GEO_URI)
+                            ),
+                        ),
+                        hiddenApps = emptySet(),
+                    ),
                     source = MutableStateFlow("foo"),
                     onClose = {},
                     onTextMatchesInput = { false },
@@ -501,17 +567,24 @@ private fun DarkThirdStepPreview() {
                     .fillMaxSize(),
             ) {
                 val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
+                val outputRepository = OutputRepository(
+                    coordinateConverter = coordinateConverter,
+                )
                 @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
-                    appDetails = mapOf(
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    ),
-                    initialVisible = true,
+                    visible = MutableStateFlow(true),
                     conversionSucceeded = false,
+                    outputsForApps = outputRepository.getOutputsForApps(
+                        mapOf(
+                            PackageNames.OSMAND_PLUS to App(
+                                packageName = PackageNames.OSMAND_PLUS,
+                                dataTypes = setOf(DataType.GEO_URI)
+                            ),
+                        ),
+                        hiddenApps = emptySet(),
+                    ),
                     source = MutableStateFlow("foo"),
                     onClose = {},
                     onTextMatchesInput = { false },
@@ -533,17 +606,24 @@ private fun CompletedPreview() {
                     .fillMaxSize(),
             ) {
                 val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
+                val outputRepository = OutputRepository(
+                    coordinateConverter = coordinateConverter,
+                )
                 @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
-                    appDetails = mapOf(
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    ),
-                    initialVisible = true,
+                    visible = MutableStateFlow(true),
                     conversionSucceeded = true,
+                    outputsForApps = outputRepository.getOutputsForApps(
+                        mapOf(
+                            PackageNames.OSMAND_PLUS to App(
+                                packageName = PackageNames.OSMAND_PLUS,
+                                dataTypes = setOf(DataType.GEO_URI)
+                            ),
+                        ),
+                        hiddenApps = emptySet(),
+                    ),
                     source = MutableStateFlow(""),
                     onClose = {},
                     onTextMatchesInput = { false },
@@ -565,17 +645,24 @@ private fun DarkCompletedPreview() {
                     .fillMaxSize(),
             ) {
                 val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
+                val outputRepository = OutputRepository(
+                    coordinateConverter = coordinateConverter,
+                )
                 @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
-                    appDetails = mapOf(
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    ),
-                    initialVisible = true,
+                    visible = MutableStateFlow(true),
                     conversionSucceeded = true,
+                    outputsForApps = outputRepository.getOutputsForApps(
+                        mapOf(
+                            PackageNames.OSMAND_PLUS to App(
+                                packageName = PackageNames.OSMAND_PLUS,
+                                dataTypes = setOf(DataType.GEO_URI)
+                            ),
+                        ),
+                        hiddenApps = emptySet(),
+                    ),
                     source = MutableStateFlow(""),
                     onClose = {},
                     onTextMatchesInput = { false },
