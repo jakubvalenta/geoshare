@@ -4,20 +4,17 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
-import androidx.lifecycle.viewmodel.compose.saveable
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.InputRepository
@@ -43,10 +40,10 @@ import page.ooooo.geoshare.lib.conversion.LocationRationaleShown
 import page.ooooo.geoshare.lib.conversion.LocationReceived
 import page.ooooo.geoshare.lib.conversion.SourceReceived
 import page.ooooo.geoshare.lib.conversion.State
-import page.ooooo.geoshare.lib.outputs.Action
-import page.ooooo.geoshare.lib.outputs.LocationAction
 import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.ActionResult
+import page.ooooo.geoshare.lib.outputs.LocationAction
 import javax.inject.Inject
 
 @OptIn(SavedStateHandleSaveableApi::class)
@@ -76,13 +73,14 @@ class ConversionViewModel @Inject constructor(
         _currentState.value = newState
     }
 
-    var source by savedStateHandle.saveable("source") { mutableStateOf("") }
+    private val _source = savedStateHandle.getMutableStateFlow("source", "")
+    val source: StateFlow<String> = _source.asStateFlow()
 
     private var transitionJob: Job? = null
     private val transitionExceptionHandler = CoroutineExceptionHandler { _, tr ->
         stateContext.log.e(TAG, "Exception when transitioning state", tr)
         stateContext.currentState = ConversionFailed(
-            source,
+            _source.value,
             stateContext.resources.getString(R.string.conversion_failed_reason_exception),
             details = tr.stackTraceToString(),
         )
@@ -91,7 +89,7 @@ class ConversionViewModel @Inject constructor(
     // Methods
 
     fun start() {
-        transition { SourceReceived(stateContext, source) }
+        transition { SourceReceived(stateContext, _source.value) }
     }
 
     private fun transition(initialState: (suspend () -> State)) {
@@ -128,6 +126,10 @@ class ConversionViewModel @Inject constructor(
         (stateContext.currentState as? ConversionState.HasError)?.apply {
             transition { SourceReceived(stateContext, source) }
         }
+    }
+
+    fun setSource(newSource: String) {
+        _source.value = newSource
     }
 
     // Any action
@@ -205,7 +207,7 @@ class ConversionViewModel @Inject constructor(
     // Lifecycle
 
     fun onCreateOrNewIntent(intent: Intent) {
-        source = AndroidTools.getIntentUriString(intent).orEmpty()
+        _source.value = AndroidTools.getIntentUriString(intent).orEmpty()
         start()
     }
 

@@ -16,6 +16,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.onPreviewKeyEvent
@@ -25,6 +26,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.android.AndroidTools
@@ -33,15 +37,16 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun MainForm(
-    source: String,
+    source: StateFlow<String>,
     errorMessageResId: Int?,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
+    onSetSource: (newSource: String) -> Unit,
     onSubmit: () -> Unit,
-    onUpdateInput: (newSource: String) -> Unit,
 ) {
     val clipboard = LocalClipboard.current
     val coroutineScope = rememberCoroutineScope()
     val spacing = LocalSpacing.current
+    val source by source.collectAsStateWithLifecycle()
 
     Column(
         Modifier.padding(horizontal = spacing.windowPadding),
@@ -50,7 +55,7 @@ fun MainForm(
         OutlinedTextField(
             value = source,
             onValueChange = {
-                onUpdateInput(it)
+                onSetSource(it)
                 onSetErrorMessageResId(null)
             },
             modifier = Modifier
@@ -70,7 +75,7 @@ fun MainForm(
             trailingIcon = {
                 if (source.isNotEmpty()) {
                     IconButton({
-                        onUpdateInput("")
+                        onSetSource("")
                         onSetErrorMessageResId(null)
                     }) {
                         Icon(
@@ -81,7 +86,7 @@ fun MainForm(
                 } else {
                     IconButton({
                         coroutineScope.launch {
-                            onUpdateInput(AndroidTools.pasteFromClipboard(clipboard))
+                            onSetSource(AndroidTools.pasteFromClipboard(clipboard))
                             onSetErrorMessageResId(null)
                         }
                     }) {
@@ -131,11 +136,11 @@ private fun DefaultPreview() {
         Surface {
             Column {
                 MainForm(
-                    source = "",
+                    source = MutableStateFlow(""),
                     errorMessageResId = null,
                     onSetErrorMessageResId = {},
+                    onSetSource = {},
                     onSubmit = {},
-                    onUpdateInput = {},
                 )
             }
         }
@@ -149,11 +154,11 @@ private fun DarkPreview() {
         Surface {
             Column {
                 MainForm(
-                    source = "",
+                    source = MutableStateFlow(""),
                     errorMessageResId = null,
                     onSetErrorMessageResId = {},
+                    onSetSource = {},
                     onSubmit = {},
-                    onUpdateInput = {},
                 )
             }
         }
@@ -167,11 +172,11 @@ private fun FilledPreview() {
         Surface {
             Column {
                 MainForm(
-                    source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                     errorMessageResId = null,
                     onSetErrorMessageResId = {},
+                    onSetSource = {},
                     onSubmit = {},
-                    onUpdateInput = {},
                 )
             }
         }
@@ -185,11 +190,11 @@ private fun DarkFilledPreview() {
         Surface {
             Column {
                 MainForm(
-                    source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                     errorMessageResId = null,
                     onSetErrorMessageResId = {},
+                    onSetSource = {},
                     onSubmit = {},
-                    onUpdateInput = {},
                 )
             }
         }
@@ -203,10 +208,10 @@ private fun ErrorPreview() {
         Surface {
             Column {
                 MainForm(
-                    source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                     errorMessageResId = R.string.conversion_failed_missing_url,
                     onSetErrorMessageResId = {},
-                    onUpdateInput = {},
+                    onSetSource = {},
                     onSubmit = {},
                 )
             }
@@ -221,10 +226,10 @@ private fun DarkErrorPreview() {
         Surface {
             Column {
                 MainForm(
-                    source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                     errorMessageResId = R.string.conversion_failed_missing_url,
                     onSetErrorMessageResId = {},
-                    onUpdateInput = {},
+                    onSetSource = {},
                     onSubmit = {},
                 )
             }

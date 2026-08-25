@@ -80,6 +80,8 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
@@ -374,8 +376,8 @@ fun MainScreen(
             conversionViewModel.reset()
         },
         onRetry = { conversionViewModel.retry() },
+        onSetSource = { conversionViewModel.setSource(it) },
         onStart = { conversionViewModel.start() },
-        onUpdateInput = { conversionViewModel.source = it },
     )
 }
 
@@ -401,7 +403,7 @@ private fun MainScreen(
     outputsForPoints: List<PointsOutput>,
     outputsForPointsChips: List<PointsOutput>,
     outputsForSharing: List<Output>,
-    source: String,
+    source: StateFlow<String>,
     userPreferenceMessage: Message?,
     onCancel: () -> Unit,
     onDeny: (Boolean) -> Unit,
@@ -420,8 +422,8 @@ private fun MainScreen(
     onReset: () -> Unit,
     onRetry: () -> Unit,
     onExecute: (Action<*>) -> Unit,
+    onSetSource: (String) -> Unit,
     onStart: () -> Unit,
-    onUpdateInput: (String) -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
     val coroutineScope = rememberCoroutineScope()
@@ -586,8 +588,8 @@ private fun MainScreen(
                                             source = source,
                                             errorMessageResId = errorMessageResId,
                                             onSetErrorMessageResId = setErrorMessageResId,
+                                            onSetSource = onSetSource,
                                             onSubmit = onStart,
-                                            onUpdateInput = onUpdateInput,
                                         )
                                     }
                                     item {
@@ -597,7 +599,7 @@ private fun MainScreen(
                                             onNavigateToInputsScreen = onNavigateToInputsScreen,
                                             onNavigateToIntroScreen = onNavigateToIntroScreen,
                                             onSetErrorMessageResId = setErrorMessageResId,
-                                            onUpdateInput = onUpdateInput,
+                                            onSetSource = onSetSource,
                                         )
                                     }
                                 }
@@ -608,8 +610,8 @@ private fun MainScreen(
                                     source = source,
                                     errorMessageResId = errorMessageResId,
                                     onSetErrorMessageResId = setErrorMessageResId,
+                                    onSetSource = onSetSource,
                                     onSubmit = onStart,
-                                    onUpdateInput = onUpdateInput,
                                 )
                             }
                         } else {
@@ -752,7 +754,7 @@ private fun MainScreen(
                                     onNavigateToInputsScreen = onNavigateToInputsScreen,
                                     onNavigateToIntroScreen = onNavigateToIntroScreen,
                                     onSetErrorMessageResId = setErrorMessageResId,
-                                    onUpdateInput = onUpdateInput,
+                                    onSetSource = onSetSource,
                                 )
                             }
                     }
@@ -1030,7 +1032,7 @@ private fun DefaultPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            source = "",
+            source = MutableStateFlow(""),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
@@ -1049,8 +1051,9 @@ private fun DefaultPreview() {
             onReset = {},
             onRetry = {},
             onExecute = {},
+            onSetSource = {},
             onStart = {},
-        ) {}
+        )
     }
 }
 
@@ -1080,7 +1083,7 @@ private fun DarkPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            source = "",
+            source = MutableStateFlow(""),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
@@ -1099,8 +1102,9 @@ private fun DarkPreview() {
             onReset = {},
             onRetry = {},
             onExecute = {},
+            onSetSource = {},
             onStart = {},
-        ) {}
+        )
     }
 }
 
@@ -1130,7 +1134,7 @@ private fun SmallPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            source = "",
+            source = MutableStateFlow(""),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
@@ -1149,8 +1153,9 @@ private fun SmallPreview() {
             onReset = {},
             onRetry = {},
             onExecute = {},
+            onSetSource = {},
             onStart = {},
-        ) {}
+        )
     }
 }
 
@@ -1180,7 +1185,7 @@ private fun TabletPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            source = "",
+            source = MutableStateFlow(""),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
@@ -1199,8 +1204,9 @@ private fun TabletPreview() {
             onReset = {},
             onRetry = {},
             onExecute = {},
+            onSetSource = {},
             onStart = {},
-        ) {}
+        )
     }
 }
 
@@ -1262,7 +1268,7 @@ private fun SucceededPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
-            source = "",
+            source = MutableStateFlow(""),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
@@ -1281,8 +1287,9 @@ private fun SucceededPreview() {
             onReset = {},
             onRetry = {},
             onExecute = {},
+            onSetSource = {},
             onStart = {},
-        ) {}
+        )
     }
 }
 
@@ -1344,7 +1351,7 @@ private fun DarkSucceededPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
-            source = "",
+            source = MutableStateFlow(""),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
@@ -1363,8 +1370,9 @@ private fun DarkSucceededPreview() {
             onReset = {},
             onRetry = {},
             onExecute = {},
+            onSetSource = {},
             onStart = {},
-        ) {}
+        )
     }
 }
 
@@ -1425,7 +1433,7 @@ private fun SmallSucceededPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
-            source = "",
+            source = MutableStateFlow(""),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
@@ -1444,8 +1452,9 @@ private fun SmallSucceededPreview() {
             onReset = {},
             onRetry = {},
             onExecute = {},
+            onSetSource = {},
             onStart = {},
-        ) {}
+        )
     }
 }
 
@@ -1507,7 +1516,7 @@ private fun TabletSucceededPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
-            source = "",
+            source = MutableStateFlow(""),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
@@ -1526,8 +1535,9 @@ private fun TabletSucceededPreview() {
             onReset = {},
             onRetry = {},
             onExecute = {},
+            onSetSource = {},
             onStart = {},
-        ) {}
+        )
     }
 }
 
@@ -1565,7 +1575,7 @@ private fun ErrorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            source = "",
+            source = MutableStateFlow(""),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
@@ -1584,8 +1594,9 @@ private fun ErrorPreview() {
             onReset = {},
             onRetry = {},
             onExecute = {},
+            onSetSource = {},
             onStart = {},
-        ) {}
+        )
     }
 }
 
@@ -1623,7 +1634,7 @@ private fun DarkErrorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            source = "",
+            source = MutableStateFlow(""),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
@@ -1642,8 +1653,9 @@ private fun DarkErrorPreview() {
             onReset = {},
             onRetry = {},
             onExecute = {},
+            onSetSource = {},
             onStart = {},
-        ) {}
+        )
     }
 }
 
@@ -1681,7 +1693,7 @@ private fun TabletErrorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            source = "",
+            source = MutableStateFlow(""),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
@@ -1700,8 +1712,9 @@ private fun TabletErrorPreview() {
             onReset = {},
             onRetry = {},
             onExecute = {},
+            onSetSource = {},
             onStart = {},
-        ) {}
+        )
     }
 }
 
@@ -1740,7 +1753,7 @@ private fun WarningPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            source = "",
+            source = MutableStateFlow(""),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
@@ -1759,8 +1772,9 @@ private fun WarningPreview() {
             onReset = {},
             onRetry = {},
             onExecute = {},
+            onSetSource = {},
             onStart = {},
-        ) {}
+        )
     }
 }
 
@@ -1799,7 +1813,7 @@ private fun DarkWarningPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            source = "",
+            source = MutableStateFlow(""),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
@@ -1818,8 +1832,9 @@ private fun DarkWarningPreview() {
             onReset = {},
             onRetry = {},
             onExecute = {},
+            onSetSource = {},
             onStart = {},
-        ) {}
+        )
     }
 }
 
@@ -1874,7 +1889,7 @@ private fun LoadingIndicatorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            source = "",
+            source = MutableStateFlow(""),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
@@ -1893,8 +1908,9 @@ private fun LoadingIndicatorPreview() {
             onReset = {},
             onRetry = {},
             onExecute = {},
+            onSetSource = {},
             onStart = {},
-        ) {}
+        )
     }
 }
 
@@ -1949,7 +1965,7 @@ private fun DarkLoadingIndicatorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            source = "",
+            source = MutableStateFlow(""),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
@@ -1968,8 +1984,9 @@ private fun DarkLoadingIndicatorPreview() {
             onReset = {},
             onRetry = {},
             onExecute = {},
+            onSetSource = {},
             onStart = {},
-        ) {}
+        )
     }
 }
 
@@ -2024,7 +2041,7 @@ private fun TabletLoadingIndicatorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            source = "",
+            source = MutableStateFlow(""),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
@@ -2043,8 +2060,9 @@ private fun TabletLoadingIndicatorPreview() {
             onReset = {},
             onRetry = {},
             onExecute = {},
+            onSetSource = {},
             onStart = {},
-        ) {}
+        )
     }
 }
 
@@ -2096,7 +2114,7 @@ private fun WebViewPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            source = "",
+            source = MutableStateFlow(""),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
@@ -2115,8 +2133,9 @@ private fun WebViewPreview() {
             onReset = {},
             onRetry = {},
             onExecute = {},
+            onSetSource = {},
             onStart = {},
-        ) {}
+        )
     }
 }
 
@@ -2168,7 +2187,7 @@ private fun DarkWebViewPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            source = "",
+            source = MutableStateFlow(""),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
@@ -2187,8 +2206,9 @@ private fun DarkWebViewPreview() {
             onReset = {},
             onRetry = {},
             onExecute = {},
+            onSetSource = {},
             onStart = {},
-        ) {}
+        )
     }
 }
 
@@ -2240,7 +2260,7 @@ private fun TabletWebViewPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            source = "",
+            source = MutableStateFlow(""),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
@@ -2259,8 +2279,9 @@ private fun TabletWebViewPreview() {
             onReset = {},
             onRetry = {},
             onExecute = {},
+            onSetSource = {},
             onStart = {},
-        ) {}
+        )
     }
 }
 
@@ -2309,7 +2330,7 @@ private fun EmptyPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            source = "",
+            source = MutableStateFlow(""),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
@@ -2328,7 +2349,8 @@ private fun EmptyPreview() {
             onReset = {},
             onRetry = {},
             onExecute = {},
+            onSetSource = {},
             onStart = {},
-        ) {}
+        )
     }
 }
