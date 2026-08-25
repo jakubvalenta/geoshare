@@ -6,12 +6,13 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,8 +23,6 @@ import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilledIconButton
@@ -44,13 +43,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -64,6 +67,8 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.App
+import page.ooooo.geoshare.lib.android.AppDetail
+import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.formatters.UriFormatter
@@ -71,9 +76,8 @@ import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.ActionContext
-import page.ooooo.geoshare.lib.outputs.BasicAction
+import page.ooooo.geoshare.lib.outputs.OpenPointOutput
 import page.ooooo.geoshare.lib.outputs.Output
-import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
@@ -81,9 +85,11 @@ import kotlin.time.Duration.Companion.seconds
 @Composable
 fun BoxScope.WelcomeSheet(
     visible: StateFlow<Boolean>,
+    appDetails: AppDetails,
     conversionSucceeded: Boolean,
     initialLinkCopied: Boolean = false,
     source: StateFlow<String>,
+    sourceComesFromIntent: StateFlow<Boolean>,
     outputsForApps: Map<String, List<Output>>,
     onClose: () -> Unit,
     onTextMatchesInput: (text: String) -> Boolean,
@@ -100,9 +106,11 @@ fun BoxScope.WelcomeSheet(
     ) {
         WelcomeCard(
             conversionSucceeded = conversionSucceeded,
+            appDetails = appDetails,
             initialLinkCopied = initialLinkCopied,
-            source = source,
             outputsForApps = outputsForApps,
+            source = source,
+            sourceComesFromIntent = sourceComesFromIntent,
             onClose = onClose,
             onTextMatchesInput = onTextMatchesInput,
         )
@@ -111,11 +119,13 @@ fun BoxScope.WelcomeSheet(
 
 @Composable
 private fun WelcomeCard(
+    appDetails: AppDetails,
     conversionSucceeded: Boolean,
     initialLinkCopied: Boolean = false,
     outputsForApps: Map<String, List<Output>>,
     stepCount: Int = 3,
     source: StateFlow<String>,
+    sourceComesFromIntent: StateFlow<Boolean>,
     onClose: () -> Unit,
     onTextMatchesInput: (text: String) -> Boolean,
 ) {
@@ -129,9 +139,11 @@ private fun WelcomeCard(
     val examplePoint = WGS84Point.Kilimanjaro
 
     /**
-     * An action that opens a point in the first map app from a list of common apps that is installed.
+     * An output that opens a point in a map app.
+     *
+     * The map app is the first installed app from a list of common map apps.
      */
-    val exampleAppAction: BasicAction<*>? = setOf(
+    val exampleAppOutput = setOf(
         PackageNames.GOOGLE_MAPS,
         PackageNames.OSMAND_PLUS,
         PackageNames.COMAPS_FDROID,
@@ -141,16 +153,17 @@ private fun WelcomeCard(
         PackageNames.MAGIC_EARTH,
         PackageNames.MAPS_ME,
     ).firstNotNullOfOrNull { packageName ->
-        outputsForApps[packageName]
-            ?.firstNotNullOfOrNull { it as? PointOutput }
-            ?.let { it.toAction(examplePoint) as? BasicAction }
+        outputsForApps[packageName]?.firstNotNullOfOrNull { it as? OpenPointOutput }
     }
 
     val source by source.collectAsStateWithLifecycle()
+    val sourceComesFromIntent by sourceComesFromIntent.collectAsStateWithLifecycle()
     val sourceIsNotEmpty = remember(source) { source.isNotEmpty() }
     var linkCopied by remember { mutableStateOf(initialLinkCopied) }
-    val completedStep = remember(conversionSucceeded, sourceIsNotEmpty, linkCopied) {
-        if (conversionSucceeded) {
+    val completedIndex = remember(conversionSucceeded, sourceIsNotEmpty, linkCopied) {
+        if (sourceComesFromIntent) {
+            32
+        } else if (conversionSucceeded) {
             2
         } else if (sourceIsNotEmpty) {
             1
@@ -160,7 +173,7 @@ private fun WelcomeCard(
             -1
         }
     }
-    val completed = completedStep >= stepCount - 1
+    val allStepsCompleted = completedIndex >= stepCount - 1
 
     LaunchedEffect(conversionSucceeded, sourceIsNotEmpty) {
         if (!conversionSucceeded && !sourceIsNotEmpty) {
@@ -179,7 +192,7 @@ private fun WelcomeCard(
     }
 
     ElevatedCard(
-        Modifier.fillMaxWidth(),
+        Modifier.fillMaxWidth(), // TODO Apply window padding
         shape = MaterialTheme.shapes.large.copy(
             bottomStart = ZeroCornerSize,
             bottomEnd = ZeroCornerSize,
@@ -192,10 +205,10 @@ private fun WelcomeCard(
         Box {
             Column(Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.small + spacing.tiny)) {
                 Text(
-                    if (!completed) {
-                        stringResource(R.string.welcome_headline, appName)
-                    } else {
+                    if (allStepsCompleted) {
                         stringResource(R.string.welcome_completed_headline, appName)
+                    } else {
+                        stringResource(R.string.welcome_headline, appName)
                     },
                     Modifier
                         .padding(horizontal = 50.dp)
@@ -204,66 +217,84 @@ private fun WelcomeCard(
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.headlineSmall
                 )
-                ParagraphText(
-                    if (!completed) {
-                        stringResource(R.string.welcome_text, appName)
-                    } else {
-                        stringResource(R.string.welcome_completed_text)
-                    },
-                    Modifier.padding(bottom = spacing.small),
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-                Column(verticalArrangement = Arrangement.spacedBy(spacing.small)) {
-                    WelcomeStep(index = 0, completedStep = completedStep) {
-                        Column {
-                            ParagraphText(stringResource(R.string.welcome_copy))
-                            SelectionContainer {
-                                Text(
-                                    UriFormatter.formatUriString(
-                                        examplePoint, "https://maps.google.com/?q={lat}%2C{lon}"
-                                    ).orEmpty(),
-                                    fontStyle = FontStyle.Italic
-                                )
-                            }
-                        }
-                    }
-                    WelcomeStep(index = 1, completedStep = completedStep) {
-                        ParagraphText(stringResource(R.string.welcome_paste))
-                    }
-                    WelcomeStep(index = 2, completedStep = completedStep) {
+                CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
+                    if (allStepsCompleted) {
                         ParagraphText(
-                            annotatedStringResource(
-                                R.string.welcome_submit,
-                                FormatArg.Text(
-                                    stringResource(R.string.main_create_geo_uri),
-                                    SpanStyle(fontStyle = FontStyle.Italic),
-                                )
-                            )
+                            stringResource(R.string.welcome_completed_text),
+                            fontWeight = FontWeight.Bold,
+                        )
+                    } else {
+                        ParagraphText(
+                            stringResource(R.string.welcome_text, appName),
                         )
                     }
-                    WelcomeStep(index = 3, completedStep = completedStep) {
-                        Column {
+                }
+                Column(
+                    Modifier.padding(top = spacing.small),
+                    verticalArrangement = Arrangement.spacedBy(spacing.small)
+                ) {
+                    WelcomeStep(
+                        index = 0,
+                        completedIndex = completedIndex,
+                        title = { ParagraphText(stringResource(R.string.welcome_copy)) },
+                    ) {
+                        ParagraphText(stringResource(R.string.welcome_copy_help))
+                        SelectionContainer {
+                            Text(
+                                UriFormatter.formatUriString(
+                                    examplePoint, "https://maps.google.com/?q={lat}%2C{lon}"
+                                ).orEmpty(),
+                                Modifier.background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f)),
+                            )
+                        }
+                    }
+                    WelcomeStep(
+                        index = 1,
+                        completedIndex = completedIndex,
+                        title = { ParagraphText(stringResource(R.string.welcome_paste)) },
+                    )
+                    WelcomeStep(
+                        index = 2, completedIndex = completedIndex,
+                        title = {
+                            ParagraphText(
+                                annotatedStringResource(
+                                    R.string.welcome_submit,
+                                    FormatArg.Text(
+                                        stringResource(R.string.main_create_geo_uri),
+                                        SpanStyle(fontStyle = FontStyle.Italic),
+                                    )
+                                )
+                            )
+                        },
+                    )
+                    WelcomeStep(
+                        index = 3,
+                        completedIndex = completedIndex,
+                        title = {
                             ParagraphText(stringResource(R.string.welcome_share, appName))
-                            if (exampleAppAction != null) {
-                                Button(
-                                    {
+                        },
+                    ) {
+                        if (exampleAppOutput != null) {
+                            ParagraphText(
+                                buildAnnotatedString {
+                                    append(stringResource(R.string.welcome_share_help))
+                                    append(" ")
+                                    val label = appDetails[exampleAppOutput.packageName]?.label.orEmpty()
+                                    ClickableLink(
+                                        stringResource(R.string.welcome_share_open_app, label),
+                                        styles = AnnotatedString.UnderlinedLinkStyles,
+                                    ) {
                                         val actionContext = ActionContext(
                                             context = context,
                                             clipboard = clipboard,
                                             resources = resources,
                                         )
                                         coroutineScope.launch {
-                                            exampleAppAction.execute(actionContext)
+                                            exampleAppOutput.toAction(examplePoint).execute(actionContext)
                                         }
-                                    },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.tertiary,
-                                        contentColor = MaterialTheme.colorScheme.onTertiary,
-                                    ),
-                                ) {
-                                    Text(stringResource(R.string.welcome_open_app))
+                                    }
                                 }
-                            }
+                            )
                         }
                     }
                 }
@@ -291,17 +322,21 @@ private fun WelcomeCard(
 @Composable
 private fun WelcomeStep(
     index: Int,
-    completedStep: Int,
-    content: @Composable RowScope.() -> Unit,
+    completedIndex: Int,
+    title: @Composable () -> Unit,
+    content: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     val spacing = LocalSpacing.current
+    val stepCompleted = completedIndex >= index
 
     Row(
+        Modifier.graphicsLayer {
+            alpha = if (stepCompleted) 0.7f else 1f
+        },
         horizontalArrangement = Arrangement.spacedBy(spacing.tiny),
-        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Crossfade(completedStep >= index) { completed ->
-            if (completed) {
+        Crossfade(stepCompleted) { targetState ->
+            if (targetState) {
                 Icon(painterResource(R.drawable.check_circle_24px), contentDescription = null)
             } else {
                 when (index) {
@@ -313,8 +348,19 @@ private fun WelcomeStep(
                 }?.let { painter -> Icon(painter, contentDescription = null) }
             }
         }
-        CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
-            content()
+        Column(Modifier.padding(top = 2.dp), verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
+            CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
+                CompositionLocalProvider(LocalTextStyle provides LocalTextStyle.current.run {
+                    if (!stepCompleted) {
+                        copy(fontWeight = FontWeight.Bold)
+                    } else {
+                        this
+                    }
+                }) {
+                    title()
+                }
+                content?.invoke(this)
+            }
         }
     }
 }
@@ -339,6 +385,13 @@ private fun FirstStepPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
                     visible = MutableStateFlow(true),
+                    appDetails = mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
                     conversionSucceeded = false,
                     outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
@@ -350,6 +403,7 @@ private fun FirstStepPreview() {
                         hiddenApps = emptySet(),
                     ),
                     source = MutableStateFlow(""),
+                    sourceComesFromIntent = MutableStateFlow(false),
                     onClose = {},
                     onTextMatchesInput = { false },
                 )
@@ -378,6 +432,13 @@ private fun DarkFirstStepPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
                     visible = MutableStateFlow(true),
+                    appDetails = mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
                     conversionSucceeded = false,
                     outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
@@ -389,6 +450,7 @@ private fun DarkFirstStepPreview() {
                         hiddenApps = emptySet(),
                     ),
                     source = MutableStateFlow(""),
+                    sourceComesFromIntent = MutableStateFlow(false),
                     onClose = {},
                     onTextMatchesInput = { false },
                 )
@@ -417,6 +479,13 @@ private fun TabletFirstStepPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
                     visible = MutableStateFlow(true),
+                    appDetails = mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
                     conversionSucceeded = false,
                     outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
@@ -428,6 +497,7 @@ private fun TabletFirstStepPreview() {
                         hiddenApps = emptySet(),
                     ),
                     source = MutableStateFlow(""),
+                    sourceComesFromIntent = MutableStateFlow(false),
                     onClose = {},
                     onTextMatchesInput = { false },
                 )
@@ -456,6 +526,13 @@ private fun SecondStepPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
                     visible = MutableStateFlow(true),
+                    appDetails = mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
                     conversionSucceeded = false,
                     initialLinkCopied = true,
                     outputsForApps = outputRepository.getOutputsForApps(
@@ -468,6 +545,7 @@ private fun SecondStepPreview() {
                         hiddenApps = emptySet(),
                     ),
                     source = MutableStateFlow(""),
+                    sourceComesFromIntent = MutableStateFlow(false),
                     onClose = {},
                     onTextMatchesInput = { false },
                 )
@@ -496,6 +574,13 @@ private fun DarkSecondStepPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
                     visible = MutableStateFlow(true),
+                    appDetails = mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
                     conversionSucceeded = false,
                     initialLinkCopied = true,
                     outputsForApps = outputRepository.getOutputsForApps(
@@ -508,6 +593,7 @@ private fun DarkSecondStepPreview() {
                         hiddenApps = emptySet(),
                     ),
                     source = MutableStateFlow(""),
+                    sourceComesFromIntent = MutableStateFlow(false),
                     onClose = {},
                     onTextMatchesInput = { false },
                 )
@@ -536,6 +622,13 @@ private fun ThirdStepPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
                     visible = MutableStateFlow(true),
+                    appDetails = mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
                     conversionSucceeded = false,
                     outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
@@ -547,6 +640,7 @@ private fun ThirdStepPreview() {
                         hiddenApps = emptySet(),
                     ),
                     source = MutableStateFlow("foo"),
+                    sourceComesFromIntent = MutableStateFlow(false),
                     onClose = {},
                     onTextMatchesInput = { false },
                 )
@@ -575,6 +669,13 @@ private fun DarkThirdStepPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
                     visible = MutableStateFlow(true),
+                    appDetails = mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
                     conversionSucceeded = false,
                     outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
@@ -586,6 +687,101 @@ private fun DarkThirdStepPreview() {
                         hiddenApps = emptySet(),
                     ),
                     source = MutableStateFlow("foo"),
+                    sourceComesFromIntent = MutableStateFlow(false),
+                    onClose = {},
+                    onTextMatchesInput = { false },
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun FourthStepPreview() {
+    AppTheme {
+        Scaffold { innerPadding ->
+            Box(
+                Modifier
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+                    .fillMaxSize(),
+            ) {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
+                val outputRepository = OutputRepository(
+                    coordinateConverter = coordinateConverter,
+                )
+                @SuppressLint("LocalContextGetResourceValueCall")
+                WelcomeSheet(
+                    visible = MutableStateFlow(true),
+                    appDetails = mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
+                    conversionSucceeded = false,
+                    outputsForApps = outputRepository.getOutputsForApps(
+                        mapOf(
+                            PackageNames.OSMAND_PLUS to App(
+                                packageName = PackageNames.OSMAND_PLUS,
+                                dataTypes = setOf(DataType.GEO_URI)
+                            ),
+                        ),
+                        hiddenApps = emptySet(),
+                    ),
+                    source = MutableStateFlow("foo"),
+                    sourceComesFromIntent = MutableStateFlow(false),
+                    onClose = {},
+                    onTextMatchesInput = { false },
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkFourthStepPreview() {
+    AppTheme {
+        Scaffold { innerPadding ->
+            Box(
+                Modifier
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+                    .fillMaxSize(),
+            ) {
+                val context = LocalContext.current
+                val geometries = Geometries(context)
+                val coordinateConverter = CoordinateConverter(geometries)
+                val outputRepository = OutputRepository(
+                    coordinateConverter = coordinateConverter,
+                )
+                @SuppressLint("LocalContextGetResourceValueCall")
+                WelcomeSheet(
+                    visible = MutableStateFlow(true),
+                    appDetails = mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
+                    conversionSucceeded = false,
+                    outputsForApps = outputRepository.getOutputsForApps(
+                        mapOf(
+                            PackageNames.OSMAND_PLUS to App(
+                                packageName = PackageNames.OSMAND_PLUS,
+                                dataTypes = setOf(DataType.GEO_URI)
+                            ),
+                        ),
+                        hiddenApps = emptySet(),
+                    ),
+                    source = MutableStateFlow("foo"),
+                    sourceComesFromIntent = MutableStateFlow(false),
                     onClose = {},
                     onTextMatchesInput = { false },
                 )
@@ -614,6 +810,13 @@ private fun CompletedPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
                     visible = MutableStateFlow(true),
+                    appDetails = mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
                     conversionSucceeded = true,
                     outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
@@ -625,6 +828,7 @@ private fun CompletedPreview() {
                         hiddenApps = emptySet(),
                     ),
                     source = MutableStateFlow(""),
+                    sourceComesFromIntent = MutableStateFlow(true),
                     onClose = {},
                     onTextMatchesInput = { false },
                 )
@@ -653,6 +857,13 @@ private fun DarkCompletedPreview() {
                 @SuppressLint("LocalContextGetResourceValueCall")
                 WelcomeSheet(
                     visible = MutableStateFlow(true),
+                    appDetails = mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
                     conversionSucceeded = true,
                     outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
@@ -664,6 +875,7 @@ private fun DarkCompletedPreview() {
                         hiddenApps = emptySet(),
                     ),
                     source = MutableStateFlow(""),
+                    sourceComesFromIntent = MutableStateFlow(true),
                     onClose = {},
                     onTextMatchesInput = { false },
                 )

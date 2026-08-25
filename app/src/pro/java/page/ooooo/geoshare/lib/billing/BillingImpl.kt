@@ -77,10 +77,10 @@ class BillingImpl(
         .build()
 
     private val _status: MutableStateFlow<BillingStatus> = MutableStateFlow(BillingStatus.Loading())
-    override val status: StateFlow<BillingStatus> = _status
+    override val status: StateFlow<BillingStatus> = _status.asStateFlow()
 
     private val _message: MutableStateFlow<Message?> = MutableStateFlow(null)
-    override val message: StateFlow<Message?> = _message
+    override val message: StateFlow<Message?> = _message.asStateFlow()
 
     override fun onBillingSetupFinished(billingResult: BillingResult) {
         when (billingResult.responseCode) {

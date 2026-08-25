@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
@@ -28,7 +29,7 @@ class UserPreferenceViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _message = MutableStateFlow<Message?>(null)
-    val message: StateFlow<Message?> = _message
+    val message: StateFlow<Message?> = _message.asStateFlow()
 
     val apps: StateFlow<Apps> = appsRepository.apps
         .stateIn(

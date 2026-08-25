@@ -166,7 +166,7 @@ private fun ColumnScope.AboutMainPane(
         )
         ParagraphText(
             buildAnnotatedString {
-                ClickableLink(stringResource(R.string.licenses), onNavigateToLicensesScreen)
+                ClickableLink(stringResource(R.string.licenses), onClick = onNavigateToLicensesScreen)
             }
         )
         if (donationVisible) {

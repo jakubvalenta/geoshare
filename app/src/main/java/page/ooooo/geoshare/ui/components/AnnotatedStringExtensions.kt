@@ -41,7 +41,7 @@ fun annotatedStringResource(@StringRes id: Int, vararg formatArgs: FormatArg): A
                         }
 
                     is FormatArg.Link ->
-                        ClickableLink(argument.text, argument.onClick)
+                        ClickableLink(argument.text, onClick = argument.onClick)
                 }
             }
         }
@@ -49,9 +49,13 @@ fun annotatedStringResource(@StringRes id: Int, vararg formatArgs: FormatArg): A
 }
 
 @Composable
-fun AnnotatedString.Builder.ClickableLink(text: String, onClick: () -> Unit) {
+fun AnnotatedString.Builder.ClickableLink(
+    text: String,
+    styles: TextLinkStyles = AnnotatedString.DefaultLinkStyles,
+    onClick: () -> Unit,
+) {
     withLink(
-        LinkAnnotation.Clickable(tag = "link", styles = AnnotatedString.linkStyles) {
+        LinkAnnotation.Clickable(tag = "link", styles = styles) {
             onClick()
         }
     ) {
@@ -59,7 +63,17 @@ fun AnnotatedString.Builder.ClickableLink(text: String, onClick: () -> Unit) {
     }
 }
 
-val AnnotatedString.Companion.linkStyles
+val AnnotatedString.Companion.DefaultLinkStyles
     @Composable get() = TextLinkStyles(
-        SpanStyle(color = MaterialTheme.colorScheme.tertiary, textDecoration = TextDecoration.Underline)
+        SpanStyle(
+            color = MaterialTheme.colorScheme.tertiary,
+            textDecoration = TextDecoration.Underline,
+        )
+    )
+
+val AnnotatedString.Companion.UnderlinedLinkStyles
+    @Composable get() = TextLinkStyles(
+        SpanStyle(
+            textDecoration = TextDecoration.Underline,
+        )
     )

@@ -449,6 +449,7 @@ object AndroidTools {
     suspend fun pasteFromClipboard(clipboard: Clipboard): String =
         clipboard.getClipEntry()?.clipData?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.text?.toString().orEmpty()
 
+    // FIXME Is it really silent?
     fun silentPasteFromClipboard(clipboard: Clipboard): String =
         @Suppress("DEPRECATION")
         clipboard.nativeClipboard.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.text?.toString().orEmpty()

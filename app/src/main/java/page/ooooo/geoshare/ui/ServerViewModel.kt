@@ -55,7 +55,7 @@ class ServerViewModel @Inject constructor(
         )
 
     private val _message = MutableStateFlow<Message?>(null)
-    val message: StateFlow<Message?> = _message
+    val message: StateFlow<Message?> = _message.asStateFlow()
 
     /**
      * Dummy object to read default form values from.

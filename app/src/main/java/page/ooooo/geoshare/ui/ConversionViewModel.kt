@@ -59,7 +59,7 @@ class ConversionViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _currentState = MutableStateFlow<State>(Initial())
-    val currentState: StateFlow<State> = _currentState
+    val currentState: StateFlow<State> = _currentState.asStateFlow()
 
     val stateContext = ConversionStateContext(
         inputs = inputRepository.all,
@@ -75,6 +75,9 @@ class ConversionViewModel @Inject constructor(
 
     private val _source = savedStateHandle.getMutableStateFlow("source", "")
     val source: StateFlow<String> = _source.asStateFlow()
+
+    private val _sourceComesFromIntent = savedStateHandle.getMutableStateFlow("sourceComesFromIntent", false)
+    val sourceComesFromIntent: StateFlow<Boolean> = _sourceComesFromIntent.asStateFlow()
 
     private var transitionJob: Job? = null
     private val transitionExceptionHandler = CoroutineExceptionHandler { _, tr ->
@@ -130,6 +133,7 @@ class ConversionViewModel @Inject constructor(
 
     fun setSource(newSource: String) {
         _source.value = newSource
+        _sourceComesFromIntent.value = false
     }
 
     // Any action
@@ -208,6 +212,7 @@ class ConversionViewModel @Inject constructor(
 
     fun onCreateOrNewIntent(intent: Intent) {
         _source.value = AndroidTools.getIntentUriString(intent).orEmpty()
+        _sourceComesFromIntent.value = true
         start()
     }
 
