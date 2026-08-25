@@ -1,1 +1,2 @@
 - Added a warning that Google Search links are not supported.
+- Fixed glitch when typing in the main form.
