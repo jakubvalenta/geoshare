@@ -353,4 +353,5 @@
     <string name="user_preferences_finish_title">Закрытие</string>
     <string name="user_preferences_finish_after_action_succeeded">Закрывать приложение после обмена с ним ссылкой и выполнения какого-либо действия (запуск картографического приложения, копирование координат, сохранение GPX и т.д.)</string>
     <string name="user_preferences_finish_after_action_succeeded_and_opened_app">Закрывать приложение после обмена с ним ссылкой и запуска картографического приложения</string>
+    <string name="conversion_failed_unsupported_source_google_search">Ссылки Google Поиска не поддерживаются</string>
 </resources>
