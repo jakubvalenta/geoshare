@@ -3,7 +3,7 @@ package page.ooooo.geoshare.ui.components
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
@@ -28,22 +30,20 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
@@ -59,13 +59,11 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
-import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.App
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
@@ -80,19 +78,17 @@ import page.ooooo.geoshare.lib.outputs.OpenPointOutput
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
-import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun BoxScope.WelcomeSheet(
     visible: StateFlow<Boolean>,
     appDetails: AppDetails,
     conversionSucceeded: Boolean,
-    initialLinkCopied: Boolean = false,
-    source: StateFlow<String>,
+    initialPage: Int = 0,
     sourceComesFromIntent: StateFlow<Boolean>,
+    sourceMatchesInput: StateFlow<Boolean>,
     outputsForApps: Map<String, List<Output>>,
     onClose: () -> Unit,
-    onTextMatchesInput: (text: String) -> Boolean,
 ) {
     val visible by visible.collectAsStateWithLifecycle()
 
@@ -107,12 +103,11 @@ fun BoxScope.WelcomeSheet(
         WelcomeCard(
             conversionSucceeded = conversionSucceeded,
             appDetails = appDetails,
-            initialLinkCopied = initialLinkCopied,
+            initialPage = initialPage,
             outputsForApps = outputsForApps,
-            source = source,
             sourceComesFromIntent = sourceComesFromIntent,
+            sourceMatchesInput = sourceMatchesInput,
             onClose = onClose,
-            onTextMatchesInput = onTextMatchesInput,
         )
     }
 }
@@ -121,13 +116,12 @@ fun BoxScope.WelcomeSheet(
 private fun WelcomeCard(
     appDetails: AppDetails,
     conversionSucceeded: Boolean,
-    initialLinkCopied: Boolean = false,
+    initialPage: Int = 0,
     outputsForApps: Map<String, List<Output>>,
-    stepCount: Int = 4,
-    source: StateFlow<String>,
+    pageCount: Int = 4,
     sourceComesFromIntent: StateFlow<Boolean>,
+    sourceMatchesInput: StateFlow<Boolean>,
     onClose: () -> Unit,
-    onTextMatchesInput: (text: String) -> Boolean,
 ) {
     val appName = stringResource(R.string.app_name)
     val clipboard = LocalClipboard.current
@@ -156,38 +150,22 @@ private fun WelcomeCard(
         outputsForApps[packageName]?.firstNotNullOfOrNull { it as? OpenPointOutput }
     }
 
-    val source by source.collectAsStateWithLifecycle()
+    val pagerState = rememberPagerState(initialPage) { pageCount }
+    val animatedProgress by animateFloatAsState(
+        targetValue = (pagerState.currentPage + 1f) / pageCount,
+        animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
+        label = "progressAnimation",
+    )
     val sourceComesFromIntent by sourceComesFromIntent.collectAsStateWithLifecycle()
-    val sourceIsNotEmpty = remember(source) { source.isNotEmpty() }
-    var linkCopied by remember { mutableStateOf(initialLinkCopied) }
-    val completedIndex = remember(conversionSucceeded, sourceIsNotEmpty, linkCopied) {
-        if (sourceComesFromIntent) {
-            3
-        } else if (conversionSucceeded) {
-            2
-        } else if (sourceIsNotEmpty) {
-            1
-        } else if (linkCopied) {
-            0
-        } else {
-            -1
-        }
-    }
-    val allStepsCompleted = completedIndex >= stepCount - 1
+    val sourceMatchesInput by sourceMatchesInput.collectAsStateWithLifecycle()
 
-    LaunchedEffect(conversionSucceeded, sourceIsNotEmpty) {
-        if (!conversionSucceeded && !sourceIsNotEmpty) {
-            while (!linkCopied) {
-                if (
-                    AndroidTools
-                        .silentPasteFromClipboard(clipboard)
-                        .let { it.isNotEmpty() && onTextMatchesInput(it) }
-                ) {
-                    linkCopied = true
-                } else {
-                    delay(1.seconds)
-                }
-            }
+    LaunchedEffect(conversionSucceeded, sourceComesFromIntent, sourceMatchesInput) {
+        if (sourceComesFromIntent) {
+            pagerState.animateScrollToPage(3)
+        } else if (conversionSucceeded) {
+            pagerState.animateScrollToPage(2)
+        } else if (sourceMatchesInput) {
+            pagerState.animateScrollToPage(1)
         }
     }
 
@@ -201,101 +179,106 @@ private fun WelcomeCard(
     ) {
         Box {
             Column(Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.small + spacing.tiny)) {
-                Text(
-                    if (allStepsCompleted) {
-                        stringResource(R.string.welcome_completed_headline, appName)
-                    } else {
-                        stringResource(R.string.welcome_headline, appName)
-                    },
-                    Modifier
-                        .padding(horizontal = 50.dp)
-                        .padding(bottom = spacing.small)
-                        .fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.headlineSmall
-                )
-                CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
-                    if (allStepsCompleted) {
-                        ParagraphText(
-                            stringResource(R.string.welcome_completed_text),
-                            fontWeight = FontWeight.Bold,
-                        )
-                    } else {
-                        ParagraphText(
-                            stringResource(R.string.welcome_text, appName),
-                        )
-                    }
-                }
-                Column(
-                    Modifier.padding(top = spacing.small),
-                    verticalArrangement = Arrangement.spacedBy(spacing.small)
-                ) {
-                    // TODO Show only one step at a time
-                    WelcomeStep(
-                        index = 0,
-                        completedIndex = completedIndex,
-                        title = { ParagraphText(stringResource(R.string.welcome_copy)) },
-                    ) {
-                        ParagraphText(stringResource(R.string.welcome_copy_help))
-                        SelectionContainer {
-                            Text(
-                                UriFormatter.formatUriString(
-                                    examplePoint, "https://maps.google.com/?q={lat}%2C{lon}"
-                                ).orEmpty(),
-                                Modifier.background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f)),
-                            )
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.padding(
+                        horizontal = spacing.windowPadding,
+                        vertical = spacing.small + spacing.tiny
+                    ),
+                ) { page ->
+                    when (page) {
+                        0 -> WelcomeStep(
+                            page = 0,
+                            pageCount = pageCount,
+                            headline = { stringResource(R.string.welcome_paste_headline) },
+                            text = { stringResource(R.string.welcome_paste_text, appName) },
+                            action = {
+                                ParagraphText(stringResource(R.string.welcome_paste_action))
+                            },
+                        ) {
+                            ParagraphText(stringResource(R.string.welcome_paste_description))
+                            SelectionContainer {
+                                Text(
+                                    UriFormatter.formatUriString(
+                                        examplePoint, "https://maps.google.com/?q={lat}%2C{lon}"
+                                    ).orEmpty(),
+                                    Modifier.background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f)),
+                                )
+                            }
                         }
-                    }
-                    WelcomeStep(
-                        index = 1,
-                        completedIndex = completedIndex,
-                        title = { ParagraphText(stringResource(R.string.welcome_paste)) },
-                    )
-                    WelcomeStep(
-                        index = 2, completedIndex = completedIndex,
-                        title = {
-                            ParagraphText(
-                                annotatedStringResource(
-                                    R.string.welcome_submit,
-                                    FormatArg.Text(
-                                        stringResource(R.string.main_create_geo_uri),
-                                        SpanStyle(fontStyle = FontStyle.Italic),
+
+                        1 -> WelcomeStep(
+                            page = 1,
+                            pageCount = pageCount,
+                            headline = { stringResource(R.string.welcome_submit_headline) },
+                            text = { stringResource(R.string.welcome_submit_text) },
+                            action = {
+                                ParagraphText(
+                                    annotatedStringResource(
+                                        R.string.welcome_submit_action,
+                                        FormatArg.Text(
+                                            stringResource(R.string.main_create_geo_uri),
+                                            SpanStyle(fontStyle = FontStyle.Italic),
+                                        ),
                                     )
                                 )
-                            )
-                        },
-                    )
-                    WelcomeStep(
-                        index = 3,
-                        completedIndex = completedIndex,
-                        title = {
-                            ParagraphText(stringResource(R.string.welcome_share, appName))
-                        },
-                    ) {
-                        if (exampleAppOutput != null) {
-                            ParagraphText(
-                                buildAnnotatedString {
-                                    append(stringResource(R.string.welcome_share_help))
-                                    append(" ")
-                                    val label = appDetails[exampleAppOutput.packageName]?.label.orEmpty()
-                                    ClickableLink(
-                                        stringResource(R.string.welcome_share_open_app, label),
-                                        styles = AnnotatedString.UnderlinedLinkStyles,
-                                    ) {
-                                        val actionContext = ActionContext(
-                                            context = context,
-                                            clipboard = clipboard,
-                                            resources = resources,
-                                        )
-                                        coroutineScope.launch {
-                                            exampleAppOutput.toAction(examplePoint).execute(actionContext)
+                            },
+                        )
+
+                        2 -> WelcomeStep(
+                            page = 2,
+                            pageCount = pageCount,
+                            headline = { stringResource(R.string.welcome_share_headline) },
+                            text = { stringResource(R.string.welcome_share_text, appName) },
+                            action = {
+                                ParagraphText(stringResource(R.string.welcome_share_action, appName))
+                            },
+                        ) {
+                            if (exampleAppOutput != null) {
+                                ParagraphText(
+                                    buildAnnotatedString {
+                                        append(stringResource(R.string.welcome_share_help))
+                                        append(" ")
+                                        val label =
+                                            appDetails[exampleAppOutput.packageName]?.label.orEmpty()
+                                        ClickableLink(
+                                            stringResource(R.string.welcome_share_open_app, label),
+                                            styles = AnnotatedString.UnderlinedLinkStyles,
+                                        ) {
+                                            val actionContext = ActionContext(
+                                                context = context,
+                                                clipboard = clipboard,
+                                                resources = resources,
+                                            )
+                                            coroutineScope.launch {
+                                                exampleAppOutput.toAction(examplePoint)
+                                                    .execute(actionContext)
+                                            }
                                         }
                                     }
-                                }
-                            )
+                                )
+                            }
                         }
+
+                        3 -> WelcomeStep(
+                            page = 3,
+                            pageCount = pageCount,
+                            headline = { stringResource(R.string.welcome_completed_headline) },
+                            text = { stringResource(R.string.welcome_completed_text, appName) },
+                            action = {
+                                ParagraphText(stringResource(R.string.welcome_completed_action))
+                            },
+                        )
                     }
                 }
+                LinearProgressIndicator(
+                    { animatedProgress },
+                    Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(vertical = spacing.tinyAdaptive),
+                    color = MaterialTheme.colorScheme.onTertiaryContainer,
+                    trackColor = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.2f),
+                )
             }
             FilledIconButton(
                 onClose,
@@ -319,45 +302,48 @@ private fun WelcomeCard(
 
 @Composable
 private fun WelcomeStep(
-    index: Int,
-    completedIndex: Int,
-    title: @Composable () -> Unit,
-    content: (@Composable ColumnScope.() -> Unit)? = null,
+    page: Int,
+    pageCount: Int,
+    headline: @Composable () -> String,
+    text: (@Composable () -> String)? = null,
+    action: @Composable () -> Unit,
+    description: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     val spacing = LocalSpacing.current
-    val stepCompleted = completedIndex >= index
 
-    Row(
-        Modifier.graphicsLayer {
-            alpha = if (stepCompleted) 0.7f else 1f
-        },
-        horizontalArrangement = Arrangement.spacedBy(spacing.tiny),
-    ) {
-        Crossfade(stepCompleted) { targetState ->
-            if (targetState) {
-                Icon(painterResource(R.drawable.check_circle_24px), contentDescription = null)
-            } else {
-                when (index) {
+    Column(verticalArrangement = Arrangement.spacedBy(spacing.small)) {
+        Text(
+            headline(),
+            Modifier
+                .padding(horizontal = 50.dp)
+                .fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.headlineSmall
+        )
+        CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
+            if (text != null) {
+                ParagraphText(text())
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(spacing.tiny)) {
+                val image = when (page) {
+                    pageCount - 1 -> painterResource(R.drawable.check_circle_24px)
                     0 -> painterResource(R.drawable.counter_1_24px)
                     1 -> painterResource(R.drawable.counter_2_24px)
                     2 -> painterResource(R.drawable.counter_3_24px)
                     3 -> painterResource(R.drawable.counter_4_24px)
                     else -> null
-                }?.let { painter -> Icon(painter, contentDescription = null) }
-            }
-        }
-        Column(Modifier.padding(top = 2.dp), verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
-            CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
-                CompositionLocalProvider(LocalTextStyle provides LocalTextStyle.current.run {
-                    if (!stepCompleted) {
-                        copy(fontWeight = FontWeight.Bold)
-                    } else {
-                        this
-                    }
-                }) {
-                    title()
                 }
-                content?.invoke(this)
+                if (image != null) {
+                    Icon(image, contentDescription = null)
+                }
+                Column(Modifier.padding(top = 2.dp), verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
+                    CompositionLocalProvider(
+                        LocalTextStyle provides LocalTextStyle.current.copy(fontWeight = FontWeight.Bold)
+                    ) {
+                        action()
+                    }
+                    description?.invoke(this)
+                }
             }
         }
     }
@@ -391,6 +377,7 @@ private fun FirstStepPreview() {
                         ),
                     ),
                     conversionSucceeded = false,
+                    initialPage = 0,
                     outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
                             PackageNames.OSMAND_PLUS to App(
@@ -400,10 +387,9 @@ private fun FirstStepPreview() {
                         ),
                         hiddenApps = emptySet(),
                     ),
-                    source = MutableStateFlow(""),
                     sourceComesFromIntent = MutableStateFlow(false),
+                    sourceMatchesInput = MutableStateFlow(false),
                     onClose = {},
-                    onTextMatchesInput = { false },
                 )
             }
         }
@@ -438,6 +424,7 @@ private fun DarkFirstStepPreview() {
                         ),
                     ),
                     conversionSucceeded = false,
+                    initialPage = 0,
                     outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
                             PackageNames.OSMAND_PLUS to App(
@@ -447,10 +434,9 @@ private fun DarkFirstStepPreview() {
                         ),
                         hiddenApps = emptySet(),
                     ),
-                    source = MutableStateFlow(""),
                     sourceComesFromIntent = MutableStateFlow(false),
+                    sourceMatchesInput = MutableStateFlow(false),
                     onClose = {},
-                    onTextMatchesInput = { false },
                 )
             }
         }
@@ -485,6 +471,7 @@ private fun TabletFirstStepPreview() {
                         ),
                     ),
                     conversionSucceeded = false,
+                    initialPage = 0,
                     outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
                             PackageNames.OSMAND_PLUS to App(
@@ -494,10 +481,9 @@ private fun TabletFirstStepPreview() {
                         ),
                         hiddenApps = emptySet(),
                     ),
-                    source = MutableStateFlow(""),
                     sourceComesFromIntent = MutableStateFlow(false),
+                    sourceMatchesInput = MutableStateFlow(false),
                     onClose = {},
-                    onTextMatchesInput = { false },
                 )
             }
         }
@@ -532,7 +518,7 @@ private fun SecondStepPreview() {
                         ),
                     ),
                     conversionSucceeded = false,
-                    initialLinkCopied = true,
+                    initialPage = 2,
                     outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
                             PackageNames.OSMAND_PLUS to App(
@@ -542,10 +528,9 @@ private fun SecondStepPreview() {
                         ),
                         hiddenApps = emptySet(),
                     ),
-                    source = MutableStateFlow(""),
                     sourceComesFromIntent = MutableStateFlow(false),
+                    sourceMatchesInput = MutableStateFlow(true),
                     onClose = {},
-                    onTextMatchesInput = { false },
                 )
             }
         }
@@ -580,7 +565,7 @@ private fun DarkSecondStepPreview() {
                         ),
                     ),
                     conversionSucceeded = false,
-                    initialLinkCopied = true,
+                    initialPage = 2,
                     outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
                             PackageNames.OSMAND_PLUS to App(
@@ -590,10 +575,9 @@ private fun DarkSecondStepPreview() {
                         ),
                         hiddenApps = emptySet(),
                     ),
-                    source = MutableStateFlow(""),
                     sourceComesFromIntent = MutableStateFlow(false),
+                    sourceMatchesInput = MutableStateFlow(true),
                     onClose = {},
-                    onTextMatchesInput = { false },
                 )
             }
         }
@@ -627,7 +611,8 @@ private fun ThirdStepPreview() {
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
-                    conversionSucceeded = false,
+                    conversionSucceeded = true,
+                    initialPage = 2,
                     outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
                             PackageNames.OSMAND_PLUS to App(
@@ -637,10 +622,9 @@ private fun ThirdStepPreview() {
                         ),
                         hiddenApps = emptySet(),
                     ),
-                    source = MutableStateFlow("foo"),
                     sourceComesFromIntent = MutableStateFlow(false),
+                    sourceMatchesInput = MutableStateFlow(true),
                     onClose = {},
-                    onTextMatchesInput = { false },
                 )
             }
         }
@@ -674,7 +658,8 @@ private fun DarkThirdStepPreview() {
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
-                    conversionSucceeded = false,
+                    conversionSucceeded = true,
+                    initialPage = 2,
                     outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
                             PackageNames.OSMAND_PLUS to App(
@@ -684,10 +669,9 @@ private fun DarkThirdStepPreview() {
                         ),
                         hiddenApps = emptySet(),
                     ),
-                    source = MutableStateFlow("foo"),
                     sourceComesFromIntent = MutableStateFlow(false),
+                    sourceMatchesInput = MutableStateFlow(true),
                     onClose = {},
-                    onTextMatchesInput = { false },
                 )
             }
         }
@@ -721,7 +705,8 @@ private fun FourthStepPreview() {
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
-                    conversionSucceeded = false,
+                    conversionSucceeded = true,
+                    initialPage = 3,
                     outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
                             PackageNames.OSMAND_PLUS to App(
@@ -731,10 +716,9 @@ private fun FourthStepPreview() {
                         ),
                         hiddenApps = emptySet(),
                     ),
-                    source = MutableStateFlow("foo"),
-                    sourceComesFromIntent = MutableStateFlow(false),
+                    sourceComesFromIntent = MutableStateFlow(true),
+                    sourceMatchesInput = MutableStateFlow(true),
                     onClose = {},
-                    onTextMatchesInput = { false },
                 )
             }
         }
@@ -768,54 +752,8 @@ private fun DarkFourthStepPreview() {
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
-                    conversionSucceeded = false,
-                    outputsForApps = outputRepository.getOutputsForApps(
-                        mapOf(
-                            PackageNames.OSMAND_PLUS to App(
-                                packageName = PackageNames.OSMAND_PLUS,
-                                dataTypes = setOf(DataType.GEO_URI)
-                            ),
-                        ),
-                        hiddenApps = emptySet(),
-                    ),
-                    source = MutableStateFlow("foo"),
-                    sourceComesFromIntent = MutableStateFlow(false),
-                    onClose = {},
-                    onTextMatchesInput = { false },
-                )
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun CompletedPreview() {
-    AppTheme {
-        Scaffold { innerPadding ->
-            Box(
-                Modifier
-                    .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding)
-                    .fillMaxSize(),
-            ) {
-                val context = LocalContext.current
-                val geometries = Geometries(context)
-                val coordinateConverter = CoordinateConverter(geometries)
-                val outputRepository = OutputRepository(
-                    coordinateConverter = coordinateConverter,
-                )
-                @SuppressLint("LocalContextGetResourceValueCall")
-                WelcomeSheet(
-                    visible = MutableStateFlow(true),
-                    appDetails = mapOf(
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    ),
                     conversionSucceeded = true,
+                    initialPage = 3,
                     outputsForApps = outputRepository.getOutputsForApps(
                         mapOf(
                             PackageNames.OSMAND_PLUS to App(
@@ -825,57 +763,9 @@ private fun CompletedPreview() {
                         ),
                         hiddenApps = emptySet(),
                     ),
-                    source = MutableStateFlow(""),
                     sourceComesFromIntent = MutableStateFlow(true),
+                    sourceMatchesInput = MutableStateFlow(true),
                     onClose = {},
-                    onTextMatchesInput = { false },
-                )
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkCompletedPreview() {
-    AppTheme {
-        Scaffold { innerPadding ->
-            Box(
-                Modifier
-                    .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding)
-                    .fillMaxSize(),
-            ) {
-                val context = LocalContext.current
-                val geometries = Geometries(context)
-                val coordinateConverter = CoordinateConverter(geometries)
-                val outputRepository = OutputRepository(
-                    coordinateConverter = coordinateConverter,
-                )
-                @SuppressLint("LocalContextGetResourceValueCall")
-                WelcomeSheet(
-                    visible = MutableStateFlow(true),
-                    appDetails = mapOf(
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    ),
-                    conversionSucceeded = true,
-                    outputsForApps = outputRepository.getOutputsForApps(
-                        mapOf(
-                            PackageNames.OSMAND_PLUS to App(
-                                packageName = PackageNames.OSMAND_PLUS,
-                                dataTypes = setOf(DataType.GEO_URI)
-                            ),
-                        ),
-                        hiddenApps = emptySet(),
-                    ),
-                    source = MutableStateFlow(""),
-                    sourceComesFromIntent = MutableStateFlow(true),
-                    onClose = {},
-                    onTextMatchesInput = { false },
                 )
             }
         }

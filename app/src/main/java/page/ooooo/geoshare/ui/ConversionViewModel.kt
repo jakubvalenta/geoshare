@@ -7,14 +7,17 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.InputRepository
@@ -46,7 +49,6 @@ import page.ooooo.geoshare.lib.outputs.ActionResult
 import page.ooooo.geoshare.lib.outputs.LocationAction
 import javax.inject.Inject
 
-@OptIn(SavedStateHandleSaveableApi::class)
 @HiltViewModel
 class ConversionViewModel @Inject constructor(
     @ApplicationContext context: Context,
@@ -78,6 +80,17 @@ class ConversionViewModel @Inject constructor(
 
     private val _sourceComesFromIntent = savedStateHandle.getMutableStateFlow("sourceComesFromIntent", false)
     val sourceComesFromIntent: StateFlow<Boolean> = _sourceComesFromIntent.asStateFlow()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val sourceMatchesInput: StateFlow<Boolean> = _source
+        .mapLatest { source ->
+            inputRepository.all.firstOrNull { it.match(source) != null } != null
+        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            false,
+        )
 
     private var transitionJob: Job? = null
     private val transitionExceptionHandler = CoroutineExceptionHandler { _, tr ->
