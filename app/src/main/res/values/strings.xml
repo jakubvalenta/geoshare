@@ -365,20 +365,11 @@
     <string name="user_preferences_section_appearance">Appearance</string>
     <string name="user_preferences_section_input">Input</string>
     <string name="user_preferences_section_output">Output</string>
-    <string name="welcome_completed_action">This is the end of the tutorial.</string>
-    <string name="welcome_completed_headline">Congratulations!</string>
-    <string name="welcome_completed_text">You’ve processed a map link by sharing it with %1$s.</string>
-    <string name="welcome_paste_action">Paste a map link in the form above</string>
-    <string name="welcome_paste_description">Don’t have a map link yet? Select and copy this one:</string>
-    <string name="welcome_paste_headline">Tutorial</string>
-    <string name="welcome_paste_text">%1$s works by processing map links.</string>
-    <string name="welcome_share_action">Open your favorite map app and use its share function to share a location with %1$s.</string>
-    <string name="welcome_share_headline">Excellent!</string>
-    <string name="welcome_share_help">Don’t know which map app to open?</string>
-    <string name="welcome_share_open_app">Launch %1$s</string>
-    <string name="welcome_share_text">You can now see the location of your map link, and open it in another map. Would you like to learn how to use %1$s faster?</string>
-    <string name="welcome_submit_action">Now press the button %1$s.</string>
-    <string name="welcome_submit_headline">Great!</string>
-    <string name="welcome_submit_text">You’ve pasted a valid map link in the form.</string>
+    <string name="help_share_source_action">Try it with %1$s</string>
+    <string name="help_share_source_text">Open your favorite map app and use its share function to share a location with %1$s.</string>
+    <string name="help_share_source_title">Would you like to launch GeoShare faster?</string>
+    <string name="help_welcome_action">Or copy this example</string>
+    <string name="help_welcome_text">Do you have a map link ready? Enter it in the form and press Show coordinates.</string>
+    <string name="help_welcome_title">Welcome</string>
     <string name="yes">Yes</string>
 </resources>

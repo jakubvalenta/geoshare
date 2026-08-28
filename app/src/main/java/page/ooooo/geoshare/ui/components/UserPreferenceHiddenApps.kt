@@ -103,12 +103,10 @@ fun UserPreferenceHiddenAppsControls(
         fun isChecked(option: String): Boolean = value?.contains(option) == false
 
         fun setValue(option: String, checked: Boolean) {
-            val newValue = (value ?: emptySet()).let { value ->
-                if (!checked) {
-                    value + option
-                } else {
-                    value - option
-                }
+            val newValue = if (!checked) {
+                value.orEmpty() + option
+            } else {
+                value.orEmpty() - option
             }
             onValueChange { preferences ->
                 HiddenAppsPreference.setValue(preferences, newValue)

@@ -35,12 +35,16 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
+import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.lib.android.App
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
@@ -70,9 +74,12 @@ fun ResultCoordinates(
     appDetails: AppDetails,
     coordinateFormat: CoordinateFormat,
     coordinateConverter: CoordinateConverter,
+    dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
     outputsForApps: Map<String, List<Output>>,
     outputsForPointChips: List<PointOutput>,
     outputsForPointsChips: List<PointsOutput>,
+    sourceComesFromIntent: StateFlow<Boolean>,
+    onDismissHelpMessage: (helpMessage: HelpMessage) -> Unit,
     onExecute: (action: Action<*>) -> Unit,
     onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
     onSelect: (index: Int?) -> Unit,
@@ -84,7 +91,9 @@ fun ResultCoordinates(
     val resources = LocalResources.current
     val lastPoint = points.lastOrNull() ?: return
     val spacing = LocalSpacing.current
+
     var expanded by remember { mutableStateOf(initialExpanded) }
+    val sourceComesFromIntent by sourceComesFromIntent.collectAsStateWithLifecycle()
 
     Column {
         Row(
@@ -175,19 +184,7 @@ fun ResultCoordinates(
                 }
             }
         }
-        // TODO If not shared
-        HelpCard(
-            title = {
-                Text("Would you like to launch GeoShare faster?")
-            },
-            onClose = {
-                // TODO Close
-            },
-            modifier = Modifier
-                .padding(horizontal = spacing.windowPadding)
-                .padding(bottom = spacing.small),
-        ) {
-            val appName = stringResource(R.string.app_name)
+        if (!sourceComesFromIntent) {
             val examplePoint = WGS84Point.Kilimanjaro
 
             /**
@@ -207,26 +204,36 @@ fun ResultCoordinates(
             ).firstNotNullOfOrNull { packageName ->
                 outputsForApps[packageName]?.firstNotNullOfOrNull { it as? OpenPointOutput }
             }
-            ParagraphText(
-                buildAnnotatedString {
-                    append(stringResource(R.string.welcome_share_action, appName))
-                    if (exampleAppOutput != null) {
-                        val label = appDetails[exampleAppOutput.packageName]?.label.orEmpty()
-                        append(" Try it: ")
-                        ClickableLink(
-                            stringResource(R.string.welcome_share_open_app, label),
-                            styles = AnnotatedString.UnderlinedLinkStyles,
-                        ) {
-                            val actionContext = ActionContext(
-                                context = context, clipboard = clipboard, resources = resources
-                            )
-                            coroutineScope.launch {
-                                exampleAppOutput.toAction(examplePoint).execute(actionContext)
-                            }
+            HelpCard(
+                helpMessage = HelpMessage.SHARE_SOURCE,
+                dismissedHelpMessages = dismissedHelpMessages,
+                title = { Text(stringResource(R.string.help_share_source_title)) },
+                actionText = exampleAppOutput?.let { exampleAppOutput ->
+                    appDetails[exampleAppOutput.packageName]?.label?.let { exampleAppLabel ->
+                        {
+                            stringResource(R.string.help_share_source_action, exampleAppLabel)
                         }
                     }
-                }
-            )
+                },
+                onAction = {
+                    exampleAppOutput?.let { exampleAppOutput ->
+                        val actionContext = ActionContext(
+                            context = context, clipboard = clipboard, resources = resources
+                        )
+                        coroutineScope.launch {
+                            exampleAppOutput.toAction(examplePoint).execute(actionContext)
+                        }
+                    }
+                },
+                onDismiss = onDismissHelpMessage,
+                modifier = Modifier
+                    .padding(horizontal = spacing.windowPadding)
+                    .padding(bottom = spacing.small),
+            ) {
+                ParagraphText(
+                    stringResource(R.string.help_share_source_text, stringResource(R.string.app_name))
+                )
+            }
         }
         points.takeIf { points.size > 1 }?.let { points ->
             Surface(
@@ -359,6 +366,7 @@ private fun DefaultPreview() {
                 ),
                 coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
+                dismissedHelpMessages = MutableStateFlow(emptySet()),
                 outputsForApps = outputRepository.getOutputsForApps(
                     mapOf(
                         PackageNames.OSMAND_PLUS to App(
@@ -370,6 +378,8 @@ private fun DefaultPreview() {
                 ),
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
+                sourceComesFromIntent = MutableStateFlow(false),
+                onDismissHelpMessage = {},
                 onExecute = {},
                 onNavigateToFaqScreen = {},
                 onSelect = {},
@@ -404,6 +414,7 @@ private fun DarkPreview() {
                 ),
                 coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
+                dismissedHelpMessages = MutableStateFlow(emptySet()),
                 outputsForApps = outputRepository.getOutputsForApps(
                     mapOf(
                         PackageNames.OSMAND_PLUS to App(
@@ -415,6 +426,8 @@ private fun DarkPreview() {
                 ),
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
+                sourceComesFromIntent = MutableStateFlow(false),
+                onDismissHelpMessage = {},
                 onExecute = {},
                 onNavigateToFaqScreen = {},
                 onSelect = {},
@@ -446,6 +459,7 @@ private fun DescriptionPreview() {
                 ),
                 coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
+                dismissedHelpMessages = MutableStateFlow(null),
                 outputsForApps = outputRepository.getOutputsForApps(
                     mapOf(
                         PackageNames.OSMAND_PLUS to App(
@@ -457,6 +471,8 @@ private fun DescriptionPreview() {
                 ),
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
+                sourceComesFromIntent = MutableStateFlow(false),
+                onDismissHelpMessage = {},
                 onExecute = {},
                 onNavigateToFaqScreen = {},
                 onSelect = {},
@@ -488,6 +504,7 @@ private fun DarkDescriptionPreview() {
                 ),
                 coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
+                dismissedHelpMessages = MutableStateFlow(null),
                 outputsForApps = outputRepository.getOutputsForApps(
                     mapOf(
                         PackageNames.OSMAND_PLUS to App(
@@ -499,6 +516,8 @@ private fun DarkDescriptionPreview() {
                 ),
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
+                sourceComesFromIntent = MutableStateFlow(false),
+                onDismissHelpMessage = {},
                 onExecute = {},
                 onNavigateToFaqScreen = {},
                 onSelect = {},
@@ -533,6 +552,7 @@ private fun NamePreview() {
                 ),
                 coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
+                dismissedHelpMessages = MutableStateFlow(null),
                 outputsForApps = outputRepository.getOutputsForApps(
                     mapOf(
                         PackageNames.OSMAND_PLUS to App(
@@ -544,6 +564,8 @@ private fun NamePreview() {
                 ),
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
+                sourceComesFromIntent = MutableStateFlow(false),
+                onDismissHelpMessage = {},
                 onExecute = {},
                 onNavigateToFaqScreen = {},
                 onSelect = {},
@@ -578,6 +600,7 @@ private fun DarkNamePreview() {
                 ),
                 coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
+                dismissedHelpMessages = MutableStateFlow(null),
                 outputsForApps = outputRepository.getOutputsForApps(
                     mapOf(
                         PackageNames.OSMAND_PLUS to App(
@@ -589,6 +612,8 @@ private fun DarkNamePreview() {
                 ),
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
+                sourceComesFromIntent = MutableStateFlow(false),
+                onDismissHelpMessage = {},
                 onExecute = {},
                 onNavigateToFaqScreen = {},
                 onSelect = {},
@@ -628,6 +653,7 @@ private fun PointsPreview() {
                 ),
                 coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
+                dismissedHelpMessages = MutableStateFlow(null),
                 outputsForApps = outputRepository.getOutputsForApps(
                     mapOf(
                         PackageNames.OSMAND_PLUS to App(
@@ -640,6 +666,8 @@ private fun PointsPreview() {
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 initialExpanded = true,
+                sourceComesFromIntent = MutableStateFlow(false),
+                onDismissHelpMessage = {},
                 onExecute = {},
                 onNavigateToFaqScreen = {},
                 onSelect = {},
@@ -679,6 +707,7 @@ private fun DarkPointsPreview() {
                 ),
                 coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
+                dismissedHelpMessages = MutableStateFlow(null),
                 outputsForApps = outputRepository.getOutputsForApps(
                     mapOf(
                         PackageNames.OSMAND_PLUS to App(
@@ -691,6 +720,8 @@ private fun DarkPointsPreview() {
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 initialExpanded = true,
+                sourceComesFromIntent = MutableStateFlow(false),
+                onDismissHelpMessage = {},
                 onExecute = {},
                 onNavigateToFaqScreen = {},
                 onSelect = {},
@@ -726,6 +757,7 @@ private fun PointsWithNamePreview() {
                 ),
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
                 coordinateConverter = coordinateConverter,
+                dismissedHelpMessages = MutableStateFlow(null),
                 outputsForApps = outputRepository.getOutputsForApps(
                     mapOf(
                         PackageNames.OSMAND_PLUS to App(
@@ -738,6 +770,8 @@ private fun PointsWithNamePreview() {
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 initialExpanded = true,
+                sourceComesFromIntent = MutableStateFlow(false),
+                onDismissHelpMessage = {},
                 onExecute = {},
                 onNavigateToFaqScreen = {},
                 onSelect = {},
@@ -773,6 +807,7 @@ private fun DarkPointsWithNamePreview() {
                 ),
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
                 coordinateConverter = coordinateConverter,
+                dismissedHelpMessages = MutableStateFlow(null),
                 outputsForApps = outputRepository.getOutputsForApps(
                     mapOf(
                         PackageNames.OSMAND_PLUS to App(
@@ -785,6 +820,8 @@ private fun DarkPointsWithNamePreview() {
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 initialExpanded = true,
+                sourceComesFromIntent = MutableStateFlow(false),
+                onDismissHelpMessage = {},
                 onExecute = {},
                 onNavigateToFaqScreen = {},
                 onSelect = {},

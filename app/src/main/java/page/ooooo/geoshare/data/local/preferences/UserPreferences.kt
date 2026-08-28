@@ -431,6 +431,37 @@ interface SetPreference : TextPreference<Set<String>?> {
     }
 }
 
+object DismissedHelpMessagesPreference : TextPreference<Set<HelpMessage>?> {
+    override val key = stringPreferencesKey("dismissed_help_messages")
+    override val default: Set<HelpMessage> = emptySet()
+    val loading = null
+
+    override fun serialize(value: Set<HelpMessage>?, log: Log) =
+        try {
+            Json.encodeToString(value)
+        } catch (tr: SerializationException) {
+            // Silently ignore serialization errors, because the value should always serialize
+            log.e(TAG, "Serialization error", tr)
+            ""
+        }
+
+    override fun deserialize(value: String?, log: Log) =
+        if (value != null) {
+            try {
+                Json.decodeFromString<Set<HelpMessage>?>(value)
+            } catch (tr: IllegalArgumentException) {
+                log.e(TAG, "Deserialization error", tr)
+                default
+            }
+        } else {
+            default
+        }
+
+    override fun getValue(values: UserPreferencesValues) = values.dismissedHelpMessages
+
+    private const val TAG = "DismissedHelpMessagePreference"
+}
+
 object HiddenAppsPreference : SetPreference {
     override val key = stringPreferencesKey("hidden_apps")
     override val default: Set<String> = emptySet()
@@ -468,5 +499,6 @@ data class UserPreferencesValues(
     val dynamicColor: Boolean = DynamicColorPreference.loading,
     val finish: Finish = FinishPreference.loading,
     val hiddenApps: Set<String>? = HiddenAppsPreference.loading,
+    val dismissedHelpMessages: Set<HelpMessage>? = DismissedHelpMessagesPreference.loading,
     val introShownForVersionCode: Int? = IntroShowForVersionCodePreference.loading,
 )

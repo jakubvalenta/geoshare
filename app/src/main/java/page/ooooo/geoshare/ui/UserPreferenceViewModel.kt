@@ -60,7 +60,7 @@ class UserPreferenceViewModel @Inject constructor(
         editUserPreferences { preferences ->
             HiddenAppsPreference.setValue(
                 preferences,
-                (HiddenAppsPreference.getValue(preferences) ?: emptySet()) + packageName,
+                HiddenAppsPreference.getValue(preferences).orEmpty() + packageName,
             )
         }
         _message.value = Message(resources.getString(R.string.user_preferences_apps_message_hidden))

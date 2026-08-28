@@ -21,6 +21,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.preferences.CachedPurchasePreference
 import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePreference
+import page.ooooo.geoshare.data.local.preferences.DismissedHelpMessagesPreference
 import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -111,6 +112,23 @@ fun UserPreferenceDeveloperOptionsControls(
         }
         userPreferenceTextControl(
             userPreference = CachedPurchasePreference,
+            values = values,
+            onValueChange = onValueChange,
+        )
+        item {
+            ParagraphText(
+                "Dismissed help messages", // TODO
+                Modifier
+                    .padding(horizontal = LocalSpacing.current.windowPadding)
+                    .padding(
+                        top = LocalSpacing.current.mediumAdaptive,
+                        bottom = LocalSpacing.current.smallAdaptive,
+                    ),
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
+        userPreferenceTextControl(
+            userPreference = DismissedHelpMessagesPreference,
             values = values,
             onValueChange = onValueChange,
         )

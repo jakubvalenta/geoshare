@@ -460,7 +460,7 @@ private fun BillingSupportingPane(
                 Offer.Period.ONE_TIME -> 1
                 Offer.Period.MONTHLY -> 0
             }
-        } ?: emptyList()
+        }.orEmpty()
     }
     var selectedOffer by remember(sortedBillingOffers) { mutableStateOf(sortedBillingOffers.firstOrNull()) }
 
