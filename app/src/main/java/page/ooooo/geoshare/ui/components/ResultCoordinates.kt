@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.ui.components
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,10 +21,13 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -32,11 +36,16 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
+import page.ooooo.geoshare.lib.android.App
+import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.DataType
+import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.GCJ02Point
@@ -46,6 +55,9 @@ import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.Action
+import page.ooooo.geoshare.lib.outputs.ActionContext
+import page.ooooo.geoshare.lib.outputs.OpenPointOutput
+import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
 import page.ooooo.geoshare.ui.FaqItemId
@@ -58,6 +70,7 @@ fun ResultCoordinates(
     appDetails: AppDetails,
     coordinateFormat: CoordinateFormat,
     coordinateConverter: CoordinateConverter,
+    outputsForApps: Map<String, List<Output>>,
     outputsForPointChips: List<PointOutput>,
     outputsForPointsChips: List<PointsOutput>,
     onExecute: (action: Action<*>) -> Unit,
@@ -65,6 +78,10 @@ fun ResultCoordinates(
     onSelect: (index: Int?) -> Unit,
     initialExpanded: Boolean = false,
 ) {
+    val clipboard = LocalClipboard.current
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val resources = LocalResources.current
     val lastPoint = points.lastOrNull() ?: return
     val spacing = LocalSpacing.current
     var expanded by remember { mutableStateOf(initialExpanded) }
@@ -157,6 +174,59 @@ fun ResultCoordinates(
                     }
                 }
             }
+        }
+        // TODO If not shared
+        HelpCard(
+            title = {
+                Text("Would you like to launch GeoShare faster?")
+            },
+            onClose = {
+                // TODO Close
+            },
+            modifier = Modifier
+                .padding(horizontal = spacing.windowPadding)
+                .padding(bottom = spacing.small),
+        ) {
+            val appName = stringResource(R.string.app_name)
+            val examplePoint = WGS84Point.Kilimanjaro
+
+            /**
+             * An output that opens a point in a map app.
+             *
+             * The map app is the first installed app from a list of common map apps.
+             */
+            val exampleAppOutput = setOf(
+                PackageNames.GOOGLE_MAPS,
+                PackageNames.OSMAND_PLUS,
+                PackageNames.COMAPS_FDROID,
+                PackageNames.ORGANIC_MAPS,
+                PackageNames.MAPY_COM,
+                PackageNames.HERE_WEGO,
+                PackageNames.MAGIC_EARTH,
+                PackageNames.MAPS_ME,
+            ).firstNotNullOfOrNull { packageName ->
+                outputsForApps[packageName]?.firstNotNullOfOrNull { it as? OpenPointOutput }
+            }
+            ParagraphText(
+                buildAnnotatedString {
+                    append(stringResource(R.string.welcome_share_action, appName))
+                    if (exampleAppOutput != null) {
+                        val label = appDetails[exampleAppOutput.packageName]?.label.orEmpty()
+                        append(" Try it: ")
+                        ClickableLink(
+                            stringResource(R.string.welcome_share_open_app, label),
+                            styles = AnnotatedString.UnderlinedLinkStyles,
+                        ) {
+                            val actionContext = ActionContext(
+                                context = context, clipboard = clipboard, resources = resources
+                            )
+                            coroutineScope.launch {
+                                exampleAppOutput.toAction(examplePoint).execute(actionContext)
+                            }
+                        }
+                    }
+                }
+            )
         }
         points.takeIf { points.size > 1 }?.let { points ->
             Surface(
@@ -277,11 +347,27 @@ private fun DefaultPreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
+            @SuppressLint("LocalContextGetResourceValueCall")
             ResultCoordinates(
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
-                appDetails = emptyMap(),
+                appDetails = mapOf(
+                    PackageNames.OSMAND_PLUS to AppDetail(
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                    ),
+                ),
                 coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
+                outputsForApps = outputRepository.getOutputsForApps(
+                    mapOf(
+                        PackageNames.OSMAND_PLUS to App(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            dataTypes = setOf(DataType.GEO_URI)
+                        ),
+                    ),
+                    hiddenApps = emptySet(),
+                ),
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 onExecute = {},
@@ -306,11 +392,27 @@ private fun DarkPreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
+            @SuppressLint("LocalContextGetResourceValueCall")
             ResultCoordinates(
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
-                appDetails = emptyMap(),
+                appDetails = mapOf(
+                    PackageNames.OSMAND_PLUS to AppDetail(
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                    ),
+                ),
                 coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
+                outputsForApps = outputRepository.getOutputsForApps(
+                    mapOf(
+                        PackageNames.OSMAND_PLUS to App(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            dataTypes = setOf(DataType.GEO_URI)
+                        ),
+                    ),
+                    hiddenApps = emptySet(),
+                ),
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 onExecute = {},
@@ -332,11 +434,27 @@ private fun DescriptionPreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
+            @SuppressLint("LocalContextGetResourceValueCall")
             ResultCoordinates(
                 points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI)),
-                appDetails = emptyMap(),
+                appDetails = mapOf(
+                    PackageNames.OSMAND_PLUS to AppDetail(
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                    ),
+                ),
                 coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
+                outputsForApps = outputRepository.getOutputsForApps(
+                    mapOf(
+                        PackageNames.OSMAND_PLUS to App(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            dataTypes = setOf(DataType.GEO_URI)
+                        ),
+                    ),
+                    hiddenApps = emptySet(),
+                ),
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 onExecute = {},
@@ -358,11 +476,27 @@ private fun DarkDescriptionPreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
+            @SuppressLint("LocalContextGetResourceValueCall")
             ResultCoordinates(
                 points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI)),
-                appDetails = emptyMap(),
+                appDetails = mapOf(
+                    PackageNames.OSMAND_PLUS to AppDetail(
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                    ),
+                ),
                 coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
+                outputsForApps = outputRepository.getOutputsForApps(
+                    mapOf(
+                        PackageNames.OSMAND_PLUS to App(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            dataTypes = setOf(DataType.GEO_URI)
+                        ),
+                    ),
+                    hiddenApps = emptySet(),
+                ),
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 onExecute = {},
@@ -384,14 +518,30 @@ private fun NamePreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
+            @SuppressLint("LocalContextGetResourceValueCall")
             ResultCoordinates(
                 points = persistentListOf(
                     WGS84Point(NaivePoint.example),
                     GCJ02Point(31.22850685422705, 121.47552456472106, z = 11.0, source = Source.MAP_CENTER),
                 ),
-                appDetails = emptyMap(),
+                appDetails = mapOf(
+                    PackageNames.OSMAND_PLUS to AppDetail(
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                    ),
+                ),
                 coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
+                outputsForApps = outputRepository.getOutputsForApps(
+                    mapOf(
+                        PackageNames.OSMAND_PLUS to App(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            dataTypes = setOf(DataType.GEO_URI)
+                        ),
+                    ),
+                    hiddenApps = emptySet(),
+                ),
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 onExecute = {},
@@ -413,14 +563,30 @@ private fun DarkNamePreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
+            @SuppressLint("LocalContextGetResourceValueCall")
             ResultCoordinates(
                 points = persistentListOf(
                     WGS84Point(NaivePoint.example),
                     GCJ02Point(31.22850685422705, 121.47552456472106, z = 11.0, source = Source.MAP_CENTER),
                 ),
-                appDetails = emptyMap(),
+                appDetails = mapOf(
+                    PackageNames.OSMAND_PLUS to AppDetail(
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                    ),
+                ),
                 coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
+                outputsForApps = outputRepository.getOutputsForApps(
+                    mapOf(
+                        PackageNames.OSMAND_PLUS to App(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            dataTypes = setOf(DataType.GEO_URI)
+                        ),
+                    ),
+                    hiddenApps = emptySet(),
+                ),
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 onExecute = {},
@@ -442,6 +608,7 @@ private fun PointsPreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
+            @SuppressLint("LocalContextGetResourceValueCall")
             ResultCoordinates(
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
@@ -452,9 +619,24 @@ private fun PointsPreview() {
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.genRandomPoint()),
                 ),
-                appDetails = emptyMap(),
+                appDetails = mapOf(
+                    PackageNames.OSMAND_PLUS to AppDetail(
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                    ),
+                ),
                 coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
+                outputsForApps = outputRepository.getOutputsForApps(
+                    mapOf(
+                        PackageNames.OSMAND_PLUS to App(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            dataTypes = setOf(DataType.GEO_URI)
+                        ),
+                    ),
+                    hiddenApps = emptySet(),
+                ),
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 initialExpanded = true,
@@ -477,6 +659,7 @@ private fun DarkPointsPreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
+            @SuppressLint("LocalContextGetResourceValueCall")
             ResultCoordinates(
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
@@ -487,9 +670,24 @@ private fun DarkPointsPreview() {
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.genRandomPoint()),
                 ),
-                appDetails = emptyMap(),
+                appDetails = mapOf(
+                    PackageNames.OSMAND_PLUS to AppDetail(
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                    ),
+                ),
                 coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
+                outputsForApps = outputRepository.getOutputsForApps(
+                    mapOf(
+                        PackageNames.OSMAND_PLUS to App(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            dataTypes = setOf(DataType.GEO_URI)
+                        ),
+                    ),
+                    hiddenApps = emptySet(),
+                ),
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 initialExpanded = true,
@@ -512,15 +710,31 @@ private fun PointsWithNamePreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
+            @SuppressLint("LocalContextGetResourceValueCall")
             ResultCoordinates(
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.genRandomPoint(name = "Berlin, Germany", z = 13.0)),
                 ),
-                appDetails = emptyMap(),
+                appDetails = mapOf(
+                    PackageNames.OSMAND_PLUS to AppDetail(
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                    ),
+                ),
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
                 coordinateConverter = coordinateConverter,
+                outputsForApps = outputRepository.getOutputsForApps(
+                    mapOf(
+                        PackageNames.OSMAND_PLUS to App(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            dataTypes = setOf(DataType.GEO_URI)
+                        ),
+                    ),
+                    hiddenApps = emptySet(),
+                ),
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 initialExpanded = true,
@@ -543,15 +757,31 @@ private fun DarkPointsWithNamePreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
+            @SuppressLint("LocalContextGetResourceValueCall")
             ResultCoordinates(
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.genRandomPoint(name = "Berlin, Germany", z = 13.0)),
                 ),
-                appDetails = emptyMap(),
+                appDetails = mapOf(
+                    PackageNames.OSMAND_PLUS to AppDetail(
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                    ),
+                ),
                 coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
                 coordinateConverter = coordinateConverter,
+                outputsForApps = outputRepository.getOutputsForApps(
+                    mapOf(
+                        PackageNames.OSMAND_PLUS to App(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            dataTypes = setOf(DataType.GEO_URI)
+                        ),
+                    ),
+                    hiddenApps = emptySet(),
+                ),
                 outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
                 initialExpanded = true,

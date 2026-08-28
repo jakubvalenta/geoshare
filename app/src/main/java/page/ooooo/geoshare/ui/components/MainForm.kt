@@ -2,16 +2,19 @@ package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
 import android.view.KeyEvent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -32,6 +35,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.android.AndroidTools
+import page.ooooo.geoshare.lib.formatters.UriFormatter
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -48,10 +53,30 @@ fun MainForm(
     val spacing = LocalSpacing.current
     val source by source.collectAsStateWithLifecycle()
 
+    val examplePoint = WGS84Point.Kilimanjaro
+
     Column(
         Modifier.padding(horizontal = spacing.windowPadding),
         verticalArrangement = Arrangement.spacedBy(spacing.mediumAdaptive),
     ) {
+        HelpCard(
+            title = {
+                Text("Welcome! Do you have a map link ready?")
+            },
+            onClose = {
+                // TODO Close
+            },
+        ) {
+            ParagraphText("Enter it in the form and press Show coordinates. Or copy this example:")
+            SelectionContainer {
+                Text(
+                    UriFormatter.formatUriString(
+                        examplePoint, "https://maps.google.com/?q={lat}%2C{lon}"
+                    ).orEmpty(),
+                    Modifier.background(MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.1f)),
+                )
+            }
+        }
         OutlinedTextField(
             value = source,
             onValueChange = {

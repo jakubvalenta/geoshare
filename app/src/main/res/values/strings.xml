@@ -375,7 +375,7 @@
     <string name="welcome_share_action">Open your favorite map app and use its share function to share a location with %1$s.</string>
     <string name="welcome_share_headline">Excellent!</string>
     <string name="welcome_share_help">Don’t know which map app to open?</string>
-    <string name="welcome_share_open_app">Open %1$s</string>
+    <string name="welcome_share_open_app">Launch %1$s</string>
     <string name="welcome_share_text">You can now see the location of your map link, and open it in another map. Would you like to learn how to use %1$s faster?</string>
     <string name="welcome_submit_action">Now press the button %1$s.</string>
     <string name="welcome_submit_headline">Great!</string>

@@ -152,7 +152,6 @@ import page.ooooo.geoshare.ui.components.ResultSheet
 import page.ooooo.geoshare.ui.components.ResultTitle
 import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
 import page.ooooo.geoshare.ui.components.StyledSupportingPaneScaffold
-import page.ooooo.geoshare.ui.components.WelcomeSheet
 import page.ooooo.geoshare.ui.components.checkeredBackground
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -541,6 +540,7 @@ private fun MainScreen(
                                                 appDetails = appDetails,
                                                 coordinateConverter = coordinateConverter,
                                                 coordinateFormat = coordinateFormat,
+                                                outputsForApps = outputsForApps,
                                                 outputsForPointChips = outputsForPointChips,
                                                 outputsForPointsChips = outputsForPointsChips,
                                                 onExecute = onExecute,
@@ -651,6 +651,7 @@ private fun MainScreen(
                                                     appDetails = appDetails,
                                                     coordinateConverter = coordinateConverter,
                                                     coordinateFormat = coordinateFormat,
+                                                    outputsForApps = outputsForApps,
                                                     outputsForPointChips = outputsForPointChips,
                                                     outputsForPointsChips = outputsForPointsChips,
                                                     onExecute = onExecute,
@@ -773,16 +774,6 @@ private fun MainScreen(
                 shouldAutoFocusCurrentDestination = false,
             )
         }
-
-        WelcomeSheet(
-            visible = welcomeVisible,
-            appDetails = appDetails,
-            conversionSucceeded = currentState is ConversionState.HasResult,
-            outputsForApps = outputsForApps,
-            sourceComesFromIntent = sourceComesFromIntent,
-            sourceMatchesInput = sourceMatchesInput,
-            onClose = onCloseWelcome,
-        )
     }
 
     if (currentState is ConversionState.HasResult && selectedPointIndex != null) {
