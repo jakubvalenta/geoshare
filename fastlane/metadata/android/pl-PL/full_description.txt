@@ -1,13 +1,49 @@
-<b>Kiedy używać GeoShare</b>
+Udostępnij link do mapy z dowolnej aplikacji do GeoShare, a ta otworzy go w innej zainstalowanej aplikacji mapowej.
 
-Jeśli ktoś wyśle ci link do Map Google, ale wolisz korzystać z OpenStreetMap, możesz udostępnić link za pomocą GeoShare. Aplikacja otworzy go w wybranej zainstalowanej aplikacji mapowej, takiej jak OsmAnd lub Organic Maps.
+<b>Obsługiwane aplikacje i formaty</b>
 
-Jeśli lubisz znajdować miejsca w Mapach Google, ale wolisz inną aplikację do nawigacji, możesz udostępnić lokalizację z Map Google za pomocą GeoShare. Aplikacja otworzy ją w ulubionej aplikacji nawigacyjnej.
+- Google Maps
+- Apple Maps
+- 2GIS
+- Amap (AutoNavi)
+- Baidu Map (beta)
+- Cartes IGN
+- CoMaps
+- HERE WeGo
+- Magic Earth
+- Maps.me
+- Mapy.com
+- OpenStreetMap
+- Organic Maps
+- OsmAnd
+- Plus Codes (tylko global)
+- Urbi
+- Waze
+- Yandex Maps
+- coordinates
 
-Możesz także użyć aplikacji do skopiowania linków Google Maps jako geo: link do schowka.
+<b>Przykłady użycia</b>
 
-<b>Jak to działa i kwestie prywatności</b>
+Gdy ktoś wyśle Ci link do Google Maps, ale wolisz korzystać z OpenStreetMap, możesz szybko <b>otworzyć tę samą lokalizację</b> w OsmAnd lub Organic Maps.
 
-Geo Share konwertuje linki Google Maps na geo: linki, które mogą być otwierane przez inne aplikacje mapowe. Aby utworzyć geo: link, wymagane są współrzędne geograficzne. Geo Share przetwarza je z adresu URL Google Maps.
+Gdy lubisz Google Maps do wyszukiwania miejsc, ale do nawigacji wolisz inną aplikację, możesz łatwo przełączyć się z Google Maps do swojej ulubionej <b>aplikacji do nawigacji</b>.
 
-Jednak nie wszystkie adresy URL Map Google zawierają współrzędne. W takich przypadkach Geo Share wyświetli monit o pozwolenie na połączenie się z Google i pobranie współrzędnych z nagłówków HTTP lub dokumentu HTML łącza. Więcej szczegółowych informacji można znaleźć w sekcji FAQ aplikacji.
+<b>Inne funkcje</b>
+
+-Pokazuje <b>współrzędne geograficzne</b> z linku do mapy i umożliwia ich skopiowanie do schowka w różnych formatach, np. jako geo: link.
+-Pokazuje wszystkie punkty z linku zawierającego <b>listę miejsc</b>.
+-Umożliwia <b>automatyczne</b> wykonywanie akcji po przetworzeniu linku do mapy.
+-Umożliwia <b>uruchomienie nawigacji</b> we wszystkich aplikacjach, które to obsługują, w tym TomTom.
+-Umożliwia otwarcie lokalizacji w <b>mapach przeglądarkowych</b> - domyślnych lub własnych.
+-Umożliwia zapisanie lokalizacji jako <b>plik GPX</b>.
+-Umożliwia wysłanie lokalizacji przez <b>komunikator</b>.
+-Umożliwia przypisanie lokalizacji do <b>kontaktu</b>.
+-Ponawia próbę <b>w przypadku niestabilnego połączenia internetowego</b>.
+-Umożliwia <b>wklejanie linków do map</b> bezpośrednio w aplikacji, zamiast udostępniania ich do niej.
+-Interfejs dostosowuje się do <b>tabletów</b>.
+
+<b>Jak to działa i prywatność</b>
+
+GeoShare przekształca linki do map (np. https://maps.app.goo.gl/...) na geo: links, które mogą być otwierane przez inne aplikacje mapowe. Do utworzenia geo: link wymagane są współrzędne geograficzne. GeoShare odczytuje je z adresu URL mapy.
+
+Jednak nie wszystkie adresy URL zawierają współrzędne. W takich przypadkach GeoShare <b>poprosi o zgodę na połączenie z usługą map (Google Maps, Apple Maps itd.)</b> i pobierze współrzędne z nagłówków HTTP lub kodu HTML linku. Więcej szczegółowych informacji znajdziesz na ekranie FAQ w aplikacji.
