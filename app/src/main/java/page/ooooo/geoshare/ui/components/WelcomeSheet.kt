@@ -12,12 +12,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -131,25 +135,11 @@ private fun WelcomeCard(
     val spacing = LocalSpacing.current
 
     val examplePoint = WGS84Point.Kilimanjaro
-
-    /**
-     * An output that opens a point in a map app.
-     *
-     * The map app is the first installed app from a list of common map apps.
-     */
-    val exampleAppOutput = setOf(
-        PackageNames.GOOGLE_MAPS,
-        PackageNames.OSMAND_PLUS,
-        PackageNames.COMAPS_FDROID,
-        PackageNames.ORGANIC_MAPS,
-        PackageNames.MAPY_COM,
-        PackageNames.HERE_WEGO,
-        PackageNames.MAGIC_EARTH,
-        PackageNames.MAPS_ME,
-    ).firstNotNullOfOrNull { packageName ->
-        outputsForApps[packageName]?.firstNotNullOfOrNull { it as? OpenPointOutput }
+    val insetPadding = WindowInsets.safeDrawing.asPaddingValues().run {
+        PaddingValues(
+            bottom = calculateBottomPadding(),
+        )
     }
-
     val pagerState = rememberPagerState(initialPage) { pageCount }
     val animatedProgress by animateFloatAsState(
         targetValue = (pagerState.currentPage + 1f) / pageCount,
@@ -170,7 +160,7 @@ private fun WelcomeCard(
     }
 
     ElevatedCard(
-        Modifier.fillMaxWidth(), // TODO Apply window padding
+        Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.tertiaryContainer,
@@ -178,14 +168,21 @@ private fun WelcomeCard(
         elevation = CardDefaults.cardElevation(10.dp),
     ) {
         Box {
-            Column(Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.small + spacing.tiny)) {
-                HorizontalPager(
-                    state = pagerState,
-                    modifier = Modifier.padding(
-                        horizontal = spacing.windowPadding,
-                        vertical = spacing.small + spacing.tiny
-                    ),
-                ) { page ->
+            Column(
+                Modifier
+                    .padding(insetPadding)
+                    .consumeWindowInsets(insetPadding)
+                    .padding(horizontal = spacing.windowPadding),
+            ) {
+                LinearProgressIndicator(
+                    { animatedProgress },
+                    Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 20.dp, bottom = spacing.small),
+                    color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.5f),
+                    trackColor = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.1f),
+                )
+                HorizontalPager(pagerState, Modifier.padding(bottom = spacing.small)) { page ->
                     when (page) {
                         0 -> WelcomeStep(
                             page = 0,
@@ -202,7 +199,9 @@ private fun WelcomeCard(
                                     UriFormatter.formatUriString(
                                         examplePoint, "https://maps.google.com/?q={lat}%2C{lon}"
                                     ).orEmpty(),
-                                    Modifier.background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f)),
+                                    Modifier
+                                        .padding(horizontal = spacing.medium)
+                                        .background(MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.1f)),
                                 )
                             }
                         }
@@ -234,6 +233,23 @@ private fun WelcomeCard(
                                 ParagraphText(stringResource(R.string.welcome_share_action, appName))
                             },
                         ) {
+                            /**
+                             * An output that opens a point in a map app.
+                             *
+                             * The map app is the first installed app from a list of common map apps.
+                             */
+                            val exampleAppOutput = setOf(
+                                PackageNames.GOOGLE_MAPS,
+                                PackageNames.OSMAND_PLUS,
+                                PackageNames.COMAPS_FDROID,
+                                PackageNames.ORGANIC_MAPS,
+                                PackageNames.MAPY_COM,
+                                PackageNames.HERE_WEGO,
+                                PackageNames.MAGIC_EARTH,
+                                PackageNames.MAPS_ME,
+                            ).firstNotNullOfOrNull { packageName ->
+                                outputsForApps[packageName]?.firstNotNullOfOrNull { it as? OpenPointOutput }
+                            }
                             if (exampleAppOutput != null) {
                                 ParagraphText(
                                     buildAnnotatedString {
@@ -271,24 +287,16 @@ private fun WelcomeCard(
                         )
                     }
                 }
-                LinearProgressIndicator(
-                    { animatedProgress },
-                    Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(vertical = spacing.tinyAdaptive),
-                    color = MaterialTheme.colorScheme.onTertiaryContainer,
-                    trackColor = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.2f),
-                )
             }
             FilledIconButton(
                 onClose,
                 Modifier
                     .align(Alignment.TopEnd)
                     .offset(x = (-3).dp, y = 3.dp)
-                    .alpha(0.8f),
+                    .alpha(0.5f),
                 colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = MaterialTheme.colorScheme.onTertiary,
+                    containerColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                    contentColor = MaterialTheme.colorScheme.tertiaryContainer,
                 )
             ) {
                 Icon(
