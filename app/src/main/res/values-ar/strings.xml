@@ -367,4 +367,5 @@
     <string name="user_preferences_finish_description">اختر متى يجب أن يُغلق التطبيق نفسه تلقائيًا. لا يظهر التطبيق المغلق بعد استخدام إيماءة الرجوع.</string>
     <string name="user_preferences_finish_never">لا تغلق التطبيق تلقائيًا</string>
     <string name="user_preferences_finish_title">يغلق</string>
+    <string name="conversion_failed_unsupported_source_google_search">روابط بحث Google غير مدعومة</string>
 </resources>
