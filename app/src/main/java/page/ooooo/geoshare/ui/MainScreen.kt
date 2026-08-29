@@ -138,6 +138,7 @@ import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.ConversionWebView
+import page.ooooo.geoshare.ui.components.HelpCard
 import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
 import page.ooooo.geoshare.ui.components.MainForm
 import page.ooooo.geoshare.ui.components.MainHeadline
@@ -145,6 +146,7 @@ import page.ooooo.geoshare.ui.components.MainHelp
 import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
+import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.PermissionDialog
 import page.ooooo.geoshare.ui.components.ResultApps
 import page.ooooo.geoshare.ui.components.ResultCoordinates
@@ -694,6 +696,7 @@ private fun MainScreen(
 
                     if (currentState is ConversionState.HasSource) {
                         MainCopySourceButton(
+                            dismissedHelpMessages = dismissedHelpMessages,
                             source = currentState.source,
                             innerPadding = innerPadding,
                             containerColor = if (!wide) {
@@ -701,6 +704,8 @@ private fun MainScreen(
                             } else {
                                 Color.Transparent
                             },
+                            onDismissHelpMessage = onDismissHelpMessage,
+                            onNavigateToFaqScreen = onNavigateToFaqScreen,
                         )
                     } else {
                         Spacer(Modifier.padding(innerPadding))
@@ -974,10 +979,14 @@ private fun MainWebView(
 
 @Composable
 private fun MainCopySourceButton(
+    dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
     source: String,
     containerColor: Color,
     innerPadding: PaddingValues,
+    onDismissHelpMessage: (helpMessage: HelpMessage) -> Unit,
+    onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
 ) {
+    val appName = stringResource(R.string.app_name)
     val clipboard = LocalClipboard.current
     val coroutineScope = rememberCoroutineScope()
     val spacing = LocalSpacing.current
@@ -988,6 +997,7 @@ private fun MainCopySourceButton(
             .background(containerColor)
             .padding(innerPadding)
             .consumeWindowInsets(innerPadding)
+            .padding(top = spacing.tiny),
     ) {
         TextButton(
             {
@@ -995,11 +1005,28 @@ private fun MainCopySourceButton(
                     AndroidTools.copyToClipboard(clipboard, source)
                 }
             },
-            Modifier
-                .padding(start = 4.dp)
-                .padding(top = spacing.tiny),
+            Modifier.padding(start = 5.dp),
         ) {
             Text(stringResource(R.string.conversion_succeeded_skip))
+        }
+        // TODO Show help conditionally
+        HelpCard(
+            helpMessage = HelpMessage.OPEN_BY_DEFAULT,
+            dismissedHelpMessages = dismissedHelpMessages,
+            title = { Text(stringResource(R.string.help_open_by_default_title, appName)) },
+            actionText = {
+                stringResource(R.string.help_open_by_default_action)
+            },
+            onAction = {
+                onNavigateToFaqScreen(FaqItemId.OPEN_BY_DEFAULT)
+            },
+            onDismiss = onDismissHelpMessage,
+            modifier = Modifier
+                .padding(horizontal = spacing.windowPadding, vertical = spacing.tiny),
+        ) {
+            ParagraphText(
+                stringResource(R.string.help_open_by_default_text, appName)
+            )
         }
     }
 }
@@ -1257,7 +1284,7 @@ private fun SucceededPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            dismissedHelpMessages = MutableStateFlow(null),
+            dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
             inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
@@ -1370,7 +1397,7 @@ private fun DarkSucceededPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            dismissedHelpMessages = MutableStateFlow(null),
+            dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
             inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
@@ -1482,7 +1509,7 @@ private fun SmallSucceededPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            dismissedHelpMessages = MutableStateFlow(null),
+            dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
             inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
@@ -1595,7 +1622,7 @@ private fun TabletSucceededPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
-            dismissedHelpMessages = MutableStateFlow(null),
+            dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
             inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,

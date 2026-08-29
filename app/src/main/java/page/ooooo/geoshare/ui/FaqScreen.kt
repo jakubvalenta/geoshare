@@ -48,9 +48,11 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @Keep
 enum class FaqItemId {
     HOW_IT_WORKS,
+    OPEN_BY_DEFAULT,
     LOCATION_PERMISSION,
     NAME_ONLY,
     PRIVACY,
+    SHARE_SOURCE,
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

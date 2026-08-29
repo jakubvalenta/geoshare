@@ -368,8 +368,11 @@
     <string name="help_share_source_action">Try it with %1$s</string>
     <string name="help_share_source_text">Open your favorite map app and use its share function to share a location with %1$s.</string>
     <string name="help_share_source_title">Would you like to launch GeoShare faster?</string>
-    <string name="help_welcome_action">Or copy this example</string>
+    <string name="help_welcome_action">Or copy this example:</string>
     <string name="help_welcome_text">Do you have a map link ready? Enter it in the form and press Show coordinates.</string>
     <string name="help_welcome_title">Welcome</string>
+    <string name="help_open_by_default_action">Read the FAQ</string>
+    <string name="help_open_by_default_text">Configure Android so that tapping a map link always opens %1$s instead of the default map app.</string>
+    <string name="help_open_by_default_title">Learn how to open %1$s by default</string>
     <string name="yes">Yes</string>
 </resources>
