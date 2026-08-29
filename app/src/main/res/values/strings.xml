@@ -86,8 +86,6 @@
     <string name="intro_open_by_default_app_screenshot_cancel">Cancel</string>
     <string name="intro_open_by_default_app_screenshot_add">Add</string>
     <string name="intro_nav_close">Close</string>
-    <string name="intro_nav_next">Next</string>
-    <string name="intro_nav_finish">Get started</string>
     <string name="intro_settings_activity_not_found">Failed to open settings</string>
     <string name="main_input_uri_label">Paste a map link here</string>
     <string name="main_input_uri_clear_content_description">Clear</string>
