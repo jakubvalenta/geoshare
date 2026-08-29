@@ -52,24 +52,21 @@
     <string name="conversion_succeeded_skip">Copy original link</string>
     <string name="donation_button">Donate on Ko-fi</string>
     <string name="donation_description">Does this app save you time?</string>
+    <string name="help_open_by_default_action">Learn more in FAQ</string>
+    <string name="help_open_by_default_text">You can configure Android so that tapping a map link always opens %1$s instead of the default map.</string>
+    <string name="help_open_by_default_title">Always open map links in %1$s</string>
+    <string name="help_share_source_action">Try it in %1$s</string>
+    <string name="help_share_source_text">In many map apps, you can use the share function to open a location in %1$s.</string>
+    <string name="help_share_source_title">Launch GeoShare from a map app</string>
+    <string name="help_welcome_action">Or copy this example:</string>
+    <string name="help_welcome_text">Do you have a map link ready? Enter it in the form and press Show coordinates.</string>
+    <string name="help_welcome_title">Welcome</string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="nav_back_content_description">Back to main screen</string>
-    <string name="intro_title">Intro</string>
-    <string name="intro_how_to_share_headline">How to show a map location in another map app</string>
-    <string name="intro_how_to_share_google_maps_caption">Share a location from your map app or web browser.</string>
-    <string name="intro_how_to_share_google_maps_content_description">Screenshot of Google Maps’ share screen</string>
-    <string name="intro_how_to_share_google_maps_screenshot_title">Sharing with</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Dropped pin</string>
-    <string name="intro_how_to_share_google_maps_screenshot_url" translatable="false">https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_messaging">Messaging</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_chrome" translatable="false">Chrome</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_firefox" translatable="false">Firefox</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[Choose <i>%1$s</i> and the app will let you open the same location in any installed map app.]]></string>
-    <string name="intro_how_to_share_app_content_description">Screenshot of %1$s’s share screen</string>
     <string name="conversion_succeeded_apps_headline">Open with</string>
     <string name="conversion_succeeded_apps_links_configure">Configure web maps</string>
-    <string name="intro_open_by_default_headline">Configure Android to open links to Google Maps in alternative maps (optional)</string>
+    <string name="intro_open_by_default_headline">How to always open links in %1$s</string>
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[First, go to Settings ➞ Apps ➞ Maps ➞ <i>Open by default</i> and turn off the opening of links in this app.]]></string>
     <string name="intro_open_by_default_google_maps_content_description">Screenshot of Google Maps’ Open by default settings</string>
     <string name="intro_open_by_default_google_maps_button">Open Google Maps settings</string>
@@ -365,14 +362,5 @@
     <string name="user_preferences_section_appearance">Appearance</string>
     <string name="user_preferences_section_input">Input</string>
     <string name="user_preferences_section_output">Output</string>
-    <string name="help_share_source_action">Try it with %1$s</string>
-    <string name="help_share_source_text">Open your favorite map app and use its share function to share a location with %1$s.</string>
-    <string name="help_share_source_title">Would you like to launch GeoShare faster?</string>
-    <string name="help_welcome_action">Or copy this example:</string>
-    <string name="help_welcome_text">Do you have a map link ready? Enter it in the form and press Show coordinates.</string>
-    <string name="help_welcome_title">Welcome</string>
-    <string name="help_open_by_default_action">Read the FAQ</string>
-    <string name="help_open_by_default_text">Configure Android so that tapping a map link always opens %1$s instead of the default map app.</string>
-    <string name="help_open_by_default_title">Learn how to open %1$s by default</string>
     <string name="yes">Yes</string>
 </resources>

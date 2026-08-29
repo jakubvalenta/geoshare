@@ -25,9 +25,6 @@ data class FaqRoute(val itemId: FaqItemId? = null)
 data class InputsRoute(val groupId: InputGroupId? = null)
 
 @Serializable
-object IntroRoute
-
-@Serializable
 object LicensesRoute
 
 @Serializable
@@ -82,11 +79,6 @@ fun MainNavigation(
                 },
             )
         }
-        composable<IntroRoute> {
-            IntroScreen(
-                onClose = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
-            )
-        }
         composable<MainRoute> {
             MainScreen(
                 onFinish = onFinish,
@@ -94,7 +86,6 @@ fun MainNavigation(
                 onNavigateToBillingScreen = { navController.navigate(BillingRoute) },
                 onNavigateToFaqScreen = { itemId -> navController.navigate(FaqRoute(itemId)) },
                 onNavigateToInputsScreen = { navController.navigate(InputsRoute()) },
-                onNavigateToIntroScreen = { navController.navigate(IntroRoute) },
                 onNavigateToLinkScreen = { navController.navigate(LinkRoute) },
                 onNavigateToUserPreferencesScreen = { groupId -> navController.navigate(UserPreferencesRoute(groupId)) },
                 billingViewModel = billingViewModel,

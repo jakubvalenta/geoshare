@@ -168,7 +168,6 @@ fun MainScreen(
     onNavigateToBillingScreen: () -> Unit,
     onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
     onNavigateToInputsScreen: () -> Unit,
-    onNavigateToIntroScreen: () -> Unit,
     onNavigateToLinkScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: (groupId: UserPreferenceGroupId?) -> Unit,
     billingViewModel: BillingViewModel,
@@ -361,10 +360,6 @@ fun MainScreen(
             conversionViewModel.cancel()
             onNavigateToInputsScreen()
         },
-        onNavigateToIntroScreen = {
-            conversionViewModel.cancel()
-            onNavigateToIntroScreen()
-        },
         onNavigateToLinkScreen = {
             conversionViewModel.cancel()
             onNavigateToLinkScreen()
@@ -422,7 +417,6 @@ private fun MainScreen(
     onNavigateToBillingScreen: () -> Unit,
     onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
     onNavigateToInputsScreen: () -> Unit,
-    onNavigateToIntroScreen: () -> Unit,
     onNavigateToLinkScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: (groupId: UserPreferenceGroupId?) -> Unit,
     onReset: () -> Unit,
@@ -501,7 +495,6 @@ private fun MainScreen(
                                         onNavigateToBillingScreen = onNavigateToBillingScreen,
                                         onNavigateToFaqScreen = onNavigateToFaqScreen,
                                         onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                        onNavigateToIntroScreen = onNavigateToIntroScreen,
                                         onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
                                     )
                                 }
@@ -606,8 +599,8 @@ private fun MainScreen(
                                                 inputRepository = inputRepository,
                                                 modifier = Modifier.padding(top = spacing.largeAdaptive),
                                                 onDismissHelpMessage = onDismissHelpMessage,
+                                                onNavigateToFaqScreen = onNavigateToFaqScreen,
                                                 onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                                onNavigateToIntroScreen = onNavigateToIntroScreen,
                                                 onSetErrorMessageResId = setErrorMessageResId,
                                                 onSetSource = onSetSource,
                                             )
@@ -698,12 +691,13 @@ private fun MainScreen(
                         MainCopySourceButton(
                             dismissedHelpMessages = dismissedHelpMessages,
                             source = currentState.source,
-                            innerPadding = innerPadding,
                             containerColor = if (!wide) {
                                 MaterialTheme.colorScheme.surfaceContainer
                             } else {
                                 Color.Transparent
                             },
+                            innerPadding = innerPadding,
+                            sourceComesFromIntent = sourceComesFromIntent,
                             onDismissHelpMessage = onDismissHelpMessage,
                             onNavigateToFaqScreen = onNavigateToFaqScreen,
                         )
@@ -739,7 +733,6 @@ private fun MainScreen(
                                     onNavigateToBillingScreen = onNavigateToBillingScreen,
                                     onNavigateToFaqScreen = onNavigateToFaqScreen,
                                     onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                    onNavigateToIntroScreen = onNavigateToIntroScreen,
                                     onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
                                 )
                             }
@@ -770,8 +763,8 @@ private fun MainScreen(
                                         inputRepository = inputRepository,
                                         modifier = Modifier.padding(top = spacing.largeAdaptive),
                                         onDismissHelpMessage = onDismissHelpMessage,
+                                        onNavigateToFaqScreen = onNavigateToFaqScreen,
                                         onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                        onNavigateToIntroScreen = onNavigateToIntroScreen,
                                         onSetErrorMessageResId = setErrorMessageResId,
                                         onSetSource = onSetSource,
                                     )
@@ -983,6 +976,7 @@ private fun MainCopySourceButton(
     source: String,
     containerColor: Color,
     innerPadding: PaddingValues,
+    sourceComesFromIntent: StateFlow<Boolean>,
     onDismissHelpMessage: (helpMessage: HelpMessage) -> Unit,
     onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
 ) {
@@ -990,6 +984,8 @@ private fun MainCopySourceButton(
     val clipboard = LocalClipboard.current
     val coroutineScope = rememberCoroutineScope()
     val spacing = LocalSpacing.current
+
+    val sourceComesFromIntent by sourceComesFromIntent.collectAsStateWithLifecycle()
 
     Column(
         Modifier
@@ -1009,24 +1005,25 @@ private fun MainCopySourceButton(
         ) {
             Text(stringResource(R.string.conversion_succeeded_skip))
         }
-        // TODO Show help conditionally
-        HelpCard(
-            helpMessage = HelpMessage.OPEN_BY_DEFAULT,
-            dismissedHelpMessages = dismissedHelpMessages,
-            title = { Text(stringResource(R.string.help_open_by_default_title, appName)) },
-            actionText = {
-                stringResource(R.string.help_open_by_default_action)
-            },
-            onAction = {
-                onNavigateToFaqScreen(FaqItemId.OPEN_BY_DEFAULT)
-            },
-            onDismiss = onDismissHelpMessage,
-            modifier = Modifier
-                .padding(horizontal = spacing.windowPadding, vertical = spacing.tiny),
-        ) {
-            ParagraphText(
-                stringResource(R.string.help_open_by_default_text, appName)
-            )
+        if (sourceComesFromIntent) {
+            HelpCard(
+                helpMessage = HelpMessage.OPEN_BY_DEFAULT,
+                dismissedHelpMessages = dismissedHelpMessages,
+                title = { Text(stringResource(R.string.help_open_by_default_title, appName)) },
+                actionText = {
+                    stringResource(R.string.help_open_by_default_action)
+                },
+                onAction = {
+                    onNavigateToFaqScreen(FaqItemId.OPEN_BY_DEFAULT)
+                },
+                onDismiss = onDismissHelpMessage,
+                modifier = Modifier
+                    .padding(horizontal = spacing.windowPadding, vertical = spacing.tiny),
+            ) {
+                ParagraphText(
+                    stringResource(R.string.help_open_by_default_text, appName)
+                )
+            }
         }
     }
 }
@@ -1076,7 +1073,6 @@ private fun DefaultPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
@@ -1130,7 +1126,6 @@ private fun DarkPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
@@ -1184,7 +1179,6 @@ private fun SmallPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
@@ -1238,7 +1232,6 @@ private fun TabletPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
@@ -1336,7 +1329,7 @@ private fun SucceededPreview() {
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
             source = MutableStateFlow(""),
-            sourceComesFromIntent = MutableStateFlow(false),
+            sourceComesFromIntent = MutableStateFlow(true),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
@@ -1351,7 +1344,6 @@ private fun SucceededPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
@@ -1449,7 +1441,7 @@ private fun DarkSucceededPreview() {
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
             source = MutableStateFlow(""),
-            sourceComesFromIntent = MutableStateFlow(false),
+            sourceComesFromIntent = MutableStateFlow(true),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
@@ -1464,7 +1456,6 @@ private fun DarkSucceededPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
@@ -1561,7 +1552,7 @@ private fun SmallSucceededPreview() {
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
             source = MutableStateFlow(""),
-            sourceComesFromIntent = MutableStateFlow(false),
+            sourceComesFromIntent = MutableStateFlow(true),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
@@ -1576,7 +1567,6 @@ private fun SmallSucceededPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
@@ -1689,7 +1679,6 @@ private fun TabletSucceededPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
@@ -1751,7 +1740,6 @@ private fun ErrorPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
@@ -1813,7 +1801,6 @@ private fun DarkErrorPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
@@ -1875,7 +1862,6 @@ private fun TabletErrorPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
@@ -1938,7 +1924,6 @@ private fun WarningPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
@@ -2001,7 +1986,6 @@ private fun DarkWarningPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
@@ -2080,7 +2064,6 @@ private fun LoadingIndicatorPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
@@ -2159,7 +2142,6 @@ private fun DarkLoadingIndicatorPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
@@ -2238,7 +2220,6 @@ private fun TabletLoadingIndicatorPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
@@ -2314,7 +2295,6 @@ private fun WebViewPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
@@ -2390,7 +2370,6 @@ private fun DarkWebViewPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
@@ -2466,7 +2445,6 @@ private fun TabletWebViewPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
@@ -2539,7 +2517,6 @@ private fun EmptyPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},

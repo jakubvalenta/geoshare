@@ -39,6 +39,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
+import page.ooooo.geoshare.data.local.preferences.isDismissed
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -57,7 +58,7 @@ fun HelpCard(
     val spacing = LocalSpacing.current
 
     val dismissedHelpMessages by dismissedHelpMessages.collectAsStateWithLifecycle()
-    val visible = remember(dismissedHelpMessages) { dismissedHelpMessages?.contains(helpMessage) == false }
+    val visible = remember(dismissedHelpMessages) { !helpMessage.isDismissed(dismissedHelpMessages) }
 
     AnimatedVisibility(
         visible,
