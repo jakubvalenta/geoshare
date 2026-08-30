@@ -566,6 +566,7 @@ private fun LinkDetailPane(
                 .semantics { testTagsAsResourceId = true }
                 .testTag("geoShareLinkDeleteDialog"),
         ) {
+            val name by name.collectAsStateWithLifecycle()
             Text(stringResource(R.string.links_delete_text, name))
         }
     }

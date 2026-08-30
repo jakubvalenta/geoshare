@@ -481,6 +481,7 @@ private fun ServerDetailPane(
                 .semantics { testTagsAsResourceId = true }
                 .testTag("geoShareServerDeleteDialog"),
         ) {
+            val name by name.collectAsStateWithLifecycle()
             Text(stringResource(R.string.server_delete_text, name))
         }
     }
