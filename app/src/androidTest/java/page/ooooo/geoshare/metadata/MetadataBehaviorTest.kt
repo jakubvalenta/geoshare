@@ -55,7 +55,7 @@ class MetadataBehaviorTest {
 
         // Main form
         dismissHelpMessage()
-        quickWaitForStableInActiveWindow()
+        quickWaitForStableInActiveWindow() // Wait for help message exit animation
         Screengrab.screenshot("1")
 
         // Connection permission dialog
@@ -67,7 +67,7 @@ class MetadataBehaviorTest {
         dialog.confirmDialog()
         assertConversionSucceeds(WGS84Point(42.5784957, 1.8955661, source = Source.URI))
         dismissHelpMessage()
-        quickWaitForStableInActiveWindow()
+        quickWaitForStableInActiveWindow() // Wait for help message exit animation
         Screengrab.screenshot("2")
 
         // Automation preferences screen
