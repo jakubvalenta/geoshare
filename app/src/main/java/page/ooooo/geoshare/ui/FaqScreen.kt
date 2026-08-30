@@ -125,7 +125,8 @@ private fun FaqScreen(
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .testTag("geoShareFaqPane"),
             verticalArrangement = Arrangement.spacedBy(spacing.medium),
         ) {
             FaqItem(

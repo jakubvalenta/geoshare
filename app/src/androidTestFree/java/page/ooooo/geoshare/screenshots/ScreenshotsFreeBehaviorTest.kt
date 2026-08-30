@@ -611,10 +611,15 @@ class ScreenshotsFreeBehaviorTest {
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/faq_name_only")
 
-        // FAQ - Open by default
+        // FAQ - Open by default - Page 1
         onElement { viewIdResourceName == "geoShareFaqItem_${FaqItemId.OPEN_BY_DEFAULT}" }.click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("main_strings/faq_open_by_default")
+        saveScreenshot("main_strings/faq_open_by_default_page_1")
+
+        // FAQ - Open by default - Page 2
+        onElement { viewIdResourceName == "geoShareFaqPane" }.scroll(Direction.DOWN, 2f)
+        saveScreenshot("main_strings/faq_open_by_default_page_2")
+        onElement { viewIdResourceName == "geoShareFaqPane" }.scroll(Direction.UP, 2f)
 
         // FAQ - Privacy
         onElement { viewIdResourceName == "geoShareFaqItem_${FaqItemId.PRIVACY}" }.click()
