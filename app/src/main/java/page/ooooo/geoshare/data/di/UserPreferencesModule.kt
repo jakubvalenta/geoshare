@@ -25,7 +25,6 @@ import page.ooooo.geoshare.data.local.preferences.DynamicColorPreference
 import page.ooooo.geoshare.data.local.preferences.Finish
 import page.ooooo.geoshare.data.local.preferences.FinishPreference
 import page.ooooo.geoshare.data.local.preferences.HiddenAppsPreference
-import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.UserPreference
@@ -66,7 +65,6 @@ class FakeUserPreferencesRepository(
             dynamicColor = DynamicColorPreference.getValue(it),
             finish = FinishPreference.getValue(it),
             hiddenApps = HiddenAppsPreference.getValue(it),
-            introShownForVersionCode = IntroShowForVersionCodePreference.getValue(it),
         )
     }
 
@@ -83,7 +81,6 @@ class FakeUserPreferencesRepository(
             DynamicColorPreference.setValue(this, initialValues.dynamicColor)
             FinishPreference.setValue(this, initialValues.finish)
             HiddenAppsPreference.setValue(this, initialValues.hiddenApps)
-            IntroShowForVersionCodePreference.setValue(this, initialValues.introShownForVersionCode)
         }
     }
 
@@ -113,5 +110,4 @@ val defaultFakeUserPreferences = UserPreferencesValues(
     dynamicColor = false,
     finish = Finish.AFTER_ACTION_SUCCEEDED_AND_OPENED_APP,
     hiddenApps = emptySet(),
-    introShownForVersionCode = 0,
 )

@@ -4,7 +4,6 @@ import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import page.ooooo.geoshare.tests.assumeDomainResolvable
-import page.ooooo.geoshare.tests.closeIntro
 import page.ooooo.geoshare.tests.configureConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.tests.launchApplication
@@ -29,10 +28,9 @@ class UrbiInputBehaviorTest : InputBehaviorTest {
             assumeDomainResolvable("go.2gis.com")
         }
 
-        // Launch app and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
         configureConnectionPermissionPreference(Permission.ALWAYS)
 
         // Short link

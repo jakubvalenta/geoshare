@@ -18,10 +18,9 @@ import page.ooooo.geoshare.ui.UserPreferenceGroupId
 class LinkBehaviorTest {
     @Test
     fun whenLinkIsInserted_allowsCopyingIt() = uiAutomator {
-        // Launch application and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Go to link list
         goToUserPreferencesDetail(UserPreferenceGroupId.LINKS)
@@ -59,10 +58,9 @@ class LinkBehaviorTest {
 
     @Test
     fun allowsUpdatingAndDeletingAndRestoringLink() = uiAutomator {
-        // Launch application and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Go to link list
         goToUserPreferencesDetail(UserPreferenceGroupId.LINKS)
@@ -134,10 +132,9 @@ class LinkBehaviorTest {
 
     @Test
     fun allowsTogglingLink() = uiAutomator {
-        // Launch application and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Go to link list
         goToUserPreferencesDetail(UserPreferenceGroupId.LINKS)

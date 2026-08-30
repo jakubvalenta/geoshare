@@ -43,7 +43,6 @@ class ConversionBehaviorTest {
         // Go back to app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Shows main screen instead of result screen, because the app finished
         onElement { viewIdResourceName == "geoShareMainSourceTextField" }
@@ -325,10 +324,9 @@ class ConversionBehaviorTest {
     fun opensGoogleMapsSearchLink() = uiAutomator {
         assumeAppInstalled(PackageNames.GOOGLE_MAPS)
 
-        // Launch application and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Share a geo: URI with the app
         val query = "foo"
@@ -401,10 +399,9 @@ class ConversionBehaviorTest {
 
     @Test
     fun savesGpxRoute() = uiAutomator {
-        // Launch application and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Share a URI with the app
         shareUri()
@@ -437,10 +434,9 @@ class ConversionBehaviorTest {
 
     @Test
     fun savesPointToContact() = uiAutomator {
-        // Launch application and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Share a geo: URI with the app
         val point = WGS84Point(NaivePoint.genRandomPoint())

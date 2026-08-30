@@ -6,7 +6,6 @@ import org.junit.Test
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import page.ooooo.geoshare.tests.closeIntro
 import page.ooooo.geoshare.tests.configureConnectionPermissionPreference
 import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.tests.testUri
@@ -16,10 +15,9 @@ import page.ooooo.geoshare.tests.waitForAppToBeVisible
 class GoogleMapsPlaceListInputBehaviorTest : InputBehaviorTest {
     @Test
     fun googleMapsPlaceListInput_online() = uiAutomator {
-        // Launch app and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
         configureConnectionPermissionPreference(Permission.ALWAYS)
 
         if (htmlParsingSupported) {

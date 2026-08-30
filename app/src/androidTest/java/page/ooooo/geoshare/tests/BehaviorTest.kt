@@ -100,11 +100,6 @@ fun closeApplication() {
     activityManager.appTasks.forEach { it.finishAndRemoveTask() }
 }
 
-fun UiAutomatorTestScope.closeIntro() {
-    quickWaitForStableInActiveWindow() // Wait for the intro to render, otherwise closing it can fail even with large timeout
-    onElementOrNull(3_000) { viewIdResourceName == "geoShareIntroCloseButton" }?.click()
-}
-
 fun UiAutomatorTestScope.quickWaitForStableInActiveWindow() {
     waitForStableInActiveWindow(stableTimeoutMs = 1_000, stableIntervalMs = 100, requireStableScreenshot = false)
 }

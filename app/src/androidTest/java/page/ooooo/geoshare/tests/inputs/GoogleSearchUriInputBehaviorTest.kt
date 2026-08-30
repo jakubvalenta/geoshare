@@ -2,7 +2,6 @@ package page.ooooo.geoshare.tests.inputs
 
 import androidx.test.uiautomator.uiAutomator
 import org.junit.Test
-import page.ooooo.geoshare.tests.closeIntro
 import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.tests.testUriFails
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
@@ -10,10 +9,9 @@ import page.ooooo.geoshare.tests.waitForAppToBeVisible
 class GoogleSearchUriInputBehaviorTest : InputBehaviorTest {
     @Test
     fun googleSearchUriInput_offline() = uiAutomator {
-        // Launch app and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Google Search short link
         testUriFails(

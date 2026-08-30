@@ -13,7 +13,6 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.tests.TestServer
 import page.ooooo.geoshare.tests.TestServerParams
-import page.ooooo.geoshare.tests.closeIntro
 import page.ooooo.geoshare.tests.configureConnectionPermissionPreference
 import page.ooooo.geoshare.tests.configureServer
 import page.ooooo.geoshare.tests.getAndAssumeTestServer
@@ -66,10 +65,9 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
 
     @Test
     fun googleMapsAddressApiInput_online() = uiAutomator {
-        // Launch app and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
         configureConnectionPermissionPreference(Permission.ALWAYS)
         configureServer(testServer)
 

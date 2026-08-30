@@ -46,7 +46,6 @@ class DefaultUserPreferencesRepository @Inject constructor(
                 dynamicColor = DynamicColorPreference.getValue(it),
                 finish = FinishPreference.getValue(it),
                 hiddenApps = HiddenAppsPreference.getValue(it),
-                introShownForVersionCode = IntroShowForVersionCodePreference.getValue(it),
             )
         }
 

@@ -10,44 +10,10 @@ import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
 class InputsBehaviorTest {
     @Test
-    fun whenAppIsOpenTwice_isVisibleOnlyFirstTime() = uiAutomator {
+    fun whenOpenWithOldVersionCode_showsRecentInputsAndSavesNewVersionCode() = uiAutomator {
         // Launch app
         launchApplication()
         waitForAppToBeVisible()
-
-        // Go to the second intro page
-        onElement { viewIdResourceName == "geoShareIntroPage0Headline" }
-        onElement { viewIdResourceName == "geoShareIntroNextButton" }.click()
-
-        // Relaunch app
-        closeApplication()
-        launchApplication()
-        waitForAppToBeVisible()
-
-        // Intro is still visible; go through all intro pages
-        for (page in 0..1) {
-            onElement { viewIdResourceName == "geoShareIntroPage${page}Headline" }
-            onElement { viewIdResourceName == "geoShareIntroNextButton" }.click()
-        }
-
-        // Main screen is visible
-        onElement { viewIdResourceName == "geoShareMainSourceTextField" }
-
-        // Relaunch app
-        closeApplication()
-        launchApplication()
-        waitForAppToBeVisible()
-
-        // Main screen is visible again
-        onElement { viewIdResourceName == "geoShareMainSourceTextField" }
-    }
-
-    @Test
-    fun whenOpenWithOldVersionCode_showsRecentInputsAndSavesNewVersionCode() = uiAutomator {
-        // Launch application and close intro
-        launchApplication()
-        waitForAppToBeVisible()
-        closeIntro()
 
         // Does not show main menu badge
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareMainMenuBadge" })

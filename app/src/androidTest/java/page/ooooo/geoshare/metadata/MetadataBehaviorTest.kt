@@ -6,7 +6,6 @@ import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import page.ooooo.geoshare.tests.assertConversionSucceeds
-import page.ooooo.geoshare.tests.closeIntro
 import page.ooooo.geoshare.tests.confirmDialog
 import page.ooooo.geoshare.tests.disableDarkMode
 import page.ooooo.geoshare.tests.disableSystemUIDemoMode
@@ -52,13 +51,8 @@ class MetadataBehaviorTest {
         launchApplication()
         waitForAppToBeVisible()
 
-        // Intro screen
-        onElement { viewIdResourceName == "geoShareIntroPage_0" }
-        quickWaitForStableInActiveWindow()
-        Screengrab.screenshot("5")
-
         // Main form
-        closeIntro()
+        // TODO Close help
         onElement { viewIdResourceName == "geoShareMainSourceTextField" }
         quickWaitForStableInActiveWindow()
         Screengrab.screenshot("1")
@@ -69,6 +63,7 @@ class MetadataBehaviorTest {
         Screengrab.screenshot("4")
 
         // Result screen
+        // TODO Close help
         dialog.confirmDialog()
         assertConversionSucceeds(WGS84Point(42.5784957, 1.8955661, source = Source.URI))
         Screengrab.screenshot("2")

@@ -472,14 +472,6 @@ object HiddenAppsPreference : SetPreference {
     fun getOptions(apps: Apps): Set<String> = apps.keys
 }
 
-object IntroShowForVersionCodePreference : NullableIntPreference {
-    override val key = stringPreferencesKey("intro_shown_for_version_code")
-    override val default = 0
-    val loading = null
-
-    override fun getValue(values: UserPreferencesValues) = values.introShownForVersionCode
-}
-
 object ChangelogShownForVersionCodePreference : NullableIntPreference {
     override val key = stringPreferencesKey("changelog_shown_for_version_code")
     override val default = BuildConfig.VERSION_CODE
@@ -500,5 +492,4 @@ data class UserPreferencesValues(
     val finish: Finish = FinishPreference.loading,
     val hiddenApps: Set<String>? = HiddenAppsPreference.loading,
     val dismissedHelpMessages: Set<HelpMessage>? = DismissedHelpMessagesPreference.loading,
-    val introShownForVersionCode: Int? = IntroShowForVersionCodePreference.loading,
 )

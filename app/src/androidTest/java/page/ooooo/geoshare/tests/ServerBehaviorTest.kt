@@ -16,10 +16,9 @@ import page.ooooo.geoshare.ui.UserPreferenceGroupId
 class ServerBehaviorTest {
     @Test
     fun allowsInsertingServer() = uiAutomator {
-        // Launch application and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Go to server list
         goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
@@ -49,10 +48,9 @@ class ServerBehaviorTest {
 
     @Test
     fun allowsUpdatingAndDeletingAndRestoringServer() = uiAutomator {
-        // Launch application and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Go to server list
         goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)

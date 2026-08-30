@@ -102,16 +102,11 @@ class ScreenshotsFreeBehaviorTest {
             assumeDomainResolvable("maps.google.com")
         }
 
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
 
-        // First test intro, because it automatically appears
-        testIntro()
-
-        // Then test main, because it's already visible after closing the intro
-        testMain()
-
-        // Then test preferences, because they've not been changed by other tests yet
+        // First test preferences, because further tests might change them
         testPreferences()
         testPreferencesAutomationMessaging()
         testPreferencesAutomationOsmAnd()
@@ -129,28 +124,15 @@ class ScreenshotsFreeBehaviorTest {
         testConversionResultChecks()
         testConversionResultLocation()
         testConversionResultPoints()
+        testHelp()
+        testMain()
         testInputs()
         testLinks()
         testServers()
     }
 
-    fun testIntro() = uiAutomator {
-        // Intro - How to show a map location
-        onElement { viewIdResourceName == "geoShareIntroPage_0" }
-        quickWaitForStableInActiveWindow()
-        saveScreenshot("main_strings/intro_how_to_show_a_map_location")
-
-        // Intro - Open links in GeoShare - Page 1
-        onElement { viewIdResourceName == "geoShareIntroNextButton" }.click()
-        quickWaitForStableInActiveWindow()
-        saveScreenshot("main_strings/intro_open_links_in_geo_share_page_1")
-
-        // Intro - Open links in GeoShare - Page 2
-        onElement { viewIdResourceName == "geoShareIntroPage_1" }.scroll(Direction.DOWN, 2f)
-        quickWaitForStableInActiveWindow()
-        saveScreenshot("main_strings/intro_open_links_in_geo_share_page_2")
-
-        onElement { viewIdResourceName == "geoShareIntroNextButton" }.click() // Finish intro
+    fun testHelp() = uiAutomator {
+        // TODO
     }
 
     fun testMain() = uiAutomator {

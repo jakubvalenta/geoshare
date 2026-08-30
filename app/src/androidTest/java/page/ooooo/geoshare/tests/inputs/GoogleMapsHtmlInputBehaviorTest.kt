@@ -10,7 +10,6 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.tests.assumeDomainResolvable
 import page.ooooo.geoshare.tests.assumeNotEmulator
-import page.ooooo.geoshare.tests.closeIntro
 import page.ooooo.geoshare.tests.configureConnectionPermissionPreference
 import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.tests.testUri
@@ -24,10 +23,9 @@ class GoogleMapsHtmlInputBehaviorTest : InputBehaviorTest {
             assumeDomainResolvable("maps.google.com")
         }
 
-        // Launch app and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
         configureConnectionPermissionPreference(Permission.ALWAYS)
 
         if (htmlParsingSupported) {
@@ -62,10 +60,9 @@ class GoogleMapsHtmlInputBehaviorTest : InputBehaviorTest {
             false,
         )
 
-        // Launch app and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
         configureConnectionPermissionPreference(Permission.ALWAYS)
 
         // Google Search

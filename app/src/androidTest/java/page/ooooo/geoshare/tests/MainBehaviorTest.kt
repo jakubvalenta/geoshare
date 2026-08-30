@@ -11,10 +11,9 @@ class MainBehaviorTest {
     fun whenTextIsEntered_showsPointAndAllowsOpeningGoogleMaps() = uiAutomator {
         assumeAppInstalled(PackageNames.GOOGLE_MAPS)
 
-        // Launch app and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Enter text in the main form and submit it
         testText(

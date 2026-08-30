@@ -16,10 +16,9 @@ import page.ooooo.geoshare.ui.UserPreferenceGroupId
 class BillingDemoBehaviorTest {
     @Test
     fun allowsPurchasingAndRefundingOneTimeProduct() = uiAutomator {
-        // Launch application and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Shows free headline
         onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "GeoShare" }
@@ -83,10 +82,9 @@ class BillingDemoBehaviorTest {
 
     @Test
     fun allowsPurchasingAndRefundingSubscription() = uiAutomator {
-        // Launch application and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Shows free headline
         onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "GeoShare" }
@@ -156,10 +154,9 @@ class BillingDemoBehaviorTest {
 
     @Test
     fun allowsUsingAutomationAfterPurchase() = uiAutomator {
-        // Launch application and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Share a URI with the app
         shareUri()
@@ -205,10 +202,9 @@ class BillingDemoBehaviorTest {
 
     @Test
     fun allowsUsingCustomLinkAfterPurchase() = uiAutomator {
-        // Launch application and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Go to link list
         goToUserPreferencesDetail(UserPreferenceGroupId.LINKS)

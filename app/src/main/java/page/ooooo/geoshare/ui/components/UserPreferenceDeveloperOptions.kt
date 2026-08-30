@@ -22,7 +22,6 @@ import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.preferences.CachedPurchasePreference
 import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.DismissedHelpMessagesPreference
-import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -80,23 +79,6 @@ fun UserPreferenceDeveloperOptionsControls(
             values = values,
             onValueChange = onValueChange,
             modifier = Modifier.testTag("geoShareUserPreferenceChangelogShownForVersionCode"),
-        )
-        item {
-            ParagraphText(
-                stringResource(R.string.user_preferences_last_run_version_code_title),
-                Modifier
-                    .padding(horizontal = LocalSpacing.current.windowPadding)
-                    .padding(
-                        top = LocalSpacing.current.mediumAdaptive,
-                        bottom = LocalSpacing.current.smallAdaptive,
-                    ),
-                style = MaterialTheme.typography.bodyMedium,
-            )
-        }
-        userPreferenceTextControl(
-            userPreference = IntroShowForVersionCodePreference,
-            values = values,
-            onValueChange = onValueChange,
         )
         item {
             ParagraphText(
