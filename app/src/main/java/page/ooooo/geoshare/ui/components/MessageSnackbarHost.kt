@@ -6,6 +6,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarVisuals
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import page.ooooo.geoshare.lib.Message
 
@@ -18,35 +19,23 @@ class MessageSnackbarVisuals(message: Message) : SnackbarVisuals {
 }
 
 @Composable
-fun MessageSnackbarHost(
-    hostState: SnackbarHostState,
-) {
+fun MessageSnackbarHost(hostState: SnackbarHostState) {
     SnackbarHost(
         hostState = hostState,
     ) { snackbarData ->
         val isError = (snackbarData.visuals as? MessageSnackbarVisuals)?.isError ?: false
+        val containerColor = if (isError) {
+            MaterialTheme.colorScheme.error
+        } else {
+            MaterialTheme.colorScheme.primaryContainer
+        }
+        val contentColor = contentColorFor(containerColor)
         Snackbar(
             snackbarData = snackbarData,
-            containerColor = if (isError) {
-                MaterialTheme.colorScheme.error
-            } else {
-                MaterialTheme.colorScheme.inverseSurface
-            },
-            contentColor = if (isError) {
-                MaterialTheme.colorScheme.onError
-            } else {
-                MaterialTheme.colorScheme.inverseOnSurface
-            },
-            dismissActionContentColor = if (isError) {
-                MaterialTheme.colorScheme.onError
-            } else {
-                MaterialTheme.colorScheme.inverseOnSurface
-            },
-            actionColor = if (isError) {
-                MaterialTheme.colorScheme.onError
-            } else {
-                MaterialTheme.colorScheme.inverseOnSurface
-            },
+            containerColor = containerColor,
+            contentColor = contentColor,
+            dismissActionContentColor = contentColor,
+            actionColor = contentColor,
         )
     }
 }
