@@ -12,6 +12,7 @@ import page.ooooo.geoshare.tests.assumeAppInstalled
 import page.ooooo.geoshare.tests.assumeDomainResolvable
 import page.ooooo.geoshare.tests.confirmDialog
 import page.ooooo.geoshare.tests.disableSystemUIDemoMode
+import page.ooooo.geoshare.tests.dismissHelpMessage
 import page.ooooo.geoshare.tests.enableDarkMode
 import page.ooooo.geoshare.tests.enableSystemUIDemoMode
 import page.ooooo.geoshare.tests.goBackToMainForm
@@ -78,7 +79,8 @@ class ScreenshotsProBehaviorTest {
         // Conversion - Check - Name only
         shareUri("https://www.google.com/maps/place/Hermannstr.+20,+Berlin/")
         onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
-        onElement { viewIdResourceName == "geoShareResultLastPointName" }
+        dismissHelpMessage()
+        quickWaitForStableInActiveWindow() // Wait for help message exit animation
         saveScreenshot("main_strings/conversion_result_check_name_only")
 
         // Conversion - Check - Points name only
