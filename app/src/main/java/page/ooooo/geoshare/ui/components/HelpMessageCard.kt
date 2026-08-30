@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
@@ -44,7 +45,7 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
-fun HelpCard(
+fun HelpMessageCard(
     helpMessage: HelpMessage,
     dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
     title: @Composable () -> Unit,
@@ -66,7 +67,9 @@ fun HelpCard(
         exit = shrinkVertically(),
     ) {
         Card(
-            modifier = modifier.widthIn(max = spacing.largeButtonMaxWidth + 2 * spacing.largeButtonHorizontalPadding),
+            modifier = modifier
+                .widthIn(max = spacing.largeButtonMaxWidth + 2 * spacing.largeButtonHorizontalPadding)
+                .testTag("geoShareHelpMessage_$helpMessage"),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.tertiaryContainer,
             ),
@@ -99,7 +102,9 @@ fun HelpCard(
                 }
                 IconButton(
                     { onDismiss(helpMessage) },
-                    Modifier.align(Alignment.TopEnd),
+                    Modifier
+                        .align(Alignment.TopEnd)
+                        .testTag("geoShareHelpMessageDismiss"),
                 ) {
                     Icon(
                         Icons.Default.Close,
@@ -118,7 +123,7 @@ fun HelpCard(
 private fun DefaultPreview() {
     AppTheme {
         Surface {
-            HelpCard(
+            HelpMessageCard(
                 helpMessage = HelpMessage.WELCOME,
                 dismissedHelpMessages = MutableStateFlow(emptySet()),
                 title = { Text(stringResource(R.string.help_welcome_title)) },
@@ -135,7 +140,7 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         Surface {
-            HelpCard(
+            HelpMessageCard(
                 helpMessage = HelpMessage.WELCOME,
                 dismissedHelpMessages = MutableStateFlow(emptySet()),
                 title = { Text(stringResource(R.string.help_welcome_title)) },
@@ -152,7 +157,7 @@ private fun DarkPreview() {
 private fun TabletPreview() {
     AppTheme {
         Surface {
-            HelpCard(
+            HelpMessageCard(
                 helpMessage = HelpMessage.WELCOME,
                 dismissedHelpMessages = MutableStateFlow(emptySet()),
                 title = { Text(stringResource(R.string.help_welcome_title)) },

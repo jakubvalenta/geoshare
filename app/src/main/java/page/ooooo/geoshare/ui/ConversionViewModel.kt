@@ -89,7 +89,8 @@ class ConversionViewModel @Inject constructor(
 
     // Methods
 
-    fun start() {
+    fun start(sourceComesFromIntent: Boolean) {
+        _sourceComesFromIntent.value = sourceComesFromIntent
         transition { SourceReceived(stateContext, _source.value) }
     }
 
@@ -131,7 +132,6 @@ class ConversionViewModel @Inject constructor(
 
     fun setSource(newSource: String) {
         _source.value = newSource
-        _sourceComesFromIntent.value = false
     }
 
     // Any action
@@ -209,9 +209,8 @@ class ConversionViewModel @Inject constructor(
     // Lifecycle
 
     fun onCreateOrNewIntent(intent: Intent) {
-        _source.value = AndroidTools.getIntentUriString(intent).orEmpty()
-        _sourceComesFromIntent.value = true
-        start()
+        setSource(AndroidTools.getIntentUriString(intent).orEmpty())
+        start(true)
     }
 
     private companion object {

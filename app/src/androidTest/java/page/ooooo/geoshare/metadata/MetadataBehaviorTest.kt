@@ -13,6 +13,7 @@ import page.ooooo.geoshare.tests.enableSystemUIDemoMode
 import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.tests.dismissHelpMessage
 import page.ooooo.geoshare.tests.quickWaitForStableInActiveWindow
 import page.ooooo.geoshare.tests.shareUri
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
@@ -48,12 +49,12 @@ class MetadataBehaviorTest {
 
     @Test
     fun metadata() = uiAutomator {
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
 
         // Main form
-        // TODO Close help
-        onElement { viewIdResourceName == "geoShareMainSourceTextField" }
+        dismissHelpMessage()
         quickWaitForStableInActiveWindow()
         Screengrab.screenshot("1")
 
@@ -63,9 +64,10 @@ class MetadataBehaviorTest {
         Screengrab.screenshot("4")
 
         // Result screen
-        // TODO Close help
         dialog.confirmDialog()
         assertConversionSucceeds(WGS84Point(42.5784957, 1.8955661, source = Source.URI))
+        dismissHelpMessage()
+        quickWaitForStableInActiveWindow()
         Screengrab.screenshot("2")
 
         // Automation preferences screen

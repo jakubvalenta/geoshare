@@ -204,7 +204,7 @@ fun ResultCoordinates(
             ).firstNotNullOfOrNull { packageName ->
                 outputsForApps[packageName]?.firstNotNullOfOrNull { it as? OpenPointOutput }
             }
-            HelpCard(
+            HelpMessageCard(
                 helpMessage = HelpMessage.SHARE_SOURCE,
                 dismissedHelpMessages = dismissedHelpMessages,
                 title = { Text(stringResource(R.string.help_share_source_title)) },

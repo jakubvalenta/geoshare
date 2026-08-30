@@ -99,7 +99,7 @@ fun UserPreferenceDeveloperOptionsControls(
         )
         item {
             ParagraphText(
-                "Dismissed help messages", // TODO
+                stringResource(R.string.user_preferences_dismissed_help_messages),
                 Modifier
                     .padding(horizontal = LocalSpacing.current.windowPadding)
                     .padding(

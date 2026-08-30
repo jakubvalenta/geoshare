@@ -17,6 +17,7 @@ import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyLinkUriAutomation
 import page.ooooo.geoshare.data.local.preferences.DynamicColorPreference
+import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenPointsGpxAutomation
@@ -32,6 +33,7 @@ import page.ooooo.geoshare.tests.chooseFile
 import page.ooooo.geoshare.tests.confirmDialog
 import page.ooooo.geoshare.tests.disableSystemUIDemoMode
 import page.ooooo.geoshare.tests.dismissDialog
+import page.ooooo.geoshare.tests.dismissHelpMessage
 import page.ooooo.geoshare.tests.enableDarkMode
 import page.ooooo.geoshare.tests.enableSystemUIDemoMode
 import page.ooooo.geoshare.tests.expandSheet
@@ -58,6 +60,7 @@ import page.ooooo.geoshare.tests.scrollToSheetItem
 import page.ooooo.geoshare.tests.setAppLocales
 import page.ooooo.geoshare.tests.setMainInput
 import page.ooooo.geoshare.tests.shareUri
+import page.ooooo.geoshare.tests.submitMainForm
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
 import page.ooooo.geoshare.tests.withNetworkOff
 import page.ooooo.geoshare.ui.FaqItemId
@@ -106,12 +109,15 @@ class ScreenshotsFreeBehaviorTest {
         launchApplication()
         waitForAppToBeVisible()
 
-        // First test preferences, because further tests might change them
+        // 1. Test help messages, so that they don't appear in later screenshots
+        testHelpMessages()
+
+        // 2. Test preferences, while they still have default values, because later tests might change them
         testPreferences()
         testPreferencesAutomationMessaging()
         testPreferencesAutomationOsmAnd()
 
-        // Then test all other screens in alphabetical order
+        // 3. Test all other screens in alphabetical order
         testAbout()
         testAutomation()
         testAutomationShare()
@@ -124,20 +130,38 @@ class ScreenshotsFreeBehaviorTest {
         testConversionResultChecks()
         testConversionResultLocation()
         testConversionResultPoints()
-        testHelp()
         testMain()
         testInputs()
         testLinks()
         testServers()
     }
 
-    fun testHelp() = uiAutomator {
-        // TODO
+    fun testHelpMessages() = uiAutomator {
+        // Help - Message - Welcome
+        onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.WELCOME}" }
+        saveScreenshot("main_strings/help_message_welcome")
+        dismissHelpMessage()
+
+        // Help - Message - Share source
+        setMainInput()
+        submitMainForm()
+        onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.SHARE_SOURCE}" }
+        saveScreenshot("main_strings/help_message_share_source")
+        dismissHelpMessage()
+
+        // Help - Message - Open by default
+        shareUri()
+        onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.OPEN_BY_DEFAULT}" }
+        saveScreenshot("main_strings/help_message_open_by_default")
+        dismissHelpMessage()
+
+        goBackToMainForm()
     }
 
     fun testMain() = uiAutomator {
         // Main
         quickWaitForStableInActiveWindow()
+        setMainInput("")
         saveScreenshot("main_strings/main")
 
         // Main - Error - Missing URL
@@ -179,6 +203,7 @@ class ScreenshotsFreeBehaviorTest {
         scrollToAutomationItem(CopyCoordsDecAutomation).click()
         goBackToMainForm()
         setMainInput()
+        submitMainForm()
         onElement(pollIntervalMs = 50) { viewIdResourceName == "geoShareResultMessageSuccess" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/automation_copy_coords_success")
@@ -188,6 +213,7 @@ class ScreenshotsFreeBehaviorTest {
         scrollToAutomationItem(OpenDisplayGeoUriAutomation(PackageNames.GOOGLE_MAPS)).click()
         goBackToMainForm()
         setMainInput()
+        submitMainForm()
         onElement { viewIdResourceName == "geoShareResultAutomationCounter" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/automation_open_app_waiting")
@@ -198,6 +224,7 @@ class ScreenshotsFreeBehaviorTest {
         scrollToAutomationItem(CopyLinkUriAutomation(UUID.fromString(InitialLinks.APPLE_MAPS_NAVIGATION_UUID))).click()
         goBackToMainForm()
         setMainInput()
+        submitMainForm()
         onElement(pollIntervalMs = 50) { viewIdResourceName == "geoShareResultMessageSuccess" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/automation_copy_link_success")
@@ -207,6 +234,7 @@ class ScreenshotsFreeBehaviorTest {
         scrollToAutomationItem(SavePointsGpxAutomation).click()
         goBackToMainForm()
         setMainInput()
+        submitMainForm()
         onElement { viewIdResourceName == "geoShareResultAutomationCounter" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/automation_save_gpx_waiting")
@@ -234,6 +262,7 @@ class ScreenshotsFreeBehaviorTest {
         scrollToAutomationItem(ShareDisplayGeoUriAutomation).click()
         goBackToMainForm()
         setMainInput()
+        submitMainForm()
         onElement { viewIdResourceName == "geoShareResultAutomationCounter" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/automation_share_waiting")
@@ -250,6 +279,7 @@ class ScreenshotsFreeBehaviorTest {
         scrollToAutomationItem(ShareRouteGpxAutomation).click()
         goBackToMainForm()
         setMainInput()
+        submitMainForm()
         onElement { viewIdResourceName == "geoShareResultAutomationCounter" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/automation_share_gpx_route_waiting")
@@ -580,6 +610,11 @@ class ScreenshotsFreeBehaviorTest {
         onElement { viewIdResourceName == "geoShareFaqItem_${FaqItemId.NAME_ONLY}" }.click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/faq_name_only")
+
+        // FAQ - Open by default
+        onElement { viewIdResourceName == "geoShareFaqItem_${FaqItemId.OPEN_BY_DEFAULT}" }.click()
+        quickWaitForStableInActiveWindow()
+        saveScreenshot("main_strings/faq_open_by_default")
 
         // FAQ - Privacy
         onElement { viewIdResourceName == "geoShareFaqItem_${FaqItemId.PRIVACY}" }.click()

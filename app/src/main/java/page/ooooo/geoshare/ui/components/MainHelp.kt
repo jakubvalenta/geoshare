@@ -56,7 +56,7 @@ fun MainHelp(
     )
 
     Column(modifier.padding(horizontal = spacing.windowPadding)) {
-        HelpCard(
+        HelpMessageCard(
             helpMessage = HelpMessage.WELCOME,
             dismissedHelpMessages = dismissedHelpMessages,
             title = { Text(stringResource(R.string.help_welcome_title)) },

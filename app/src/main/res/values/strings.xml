@@ -350,6 +350,7 @@
     <string name="user_preferences_apps_description">Choose which of your installed apps should be displayed after converting a map link to coordinates.</string>
     <string name="user_preferences_apps_message_hidden">The app has been hidden. You can show it again in preferences.</string>
     <string name="user_preferences_apps_title">Apps</string>
+    <string name="user_preferences_dismissed_help_messages" translatable="false">Dismissed help messages</string>
     <string name="user_preferences_dynamic_color_title">Dynamic color</string>
     <string name="user_preferences_finish_after_action_succeeded">Close the app after sharing a link with it and performing any action (opening a map app, copying coordinates, saving GPX, etc.)</string>
     <string name="user_preferences_finish_after_action_succeeded_and_opened_app">Close the app after sharing a link with it and opening a map app</string>

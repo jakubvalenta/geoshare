@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.tests
 
-import android.app.ActivityManager
 import android.content.Context
 import android.graphics.Bitmap
 import android.location.Location
@@ -92,12 +91,6 @@ fun UiAutomatorTestScope.waitForAppToBeVisible(
     timeoutMs: Long = 10_000,
 ) {
     waitForAppToBeVisible(packageName, timeoutMs)
-}
-
-fun closeApplication() {
-    val context = InstrumentationRegistry.getInstrumentation().targetContext
-    val activityManager = context.getSystemService(ActivityManager::class.java)
-    activityManager.appTasks.forEach { it.finishAndRemoveTask() }
 }
 
 fun UiAutomatorTestScope.quickWaitForStableInActiveWindow() {
@@ -204,6 +197,10 @@ suspend fun assumeHttpGetReturnsStatus(@Suppress("SameParameterValue") url: Stri
 
 fun assumeNotEmulator() {
     assumeTrue("This test only works on a physical device, not an emulator", Build.HARDWARE != "ranchu")
+}
+
+fun UiAutomatorTestScope.dismissHelpMessage() {
+    onElement { viewIdResourceName == "geoShareHelpMessageDismiss" }.click()
 }
 
 /**
@@ -419,20 +416,18 @@ fun UiAutomatorTestScope.testUriFails(
 }
 
 fun UiAutomatorTestScope.setMainInput(unsafeText: String = "geo:52.47254,13.4345") {
-    // Set main input
     onElement { viewIdResourceName == "geoShareMainSourceTextField" }.setText(unsafeText)
     quickWaitForStableInActiveWindow() // Wait for the submit button to get its final position, after setting text
+}
 
-    // Submit main form
-    onElement { viewIdResourceName == "geoShareMainSourceTextField" }.let { textField ->
-        // Get the text field again to prevent stale element
-        if (textField.isFocused) {
-            // If the field is focused, the submit button can be covered by IME, so submit by pressing Enter
-            pressEnter()
-        } else {
-            // If the field is not focused, then pressing Enter doesn't submit, so submit by clicking the submit button
-            onElement { viewIdResourceName == "geoShareMainSubmitButton" }.click()
-        }
+fun UiAutomatorTestScope.submitMainForm() {
+    val textField = onElement { viewIdResourceName == "geoShareMainSourceTextField" }
+    if (textField.isFocused) {
+        // If the field is focused, the submit button can be covered by IME, so submit by pressing Enter
+        pressEnter()
+    } else {
+        // If the field is not focused, then pressing Enter doesn't submit, so submit by clicking the submit button
+        onElement { viewIdResourceName == "geoShareMainSubmitButton" }.click()
     }
 }
 
@@ -446,6 +441,7 @@ fun UiAutomatorTestScope.setMainInput(unsafeText: String = "geo:52.47254,13.4345
 fun UiAutomatorTestScope.testText(expectedPoints: Points, unsafeText: String) {
     goBackToMainForm()
     setMainInput(unsafeText)
+    submitMainForm()
     assertConversionSucceeds(expectedPoints)
 }
 

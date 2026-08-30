@@ -138,7 +138,7 @@ import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.ConversionWebView
-import page.ooooo.geoshare.ui.components.HelpCard
+import page.ooooo.geoshare.ui.components.HelpMessageCard
 import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
 import page.ooooo.geoshare.ui.components.MainForm
 import page.ooooo.geoshare.ui.components.MainHeadline
@@ -374,7 +374,7 @@ fun MainScreen(
         },
         onRetry = { conversionViewModel.retry() },
         onSetSource = { conversionViewModel.setSource(it) },
-        onStart = { conversionViewModel.start() },
+        onSubmit = { conversionViewModel.start(false) },
     )
 }
 
@@ -422,7 +422,7 @@ private fun MainScreen(
     onReset: () -> Unit,
     onRetry: () -> Unit,
     onSetSource: (String) -> Unit,
-    onStart: () -> Unit,
+    onSubmit: () -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
     val mainContainerColor = when (currentState) {
@@ -590,7 +590,7 @@ private fun MainScreen(
                                                 errorMessageResId = errorMessageResId,
                                                 onSetErrorMessageResId = setErrorMessageResId,
                                                 onSetSource = onSetSource,
-                                                onSubmit = onStart,
+                                                onSubmit = onSubmit,
                                             )
                                         }
                                         item {
@@ -614,7 +614,7 @@ private fun MainScreen(
                                         errorMessageResId = errorMessageResId,
                                         onSetErrorMessageResId = setErrorMessageResId,
                                         onSetSource = onSetSource,
-                                        onSubmit = onStart,
+                                        onSubmit = onSubmit,
                                     )
                                 }
                             } else {
@@ -686,24 +686,19 @@ private fun MainScreen(
                             }
                         }
                     }
-
-                    if (currentState is ConversionState.HasSource) {
-                        MainCopySourceButton(
-                            dismissedHelpMessages = dismissedHelpMessages,
-                            source = currentState.source,
-                            containerColor = if (!wide) {
-                                MaterialTheme.colorScheme.surfaceContainer
-                            } else {
-                                Color.Transparent
-                            },
-                            innerPadding = innerPadding,
-                            sourceComesFromIntent = sourceComesFromIntent,
-                            onDismissHelpMessage = onDismissHelpMessage,
-                            onNavigateToFaqScreen = onNavigateToFaqScreen,
-                        )
-                    } else {
-                        Spacer(Modifier.padding(innerPadding))
-                    }
+                    MainBottomBar(
+                        containerColor = if (!wide) {
+                            MaterialTheme.colorScheme.surfaceContainer
+                        } else {
+                            Color.Transparent
+                        },
+                        currentState = currentState,
+                        dismissedHelpMessages = dismissedHelpMessages,
+                        innerPadding = innerPadding,
+                        sourceComesFromIntent = sourceComesFromIntent,
+                        onDismissHelpMessage = onDismissHelpMessage,
+                        onNavigateToFaqScreen = onNavigateToFaqScreen
+                    )
                 },
                 supportingPane = { wide ->
                     LargeTopAppBarPane(
@@ -971,10 +966,10 @@ private fun MainWebView(
 }
 
 @Composable
-private fun MainCopySourceButton(
-    dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
-    source: String,
+private fun MainBottomBar(
     containerColor: Color,
+    currentState: State,
+    dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
     innerPadding: PaddingValues,
     sourceComesFromIntent: StateFlow<Boolean>,
     onDismissHelpMessage: (helpMessage: HelpMessage) -> Unit,
@@ -987,44 +982,48 @@ private fun MainCopySourceButton(
 
     val sourceComesFromIntent by sourceComesFromIntent.collectAsStateWithLifecycle()
 
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .background(containerColor)
-            .padding(innerPadding)
-            .consumeWindowInsets(innerPadding)
-            .padding(top = spacing.tiny),
-    ) {
-        TextButton(
-            {
-                coroutineScope.launch {
-                    AndroidTools.copyToClipboard(clipboard, source)
-                }
-            },
-            Modifier.padding(start = 5.dp),
+    if (currentState is ConversionState.HasSource) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .background(containerColor)
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+                .padding(top = spacing.tiny),
         ) {
-            Text(stringResource(R.string.conversion_succeeded_skip))
-        }
-        if (sourceComesFromIntent) {
-            HelpCard(
-                helpMessage = HelpMessage.OPEN_BY_DEFAULT,
-                dismissedHelpMessages = dismissedHelpMessages,
-                title = { Text(stringResource(R.string.help_open_by_default_title, appName)) },
-                actionText = {
-                    stringResource(R.string.help_open_by_default_action)
+            if (currentState is ConversionState.HasResult && sourceComesFromIntent) {
+                HelpMessageCard(
+                    helpMessage = HelpMessage.OPEN_BY_DEFAULT,
+                    dismissedHelpMessages = dismissedHelpMessages,
+                    title = { Text(stringResource(R.string.help_open_by_default_title, appName)) },
+                    actionText = {
+                        stringResource(R.string.help_open_by_default_action)
+                    },
+                    onAction = {
+                        onNavigateToFaqScreen(FaqItemId.OPEN_BY_DEFAULT)
+                    },
+                    onDismiss = onDismissHelpMessage,
+                    modifier = Modifier
+                        .padding(horizontal = spacing.windowPadding, vertical = spacing.tiny),
+                ) {
+                    ParagraphText(
+                        stringResource(R.string.help_open_by_default_text, appName)
+                    )
+                }
+            }
+            TextButton(
+                {
+                    coroutineScope.launch {
+                        AndroidTools.copyToClipboard(clipboard, currentState.source)
+                    }
                 },
-                onAction = {
-                    onNavigateToFaqScreen(FaqItemId.OPEN_BY_DEFAULT)
-                },
-                onDismiss = onDismissHelpMessage,
-                modifier = Modifier
-                    .padding(horizontal = spacing.windowPadding, vertical = spacing.tiny),
+                Modifier.padding(start = 5.dp),
             ) {
-                ParagraphText(
-                    stringResource(R.string.help_open_by_default_text, appName)
-                )
+                Text(stringResource(R.string.conversion_succeeded_skip))
             }
         }
+    } else {
+        Spacer(Modifier.padding(innerPadding))
     }
 }
 
@@ -1078,7 +1077,7 @@ private fun DefaultPreview() {
             onReset = {},
             onRetry = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1131,7 +1130,7 @@ private fun DarkPreview() {
             onReset = {},
             onRetry = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1184,7 +1183,7 @@ private fun SmallPreview() {
             onReset = {},
             onRetry = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1237,7 +1236,7 @@ private fun TabletPreview() {
             onReset = {},
             onRetry = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1349,7 +1348,7 @@ private fun SucceededPreview() {
             onReset = {},
             onRetry = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1461,7 +1460,7 @@ private fun DarkSucceededPreview() {
             onReset = {},
             onRetry = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1572,7 +1571,7 @@ private fun SmallSucceededPreview() {
             onReset = {},
             onRetry = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1684,7 +1683,7 @@ private fun TabletSucceededPreview() {
             onReset = {},
             onRetry = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1745,7 +1744,7 @@ private fun ErrorPreview() {
             onReset = {},
             onRetry = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1806,7 +1805,7 @@ private fun DarkErrorPreview() {
             onReset = {},
             onRetry = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1867,7 +1866,7 @@ private fun TabletErrorPreview() {
             onReset = {},
             onRetry = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1929,7 +1928,7 @@ private fun WarningPreview() {
             onReset = {},
             onRetry = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1991,7 +1990,7 @@ private fun DarkWarningPreview() {
             onReset = {},
             onRetry = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -2069,7 +2068,7 @@ private fun LoadingIndicatorPreview() {
             onReset = {},
             onRetry = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -2147,7 +2146,7 @@ private fun DarkLoadingIndicatorPreview() {
             onReset = {},
             onRetry = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -2225,7 +2224,7 @@ private fun TabletLoadingIndicatorPreview() {
             onReset = {},
             onRetry = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -2300,7 +2299,7 @@ private fun WebViewPreview() {
             onReset = {},
             onRetry = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -2375,7 +2374,7 @@ private fun DarkWebViewPreview() {
             onReset = {},
             onRetry = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -2450,7 +2449,7 @@ private fun TabletWebViewPreview() {
             onReset = {},
             onRetry = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -2522,7 +2521,7 @@ private fun EmptyPreview() {
             onReset = {},
             onRetry = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
