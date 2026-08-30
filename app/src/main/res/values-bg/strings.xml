@@ -339,4 +339,5 @@
     <string name="user_preferences_finish_description">Изберете кога приложението да се затваря автоматично. Затворено приложение не се показва след използване на жеста за връщане назад.</string>
     <string name="user_preferences_finish_never">Не затваряй приложението автоматично</string>
     <string name="user_preferences_finish_title">Затваряне</string>
+    <string name="conversion_failed_unsupported_source_google_search">Връзките към търсенето в Google не се поддържат</string>
 </resources>
