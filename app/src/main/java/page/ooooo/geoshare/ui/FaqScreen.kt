@@ -226,7 +226,7 @@ private fun FaqScreen(
                 itemId = FaqItemId.OPEN_BY_DEFAULT,
                 expandedItemId = expandedItemId,
                 onSetExpandedItemId = { expandedItemId = it },
-                title = stringResource(R.string.intro_open_by_default_headline, appName),
+                title = stringResource(R.string.faq_open_by_default_headline, appName),
             ) {
                 FaqFigure(
                     stringResource(R.string.intro_open_by_default_google_maps_caption),

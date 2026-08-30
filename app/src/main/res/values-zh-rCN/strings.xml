@@ -2,22 +2,13 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="nav_menu_content_description">菜单</string>
     <string name="nav_back_content_description">返回主屏幕</string>
-    <string name="intro_title">介绍</string>
-    <string name="intro_how_to_share_headline">如何在其他地图应用中显示地图位置</string>
-    <string name="intro_how_to_share_google_maps_caption">从地图应用或您的网络浏览器分享位置。</string>
-    <string name="intro_how_to_share_google_maps_content_description">Google 地图分享屏幕的屏幕截图</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[选择 <i>%1$s</i>，该应用将允许您在任何已安装的地图应用中打开同一位置。]]></string>
-    <string name="intro_how_to_share_app_content_description">%1$s 分享屏幕的屏幕截图</string>
     <string name="intro_open_by_default_google_maps_content_description">Google 地图默认打开设置的屏幕截图</string>
     <string name="intro_open_by_default_google_maps_button">打开 Google 地图设置</string>
     <string name="intro_open_by_default_app_caption"><![CDATA[然后转到设置 ➞ 应用 ➞ %1$s ➞ <i>默认打开</i>，开启在此应用中打开链接，然后点击<i>添加链接</i>。]]></string>
     <string name="intro_open_by_default_app_button">打开 %1$s 设置</string>
     <string name="intro_nav_close">关闭</string>
-    <string name="intro_nav_next">下一页</string>
-    <string name="intro_nav_finish">开始</string>
     <string name="main_input_uri_label">在此处粘贴地图链接</string>
     <string name="main_input_uri_clear_content_description">清除</string>
-    <string name="main_navigate_to_intro">发现更多应用功能</string>
     <string name="converter_google_maps_permission_title">连接到 Google？</string>
     <string name="conversion_permission_common_deny">取消</string>
     <string name="about_title">关于</string>
@@ -35,7 +26,6 @@
     <string name="conversion_succeeded_apps_not_found">未安装地图应用</string>
     <string name="copying_finished">已复制到剪贴板</string>
     <string name="conversion_failed_connection_permission_denied">如果不连接到地图服务，则不支持此链接</string>
-    <string name="intro_open_by_default_headline">配置 Android 以在替代地图中打开 Google 地图的链接（可选）</string>
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[首先，转到设置 ➞ 应用 ➞ 地图 ➞ <i>默认打开</i>，并关闭在此应用中打开链接。]]></string>
     <string name="main_input_uri_supporting_text">例如：https://maps.app.goo.gl/… 或 maps.apple.com/…</string>
     <string name="intro_settings_activity_not_found">无法打开设置</string>
@@ -46,9 +36,6 @@
     <string name="conversion_permission_common_text"><![CDATA[链接 <tt>%1$s</tt> 不包含坐标。%2$s 需要连接到地图服务才能获取坐标。]]></string>
     <string name="about_text"><![CDATA[<p>%1$s 是根据 <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> 或更高版本许可协议分发的自由及开源应用。</p><br><p>您可以在 <a href="https://github.com/jakubvalenta/geoshare">GitHub</a> 找到代码，也可以在那里<a href="https://github.com/jakubvalenta/geoshare/issues">报告问题</a>。</p><br><p>欢迎您的反馈。您可以通过 <a href="mailto:%2$s">%2$s</a>与我联系。</p>]]></string>
     <string name="intro_how_to_share_google_maps_screenshot_place">位置标记</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_messaging">短信</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">蓝牙</string>
-    <string name="intro_how_to_share_google_maps_screenshot_title">分享方式</string>
     <string name="converter_apple_maps_permission_title">连接到 Apple？</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">地图</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">选择如何打开此应用的网络链接</string>

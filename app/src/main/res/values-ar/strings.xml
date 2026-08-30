@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="intro_title">مقدمة</string>
     <string name="intro_nav_close">أغلِق</string>
     <string name="about_title">حول</string>
     <string name="about_app_icon_content_description">أيقونة التطبيق</string>
@@ -10,26 +9,17 @@
     <string name="conversion_failed_connection_permission_denied">هذا الرابط غير مدعوم بدون الاتصال بخدمة الخرائط</string>
     <string name="nav_menu_content_description">القائمة</string>
     <string name="nav_back_content_description">العودة إلى الشاشة الرئيسية</string>
-    <string name="intro_how_to_share_headline">كيفية إظهار موقع خريطة في تطبيق خرائط آخر</string>
-    <string name="intro_how_to_share_google_maps_caption">شارك موقعًا من تطبيق الخرائط أو متصفح الويب الخاص بك.</string>
-    <string name="intro_how_to_share_google_maps_content_description">لقطة شاشة لشاشة المشاركة في خرائط جوجل</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[اختر <i>%1$s</i> وسيسمح لك التطبيق بفتح نفس الموقع في أي تطبيق خرائط مثبت.]]></string>
-    <string name="intro_how_to_share_app_content_description">لقطة شاشة لشاشة المشاركة في %1$s</string>
-    <string name="intro_open_by_default_headline">اضبط أندرويد لفتح روابط خرائط جوجل في خرائط بديلة (اختياري)</string>
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[أولاً، انتقل إلى الإعدادات ← التطبيقات ← الخرائط ← <i>فتح افتراضيًا</i> وأوقف فتح الروابط في هذا التطبيق.]]></string>
     <string name="intro_open_by_default_google_maps_content_description">لقطة شاشة لإعدادات فتح افتراضيًا في خرائط جوجل</string>
     <string name="intro_open_by_default_google_maps_button">افتح إعدادات خرائط جوجل</string>
     <string name="intro_open_by_default_app_caption"><![CDATA[ثم انتقل إلى الإعدادات ← التطبيقات ← %1$s ← <i>فتح افتراضيًا</i>، وفعّل فتح الروابط في هذا التطبيق، وانقر على <i>إضافة روابط</i>.]]></string>
     <string name="intro_open_by_default_app_button">افتح إعدادات %1$s</string>
     <string name="intro_open_by_default_app_note">إذا كانت بعض الروابط معطلة، فإن تطبيقات جوجل الأخرى مضبوطة لفتحها افتراضيًا. يمكنك العثور على هذه التطبيقات وإيقاف فتح الروابط لها، كما فعلنا مع خرائط جوجل. تحقق أيضًا من التطبيقات المثبتة في «المساحة الخاصة»، إذا كنت تستخدم هذه الميزة في نظام أندرويد.</string>
-    <string name="intro_nav_next">التالي</string>
-    <string name="intro_nav_finish">ابدأ</string>
     <string name="intro_settings_activity_not_found">فشل في فتح الإعدادات</string>
     <string name="main_input_uri_label">ألصق رابط خرائط هنا</string>
     <string name="main_input_uri_clear_content_description">امحُ</string>
     <string name="main_input_uri_supporting_text">مثال: https://maps.app.goo.gl/… أو maps.apple.com/…</string>
     <string name="main_create_geo_uri">أظهر الإحداثيات</string>
-    <string name="main_navigate_to_intro">اكتشف المزيد من ميزات التطبيق</string>
     <string name="converter_google_maps_permission_title">الاتصال بجوجل؟</string>
     <string name="conversion_permission_common_grant">موافق</string>
     <string name="conversion_permission_common_deny">ألغِ</string>
@@ -45,10 +35,7 @@
     <string name="conversion_failed_missing_url">رابط مفقود</string>
     <string name="conversion_succeeded_apps_not_found">لم يُثبّت تطبيق الخرائط</string>
     <string name="conversion_error_report">بلّغ عن مشكلة</string>
-    <string name="intro_how_to_share_google_maps_screenshot_title">مشاركة مع</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">الموقع المحدد</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_messaging">المراسلة</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">البلوتوث</string>
     <string name="conversion_succeeded_apps_headline">افتح باستخدام</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">خرائط</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">اختر كيفية فتح روابط الويب لهذا التطبيق</string>
