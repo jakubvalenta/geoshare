@@ -39,7 +39,7 @@ import page.ooooo.geoshare.data.local.preferences.DynamicColorPreference
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.android.DataTypes
+import page.ooooo.geoshare.lib.android.Apps
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.CustomLinkFeature
@@ -132,7 +132,7 @@ fun UserPreferenceScreen(
 @Composable
 private fun UserPreferenceScreen(
     initialGroupId: UserPreferenceGroupId?,
-    apps: DataTypes,
+    apps: Apps,
     appDetails: AppDetails,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
@@ -228,7 +228,7 @@ private fun UserPreferenceScreen(
 private fun UserPreferenceListPane(
     currentGroupId: UserPreferenceGroupId?,
     values: UserPreferencesValues,
-    apps: DataTypes,
+    apps: Apps,
     appDetails: AppDetails,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
@@ -425,7 +425,7 @@ private fun UserPreferenceListPane(
 @Composable
 private fun UserPreferenceDetailPane(
     currentGroupId: UserPreferenceGroupId,
-    apps: DataTypes,
+    apps: Apps,
     appDetails: AppDetails,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,

@@ -1,24 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="nav_menu_content_description">Меню</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[Изберете <i>%1$s</i> и приложението ще ви позволи да отворите същото местоположение във всяко инсталирано приложение за карти.]]></string>
     <string name="intro_open_by_default_google_maps_button">Отворете настройките на Google Карти</string>
-    <string name="intro_title">Въведение</string>
-    <string name="intro_how_to_share_app_content_description">Екранна снимка на екрана за споделяне на %1$s</string>
     <string name="intro_open_by_default_google_maps_content_description">Екранна снимка на настройките за отваряне по подразбиране на Google Карти</string>
-    <string name="intro_nav_next">Следващо</string>
-    <string name="intro_nav_finish">Да започваме</string>
     <string name="main_input_uri_label">Поставете връзка към картата тук</string>
     <string name="main_input_uri_clear_content_description">Изчисти</string>
     <string name="main_create_geo_uri">Показване на координати</string>
     <string name="converter_google_maps_permission_title">Свързване с Google?</string>
     <string name="conversion_permission_common_grant">Добре</string>
-    <string name="intro_how_to_share_headline">Как да покажа местоположение на картата в друго приложение за карти</string>
     <string name="nav_back_content_description">Връщане към основния екран</string>
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[Първо отидете на Настройки ➞ Приложения ➞ Карти ➞ <i>Отваряне по подразбиране</i> и изключете отварянето на връзки в това приложение.]]></string>
-    <string name="intro_open_by_default_headline">Конфигурирайте Android да отваря връзки към Google Карти в алтернативни карти (по избор)</string>
-    <string name="intro_how_to_share_google_maps_caption">Споделете местоположение от приложението си за карти или уеб браузър.</string>
-    <string name="intro_how_to_share_google_maps_content_description">Екранна снимка на екрана за споделяне на Google Карти</string>
     <string name="intro_open_by_default_app_button">Отворете настройките на %1$s</string>
     <string name="intro_open_by_default_app_caption"><![CDATA[След това отидете на Настройки ➞ Приложения ➞ %1$s ➞ <i>Отваряне по подразбиране</i>, включете отварянето на връзки в това приложение и докоснете <i>Добавяне на връзки</i>.]]></string>
     <string name="intro_open_by_default_app_note">Ако някои връзки са сиви, други приложения за карти са настроени да ги отварят по подразбиране. Можете да намерите тези приложения и да изключите отварянето на връзки за тях, както направихме за Google Maps. Проверете също приложенията, инсталирани в личното пространство, ако използвате тази функция на Android.</string>
@@ -26,7 +17,6 @@
     <string name="intro_settings_activity_not_found">Неуспешно отваряне на настройките</string>
     <string name="conversion_permission_common_deny">Отказ</string>
     <string name="main_input_uri_supporting_text">напр. https://maps.app.goo.gl/… or maps.apple.com/…</string>
-    <string name="main_navigate_to_intro">Открийте още функции на приложението</string>
     <string name="conversion_error_report">Докладване на проблем</string>
     <string name="conversion_permission_common_text"><![CDATA[Връзката <tt>%1$s</tt> не съдържа координати. %2$s трябва да се свърже с картографската услуга, за да ги получи.]]></string>
     <string name="user_preferences_connection_title">Връзка с картографска услуга</string>
@@ -45,9 +35,6 @@
     <string name="user_preferences_title">Предпочитания</string>
     <string name="about_text"><![CDATA[<p>%1$s е безплатно приложение с отворен код, разпространявано под <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> или по-нов лиценз.</p><br><p>Можете да намерите кода на <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, където можете също да <a href="https://github.com/jakubvalenta/geoshare/issues">докладвате за проблеми</a>.</p><br><p>Вашите отзиви са добре дошли. Можете да се свържете с мен на <a href="mailto:%2$s">%2$s</a>.</p>]]></string>
     <string name="user_preferences_connection_description">За да поддържа кратки връзки и връзки, които не съдържат географски координати в URL адреса, %1$s може да се свърже с картографската услуга (Google Maps, Apple Maps и др.).</string>
-    <string name="intro_how_to_share_google_maps_screenshot_title">Споделяне с</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_messaging">Съобщения</string>
     <string name="conversion_succeeded_apps_headline">Отвори с</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">В приложението</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">Във вашия браузър</string>

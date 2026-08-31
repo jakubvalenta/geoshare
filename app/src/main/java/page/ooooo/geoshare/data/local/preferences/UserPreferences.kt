@@ -13,7 +13,7 @@ import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.DataType
-import page.ooooo.geoshare.lib.android.DataTypes
+import page.ooooo.geoshare.lib.android.Apps
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -203,7 +203,7 @@ object AutomationPreference : OptionsPreference<Automation> {
     }
 
     fun getOptionGroups(
-        apps: DataTypes,
+        apps: Apps,
         appDetails: AppDetails,
         hiddenApps: Set<String>?,
         links: List<Link>,
@@ -230,29 +230,29 @@ object AutomationPreference : OptionsPreference<Automation> {
         apps
             .filterKeys { hiddenApps?.contains(it) != true }
             .toSortedMap(compareBy(nullsLast()) { packageName -> appDetails[packageName]?.label })
-            .flatMap { (packageName, dataTypes) ->
+            .flatMap { (packageName, app) ->
                 buildList {
-                    if (DataType.GEO_URI in dataTypes) {
+                    if (DataType.GEO_URI in app.dataTypes) {
                         add(OpenDisplayGeoUriAutomation(packageName))
                     }
-                    if (DataType.MAGIC_EARTH_URI in dataTypes) {
+                    if (DataType.MAGIC_EARTH_URI in app.dataTypes) {
                         add(OpenDisplayMagicEarthUriAutomation(packageName))
                         add(OpenNavigationMagicEarthUriAutomation(packageName))
                     }
-                    if (DataType.GOOGLE_NAVIGATION_URI in dataTypes) {
+                    if (DataType.GOOGLE_NAVIGATION_URI in app.dataTypes) {
                         add(OpenNavigationGoogleUriAutomation(packageName))
                     }
-                    if (DataType.GOOGLE_STREET_VIEW_URI in dataTypes) {
+                    if (DataType.GOOGLE_STREET_VIEW_URI in app.dataTypes) {
                         add(OpenStreetViewGoogleUriAutomation(packageName))
                     }
-                    if (DataType.GPX_DATA in dataTypes) {
+                    if (DataType.GPX_DATA in app.dataTypes) {
                         add(OpenRouteGpxAutomation(packageName))
                         add(OpenPointsGpxAutomation(packageName))
                     }
-                    if (DataType.GPX_ONE_POINT_DATA in dataTypes) {
+                    if (DataType.GPX_ONE_POINT_DATA in app.dataTypes) {
                         add(OpenRouteOnePointGpxAutomation(packageName))
                     }
-                    if (DataType.SEND_PLAIN_TEXT in dataTypes) {
+                    if (DataType.SEND_PLAIN_TEXT in app.dataTypes) {
                         add(SendPointAutomation(packageName))
                     }
                 }
@@ -431,6 +431,37 @@ interface SetPreference : TextPreference<Set<String>?> {
     }
 }
 
+object DismissedHelpMessagesPreference : TextPreference<Set<HelpMessage>?> {
+    override val key = stringPreferencesKey("dismissed_help_messages")
+    override val default: Set<HelpMessage> = emptySet()
+    val loading = null
+
+    override fun serialize(value: Set<HelpMessage>?, log: Log) =
+        try {
+            Json.encodeToString(value)
+        } catch (tr: SerializationException) {
+            // Silently ignore serialization errors, because the value should always serialize
+            log.e(TAG, "Serialization error", tr)
+            ""
+        }
+
+    override fun deserialize(value: String?, log: Log) =
+        if (value != null) {
+            try {
+                Json.decodeFromString<Set<HelpMessage>?>(value)
+            } catch (tr: IllegalArgumentException) {
+                log.e(TAG, "Deserialization error", tr)
+                default
+            }
+        } else {
+            default
+        }
+
+    override fun getValue(values: UserPreferencesValues) = values.dismissedHelpMessages
+
+    private const val TAG = "DismissedHelpMessagePreference"
+}
+
 object HiddenAppsPreference : SetPreference {
     override val key = stringPreferencesKey("hidden_apps")
     override val default: Set<String> = emptySet()
@@ -438,15 +469,7 @@ object HiddenAppsPreference : SetPreference {
 
     override fun getValue(values: UserPreferencesValues) = values.hiddenApps
 
-    fun getOptions(apps: DataTypes): Set<String> = apps.keys
-}
-
-object IntroShowForVersionCodePreference : NullableIntPreference {
-    override val key = stringPreferencesKey("intro_shown_for_version_code")
-    override val default = 0
-    val loading = null
-
-    override fun getValue(values: UserPreferencesValues) = values.introShownForVersionCode
+    fun getOptions(apps: Apps): Set<String> = apps.keys
 }
 
 object ChangelogShownForVersionCodePreference : NullableIntPreference {
@@ -468,5 +491,5 @@ data class UserPreferencesValues(
     val dynamicColor: Boolean = DynamicColorPreference.loading,
     val finish: Finish = FinishPreference.loading,
     val hiddenApps: Set<String>? = HiddenAppsPreference.loading,
-    val introShownForVersionCode: Int? = IntroShowForVersionCodePreference.loading,
+    val dismissedHelpMessages: Set<HelpMessage>? = DismissedHelpMessagesPreference.loading,
 )

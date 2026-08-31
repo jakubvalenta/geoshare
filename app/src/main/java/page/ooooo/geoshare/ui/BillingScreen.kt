@@ -304,13 +304,13 @@ private fun BillingMainPane(
                         R.string.billing_intro_not_purchased
                     }
                 ),
-                Modifier.padding(top = spacing.smallAdaptive),
+                Modifier.padding(top = spacing.extraTiny),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyLarge,
             )
             MainHeadline(
                 appNameResId = billingAppNameResId,
-                modifier = Modifier.padding(top = spacing.tinyAdaptive),
+                modifier = Modifier.padding(top = spacing.extraTiny, bottom = spacing.small),
                 iconEnabled = false
             )
             CompositionLocalProvider(
@@ -322,11 +322,7 @@ private fun BillingMainPane(
                 TextList(
                     Modifier
                         .fillMaxWidth()
-                        .padding(
-                            start = spacing.small,
-                            top = spacing.smallAdaptive,
-                            end = spacing.medium,
-                        ),
+                        .padding(start = spacing.small, end = spacing.medium),
                     bulletSpace = spacing.tiny,
                     bulletWidth = 44.dp,
                 ) {
@@ -347,7 +343,7 @@ private fun BillingMainPane(
                     }
                     billingFeatures.forEach { feature ->
                         TextListItem(
-                            Modifier.padding(vertical = spacing.tinyAdaptive),
+                            Modifier.padding(vertical = spacing.extraTiny),
                             bullet = {
                                 Icon(
                                     imageVector = Icons.Default.Done,
@@ -362,7 +358,7 @@ private fun BillingMainPane(
                                 style = MaterialTheme.typography.bodyLarge,
                             )
                         }
-                        TextListItem(Modifier.padding(bottom = spacing.tinyAdaptive)) {
+                        TextListItem(Modifier.padding(bottom = spacing.extraTiny)) {
                             Text(stringResource(feature.descriptionResId))
                         }
                     }
@@ -460,7 +456,7 @@ private fun BillingSupportingPane(
                 Offer.Period.ONE_TIME -> 1
                 Offer.Period.MONTHLY -> 0
             }
-        } ?: emptyList()
+        }.orEmpty()
     }
     var selectedOffer by remember(sortedBillingOffers) { mutableStateOf(sortedBillingOffers.firstOrNull()) }
 
@@ -632,6 +628,27 @@ private fun DarkPreview() {
 @Preview(showBackground = true, device = Devices.TABLET)
 @Composable
 private fun TabletPreview() {
+    AppTheme {
+        BillingScreen(
+            billingAppNameResId = R.string.app_name_pro,
+            billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+            billingMessage = null,
+            billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
+            billingRefundableDuration = 48.hours,
+            billingStatus = BillingStatus.NotPurchased(),
+            animationsEnabled = false,
+            onBack = {},
+            onConsumePurchases = {},
+            onDismissMessage = {},
+            onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, device = Devices.NEXUS_5)
+@Composable
+private fun SmallPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,

@@ -14,8 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.ui.theme.AppTheme
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun LargeButton(
@@ -25,12 +25,13 @@ fun LargeButton(
     colors: ButtonColors = ButtonDefaults.buttonColors(),
     onClick: () -> Unit,
 ) {
-    Column(Modifier.padding(horizontal = 9.dp)) {
+    val spacing = LocalSpacing.current
+    Column(Modifier.padding(horizontal = spacing.largeButtonHorizontalPadding)) {
         Button(
             onClick,
             modifier
                 .align(Alignment.CenterHorizontally)
-                .width(400.dp),
+                .width(spacing.largeButtonMaxWidth),
             enabled = enabled,
             colors = colors,
         ) {

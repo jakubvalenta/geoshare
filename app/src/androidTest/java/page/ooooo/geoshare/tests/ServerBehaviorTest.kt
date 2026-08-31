@@ -16,10 +16,9 @@ import page.ooooo.geoshare.ui.UserPreferenceGroupId
 class ServerBehaviorTest {
     @Test
     fun allowsInsertingServer() = uiAutomator {
-        // Launch application and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Go to server list
         goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
@@ -49,10 +48,9 @@ class ServerBehaviorTest {
 
     @Test
     fun allowsUpdatingAndDeletingAndRestoringServer() = uiAutomator {
-        // Launch application and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Go to server list
         goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
@@ -119,6 +117,9 @@ class ServerBehaviorTest {
 
         // Shows the restored server
         onElement { viewIdResourceName == "geoShareServerListPane" }
+            .scroll(Direction.DOWN, 10f)
+        onElement { viewIdResourceName == "geoShareServerListPane" }
+            // Scroll again, because only now can the lazy column pane scroll all the way to the top
             .scrollToElement(Direction.UP) { viewIdResourceName == "geoShareServerListItemMenu_$GOOGLE_MAPS_GEOCODE_ADDRESS_UUID" }
     }
 }

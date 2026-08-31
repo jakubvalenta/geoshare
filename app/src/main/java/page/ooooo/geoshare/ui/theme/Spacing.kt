@@ -7,16 +7,14 @@ import androidx.compose.ui.unit.dp
 
 @Immutable
 data class Spacing(
+    val extraTiny: Dp = 4.dp,
     val tiny: Dp = 8.dp,
-    val small: Dp = 15.dp,
-    val medium: Dp = 30.dp,
-    val large: Dp = 45.dp,
+    val small: Dp = 16.dp,
+    val medium: Dp = 24.dp,
+    val large: Dp = 32.dp,
 
-    val tinyAdaptive: Dp = tiny,
-    val smallAdaptive: Dp = small,
-    val mediumAdaptive: Dp = medium,
-    val largeAdaptive: Dp = large,
-
+    val largeButtonHorizontalPadding: Dp = 9.dp,
+    val largeButtonMaxWidth: Dp = 400.dp,
     val largeTopAppBarCollapsedHeight: Dp = TopAppBarDefaults.LargeAppBarCollapsedHeight,
     val largeTopAppBarExpandedHeight: Dp = TopAppBarDefaults.LargeAppBarExpandedHeight,
     val windowPadding: Dp = 16.dp,
@@ -25,10 +23,5 @@ data class Spacing(
 val defaultSpacing = Spacing()
 
 val smallWindowSpacing = Spacing(
-    tinyAdaptive = 4.dp,
-    smallAdaptive = 8.dp,
-    mediumAdaptive = 16.dp,
-    largeAdaptive = 24.dp,
-
     largeTopAppBarExpandedHeight = 128.dp,
 )

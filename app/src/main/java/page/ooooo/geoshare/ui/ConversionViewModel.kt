@@ -7,7 +7,6 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -46,7 +45,6 @@ import page.ooooo.geoshare.lib.outputs.ActionResult
 import page.ooooo.geoshare.lib.outputs.LocationAction
 import javax.inject.Inject
 
-@OptIn(SavedStateHandleSaveableApi::class)
 @HiltViewModel
 class ConversionViewModel @Inject constructor(
     @ApplicationContext context: Context,
@@ -59,7 +57,7 @@ class ConversionViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _currentState = MutableStateFlow<State>(Initial())
-    val currentState: StateFlow<State> = _currentState
+    val currentState: StateFlow<State> = _currentState.asStateFlow()
 
     val stateContext = ConversionStateContext(
         inputs = inputRepository.all,
@@ -76,6 +74,9 @@ class ConversionViewModel @Inject constructor(
     private val _source = savedStateHandle.getMutableStateFlow("source", "")
     val source: StateFlow<String> = _source.asStateFlow()
 
+    private val _sourceComesFromIntent = savedStateHandle.getMutableStateFlow("sourceComesFromIntent", false)
+    val sourceComesFromIntent: StateFlow<Boolean> = _sourceComesFromIntent.asStateFlow()
+
     private var transitionJob: Job? = null
     private val transitionExceptionHandler = CoroutineExceptionHandler { _, tr ->
         stateContext.log.e(TAG, "Exception when transitioning state", tr)
@@ -88,7 +89,8 @@ class ConversionViewModel @Inject constructor(
 
     // Methods
 
-    fun start() {
+    fun start(sourceComesFromIntent: Boolean) {
+        _sourceComesFromIntent.value = sourceComesFromIntent
         transition { SourceReceived(stateContext, _source.value) }
     }
 
@@ -207,8 +209,8 @@ class ConversionViewModel @Inject constructor(
     // Lifecycle
 
     fun onCreateOrNewIntent(intent: Intent) {
-        _source.value = AndroidTools.getIntentUriString(intent).orEmpty()
-        start()
+        setSource(AndroidTools.getIntentUriString(intent).orEmpty())
+        start(true)
     }
 
     private companion object {

@@ -1,26 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="main_input_uri_label">Pegue aquí un enlace de mapa</string>
-    <string name="intro_title">Intro</string>
     <string name="intro_open_by_default_app_caption"><![CDATA[Luego vaya a Ajustes ➞ Aplicaciones ➞ %1$s ➞ <i>Abrir por defecto</i>, active la apertura de enlaces en esta aplicación, y pulse <i>Añadir enlaces</i>.]]></string>
     <string name="nav_menu_content_description">Menú</string>
     <string name="main_create_geo_uri">Mostrar coordenadas</string>
     <string name="intro_open_by_default_app_button">Abrir ajustes de %1$s</string>
     <string name="user_preferences_connection_description">Para soportar enlaces cortos de mapas, y para obtener coordenadas de la página web del servicio de mapas cuando el enlace no las contiene, %1$s puede conectarse al servicio de mapas. Puedes encontrar más información en la pantalla de preguntas frecuentes (FAQ).</string>
-    <string name="intro_how_to_share_headline">Cómo mostrar la ubicación del mapa en otra aplicación de mapas</string>
-    <string name="intro_nav_finish">Empezar</string>
     <string name="conversion_permission_common_deny">Cancelar</string>
-    <string name="intro_how_to_share_google_maps_caption">Comparte una ubicación desde tu aplicación de mapas o el navegador web.</string>
-    <string name="intro_how_to_share_google_maps_content_description">Captura de pantalla de Google Maps</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[Elige <i>%1$s</i> y la aplicación te permitirá abrir la misma ubicación en cualquier aplicación de mapas instalada.]]></string>
-    <string name="intro_how_to_share_app_content_description">Captura de pantalla de %1$s</string>
-    <string name="intro_open_by_default_headline">Configurar Android para abrir enlaces a Google Maps en mapas alternativos (opcional)</string>
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[Primero, vaya a Ajustes ➞ Aplicaciones ➞ Mapas ➞ <i>Abrir por defecto</i> y apaga la apertura de enlaces en esta aplicación.]]></string>
     <string name="intro_open_by_default_google_maps_content_description">Captura de pantalla de la configuración predeterminada de Google Maps</string>
     <string name="intro_open_by_default_google_maps_button">Abrir los ajustes de Google Maps</string>
     <string name="intro_nav_close">Cerrar</string>
-    <string name="intro_nav_next">Siguiente</string>
-    <string name="main_navigate_to_intro">Descubrir más características de la app</string>
     <string name="conversion_error_report">Reportar incidente</string>
     <string name="converter_google_maps_permission_title">¿Conectarse a Google?</string>
     <string name="conversion_permission_common_grant">Aceptar</string>
@@ -46,10 +36,7 @@
     <string name="about_text"><![CDATA[<p>%1$s es una aplicación libre y de código abierto distribuido bajo la licencia <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> o superior.</p><br><p>Puede encontrar el código por <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, donde puede también<a href="https://github.com/jakubvalenta/geoshare/issues">reportar incidentes</a>.</p><br><p>Sus comentarios son bienvenidos. Puede contactarme vía <a href="mailto:%2$s">%2$s</a>.</p>]]></string>
     <string name="user_preferences_connection_title">¿Permitir conectarse al servicio de mapas (Google, Apple, etc.)?</string>
     <string name="conversion_succeeded_skip">Copiar enlace original</string>
-    <string name="intro_how_to_share_google_maps_screenshot_title">Compartiendo con</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Pin caído</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_messaging">Mensajería</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
     <string name="conversion_succeeded_apps_headline">Abrir con</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">Mapas</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">Elije cómo abrir enlaces web para esta aplicación</string>

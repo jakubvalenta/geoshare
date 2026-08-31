@@ -22,6 +22,7 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -146,7 +147,6 @@ fun ResultTitle(
                     targetState.output.errorText(appDetails),
                     Modifier.testTag("geoShareResultMessageError"),
                     containerColor = MaterialTheme.colorScheme.errorContainer,
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
                 )
             }
 
@@ -162,7 +162,6 @@ fun ResultTitle(
                     targetState.output.automationErrorText(appDetails),
                     Modifier.testTag("geoShareResultMessageError"),
                     containerColor = MaterialTheme.colorScheme.errorContainer,
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
                 )
             }
 
@@ -171,7 +170,6 @@ fun ResultTitle(
                     stringResource(R.string.conversion_succeeded_location_failed),
                     Modifier.testTag("geoShareResultMessageError"),
                     containerColor = MaterialTheme.colorScheme.errorContainer,
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
                 )
             }
 
@@ -238,8 +236,8 @@ private fun ResultMessageRow(content: @Composable RowScope.() -> Unit) {
 private fun RowScope.ResultMessageText(
     text: String,
     modifier: Modifier = Modifier,
-    containerColor: Color = MaterialTheme.colorScheme.tertiaryContainer,
-    contentColor: Color = MaterialTheme.colorScheme.onTertiaryContainer,
+    containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
+    contentColor: Color = contentColorFor(containerColor),
 ) {
     val spacing = LocalSpacing.current
     Row(
@@ -277,8 +275,9 @@ private fun ActionCompletedPreview() {
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -311,8 +310,9 @@ private fun DarkActionCompletedPreview() {
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -346,8 +346,9 @@ private fun ActionCompletedFeatureNotAvailablePreview() {
                     ),
                     appDetails = mapOf(
                         PackageNames.OSMAND_PLUS to AppDetail(
-                            "OsmAnd",
-                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -378,8 +379,9 @@ private fun DarkActionCompletedFeatureNotAvailablePreview() {
                     ),
                     appDetails = mapOf(
                         PackageNames.OSMAND_PLUS to AppDetail(
-                            "OsmAnd",
-                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -426,8 +428,9 @@ private fun ActionWaitingPreview() {
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -477,8 +480,9 @@ private fun DarkActionWaitingPreview() {
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -526,8 +530,9 @@ private fun LocationPermissionReceivedPreview() {
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -575,8 +580,9 @@ private fun DarkLocationPermissionReceivedPreview() {
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -612,8 +618,9 @@ private fun SucceededPreview() {
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -649,8 +656,9 @@ private fun DarSucceededPreview() {
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -686,8 +694,9 @@ private fun FailedPreview() {
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -723,8 +732,9 @@ private fun DarkFailedPreview() {
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),

@@ -33,6 +33,7 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import page.ooooo.geoshare.R
@@ -77,10 +78,10 @@ class BillingImpl(
         .build()
 
     private val _status: MutableStateFlow<BillingStatus> = MutableStateFlow(BillingStatus.Loading())
-    override val status: StateFlow<BillingStatus> = _status
+    override val status: StateFlow<BillingStatus> = _status.asStateFlow()
 
     private val _message: MutableStateFlow<Message?> = MutableStateFlow(null)
-    override val message: StateFlow<Message?> = _message
+    override val message: StateFlow<Message?> = _message.asStateFlow()
 
     override fun onBillingSetupFinished(billingResult: BillingResult) {
         when (billingResult.responseCode) {

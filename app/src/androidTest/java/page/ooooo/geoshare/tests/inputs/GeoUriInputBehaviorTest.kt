@@ -2,7 +2,6 @@ package page.ooooo.geoshare.tests.inputs
 
 import androidx.test.uiautomator.uiAutomator
 import org.junit.Test
-import page.ooooo.geoshare.tests.closeIntro
 import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
@@ -13,10 +12,9 @@ import page.ooooo.geoshare.tests.waitForAppToBeVisible
 class GeoUriInputBehaviorTest : InputBehaviorTest {
     @Test
     fun geoUri_offline() = uiAutomator {
-        // Launch app and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Coordinates, query and zoom
         testUri(

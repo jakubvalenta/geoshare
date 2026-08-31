@@ -4,7 +4,6 @@ import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import page.ooooo.geoshare.tests.assumeDomainResolvable
-import page.ooooo.geoshare.tests.closeIntro
 import page.ooooo.geoshare.tests.configureConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.tests.launchApplication
@@ -17,10 +16,9 @@ import page.ooooo.geoshare.tests.waitForAppToBeVisible
 class WazeInputBehaviorTest : InputBehaviorTest {
     @Test
     fun waze_offline() = uiAutomator {
-        // Launch app and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Coordinates
         testUri(
@@ -58,10 +56,9 @@ class WazeInputBehaviorTest : InputBehaviorTest {
             assumeDomainResolvable("waze.com")
         }
 
-        // Launch app and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
         configureConnectionPermissionPreference(Permission.ALWAYS)
 
         // Place id

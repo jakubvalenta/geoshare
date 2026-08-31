@@ -1,6 +1,8 @@
 package page.ooooo.geoshare.ui
 
 import android.content.res.Configuration
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.Keep
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,7 +11,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -21,44 +26,81 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.android.AndroidTools
+import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.ui.components.ExpandablePane
 import page.ooooo.geoshare.ui.components.FormatArg
 import page.ooooo.geoshare.ui.components.NavigationBackButton
+import page.ooooo.geoshare.ui.components.ParagraphHtml
 import page.ooooo.geoshare.ui.components.ParagraphText
+import page.ooooo.geoshare.ui.components.ScreenshotOpenByDefault
+import page.ooooo.geoshare.ui.components.ScreenshotOpenByDefaultMapApp
 import page.ooooo.geoshare.ui.components.TextList
 import page.ooooo.geoshare.ui.components.TextListBullet
 import page.ooooo.geoshare.ui.components.TextListItem
 import page.ooooo.geoshare.ui.components.annotatedStringResource
+import page.ooooo.geoshare.ui.components.styledArgsString
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Keep
 enum class FaqItemId {
     HOW_IT_WORKS,
+    OPEN_BY_DEFAULT,
     LOCATION_PERMISSION,
     NAME_ONLY,
     PRIVACY,
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FaqScreen(
     initialExpandedItemId: FaqItemId? = null,
     onBack: () -> Unit,
     onNavigateToUserPreferencesScreen: (groupId: UserPreferenceGroupId) -> Unit,
+) {
+    val context = LocalContext.current
+    val settingsLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { _ ->
+        // Do nothing.
+    }
+
+    FaqScreen(
+        initialExpandedItemId = initialExpandedItemId,
+        onBack = onBack,
+        onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
+        onShowOpenByDefaultSettings = {
+            AndroidTools.showOpenByDefaultSettings(context, settingsLauncher)
+        },
+        onShowOpenByDefaultSettingsForPackage = { packageName ->
+            AndroidTools.showOpenByDefaultSettingsForPackage(context, settingsLauncher, packageName)
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FaqScreen(
+    initialExpandedItemId: FaqItemId? = null,
+    onBack: () -> Unit,
+    onNavigateToUserPreferencesScreen: (groupId: UserPreferenceGroupId) -> Unit,
+    onShowOpenByDefaultSettings: () -> Unit,
+    onShowOpenByDefaultSettingsForPackage: (packageName: String) -> Unit,
 ) {
     val spacing = LocalSpacing.current
     var expandedItemId by retain { mutableStateOf(initialExpandedItemId) }
@@ -83,7 +125,8 @@ fun FaqScreen(
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .testTag("geoShareFaqPane"),
             verticalArrangement = Arrangement.spacedBy(spacing.medium),
         ) {
             FaqItem(
@@ -179,6 +222,55 @@ fun FaqScreen(
                     stringResource(R.string.faq_location_permission_text, appName)
                 )
             }
+            FaqItem(
+                itemId = FaqItemId.OPEN_BY_DEFAULT,
+                expandedItemId = expandedItemId,
+                onSetExpandedItemId = { expandedItemId = it },
+                title = stringResource(R.string.faq_open_by_default_headline, appName),
+            ) {
+                FaqFigure(
+                    stringResource(R.string.intro_open_by_default_google_maps_caption),
+                ) {
+                    ScreenshotOpenByDefaultMapApp()
+                    Button(
+                        {
+                            onShowOpenByDefaultSettingsForPackage(PackageNames.GOOGLE_MAPS)
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                        ),
+                    ) {
+                        Text(stringResource(R.string.intro_open_by_default_google_maps_button))
+                    }
+                }
+                FaqFigure(
+                    stringResource(R.string.intro_open_by_default_app_caption, appName),
+                ) {
+                    ScreenshotOpenByDefault()
+                    FilledTonalButton(
+                        {
+                            onShowOpenByDefaultSettings()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                        ),
+                    ) {
+                        Text(stringResource(R.string.intro_open_by_default_app_button, appName))
+                    }
+                    ParagraphText(
+                        styledArgsString(
+                            R.string.intro_open_by_default_app_note_1,
+                            SpanStyle(fontWeight = FontWeight.Bold),
+                            "maps.app.goo.gl", "maps.google.com", "www.google.com",
+                        )
+                    )
+                    ParagraphText(
+                        stringResource(R.string.intro_open_by_default_app_note)
+                    )
+                }
+            }
         }
     }
 }
@@ -223,6 +315,24 @@ private fun FaqItem(
             ) {
                 content()
             }
+        }
+    }
+}
+
+@Composable
+private fun FaqFigure(
+    captionHtml: String,
+    content: @Composable () -> Unit = {},
+) {
+    val spacing = LocalSpacing.current
+    Column(
+        Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(spacing.tiny),
+    ) {
+        CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
+            ParagraphHtml(captionHtml, Modifier.fillMaxWidth())
+            content()
         }
     }
 }
@@ -341,6 +451,30 @@ private fun DarkLocationPermissionPreview() {
     AppTheme {
         FaqScreen(
             initialExpandedItemId = FaqItemId.LOCATION_PERMISSION,
+            onBack = {},
+            onNavigateToUserPreferencesScreen = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun OpenByDefaultPreview() {
+    AppTheme {
+        FaqScreen(
+            initialExpandedItemId = FaqItemId.OPEN_BY_DEFAULT,
+            onBack = {},
+            onNavigateToUserPreferencesScreen = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkOpenByDefaultPreview() {
+    AppTheme {
+        FaqScreen(
+            initialExpandedItemId = FaqItemId.OPEN_BY_DEFAULT,
             onBack = {},
             onNavigateToUserPreferencesScreen = {},
         )

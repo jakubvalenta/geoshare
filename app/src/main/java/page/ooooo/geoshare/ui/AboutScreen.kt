@@ -8,11 +8,12 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
@@ -153,7 +154,7 @@ private fun ColumnScope.AboutMainPane(
     val appName = stringResource(R.string.app_name)
     Text(
         stringResource(R.string.about_app_name_and_version, appName, BuildConfig.VERSION_NAME),
-        Modifier.padding(bottom = spacing.mediumAdaptive),
+        Modifier.padding(bottom = spacing.small),
         style = MaterialTheme.typography.headlineSmall,
     )
     CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
@@ -166,15 +167,16 @@ private fun ColumnScope.AboutMainPane(
         )
         ParagraphText(
             buildAnnotatedString {
-                ClickableLink(stringResource(R.string.licenses), onNavigateToLicensesScreen)
+                ClickableLink(stringResource(R.string.licenses), onClick = onNavigateToLicensesScreen)
             }
         )
         if (donationVisible) {
-            ElevatedCard(
-                modifier = Modifier.padding(top = spacing.largeAdaptive),
+            Card(
+                modifier = Modifier
+                    .widthIn(max = 600.dp)
+                    .padding(top = spacing.large),
                 colors = CardDefaults.elevatedCardColors(
                     containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
                 ),
             ) {
                 ParagraphText(

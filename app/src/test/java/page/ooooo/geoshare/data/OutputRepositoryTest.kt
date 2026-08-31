@@ -41,6 +41,7 @@ import page.ooooo.geoshare.data.local.preferences.ShareNavigationGoogleUriAutoma
 import page.ooooo.geoshare.data.local.preferences.SharePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareRouteGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareStreetViewGoogleUriAutomation
+import page.ooooo.geoshare.lib.android.App
 import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
@@ -147,18 +148,36 @@ class OutputRepositoryTest {
             ),
             outputRepository.getOutputsForApps(
                 mapOf(
-                    PackageNames.TEST to setOf(DataType.GEO_URI),
-                    PackageNames.GOOGLE_MAPS to setOf(
-                        DataType.GEO_URI,
-                        DataType.GOOGLE_NAVIGATION_URI,
-                        DataType.GOOGLE_STREET_VIEW_URI,
-                        DataType.GPX_DATA,
+                    PackageNames.TEST to App(packageName = PackageNames.TEST, dataTypes = setOf(DataType.GEO_URI)),
+                    PackageNames.GOOGLE_MAPS to App(
+                        packageName = PackageNames.GOOGLE_MAPS,
+                        dataTypes = setOf(
+                            DataType.GEO_URI,
+                            DataType.GOOGLE_NAVIGATION_URI,
+                            DataType.GOOGLE_STREET_VIEW_URI,
+                            DataType.GPX_DATA,
+                        ),
                     ),
-                    PackageNames.CARTES_IGN to setOf(DataType.CARTES_IGN_URL),
-                    PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
-                    PackageNames.SIGNAL to setOf(DataType.SEND_PLAIN_TEXT),
-                    PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
-                    "${PackageNames.TEST}.empty" to emptySet(),
+                    PackageNames.CARTES_IGN to App(
+                        packageName = PackageNames.CARTES_IGN,
+                        dataTypes = setOf(DataType.CARTES_IGN_URL)
+                    ),
+                    PackageNames.MAGIC_EARTH to App(
+                        packageName = PackageNames.MAGIC_EARTH,
+                        dataTypes = setOf(DataType.MAGIC_EARTH_URI)
+                    ),
+                    PackageNames.SIGNAL to App(
+                        packageName = PackageNames.SIGNAL,
+                        dataTypes = setOf(DataType.SEND_PLAIN_TEXT)
+                    ),
+                    PackageNames.TOMTOM to App(
+                        packageName = PackageNames.TOMTOM,
+                        dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
+                    ),
+                    "${PackageNames.TEST}.empty" to App(
+                        packageName = "${PackageNames.TEST}.empty",
+                        dataTypes = emptySet()
+                    ),
                 ),
                 emptySet(),
             ),
@@ -178,10 +197,19 @@ class OutputRepositoryTest {
             ),
             outputRepository.getOutputsForApps(
                 mapOf(
-                    PackageNames.TEST to setOf(DataType.GEO_URI),
-                    PackageNames.GOOGLE_MAPS to setOf(DataType.GOOGLE_NAVIGATION_URI),
-                    PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
-                    PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
+                    PackageNames.TEST to App(packageName = PackageNames.TEST, dataTypes = setOf(DataType.GEO_URI)),
+                    PackageNames.GOOGLE_MAPS to App(
+                        packageName = PackageNames.GOOGLE_MAPS,
+                        dataTypes = setOf(DataType.GOOGLE_NAVIGATION_URI)
+                    ),
+                    PackageNames.MAGIC_EARTH to App(
+                        packageName = PackageNames.MAGIC_EARTH,
+                        dataTypes = setOf(DataType.MAGIC_EARTH_URI)
+                    ),
+                    PackageNames.TOMTOM to App(
+                        packageName = PackageNames.TOMTOM,
+                        dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
+                    ),
                 ),
                 setOf(
                     PackageNames.GOOGLE_MAPS,

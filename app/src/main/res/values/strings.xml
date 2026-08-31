@@ -52,24 +52,20 @@
     <string name="conversion_succeeded_skip">Copy original link</string>
     <string name="donation_button">Donate on Ko-fi</string>
     <string name="donation_description">Does this app save you time?</string>
+    <string name="help_open_by_default_action">Learn more in FAQ</string>
+    <string name="help_open_by_default_text">You can configure Android so that tapping a map link always opens %1$s instead of the default map.</string>
+    <string name="help_open_by_default_title">Always open map links in %1$s</string>
+    <string name="help_share_source_action">Try it in %1$s</string>
+    <string name="help_share_source_text">In many map apps, you can use a share button %1$s to open a location in %2$s.</string>
+    <string name="help_share_source_title">Launch GeoShare from a map app</string>
+    <string name="help_welcome_action">Or copy this example:</string>
+    <string name="help_welcome_text">Do you have a map link ready? Enter it in the form and press Show coordinates.</string>
+    <string name="help_welcome_title">Welcome</string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="nav_back_content_description">Back to main screen</string>
-    <string name="intro_title">Intro</string>
-    <string name="intro_how_to_share_headline">How to show a map location in another map app</string>
-    <string name="intro_how_to_share_google_maps_caption">Share a location from your map app or web browser.</string>
-    <string name="intro_how_to_share_google_maps_content_description">Screenshot of Google Maps’ share screen</string>
-    <string name="intro_how_to_share_google_maps_screenshot_title">Sharing with</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Dropped pin</string>
-    <string name="intro_how_to_share_google_maps_screenshot_url" translatable="false">https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_messaging">Messaging</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_chrome" translatable="false">Chrome</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_firefox" translatable="false">Firefox</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[Choose <i>%1$s</i> and the app will let you open the same location in any installed map app.]]></string>
-    <string name="intro_how_to_share_app_content_description">Screenshot of %1$s’s share screen</string>
     <string name="conversion_succeeded_apps_headline">Open with</string>
     <string name="conversion_succeeded_apps_links_configure">Configure web maps</string>
-    <string name="intro_open_by_default_headline">Configure Android to open links to Google Maps in alternative maps (optional)</string>
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[First, go to Settings ➞ Apps ➞ Maps ➞ <i>Open by default</i> and turn off the opening of links in this app.]]></string>
     <string name="intro_open_by_default_google_maps_content_description">Screenshot of Google Maps’ Open by default settings</string>
     <string name="intro_open_by_default_google_maps_button">Open Google Maps settings</string>
@@ -89,15 +85,12 @@
     <string name="intro_open_by_default_app_screenshot_cancel">Cancel</string>
     <string name="intro_open_by_default_app_screenshot_add">Add</string>
     <string name="intro_nav_close">Close</string>
-    <string name="intro_nav_next">Next</string>
-    <string name="intro_nav_finish">Get started</string>
     <string name="intro_settings_activity_not_found">Failed to open settings</string>
     <string name="main_input_uri_label">Paste a map link here</string>
     <string name="main_input_uri_clear_content_description">Clear</string>
     <string name="main_input_uri_paste_content_description">Paste</string>
     <string name="main_input_uri_supporting_text">e.g. https://maps.app.goo.gl/&#8230; or maps.apple.com/&#8230;</string>
     <string name="main_create_geo_uri">Show coordinates</string>
-    <string name="main_navigate_to_intro">Discover more app features</string>
     <string name="main_random">Random link</string>
     <string name="no">No</string>
     <string name="output_gpx_location_permission">%1$s will create a route that starts at your current location.</string>
@@ -219,6 +212,7 @@
     <string name="faq_name_only_title">Failed to find coordinates, using a place name</string>
     <string name="faq_name_only_text_1">%1$s is able to extract only a place name, e.g. “Mount Kilimanjaro”, from certain map links. When you open this location in another map app, it might show a different place than the original link, because several places with the same name might exist.</string>
     <string name="faq_name_only_text_2">Points identified only by name are not included in GPX routes.</string>
+    <string name="faq_open_by_default_headline">How to always open links in %1$s</string>
     <string name="faq_privacy_headline">Privacy considerations</string>
     <string name="faq_privacy_text">When possible, %1$s converts map links offline. If the map link requires online conversion, the app will ask you before connecting to the map service (Google Maps, Apple Maps, etc.). If you allow the connection, the map service will receive the map link, and it will be able to read your IP address.</string>
     <string name="faq_privacy_text_server">For some map links, %1$s calls a remote server, the open-source %3$s. This server then calls the map service API (e.g. the Google Maps API). %2$s doesn’t keep logs of map links. To apply rate limiting, it stores a public key that identifies your device and separately your IP address for limited time.</string>
@@ -240,7 +234,6 @@
     <string name="user_preferences_coordinate_format_option_deg_min_sec">Degrees, minutes, seconds</string>
     <string name="user_preferences_coordinate_format_title">Coordinate format</string>
     <string name="user_preferences_developer_title" translatable="false">Developer options</string>
-    <string name="user_preferences_last_run_version_code_title" translatable="false">Which version of the app was last run?</string>
     <string name="user_preferences_changelog_shown_for_version_code_title" translatable="false">For which version of the app was changelog last shown?</string>
     <string name="user_preferences_number_error_range" tools:ignore="PluralsCandidate">Value must be between %1$d and %2$d</string>
     <string name="conversion_failed_missing_url">Missing URL</string>
@@ -356,6 +349,7 @@
     <string name="user_preferences_apps_description">Choose which of your installed apps should be displayed after converting a map link to coordinates.</string>
     <string name="user_preferences_apps_message_hidden">The app has been hidden. You can show it again in preferences.</string>
     <string name="user_preferences_apps_title">Apps</string>
+    <string name="user_preferences_dismissed_help_messages" translatable="false">Dismissed help messages</string>
     <string name="user_preferences_dynamic_color_title">Dynamic color</string>
     <string name="user_preferences_finish_after_action_succeeded">Close the app after sharing a link with it and performing any action (opening a map app, copying coordinates, saving GPX, etc.)</string>
     <string name="user_preferences_finish_after_action_succeeded_and_opened_app">Close the app after sharing a link with it and opening a map app</string>

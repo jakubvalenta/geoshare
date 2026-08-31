@@ -6,7 +6,6 @@ import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import page.ooooo.geoshare.tests.assertConversionSucceeds
-import page.ooooo.geoshare.tests.closeIntro
 import page.ooooo.geoshare.tests.confirmDialog
 import page.ooooo.geoshare.tests.disableDarkMode
 import page.ooooo.geoshare.tests.disableSystemUIDemoMode
@@ -14,6 +13,7 @@ import page.ooooo.geoshare.tests.enableSystemUIDemoMode
 import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.tests.dismissHelpMessage
 import page.ooooo.geoshare.tests.quickWaitForStableInActiveWindow
 import page.ooooo.geoshare.tests.shareUri
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
@@ -49,18 +49,13 @@ class MetadataBehaviorTest {
 
     @Test
     fun metadata() = uiAutomator {
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
 
-        // Intro screen
-        onElement { viewIdResourceName == "geoShareIntroPage_0" }
-        quickWaitForStableInActiveWindow()
-        Screengrab.screenshot("5")
-
         // Main form
-        closeIntro()
-        onElement { viewIdResourceName == "geoShareMainSourceTextField" }
-        quickWaitForStableInActiveWindow()
+        dismissHelpMessage()
+        quickWaitForStableInActiveWindow() // Wait for help message exit animation
         Screengrab.screenshot("1")
 
         // Connection permission dialog
@@ -71,6 +66,8 @@ class MetadataBehaviorTest {
         // Result screen
         dialog.confirmDialog()
         assertConversionSucceeds(WGS84Point(42.5784957, 1.8955661, source = Source.URI))
+        dismissHelpMessage()
+        quickWaitForStableInActiveWindow() // Wait for help message exit animation
         Screengrab.screenshot("2")
 
         // Automation preferences screen

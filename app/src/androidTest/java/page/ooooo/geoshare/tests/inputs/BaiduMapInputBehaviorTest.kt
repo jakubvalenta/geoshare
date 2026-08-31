@@ -6,7 +6,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import page.ooooo.geoshare.tests.NETWORK_TIMEOUT
 import page.ooooo.geoshare.tests.assumeDomainResolvable
-import page.ooooo.geoshare.tests.closeIntro
 import page.ooooo.geoshare.tests.configureConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.tests.launchApplication
@@ -108,10 +107,9 @@ class BaiduMapInputBehaviorTest : InputBehaviorTest {
             assumeDomainResolvable("map.baidu.com")
         }
 
-        // Launch app and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
         configureConnectionPermissionPreference(Permission.ALWAYS)
 
         // Retry the first test, because it usually fails the first time it's run, probably because the WebView needs to

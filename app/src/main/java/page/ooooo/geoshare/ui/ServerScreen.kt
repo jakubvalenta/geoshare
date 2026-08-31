@@ -301,7 +301,7 @@ private fun ServerListPane(
                 stringResource(R.string.server_list_description, stringResource(R.string.app_name)),
                 Modifier
                     .padding(horizontal = spacing.windowPadding)
-                    .padding(top = spacing.tinyAdaptive, bottom = spacing.smallAdaptive),
+                    .padding(top = spacing.tiny, bottom = spacing.small),
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
@@ -310,7 +310,6 @@ private fun ServerListPane(
                 { onNavigateToContentKey(-1) },
                 Modifier
                     .padding(horizontal = spacing.windowPadding)
-                    .padding(top = spacing.smallAdaptive)
                     .testTag("geoShareServerListInsert"),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.secondary,
@@ -358,7 +357,7 @@ private fun ServerListPane(
                 modifier = Modifier
                     .testTag("geoShareServerRestoreInitialButton")
                     .padding(horizontal = spacing.windowPadding)
-                    .padding(top = spacing.mediumAdaptive, bottom = spacing.tinyAdaptive),
+                    .padding(top = spacing.small, bottom = spacing.tiny),
                 colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
             ) {
                 Text(stringResource(R.string.server_restore_initial_data))
@@ -460,7 +459,7 @@ private fun ServerDetailPane(
                         onSetUrlTemplate = onSetUrlTemplate,
                         modifier = Modifier
                             .width(600.dp)
-                            .padding(top = spacing.smallAdaptive, bottom = spacing.tinyAdaptive),
+                            .padding(top = spacing.small, bottom = spacing.tiny),
                     )
                 }
             }
@@ -481,6 +480,7 @@ private fun ServerDetailPane(
                 .semantics { testTagsAsResourceId = true }
                 .testTag("geoShareServerDeleteDialog"),
         ) {
+            val name by name.collectAsStateWithLifecycle()
             Text(stringResource(R.string.server_delete_text, name))
         }
     }

@@ -15,16 +15,13 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -34,14 +31,11 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.contentColorFor
-import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -92,11 +86,13 @@ import page.ooooo.geoshare.data.di.FakeLinkRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
+import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.shouldAppFinish
 import page.ooooo.geoshare.lib.Attempt
 import page.ooooo.geoshare.lib.Message
 import page.ooooo.geoshare.lib.android.AndroidTools
+import page.ooooo.geoshare.lib.android.App
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.PackageNames
@@ -142,6 +138,7 @@ import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.ConversionWebView
+import page.ooooo.geoshare.ui.components.HelpMessageCard
 import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
 import page.ooooo.geoshare.ui.components.MainForm
 import page.ooooo.geoshare.ui.components.MainHeadline
@@ -149,6 +146,7 @@ import page.ooooo.geoshare.ui.components.MainHelp
 import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
+import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.PermissionDialog
 import page.ooooo.geoshare.ui.components.ResultApps
 import page.ooooo.geoshare.ui.components.ResultCoordinates
@@ -170,11 +168,11 @@ fun MainScreen(
     onNavigateToBillingScreen: () -> Unit,
     onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
     onNavigateToInputsScreen: () -> Unit,
-    onNavigateToIntroScreen: () -> Unit,
     onNavigateToLinkScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: (groupId: UserPreferenceGroupId?) -> Unit,
     billingViewModel: BillingViewModel,
     conversionViewModel: ConversionViewModel,
+    helpViewModel: HelpViewModel = hiltViewModel(),
     inputViewModel: InputViewModel = hiltViewModel(),
     outputViewModel: OutputViewModel = hiltViewModel(),
     linkViewModel: LinkViewModel = hiltViewModel(),
@@ -317,6 +315,7 @@ fun MainScreen(
         changelogShown = changelogShown,
         coordinateConverter = outputViewModel.coordinateConverter,
         coordinateFormat = userPreferencesValues.coordinateFormat,
+        dismissedHelpMessages = helpViewModel.dismissedHelpMessages,
         inputRepository = inputViewModel.inputRepository,
         largeLoadingIndicator = largeLoadingIndicator,
         linkMessage = linkMessage,
@@ -328,6 +327,7 @@ fun MainScreen(
         outputsForPointsChips = outputsForPointsChips,
         outputsForSharing = outputsForSharing,
         source = conversionViewModel.source,
+        sourceComesFromIntent = conversionViewModel.sourceComesFromIntent,
         userPreferenceMessage = userPreferencesMessage,
         onCancel = {
             locationJob?.cancel()
@@ -335,13 +335,14 @@ fun MainScreen(
         },
         onDeny = { doNotAsk -> conversionViewModel.deny(doNotAsk) },
         onDisableLinkGroup = { group -> linkViewModel.disableGroup(resources, group) },
+        onDismissHelpMessage = { helpMessage -> helpViewModel.dismissHelpMessage(helpMessage) },
         onDismissLinkMessage = { linkViewModel.dismissMessage() },
         onDismissUserPreferenceMessage = { userPreferenceViewModel.dismissMessage() },
-        onGrant = { doNotAsk -> conversionViewModel.grant(doNotAsk) },
         onExecute = { action ->
             conversionViewModel.cancel()
             conversionViewModel.startAction(action)
         },
+        onGrant = { doNotAsk -> conversionViewModel.grant(doNotAsk) },
         onHideApp = { packageName -> userPreferenceViewModel.hideApp(resources, packageName) },
         onNavigateToAboutScreen = {
             conversionViewModel.cancel()
@@ -359,10 +360,6 @@ fun MainScreen(
             conversionViewModel.cancel()
             onNavigateToInputsScreen()
         },
-        onNavigateToIntroScreen = {
-            conversionViewModel.cancel()
-            onNavigateToIntroScreen()
-        },
         onNavigateToLinkScreen = {
             conversionViewModel.cancel()
             onNavigateToLinkScreen()
@@ -377,7 +374,7 @@ fun MainScreen(
         },
         onRetry = { conversionViewModel.retry() },
         onSetSource = { conversionViewModel.setSource(it) },
-        onStart = { conversionViewModel.start() },
+        onSubmit = { conversionViewModel.start(false) },
     )
 }
 
@@ -393,6 +390,7 @@ private fun MainScreen(
     changelogShown: Boolean,
     coordinateConverter: CoordinateConverter,
     coordinateFormat: CoordinateFormat,
+    dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
     inputRepository: InputRepository,
     largeLoadingIndicator: LoadingIndicator.Large?,
     linkMessage: Message?,
@@ -404,29 +402,29 @@ private fun MainScreen(
     outputsForPointsChips: List<PointsOutput>,
     outputsForSharing: List<Output>,
     source: StateFlow<String>,
+    sourceComesFromIntent: StateFlow<Boolean>,
     userPreferenceMessage: Message?,
     onCancel: () -> Unit,
     onDeny: (Boolean) -> Unit,
     onDisableLinkGroup: (String?) -> Unit,
+    onDismissHelpMessage: (helpMessage: HelpMessage) -> Unit,
     onDismissLinkMessage: () -> Unit,
     onDismissUserPreferenceMessage: () -> Unit,
+    onExecute: (Action<*>) -> Unit,
     onGrant: (Boolean) -> Unit,
     onHideApp: (String) -> Unit,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
     onNavigateToInputsScreen: () -> Unit,
-    onNavigateToIntroScreen: () -> Unit,
     onNavigateToLinkScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: (groupId: UserPreferenceGroupId?) -> Unit,
     onReset: () -> Unit,
     onRetry: () -> Unit,
-    onExecute: (Action<*>) -> Unit,
     onSetSource: (String) -> Unit,
-    onStart: () -> Unit,
+    onSubmit: () -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
-    val coroutineScope = rememberCoroutineScope()
     val mainContainerColor = when (currentState) {
         is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null -> MaterialTheme.colorScheme.surfaceContainer
         is ConversionState.HasError if currentState.warning -> MaterialTheme.colorScheme.surfaceContainerHighest
@@ -439,7 +437,6 @@ private fun MainScreen(
 
     val (errorMessageResId, setErrorMessageResId) = retain { mutableStateOf<Int?>(null) }
     val (selectedPointIndex, setSelectedPointIndex) = retain { mutableStateOf<Int?>(null) }
-    val sheetState = rememberBottomSheetState(SheetValue.Hidden)
     val snackbarHostState = remember { SnackbarHostState() }
 
     BackHandler(currentState !is Initial) {
@@ -462,32 +459,266 @@ private fun MainScreen(
         }
     }
 
-    Scaffold(
-        snackbarHost = {
-            MessageSnackbarHost(snackbarHostState)
-        },
-    ) {
-        StyledSupportingPaneScaffold(
-            mainPane = { innerPadding, wide ->
-                Column(Modifier.weight(1f)) {
-                    LargeTopAppBarPane(
-                        modifier = Modifier.testTag("geoShareMainPane"),
-                        title = { maxLines ->
-                            MainTitle(
-                                currentState = currentState,
-                                billingAppNameResId = billingAppNameResId,
-                                billingStatus = billingStatus,
-                                largeLoadingIndicator = largeLoadingIndicator,
-                                maxLines = maxLines,
-                            )
+    Box(Modifier.fillMaxSize()) {
+        Scaffold(
+            snackbarHost = {
+                MessageSnackbarHost(snackbarHostState)
+            },
+        ) {
+            StyledSupportingPaneScaffold(
+                mainPane = { innerPadding, wide ->
+                    Column(Modifier.weight(1f)) {
+                        LargeTopAppBarPane(
+                            modifier = Modifier.testTag("geoShareMainPane"),
+                            title = { maxLines ->
+                                MainTitle(
+                                    currentState = currentState,
+                                    billingAppNameResId = billingAppNameResId,
+                                    billingStatus = billingStatus,
+                                    largeLoadingIndicator = largeLoadingIndicator,
+                                    maxLines = maxLines,
+                                )
+                            },
+                            onBack = if (currentState !is Initial) {
+                                onReset
+                            } else {
+                                null
+                            },
+                            actions = {
+                                if (!wide) {
+                                    MainMenu(
+                                        currentState = currentState,
+                                        billingAppNameResId = billingAppNameResId,
+                                        billingStatus = billingStatus,
+                                        changelogShown = changelogShown,
+                                        onNavigateToAboutScreen = onNavigateToAboutScreen,
+                                        onNavigateToBillingScreen = onNavigateToBillingScreen,
+                                        onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                        onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                        onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
+                                    )
+                                }
+                            },
+                            expandedHeight = if (currentState is Initial) {
+                                spacing.largeTopAppBarExpandedHeight + spacing.medium
+                            } else {
+                                spacing.largeTopAppBarExpandedHeight
+                            },
+                        ) {
+                            if (!wide) {
+                                when (currentState) {
+                                    is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
+                                        item {
+                                            MainLoadingIndicator(
+                                                loadingIndicator = largeLoadingIndicator,
+                                                onCancel = onCancel,
+                                            )
+                                        }
+
+                                    is ConversionState.HasError ->
+                                        item {
+                                            ResultError(
+                                                source = currentState.source,
+                                                message = currentState.message,
+                                                details = currentState.details,
+                                                warning = currentState.warning,
+                                                onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                                onRetry = onRetry,
+                                            )
+                                        }
+
+                                    is ConversionState.HasResult -> {
+                                        item {
+                                            ResultCoordinates(
+                                                points = currentState.points,
+                                                appDetails = appDetails,
+                                                coordinateConverter = coordinateConverter,
+                                                coordinateFormat = coordinateFormat,
+                                                dismissedHelpMessages = dismissedHelpMessages,
+                                                outputsForApps = outputsForApps,
+                                                outputsForPointChips = outputsForPointChips,
+                                                outputsForPointsChips = outputsForPointsChips,
+                                                sourceComesFromIntent = sourceComesFromIntent,
+                                                onDismissHelpMessage = onDismissHelpMessage,
+                                                onExecute = onExecute,
+                                                onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                                onSelect = { index ->
+                                                    onCancel()
+                                                    setSelectedPointIndex(index)
+                                                },
+                                            )
+                                        }
+                                        item {
+                                            Column(
+                                                // This column must not have weight(1f), otherwise the last row of app icons gets shrunk
+                                                Modifier
+                                                    .fillMaxWidth()
+                                                    .background(MaterialTheme.colorScheme.surface)
+                                            ) {
+                                                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                                                    ResultTitle(
+                                                        currentState = currentState,
+                                                        appDetails = appDetails,
+                                                        billingFeatures = billingFeatures,
+                                                        billingStatus = billingStatus,
+                                                        modifier = Modifier
+                                                            .padding(horizontal = spacing.windowPadding)
+                                                            .padding(top = spacing.medium),
+                                                        onCancel = onCancel,
+                                                        onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
+                                                    )
+                                                    ResultApps(
+                                                        appDetails = appDetails,
+                                                        outputsForApps = outputsForApps,
+                                                        outputsForLinks = outputsForLinks,
+                                                        outputsForSharing = outputsForSharing,
+                                                        points = currentState.points,
+                                                        onDisableLinkGroup = onDisableLinkGroup,
+                                                        onExecute = onExecute,
+                                                        onHideApp = onHideApp,
+                                                        onNavigateToLinkScreen = onNavigateToLinkScreen,
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    is Initial -> {
+                                        item {
+                                            MainForm(
+                                                source = source,
+                                                errorMessageResId = errorMessageResId,
+                                                onSetErrorMessageResId = setErrorMessageResId,
+                                                onSetSource = onSetSource,
+                                                onSubmit = onSubmit,
+                                            )
+                                        }
+                                        item {
+                                            MainHelp(
+                                                dismissedHelpMessages = dismissedHelpMessages,
+                                                inputRepository = inputRepository,
+                                                modifier = Modifier.padding(top = spacing.medium),
+                                                onDismissHelpMessage = onDismissHelpMessage,
+                                                onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                                onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                                onSetErrorMessageResId = setErrorMessageResId,
+                                                onSetSource = onSetSource,
+                                            )
+                                        }
+                                    }
+                                }
+                            } else if (currentState is Initial) {
+                                item {
+                                    MainForm(
+                                        source = source,
+                                        errorMessageResId = errorMessageResId,
+                                        onSetErrorMessageResId = setErrorMessageResId,
+                                        onSetSource = onSetSource,
+                                        onSubmit = onSubmit,
+                                    )
+                                }
+                            } else {
+                                item {
+                                    Card(
+                                        colors = CardDefaults.cardColors(
+                                            containerColor = mainContainerColor,
+                                            contentColor = mainContentColor,
+                                        ),
+                                    ) {
+                                        Spacer(Modifier.height(spacing.small))
+
+                                        when (currentState) {
+                                            is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
+                                                MainLoadingIndicator(
+                                                    loadingIndicator = largeLoadingIndicator,
+                                                    onCancel = onCancel,
+                                                )
+
+                                            is ConversionState.HasError ->
+                                                ResultError(
+                                                    source = currentState.source,
+                                                    message = currentState.message,
+                                                    details = currentState.details,
+                                                    warning = currentState.warning,
+                                                    onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                                    onRetry = onRetry,
+                                                )
+
+                                            is ConversionState.HasResult -> {
+                                                ResultCoordinates(
+                                                    points = currentState.points,
+                                                    appDetails = appDetails,
+                                                    coordinateConverter = coordinateConverter,
+                                                    coordinateFormat = coordinateFormat,
+                                                    dismissedHelpMessages = dismissedHelpMessages,
+                                                    outputsForApps = outputsForApps,
+                                                    outputsForPointChips = outputsForPointChips,
+                                                    outputsForPointsChips = outputsForPointsChips,
+                                                    sourceComesFromIntent = sourceComesFromIntent,
+                                                    onDismissHelpMessage = onDismissHelpMessage,
+                                                    onExecute = onExecute,
+                                                    onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                                    onSelect = { index ->
+                                                        onCancel()
+                                                        setSelectedPointIndex(index)
+                                                    },
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        Column(
+                            Modifier
+                                .weight(1f)
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.surface)
+                        ) {
+                            if (currentState is PermissionGrantedWebViewInput) {
+                                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                                    MainWebView(
+                                        matchedInput = currentState.matchedInput,
+                                        pendingData = currentState.pendingData,
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    MainBottomBar(
+                        containerColor = if (!wide) {
+                            MaterialTheme.colorScheme.surfaceContainer
+                        } else {
+                            Color.Transparent
                         },
-                        onBack = if (currentState !is Initial) {
-                            onReset
+                        currentState = currentState,
+                        dismissedHelpMessages = dismissedHelpMessages,
+                        innerPadding = innerPadding,
+                        sourceComesFromIntent = sourceComesFromIntent,
+                        onDismissHelpMessage = onDismissHelpMessage,
+                        onNavigateToFaqScreen = onNavigateToFaqScreen
+                    )
+                },
+                supportingPane = { wide ->
+                    LargeTopAppBarPane(
+                        modifier = Modifier.testTag("geoShareMainSupportingPane"),
+                        title = if (currentState is ConversionState.HasResult) {
+                            {
+                                ResultTitle(
+                                    currentState = currentState,
+                                    appDetails = appDetails,
+                                    billingFeatures = billingFeatures,
+                                    billingStatus = billingStatus,
+                                    onCancel = onCancel,
+                                    onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
+                                )
+                            }
                         } else {
                             null
                         },
                         actions = {
-                            if (!wide) {
+                            if (wide) {
                                 MainMenu(
                                     currentState = currentState,
                                     billingAppNameResId = billingAppNameResId,
@@ -497,304 +728,66 @@ private fun MainScreen(
                                     onNavigateToBillingScreen = onNavigateToBillingScreen,
                                     onNavigateToFaqScreen = onNavigateToFaqScreen,
                                     onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                    onNavigateToIntroScreen = onNavigateToIntroScreen,
                                     onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
                                 )
                             }
                         },
-                        expandedHeight = if (currentState is Initial) {
-                            spacing.largeTopAppBarExpandedHeight + spacing.largeAdaptive
-                        } else {
-                            spacing.largeTopAppBarExpandedHeight
-                        },
                     ) {
-                        if (!wide) {
-                            when (currentState) {
-                                is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
-                                    item {
-                                        MainLoadingIndicator(
-                                            loadingIndicator = largeLoadingIndicator,
-                                            onCancel = onCancel,
-                                        )
-                                    }
+                        when (currentState) {
+                            is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null -> {}
 
-                                is ConversionState.HasError ->
-                                    item {
-                                        ResultError(
-                                            source = currentState.source,
-                                            message = currentState.message,
-                                            details = currentState.details,
-                                            warning = currentState.warning,
-                                            onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                            onRetry = onRetry,
-                                        )
-                                    }
-
-                                is ConversionState.HasResult -> {
-                                    item {
-                                        ResultCoordinates(
-                                            points = currentState.points,
-                                            appDetails = appDetails,
-                                            coordinateConverter = coordinateConverter,
-                                            coordinateFormat = coordinateFormat,
-                                            outputsForPointChips = outputsForPointChips,
-                                            outputsForPointsChips = outputsForPointsChips,
-                                            onExecute = onExecute,
-                                            onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                            onSelect = { index ->
-                                                onCancel()
-                                                setSelectedPointIndex(index)
-                                            },
-                                        )
-                                    }
-                                    item {
-                                        Column(
-                                            // This column must not have weight(1f), otherwise the last row of app icons gets shrunk
-                                            Modifier
-                                                .fillMaxWidth()
-                                                .background(MaterialTheme.colorScheme.surface)
-                                        ) {
-                                            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                                                ResultTitle(
-                                                    currentState = currentState,
-                                                    appDetails = appDetails,
-                                                    billingFeatures = billingFeatures,
-                                                    billingStatus = billingStatus,
-                                                    modifier = Modifier
-                                                        .padding(horizontal = spacing.windowPadding)
-                                                        .padding(top = spacing.largeAdaptive),
-                                                    onCancel = onCancel,
-                                                    onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
-                                                )
-                                                ResultApps(
-                                                    appDetails = appDetails,
-                                                    outputsForApps = outputsForApps,
-                                                    outputsForLinks = outputsForLinks,
-                                                    outputsForSharing = outputsForSharing,
-                                                    points = currentState.points,
-                                                    onDisableLinkGroup = onDisableLinkGroup,
-                                                    onExecute = onExecute,
-                                                    onHideApp = onHideApp,
-                                                    onNavigateToLinkScreen = onNavigateToLinkScreen,
-                                                )
-                                            }
-                                        }
-                                    }
+                            is ConversionState.HasResult ->
+                                item {
+                                    ResultApps(
+                                        appDetails = appDetails,
+                                        outputsForApps = outputsForApps,
+                                        outputsForLinks = outputsForLinks,
+                                        outputsForSharing = outputsForSharing,
+                                        points = currentState.points,
+                                        onDisableLinkGroup = onDisableLinkGroup,
+                                        onExecute = onExecute,
+                                        onHideApp = onHideApp,
+                                        onNavigateToLinkScreen = onNavigateToLinkScreen,
+                                    )
                                 }
 
-                                is Initial -> {
-                                    item {
-                                        MainForm(
-                                            source = source,
-                                            errorMessageResId = errorMessageResId,
-                                            onSetErrorMessageResId = setErrorMessageResId,
-                                            onSetSource = onSetSource,
-                                            onSubmit = onStart,
-                                        )
-                                    }
-                                    item {
-                                        MainHelp(
-                                            inputRepository = inputRepository,
-                                            modifier = Modifier.padding(top = spacing.largeAdaptive),
-                                            onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                            onNavigateToIntroScreen = onNavigateToIntroScreen,
-                                            onSetErrorMessageResId = setErrorMessageResId,
-                                            onSetSource = onSetSource,
-                                        )
-                                    }
+                            is Initial ->
+                                item {
+                                    MainHelp(
+                                        dismissedHelpMessages = dismissedHelpMessages,
+                                        inputRepository = inputRepository,
+                                        modifier = Modifier.padding(top = spacing.medium),
+                                        onDismissHelpMessage = onDismissHelpMessage,
+                                        onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                        onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                        onSetErrorMessageResId = setErrorMessageResId,
+                                        onSetSource = onSetSource,
+                                    )
                                 }
-                            }
-                        } else if (currentState is Initial) {
-                            item {
-                                MainForm(
-                                    source = source,
-                                    errorMessageResId = errorMessageResId,
-                                    onSetErrorMessageResId = setErrorMessageResId,
-                                    onSetSource = onSetSource,
-                                    onSubmit = onStart,
-                                )
-                            }
-                        } else {
-                            item {
-                                Card(
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = mainContainerColor,
-                                        contentColor = mainContentColor,
-                                    ),
-                                ) {
-                                    Spacer(Modifier.height(spacing.mediumAdaptive))
-
-                                    when (currentState) {
-                                        is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
-                                            MainLoadingIndicator(
-                                                loadingIndicator = largeLoadingIndicator,
-                                                onCancel = onCancel,
-                                            )
-
-                                        is ConversionState.HasError ->
-                                            ResultError(
-                                                source = currentState.source,
-                                                message = currentState.message,
-                                                details = currentState.details,
-                                                warning = currentState.warning,
-                                                onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                                onRetry = onRetry,
-                                            )
-
-                                        is ConversionState.HasResult -> {
-                                            ResultCoordinates(
-                                                points = currentState.points,
-                                                appDetails = appDetails,
-                                                coordinateConverter = coordinateConverter,
-                                                coordinateFormat = coordinateFormat,
-                                                outputsForPointChips = outputsForPointChips,
-                                                outputsForPointsChips = outputsForPointsChips,
-                                                onExecute = onExecute,
-                                                onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                                onSelect = { index ->
-                                                    onCancel()
-                                                    setSelectedPointIndex(index)
-                                                },
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    Column(
-                        Modifier
-                            .weight(1f)
-                            .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.surface)
-                    ) {
-                        if (currentState is PermissionGrantedWebViewInput) {
-                            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                                MainWebView(
-                                    matchedInput = currentState.matchedInput,
-                                    pendingData = currentState.pendingData,
-                                )
-                            }
-                        }
-                    }
-                }
-
-                if (currentState is ConversionState.HasSource) {
-                    MainCopySourceButton(
-                        source = currentState.source,
-                        innerPadding = innerPadding,
-                        containerColor = if (!wide) {
-                            MaterialTheme.colorScheme.surfaceContainer
-                        } else {
-                            Color.Transparent
-                        },
-                    )
-                } else {
-                    Spacer(Modifier.padding(innerPadding))
-                }
-            },
-            supportingPane = { wide ->
-                LargeTopAppBarPane(
-                    modifier = Modifier.testTag("geoShareMainSupportingPane"),
-                    title = if (currentState is ConversionState.HasResult) {
-                        {
-                            ResultTitle(
-                                currentState = currentState,
-                                appDetails = appDetails,
-                                billingFeatures = billingFeatures,
-                                billingStatus = billingStatus,
-                                onCancel = onCancel,
-                                onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
-                            )
-                        }
-                    } else {
-                        null
-                    },
-                    actions = {
-                        if (wide) {
-                            MainMenu(
-                                currentState = currentState,
-                                billingAppNameResId = billingAppNameResId,
-                                billingStatus = billingStatus,
-                                changelogShown = changelogShown,
-                                onNavigateToAboutScreen = onNavigateToAboutScreen,
-                                onNavigateToBillingScreen = onNavigateToBillingScreen,
-                                onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                onNavigateToIntroScreen = onNavigateToIntroScreen,
-                                onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
-                            )
-                        }
-                    },
-                ) {
-                    when (currentState) {
-                        is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null -> {}
-
-                        is ConversionState.HasResult ->
-                            item {
-                                ResultApps(
-                                    appDetails = appDetails,
-                                    outputsForApps = outputsForApps,
-                                    outputsForLinks = outputsForLinks,
-                                    outputsForSharing = outputsForSharing,
-                                    points = currentState.points,
-                                    onDisableLinkGroup = onDisableLinkGroup,
-                                    onExecute = onExecute,
-                                    onHideApp = onHideApp,
-                                    onNavigateToLinkScreen = onNavigateToLinkScreen,
-                                )
-                            }
-
-                        is Initial ->
-                            item {
-                                MainHelp(
-                                    inputRepository = inputRepository,
-                                    modifier = Modifier.padding(top = spacing.largeAdaptive),
-                                    onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                    onNavigateToIntroScreen = onNavigateToIntroScreen,
-                                    onSetErrorMessageResId = setErrorMessageResId,
-                                    onSetSource = onSetSource,
-                                )
-                            }
-                    }
-                }
-            },
-            colors = StyledPaneScaffoldDefaults.colors(
-                mainContainerColor = mainContainerColor,
-                mainContentColor = mainContentColor,
-                wideMainContainerColor = Color.Transparent,
-                wideMainContentColor = MaterialTheme.colorScheme.onSurface,
-            ),
-            shouldAutoFocusCurrentDestination = false,
-        )
-    }
-
-    if (currentState is ConversionState.HasResult && selectedPointIndex != null) {
-        ModalBottomSheet(
-            onDismissRequest = { setSelectedPointIndex(null) },
-            modifier = Modifier
-                // Set and consume insets to prevent unclickable items when the sheet is expanded (probably a bug in
-                // Compose Material 3)
-                .windowInsetsPadding(WindowInsets.safeDrawing),
-            sheetState = sheetState,
-        ) {
-            ResultSheet(
-                points = currentState.points,
-                selectedPointIndex = selectedPointIndex,
-                appDetails = appDetails,
-                outputsForPoint = outputsForPoint,
-                outputsForPoints = outputsForPoints,
-                onExecute = onExecute,
-                onHide = {
-                    coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            setSelectedPointIndex(null)
                         }
                     }
                 },
+                colors = StyledPaneScaffoldDefaults.colors(
+                    mainContainerColor = mainContainerColor,
+                    mainContentColor = mainContentColor,
+                    wideMainContainerColor = Color.Transparent,
+                    wideMainContentColor = MaterialTheme.colorScheme.onSurface,
+                ),
+                shouldAutoFocusCurrentDestination = false,
             )
         }
+    }
+
+    if (currentState is ConversionState.HasResult && selectedPointIndex != null) {
+        ResultSheet(
+            points = currentState.points,
+            selectedPointIndex = selectedPointIndex,
+            appDetails = appDetails,
+            outputsForPoint = outputsForPoint,
+            outputsForPoints = outputsForPoints,
+            onExecute = onExecute,
+            onSelectPointIndex = setSelectedPointIndex,
+        )
     }
 
     when (currentState) {
@@ -973,34 +966,64 @@ private fun MainWebView(
 }
 
 @Composable
-private fun MainCopySourceButton(
-    source: String,
+private fun MainBottomBar(
     containerColor: Color,
+    currentState: State,
+    dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
     innerPadding: PaddingValues,
+    sourceComesFromIntent: StateFlow<Boolean>,
+    onDismissHelpMessage: (helpMessage: HelpMessage) -> Unit,
+    onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
 ) {
+    val appName = stringResource(R.string.app_name)
     val clipboard = LocalClipboard.current
     val coroutineScope = rememberCoroutineScope()
     val spacing = LocalSpacing.current
 
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .background(containerColor)
-            .padding(innerPadding)
-            .consumeWindowInsets(innerPadding)
-    ) {
-        TextButton(
-            {
-                coroutineScope.launch {
-                    AndroidTools.copyToClipboard(clipboard, source)
-                }
-            },
+    val sourceComesFromIntent by sourceComesFromIntent.collectAsStateWithLifecycle()
+
+    if (currentState is ConversionState.HasSource) {
+        Column(
             Modifier
-                .padding(start = 4.dp)
-                .padding(top = spacing.tiny),
+                .fillMaxWidth()
+                .background(containerColor)
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
         ) {
-            Text(stringResource(R.string.conversion_succeeded_skip))
+            if (currentState is ConversionState.HasResult && sourceComesFromIntent) {
+                HelpMessageCard(
+                    helpMessage = HelpMessage.OPEN_BY_DEFAULT,
+                    dismissedHelpMessages = dismissedHelpMessages,
+                    title = { Text(stringResource(R.string.help_open_by_default_title, appName)) },
+                    actionText = {
+                        stringResource(R.string.help_open_by_default_action)
+                    },
+                    onAction = {
+                        onNavigateToFaqScreen(FaqItemId.OPEN_BY_DEFAULT)
+                    },
+                    onDismiss = onDismissHelpMessage,
+                    modifier = Modifier
+                        .padding(horizontal = spacing.windowPadding)
+                        .padding(top = spacing.tiny, bottom = spacing.extraTiny),
+                ) {
+                    ParagraphText(
+                        stringResource(R.string.help_open_by_default_text, appName)
+                    )
+                }
+            }
+            TextButton(
+                {
+                    coroutineScope.launch {
+                        AndroidTools.copyToClipboard(clipboard, currentState.source)
+                    }
+                },
+                Modifier.padding(start = 5.dp),
+            ) {
+                Text(stringResource(R.string.conversion_succeeded_skip))
+            }
         }
+    } else {
+        Spacer(Modifier.padding(innerPadding))
     }
 }
 
@@ -1022,6 +1045,7 @@ private fun DefaultPreview() {
             changelogShown = false,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
+            dismissedHelpMessages = MutableStateFlow(emptySet()),
             inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
@@ -1033,11 +1057,14 @@ private fun DefaultPreview() {
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
+            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
+            onDismissHelpMessage = {},
             onDismissLinkMessage = {},
+            onExecute = {},
             onDismissUserPreferenceMessage = {},
             onGrant = {},
             onHideApp = {},
@@ -1045,14 +1072,12 @@ private fun DefaultPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1073,6 +1098,7 @@ private fun DarkPreview() {
             changelogShown = false,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
+            dismissedHelpMessages = MutableStateFlow(emptySet()),
             inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
@@ -1084,11 +1110,14 @@ private fun DarkPreview() {
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
+            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
+            onDismissHelpMessage = {},
             onDismissLinkMessage = {},
+            onExecute = {},
             onDismissUserPreferenceMessage = {},
             onGrant = {},
             onHideApp = {},
@@ -1096,14 +1125,12 @@ private fun DarkPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1124,6 +1151,7 @@ private fun SmallPreview() {
             changelogShown = false,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
+            dismissedHelpMessages = MutableStateFlow(emptySet()),
             inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
@@ -1135,11 +1163,14 @@ private fun SmallPreview() {
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
+            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
+            onDismissHelpMessage = {},
             onDismissLinkMessage = {},
+            onExecute = {},
             onDismissUserPreferenceMessage = {},
             onGrant = {},
             onHideApp = {},
@@ -1147,14 +1178,12 @@ private fun SmallPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1175,6 +1204,7 @@ private fun TabletPreview() {
             changelogShown = false,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
+            dismissedHelpMessages = MutableStateFlow(emptySet()),
             inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
@@ -1186,11 +1216,14 @@ private fun TabletPreview() {
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
+            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
+            onDismissHelpMessage = {},
             onDismissLinkMessage = {},
+            onExecute = {},
             onDismissUserPreferenceMessage = {},
             onGrant = {},
             onHideApp = {},
@@ -1198,14 +1231,12 @@ private fun TabletPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1245,20 +1276,48 @@ private fun SucceededPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
+            dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
             inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
                 mapOf(
-                    PackageNames.COMAPS_FDROID to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    PackageNames.GMAPS_WV to setOf(DataType.GEO_URI),
-                    PackageNames.GOOGLE_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    PackageNames.HERE_WEGO to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
-                    PackageNames.MAPY_COM to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    PackageNames.ORGANIC_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    PackageNames.OSMAND_PLUS to setOf(DataType.GPX_DATA),
-                    PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
+                    PackageNames.COMAPS_FDROID to App(
+                        packageName = PackageNames.COMAPS_FDROID,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
+                    PackageNames.GMAPS_WV to App(
+                        packageName = PackageNames.GMAPS_WV,
+                        dataTypes = setOf(DataType.GEO_URI)
+                    ),
+                    PackageNames.GOOGLE_MAPS to App(
+                        packageName = PackageNames.GOOGLE_MAPS,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
+                    PackageNames.HERE_WEGO to App(
+                        packageName = PackageNames.HERE_WEGO,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
+                    PackageNames.MAGIC_EARTH to App(
+                        packageName = PackageNames.MAGIC_EARTH,
+                        dataTypes = setOf(DataType.MAGIC_EARTH_URI)
+                    ),
+                    PackageNames.MAPY_COM to App(
+                        packageName = PackageNames.MAPY_COM,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
+                    PackageNames.ORGANIC_MAPS to App(
+                        packageName = PackageNames.ORGANIC_MAPS,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
+                    PackageNames.OSMAND_PLUS to App(
+                        packageName = PackageNames.OSMAND_PLUS,
+                        dataTypes = setOf(DataType.GPX_DATA)
+                    ),
+                    PackageNames.TOMTOM to App(
+                        packageName = PackageNames.TOMTOM,
+                        dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
+                    ),
                 ),
                 emptySet(),
             ),
@@ -1269,11 +1328,14 @@ private fun SucceededPreview() {
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
             source = MutableStateFlow(""),
+            sourceComesFromIntent = MutableStateFlow(true),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
+            onDismissHelpMessage = {},
             onDismissLinkMessage = {},
+            onExecute = {},
             onDismissUserPreferenceMessage = {},
             onGrant = {},
             onHideApp = {},
@@ -1281,14 +1343,12 @@ private fun SucceededPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1328,20 +1388,48 @@ private fun DarkSucceededPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
+            dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
             inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
                 mapOf(
-                    PackageNames.COMAPS_FDROID to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    PackageNames.GMAPS_WV to setOf(DataType.GEO_URI),
-                    PackageNames.GOOGLE_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    PackageNames.HERE_WEGO to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
-                    PackageNames.MAPY_COM to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    PackageNames.ORGANIC_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    PackageNames.OSMAND_PLUS to setOf(DataType.GPX_DATA),
-                    PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
+                    PackageNames.COMAPS_FDROID to App(
+                        packageName = PackageNames.COMAPS_FDROID,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
+                    PackageNames.GMAPS_WV to App(
+                        packageName = PackageNames.GMAPS_WV,
+                        dataTypes = setOf(DataType.GEO_URI)
+                    ),
+                    PackageNames.GOOGLE_MAPS to App(
+                        packageName = PackageNames.GOOGLE_MAPS,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
+                    PackageNames.HERE_WEGO to App(
+                        packageName = PackageNames.HERE_WEGO,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
+                    PackageNames.MAGIC_EARTH to App(
+                        packageName = PackageNames.MAGIC_EARTH,
+                        dataTypes = setOf(DataType.MAGIC_EARTH_URI)
+                    ),
+                    PackageNames.MAPY_COM to App(
+                        packageName = PackageNames.MAPY_COM,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
+                    PackageNames.ORGANIC_MAPS to App(
+                        packageName = PackageNames.ORGANIC_MAPS,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
+                    PackageNames.OSMAND_PLUS to App(
+                        packageName = PackageNames.OSMAND_PLUS,
+                        dataTypes = setOf(DataType.GPX_DATA)
+                    ),
+                    PackageNames.TOMTOM to App(
+                        packageName = PackageNames.TOMTOM,
+                        dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
+                    ),
                 ),
                 emptySet(),
             ),
@@ -1352,11 +1440,14 @@ private fun DarkSucceededPreview() {
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
             source = MutableStateFlow(""),
+            sourceComesFromIntent = MutableStateFlow(true),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
+            onDismissHelpMessage = {},
             onDismissLinkMessage = {},
+            onExecute = {},
             onDismissUserPreferenceMessage = {},
             onGrant = {},
             onHideApp = {},
@@ -1364,14 +1455,12 @@ private fun DarkSucceededPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1410,20 +1499,48 @@ private fun SmallSucceededPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
+            dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
             inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
                 mapOf(
-                    PackageNames.COMAPS_FDROID to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    PackageNames.GMAPS_WV to setOf(DataType.GEO_URI),
-                    PackageNames.GOOGLE_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    PackageNames.HERE_WEGO to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
-                    PackageNames.MAPY_COM to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    PackageNames.ORGANIC_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    PackageNames.OSMAND_PLUS to setOf(DataType.GPX_DATA),
-                    PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
+                    PackageNames.COMAPS_FDROID to App(
+                        packageName = PackageNames.COMAPS_FDROID,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
+                    PackageNames.GMAPS_WV to App(
+                        packageName = PackageNames.GMAPS_WV,
+                        dataTypes = setOf(DataType.GEO_URI)
+                    ),
+                    PackageNames.GOOGLE_MAPS to App(
+                        packageName = PackageNames.GOOGLE_MAPS,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
+                    PackageNames.HERE_WEGO to App(
+                        packageName = PackageNames.HERE_WEGO,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
+                    PackageNames.MAGIC_EARTH to App(
+                        packageName = PackageNames.MAGIC_EARTH,
+                        dataTypes = setOf(DataType.MAGIC_EARTH_URI)
+                    ),
+                    PackageNames.MAPY_COM to App(
+                        packageName = PackageNames.MAPY_COM,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
+                    PackageNames.ORGANIC_MAPS to App(
+                        packageName = PackageNames.ORGANIC_MAPS,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
+                    PackageNames.OSMAND_PLUS to App(
+                        packageName = PackageNames.OSMAND_PLUS,
+                        dataTypes = setOf(DataType.GPX_DATA)
+                    ),
+                    PackageNames.TOMTOM to App(
+                        packageName = PackageNames.TOMTOM,
+                        dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
+                    ),
                 ),
                 emptySet(),
             ),
@@ -1434,11 +1551,14 @@ private fun SmallSucceededPreview() {
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
             source = MutableStateFlow(""),
+            sourceComesFromIntent = MutableStateFlow(true),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
+            onDismissHelpMessage = {},
             onDismissLinkMessage = {},
+            onExecute = {},
             onDismissUserPreferenceMessage = {},
             onGrant = {},
             onHideApp = {},
@@ -1446,14 +1566,12 @@ private fun SmallSucceededPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1493,20 +1611,48 @@ private fun TabletSucceededPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
+            dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
             inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
                 mapOf(
-                    PackageNames.COMAPS_FDROID to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    PackageNames.GMAPS_WV to setOf(DataType.GEO_URI),
-                    PackageNames.GOOGLE_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    PackageNames.HERE_WEGO to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
-                    PackageNames.MAPY_COM to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    PackageNames.ORGANIC_MAPS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                    PackageNames.OSMAND_PLUS to setOf(DataType.GPX_DATA),
-                    PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
+                    PackageNames.COMAPS_FDROID to App(
+                        packageName = PackageNames.COMAPS_FDROID,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
+                    PackageNames.GMAPS_WV to App(
+                        packageName = PackageNames.GMAPS_WV,
+                        dataTypes = setOf(DataType.GEO_URI)
+                    ),
+                    PackageNames.GOOGLE_MAPS to App(
+                        packageName = PackageNames.GOOGLE_MAPS,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
+                    PackageNames.HERE_WEGO to App(
+                        packageName = PackageNames.HERE_WEGO,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
+                    PackageNames.MAGIC_EARTH to App(
+                        packageName = PackageNames.MAGIC_EARTH,
+                        dataTypes = setOf(DataType.MAGIC_EARTH_URI)
+                    ),
+                    PackageNames.MAPY_COM to App(
+                        packageName = PackageNames.MAPY_COM,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
+                    PackageNames.ORGANIC_MAPS to App(
+                        packageName = PackageNames.ORGANIC_MAPS,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
+                    PackageNames.OSMAND_PLUS to App(
+                        packageName = PackageNames.OSMAND_PLUS,
+                        dataTypes = setOf(DataType.GPX_DATA)
+                    ),
+                    PackageNames.TOMTOM to App(
+                        packageName = PackageNames.TOMTOM,
+                        dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
+                    ),
                 ),
                 emptySet(),
             ),
@@ -1517,11 +1663,14 @@ private fun TabletSucceededPreview() {
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
             source = MutableStateFlow(""),
+            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
+            onDismissHelpMessage = {},
             onDismissLinkMessage = {},
+            onExecute = {},
             onDismissUserPreferenceMessage = {},
             onGrant = {},
             onHideApp = {},
@@ -1529,14 +1678,12 @@ private fun TabletSucceededPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1565,6 +1712,7 @@ private fun ErrorPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
+            dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
@@ -1576,11 +1724,14 @@ private fun ErrorPreview() {
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
+            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
+            onDismissHelpMessage = {},
             onDismissLinkMessage = {},
+            onExecute = {},
             onDismissUserPreferenceMessage = {},
             onGrant = {},
             onHideApp = {},
@@ -1588,14 +1739,12 @@ private fun ErrorPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1624,6 +1773,7 @@ private fun DarkErrorPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
+            dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
@@ -1635,11 +1785,14 @@ private fun DarkErrorPreview() {
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
+            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
+            onDismissHelpMessage = {},
             onDismissLinkMessage = {},
+            onExecute = {},
             onDismissUserPreferenceMessage = {},
             onGrant = {},
             onHideApp = {},
@@ -1647,14 +1800,12 @@ private fun DarkErrorPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1683,6 +1834,7 @@ private fun TabletErrorPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
+            dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
@@ -1694,11 +1846,14 @@ private fun TabletErrorPreview() {
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
+            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
+            onDismissHelpMessage = {},
             onDismissLinkMessage = {},
+            onExecute = {},
             onDismissUserPreferenceMessage = {},
             onGrant = {},
             onHideApp = {},
@@ -1706,14 +1861,12 @@ private fun TabletErrorPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1743,6 +1896,7 @@ private fun WarningPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
+            dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
@@ -1754,11 +1908,14 @@ private fun WarningPreview() {
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
+            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
+            onDismissHelpMessage = {},
             onDismissLinkMessage = {},
+            onExecute = {},
             onDismissUserPreferenceMessage = {},
             onGrant = {},
             onHideApp = {},
@@ -1766,14 +1923,12 @@ private fun WarningPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1803,6 +1958,7 @@ private fun DarkWarningPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
+            dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
@@ -1814,11 +1970,14 @@ private fun DarkWarningPreview() {
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
+            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
+            onDismissHelpMessage = {},
             onDismissLinkMessage = {},
+            onExecute = {},
             onDismissUserPreferenceMessage = {},
             onGrant = {},
             onHideApp = {},
@@ -1826,14 +1985,12 @@ private fun DarkWarningPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1879,6 +2036,7 @@ private fun LoadingIndicatorPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
+            dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
             largeLoadingIndicator = currentState.getLoadingIndicator(),
             linkMessage = null,
@@ -1890,11 +2048,14 @@ private fun LoadingIndicatorPreview() {
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
+            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
+            onDismissHelpMessage = {},
             onDismissLinkMessage = {},
+            onExecute = {},
             onDismissUserPreferenceMessage = {},
             onGrant = {},
             onHideApp = {},
@@ -1902,14 +2063,12 @@ private fun LoadingIndicatorPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -1955,6 +2114,7 @@ private fun DarkLoadingIndicatorPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
+            dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
             largeLoadingIndicator = currentState.getLoadingIndicator(),
             linkMessage = null,
@@ -1966,11 +2126,14 @@ private fun DarkLoadingIndicatorPreview() {
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
+            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
+            onDismissHelpMessage = {},
             onDismissLinkMessage = {},
+            onExecute = {},
             onDismissUserPreferenceMessage = {},
             onGrant = {},
             onHideApp = {},
@@ -1978,14 +2141,12 @@ private fun DarkLoadingIndicatorPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -2031,6 +2192,7 @@ private fun TabletLoadingIndicatorPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
+            dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
             largeLoadingIndicator = currentState.getLoadingIndicator(),
             linkMessage = null,
@@ -2042,11 +2204,14 @@ private fun TabletLoadingIndicatorPreview() {
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
+            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
+            onDismissHelpMessage = {},
             onDismissLinkMessage = {},
+            onExecute = {},
             onDismissUserPreferenceMessage = {},
             onGrant = {},
             onHideApp = {},
@@ -2054,14 +2219,12 @@ private fun TabletLoadingIndicatorPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -2104,6 +2267,7 @@ private fun WebViewPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
+            dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
             largeLoadingIndicator = currentState.getLoadingIndicator(),
             linkMessage = null,
@@ -2115,11 +2279,14 @@ private fun WebViewPreview() {
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
+            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
+            onDismissHelpMessage = {},
             onDismissLinkMessage = {},
+            onExecute = {},
             onDismissUserPreferenceMessage = {},
             onGrant = {},
             onHideApp = {},
@@ -2127,14 +2294,12 @@ private fun WebViewPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -2177,6 +2342,7 @@ private fun DarkWebViewPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
+            dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
             largeLoadingIndicator = currentState.getLoadingIndicator(),
             linkMessage = null,
@@ -2188,11 +2354,14 @@ private fun DarkWebViewPreview() {
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
+            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
+            onDismissHelpMessage = {},
             onDismissLinkMessage = {},
+            onExecute = {},
             onDismissUserPreferenceMessage = {},
             onGrant = {},
             onHideApp = {},
@@ -2200,14 +2369,12 @@ private fun DarkWebViewPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -2250,6 +2417,7 @@ private fun TabletWebViewPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
+            dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
             largeLoadingIndicator = currentState.getLoadingIndicator(),
             linkMessage = null,
@@ -2261,11 +2429,14 @@ private fun TabletWebViewPreview() {
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
+            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
+            onDismissHelpMessage = {},
             onDismissLinkMessage = {},
+            onExecute = {},
             onDismissUserPreferenceMessage = {},
             onGrant = {},
             onHideApp = {},
@@ -2273,14 +2444,12 @@ private fun TabletWebViewPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }
@@ -2320,6 +2489,7 @@ private fun EmptyPreview() {
             changelogShown = true,
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
+            dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
             largeLoadingIndicator = null,
             linkMessage = null,
@@ -2331,11 +2501,14 @@ private fun EmptyPreview() {
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
             source = MutableStateFlow(""),
+            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
+            onDismissHelpMessage = {},
             onDismissLinkMessage = {},
+            onExecute = {},
             onDismissUserPreferenceMessage = {},
             onGrant = {},
             onHideApp = {},
@@ -2343,14 +2516,12 @@ private fun EmptyPreview() {
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToIntroScreen = {},
             onNavigateToLinkScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onExecute = {},
             onSetSource = {},
-            onStart = {},
+            onSubmit = {},
         )
     }
 }

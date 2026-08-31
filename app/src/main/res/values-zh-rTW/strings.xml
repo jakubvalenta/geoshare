@@ -3,10 +3,6 @@
     <string name="conversion_succeeded_save_gpx">儲存GPX</string>
     <string name="nav_back_content_description">返回主畫面</string>
     <string name="conversion_succeeded_share">分享</string>
-    <string name="intro_how_to_share_headline">如何在其他地圖應用程式中顯示地圖位置</string>
-    <string name="intro_how_to_share_google_maps_caption">從您的地圖應用程式和網路瀏覽器分享位置。</string>
-    <string name="intro_how_to_share_google_maps_content_description">Google地圖分享畫面的螢幕截圖</string>
-    <string name="intro_how_to_share_google_maps_screenshot_title">分享給</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">地圖</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">選擇要如何在此應用程式中開啟網頁連結</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">在本應用程式中</string>
@@ -24,11 +20,9 @@
     <string name="conversion_permission_common_deny">取消</string>
     <string name="conversion_succeeded_skip">複製原始連結</string>
     <string name="nav_menu_content_description">選單</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">藍芽</string>
     <string name="main_input_uri_clear_content_description">清除</string>
     <string name="main_input_uri_supporting_text">例如 https://maps.app.goo.gl/… 或 maps.apple.com/…</string>
     <string name="inputs_title">支援的地圖服務</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_messaging">簡訊</string>
     <string name="converter_google_maps_permission_title">連接至Google？</string>
     <string name="converter_google_maps_loading_indicator_title">正在連接至 Google…</string>
     <string name="conversion_failed_connection_permission_denied">此連結若未連接至地圖服務，則不支援</string>
@@ -41,18 +35,13 @@
     <string name="conversion_permission_common_text"><![CDATA[The link <tt>%1$s</tt> 不含有坐標. %2$s 需要連接至地圖服務來取得。]]></string>
     <string name="user_preferences_connection_title">允許連接到地圖服務嗎（ Google, Apple 等）？</string>
     <string name="user_preferences_connection_description">為了支援縮短的地圖連結，並在連結本身未包含座標時，從地圖服務的網頁中取得座標,，%1$s 可以連接到地圖服務。您可查看應用程式內的常見問題（FAQ）頁面了解更詳細的資訊。</string>
-    <string name="intro_title">簡介</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">放置圖釘</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[選擇 <i>%1$s</i> 之後，應用程式將會讓您在其他安裝的地圖應用程式中打開相同的地點。]]></string>
-    <string name="intro_how_to_share_app_content_description">螢幕截圖關於%1$s的分享畫面</string>
     <string name="conversion_succeeded_apps_headline">用…開啟</string>
-    <string name="intro_open_by_default_headline">設定安卓可以在Google地圖或替代的地圖中開啟連結（ 可選擇的）</string>
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[首先，前往設定➞ Apps ➞ Maps ➞ <i>在預設中開啟</i> 然後關閉「在此應用程式中開啟連結」的功能。]]></string>
     <string name="intro_open_by_default_google_maps_content_description">Google地圖中預設開啟設定畫面的螢幕截圖</string>
     <string name="intro_open_by_default_google_maps_button">開啟Google地圖設定</string>
     <string name="conversion_failed_cancelled">取消</string>
     <string name="main_create_geo_uri">顯示座標</string>
-    <string name="main_navigate_to_intro">探索更多應用程式特色</string>
     <string name="conversion_succeeded_title">座標</string>
     <string name="conversion_error_title">錯誤</string>
     <string name="conversion_error_report">回報問題</string>
@@ -74,8 +63,6 @@
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="other">%1$d支援連結</item>
     </plurals>
-    <string name="intro_nav_next">下一個</string>
-    <string name="intro_nav_finish">開始</string>
     <string name="intro_settings_activity_not_found">無法開啟設定</string>
     <string name="main_input_uri_label">在此貼上地圖連結</string>
     <string name="about_text"><![CDATA[<p>%1$s是免費且開源的應用程式分佈在 <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> 或其後版本授權條款發行。</p><br><p>您可以在 <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>找到代碼，你也可以在 <a href="https://github.com/jakubvalenta/geoshare/issues">回報錯誤</a>.</p><br><p>歡迎您給我們反饋。 您可以透過<a href="mailto:%2$s">%2$s</a>.</p>]]></string>

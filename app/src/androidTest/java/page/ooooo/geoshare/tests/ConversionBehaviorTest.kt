@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.tests
 
-import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.UiAutomatorTestScope
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
@@ -43,7 +42,6 @@ class ConversionBehaviorTest {
         // Go back to app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Shows main screen instead of result screen, because the app finished
         onElement { viewIdResourceName == "geoShareMainSourceTextField" }
@@ -312,9 +310,7 @@ class ConversionBehaviorTest {
         shareUri()
 
         // Tap the messaging app icon
-        onMainScrollablePane()
-            // Scroll by percents, because it's more reliable than scrolling to the app icon
-            .scroll(Direction.DOWN, 2f)
+        scrollToAppIcons()
         clickAppIcon(messagingAppPackageName)
 
         // Opens the messaging app
@@ -325,19 +321,16 @@ class ConversionBehaviorTest {
     fun opensGoogleMapsSearchLink() = uiAutomator {
         assumeAppInstalled(PackageNames.GOOGLE_MAPS)
 
-        // Launch application and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Share a geo: URI with the app
         val query = "foo"
         shareUri("geo:?q=$query")
 
         // Click the link
-        onMainScrollablePane()
-            // Scroll by percents, because it's more reliable than scrolling to the app icon
-            .scroll(Direction.DOWN, 2f)
+        scrollToLinkIcons()
         onElement { viewIdResourceName == "geoShareApp_${InitialLinks.GOOGLE_MAPS_DISPLAY_UUID}" }.longClick()
         onElement {
             viewIdResourceName == "geoShareAppOutput" && textAsString()?.contains("Google Maps search") == true
@@ -359,9 +352,7 @@ class ConversionBehaviorTest {
             shareUri()
 
             // Launch navigation in TomTom
-            onMainScrollablePane()
-                // Scroll by percents, because it's more reliable than scrolling to the app icon
-                .scroll(Direction.DOWN, 2f)
+            scrollToAppIcons()
             launchNavigationInApp(PackageNames.TOMTOM)
 
             // Dismiss the location rationale dialog
@@ -401,10 +392,9 @@ class ConversionBehaviorTest {
 
     @Test
     fun savesGpxRoute() = uiAutomator {
-        // Launch application and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Share a URI with the app
         shareUri()
@@ -437,10 +427,9 @@ class ConversionBehaviorTest {
 
     @Test
     fun savesPointToContact() = uiAutomator {
-        // Launch application and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Share a geo: URI with the app
         val point = WGS84Point(NaivePoint.genRandomPoint())

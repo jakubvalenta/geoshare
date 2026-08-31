@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Message
@@ -31,10 +32,10 @@ class BillingImpl(override val context: Context) : Billing {
     )
 
     private val _status: MutableStateFlow<BillingStatus> = MutableStateFlow(BillingStatus.Loading())
-    override val status: StateFlow<BillingStatus> = _status
+    override val status: StateFlow<BillingStatus> = _status.asStateFlow()
 
     private val _message: MutableStateFlow<Message?> = MutableStateFlow(null)
-    override val message: StateFlow<Message?> = _message
+    override val message: StateFlow<Message?> = _message.asStateFlow()
 
     override fun startConnection() {
         _message.value = null

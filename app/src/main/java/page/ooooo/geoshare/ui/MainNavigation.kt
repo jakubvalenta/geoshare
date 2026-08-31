@@ -4,9 +4,7 @@ import android.util.Log
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -25,9 +23,6 @@ data class FaqRoute(val itemId: FaqItemId? = null)
 
 @Serializable
 data class InputsRoute(val groupId: InputGroupId? = null)
-
-@Serializable
-object IntroRoute
 
 @Serializable
 object LicensesRoute
@@ -51,12 +46,9 @@ private const val TAG = "MainNavigation"
 fun MainNavigation(
     billingViewModel: BillingViewModel,
     conversionViewModel: ConversionViewModel = hiltViewModel(),
-    introEnabled: Boolean = true,
     onFinish: () -> Unit = {},
-    introViewModel: IntroViewModel = hiltViewModel(),
 ) {
     val navController = rememberNavController()
-    val introShown by introViewModel.shown.collectAsStateWithLifecycle()
     val source = conversionViewModel.source
 
     /**
@@ -66,14 +58,6 @@ fun MainNavigation(
         if (navController.currentBackStackEntry != MainRoute) {
             Log.d(TAG, "Navigating to main screen")
             navController.navigate(MainRoute)
-        }
-    }
-
-    LaunchedEffect(introEnabled, introShown) {
-        if (introEnabled && !introShown) {
-            navController.navigate(IntroRoute) {
-                popUpTo(MainRoute) { inclusive = false }
-            }
         }
     }
 
@@ -95,12 +79,6 @@ fun MainNavigation(
                 },
             )
         }
-        composable<IntroRoute> {
-            IntroScreen(
-                onClose = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
-                viewModel = introViewModel,
-            )
-        }
         composable<MainRoute> {
             MainScreen(
                 onFinish = onFinish,
@@ -108,7 +86,6 @@ fun MainNavigation(
                 onNavigateToBillingScreen = { navController.navigate(BillingRoute) },
                 onNavigateToFaqScreen = { itemId -> navController.navigate(FaqRoute(itemId)) },
                 onNavigateToInputsScreen = { navController.navigate(InputsRoute()) },
-                onNavigateToIntroScreen = { navController.navigate(IntroRoute) },
                 onNavigateToLinkScreen = { navController.navigate(LinkRoute) },
                 onNavigateToUserPreferencesScreen = { groupId -> navController.navigate(UserPreferencesRoute(groupId)) },
                 billingViewModel = billingViewModel,

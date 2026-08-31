@@ -29,9 +29,10 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.preferences.HiddenAppsPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
+import page.ooooo.geoshare.lib.android.App
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.android.DataTypes
+import page.ooooo.geoshare.lib.android.Apps
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -41,7 +42,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun UserPreferenceHiddenAppsListItem(
     index: Int,
     count: Int,
-    apps: DataTypes,
+    apps: Apps,
     selected: Boolean,
     values: UserPreferencesValues,
     modifier: Modifier = Modifier,
@@ -55,16 +56,14 @@ fun UserPreferenceHiddenAppsListItem(
         supportingContent = HiddenAppsPreference.getValue(values)?.let { value ->
             @Composable {
                 val options = HiddenAppsPreference.getOptions(apps)
-                Text(
-                    (options - value).size.takeIf { it != options.size }?.let { visibleCount ->
-                        pluralStringResource(
-                            R.plurals.user_preferences_apps_visible_count,
-                            visibleCount,
-                            visibleCount,
-                            options.size,
-                        )
-                    } ?: stringResource(R.string.user_preferences_apps_visible_all)
-                )
+                Text((options - value).size.takeIf { it != options.size }?.let { visibleCount ->
+                    pluralStringResource(
+                        R.plurals.user_preferences_apps_visible_count,
+                        visibleCount,
+                        visibleCount,
+                        options.size,
+                    )
+                } ?: stringResource(R.string.user_preferences_apps_visible_all))
             }
         },
         colors = segmentedListColors(),
@@ -79,7 +78,7 @@ fun UserPreferenceHiddenAppsListItem(
 @Composable
 fun UserPreferenceHiddenAppsControls(
     appDetails: AppDetails,
-    apps: DataTypes,
+    apps: Apps,
     billingAppNameResId: Int,
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
@@ -101,16 +100,13 @@ fun UserPreferenceHiddenAppsControls(
         val value = HiddenAppsPreference.getValue(values)
         val enabled = value != null
 
-        fun isChecked(option: String): Boolean =
-            value?.contains(option) == false
+        fun isChecked(option: String): Boolean = value?.contains(option) == false
 
         fun setValue(option: String, checked: Boolean) {
-            val newValue = (value ?: emptySet()).let { value ->
-                if (!checked) {
-                    value + option
-                } else {
-                    value - option
-                }
+            val newValue = if (!checked) {
+                value.orEmpty() + option
+            } else {
+                value.orEmpty() - option
             }
             onValueChange { preferences ->
                 HiddenAppsPreference.setValue(preferences, newValue)
@@ -165,9 +161,13 @@ private fun ListItemPreview() {
                     index = 0,
                     count = 1,
                     apps = mapOf(
-                        PackageNames.COMAPS_FDROID to emptySet(),
-                        PackageNames.ORGANIC_MAPS to emptySet(),
-                        PackageNames.OSMAND_PLUS to emptySet(),
+                        PackageNames.COMAPS_FDROID to App(
+                            packageName = PackageNames.COMAPS_FDROID, dataTypes = emptySet()
+                        ),
+                        PackageNames.ORGANIC_MAPS to App(
+                            packageName = PackageNames.ORGANIC_MAPS, dataTypes = emptySet()
+                        ),
+                        PackageNames.OSMAND_PLUS to App(packageName = PackageNames.OSMAND_PLUS, dataTypes = emptySet()),
                     ),
                     selected = false,
                     values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
@@ -188,9 +188,13 @@ private fun DarkListItemPreview() {
                     index = 0,
                     count = 1,
                     apps = mapOf(
-                        PackageNames.COMAPS_FDROID to emptySet(),
-                        PackageNames.ORGANIC_MAPS to emptySet(),
-                        PackageNames.OSMAND_PLUS to emptySet(),
+                        PackageNames.COMAPS_FDROID to App(
+                            packageName = PackageNames.COMAPS_FDROID, dataTypes = emptySet()
+                        ),
+                        PackageNames.ORGANIC_MAPS to App(
+                            packageName = PackageNames.ORGANIC_MAPS, dataTypes = emptySet()
+                        ),
+                        PackageNames.OSMAND_PLUS to App(packageName = PackageNames.OSMAND_PLUS, dataTypes = emptySet()),
                     ),
                     selected = false,
                     values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
@@ -211,9 +215,13 @@ private fun AllListItemPreview() {
                     index = 0,
                     count = 1,
                     apps = mapOf(
-                        PackageNames.COMAPS_FDROID to emptySet(),
-                        PackageNames.ORGANIC_MAPS to emptySet(),
-                        PackageNames.OSMAND_PLUS to emptySet(),
+                        PackageNames.COMAPS_FDROID to App(
+                            packageName = PackageNames.COMAPS_FDROID, dataTypes = emptySet()
+                        ),
+                        PackageNames.ORGANIC_MAPS to App(
+                            packageName = PackageNames.ORGANIC_MAPS, dataTypes = emptySet()
+                        ),
+                        PackageNames.OSMAND_PLUS to App(packageName = PackageNames.OSMAND_PLUS, dataTypes = emptySet()),
                     ),
                     selected = false,
                     values = UserPreferencesValues(
@@ -240,9 +248,13 @@ private fun DarkAllListItemPreview() {
                     index = 0,
                     count = 1,
                     apps = mapOf(
-                        PackageNames.COMAPS_FDROID to emptySet(),
-                        PackageNames.ORGANIC_MAPS to emptySet(),
-                        PackageNames.OSMAND_PLUS to emptySet(),
+                        PackageNames.COMAPS_FDROID to App(
+                            packageName = PackageNames.COMAPS_FDROID, dataTypes = emptySet()
+                        ),
+                        PackageNames.ORGANIC_MAPS to App(
+                            packageName = PackageNames.ORGANIC_MAPS, dataTypes = emptySet()
+                        ),
+                        PackageNames.OSMAND_PLUS to App(packageName = PackageNames.OSMAND_PLUS, dataTypes = emptySet()),
                     ),
                     selected = false,
                     values = UserPreferencesValues(
@@ -269,9 +281,13 @@ private fun NoneListItemPreview() {
                     index = 0,
                     count = 1,
                     apps = mapOf(
-                        PackageNames.COMAPS_FDROID to emptySet(),
-                        PackageNames.ORGANIC_MAPS to emptySet(),
-                        PackageNames.OSMAND_PLUS to emptySet(),
+                        PackageNames.COMAPS_FDROID to App(
+                            packageName = PackageNames.COMAPS_FDROID, dataTypes = emptySet()
+                        ),
+                        PackageNames.ORGANIC_MAPS to App(
+                            packageName = PackageNames.ORGANIC_MAPS, dataTypes = emptySet()
+                        ),
+                        PackageNames.OSMAND_PLUS to App(packageName = PackageNames.OSMAND_PLUS, dataTypes = emptySet()),
                     ),
                     selected = false,
                     values = defaultFakeUserPreferences,
@@ -292,9 +308,13 @@ private fun DarkNoneListItemPreview() {
                     index = 0,
                     count = 1,
                     apps = mapOf(
-                        PackageNames.COMAPS_FDROID to emptySet(),
-                        PackageNames.ORGANIC_MAPS to emptySet(),
-                        PackageNames.OSMAND_PLUS to emptySet(),
+                        PackageNames.COMAPS_FDROID to App(
+                            packageName = PackageNames.COMAPS_FDROID, dataTypes = emptySet()
+                        ),
+                        PackageNames.ORGANIC_MAPS to App(
+                            packageName = PackageNames.ORGANIC_MAPS, dataTypes = emptySet()
+                        ),
+                        PackageNames.OSMAND_PLUS to App(packageName = PackageNames.OSMAND_PLUS, dataTypes = emptySet()),
                     ),
                     selected = false,
                     values = defaultFakeUserPreferences,
@@ -311,26 +331,28 @@ private fun ControlsPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            @SuppressLint("LocalContextGetResourceValueCall")
-            UserPreferenceHiddenAppsControls(
+            @SuppressLint("LocalContextGetResourceValueCall") UserPreferenceHiddenAppsControls(
                 billingAppNameResId = R.string.app_name_pro,
                 apps = mapOf(
-                    PackageNames.COMAPS_FDROID to emptySet(),
-                    PackageNames.ORGANIC_MAPS to emptySet(),
-                    PackageNames.OSMAND_PLUS to emptySet(),
+                    PackageNames.COMAPS_FDROID to App(packageName = PackageNames.COMAPS_FDROID, dataTypes = emptySet()),
+                    PackageNames.ORGANIC_MAPS to App(packageName = PackageNames.ORGANIC_MAPS, dataTypes = emptySet()),
+                    PackageNames.OSMAND_PLUS to App(packageName = PackageNames.OSMAND_PLUS, dataTypes = emptySet()),
                 ),
                 appDetails = mapOf(
                     PackageNames.COMAPS_FDROID to AppDetail(
-                        "CoMaps",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.COMAPS_FDROID,
+                        label = "CoMaps",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                     PackageNames.ORGANIC_MAPS to AppDetail(
-                        "Organic Maps",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.ORGANIC_MAPS,
+                        label = "Organic Maps",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
@@ -349,26 +371,28 @@ private fun DarkControlsPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            @SuppressLint("LocalContextGetResourceValueCall")
-            UserPreferenceHiddenAppsControls(
+            @SuppressLint("LocalContextGetResourceValueCall") UserPreferenceHiddenAppsControls(
                 billingAppNameResId = R.string.app_name_pro,
                 apps = mapOf(
-                    PackageNames.COMAPS_FDROID to emptySet(),
-                    PackageNames.ORGANIC_MAPS to emptySet(),
-                    PackageNames.OSMAND_PLUS to emptySet(),
+                    PackageNames.COMAPS_FDROID to App(packageName = PackageNames.COMAPS_FDROID, dataTypes = emptySet()),
+                    PackageNames.ORGANIC_MAPS to App(packageName = PackageNames.ORGANIC_MAPS, dataTypes = emptySet()),
+                    PackageNames.OSMAND_PLUS to App(packageName = PackageNames.OSMAND_PLUS, dataTypes = emptySet()),
                 ),
                 appDetails = mapOf(
                     PackageNames.COMAPS_FDROID to AppDetail(
-                        "CoMaps",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.COMAPS_FDROID,
+                        label = "CoMaps",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                     PackageNames.ORGANIC_MAPS to AppDetail(
-                        "Organic Maps",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.ORGANIC_MAPS,
+                        label = "Organic Maps",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
@@ -387,26 +411,28 @@ private fun TabletControlsPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            @SuppressLint("LocalContextGetResourceValueCall")
-            UserPreferenceHiddenAppsControls(
+            @SuppressLint("LocalContextGetResourceValueCall") UserPreferenceHiddenAppsControls(
                 billingAppNameResId = R.string.app_name_pro,
                 apps = mapOf(
-                    PackageNames.COMAPS_FDROID to emptySet(),
-                    PackageNames.ORGANIC_MAPS to emptySet(),
-                    PackageNames.OSMAND_PLUS to emptySet(),
+                    PackageNames.COMAPS_FDROID to App(packageName = PackageNames.COMAPS_FDROID, dataTypes = emptySet()),
+                    PackageNames.ORGANIC_MAPS to App(packageName = PackageNames.ORGANIC_MAPS, dataTypes = emptySet()),
+                    PackageNames.OSMAND_PLUS to App(packageName = PackageNames.OSMAND_PLUS, dataTypes = emptySet()),
                 ),
                 appDetails = mapOf(
                     PackageNames.COMAPS_FDROID to AppDetail(
-                        "CoMaps",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.COMAPS_FDROID,
+                        label = "CoMaps",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                     PackageNames.ORGANIC_MAPS to AppDetail(
-                        "Organic Maps",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.ORGANIC_MAPS,
+                        label = "Organic Maps",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
@@ -425,26 +451,28 @@ private fun LoadingPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            @SuppressLint("LocalContextGetResourceValueCall")
-            UserPreferenceHiddenAppsControls(
+            @SuppressLint("LocalContextGetResourceValueCall") UserPreferenceHiddenAppsControls(
                 billingAppNameResId = R.string.app_name_pro,
                 apps = mapOf(
-                    PackageNames.COMAPS_FDROID to emptySet(),
-                    PackageNames.ORGANIC_MAPS to emptySet(),
-                    PackageNames.OSMAND_PLUS to emptySet(),
+                    PackageNames.COMAPS_FDROID to App(packageName = PackageNames.COMAPS_FDROID, dataTypes = emptySet()),
+                    PackageNames.ORGANIC_MAPS to App(packageName = PackageNames.ORGANIC_MAPS, dataTypes = emptySet()),
+                    PackageNames.OSMAND_PLUS to App(packageName = PackageNames.OSMAND_PLUS, dataTypes = emptySet()),
                 ),
                 appDetails = mapOf(
                     PackageNames.COMAPS_FDROID to AppDetail(
-                        "CoMaps",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.COMAPS_FDROID,
+                        label = "CoMaps",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                     PackageNames.ORGANIC_MAPS to AppDetail(
-                        "Organic Maps",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.ORGANIC_MAPS,
+                        label = "Organic Maps",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
@@ -463,26 +491,28 @@ private fun DarkLoadingPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            @SuppressLint("LocalContextGetResourceValueCall")
-            UserPreferenceHiddenAppsControls(
+            @SuppressLint("LocalContextGetResourceValueCall") UserPreferenceHiddenAppsControls(
                 billingAppNameResId = R.string.app_name_pro,
                 apps = mapOf(
-                    PackageNames.COMAPS_FDROID to emptySet(),
-                    PackageNames.ORGANIC_MAPS to emptySet(),
-                    PackageNames.OSMAND_PLUS to emptySet(),
+                    PackageNames.COMAPS_FDROID to App(packageName = PackageNames.COMAPS_FDROID, dataTypes = emptySet()),
+                    PackageNames.ORGANIC_MAPS to App(packageName = PackageNames.ORGANIC_MAPS, dataTypes = emptySet()),
+                    PackageNames.OSMAND_PLUS to App(packageName = PackageNames.OSMAND_PLUS, dataTypes = emptySet()),
                 ),
                 appDetails = mapOf(
                     PackageNames.COMAPS_FDROID to AppDetail(
-                        "CoMaps",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.COMAPS_FDROID,
+                        label = "CoMaps",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                     PackageNames.ORGANIC_MAPS to AppDetail(
-                        "Organic Maps",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.ORGANIC_MAPS,
+                        label = "Organic Maps",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
@@ -501,26 +531,28 @@ private fun TabletHiddenAppsLoadingPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            @SuppressLint("LocalContextGetResourceValueCall")
-            UserPreferenceHiddenAppsControls(
+            @SuppressLint("LocalContextGetResourceValueCall") UserPreferenceHiddenAppsControls(
                 billingAppNameResId = R.string.app_name_pro,
                 apps = mapOf(
-                    PackageNames.COMAPS_FDROID to emptySet(),
-                    PackageNames.ORGANIC_MAPS to emptySet(),
-                    PackageNames.OSMAND_PLUS to emptySet(),
+                    PackageNames.COMAPS_FDROID to App(packageName = PackageNames.COMAPS_FDROID, dataTypes = emptySet()),
+                    PackageNames.ORGANIC_MAPS to App(packageName = PackageNames.ORGANIC_MAPS, dataTypes = emptySet()),
+                    PackageNames.OSMAND_PLUS to App(packageName = PackageNames.OSMAND_PLUS, dataTypes = emptySet()),
                 ),
                 appDetails = mapOf(
                     PackageNames.COMAPS_FDROID to AppDetail(
-                        "CoMaps",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.COMAPS_FDROID,
+                        label = "CoMaps",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                     PackageNames.ORGANIC_MAPS to AppDetail(
-                        "Organic Maps",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.ORGANIC_MAPS,
+                        label = "Organic Maps",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),

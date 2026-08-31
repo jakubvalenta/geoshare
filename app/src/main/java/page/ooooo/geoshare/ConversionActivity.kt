@@ -34,7 +34,7 @@ class ConversionActivity : ComponentActivity() {
 
             // See MainActivity.onCreate()
             AppTheme(dynamicColor = userPreferencesValues.dynamicColor) {
-                MainNavigation(billingViewModel, conversionViewModel, introEnabled = false, onFinish = { finish() })
+                MainNavigation(billingViewModel, conversionViewModel, onFinish = { finish() })
             }
         }
     }

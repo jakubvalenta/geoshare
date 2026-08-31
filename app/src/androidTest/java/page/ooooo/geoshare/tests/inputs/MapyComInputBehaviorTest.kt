@@ -5,7 +5,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import page.ooooo.geoshare.tests.assumeDomainResolvable
-import page.ooooo.geoshare.tests.closeIntro
 import page.ooooo.geoshare.tests.configureConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.tests.launchApplication
@@ -36,10 +35,9 @@ class MapyComInputBehaviorTest : InputBehaviorTest {
             assumeDomainResolvable("mapy.com")
         }
 
-        // Launch app and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
         configureConnectionPermissionPreference(Permission.ALWAYS)
 
         // Short link

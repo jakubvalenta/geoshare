@@ -28,10 +28,9 @@ class UserPreferencesBehaviorTest {
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
 
-        // Launch application and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Share a URI with the app
         shareUri("geo:52.5067296,13.2599309")
@@ -196,10 +195,9 @@ class UserPreferencesBehaviorTest {
     fun whenAppIsHidden_itIsNotShownOnResultScreen() = uiAutomator {
         assumeAppInstalled(PackageNames.OSMAND_PLUS)
 
-        // Launch application and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Share a URI with the app
         shareUri()
@@ -245,20 +243,16 @@ class UserPreferencesBehaviorTest {
     fun whenLinkIsHidden_itIsNotShownOnResultScreen() = uiAutomator {
         assumeAppInstalled(PackageNames.OSMAND_PLUS)
 
-        // Launch application and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Share a URI with the app
         shareUri()
 
         // Hide a link
-        onMainScrollablePane()
-            .scrollToElement(Direction.DOWN, timeoutMs = 3_000) {
-                viewIdResourceName == "geoShareApp_${InitialLinks.APPLE_MAPS_DISPLAY_UUID}"
-            }
-            .longClick()
+        scrollToLinkIcons()
+        onElement { viewIdResourceName == "geoShareApp_${InitialLinks.APPLE_MAPS_DISPLAY_UUID}" }.longClick()
         onElement { viewIdResourceName == "geoShareAppHide" }.click()
 
         // Shows a message

@@ -59,7 +59,6 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.NaivePoint
-import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.Srs
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.CopyLinkUriOutput
@@ -190,14 +189,8 @@ fun LinkForm(
             isError = coordsUriTemplate.isEmpty(),
         )
         listOf(
-            WGS84Point(
-                -3.075833, 37.353333,
-                source = Source.GENERATED,
-            ) to stringResource(R.string.links_form_test_world),
-            WGS84Point(
-                39.915833, 116.390833,
-                source = Source.GENERATED,
-            ) to stringResource(R.string.links_form_test_china),
+            WGS84Point.Kilimanjaro to stringResource(R.string.links_form_test_world),
+            WGS84Point.ForbiddenCity to stringResource(R.string.links_form_test_china),
         ).let { testPointsWithName ->
             Column(verticalArrangement = Arrangement.spacedBy(spacing.small)) {
                 ScrollableChips(paddingValues = PaddingValues(horizontal = LocalSpacing.current.windowPadding)) {

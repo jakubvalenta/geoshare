@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.ui.components
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalResources
@@ -11,11 +12,13 @@ import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
+import androidx.compose.ui.text.withStyle
 import page.ooooo.geoshare.lib.Segment
 import page.ooooo.geoshare.lib.parseFormatString
 
 sealed interface FormatArg {
-    data class Text(val text: String) : FormatArg
+    data class Text(val text: String, val style: SpanStyle? = null) : FormatArg
+    data class InlineContent(val id: String) : FormatArg
     data class Link(val text: String, val onClick: () -> Unit) : FormatArg
 }
 
@@ -30,8 +33,20 @@ fun annotatedStringResource(@StringRes id: Int, vararg formatArgs: FormatArg): A
             is Segment.Arg -> {
                 val argument = formatArgs.getOrNull(segment.index) ?: return@forEach
                 when (argument) {
-                    is FormatArg.Text -> append(argument.text)
-                    is FormatArg.Link -> ClickableLink(argument.text, argument.onClick)
+                    is FormatArg.Text ->
+                        if (argument.style != null) {
+                            withStyle(argument.style) {
+                                append(argument.text)
+                            }
+                        } else {
+                            append(argument.text)
+                        }
+
+                    is FormatArg.InlineContent ->
+                        appendInlineContent(argument.id)
+
+                    is FormatArg.Link ->
+                        ClickableLink(argument.text, onClick = argument.onClick)
                 }
             }
         }
@@ -39,9 +54,13 @@ fun annotatedStringResource(@StringRes id: Int, vararg formatArgs: FormatArg): A
 }
 
 @Composable
-fun AnnotatedString.Builder.ClickableLink(text: String, onClick: () -> Unit) {
+fun AnnotatedString.Builder.ClickableLink(
+    text: String,
+    styles: TextLinkStyles = AnnotatedString.DefaultLinkStyles,
+    onClick: () -> Unit,
+) {
     withLink(
-        LinkAnnotation.Clickable(tag = "link", styles = AnnotatedString.linkStyles) {
+        LinkAnnotation.Clickable(tag = "link", styles = styles) {
             onClick()
         }
     ) {
@@ -49,7 +68,17 @@ fun AnnotatedString.Builder.ClickableLink(text: String, onClick: () -> Unit) {
     }
 }
 
-val AnnotatedString.Companion.linkStyles
+val AnnotatedString.Companion.DefaultLinkStyles
     @Composable get() = TextLinkStyles(
-        SpanStyle(color = MaterialTheme.colorScheme.tertiary, textDecoration = TextDecoration.Underline)
+        SpanStyle(
+            color = MaterialTheme.colorScheme.tertiary,
+            textDecoration = TextDecoration.Underline,
+        )
+    )
+
+val AnnotatedString.Companion.UnderlinedLinkStyles
+    @Composable get() = TextLinkStyles(
+        SpanStyle(
+            textDecoration = TextDecoration.Underline,
+        )
     )

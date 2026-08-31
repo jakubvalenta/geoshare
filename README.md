@@ -173,9 +173,6 @@ width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/3.png)
 [<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/4.png"
 alt="Screenshot of GeoShare asking for permission to connect to Google"
 width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/4.png)
-[<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/5.png"
-alt="Screenshot of GeoShare’s intro screen"
-width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/5.png)
 
 ## Installation
 

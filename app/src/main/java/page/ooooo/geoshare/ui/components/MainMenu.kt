@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.DropdownMenu
@@ -53,7 +52,6 @@ fun MainMenu(
     onNavigateToBillingScreen: () -> Unit,
     onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
     onNavigateToInputsScreen: () -> Unit,
-    onNavigateToIntroScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: (groupId: UserPreferenceGroupId?) -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -108,16 +106,8 @@ fun MainMenu(
                     expanded = false
                     onNavigateToFaqScreen(null)
                 },
-                leadingIcon = {},
-            )
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.intro_title)) },
-                onClick = {
-                    expanded = false
-                    onNavigateToIntroScreen()
-                },
                 leadingIcon = {
-                    Icon(painterResource(R.drawable.rocket_launch_24px), contentDescription = null)
+                    Icon(painterResource(R.drawable.help_24px), contentDescription = null)
                 },
             )
             DropdownMenuItem(
@@ -135,7 +125,7 @@ fun MainMenu(
                             }
                         },
                     ) {
-                        Icon(Icons.Outlined.Info, null)
+                        Icon(painterResource(R.drawable.map_24px), null)
                     }
                 },
             )
@@ -188,7 +178,6 @@ private fun DefaultPreview() {
                             onNavigateToBillingScreen = {},
                             onNavigateToFaqScreen = {},
                             onNavigateToInputsScreen = {},
-                            onNavigateToIntroScreen = {},
                             onNavigateToUserPreferencesScreen = {},
                         )
                     }
@@ -219,7 +208,6 @@ private fun DarkPreview() {
                             onNavigateToBillingScreen = {},
                             onNavigateToFaqScreen = {},
                             onNavigateToInputsScreen = {},
-                            onNavigateToIntroScreen = {},
                             onNavigateToUserPreferencesScreen = {},
                         )
                     }
@@ -255,7 +243,6 @@ private fun DonationPreview() {
                             onNavigateToBillingScreen = {},
                             onNavigateToFaqScreen = {},
                             onNavigateToInputsScreen = {},
-                            onNavigateToIntroScreen = {},
                             onNavigateToUserPreferencesScreen = {},
                         )
                     }
@@ -291,7 +278,6 @@ private fun DarkDonationPreview() {
                             onNavigateToBillingScreen = {},
                             onNavigateToFaqScreen = {},
                             onNavigateToInputsScreen = {},
-                            onNavigateToIntroScreen = {},
                             onNavigateToUserPreferencesScreen = {},
                         )
                     }

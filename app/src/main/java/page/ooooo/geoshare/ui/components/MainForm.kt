@@ -50,7 +50,7 @@ fun MainForm(
 
     Column(
         Modifier.padding(horizontal = spacing.windowPadding),
-        verticalArrangement = Arrangement.spacedBy(spacing.mediumAdaptive),
+        verticalArrangement = Arrangement.spacedBy(spacing.small),
     ) {
         OutlinedTextField(
             value = source,
@@ -100,7 +100,7 @@ fun MainForm(
             supportingText = {
                 Text(
                     stringResource(errorMessageResId ?: R.string.main_input_uri_supporting_text),
-                    Modifier.padding(top = spacing.tinyAdaptive),
+                    Modifier.padding(top = spacing.extraTiny),
                 )
             },
             isError = errorMessageResId != null,

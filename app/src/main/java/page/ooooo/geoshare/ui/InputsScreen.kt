@@ -183,7 +183,7 @@ private fun InputsListPane(
                 Column(Modifier.padding(horizontal = spacing.windowPadding)) {
                     ParagraphText(
                         stringResource(R.string.inputs_list_text, appName),
-                        Modifier.padding(top = spacing.tinyAdaptive, bottom = spacing.mediumAdaptive),
+                        Modifier.padding(top = spacing.tiny, bottom = spacing.small),
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     InputsSettingsButton {
@@ -219,7 +219,7 @@ private fun InputsListPane(
             }
         } else {
             item {
-                Spacer(Modifier.height(spacing.mediumAdaptive))
+                Spacer(Modifier.height(spacing.small))
             }
         }
         item {
@@ -294,7 +294,7 @@ private fun InputsDetailPane(
                 Modifier
                     .widthIn(max = maxWidth)
                     .padding(horizontal = spacing.windowPadding)
-                    .padding(top = spacing.tinyAdaptive, bottom = spacing.mediumAdaptive),
+                    .padding(top = spacing.tiny, bottom = spacing.small),
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
@@ -308,7 +308,7 @@ private fun InputsDetailPane(
                 Modifier
                     .fillMaxWidth()
                     .padding(horizontal = spacing.windowPadding)
-                    .padding(top = spacing.largeAdaptive, bottom = spacing.smallAdaptive),
+                    .padding(top = spacing.medium, bottom = spacing.tiny),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
@@ -331,7 +331,7 @@ private fun InputsDetailPane(
                 Row(
                     Modifier
                         .padding(horizontal = spacing.windowPadding)
-                        .padding(vertical = spacing.smallAdaptive),
+                        .padding(vertical = spacing.tiny),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {

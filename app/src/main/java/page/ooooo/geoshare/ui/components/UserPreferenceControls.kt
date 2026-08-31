@@ -63,7 +63,7 @@ fun UserPreferenceControls(
                             description(),
                             Modifier
                                 .padding(horizontal = spacing.windowPadding)
-                                .padding(top = spacing.tiny, bottom = spacing.mediumAdaptive)
+                                .padding(top = spacing.tiny, bottom = spacing.small)
                                 .run {
                                     if (featureNotPurchased) {
                                         alpha(0.7f)
@@ -105,6 +105,7 @@ fun <T> LazyListScope.userPreferenceOptionsControl(
     }
     optionGroups.forEachIndexed { i, values ->
         item {
+            val spacing = LocalSpacing.current
             RadioButtonGroup(
                 selectedValue = value,
                 onSelect = {
@@ -115,10 +116,10 @@ fun <T> LazyListScope.userPreferenceOptionsControl(
                 values = values,
                 enabled = enabled,
                 modifier = modifier
-                    .padding(horizontal = LocalSpacing.current.windowPadding)
+                    .padding(horizontal = spacing.windowPadding)
                     .run {
                         if (i == 0) {
-                            padding(top = LocalSpacing.current.tinyAdaptive)
+                            padding(top = spacing.tiny)
                         } else {
                             this
                         }
@@ -129,8 +130,9 @@ fun <T> LazyListScope.userPreferenceOptionsControl(
         }
         if (i < optionGroups.size - 1) {
             item {
+                val spacing = LocalSpacing.current
                 HorizontalDivider(
-                    modifier.padding(vertical = LocalSpacing.current.tinyAdaptive),
+                    modifier.padding(vertical = spacing.tiny),
                     thickness = Dp.Hairline,
                 )
             }

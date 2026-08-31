@@ -11,7 +11,6 @@ import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.billing.Offer
 import page.ooooo.geoshare.tests.assumeAppInstalled
 import page.ooooo.geoshare.tests.assumeDomainResolvable
-import page.ooooo.geoshare.tests.closeIntro
 import page.ooooo.geoshare.tests.disableSystemUIDemoMode
 import page.ooooo.geoshare.tests.enableDarkMode
 import page.ooooo.geoshare.tests.enableSystemUIDemoMode
@@ -54,10 +53,9 @@ class ScreenshotsDemoBehaviorTest {
             assumeDomainResolvable("maps.google.com")
         }
 
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
-        quickWaitForStableInActiveWindow() // Wait for the intro to close
 
         // Test all screens in alphabetical order
         testBilling()

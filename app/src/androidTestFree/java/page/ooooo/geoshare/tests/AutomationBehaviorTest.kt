@@ -24,10 +24,9 @@ import kotlin.time.Duration.Companion.seconds
 class AutomationBehaviorTest {
     @Test
     fun copiesCoordinates() = uiAutomator {
-        // Launch application and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Configure automation
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
@@ -47,10 +46,9 @@ class AutomationBehaviorTest {
     fun opensApp() = uiAutomator {
         assumeAppInstalled(PackageNames.GOOGLE_MAPS)
 
-        // Launch application and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Configure automation
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
@@ -83,9 +81,9 @@ class AutomationBehaviorTest {
             val messagingAppPackageName = PackageNames.CONVERSATIONS
             assumeAppInstalled(messagingAppPackageName)
 
-            // Launch application and close intro
+            // Launch app
             launchApplication()
-            closeIntro()
+            waitForAppToBeVisible()
 
             // Configure automation
             goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
@@ -108,9 +106,9 @@ class AutomationBehaviorTest {
             assumeAppInstalled(PackageNames.TOMTOM)
             assumeDomainResolvable("tomtom.com")
 
-            // Launch application and close intro
+            // Launch app
             launchApplication()
-            closeIntro()
+            waitForAppToBeVisible()
 
             // Configure automation
             goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
@@ -144,10 +142,9 @@ class AutomationBehaviorTest {
 
     @Test
     fun savesGpxRoute() = uiAutomator {
-        // Launch application and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Configure automation
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
@@ -173,10 +170,9 @@ class AutomationBehaviorTest {
 
     @Test
     fun savesPointToContact() = uiAutomator {
-        // Launch application and close intro
+        // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        closeIntro()
 
         // Configure automation
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
