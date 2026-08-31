@@ -100,7 +100,6 @@
         <item quantity="other">Автоматичні збереження GPX через %1$ds</item>
     </plurals>
     <string name="conversion_automation_share_failed">Не вдалося автоматично поділитися посиланням</string>
-    <string name="conversion_automation_share_succeeded">Автоматично опубліковане посилання</string>
     <plurals name="conversion_automation_share_waiting">
         <item quantity="one">Автоматичне поширення посилання через %1$ds</item>
         <item quantity="few">Автоматичні поширення посилання через %1$ds</item>

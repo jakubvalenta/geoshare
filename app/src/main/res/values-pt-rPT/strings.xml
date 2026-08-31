@@ -132,7 +132,6 @@
         <item quantity="other">A gravar GPX automaticamente em %1$ds</item>
     </plurals>
     <string name="conversion_automation_share_failed">Falha ao partilhar ligação automaticamente</string>
-    <string name="conversion_automation_share_succeeded">Ligação partilhada automaticamente</string>
     <plurals name="conversion_automation_share_waiting">
         <item quantity="one">A partilhar ligação automaticamente em %1$ds</item>
         <item quantity="many">A partilhar ligação automaticamente em %1$ds</item>

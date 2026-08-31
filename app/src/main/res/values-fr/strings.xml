@@ -97,7 +97,6 @@
         <item quantity="other">Sauvegarde automatique du GPX dans %1$ds</item>
     </plurals>
     <string name="conversion_automation_share_failed">Échec du partage automatique du lien</string>
-    <string name="conversion_automation_share_succeeded">Lien partagé automatiquement</string>
     <plurals name="conversion_automation_share_waiting">
         <item quantity="one">Lien de partage automatique dans %1$ds</item>
         <item quantity="many">Lien de partage automatique dans %1$ds</item>

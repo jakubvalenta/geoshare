@@ -91,7 +91,6 @@
         <item quantity="other">将在 %1$d 秒后自动保存 GPX</item>
     </plurals>
     <string name="conversion_automation_share_failed">无法自动分享链接</string>
-    <string name="conversion_automation_share_succeeded">已自动分享链接</string>
     <plurals name="conversion_automation_share_waiting">
         <item quantity="other">将在 %1$d 秒后自动分享链接</item>
     </plurals>

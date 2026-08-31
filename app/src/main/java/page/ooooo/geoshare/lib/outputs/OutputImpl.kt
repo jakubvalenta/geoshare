@@ -163,8 +163,7 @@ sealed interface SharePointOutput :
     PointOutput.WithoutLocation,
     Output.HasErrorText,
     Output.HasAutomationDelay,
-    Output.HasAutomationErrorText,
-    Output.HasAutomationSuccessText {
+    Output.HasAutomationErrorText {
 
     fun getText(value: Point, uriQuote: UriQuote = DefaultUriQuote): String? = null
 
@@ -180,10 +179,6 @@ sealed interface SharePointOutput :
     @Composable
     override fun automationErrorText(appDetails: AppDetails) =
         stringResource(R.string.conversion_automation_share_failed)
-
-    @Composable
-    override fun automationSuccessText(appDetails: AppDetails) =
-        stringResource(R.string.conversion_automation_share_succeeded)
 
     @Composable
     override fun automationWaitingText(counterSec: Int, appDetails: AppDetails) =

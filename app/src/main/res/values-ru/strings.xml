@@ -121,7 +121,6 @@
         <item quantity="other">Автоматическое сохранение GPX через %1$d сек.</item>
     </plurals>
     <string name="conversion_automation_share_failed">Не удалось автоматически поделиться ссылкой</string>
-    <string name="conversion_automation_share_succeeded">Поделились ссылкой автоматически</string>
     <plurals name="conversion_automation_share_waiting">
         <item quantity="one">Автоматический обмен ссылкой через %1$d сек.</item>
         <item quantity="few">Автоматический обмен ссылкой через %1$d сек.</item>

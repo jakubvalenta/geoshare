@@ -272,9 +272,6 @@ class ScreenshotsFreeBehaviorTest {
         }
         pressBack() // Close the system share menu
 
-        // Automation - Share - Success
-        saveScreenshot("main_strings/automation_share_success") // Don't wait, because the message will disappear fast
-
         // Automation - Share GPX route - Waiting
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
         scrollToAutomationItem(ShareRouteGpxAutomation).click()

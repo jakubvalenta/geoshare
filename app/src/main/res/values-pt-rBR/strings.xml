@@ -96,7 +96,6 @@
         <item quantity="other">Salvando GPX automaticamente em %1$ds</item>
     </plurals>
     <string name="conversion_automation_share_failed">Falha ao compartilhar link automaticamente</string>
-    <string name="conversion_automation_share_succeeded">Link compartilhado automaticamente</string>
     <plurals name="conversion_automation_share_waiting">
         <item quantity="one">Compartilhando link automaticamente em %1$ds</item>
         <item quantity="many">Compartilhando link automaticamente em %1$ds</item>
