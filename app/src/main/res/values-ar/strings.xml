@@ -107,7 +107,6 @@
         <item quantity="other">يحفظ GPX تلقائيًا في%1$d ثانية</item>
     </plurals>
     <string name="conversion_automation_share_failed">فشل في مشاركة الرابط تلقائيًا</string>
-    <string name="conversion_automation_share_succeeded">رابط مشترك تلقائيًا</string>
     <plurals name="conversion_automation_share_waiting">
         <item quantity="zero">مشاركة الرابط تلقائيًا خلال %1$d ثانية</item>
         <item quantity="one">مشاركة الرابط تلقائيًا خلال ثانية</item>

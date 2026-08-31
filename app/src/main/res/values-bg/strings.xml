@@ -94,7 +94,6 @@
         <item quantity="other">Автоматично запазване на GPX в %1$ds</item>
     </plurals>
     <string name="conversion_automation_share_failed">Неуспешно автоматично споделяне на връзка</string>
-    <string name="conversion_automation_share_succeeded">Автоматично споделена връзка</string>
     <plurals name="conversion_automation_share_waiting">
         <item quantity="one">Автоматично споделяне на връзка в %1$ds</item>
         <item quantity="other">Автоматично споделяне на връзка в %1$ds</item>

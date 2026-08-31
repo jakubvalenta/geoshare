@@ -99,7 +99,6 @@
         <item quantity="other">Soubor GPX se automaticky uloží za %1$d s</item>
     </plurals>
     <string name="conversion_automation_share_failed">Nepodařilo se automaticky sdílet odkaz</string>
-    <string name="conversion_automation_share_succeeded">Odkaz byl automaticky nasdílen</string>
     <plurals name="conversion_automation_share_waiting">
         <item quantity="one">Odkaz bude automaticky nasdílen za %1$d s</item>
         <item quantity="few">Odkaz bude automaticky nasdílen za %1$d s</item>

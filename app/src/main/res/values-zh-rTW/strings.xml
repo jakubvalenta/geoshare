@@ -90,7 +90,6 @@
         <item quantity="other">自動在%1$d中儲存GPX檔</item>
     </plurals>
     <string name="conversion_automation_share_failed">自動分享連結時發生錯誤</string>
-    <string name="conversion_automation_share_succeeded">自動分享連結</string>
     <plurals name="conversion_automation_share_waiting">
         <item quantity="other">自動在%1$d中分享連結</item>
     </plurals>

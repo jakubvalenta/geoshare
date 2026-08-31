@@ -172,7 +172,6 @@
         <item quantity="other">Automatically saving GPX in %1$ds</item>
     </plurals>
     <string name="conversion_automation_share_failed">Failed to automatically share link</string>
-    <string name="conversion_automation_share_succeeded">Automatically shared link</string>
     <plurals name="conversion_automation_share_waiting">
         <item quantity="one">Automatically sharing link in %1$ds</item>
         <item quantity="other">Automatically sharing link in %1$ds</item>

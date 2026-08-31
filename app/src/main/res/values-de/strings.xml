@@ -100,7 +100,6 @@
         <item quantity="other">GPX-Datei wird automatisch in %1$d s gespeichert</item>
     </plurals>
     <string name="conversion_automation_share_failed">Fehler beim automatischen Teilen des Links</string>
-    <string name="conversion_automation_share_succeeded">Link wurde automatisch geteilt</string>
     <plurals name="conversion_automation_share_waiting">
         <item quantity="one">Link wird in %1$d s automatisch geteilt</item>
         <item quantity="other">Link wird in %1$d s automatisch geteilt</item>
