@@ -12,6 +12,7 @@ import androidx.core.graphics.scale
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.platform.io.PlatformTestStorageRegistry
 import androidx.test.uiautomator.Direction
+import androidx.test.uiautomator.StaleObjectException
 import androidx.test.uiautomator.UiAutomatorTestScope
 import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.onElement
@@ -113,6 +114,7 @@ private fun AccessibilityNodeInfo.isGrantPermissionButton(): Boolean =
     textAsString()?.lowercase() in setOf(
         "allow",
         "only this time",
+        @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "autoriser",
         @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "uniquement cette fois-ci",
     )
 
@@ -120,7 +122,8 @@ private fun AccessibilityNodeInfo.isDenyPermissionButton(): Boolean =
     textAsString()?.lowercase() in setOf(
         "deny",
         "don't allow",
-        "don’t allow", // Notice the different quote character
+        "don\u2019t allow",
+        "refuser",
         "ne pas autoriser",
     )
 
@@ -457,6 +460,24 @@ fun UiAutomatorTestScope.clickAppIcon(id: String) {
     onElement { viewIdResourceName == "geoShareApp_$id" }.click(android.graphics.Point(10, 10))
 }
 
+fun UiAutomatorTestScope.scrollToAppIcons() {
+    // Scroll by percents, because it's more reliable on Nexus 5
+    onMainScrollablePane().scroll(Direction.DOWN, 2f)
+}
+
+fun UiAutomatorTestScope.scrollToLinkIcons() {
+    // Scroll twice by percents, because it's more reliable on Nexus 5
+    onMainScrollablePane().apply {
+        repeat(2) {
+            try {
+                scroll(Direction.DOWN, 2f)
+            } catch (_: StaleObjectException) {
+                // Stale object can happen on Xiaomi, do nothing
+            }
+        }
+    }
+}
+
 fun UiAutomatorTestScope.goToInputList() {
     // If we're on the main screen, use the main menu
     onElementOrNull(1_000) { viewIdResourceName == "geoShareMainMenuButton" }?.let { mainMenu ->
@@ -547,19 +568,28 @@ fun UiObject2.scrollToSheetItem(
     scrollToElement(direction) { viewIdResourceName == "geoShareResultSheetItemHeadline" && block() }
 
 fun UiAutomatorTestScope.chooseFile() {
-    if (onElementOrNull(3_000) { textAsString() == "Recent" } != null) {
+    if (onElementOrNull(3_000) { textAsString() in setOf("Recent", "Récents") } != null) {
         // If we happen to be in the Recent folder, go to Downloads, because it's not possible to save a file to Recent
         device.click(50, 100) // Tap the hamburger menu
-        onElement { textAsString() == "Downloads" }.click()
+        onElement {
+            textAsString() in setOf(
+                "Downloads",
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Téléchargements",
+            )
+        }.click()
     } else {
         // Check that we're in the Downloads folder
         onElement {
-            textAsString() == "Downloads" ||
-                textAsString()?.startsWith("Files in") == true ||
-                textAsString()?.startsWith(
-                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-                    "Fichiers dans le dossier"
-                ) == true
+            textAsString()?.let {
+                it.startsWith("Downloads") ||
+                    it.startsWith(
+                        @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Téléchar"
+                    ) ||
+                    it.startsWith("Files in") ||
+                    it.startsWith(
+                        @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Fichiers dans le dossier"
+                    )
+            } == true
         }
     }
     onElement {
@@ -573,15 +603,19 @@ fun UiAutomatorTestScope.chooseFile() {
 fun UiAutomatorTestScope.findContact(name: String): UiObject2? {
     // If using the Android open-source contacts app, click the search button
     onElementOrNull(3_000) {
-        packageName == "com.android.contacts" && contentDescription in setOf(
-            "Search",
-            "Search contacts",
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Rechercher dans vos contacts",
-        )
+        packageName == "com.android.contacts" && (
+            viewIdResourceName == "com.android.contacts:id/menu_search" ||
+                contentDescription in setOf(
+                "Search",
+                "Search contacts",
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Rechercher dans vos contacts",
+            )
+            )
     }?.click()
 
     // Search contacts
-    val searchField = onElementOrNull(3_000) {
+    val searchTerm = name.split(' ').first()
+    val searchField = onElement(3_000) {
         when (packageName) {
             "com.android.contacts" -> when (viewIdResourceName) {
                 "android:id/search_src_text" -> true
@@ -598,12 +632,9 @@ fun UiAutomatorTestScope.findContact(name: String): UiObject2? {
             else -> false
         }
     }
-    val searchTerm = name.split(' ').first()
-    if (searchField != null) {
-        searchField.setText(searchTerm)
-    } else {
-        type(searchTerm)
-    }
+
+    // Try to find the contact. On Nexus 5, it doesn't work, because the field value doesn't get set for some reason
+    searchField.setText(searchTerm)
 
     // Return the found contact if it's immediately visible
     val foundContact = onElementOrNull(3_000) { textAsString() == name && isVisibleToUser }
@@ -613,7 +644,7 @@ fun UiAutomatorTestScope.findContact(name: String): UiObject2? {
 
     // Scroll to the found contact
     return onElementOrNull(3_000) { isScrollable }
-        ?.scrollToElementOrNull(Direction.DOWN, 45_000) { textAsString() == name && isVisibleToUser }
+        ?.scrollToElementOrNull(Direction.DOWN, 60_000) { textAsString() == name && isVisibleToUser }
 }
 
 fun UiAutomatorTestScope.insertOrEditContact(name: String = "GeoShare Test Contact") {
@@ -649,7 +680,7 @@ fun UiAutomatorTestScope.insertOrEditContact(name: String = "GeoShare Test Conta
 
     // Save the contact
     onElement {
-        packageName == "com.android.contacts" && contentDescription == "Save" ||
+        viewIdResourceName == "com.android.contacts:id/menu_save" ||
             textAsString()?.lowercase() in setOf(
             "save",
             @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "enregistrer",
@@ -674,8 +705,11 @@ fun UiAutomatorTestScope.openContact(name: String = "GeoShare Test Contact") {
         ?.click()
 
     val contactDetailOpen = onElementOrNull(3_000) {
-        packageName == "com.android.contacts" && viewIdResourceName == "com.android.contacts:id/menu_edit" ||
-            packageName == "com.google.android.contacts" && viewIdResourceName == "com.google.android.contacts:id/menu_insert_or_edit"
+        when (packageName) {
+            "com.android.contacts" -> viewIdResourceName == "com.android.contacts:id/menu_edit"
+            "com.google.android.contacts" -> viewIdResourceName == "com.google.android.contacts:id/menu_insert_or_edit"
+            else -> false
+        }
     } != null
     if (contactDetailOpen) {
         // If the contacts app is already open on the contact detail screen, do nothing
@@ -705,10 +739,21 @@ fun UiAutomatorTestScope.assertContactContainsText(expectedText: String) {
             quickWaitForStableInActiveWindow() // Wait for the swiping to finish
         }
     }
-    onElementOrNull(3_000) { packageName == "com.android.contacts" && textAsString() == "See all" }?.click()
+    onElementOrNull(3_000) {
+        packageName == "com.android.contacts" && textAsString() in setOf(
+            "See all",
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Tout afficher",
+        )
+    }?.click()
 
     // Assert
-    onElement { isScrollable }.scrollToElement(Direction.DOWN) { textAsString() == expectedText }
+    val scrollablePane = onElementOrNull(1_000) { isScrollable }
+    if (scrollablePane != null) {
+        scrollablePane.scrollToElement(Direction.DOWN) { textAsString() == expectedText }
+    } else {
+        // On Nexus 5, there is no scrollable pane, so we don't need to scroll to the element
+        onElement { textAsString() == expectedText }
+    }
 }
 
 fun UiAutomatorTestScope.mockLocation(block: MockLocationScope.() -> Unit) {

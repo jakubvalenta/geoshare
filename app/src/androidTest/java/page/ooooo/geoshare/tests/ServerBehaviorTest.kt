@@ -117,6 +117,9 @@ class ServerBehaviorTest {
 
         // Shows the restored server
         onElement { viewIdResourceName == "geoShareServerListPane" }
+            .scroll(Direction.DOWN, 10f)
+        onElement { viewIdResourceName == "geoShareServerListPane" }
+            // Scroll again, because only now can the lazy column pane scroll all the way to the top
             .scrollToElement(Direction.UP) { viewIdResourceName == "geoShareServerListItemMenu_$GOOGLE_MAPS_GEOCODE_ADDRESS_UUID" }
     }
 }

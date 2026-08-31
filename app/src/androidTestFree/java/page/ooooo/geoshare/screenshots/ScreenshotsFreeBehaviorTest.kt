@@ -55,6 +55,7 @@ import page.ooooo.geoshare.tests.quickWaitForStableInActiveWindow
 import page.ooooo.geoshare.tests.saveLinkForm
 import page.ooooo.geoshare.tests.saveScreenshot
 import page.ooooo.geoshare.tests.saveServerForm
+import page.ooooo.geoshare.tests.scrollToAppIcons
 import page.ooooo.geoshare.tests.scrollToAutomationItem
 import page.ooooo.geoshare.tests.scrollToSheetItem
 import page.ooooo.geoshare.tests.setAppLocales
@@ -480,9 +481,7 @@ class ScreenshotsFreeBehaviorTest {
         shareUri()
 
         // Conversion - Result - Location - Rationale
-        onMainScrollablePane()
-            // Scroll by percents, because it's more reliable than scrolling to the app icon
-            .scroll(Direction.DOWN, 2f)
+        scrollToAppIcons()
         launchNavigationInApp(PackageNames.TOMTOM)
         onElement(20_000) { viewIdResourceName == "geoShareLocationRationaleDialog" }.let { dialog ->
             quickWaitForStableInActiveWindow()

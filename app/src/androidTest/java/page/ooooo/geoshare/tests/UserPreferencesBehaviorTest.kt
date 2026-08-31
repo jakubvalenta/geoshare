@@ -251,11 +251,8 @@ class UserPreferencesBehaviorTest {
         shareUri()
 
         // Hide a link
-        onMainScrollablePane()
-            .scrollToElement(Direction.DOWN, timeoutMs = 3_000) {
-                viewIdResourceName == "geoShareApp_${InitialLinks.APPLE_MAPS_DISPLAY_UUID}"
-            }
-            .longClick()
+        scrollToLinkIcons()
+        onElement { viewIdResourceName == "geoShareApp_${InitialLinks.APPLE_MAPS_DISPLAY_UUID}" }.longClick()
         onElement { viewIdResourceName == "geoShareAppHide" }.click()
 
         // Shows a message

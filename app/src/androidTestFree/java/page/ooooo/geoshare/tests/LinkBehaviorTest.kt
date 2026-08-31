@@ -38,9 +38,7 @@ class LinkBehaviorTest {
         shareUri()
 
         // Tap copy link in the context menu
-        onMainScrollablePane()
-            // Scroll by percents, because it's more reliable than scrolling to the app icon
-            .scroll(Direction.DOWN, 2f)
+        scrollToLinkIcons()
         onElement { viewIdResourceName == "geoShareAppLabel" && textAsString() == "My New Maps" }.longClick()
         onElement {
             viewIdResourceName == "geoShareAppOutput" && textAsString() in setOf(
@@ -127,7 +125,12 @@ class LinkBehaviorTest {
 
         // Shows link
         onElement { viewIdResourceName == "geoShareLinkListPane" }
-            .scrollToElement(Direction.UP) { viewIdResourceName == "geoShareLinkListItem_${InitialLinks.APPLE_MAPS_NAVIGATION_UUID}" }
+            .scroll(Direction.UP, 10f)
+        onElement { viewIdResourceName == "geoShareLinkListPane" }
+            // Scroll again, because only now can the lazy column pane scroll all the way to the top
+            .scrollToElement(Direction.UP) {
+                viewIdResourceName == "geoShareLinkListItem_${InitialLinks.APPLE_MAPS_NAVIGATION_UUID}"
+            }
     }
 
     @Test
