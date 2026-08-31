@@ -35,7 +35,7 @@ fun ScrollableChips(
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues = PaddingValues(
         horizontal = LocalSpacing.current.windowPadding,
-        vertical = LocalSpacing.current.smallAdaptive,
+        vertical = LocalSpacing.current.tiny,
     ),
     content: ChipsScope.() -> Unit,
 ) {
@@ -70,7 +70,6 @@ private fun DefaultPreview() {
     AppTheme {
         Surface(
             color = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ScrollableChips {
                 item {
@@ -105,7 +104,6 @@ private fun DarkPreview() {
     AppTheme {
         Surface(
             color = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ScrollableChips {
                 item {
@@ -140,7 +138,6 @@ private fun ErrorPreview() {
     AppTheme {
         Surface(
             color = MaterialTheme.colorScheme.errorContainer,
-            contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ScrollableChips {
                 item {
@@ -175,7 +172,6 @@ private fun DarkErrorPreview() {
     AppTheme {
         Surface(
             color = MaterialTheme.colorScheme.errorContainer,
-            contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ScrollableChips {
                 item {

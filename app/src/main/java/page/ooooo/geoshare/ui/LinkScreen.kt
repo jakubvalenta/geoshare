@@ -319,7 +319,7 @@ private fun LinkListPane(
                 stringResource(R.string.links_description),
                 Modifier
                     .padding(horizontal = spacing.windowPadding)
-                    .padding(top = spacing.tinyAdaptive, bottom = spacing.smallAdaptive),
+                    .padding(top = spacing.tiny, bottom = spacing.small),
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
@@ -355,7 +355,7 @@ private fun LinkListPane(
                     if (group.isNotEmpty()) {
                         SegmentedListLabel(group, modifier = Modifier.padding(horizontal = spacing.windowPadding))
                     } else {
-                        Spacer(Modifier.height(spacing.mediumAdaptive))
+                        Spacer(Modifier.height(spacing.small))
                     }
                 }
                 item {
@@ -424,7 +424,7 @@ private fun LinkListPane(
                 onClick = { setRestoreInitialDataDialogOpen(true) },
                 modifier = Modifier
                     .padding(horizontal = spacing.windowPadding)
-                    .padding(top = spacing.mediumAdaptive, bottom = spacing.tinyAdaptive)
+                    .padding(top = spacing.small, bottom = spacing.tiny)
                     .testTag("geoShareLinkRestoreInitialButton"),
                 colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
             ) {
@@ -537,7 +537,7 @@ private fun LinkDetailPane(
                         onSetType = onSetType,
                         modifier = Modifier
                             .width(600.dp)
-                            .padding(top = spacing.smallAdaptive, bottom = spacing.tinyAdaptive),
+                            .padding(top = spacing.small, bottom = spacing.tiny),
                         enabled = CustomLinkFeature in billingFeatures && billingStatus is BillingStatus.Purchased,
                     )
                 }

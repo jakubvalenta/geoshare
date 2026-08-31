@@ -91,7 +91,7 @@ fun AppIcon(
                 .fillMaxWidth()
                 .padding(top = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(spacing.tinyAdaptive),
+            verticalArrangement = Arrangement.spacedBy(spacing.extraTiny),
         ) {
             content()
             if (label != null) {

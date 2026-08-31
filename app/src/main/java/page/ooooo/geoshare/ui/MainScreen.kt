@@ -500,7 +500,7 @@ private fun MainScreen(
                                 }
                             },
                             expandedHeight = if (currentState is Initial) {
-                                spacing.largeTopAppBarExpandedHeight + spacing.largeAdaptive
+                                spacing.largeTopAppBarExpandedHeight + spacing.medium
                             } else {
                                 spacing.largeTopAppBarExpandedHeight
                             },
@@ -563,7 +563,7 @@ private fun MainScreen(
                                                         billingStatus = billingStatus,
                                                         modifier = Modifier
                                                             .padding(horizontal = spacing.windowPadding)
-                                                            .padding(top = spacing.largeAdaptive),
+                                                            .padding(top = spacing.medium),
                                                         onCancel = onCancel,
                                                         onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
                                                     )
@@ -597,7 +597,7 @@ private fun MainScreen(
                                             MainHelp(
                                                 dismissedHelpMessages = dismissedHelpMessages,
                                                 inputRepository = inputRepository,
-                                                modifier = Modifier.padding(top = spacing.largeAdaptive),
+                                                modifier = Modifier.padding(top = spacing.medium),
                                                 onDismissHelpMessage = onDismissHelpMessage,
                                                 onNavigateToFaqScreen = onNavigateToFaqScreen,
                                                 onNavigateToInputsScreen = onNavigateToInputsScreen,
@@ -625,7 +625,7 @@ private fun MainScreen(
                                             contentColor = mainContentColor,
                                         ),
                                     ) {
-                                        Spacer(Modifier.height(spacing.mediumAdaptive))
+                                        Spacer(Modifier.height(spacing.small))
 
                                         when (currentState) {
                                             is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
@@ -756,7 +756,7 @@ private fun MainScreen(
                                     MainHelp(
                                         dismissedHelpMessages = dismissedHelpMessages,
                                         inputRepository = inputRepository,
-                                        modifier = Modifier.padding(top = spacing.largeAdaptive),
+                                        modifier = Modifier.padding(top = spacing.medium),
                                         onDismissHelpMessage = onDismissHelpMessage,
                                         onNavigateToFaqScreen = onNavigateToFaqScreen,
                                         onNavigateToInputsScreen = onNavigateToInputsScreen,
@@ -989,7 +989,6 @@ private fun MainBottomBar(
                 .background(containerColor)
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
-                .padding(top = spacing.tiny),
         ) {
             if (currentState is ConversionState.HasResult && sourceComesFromIntent) {
                 HelpMessageCard(
@@ -1004,7 +1003,8 @@ private fun MainBottomBar(
                     },
                     onDismiss = onDismissHelpMessage,
                     modifier = Modifier
-                        .padding(horizontal = spacing.windowPadding, vertical = spacing.tiny),
+                        .padding(horizontal = spacing.windowPadding)
+                        .padding(top = spacing.tiny, bottom = spacing.extraTiny),
                 ) {
                     ParagraphText(
                         stringResource(R.string.help_open_by_default_text, appName)

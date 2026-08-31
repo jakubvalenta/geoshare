@@ -44,7 +44,7 @@ fun ScreenshotOpenByDefault() {
     BoxWithConstraints(
         Modifier
             .widthIn(max = 400.dp)
-            .padding(horizontal = spacing.largeAdaptive)
+            .padding(horizontal = spacing.large)
     ) {
         val origWidth = 430.dp
         val origHeight = 632.dp

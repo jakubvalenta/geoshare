@@ -55,6 +55,7 @@ fun ResultSheet(
     onSelectPointIndex: (index: Int?) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val spacing = LocalSpacing.current
     val sheetState = rememberBottomSheetState(initialValue)
 
     val selectedPoint = points.getOrNull(selectedPointIndex) ?: return
@@ -97,7 +98,7 @@ fun ResultSheet(
                 )
             }
             item {
-                Spacer(Modifier.height(LocalSpacing.current.mediumAdaptive))
+                Spacer(Modifier.height(spacing.small))
             }
             item {
                 ResultSuccessSheetItemGroup(
@@ -127,11 +128,13 @@ private fun <T> ResultSuccessSheetItemGroup(
     value: T,
     onClick: (action: Action<*>) -> Unit,
 ) {
+    val spacing = LocalSpacing.current
+
     Column {
         if (title != null) {
             LabelLarge(
                 title,
-                Modifier.padding(start = 16.dp, end = 16.dp, bottom = LocalSpacing.current.smallAdaptive),
+                Modifier.padding(start = 16.dp, end = 16.dp, bottom = spacing.tiny),
             )
         }
         var prevIcon: IconDescriptor? = null

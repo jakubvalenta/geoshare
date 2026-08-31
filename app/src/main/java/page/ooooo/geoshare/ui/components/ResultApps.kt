@@ -162,7 +162,7 @@ private fun ResultAppsHeadline(text: String, extra: (@Composable RowScope.() -> 
             .height(50.dp)
             .padding(
                 start = spacing.windowPadding,
-                top = spacing.tinyAdaptive,
+                top = spacing.tiny,
                 end = spacing.windowPadding - 8.dp, // Align with last point menu
             ),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -188,7 +188,7 @@ private fun ResultAppsGrid(
 ) {
     val spacing = LocalSpacing.current
 
-    Grid(Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.smallAdaptive)) {
+    Grid(Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.tiny)) {
         outputsForApps
             .map { (packageName, outputs) -> Triple(packageName, appDetails[packageName]?.label, outputs) }
             .sortedWith(compareBy(nullsLast()) { (_, label) -> label })
@@ -228,7 +228,7 @@ private fun ResultAppsLinksGrid(
 ) {
     val spacing = LocalSpacing.current
 
-    Grid(Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.smallAdaptive)) {
+    Grid(Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.tiny)) {
         outputsForLinks
             .forEach { (group, outputs) ->
                 item {

@@ -58,6 +58,7 @@ fun UserPreferenceDeveloperOptionsControls(
     values: UserPreferencesValues,
     wide: Boolean,
 ) {
+    val spacing = LocalSpacing.current
     UserPreferenceControls(
         titleResId = R.string.user_preferences_developer_title,
         billingAppNameResId = billingAppNameResId,
@@ -69,8 +70,8 @@ fun UserPreferenceDeveloperOptionsControls(
             ParagraphText(
                 stringResource(R.string.user_preferences_changelog_shown_for_version_code_title),
                 Modifier
-                    .padding(horizontal = LocalSpacing.current.windowPadding)
-                    .padding(bottom = LocalSpacing.current.smallAdaptive),
+                    .padding(horizontal = spacing.windowPadding)
+                    .padding(bottom = spacing.tiny),
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
@@ -84,11 +85,8 @@ fun UserPreferenceDeveloperOptionsControls(
             ParagraphText(
                 stringResource(R.string.user_preferences_billing_cached_purchase),
                 Modifier
-                    .padding(horizontal = LocalSpacing.current.windowPadding)
-                    .padding(
-                        top = LocalSpacing.current.mediumAdaptive,
-                        bottom = LocalSpacing.current.smallAdaptive,
-                    ),
+                    .padding(horizontal = spacing.windowPadding)
+                    .padding(top = spacing.small, bottom = spacing.tiny),
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
@@ -101,11 +99,8 @@ fun UserPreferenceDeveloperOptionsControls(
             ParagraphText(
                 stringResource(R.string.user_preferences_dismissed_help_messages),
                 Modifier
-                    .padding(horizontal = LocalSpacing.current.windowPadding)
-                    .padding(
-                        top = LocalSpacing.current.mediumAdaptive,
-                        bottom = LocalSpacing.current.smallAdaptive,
-                    ),
+                    .padding(horizontal = spacing.windowPadding)
+                    .padding(top = spacing.small, bottom = spacing.tiny),
                 style = MaterialTheme.typography.bodyMedium,
             )
         }

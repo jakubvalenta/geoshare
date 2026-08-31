@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -176,7 +177,13 @@ fun ResultCoordinates(
             )
         }
         if (outputsForPointChips.isNotEmpty()) {
-            ScrollableChips {
+            ScrollableChips(
+                paddingValues = PaddingValues(
+                    start = spacing.windowPadding,
+                    end = spacing.windowPadding,
+                    bottom = spacing.extraTiny,
+                ),
+            ) {
                 outputsForPointChips.forEach { output ->
                     item {
                         StyledChip(
@@ -235,7 +242,7 @@ fun ResultCoordinates(
                 onDismiss = onDismissHelpMessage,
                 modifier = Modifier
                     .padding(horizontal = spacing.windowPadding)
-                    .padding(bottom = spacing.small),
+                    .padding(bottom = spacing.tiny + spacing.extraTiny),
             ) {
                 val shareIconId = "shareIcon"
                 val shareIconSize = 14.sp
@@ -268,7 +275,7 @@ fun ResultCoordinates(
                 color = MaterialTheme.colorScheme.surfaceContainer,
                 contentColor = MaterialTheme.colorScheme.onSurface,
             ) {
-                Column(Modifier.padding(top = spacing.mediumAdaptive)) {
+                Column(Modifier.padding(top = spacing.small)) {
                     ExpandablePane(
                         expanded = expanded,
                         onSetExpanded = { expanded = it },
