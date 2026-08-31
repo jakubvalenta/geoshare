@@ -85,7 +85,12 @@ fun MainHelp(
             },
             onDismiss = onDismissHelpMessage,
         ) {
-            ParagraphText(stringResource(R.string.help_welcome_text))
+            ParagraphText(
+                stringResource(
+                    R.string.help_welcome_text,
+                    stringResource(R.string.main_create_geo_uri),
+                )
+            )
         }
         TextButton(onNavigateToInputsScreen) {
             Icon(

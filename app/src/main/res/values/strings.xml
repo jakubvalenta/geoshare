@@ -59,7 +59,7 @@
     <string name="help_share_source_text">In many map apps, you can use a share button %1$s to open a location in %2$s.</string>
     <string name="help_share_source_title">Launch GeoShare from a map app</string>
     <string name="help_welcome_action">Or copy this example:</string>
-    <string name="help_welcome_text">Do you have a map link ready? Enter it in the form and press Show coordinates.</string>
+    <string name="help_welcome_text">Do you have a map link ready? Enter it in the form and press %1$s.</string>
     <string name="help_welcome_title">Welcome</string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="nav_back_content_description">Back to main screen</string>
