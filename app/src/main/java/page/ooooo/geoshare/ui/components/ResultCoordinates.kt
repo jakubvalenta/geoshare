@@ -159,6 +159,7 @@ fun ResultCoordinates(
                 stringResource(R.string.conversion_succeeded_check_srs),
                 Modifier
                     .padding(horizontal = spacing.windowPadding)
+                    .padding(bottom = spacing.extraTiny)
                     .testTag("geoShareResultCheckSRS"),
             )
         } else if (lastPoint.source == Source.JAVASCRIPT) {
@@ -166,6 +167,7 @@ fun ResultCoordinates(
                 stringResource(R.string.conversion_succeeded_check_experimental),
                 Modifier
                     .padding(horizontal = spacing.windowPadding)
+                    .padding(bottom = spacing.extraTiny)
                     .testTag("geoShareResultCheckExperimental"),
             )
         } else if (lastPoint.source == Source.MAP_CENTER) {
@@ -173,6 +175,7 @@ fun ResultCoordinates(
                 stringResource(R.string.conversion_succeeded_check_map_center),
                 Modifier
                     .padding(horizontal = spacing.windowPadding)
+                    .padding(bottom = spacing.extraTiny)
                     .testTag("geoShareResultCheckMapCenter"),
             )
         }
