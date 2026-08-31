@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.ui.components
 
+import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
@@ -43,6 +44,7 @@ fun ParagraphText(
     color: Color = LocalContentColor.current,
     fontStyle: FontStyle? = null,
     fontWeight: FontWeight? = null,
+    inlineContent: Map<String, InlineTextContent> = emptyMap(),
     style: TextStyle = LocalTextStyle.current,
 ) {
     Text(
@@ -51,6 +53,7 @@ fun ParagraphText(
         color = color,
         fontStyle = fontStyle,
         fontWeight = fontWeight,
+        inlineContent = inlineContent,
         style = style.copy(
             lineBreak = LineBreak.Paragraph,
             hyphens = Hyphens.Auto,

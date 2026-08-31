@@ -56,7 +56,7 @@
     <string name="help_open_by_default_text">You can configure Android so that tapping a map link always opens %1$s instead of the default map.</string>
     <string name="help_open_by_default_title">Always open map links in %1$s</string>
     <string name="help_share_source_action">Try it in %1$s</string>
-    <string name="help_share_source_text">In many map apps, you can use the share function to open a location in %1$s.</string>
+    <string name="help_share_source_text">In many map apps, you can use a share button %1$s to open a location in %2$s.</string>
     <string name="help_share_source_title">Launch GeoShare from a map app</string>
     <string name="help_welcome_action">Or copy this example:</string>
     <string name="help_welcome_text">Do you have a map link ready? Enter it in the form and press Show coordinates.</string>

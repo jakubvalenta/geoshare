@@ -8,7 +8,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,14 +30,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -230,8 +237,29 @@ fun ResultCoordinates(
                     .padding(horizontal = spacing.windowPadding)
                     .padding(bottom = spacing.small),
             ) {
+                val shareIconId = "shareIcon"
+                val shareIconSize = 14.sp
                 ParagraphText(
-                    stringResource(R.string.help_share_source_text, stringResource(R.string.app_name))
+                    annotatedStringResource(
+                        R.string.help_share_source_text,
+                        FormatArg.InlineContent(shareIconId),
+                        FormatArg.Text(stringResource(R.string.app_name)),
+                    ),
+                    inlineContent = mapOf(
+                        shareIconId to InlineTextContent(
+                            Placeholder(
+                                width = 14.sp,
+                                height = 14.sp,
+                                placeholderVerticalAlign = PlaceholderVerticalAlign.Center,
+                            )
+                        ) {
+                            Icon(
+                                Icons.Default.Share,
+                                contentDescription = null,
+                                Modifier.requiredSize(with(LocalDensity.current) { shareIconSize.toDp() }),
+                            )
+                        }
+                    )
                 )
             }
         }

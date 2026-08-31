@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.ui.components
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalResources
@@ -17,6 +18,7 @@ import page.ooooo.geoshare.lib.parseFormatString
 
 sealed interface FormatArg {
     data class Text(val text: String, val style: SpanStyle? = null) : FormatArg
+    data class InlineContent(val id: String) : FormatArg
     data class Link(val text: String, val onClick: () -> Unit) : FormatArg
 }
 
@@ -39,6 +41,9 @@ fun annotatedStringResource(@StringRes id: Int, vararg formatArgs: FormatArg): A
                         } else {
                             append(argument.text)
                         }
+
+                    is FormatArg.InlineContent ->
+                        appendInlineContent(argument.id)
 
                     is FormatArg.Link ->
                         ClickableLink(argument.text, onClick = argument.onClick)

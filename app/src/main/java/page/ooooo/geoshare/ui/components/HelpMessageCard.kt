@@ -10,9 +10,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -27,13 +30,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -124,12 +131,37 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             HelpMessageCard(
-                helpMessage = HelpMessage.WELCOME,
+                helpMessage = HelpMessage.SHARE_SOURCE,
                 dismissedHelpMessages = MutableStateFlow(emptySet()),
-                title = { Text(stringResource(R.string.help_welcome_title)) },
+                title = { Text(stringResource(R.string.help_share_source_title)) },
+                actionText = { stringResource(R.string.help_share_source_action, "OsmAnd") },
+                onAction = {},
                 onDismiss = {},
             ) {
-                ParagraphText(stringResource(R.string.help_welcome_text))
+                val shareIconId = "shareIcon"
+                val shareIconSize = 14.sp
+                ParagraphText(
+                    annotatedStringResource(
+                        R.string.help_share_source_text,
+                        FormatArg.InlineContent(shareIconId),
+                        FormatArg.Text(stringResource(R.string.app_name)),
+                    ),
+                    inlineContent = mapOf(
+                        shareIconId to InlineTextContent(
+                            Placeholder(
+                                width = 14.sp,
+                                height = 14.sp,
+                                placeholderVerticalAlign = PlaceholderVerticalAlign.Center,
+                            )
+                        ) {
+                            Icon(
+                                Icons.Default.Share,
+                                contentDescription = null,
+                                Modifier.requiredSize(with(LocalDensity.current) { shareIconSize.toDp() }),
+                            )
+                        }
+                    )
+                )
             }
         }
     }
@@ -141,12 +173,37 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             HelpMessageCard(
-                helpMessage = HelpMessage.WELCOME,
+                helpMessage = HelpMessage.SHARE_SOURCE,
                 dismissedHelpMessages = MutableStateFlow(emptySet()),
-                title = { Text(stringResource(R.string.help_welcome_title)) },
+                title = { Text(stringResource(R.string.help_share_source_title)) },
+                actionText = { stringResource(R.string.help_share_source_action, "OsmAnd") },
+                onAction = {},
                 onDismiss = {},
             ) {
-                ParagraphText(stringResource(R.string.help_welcome_text))
+                val shareIconId = "shareIcon"
+                val shareIconSize = 14.sp
+                ParagraphText(
+                    annotatedStringResource(
+                        R.string.help_share_source_text,
+                        FormatArg.InlineContent(shareIconId),
+                        FormatArg.Text(stringResource(R.string.app_name)),
+                    ),
+                    inlineContent = mapOf(
+                        shareIconId to InlineTextContent(
+                            Placeholder(
+                                width = 14.sp,
+                                height = 14.sp,
+                                placeholderVerticalAlign = PlaceholderVerticalAlign.Center,
+                            )
+                        ) {
+                            Icon(
+                                Icons.Default.Share,
+                                contentDescription = null,
+                                Modifier.requiredSize(with(LocalDensity.current) { shareIconSize.toDp() }),
+                            )
+                        }
+                    )
+                )
             }
         }
     }
@@ -158,12 +215,37 @@ private fun TabletPreview() {
     AppTheme {
         Surface {
             HelpMessageCard(
-                helpMessage = HelpMessage.WELCOME,
+                helpMessage = HelpMessage.SHARE_SOURCE,
                 dismissedHelpMessages = MutableStateFlow(emptySet()),
-                title = { Text(stringResource(R.string.help_welcome_title)) },
+                title = { Text(stringResource(R.string.help_share_source_title)) },
+                actionText = { stringResource(R.string.help_share_source_action, "OsmAnd") },
+                onAction = {},
                 onDismiss = {},
             ) {
-                ParagraphText(stringResource(R.string.help_welcome_text))
+                val shareIconId = "shareIcon"
+                val shareIconSize = 14.sp
+                ParagraphText(
+                    annotatedStringResource(
+                        R.string.help_share_source_text,
+                        FormatArg.InlineContent(shareIconId),
+                        FormatArg.Text(stringResource(R.string.app_name)),
+                    ),
+                    inlineContent = mapOf(
+                        shareIconId to InlineTextContent(
+                            Placeholder(
+                                width = 14.sp,
+                                height = 14.sp,
+                                placeholderVerticalAlign = PlaceholderVerticalAlign.Center,
+                            )
+                        ) {
+                            Icon(
+                                Icons.Default.Share,
+                                contentDescription = null,
+                                Modifier.requiredSize(with(LocalDensity.current) { shareIconSize.toDp() }),
+                            )
+                        }
+                    )
+                )
             }
         }
     }
