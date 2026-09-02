@@ -319,7 +319,14 @@
     <string name="user_preferences_finish_after_action_succeeded_and_opened_app">在通过该应用分享链接并打开地图应用后关闭应用</string>
     <string name="user_preferences_finish_after_action_succeeded">在通过该应用分享链接并执行任何操作（打开地图应用、复制坐标、保存 GPX 等）后关闭应用</string>
     <string name="conversion_failed_unsupported_source_google_search">不支持 Google 搜索链接</string>
-    <string name="help_open_by_default_text">可以配置 Android 系统使得轻触地图链接始终打开 %1$s 而不是默认地图。</string>
-    <string name="help_share_source_text">在很多地图应用中可用分享按钮 %1$s 在 %2$s 中打开一个位置。</string>
-    <string name="help_welcome_text">已经有地图链接了？在表单中输入并按 %1$s。</string>
+    <string name="help_open_by_default_text">您可以配置 Android 系统，使点击地图链接始终打开 %1$s 而不是默认地图。</string>
+    <string name="help_share_source_text">在许多地图应用中，您可以使用分享按钮 %1$s 在 %2$s 中打开位置。</string>
+    <string name="help_welcome_text">您有地图链接了吗？请在表单中输入，然后按 %1$s。</string>
+    <string name="help_welcome_title">欢迎</string>
+    <string name="help_open_by_default_action">在常见问题中了解详情</string>
+    <string name="help_open_by_default_title">始终在 %1$s 中打开地图链接</string>
+    <string name="help_share_source_action">在 %1$s 中试试</string>
+    <string name="help_share_source_title">从地图应用中启动 GeoShare</string>
+    <string name="help_welcome_action">或者复制此示例：</string>
+    <string name="faq_open_by_default_headline">如何始终在 %1$s 中打开链接</string>
 </resources>
