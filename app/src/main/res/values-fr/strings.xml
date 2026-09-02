@@ -333,4 +333,14 @@
     <string name="user_preferences_finish_never">Ne fermez pas automatiquement l’application</string>
     <string name="user_preferences_finish_title">Fermeture</string>
     <string name="conversion_failed_unsupported_source_google_search">Les liens vers la recherche Google ne sont pas pris en charge</string>
+    <string name="help_open_by_default_action">Pour en savoir plus, consultez la FAQ</string>
+    <string name="help_open_by_default_text">Vous pouvez configurer Android de manière à ce que, lorsque vous appuyez sur un lien vers une carte, %1$s s\'ouvre systématiquement à la place de l\'application de cartographie par défaut.</string>
+    <string name="help_open_by_default_title">Toujours ouvrir les liens vers les cartes dans %1$s</string>
+    <string name="help_share_source_action">Essayez-le dans %1$s</string>
+    <string name="help_share_source_text">Dans de nombreuses applications de cartographie, vous pouvez utiliser un bouton de partage %1$s pour ouvrir un lieu dans %2$s.</string>
+    <string name="help_share_source_title">Lancer GeoShare depuis une application de cartographie</string>
+    <string name="help_welcome_action">Ou copiez cet exemple :</string>
+    <string name="help_welcome_text">Avez-vous un lien vers une carte ? Saisissez-le dans le formulaire et appuyez sur %1$s.</string>
+    <string name="help_welcome_title">Bienvenue</string>
+    <string name="faq_open_by_default_headline">Comment ouvrir systématiquement les liens dans %1$s</string>
 </resources>
