@@ -319,4 +319,7 @@
     <string name="user_preferences_finish_after_action_succeeded_and_opened_app">在通过该应用分享链接并打开地图应用后关闭应用</string>
     <string name="user_preferences_finish_after_action_succeeded">在通过该应用分享链接并执行任何操作（打开地图应用、复制坐标、保存 GPX 等）后关闭应用</string>
     <string name="conversion_failed_unsupported_source_google_search">不支持 Google 搜索链接</string>
+    <string name="help_open_by_default_text">可以配置 Android 系统使得轻触地图链接始终打开 %1$s 而不是默认地图。</string>
+    <string name="help_share_source_text">在很多地图应用中可用分享按钮 %1$s 在 %2$s 中打开一个位置。</string>
+    <string name="help_welcome_text">已经有地图链接了？在表单中输入并按 %1$s。</string>
 </resources>
