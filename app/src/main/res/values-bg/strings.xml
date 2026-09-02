@@ -326,4 +326,14 @@
     <string name="user_preferences_finish_never">Не затваряй приложението автоматично</string>
     <string name="user_preferences_finish_title">Затваряне</string>
     <string name="conversion_failed_unsupported_source_google_search">Връзките към търсенето в Google не се поддържат</string>
+    <string name="help_open_by_default_action">Научете повече в ЧЗВ</string>
+    <string name="help_open_by_default_text">Можете да конфигурирате Android така, че докосването на връзка към карта винаги да отваря %1$s вместо картата по подразбиране.</string>
+    <string name="help_open_by_default_title">Винаги отваряй връзките към картата в %1$s</string>
+    <string name="help_share_source_action">Опитайте го в %1$s</string>
+    <string name="help_share_source_text">В много приложения за карти можете да използвате бутон за споделяне %1$s, за да отворите местоположение в %2$s.</string>
+    <string name="help_share_source_title">Стартирайте GeoShare от приложение за карти</string>
+    <string name="help_welcome_action">Или копирайте този пример:</string>
+    <string name="help_welcome_text">Имате ли готова връзка към картата? Въведете я във формуляра и натиснете %1$s.</string>
+    <string name="help_welcome_title">Добре дошли</string>
+    <string name="faq_open_by_default_headline">Как винаги да отварям връзки в %1$s</string>
 </resources>
