@@ -340,4 +340,14 @@
     <string name="user_preferences_finish_after_action_succeeded">Закрывать приложение после обмена с ним ссылкой и выполнения какого-либо действия (запуск картографического приложения, копирование координат, сохранение GPX и т.д.)</string>
     <string name="user_preferences_finish_after_action_succeeded_and_opened_app">Закрывать приложение после обмена с ним ссылкой и запуска картографического приложения</string>
     <string name="conversion_failed_unsupported_source_google_search">Ссылки Google Поиска не поддерживаются</string>
+    <string name="help_open_by_default_action">Подробнее в ЧаВо</string>
+    <string name="help_open_by_default_text">Можно настроить Android так, чтобы при нажатии ссылки на карту всегда открывалось приложение %1$s вместо стандартного картографического приложения.</string>
+    <string name="help_open_by_default_title">Всегда открывать ссылки на карты в %1$s</string>
+    <string name="help_share_source_action">Попробовать в %1$s</string>
+    <string name="help_share_source_text">В большинстве картографический приложений можно использовать кнопку %1$s, чтобы открыть местоположение в %2$s.</string>
+    <string name="help_share_source_title">Запуск GeoShare из картографического приложения</string>
+    <string name="help_welcome_action">Или скопируйте этот пример:</string>
+    <string name="help_welcome_text">Уже есть готовая ссылка на карту? Введите её в поле ввода и нажмите «%1$s».</string>
+    <string name="help_welcome_title">Добро пожаловать</string>
+    <string name="faq_open_by_default_headline">Как всегда открывать ссылки в %1$s</string>
 </resources>
