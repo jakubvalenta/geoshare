@@ -339,4 +339,14 @@
     <string name="user_preferences_finish_never">Nezavírat aplikaci automaticky</string>
     <string name="user_preferences_finish_title">Zavírání</string>
     <string name="conversion_failed_unsupported_source_google_search">Odkazy z vyhledávače Google nejsou podporovány</string>
+    <string name="help_open_by_default_action">Více najdete v Nejčastějších dotazech</string>
+    <string name="help_open_by_default_text">Můžete nastavit svůj Android tak, aby se po klepnutí na odkaz na mapu vždy otevřel %1$s místo výchozí mapy.</string>
+    <string name="help_open_by_default_title">Vždy otevírat odkazy na mapy v %1$s</string>
+    <string name="help_share_source_action">Zkuste to v aplikaci %1$s</string>
+    <string name="help_share_source_text">V mnoha mapových aplikacích můžete použít tlačítko sdílení %1$s pro otevření polohy v %2$s.</string>
+    <string name="help_share_source_title">Spusťte GeoShare z mapové aplikace</string>
+    <string name="help_welcome_action">Nebo zkopírujte tento příklad:</string>
+    <string name="help_welcome_text">Máte připravený odkaz na mapu? Zadejte jej do formuláře a stiskněte „%1$s“.</string>
+    <string name="help_welcome_title">Vítejte</string>
+    <string name="faq_open_by_default_headline">Jak vždy otevírat odkazy v %1$s</string>
 </resources>
