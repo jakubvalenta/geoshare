@@ -29,6 +29,8 @@ import page.ooooo.geoshare.lib.conversion.BasicActionReady
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
 import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.ConversionStateContext
+import page.ooooo.geoshare.lib.conversion.ConversionStateHistory
+import page.ooooo.geoshare.lib.conversion.ConversionStateHistoryItem
 import page.ooooo.geoshare.lib.conversion.FileActionReady
 import page.ooooo.geoshare.lib.conversion.FileUriRequested
 import page.ooooo.geoshare.lib.conversion.Initial
@@ -43,6 +45,7 @@ import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.ActionResult
 import page.ooooo.geoshare.lib.outputs.LocationAction
 import javax.inject.Inject
+import kotlin.time.TimeSource
 
 @HiltViewModel
 class ConversionViewModel @Inject constructor(
@@ -58,6 +61,11 @@ class ConversionViewModel @Inject constructor(
     private val _currentState = MutableStateFlow<ConversionState>(Initial)
     val currentState: StateFlow<ConversionState> = _currentState.asStateFlow()
 
+    private val _stateHistory = MutableStateFlow<ConversionStateHistory>(emptyList())
+    val stateHistory: StateFlow<ConversionStateHistory> = _stateHistory.asStateFlow()
+
+    private val timeSource = TimeSource.Monotonic
+
     val stateContext = ConversionStateContext(
         inputs = inputRepository.all,
         linkRepository = linkRepository,
@@ -68,6 +76,10 @@ class ConversionViewModel @Inject constructor(
     ) { newState ->
         Log.d(TAG, "Transitioned state to $newState")
         _currentState.value = newState
+        if (newState is SourceReceived) {
+            _stateHistory.value = emptyList()
+        }
+        _stateHistory.value += ConversionStateHistoryItem(newState, timeSource.markNow())
     }
 
     private val _source = savedStateHandle.getMutableStateFlow("source", "")

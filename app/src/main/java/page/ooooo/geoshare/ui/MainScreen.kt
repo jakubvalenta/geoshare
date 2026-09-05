@@ -103,6 +103,7 @@ import page.ooooo.geoshare.lib.conversion.ActionCompleted
 import page.ooooo.geoshare.lib.conversion.BasicActionReady
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
 import page.ooooo.geoshare.lib.conversion.ConversionState
+import page.ooooo.geoshare.lib.conversion.ConversionStateHistory
 import page.ooooo.geoshare.lib.conversion.ConversionSucceeded
 import page.ooooo.geoshare.lib.conversion.FileActionReady
 import page.ooooo.geoshare.lib.conversion.FileUriRequested
@@ -135,6 +136,7 @@ import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.ConversionWebView
 import page.ooooo.geoshare.ui.components.HelpMessageCard
 import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
+import page.ooooo.geoshare.ui.components.LoadingIndicatorHistory
 import page.ooooo.geoshare.ui.components.MainForm
 import page.ooooo.geoshare.ui.components.MainHeadline
 import page.ooooo.geoshare.ui.components.MainHelp
@@ -322,6 +324,7 @@ fun MainScreen(
         outputsForPoints = outputsForPoints,
         outputsForPointsChips = outputsForPointsChips,
         outputsForSharing = outputsForSharing,
+        stateHistory = conversionViewModel.stateHistory,
         source = conversionViewModel.source,
         sourceComesFromIntent = conversionViewModel.sourceComesFromIntent,
         userPreferenceMessage = userPreferencesMessage,
@@ -399,6 +402,7 @@ private fun MainScreen(
     outputsForSharing: List<Output>,
     source: StateFlow<String>,
     sourceComesFromIntent: StateFlow<Boolean>,
+    stateHistory: StateFlow<ConversionStateHistory>,
     userPreferenceMessage: Message?,
     onCancel: () -> Unit,
     onDeny: (Boolean) -> Unit,
@@ -507,6 +511,7 @@ private fun MainScreen(
                                         item {
                                             MainLoadingIndicator(
                                                 loadingIndicator = largeLoadingIndicator,
+                                                stateHistory = stateHistory,
                                                 onCancel = onCancel,
                                             )
                                         }
@@ -627,6 +632,7 @@ private fun MainScreen(
                                             is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
                                                 MainLoadingIndicator(
                                                     loadingIndicator = largeLoadingIndicator,
+                                                    stateHistory = stateHistory,
                                                     onCancel = onCancel,
                                                 )
 
@@ -882,6 +888,7 @@ private fun MainTitle(
 @Composable
 private fun MainLoadingIndicator(
     loadingIndicator: LoadingIndicator.Large,
+    stateHistory: StateFlow<ConversionStateHistory>,
     onCancel: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -920,6 +927,7 @@ private fun MainLoadingIndicator(
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
+        LoadingIndicatorHistory(stateHistory)
     }
 }
 
@@ -1052,6 +1060,7 @@ private fun DefaultPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            stateHistory = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -1105,6 +1114,7 @@ private fun DarkPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            stateHistory = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -1158,6 +1168,7 @@ private fun SmallPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            stateHistory = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -1211,6 +1222,7 @@ private fun TabletPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            stateHistory = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -1323,6 +1335,7 @@ private fun SucceededPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
+            stateHistory = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(true),
             userPreferenceMessage = null,
@@ -1435,6 +1448,7 @@ private fun DarkSucceededPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
+            stateHistory = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(true),
             userPreferenceMessage = null,
@@ -1546,6 +1560,7 @@ private fun SmallSucceededPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
+            stateHistory = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(true),
             userPreferenceMessage = null,
@@ -1658,6 +1673,7 @@ private fun TabletSucceededPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
+            stateHistory = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -1719,6 +1735,7 @@ private fun ErrorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            stateHistory = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -1780,6 +1797,7 @@ private fun DarkErrorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            stateHistory = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -1841,6 +1859,7 @@ private fun TabletErrorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            stateHistory = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -1903,6 +1922,7 @@ private fun WarningPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            stateHistory = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -1965,6 +1985,7 @@ private fun DarkWarningPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            stateHistory = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -2033,6 +2054,7 @@ private fun LoadingIndicatorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            stateHistory = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -2101,6 +2123,7 @@ private fun DarkLoadingIndicatorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            stateHistory = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -2169,6 +2192,7 @@ private fun TabletLoadingIndicatorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            stateHistory = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -2234,6 +2258,7 @@ private fun WebViewPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            stateHistory = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -2299,6 +2324,7 @@ private fun DarkWebViewPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            stateHistory = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -2364,6 +2390,7 @@ private fun TabletWebViewPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            stateHistory = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -2425,6 +2452,7 @@ private fun EmptyPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            stateHistory = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
