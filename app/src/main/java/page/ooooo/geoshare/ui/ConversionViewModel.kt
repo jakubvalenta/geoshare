@@ -38,7 +38,6 @@ import page.ooooo.geoshare.lib.conversion.LocationRationaleConfirmed
 import page.ooooo.geoshare.lib.conversion.LocationRationaleShown
 import page.ooooo.geoshare.lib.conversion.LocationReceived
 import page.ooooo.geoshare.lib.conversion.SourceReceived
-import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.ActionResult
@@ -56,8 +55,8 @@ class ConversionViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val _currentState = MutableStateFlow<State>(Initial())
-    val currentState: StateFlow<State> = _currentState.asStateFlow()
+    private val _currentState = MutableStateFlow<ConversionState>(Initial)
+    val currentState: StateFlow<ConversionState> = _currentState.asStateFlow()
 
     val stateContext = ConversionStateContext(
         inputs = inputRepository.all,
@@ -67,7 +66,7 @@ class ConversionViewModel @Inject constructor(
         userPreferencesRepository = userPreferencesRepository,
         billing = billing,
     ) { newState ->
-        Log.d(TAG, "Current state is $newState")
+        Log.d(TAG, "Transitioned state to $newState")
         _currentState.value = newState
     }
 
@@ -91,10 +90,10 @@ class ConversionViewModel @Inject constructor(
 
     fun start(sourceComesFromIntent: Boolean) {
         _sourceComesFromIntent.value = sourceComesFromIntent
-        transition { SourceReceived(stateContext, _source.value) }
+        transition { SourceReceived(_source.value) }
     }
 
-    private fun transition(initialState: (suspend () -> State)) {
+    private fun transition(initialState: (suspend () -> ConversionState)) {
         transitionJob?.cancel()
         transitionJob = viewModelScope.launch(transitionExceptionHandler) {
             stateContext.currentState = initialState()
@@ -104,13 +103,13 @@ class ConversionViewModel @Inject constructor(
 
     fun grant(doNotAsk: Boolean) {
         (stateContext.currentState as? ConversionState.HasPermission)?.apply {
-            transition { grant(doNotAsk) }
+            transition { grant(stateContext, doNotAsk) }
         }
     }
 
     fun deny(doNotAsk: Boolean) {
         (stateContext.currentState as? ConversionState.HasPermission)?.apply {
-            transition { deny(doNotAsk) }
+            transition { deny(stateContext, doNotAsk) }
         }
     }
 
@@ -120,13 +119,13 @@ class ConversionViewModel @Inject constructor(
 
     fun reset() {
         if (stateContext.currentState !is Initial) {
-            stateContext.currentState = Initial()
+            stateContext.currentState = Initial
         }
     }
 
     fun retry() {
         (stateContext.currentState as? ConversionState.HasError)?.apply {
-            transition { SourceReceived(stateContext, source) }
+            transition { SourceReceived(source) }
         }
     }
 
@@ -178,13 +177,13 @@ class ConversionViewModel @Inject constructor(
 
     fun skipLocationRationale(action: LocationAction<*>, isAutomation: Boolean) {
         (stateContext.currentState as? ConversionState.HasResult)?.apply {
-            transition { LocationPermissionReceived(stateContext, source, points, action, isAutomation) }
+            transition { LocationPermissionReceived(source, points, action, isAutomation) }
         }
     }
 
     fun receiveLocationPermission() {
         (stateContext.currentState as? LocationRationaleConfirmed)?.apply {
-            transition { LocationPermissionReceived(stateContext, source, points, action, isAutomation) }
+            transition { LocationPermissionReceived(source, points, action, isAutomation) }
         }
     }
 

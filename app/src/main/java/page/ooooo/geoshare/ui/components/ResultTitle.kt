@@ -42,26 +42,21 @@ import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.OutputRepository
-import page.ooooo.geoshare.data.di.FakeLinkRepository
-import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.billing.AutomationFeature
-import page.ooooo.geoshare.lib.billing.BillingImpl
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.CustomLinkFeature
 import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.conversion.ActionAutomationFailed
 import page.ooooo.geoshare.lib.conversion.ActionAutomationSucceeded
-import page.ooooo.geoshare.lib.conversion.ActionFailed
 import page.ooooo.geoshare.lib.conversion.ActionCompleted
+import page.ooooo.geoshare.lib.conversion.ActionFailed
 import page.ooooo.geoshare.lib.conversion.ActionSucceeded
 import page.ooooo.geoshare.lib.conversion.ActionWaiting
 import page.ooooo.geoshare.lib.conversion.ConversionState
-import page.ooooo.geoshare.lib.conversion.ConversionStateContext
 import page.ooooo.geoshare.lib.conversion.LocationFindingFailed
 import page.ooooo.geoshare.lib.conversion.LocationPermissionReceived
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
@@ -175,7 +170,7 @@ fun ResultTitle(
 
             is ConversionState.HasSmallLoadingIndicator -> ResultMessageRow {
                 ResultMessageText(
-                    targetState.getLoadingIndicator().message,
+                    targetState.getLoadingIndicator(LocalResources.current).message,
                     Modifier.testTag("geoShareResultSmallLoadingIndicatorMessage"),
                 )
                 FilledIconButton(
@@ -402,23 +397,12 @@ private fun ActionWaitingPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val resources = LocalResources.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val outputRepository = OutputRepository(
-                coordinateConverter = coordinateConverter,
-            )
             val output = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultTitle(
                 currentState = ActionWaiting(
-                    stateContext = ConversionStateContext(
-                        linkRepository = FakeLinkRepository(),
-                        outputRepository = outputRepository,
-                        resources = resources,
-                        userPreferencesRepository = FakeUserPreferencesRepository(),
-                        billing = BillingImpl(LocalContext.current),
-                    ),
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = output.toAction(WGS84Point(NaivePoint.example)),
@@ -454,23 +438,12 @@ private fun DarkActionWaitingPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val resources = LocalResources.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val outputRepository = OutputRepository(
-                coordinateConverter = coordinateConverter,
-            )
             val output = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultTitle(
                 currentState = ActionWaiting(
-                    stateContext = ConversionStateContext(
-                        linkRepository = FakeLinkRepository(),
-                        outputRepository = outputRepository,
-                        resources = resources,
-                        userPreferencesRepository = FakeUserPreferencesRepository(),
-                        billing = BillingImpl(LocalContext.current),
-                    ),
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = output.toAction(WGS84Point(NaivePoint.example)),
@@ -506,22 +479,11 @@ private fun LocationPermissionReceivedPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val resources = LocalResources.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val outputRepository = OutputRepository(
-                coordinateConverter = coordinateConverter,
-            )
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultTitle(
                 currentState = LocationPermissionReceived(
-                    stateContext = ConversionStateContext(
-                        linkRepository = FakeLinkRepository(),
-                        outputRepository = outputRepository,
-                        resources = resources,
-                        userPreferencesRepository = FakeUserPreferencesRepository(),
-                        billing = BillingImpl(LocalContext.current),
-                    ),
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter)
@@ -556,22 +518,11 @@ private fun DarkLocationPermissionReceivedPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val resources = LocalResources.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val outputRepository = OutputRepository(
-                coordinateConverter = coordinateConverter,
-            )
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultTitle(
                 currentState = LocationPermissionReceived(
-                    stateContext = ConversionStateContext(
-                        linkRepository = FakeLinkRepository(),
-                        outputRepository = outputRepository,
-                        resources = resources,
-                        userPreferencesRepository = FakeUserPreferencesRepository(),
-                        billing = BillingImpl(LocalContext.current),
-                    ),
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter)

@@ -17,6 +17,7 @@ class ActionReadyTest {
     private val coordinateConverter: CoordinateConverter = mock()
     private val source = "https://maps.google.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+    private val stateContext: ConversionStateContext = mock()
 
     @Test
     fun transition_whenActionIsCopyCoordsDec_returnsBasicActionReady() = runTest {
@@ -24,7 +25,7 @@ class ActionReadyTest {
         val state = ActionReady(source, points, action, isAutomation = true)
         assertEquals(
             BasicActionReady(source, points, action, isAutomation = true),
-            state.transition(),
+            state.transition(stateContext),
         )
     }
 
@@ -34,7 +35,7 @@ class ActionReadyTest {
         val state = ActionReady(source, points, action, isAutomation = true)
         assertEquals(
             FileUriRequested(source, points, action, isAutomation = true),
-            state.transition(),
+            state.transition(stateContext),
         )
     }
 
@@ -44,7 +45,7 @@ class ActionReadyTest {
         val state = ActionReady(source, points, action, isAutomation = true)
         assertEquals(
             LocationRationaleRequested(source, points, action, isAutomation = true),
-            state.transition(),
+            state.transition(stateContext),
         )
     }
 }

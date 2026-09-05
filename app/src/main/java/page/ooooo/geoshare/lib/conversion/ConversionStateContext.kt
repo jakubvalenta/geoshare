@@ -20,11 +20,26 @@ class ConversionStateContext(
     val log: Log = DefaultLog,
     val billing: Billing,
     val uriQuote: UriQuote = DefaultUriQuote,
-    val onStateChange: (State) -> Unit = {},
-) : StateContext() {
-    override var currentState: State = Initial()
+    val onStateChange: (ConversionState) -> Unit = {},
+) {
+    var currentState: ConversionState = Initial
         set(value) {
             field = value
             onStateChange(value)
         }
+
+    suspend fun transition() {
+        var i = 0
+        while (i < MAX_ITERATIONS) {
+            currentState = currentState.transition(this) ?: break
+            i++
+        }
+        if (i >= MAX_ITERATIONS) {
+            throw IllegalStateException("Exceeded max state iterations")
+        }
+    }
+
+    companion object {
+        const val MAX_ITERATIONS = 30
+    }
 }

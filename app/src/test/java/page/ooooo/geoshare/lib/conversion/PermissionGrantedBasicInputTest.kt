@@ -82,7 +82,6 @@ class PermissionGrantedBasicInputTest {
     @Test
     fun transition_whenInputFetchSucceedsAndParseReturnsSuccess_returnsDataParsed() = runTest {
         val state = PermissionGrantedBasicInput(
-            stateContext,
             source,
             matchedInput,
             permission,
@@ -93,13 +92,12 @@ class PermissionGrantedBasicInputTest {
         )
         assertEquals(
             DataParsed(
-                stateContext,
                 source,
                 matchedInput,
                 permission,
                 results + (matchedInput to result.copy(next = next.copy(match = "$source-data"))),
             ),
-            state.transition(),
+            state.transition(stateContext),
         )
     }
 
@@ -117,7 +115,6 @@ class PermissionGrantedBasicInputTest {
             }
             val matchedInput = MatchedInput<BasicInput<String>>(input, source)
             val state = PermissionGrantedBasicInput(
-                stateContext,
                 source,
                 matchedInput,
                 permission,
@@ -132,7 +129,7 @@ class PermissionGrantedBasicInputTest {
                     resources.getString(R.string.conversion_failed_unsupported_source_place_list),
                     warning = true,
                 ),
-                state.transition(),
+                state.transition(stateContext),
             )
         }
 
@@ -147,7 +144,6 @@ class PermissionGrantedBasicInputTest {
         }
         val matchedInput = MatchedInput<BasicInput<String>>(input, source)
         val state = PermissionGrantedBasicInput(
-            stateContext,
             source,
             matchedInput,
             permission,
@@ -158,7 +154,7 @@ class PermissionGrantedBasicInputTest {
         )
         assertEquals(
             ConversionFailed(source, resources.getString(R.string.conversion_failed_cancelled)),
-            state.transition(),
+            state.transition(stateContext),
         )
     }
 
@@ -173,7 +169,6 @@ class PermissionGrantedBasicInputTest {
         }
         val matchedInput = MatchedInput<BasicInput<String>>(input, source)
         val state = PermissionGrantedBasicInput(
-            stateContext,
             source,
             matchedInput,
             permission,
@@ -187,7 +182,7 @@ class PermissionGrantedBasicInputTest {
                 source,
                 resources.getString(R.string.conversion_failed_reason_invalid_url),
             ),
-            state.transition(),
+            state.transition(stateContext),
         )
     }
 
@@ -203,7 +198,6 @@ class PermissionGrantedBasicInputTest {
         }
         val matchedInput = MatchedInput<BasicInput<String>>(input, source)
         val state = PermissionGrantedBasicInput(
-            stateContext,
             source,
             matchedInput,
             permission,
@@ -215,7 +209,6 @@ class PermissionGrantedBasicInputTest {
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
                 PermissionGrantedBasicInput(
-                    stateContext,
                     source,
                     matchedInput,
                     permission,
@@ -223,7 +216,7 @@ class PermissionGrantedBasicInputTest {
                     lastAttempt = Attempt(1, cause),
                     maxAttempts,
                 ),
-                state.transition(),
+                state.transition(stateContext),
             )
         }
         assertEquals(0.seconds, workDuration)
@@ -242,7 +235,6 @@ class PermissionGrantedBasicInputTest {
         val matchedInput = MatchedInput<BasicInput<String>>(input, source)
         val lastAttempt = Attempt<RecoverableNetworkException>(1, lastCause)
         val state = PermissionGrantedBasicInput(
-            stateContext,
             source,
             matchedInput,
             permission,
@@ -254,7 +246,6 @@ class PermissionGrantedBasicInputTest {
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
                 PermissionGrantedBasicInput(
-                    stateContext,
                     source,
                     matchedInput,
                     permission,
@@ -262,7 +253,7 @@ class PermissionGrantedBasicInputTest {
                     lastAttempt = Attempt(2, cause),
                     maxAttempts,
                 ),
-                state.transition(),
+                state.transition(stateContext),
             )
         }
         assertEquals(1.seconds, workDuration)
@@ -281,7 +272,6 @@ class PermissionGrantedBasicInputTest {
             val matchedInput = MatchedInput<BasicInput<String>>(input, source)
             val lastAttempt = Attempt<RecoverableNetworkException>(3, lastCause)
             val state = PermissionGrantedBasicInput(
-                stateContext,
                 source,
                 matchedInput,
                 permission,
@@ -296,7 +286,7 @@ class PermissionGrantedBasicInputTest {
                         source,
                         resources.getString(R.string.network_exception_eof),
                     ),
-                    state.transition(),
+                    state.transition(stateContext),
                 )
             }
             assertEquals(0.seconds, workDuration)
@@ -326,7 +316,6 @@ class PermissionGrantedBasicInputTest {
         val matchedInput = MatchedInput<BasicInput<String>>(input, source)
         val lastAttempt = null
         val state = PermissionGrantedBasicInput(
-            stateContext,
             source,
             matchedInput,
             permission,
@@ -341,14 +330,13 @@ class PermissionGrantedBasicInputTest {
                 resources.getString(R.string.network_exception_response_error, HttpStatusCode.NotFound.value),
                 details = "Request URL: $requestUrl",
             ),
-            state.transition(),
+            state.transition(stateContext),
         )
     }
 
     @Test
     fun getLoadingIndicator_whenLastAttemptIsNull_returnsLargeLoadingIndicatorWithoutDescription() = runTest {
         val state = PermissionGrantedBasicInput(
-            stateContext,
             source,
             matchedInput,
             permission,
@@ -360,7 +348,7 @@ class PermissionGrantedBasicInputTest {
             LoadingIndicator.Large(
                 title = resources.getString(R.string.converter_google_maps_loading_indicator_title),
             ),
-            state.getLoadingIndicator(),
+            state.getLoadingIndicator(resources),
         )
     }
 
@@ -368,7 +356,6 @@ class PermissionGrantedBasicInputTest {
     fun getLoadingIndicator_whenLastAttemptNumberIsOne_returnsLargeLoadingIndicatorWithDescription() = runTest {
         val lastAttempt = Attempt<RecoverableNetworkException>(1, lastCause)
         val state = PermissionGrantedBasicInput(
-            stateContext,
             source,
             matchedInput,
             permission,
@@ -386,7 +373,7 @@ class PermissionGrantedBasicInputTest {
                     resources.getString(R.string.network_exception_eof),
                 ),
             ),
-            state.getLoadingIndicator(),
+            state.getLoadingIndicator(resources),
         )
     }
 }

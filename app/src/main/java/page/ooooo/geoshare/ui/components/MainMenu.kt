@@ -35,8 +35,8 @@ import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
+import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.Initial
-import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.ui.FaqItemId
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -44,7 +44,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun MainMenu(
-    currentState: State,
+    currentState: ConversionState,
     billingAppNameResId: Int,
     billingStatus: BillingStatus,
     changelogShown: Boolean = true,
@@ -170,7 +170,7 @@ private fun DefaultPreview() {
                     title = {},
                     actions = {
                         MainMenu(
-                            currentState = Initial(),
+                            currentState = Initial,
                             billingAppNameResId = R.string.app_name_pro,
                             billingStatus = BillingStatus.NotPurchased(),
                             changelogShown = false,
@@ -200,7 +200,7 @@ private fun DarkPreview() {
                     title = {},
                     actions = {
                         MainMenu(
-                            currentState = Initial(),
+                            currentState = Initial,
                             billingAppNameResId = R.string.app_name_pro,
                             billingStatus = BillingStatus.NotPurchased(),
                             changelogShown = false,
@@ -230,7 +230,7 @@ private fun DonationPreview() {
                     title = {},
                     actions = {
                         MainMenu(
-                            currentState = Initial(),
+                            currentState = Initial,
                             billingAppNameResId = R.string.app_name_pro,
                             billingStatus = BillingStatus.Purchased(
                                 product = BillingProduct("test", BillingProduct.Type.DONATION),
@@ -265,7 +265,7 @@ private fun DarkDonationPreview() {
                     title = {},
                     actions = {
                         MainMenu(
-                            currentState = Initial(),
+                            currentState = Initial,
                             billingAppNameResId = R.string.app_name_pro,
                             billingStatus = BillingStatus.Purchased(
                                 product = BillingProduct("test", BillingProduct.Type.DONATION),

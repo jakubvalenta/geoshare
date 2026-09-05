@@ -82,8 +82,6 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.InputRepository
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.FakeInputRepository
-import page.ooooo.geoshare.data.di.FakeLinkRepository
-import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
@@ -97,7 +95,6 @@ import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.billing.AutomationFeature
-import page.ooooo.geoshare.lib.billing.BillingImpl
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.CustomLinkFeature
@@ -106,7 +103,6 @@ import page.ooooo.geoshare.lib.conversion.ActionCompleted
 import page.ooooo.geoshare.lib.conversion.BasicActionReady
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
 import page.ooooo.geoshare.lib.conversion.ConversionState
-import page.ooooo.geoshare.lib.conversion.ConversionStateContext
 import page.ooooo.geoshare.lib.conversion.ConversionSucceeded
 import page.ooooo.geoshare.lib.conversion.FileActionReady
 import page.ooooo.geoshare.lib.conversion.FileUriRequested
@@ -120,7 +116,6 @@ import page.ooooo.geoshare.lib.conversion.LocationRationaleShown
 import page.ooooo.geoshare.lib.conversion.PermissionGrantedBasicInput
 import page.ooooo.geoshare.lib.conversion.PermissionGrantedWebViewInput
 import page.ooooo.geoshare.lib.conversion.PermissionRequested
-import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.lib.extensions.truncateMiddle
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
@@ -303,7 +298,8 @@ fun MainScreen(
         // Wait for 200ms and then show or hide loading indicator. This way we show the loading indicator only if a
         // state lasts longer than 200ms and hide it only if another loading indicator doesn't appear within 200ms.
         delay(200.milliseconds)
-        largeLoadingIndicator = (currentState as? ConversionState.HasLargeLoadingIndicator)?.getLoadingIndicator()
+        largeLoadingIndicator = (currentState as? ConversionState.HasLargeLoadingIndicator)
+            ?.getLoadingIndicator(resources)
     }
 
     MainScreen(
@@ -382,7 +378,7 @@ fun MainScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MainScreen(
-    currentState: State,
+    currentState: ConversionState,
     appDetails: AppDetails,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
@@ -842,7 +838,7 @@ private fun MainScreen(
 
 @Composable
 private fun MainTitle(
-    currentState: State,
+    currentState: ConversionState,
     billingAppNameResId: Int,
     billingStatus: BillingStatus,
     largeLoadingIndicator: LoadingIndicator.Large?,
@@ -850,7 +846,7 @@ private fun MainTitle(
 ) {
     when (currentState) {
         is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
-            currentState.getLoadingIndicator()?.title?.let { title ->
+            currentState.getLoadingIndicator(LocalResources.current)?.title?.let { title ->
                 Text(title, overflow = TextOverflow.Ellipsis, maxLines = maxLines)
             }
 
@@ -968,7 +964,7 @@ private fun MainWebView(
 @Composable
 private fun MainBottomBar(
     containerColor: Color,
-    currentState: State,
+    currentState: ConversionState,
     dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
     innerPadding: PaddingValues,
     sourceComesFromIntent: StateFlow<Boolean>,
@@ -1037,7 +1033,7 @@ private fun DefaultPreview() {
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         MainScreen(
-            currentState = Initial(),
+            currentState = Initial,
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1090,7 +1086,7 @@ private fun DarkPreview() {
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         MainScreen(
-            currentState = Initial(),
+            currentState = Initial,
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1143,7 +1139,7 @@ private fun SmallPreview() {
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         MainScreen(
-            currentState = Initial(),
+            currentState = Initial,
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1196,7 +1192,7 @@ private fun TabletPreview() {
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         MainScreen(
-            currentState = Initial(),
+            currentState = Initial,
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -2003,17 +1999,7 @@ private fun LoadingIndicatorPreview() {
         val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val outputRepository = OutputRepository(
-            coordinateConverter = coordinateConverter,
-        )
         val currentState = PermissionGrantedBasicInput(
-            stateContext = ConversionStateContext(
-                linkRepository = FakeLinkRepository(),
-                outputRepository = outputRepository,
-                resources = resources,
-                userPreferencesRepository = FakeUserPreferencesRepository(),
-                billing = BillingImpl(LocalContext.current),
-            ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             matchedInput = MatchedInput(
                 FakeInputRepository.googleMapsShortLinkInput, "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
@@ -2038,7 +2024,7 @@ private fun LoadingIndicatorPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = currentState.getLoadingIndicator(),
+            largeLoadingIndicator = currentState.getLoadingIndicator(resources),
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -2081,17 +2067,7 @@ private fun DarkLoadingIndicatorPreview() {
         val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val outputRepository = OutputRepository(
-            coordinateConverter = coordinateConverter,
-        )
         val currentState = PermissionGrantedBasicInput(
-            stateContext = ConversionStateContext(
-                linkRepository = FakeLinkRepository(),
-                outputRepository = outputRepository,
-                resources = resources,
-                userPreferencesRepository = FakeUserPreferencesRepository(),
-                billing = BillingImpl(LocalContext.current),
-            ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             matchedInput = MatchedInput(
                 FakeInputRepository.googleMapsShortLinkInput, "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
@@ -2116,7 +2092,7 @@ private fun DarkLoadingIndicatorPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = currentState.getLoadingIndicator(),
+            largeLoadingIndicator = currentState.getLoadingIndicator(resources),
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -2159,17 +2135,7 @@ private fun TabletLoadingIndicatorPreview() {
         val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val outputRepository = OutputRepository(
-            coordinateConverter = coordinateConverter,
-        )
         val currentState = PermissionGrantedBasicInput(
-            stateContext = ConversionStateContext(
-                linkRepository = FakeLinkRepository(),
-                outputRepository = outputRepository,
-                resources = resources,
-                userPreferencesRepository = FakeUserPreferencesRepository(),
-                billing = BillingImpl(LocalContext.current),
-            ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             matchedInput = MatchedInput(
                 FakeInputRepository.googleMapsShortLinkInput, "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
@@ -2194,7 +2160,7 @@ private fun TabletLoadingIndicatorPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = currentState.getLoadingIndicator(),
+            largeLoadingIndicator = currentState.getLoadingIndicator(resources),
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -2237,17 +2203,7 @@ private fun WebViewPreview() {
         val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val outputRepository = OutputRepository(
-            coordinateConverter = coordinateConverter,
-        )
         val currentState = PermissionGrantedWebViewInput(
-            stateContext = ConversionStateContext(
-                linkRepository = FakeLinkRepository(),
-                outputRepository = outputRepository,
-                resources = resources,
-                userPreferencesRepository = FakeUserPreferencesRepository(),
-                billing = BillingImpl(LocalContext.current),
-            ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             matchedInput = MatchedInput(FakeInputRepository.debugWebViewInput, "https://www.example.com/"),
             permission = Permission.ALWAYS,
@@ -2269,7 +2225,7 @@ private fun WebViewPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = currentState.getLoadingIndicator(),
+            largeLoadingIndicator = currentState.getLoadingIndicator(resources),
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -2312,17 +2268,7 @@ private fun DarkWebViewPreview() {
         val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val outputRepository = OutputRepository(
-            coordinateConverter = coordinateConverter,
-        )
         val currentState = PermissionGrantedWebViewInput(
-            stateContext = ConversionStateContext(
-                linkRepository = FakeLinkRepository(),
-                outputRepository = outputRepository,
-                resources = resources,
-                userPreferencesRepository = FakeUserPreferencesRepository(),
-                billing = BillingImpl(LocalContext.current),
-            ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             matchedInput = MatchedInput(FakeInputRepository.debugWebViewInput, "https://www.example.com/"),
             permission = Permission.ALWAYS,
@@ -2344,7 +2290,7 @@ private fun DarkWebViewPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = currentState.getLoadingIndicator(),
+            largeLoadingIndicator = currentState.getLoadingIndicator(resources),
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -2387,17 +2333,7 @@ private fun TabletWebViewPreview() {
         val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val outputRepository = OutputRepository(
-            coordinateConverter = coordinateConverter,
-        )
         val currentState = PermissionGrantedWebViewInput(
-            stateContext = ConversionStateContext(
-                linkRepository = FakeLinkRepository(),
-                outputRepository = outputRepository,
-                resources = resources,
-                userPreferencesRepository = FakeUserPreferencesRepository(),
-                billing = BillingImpl(LocalContext.current),
-            ),
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             matchedInput = MatchedInput(FakeInputRepository.debugWebViewInput, "https://www.example.com/"),
             permission = Permission.ALWAYS,
@@ -2419,7 +2355,7 @@ private fun TabletWebViewPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = currentState.getLoadingIndicator(),
+            largeLoadingIndicator = currentState.getLoadingIndicator(resources),
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -2459,23 +2395,12 @@ private fun TabletWebViewPreview() {
 private fun EmptyPreview() {
     AppTheme {
         val context = LocalContext.current
-        val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val outputRepository = OutputRepository(
-            coordinateConverter = coordinateConverter,
-        )
         MainScreen(
             currentState = ConversionSucceeded(
-                stateContext = ConversionStateContext(
-                    linkRepository = FakeLinkRepository(),
-                    outputRepository = outputRepository,
-                    resources = resources,
-                    userPreferencesRepository = FakeUserPreferencesRepository(),
-                    billing = BillingImpl(LocalContext.current),
-                ),
-                "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                persistentListOf(),
+                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                points = persistentListOf(),
             ),
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,

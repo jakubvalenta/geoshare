@@ -23,12 +23,12 @@ class PermissionDeniedTest {
 
     @Test
     fun transition_returnsDataParsed() = runTest {
-        val state = PermissionDenied(stateContext, source, matchedInput, results)
+        val state = PermissionDenied(source, matchedInput, results)
         assertEquals(
             DataParsed(
-                stateContext, source, matchedInput, Permission.NEVER, results + (matchedInput to ParseResult.Success())
+                source, matchedInput, Permission.NEVER, results + (matchedInput to ParseResult.Success())
             ),
-            state.transition(),
+            state.transition(stateContext),
         )
     }
 }

@@ -17,13 +17,14 @@ class LocationReceivedTest {
     private val source = "https://maps.google.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter).toAction(points.last())
+    private val stateContext: ConversionStateContext = mock()
 
     @Test
     fun transition_whenLocationIsNull_returnsLocationFindingFailed() = runTest {
         val state = LocationReceived(source, points, action, isAutomation = false, location = null)
         assertEquals(
             LocationFindingFailed(source, points, ActionResult.FAILED),
-            state.transition(),
+            state.transition(stateContext),
         )
     }
 
@@ -33,7 +34,7 @@ class LocationReceivedTest {
         val state = LocationReceived(source, points, action, isAutomation = false, location)
         assertEquals(
             LocationActionReady(source, points, action, isAutomation = false, location),
-            state.transition(),
+            state.transition(stateContext),
         )
     }
 }

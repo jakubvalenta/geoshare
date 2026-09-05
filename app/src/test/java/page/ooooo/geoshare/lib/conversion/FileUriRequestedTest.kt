@@ -14,11 +14,12 @@ class FileUriRequestedTest {
     private val coordinateConverter: CoordinateConverter = mock()
     private val source = "https://maps.apple.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+    private val stateContext: ConversionStateContext = mock()
 
     @Test
     fun transition_returnsNull() = runTest {
         val action = SavePointsGpxOutput(coordinateConverter).toAction(points)
         val state = FileUriRequested(source, points, action, isAutomation = false)
-        assertNull(state.transition())
+        assertNull(state.transition(stateContext))
     }
 }

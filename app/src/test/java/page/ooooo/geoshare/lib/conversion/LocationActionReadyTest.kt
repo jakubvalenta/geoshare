@@ -17,11 +17,12 @@ class LocationActionReadyTest {
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val action =
         OpenRouteOnePointGpxOutput(PackageNames.GOOGLE_MAPS, coordinateConverter).toAction(points.last())
+    private val stateContext: ConversionStateContext = mock()
 
     @Test
     fun transition_returnsNull() = runTest {
         val location = WGS84Point(3.0, 4.0, source = Source.GENERATED)
         val state = LocationActionReady(source, points, action, isAutomation = false, location)
-        assertNull(state.transition())
+        assertNull(state.transition(stateContext))
     }
 }

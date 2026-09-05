@@ -23,6 +23,7 @@ class ActionFailedTest {
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val output = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
     private val actionResult = ActionResult.FAILED
+    private val stateContext: ConversionStateContext = mock()
 
     @Test
     fun transition_whenExecutionIsNotCancelled_waitsAndReturnsActionCompleted() = runTest {
@@ -30,7 +31,7 @@ class ActionFailedTest {
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
                 ActionCompleted(source, points, actionResult),
-                state.transition(),
+                state.transition(stateContext),
             )
         }
         assertEquals(3.seconds, workDuration)
@@ -39,9 +40,9 @@ class ActionFailedTest {
     @Test
     fun transition_whenExecutionIsCancelled_returnsActionCompleted() = runTest {
         val state = ActionFailed(source, points, actionResult, output)
-        var res: State? = null
+        var res: ConversionState? = null
         val job = launch {
-            res = state.transition()
+            res = state.transition(stateContext)
         }
         testScheduler.runCurrent()
         testScheduler.advanceTimeBy(1.seconds)

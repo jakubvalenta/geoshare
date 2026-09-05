@@ -34,10 +34,10 @@ class InputMatchedTest {
             on { this@on.log } doReturn log
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = InputMatched(stateContext, source, matchedInput, Permission.ALWAYS, results)
+        val state = InputMatched(source, matchedInput, Permission.ALWAYS, results)
         assertEquals(
-            PermissionGranted(stateContext, source, matchedInput, Permission.ALWAYS, results),
-            state.transition(),
+            PermissionGranted(source, matchedInput, Permission.ALWAYS, results),
+            state.transition(stateContext),
         )
     }
 
@@ -50,10 +50,10 @@ class InputMatchedTest {
             on { this@on.log } doReturn log
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = InputMatched(stateContext, source, matchedInput, Permission.ASK, results)
+        val state = InputMatched(source, matchedInput, Permission.ASK, results)
         assertEquals(
-            PermissionRequested(stateContext, source, matchedInput, results, input.permissionTitleResId),
-            state.transition(),
+            PermissionRequested(source, matchedInput, results, input.permissionTitleResId),
+            state.transition(stateContext),
         )
     }
 
@@ -66,10 +66,10 @@ class InputMatchedTest {
             on { this@on.log } doReturn log
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = InputMatched(stateContext, source, matchedInput, Permission.NEVER, results)
+        val state = InputMatched(source, matchedInput, Permission.NEVER, results)
         assertEquals(
-            PermissionDenied(stateContext, source, matchedInput, results),
-            state.transition(),
+            PermissionDenied(source, matchedInput, results),
+            state.transition(stateContext),
         )
     }
 
@@ -83,10 +83,10 @@ class InputMatchedTest {
                 on { this@on.log } doReturn log
                 on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
             }
-            val state = InputMatched(stateContext, source, matchedInput, permission = null, results)
+            val state = InputMatched(source, matchedInput, permission = null, results)
             assertEquals(
-                PermissionGranted(stateContext, source, matchedInput, Permission.ALWAYS, results),
-                state.transition(),
+                PermissionGranted(source, matchedInput, Permission.ALWAYS, results),
+                state.transition(stateContext),
             )
         }
 
@@ -99,10 +99,10 @@ class InputMatchedTest {
             on { this@on.log } doReturn log
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = InputMatched(stateContext, source, matchedInput, permission = null, results)
+        val state = InputMatched(source, matchedInput, permission = null, results)
         assertEquals(
-            PermissionRequested(stateContext, source, matchedInput, results, input.permissionTitleResId),
-            state.transition(),
+            PermissionRequested(source, matchedInput, results, input.permissionTitleResId),
+            state.transition(stateContext),
         )
     }
 
@@ -115,10 +115,10 @@ class InputMatchedTest {
             on { this@on.log } doReturn log
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = InputMatched(stateContext, source, matchedInput, permission = null, results)
+        val state = InputMatched(source, matchedInput, permission = null, results)
         assertEquals(
-            PermissionDenied(stateContext, source, matchedInput, results),
-            state.transition(),
+            PermissionDenied(source, matchedInput, results),
+            state.transition(stateContext),
         )
     }
 
@@ -129,10 +129,10 @@ class InputMatchedTest {
         val stateContext: ConversionStateContext = mock {
             on { this@on.log } doReturn log
         }
-        val state = InputMatched(stateContext, source, matchedInput, Permission.NEVER, results)
+        val state = InputMatched(source, matchedInput, Permission.NEVER, results)
         assertEquals(
-            PermissionGranted(stateContext, source, matchedInput, Permission.NEVER, results),
-            state.transition(),
+            PermissionGranted(source, matchedInput, Permission.NEVER, results),
+            state.transition(stateContext),
         )
     }
 }

@@ -18,6 +18,7 @@ class ActionRanTest {
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val output = SavePointsGpxOutput(coordinateConverter)
     private val action = output.toAction(points)
+    private val stateContext: ConversionStateContext = mock()
 
     @Test
     fun transition_whenAutomationIsFalseAndResultIsSucceededAndOutputHasSuccessText_returnsActionSucceeded() = runTest {
@@ -25,7 +26,7 @@ class ActionRanTest {
             val action = output.toAction(points)
             assertEquals(
                 ActionSucceeded(source, points, actionResult, output),
-                ActionRan(source, points, action, actionResult, isAutomation = false).transition(),
+                ActionRan(source, points, action, actionResult, isAutomation = false).transition(stateContext),
             )
         }
     }
@@ -36,7 +37,7 @@ class ActionRanTest {
             for (actionResult in setOf(ActionResult.SUCCEEDED, ActionResult.SUCCEEDED_AND_OPENED_APP)) {
                 assertEquals(
                     ActionCompleted(source, points, actionResult),
-                    ActionRan(source, points, NoopAction, actionResult, isAutomation = false).transition(),
+                    ActionRan(source, points, NoopAction, actionResult, isAutomation = false).transition(stateContext),
                 )
             }
         }
@@ -46,7 +47,7 @@ class ActionRanTest {
         val actionResult = ActionResult.FAILED
         assertEquals(
             ActionFailed(source, points, actionResult, output),
-            ActionRan(source, points, action, actionResult, isAutomation = false).transition(),
+            ActionRan(source, points, action, actionResult, isAutomation = false).transition(stateContext),
         )
     }
 
@@ -56,7 +57,7 @@ class ActionRanTest {
             val actionResult = ActionResult.FAILED
             assertEquals(
                 ActionCompleted(source, points, actionResult),
-                ActionRan(source, points, NoopAction, actionResult, isAutomation = false).transition(),
+                ActionRan(source, points, NoopAction, actionResult, isAutomation = false).transition(stateContext),
             )
         }
 
@@ -66,7 +67,7 @@ class ActionRanTest {
             for (actionResult in setOf(ActionResult.SUCCEEDED, ActionResult.SUCCEEDED_AND_OPENED_APP)) {
                 assertEquals(
                     ActionAutomationSucceeded(source, points, actionResult, output),
-                    ActionRan(source, points, action, actionResult, isAutomation = true).transition(),
+                    ActionRan(source, points, action, actionResult, isAutomation = true).transition(stateContext),
                 )
             }
         }
@@ -77,7 +78,7 @@ class ActionRanTest {
             for (actionResult in setOf(ActionResult.SUCCEEDED, ActionResult.SUCCEEDED_AND_OPENED_APP)) {
                 assertEquals(
                     ActionCompleted(source, points, actionResult),
-                    ActionRan(source, points, NoopAction, actionResult, isAutomation = true).transition(),
+                    ActionRan(source, points, NoopAction, actionResult, isAutomation = true).transition(stateContext),
                 )
             }
         }
@@ -88,7 +89,7 @@ class ActionRanTest {
             val actionResult = ActionResult.FAILED
             assertEquals(
                 ActionCompleted(source, points, actionResult),
-                ActionRan(source, points, NoopAction, actionResult, isAutomation = true).transition(),
+                ActionRan(source, points, NoopAction, actionResult, isAutomation = true).transition(stateContext),
             )
         }
 
@@ -98,7 +99,7 @@ class ActionRanTest {
             val actionResult = ActionResult.FAILED
             assertEquals(
                 ActionCompleted(source, points, actionResult),
-                ActionRan(source, points, NoopAction, actionResult, isAutomation = true).transition(),
+                ActionRan(source, points, NoopAction, actionResult, isAutomation = true).transition(stateContext),
             )
         }
 }

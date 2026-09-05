@@ -23,22 +23,22 @@ class SourceReceivedTest {
     @Test
     fun transition_whenSourceIsEmpty_returnsConversionFailed() = runTest {
         val source = ""
-        val state = SourceReceived(stateContext, "")
+        val state = SourceReceived("")
         assertEquals(
             ConversionFailed(source, resources.getString(R.string.conversion_failed_missing_url)),
-            state.transition(),
+            state.transition(stateContext),
         )
     }
 
     @Test
     fun transition_whenSourceIsGeoUri_returnsInputFound() = runTest {
         val source = "geo:1,2?q="
-        val state = SourceReceived(stateContext, source)
+        val state = SourceReceived(source)
         assertEquals(
             InputMatched(
-                stateContext, source, MatchedInput(FakeInputRepository.geoUriInput, source), permission = null
+                source, MatchedInput(FakeInputRepository.geoUriInput, source), permission = null
             ),
-            state.transition(),
+            state.transition(stateContext),
         )
     }
 
@@ -46,37 +46,37 @@ class SourceReceivedTest {
     fun transition_whenSourceHasUriInTheMiddle_returnsInputFound() = runTest {
         val source = "FOO\nhttps://www.osmand.net/foo\nBAR"
         val match = "https://www.osmand.net/foo"
-        val state = SourceReceived(stateContext, source)
+        val state = SourceReceived(source)
         assertEquals(
             InputMatched(
-                stateContext, source, MatchedInput(FakeInputRepository.osmAndUriInput, match), permission = null
+                source, MatchedInput(FakeInputRepository.osmAndUriInput, match), permission = null
             ),
-            state.transition(),
+            state.transition(stateContext),
         )
     }
 
     @Test
     fun transition_whenSourceMatchesAnInput_returnsInputFound() = runTest {
         val source = "https://www.osmand.net/foo"
-        val state = SourceReceived(stateContext, source)
+        val state = SourceReceived(source)
         assertEquals(
             InputMatched(
-                stateContext, source, MatchedInput(FakeInputRepository.osmAndUriInput, source), permission = null
+                source, MatchedInput(FakeInputRepository.osmAndUriInput, source), permission = null
             ),
-            state.transition(),
+            state.transition(stateContext),
         )
     }
 
     @Test
     fun transition_whenSourceDoesNotMatchAnyInput_returnsConversionFailed() = runTest {
         val source = "https://maps.example.com/foo"
-        val state = SourceReceived(stateContext, source)
+        val state = SourceReceived(source)
         assertEquals(
             ConversionFailed(
                 source,
                 resources.getString(R.string.conversion_failed_unsupported_service)
             ),
-            state.transition(),
+            state.transition(stateContext),
         )
     }
 }

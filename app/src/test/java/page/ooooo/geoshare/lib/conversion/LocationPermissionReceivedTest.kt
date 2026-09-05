@@ -29,18 +29,18 @@ class LocationPermissionReceivedTest {
 
     @Test
     fun transition_returnsNull() = runTest {
-        val state = LocationPermissionReceived(stateContext, source, points, action, isAutomation = false)
-        assertNull(state.transition())
+        val state = LocationPermissionReceived(source, points, action, isAutomation = false)
+        assertNull(state.transition(stateContext))
     }
 
     @Test
     fun getLoadingIndicator_returnsSmallLoadingIndicator() = runTest {
-        val state = LocationPermissionReceived(stateContext, source, points, action, isAutomation = false)
+        val state = LocationPermissionReceived(source, points, action, isAutomation = false)
         assertEquals(
             LoadingIndicator.Small(
                 resources.getString(R.string.conversion_succeeded_location_loading_indicator_title)
             ),
-            state.getLoadingIndicator(),
+            state.getLoadingIndicator(resources),
         )
     }
 }

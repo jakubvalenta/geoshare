@@ -27,11 +27,11 @@ class ActionWaitingTest {
 
     @Test
     fun transition_whenExecutionIsNotCancelled_waitsAndReturnsActionReady() = runTest {
-        val state = ActionWaiting(stateContext, source, points, action, output, isAutomation = true, 3.seconds)
+        val state = ActionWaiting(source, points, action, output, isAutomation = true, 3.seconds)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
                 ActionReady(source, points, action, isAutomation = true),
-                state.transition(),
+                state.transition(stateContext),
             )
         }
         assertEquals(3.seconds, workDuration)
@@ -39,11 +39,11 @@ class ActionWaitingTest {
 
     @Test
     fun transition_whenExecutionIsNotCancelledAndDelayIsNotPositive_doesNotWaitAndReturnsActionReady() = runTest {
-        val state = ActionWaiting(stateContext, source, points, action, output, isAutomation = true, (-1).seconds)
+        val state = ActionWaiting(source, points, action, output, isAutomation = true, (-1).seconds)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
                 ActionReady(source, points, action, isAutomation = true),
-                state.transition(),
+                state.transition(stateContext),
             )
         }
         assertEquals(0.seconds, workDuration)
@@ -51,10 +51,10 @@ class ActionWaitingTest {
 
     @Test
     fun transition_whenExecutionIsCancelled_returnsActionCompleted() = runTest {
-        val state = ActionWaiting(stateContext, source, points, action, output, isAutomation = true, 3.seconds)
-        var res: State? = null
+        val state = ActionWaiting(source, points, action, output, isAutomation = true, 3.seconds)
+        var res: ConversionState? = null
         val job = launch {
-            res = state.transition()
+            res = state.transition(stateContext)
         }
         testScheduler.runCurrent()
         testScheduler.advanceTimeBy(1.seconds)

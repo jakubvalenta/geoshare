@@ -6,6 +6,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.kotlin.mock
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.ActionResult
@@ -17,6 +18,7 @@ class LocationFindingFailedTest {
     private val source = "https://maps.apple.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val actionResult = ActionResult.FAILED
+    private val stateContext: ConversionStateContext = mock()
 
     @Test
     fun locationFindingFailed_executionIsNotCancelled_waitsAndReturnsActionCompleted() = runTest {
@@ -24,7 +26,7 @@ class LocationFindingFailedTest {
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
                 ActionCompleted(source, points, actionResult),
-                state.transition(),
+                state.transition(stateContext),
             )
         }
         assertEquals(3.seconds, workDuration)
@@ -33,9 +35,9 @@ class LocationFindingFailedTest {
     @Test
     fun locationFindingFailed_executionIsCancelled_returnsActionCompleted() = runTest {
         val state = LocationFindingFailed(source, points, actionResult)
-        var res: State? = null
+        var res: ConversionState? = null
         val job = launch {
-            res = state.transition()
+            res = state.transition(stateContext)
         }
         testScheduler.runCurrent()
         testScheduler.advanceTimeBy(1.seconds)

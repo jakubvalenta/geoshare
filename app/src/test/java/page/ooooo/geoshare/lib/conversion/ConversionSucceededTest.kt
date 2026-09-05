@@ -64,8 +64,8 @@ class ConversionSucceededTest {
             on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = ConversionSucceeded(stateContext, source, points)
-        assertNull(state.transition())
+        val state = ConversionSucceeded(source, points)
+        assertNull(state.transition(stateContext))
     }
 
     @Test
@@ -80,8 +80,8 @@ class ConversionSucceededTest {
             on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = ConversionSucceeded(stateContext, source, points)
-        assertNull(state.transition())
+        val state = ConversionSucceeded(source, points)
+        assertNull(state.transition(stateContext))
     }
 
     @Test
@@ -102,8 +102,8 @@ class ConversionSucceededTest {
             on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = ConversionSucceeded(stateContext, source, points)
-        assertNull(state.transition())
+        val state = ConversionSucceeded(source, points)
+        assertNull(state.transition(stateContext))
         assertNull(userPreferencesRepository.getValue(CachedPurchasePreference))
     }
 
@@ -128,8 +128,8 @@ class ConversionSucceededTest {
             on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = ConversionSucceeded(stateContext, source, points)
-        assertNull(state.transition())
+        val state = ConversionSucceeded(source, points)
+        assertNull(state.transition(stateContext))
         assertEquals(
             CachedPurchase(productId = "spam", token = "spam_purchased"),
             userPreferencesRepository.getValue(CachedPurchasePreference),
@@ -158,10 +158,10 @@ class ConversionSucceededTest {
             on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = ConversionSucceeded(stateContext, source, points)
+        val state = ConversionSucceeded(source, points)
         assertEquals(
             ActionReady(source, points, action, isAutomation = true),
-            state.transition(),
+            state.transition(stateContext),
         )
         assertEquals(
             CachedPurchase(productId = "test", token = "test_purchased"),
@@ -194,8 +194,8 @@ class ConversionSucceededTest {
             on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = ConversionSucceeded(stateContext, source, points)
-        assertNull(state.transition())
+        val state = ConversionSucceeded(source, points)
+        assertNull(state.transition(stateContext))
         assertEquals(
             CachedPurchase(productId = "test", token = "test_purchased"),
             userPreferencesRepository.getValue(CachedPurchasePreference),
@@ -228,10 +228,10 @@ class ConversionSucceededTest {
             on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = ConversionSucceeded(stateContext, source, points)
+        val state = ConversionSucceeded(source, points)
         assertEquals(
             ActionReady(source, points, action, isAutomation = true),
-            state.transition(),
+            state.transition(stateContext),
         )
         assertEquals(
             CachedPurchase(productId = "test", token = "test_purchased"),
@@ -259,10 +259,10 @@ class ConversionSucceededTest {
             on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = ConversionSucceeded(stateContext, source, points, billingStatusTimeout = 3.seconds)
-        var res: State? = null
+        val state = ConversionSucceeded(source, points, billingStatusTimeout = 3.seconds)
+        var res: ConversionState? = null
         launch {
-            res = state.transition()
+            res = state.transition(stateContext)
         }
         advanceTimeBy(2.seconds)
         mockStatus.value = BillingStatus.Purchased(
@@ -301,10 +301,10 @@ class ConversionSucceededTest {
             on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = ConversionSucceeded(stateContext, source, points, billingStatusTimeout = 3.seconds)
-        var res: State? = null
+        val state = ConversionSucceeded(source, points, billingStatusTimeout = 3.seconds)
+        var res: ConversionState? = null
         launch {
-            res = state.transition()
+            res = state.transition(stateContext)
         }
         advanceTimeBy(2.seconds)
         mockStatus.value = BillingStatus.Purchased(
@@ -337,10 +337,10 @@ class ConversionSucceededTest {
             on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = ConversionSucceeded(stateContext, source, points, billingStatusTimeout = 3.seconds)
-        var res: State? = null
+        val state = ConversionSucceeded(source, points, billingStatusTimeout = 3.seconds)
+        var res: ConversionState? = null
         launch {
-            res = state.transition()
+            res = state.transition(stateContext)
         }
         advanceTimeBy(5.seconds)
         mockStatus.value = BillingStatus.Purchased(
@@ -380,10 +380,10 @@ class ConversionSucceededTest {
             on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = ConversionSucceeded(stateContext, source, points)
+        val state = ConversionSucceeded(source, points)
         assertEquals(
             ActionReady(source, points, action, isAutomation = true),
-            state.transition(),
+            state.transition(stateContext),
         )
     }
 
@@ -415,10 +415,10 @@ class ConversionSucceededTest {
             on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = ConversionSucceeded(stateContext, source, points)
+        val state = ConversionSucceeded(source, points)
         assertEquals(
-            ActionWaiting(stateContext, source, points, action, output, isAutomation = true, delay = delay),
-            state.transition(),
+            ActionWaiting(source, points, action, output, isAutomation = true, delay = delay),
+            state.transition(stateContext),
         )
     }
 
@@ -450,10 +450,10 @@ class ConversionSucceededTest {
             on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = ConversionSucceeded(stateContext, source, points)
+        val state = ConversionSucceeded(source, points)
         assertEquals(
-            ActionWaiting(stateContext, source, points, action, output, isAutomation = true, delay = delay),
-            state.transition(),
+            ActionWaiting(source, points, action, output, isAutomation = true, delay = delay),
+            state.transition(stateContext),
         )
     }
 
@@ -483,8 +483,8 @@ class ConversionSucceededTest {
             on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = ConversionSucceeded(stateContext, source, points)
-        assertNull(state.transition())
+        val state = ConversionSucceeded(source, points)
+        assertNull(state.transition(stateContext))
     }
 
     @Test
@@ -515,10 +515,10 @@ class ConversionSucceededTest {
             on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = ConversionSucceeded(stateContext, source, points)
+        val state = ConversionSucceeded(source, points)
         assertEquals(
-            ActionWaiting(stateContext, source, points, action, output, isAutomation = true, delay = delay),
-            state.transition(),
+            ActionWaiting(source, points, action, output, isAutomation = true, delay = delay),
+            state.transition(stateContext),
         )
     }
 
@@ -550,10 +550,10 @@ class ConversionSucceededTest {
             on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = ConversionSucceeded(stateContext, source, points)
+        val state = ConversionSucceeded(source, points)
         assertEquals(
-            ActionWaiting(stateContext, source, points, action, output, isAutomation = true, delay = delay),
-            state.transition(),
+            ActionWaiting(source, points, action, output, isAutomation = true, delay = delay),
+            state.transition(stateContext),
         )
     }
 

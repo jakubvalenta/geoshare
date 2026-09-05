@@ -83,17 +83,16 @@ class PermissionGrantedWebViewInputTest {
     @Test
     fun transition_whenPendingDataIsCompletedAndParseReturnsSuccess_returnsDataParsed() = runTest {
         val state = PermissionGrantedWebViewInput(
-            stateContext, source, matchedInput, permission, results, dispatcher = testScheduler
+            source, matchedInput, permission, results, dispatcher = testScheduler
         )
-        var res: State? = null
+        var res: ConversionState? = null
         launch {
-            res = state.transition()
+            res = state.transition(stateContext)
         }
         state.pendingData.complete("$source-data")
         advanceUntilIdle()
         assertEquals(
             DataParsed(
-                stateContext,
                 source,
                 matchedInput,
                 permission,
@@ -119,11 +118,11 @@ class PermissionGrantedWebViewInputTest {
             }
             val matchedInput = MatchedInput<WebViewInput>(input, source)
             val state = PermissionGrantedWebViewInput(
-                stateContext, source, matchedInput, permission, results, dispatcher = testScheduler
+                source, matchedInput, permission, results, dispatcher = testScheduler
             )
-            var res: State? = null
+            var res: ConversionState? = null
             launch {
-                res = state.transition()
+                res = state.transition(stateContext)
             }
             state.pendingData.complete("$source-data")
             advanceUntilIdle()
@@ -141,7 +140,6 @@ class PermissionGrantedWebViewInputTest {
     fun transition_whenPendingDataIsCompletedWithRecoverableNetworkExceptionAndLastAttemptIsNull_retries() = runTest {
         val cause = WebViewNetworkException()
         val state = PermissionGrantedWebViewInput(
-            stateContext,
             source,
             matchedInput,
             permission,
@@ -150,15 +148,14 @@ class PermissionGrantedWebViewInputTest {
             maxAttempts,
             dispatcher = testScheduler,
         )
-        var res: State? = null
+        var res: ConversionState? = null
         launch {
-            res = state.transition()
+            res = state.transition(stateContext)
         }
         state.pendingData.completeExceptionally(cause)
         advanceUntilIdle()
         assertEquals(
             PermissionGrantedWebViewInput(
-                stateContext,
                 source,
                 matchedInput,
                 permission,
@@ -175,7 +172,6 @@ class PermissionGrantedWebViewInputTest {
         val cause = WebViewNetworkException()
         val lastAttempt = Attempt<RecoverableNetworkException>(1, lastCause)
         val state = PermissionGrantedWebViewInput(
-            stateContext,
             source,
             matchedInput,
             permission,
@@ -184,15 +180,14 @@ class PermissionGrantedWebViewInputTest {
             maxAttempts,
             dispatcher = testScheduler,
         )
-        var res: State? = null
+        var res: ConversionState? = null
         launch {
-            res = state.transition()
+            res = state.transition(stateContext)
         }
         state.pendingData.completeExceptionally(cause)
         advanceUntilIdle()
         assertEquals(
             PermissionGrantedWebViewInput(
-                stateContext,
                 source,
                 matchedInput,
                 permission,
@@ -209,7 +204,6 @@ class PermissionGrantedWebViewInputTest {
         runTest {
             val lastAttempt = Attempt<RecoverableNetworkException>(3, lastCause)
             val state = PermissionGrantedWebViewInput(
-                stateContext,
                 source,
                 matchedInput,
                 permission,
@@ -223,7 +217,7 @@ class PermissionGrantedWebViewInputTest {
                     source,
                     resources.getString(R.string.network_exception_eof),
                 ),
-                state.transition(),
+                state.transition(stateContext),
             )
         }
 
@@ -242,7 +236,6 @@ class PermissionGrantedWebViewInputTest {
         }
         val cause = ResponseNetworkException(response, Exception())
         val state = PermissionGrantedWebViewInput(
-            stateContext,
             source,
             matchedInput,
             permission,
@@ -251,9 +244,9 @@ class PermissionGrantedWebViewInputTest {
             maxAttempts,
             dispatcher = testScheduler,
         )
-        var res: State? = null
+        var res: ConversionState? = null
         launch {
-            res = state.transition()
+            res = state.transition(stateContext)
         }
         state.pendingData.completeExceptionally(cause)
         advanceUntilIdle()
@@ -270,7 +263,7 @@ class PermissionGrantedWebViewInputTest {
     @Test
     fun transition_whenPendingDataIsNotCompletedWithinTimeout_returnsConversionFailed() = runTest {
         val state = PermissionGrantedWebViewInput(
-            stateContext, source, matchedInput, permission, results, dispatcher = testScheduler
+            source, matchedInput, permission, results, dispatcher = testScheduler
         )
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
@@ -278,7 +271,7 @@ class PermissionGrantedWebViewInputTest {
                     source,
                     resources.getString(R.string.conversion_failed_reason_timeout),
                 ),
-                state.transition(),
+                state.transition(stateContext),
             )
         }
         assertEquals(input.timeout, workDuration)
@@ -298,11 +291,11 @@ class PermissionGrantedWebViewInputTest {
         }
         val matchedInput = MatchedInput<WebViewInput>(input, source)
         val state = PermissionGrantedWebViewInput(
-            stateContext, source, matchedInput, permission, results, dispatcher = testScheduler
+            source, matchedInput, permission, results, dispatcher = testScheduler
         )
-        var res: State? = null
+        var res: ConversionState? = null
         launch {
-            res = state.transition()
+            res = state.transition(stateContext)
         }
         state.pendingData.complete("$source-data")
         advanceUntilIdle()
@@ -315,11 +308,11 @@ class PermissionGrantedWebViewInputTest {
     @Test
     fun transition_whenItIsCancelled_returnsConversionFailed() = runTest {
         val state = PermissionGrantedWebViewInput(
-            stateContext, source, matchedInput, permission, results, dispatcher = testScheduler
+            source, matchedInput, permission, results, dispatcher = testScheduler
         )
-        var res: State? = null
+        var res: ConversionState? = null
         val job = launch {
-            res = state.transition()
+            res = state.transition(stateContext)
         }
         testScheduler.runCurrent()
         testScheduler.advanceTimeBy(1.seconds)
@@ -337,7 +330,6 @@ class PermissionGrantedWebViewInputTest {
     @Test
     fun getLoadingIndicator_whenLastAttemptIsNull_returnsLargeLoadingIndicatorWithoutDescription() = runTest {
         val state = PermissionGrantedWebViewInput(
-            stateContext,
             source,
             matchedInput,
             permission,
@@ -349,7 +341,7 @@ class PermissionGrantedWebViewInputTest {
             LoadingIndicator.Large(
                 title = resources.getString(R.string.converter_google_maps_loading_indicator_title),
             ),
-            state.getLoadingIndicator(),
+            state.getLoadingIndicator(resources),
         )
     }
 
@@ -357,7 +349,6 @@ class PermissionGrantedWebViewInputTest {
     fun getLoadingIndicator_whenLastAttemptNumberIsOne_returnsLargeLoadingIndicatorWithDescription() = runTest {
         val lastAttempt = Attempt<RecoverableNetworkException>(1, lastCause)
         val state = PermissionGrantedWebViewInput(
-            stateContext,
             source,
             matchedInput,
             permission,
@@ -375,7 +366,7 @@ class PermissionGrantedWebViewInputTest {
                     resources.getString(R.string.network_exception_eof),
                 ),
             ),
-            state.getLoadingIndicator(),
+            state.getLoadingIndicator(resources),
         )
     }
 }

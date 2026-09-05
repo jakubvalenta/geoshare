@@ -28,8 +28,8 @@ class PermissionRequestedTest {
     @Test
     fun transition_returnsNull() = runTest {
         val stateContext: ConversionStateContext = mock()
-        val state = PermissionRequested(stateContext, source, matchedInput, results, input.permissionTitleResId)
-        assertNull(state.transition())
+        val state = PermissionRequested(source, matchedInput, results, input.permissionTitleResId)
+        assertNull(state.transition(stateContext))
     }
 
     @Test
@@ -40,10 +40,10 @@ class PermissionRequestedTest {
         val stateContext: ConversionStateContext = mock {
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = PermissionRequested(stateContext, source, matchedInput, results, input.permissionTitleResId)
+        val state = PermissionRequested(source, matchedInput, results, input.permissionTitleResId)
         assertEquals(
-            PermissionGranted(stateContext, source, matchedInput, Permission.ALWAYS, results),
-            state.grant(false),
+            PermissionGranted(source, matchedInput, Permission.ALWAYS, results),
+            state.grant(stateContext, false),
         )
         assertEquals(
             userPreferencesRepository.getValue(ConnectionPermissionPreference),
@@ -59,10 +59,10 @@ class PermissionRequestedTest {
         val stateContext: ConversionStateContext = mock {
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = PermissionRequested(stateContext, source, matchedInput, results, input.permissionTitleResId)
+        val state = PermissionRequested(source, matchedInput, results, input.permissionTitleResId)
         assertEquals(
-            PermissionGranted(stateContext, source, matchedInput, Permission.ALWAYS, results),
-            state.grant(true),
+            PermissionGranted(source, matchedInput, Permission.ALWAYS, results),
+            state.grant(stateContext, true),
         )
         assertEquals(
             userPreferencesRepository.getValue(ConnectionPermissionPreference),
@@ -78,10 +78,10 @@ class PermissionRequestedTest {
         val stateContext: ConversionStateContext = mock {
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = PermissionRequested(stateContext, source, matchedInput, results, input.permissionTitleResId)
+        val state = PermissionRequested(source, matchedInput, results, input.permissionTitleResId)
         assertEquals(
-            PermissionDenied(stateContext, source, matchedInput, results),
-            state.deny(false),
+            PermissionDenied(source, matchedInput, results),
+            state.deny(stateContext, false),
         )
         assertEquals(
             userPreferencesRepository.getValue(ConnectionPermissionPreference),
@@ -97,10 +97,10 @@ class PermissionRequestedTest {
         val stateContext: ConversionStateContext = mock {
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
-        val state = PermissionRequested(stateContext, source, matchedInput, results, input.permissionTitleResId)
+        val state = PermissionRequested(source, matchedInput, results, input.permissionTitleResId)
         assertEquals(
-            PermissionDenied(stateContext, source, matchedInput, results),
-            state.deny(true),
+            PermissionDenied(source, matchedInput, results),
+            state.deny(stateContext, true),
         )
         assertEquals(
             userPreferencesRepository.getValue(ConnectionPermissionPreference),

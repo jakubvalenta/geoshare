@@ -17,13 +17,14 @@ class LocationRationaleShownTest {
     private val source = "https://maps.google.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter).toAction(points.last())
+    private val stateContext: ConversionStateContext = mock()
 
     @Test
     fun grant_returnsLocationRationaleConfirmed() = runTest {
         val state = LocationRationaleShown(source, points, action, isAutomation = false)
         assertEquals(
             LocationRationaleConfirmed(source, points, action, isAutomation = false),
-            state.grant(false),
+            state.grant(stateContext, false),
         )
     }
 
@@ -32,7 +33,7 @@ class LocationRationaleShownTest {
         val state = LocationRationaleShown(source, points, action, isAutomation = false)
         assertEquals(
             ActionCompleted(source, points, ActionResult.FAILED),
-            state.deny(false),
+            state.deny(stateContext, false),
         )
     }
 }

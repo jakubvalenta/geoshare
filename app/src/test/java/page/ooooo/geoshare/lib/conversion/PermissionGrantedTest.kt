@@ -30,10 +30,10 @@ class PermissionGrantedTest {
     fun transition_whenInputIsBasicInput_returnsPermissionGrantedBasicInput() = runTest {
         val input = FakeInputRepository.googleMapsShortLinkInput
         val matchedInput = MatchedInput<BasicInput<Uri>>(input, source)
-        val state = PermissionGranted(stateContext, source, matchedInput, permission, results)
+        val state = PermissionGranted(source, matchedInput, permission, results)
         assertEquals(
-            PermissionGrantedBasicInput(stateContext, source, matchedInput, permission, results),
-            state.transition(),
+            PermissionGrantedBasicInput(source, matchedInput, permission, results),
+            state.transition(stateContext),
         )
     }
 
@@ -52,12 +52,12 @@ class PermissionGrantedTest {
             ) = throw NotImplementedError()
         }
         val matchedInput = MatchedInput<WebViewInput>(input, source)
-        val state = PermissionGranted(stateContext, source, matchedInput, permission, results)
+        val state = PermissionGranted(source, matchedInput, permission, results)
         assertEquals(
             PermissionGrantedWebViewInput(
-                stateContext, source, matchedInput, permission, results
+                source, matchedInput, permission, results
             ),
-            state.transition(),
+            state.transition(stateContext),
         )
     }
 
@@ -65,12 +65,12 @@ class PermissionGrantedTest {
     fun transition_whenInputIsNoopInput_returnsDataParsed() = runTest {
         val input = object : NoopInput {}
         val matchedInput = MatchedInput<NoopInput>(input, source)
-        val state = PermissionGranted(stateContext, source, matchedInput, permission, results)
+        val state = PermissionGranted(source, matchedInput, permission, results)
         assertEquals(
             DataParsed(
-                stateContext, source, matchedInput, permission, results + (matchedInput to ParseResult.Success())
+                source, matchedInput, permission, results + (matchedInput to ParseResult.Success())
             ),
-            state.transition(),
+            state.transition(stateContext),
         )
     }
 }
