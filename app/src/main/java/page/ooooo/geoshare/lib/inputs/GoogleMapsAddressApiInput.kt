@@ -35,6 +35,8 @@ class GoogleMapsAddressApiInput @Inject constructor(
     private val serverRepository: ServerRepository,
     private val uriQuote: UriQuote,
 ) : BasicInput<Uri>, Input.HasPermission {
+    override fun getName(resources: Resources) = "Google Maps Address API"
+
     @StringRes
     override val permissionTitleResId = R.string.converter_google_maps_permission_title
 

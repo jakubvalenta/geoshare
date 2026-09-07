@@ -15,6 +15,8 @@ sealed interface Input {
 
     fun match(source: String): String? = null
 
+    fun getName(resources: Resources): String
+
     interface HasPermission {
         val permissionTitleResId: Int
         val loadingIndicatorTitleResId: Int

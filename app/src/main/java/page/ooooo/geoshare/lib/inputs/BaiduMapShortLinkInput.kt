@@ -18,6 +18,8 @@ class BaiduMapShortLinkInput @Inject constructor(
     override val log: Log,
     override val uriQuote: UriQuote,
 ) : HeadLocationHeaderInput {
+    override fun getName(resources: Resources) = "Baidu Map Short Link"
+
     override val group = InputGroup.BAIDU_MAP
     override val changelog = persistentListOf(
         InputChangelogItem.Url(35, "https://j.map.baidu.com"),

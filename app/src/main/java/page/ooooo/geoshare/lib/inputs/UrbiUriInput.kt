@@ -26,6 +26,8 @@ class UrbiUriInput @Inject constructor(
     private val urbiHtmlInput: dagger.Lazy<UrbiHtmlInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
+    override fun getName(resources: Resources) = "2GIS / Urbi"
+
     override val group = InputGroup.URBI
     override val changelog = persistentListOf(
         InputChangelogItem.Url(27, "https://2gis.ae/"),

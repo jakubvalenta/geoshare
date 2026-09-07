@@ -24,6 +24,8 @@ import javax.inject.Singleton
 class GeoUriInput @Inject constructor(
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
+    override fun getName(resources: Resources) = "geo: URI"
+
     override val group = InputGroup.GEO_URI
     override val changelog = persistentListOf(
         InputChangelogItem.Text(3) {

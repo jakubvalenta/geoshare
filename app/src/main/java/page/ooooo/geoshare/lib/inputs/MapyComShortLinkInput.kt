@@ -17,6 +17,8 @@ class MapyComShortLinkInput @Inject constructor(
     override val log: Log,
     override val uriQuote: UriQuote,
 ) : GetLastHopUrlInput {
+    override fun getName(resources: Resources) = "Mapy.com Short Link"
+
     override val pattern = Regex("""((?:https?://)?(?:www\.)?mapy\.[a-z]{2,3}/s/\S+)""")
 
     @StringRes

@@ -21,6 +21,8 @@ class WazeHtmlInput @Inject constructor(
     override val log: Log,
     override val uriQuote: UriQuote,
 ) : BodyAsChannelInput {
+    override fun getName(resources: Resources) = "Waze HTML"
+
     @StringRes
     override val permissionTitleResId = R.string.converter_waze_permission_title
 

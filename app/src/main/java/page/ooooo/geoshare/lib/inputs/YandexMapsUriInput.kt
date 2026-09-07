@@ -22,6 +22,8 @@ class YandexMapsUriInput @Inject constructor(
     private val yandexMapsHtmlInput: dagger.Lazy<YandexMapsHtmlInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
+    override fun getName(resources: Resources) = "Yandex"
+
     override val group = InputGroup.YANDEX_MAPS
     override val changelog = persistentListOf(
         InputChangelogItem.Url(20, "https://ya.ru/maps"),

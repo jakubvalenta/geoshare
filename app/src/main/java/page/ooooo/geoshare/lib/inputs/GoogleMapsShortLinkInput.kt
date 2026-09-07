@@ -21,6 +21,8 @@ class GoogleMapsShortLinkInput @Inject constructor(
     override val log: Log,
     override val uriQuote: UriQuote,
 ) : HeadLocationHeaderInput {
+    override fun getName(resources: Resources) = "Google Maps Short Link"
+
     override val group = InputGroup.GOOGLE_MAPS
     override val changelog = persistentListOf(
         InputChangelogItem.Url(10, "https://g.co/kgs"),

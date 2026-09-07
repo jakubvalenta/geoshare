@@ -16,6 +16,8 @@ import javax.inject.Singleton
 class MapsMeUriInput @Inject constructor(
     override val uriQuote: UriQuote,
 ) : UriInput {
+    override fun getName(resources: Resources) = "Maps.me"
+
     override val group = InputGroup.MAPS_ME
     override val changelog = persistentListOf(
         InputChangelogItem.Url(25, "http://ge0.me/"),

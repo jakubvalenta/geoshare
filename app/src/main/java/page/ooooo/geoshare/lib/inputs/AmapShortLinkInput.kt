@@ -18,6 +18,8 @@ class AmapShortLinkInput @Inject constructor(
     override val log: Log,
     override val uriQuote: UriQuote,
 ) : HeadLocationHeaderInput {
+    override fun getName(resources: Resources) = "Amap Short Link"
+
     override val group = InputGroup.AMAP
     override val changelog = persistentListOf(
         InputChangelogItem.Url(27, "https://surl.amap.com/"),

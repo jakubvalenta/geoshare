@@ -26,6 +26,8 @@ class WazeUriInput @Inject constructor(
     private val wazeHtmlInput: dagger.Lazy<WazeHtmlInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
+    override fun getName(resources: Resources) = "Waze"
+
     override val group = InputGroup.WAZE
     override val changelog = persistentListOf(
         InputChangelogItem.Url(21, "https://waze.com/live-map"),

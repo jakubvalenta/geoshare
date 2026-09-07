@@ -12,6 +12,8 @@ import javax.inject.Singleton
 class GoogleMapsWebViewInput @Inject constructor(
     private val googleMapsUriInput: dagger.Lazy<GoogleMapsUriInput>,
 ) : WebViewInput {
+    override fun getName(resources: Resources) = "Google Maps WebView"
+
     @StringRes
     override val permissionTitleResId = R.string.converter_google_maps_permission_title
 

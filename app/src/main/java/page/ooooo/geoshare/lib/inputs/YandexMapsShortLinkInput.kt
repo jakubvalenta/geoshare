@@ -17,6 +17,8 @@ class YandexMapsShortLinkInput @Inject constructor(
     override val log: Log,
     override val uriQuote: UriQuote,
 ) : HeadLocationHeaderInput {
+    override fun getName(resources: Resources) = "Yandex Short Link"
+
     @StringRes
     override val permissionTitleResId = R.string.converter_yandex_maps_permission_title
 

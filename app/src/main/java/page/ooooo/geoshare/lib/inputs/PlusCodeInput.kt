@@ -26,6 +26,8 @@ import javax.inject.Singleton
  */
 @Singleton
 class PlusCodeInput @Inject constructor() : TextInput, Input.HasRandomUri {
+    override fun getName(resources: Resources) = "Plus Codes"
+
     override val group = InputGroup.PLUS_CODE
     override val changelog = persistentListOf(
         InputChangelogItem.Url(39, "https://plus.codes"),

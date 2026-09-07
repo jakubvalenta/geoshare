@@ -39,6 +39,8 @@ class HeadLocationHeaderUriInputTest {
         }
     }
     val input = object : HeadLocationHeaderInput {
+        override fun getName(resources: Resources) = "Test Input"
+
         override val engine = this@HeadLocationHeaderUriInputTest.engine
         override val log = FakeLog
         override val uriQuote = FakeUriQuote

@@ -79,7 +79,9 @@ class ConversionViewModel @Inject constructor(
         if (newState is SourceReceived) {
             _stateHistory.value = emptyList()
         }
-        _stateHistory.value += ConversionStateHistoryItem(newState, timeSource.markNow())
+        if (newState is ConversionState.HasDescription) {
+            _stateHistory.value += ConversionStateHistoryItem(newState, timeSource.markNow())
+        }
     }
 
     private val _source = savedStateHandle.getMutableStateFlow("source", "")
@@ -94,7 +96,7 @@ class ConversionViewModel @Inject constructor(
         stateContext.currentState = ConversionFailed(
             _source.value,
             stateContext.resources.getString(R.string.conversion_failed_reason_exception),
-            details = tr.stackTraceToString(),
+            stackTrace = tr.stackTraceToString(),
         )
     }
 

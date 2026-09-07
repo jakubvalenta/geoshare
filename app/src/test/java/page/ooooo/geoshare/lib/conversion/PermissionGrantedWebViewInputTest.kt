@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -41,6 +42,8 @@ class PermissionGrantedWebViewInputTest {
     private val log = FakeLog
     private val source = "https://maps.google.com/foo"
     private val input = object : WebViewInput {
+        override fun getName(resources: Resources) = "Test Input"
+
         override val permissionTitleResId = R.string.converter_google_maps_permission_title
         override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
         override val timeout = 7.seconds
@@ -106,6 +109,8 @@ class PermissionGrantedWebViewInputTest {
     fun transition_whenPendingDataIsCompletedAndParseReturnsFailure_returnsDataParsed() =
         runTest {
             val input = object : WebViewInput {
+                override fun getName(resources: Resources) = "Test Input"
+
                 override val permissionTitleResId = R.string.converter_google_maps_permission_title
                 override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
@@ -254,7 +259,7 @@ class PermissionGrantedWebViewInputTest {
             ConversionFailed(
                 source,
                 resources.getString(R.string.network_exception_response_error, HttpStatusCode.NotFound.value),
-                details = "Request URL: $requestUrl",
+                stackTrace = "Request URL: $requestUrl",
             ),
             res,
         )
@@ -280,6 +285,8 @@ class PermissionGrantedWebViewInputTest {
     @Test
     fun transition_whenInputParseThrowsCancellationException_returnsConversionFailed() = runTest {
         val input = object : WebViewInput {
+            override fun getName(resources: Resources) = "Test Input"
+
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
             override val timeout = 7.seconds
@@ -328,7 +335,7 @@ class PermissionGrantedWebViewInputTest {
     }
 
     @Test
-    fun getLoadingIndicator_whenLastAttemptIsNull_returnsLargeLoadingIndicatorWithoutDescription() = runTest {
+    fun getDetails_whenLastAttemptIsNull_returnsNull() = runTest {
         val state = PermissionGrantedWebViewInput(
             source,
             matchedInput,
@@ -337,16 +344,11 @@ class PermissionGrantedWebViewInputTest {
             lastAttempt = null,
             dispatcher = testScheduler,
         )
-        assertEquals(
-            LoadingIndicator.Large(
-                title = resources.getString(R.string.converter_google_maps_loading_indicator_title),
-            ),
-            state.getLoadingIndicator(resources),
-        )
+        assertNull(state.getDetails(resources))
     }
 
     @Test
-    fun getLoadingIndicator_whenLastAttemptNumberIsOne_returnsLargeLoadingIndicatorWithDescription() = runTest {
+    fun getDetails_whenLastAttemptNumberIsOne_returnsDetails() = runTest {
         val lastAttempt = Attempt<RecoverableNetworkException>(1, lastCause)
         val state = PermissionGrantedWebViewInput(
             source,
@@ -357,16 +359,13 @@ class PermissionGrantedWebViewInputTest {
             dispatcher = testScheduler,
         )
         assertEquals(
-            LoadingIndicator.Large(
-                title = resources.getString(R.string.converter_google_maps_loading_indicator_title),
-                description = resources.getString(
-                    R.string.conversion_loading_indicator_description,
-                    2,
-                    10,
-                    resources.getString(R.string.network_exception_eof),
-                ),
+            resources.getString(
+                R.string.conversion_loading_indicator_description,
+                2,
+                10,
+                resources.getString(R.string.network_exception_eof),
             ),
-            state.getLoadingIndicator(resources),
+            state.getDetails(resources),
         )
     }
 }

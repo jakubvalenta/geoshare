@@ -16,6 +16,8 @@ class DebugUriInput @Inject constructor(
     private val debugWebViewInput: dagger.Lazy<DebugWebViewInput>,
     override val uriQuote: UriQuote,
 ) : UriInput {
+    override fun getName(resources: Resources) = "Debug"
+
     override val group = InputGroup.DEBUG
     override val pattern = Regex("""((?:https?://)?(?:www\.)?example\.com(?:/\S+|$))""")
 

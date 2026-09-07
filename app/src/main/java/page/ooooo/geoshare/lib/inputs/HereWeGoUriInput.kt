@@ -22,6 +22,8 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 class HereWeGoUriInput @Inject constructor(
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
+    override fun getName(resources: Resources) = "HERE WeGo"
+
     override val group = InputGroup.HERE_WEGO
     override val changelog = persistentListOf(
         InputChangelogItem.Url(20, "https://share.here.com/l/"),

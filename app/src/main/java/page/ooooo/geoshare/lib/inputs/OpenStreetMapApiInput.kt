@@ -19,6 +19,8 @@ class OpenStreetMapApiInput @Inject constructor(
     override val log: Log,
     override val uriQuote: UriQuote,
 ) : BodyAsTextInput {
+    override fun getName(resources: Resources) = "OpenStreetMap API"
+
     @StringRes
     override val permissionTitleResId = R.string.converter_open_street_map_permission_title
 

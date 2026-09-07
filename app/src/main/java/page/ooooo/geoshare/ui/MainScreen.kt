@@ -21,10 +21,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -68,7 +70,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -99,11 +100,11 @@ import page.ooooo.geoshare.lib.conversion.BasicActionReady
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
 import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.ConversionStateHistory
+import page.ooooo.geoshare.lib.conversion.ConversionStateHistoryItem
 import page.ooooo.geoshare.lib.conversion.ConversionSucceeded
 import page.ooooo.geoshare.lib.conversion.FileActionReady
 import page.ooooo.geoshare.lib.conversion.FileUriRequested
 import page.ooooo.geoshare.lib.conversion.Initial
-import page.ooooo.geoshare.lib.conversion.LoadingIndicator
 import page.ooooo.geoshare.lib.conversion.LocationActionReady
 import page.ooooo.geoshare.lib.conversion.LocationPermissionReceived
 import page.ooooo.geoshare.lib.conversion.LocationRationaleConfirmed
@@ -141,17 +142,16 @@ import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.PermissionDialog
 import page.ooooo.geoshare.ui.components.ResultApps
 import page.ooooo.geoshare.ui.components.ResultCoordinates
-import page.ooooo.geoshare.ui.components.ResultError
 import page.ooooo.geoshare.ui.components.ResultSheet
 import page.ooooo.geoshare.ui.components.ResultTitle
 import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
 import page.ooooo.geoshare.ui.components.StyledSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.checkeredBackground
-import page.ooooo.geoshare.ui.components.resultLoadingIndicator
+import page.ooooo.geoshare.ui.components.resultDescription
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.math.floor
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TestTimeSource
 
 @Composable
 fun MainScreen(
@@ -287,18 +287,6 @@ fun MainScreen(
         }
     }
 
-    // Loading indicator
-
-    var largeLoadingIndicator by remember { mutableStateOf<LoadingIndicator.Large?>(null) }
-
-    LaunchedEffect(currentState) {
-        // Wait for 200ms and then show or hide loading indicator. This way we show the loading indicator only if a
-        // state lasts longer than 200ms and hide it only if another loading indicator doesn't appear within 200ms.
-        delay(200.milliseconds)
-        largeLoadingIndicator = (currentState as? ConversionState.HasLargeLoadingIndicator)
-            ?.getLoadingIndicator(resources)
-    }
-
     MainScreen(
         currentState = currentState,
         appDetails = appDetails,
@@ -310,7 +298,6 @@ fun MainScreen(
         coordinateFormat = userPreferencesValues.coordinateFormat,
         dismissedHelpMessages = helpViewModel.dismissedHelpMessages,
         inputRepository = inputViewModel.inputRepository,
-        largeLoadingIndicator = largeLoadingIndicator,
         linkMessage = linkMessage,
         outputsForApps = outputsForApps,
         outputsForLinks = outputsForLinks,
@@ -386,7 +373,6 @@ private fun MainScreen(
     coordinateFormat: CoordinateFormat,
     dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
     inputRepository: InputRepository,
-    largeLoadingIndicator: LoadingIndicator.Large?,
     linkMessage: Message?,
     outputsForApps: Map<String, List<Output>>,
     outputsForLinks: Map<String?, List<Output>>,
@@ -421,10 +407,10 @@ private fun MainScreen(
 ) {
     val appName = stringResource(R.string.app_name)
     val mainContainerColor = when (currentState) {
-        is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null -> MaterialTheme.colorScheme.surfaceContainer
         is ConversionState.HasError if currentState.warning -> MaterialTheme.colorScheme.surfaceContainerHighest
         is ConversionState.HasError -> MaterialTheme.colorScheme.errorContainer
         is ConversionState.HasResult -> MaterialTheme.colorScheme.secondaryContainer
+        is ConversionState.HasDescription -> MaterialTheme.colorScheme.surfaceContainer
         else -> MaterialTheme.colorScheme.surface
     }
     val mainContentColor = contentColorFor(mainContainerColor)
@@ -471,7 +457,6 @@ private fun MainScreen(
                                     currentState = currentState,
                                     billingAppNameResId = billingAppNameResId,
                                     billingStatus = billingStatus,
-                                    largeLoadingIndicator = largeLoadingIndicator,
                                     maxLines = maxLines,
                                 )
                             },
@@ -502,25 +487,15 @@ private fun MainScreen(
                             },
                         ) {
                             if (!wide) {
+                                if (currentState is ConversionState.HasDescription) {
+                                    resultDescription(
+                                        stateHistory = stateHistory,
+                                        onCancel = onCancel,
+                                        onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                        onRetry = onRetry,
+                                    )
+                                }
                                 when (currentState) {
-                                    is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
-                                        resultLoadingIndicator(
-                                            stateHistory = stateHistory,
-                                            onCancel = onCancel,
-                                        )
-
-                                    is ConversionState.HasError ->
-                                        item {
-                                            ResultError(
-                                                source = currentState.source,
-                                                message = currentState.message,
-                                                details = currentState.details,
-                                                warning = currentState.warning,
-                                                onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                                onRetry = onRetry,
-                                            )
-                                        }
-
                                     is ConversionState.HasResult -> {
                                         item {
                                             ResultCoordinates(
@@ -621,45 +596,34 @@ private fun MainScreen(
                                     ) {
                                         Spacer(Modifier.height(spacing.small))
 
-                                        when (currentState) {
-                                            is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
-                                                LazyColumn {
-                                                    resultLoadingIndicator(
-                                                        stateHistory = stateHistory,
-                                                        onCancel = onCancel,
-                                                    )
-                                                }
-
-                                            is ConversionState.HasError ->
-                                                ResultError(
-                                                    source = currentState.source,
-                                                    message = currentState.message,
-                                                    details = currentState.details,
-                                                    warning = currentState.warning,
-                                                    onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                                    onRetry = onRetry,
-                                                )
-
-                                            is ConversionState.HasResult -> {
-                                                ResultCoordinates(
-                                                    points = currentState.points,
-                                                    appDetails = appDetails,
-                                                    coordinateConverter = coordinateConverter,
-                                                    coordinateFormat = coordinateFormat,
-                                                    dismissedHelpMessages = dismissedHelpMessages,
-                                                    outputsForApps = outputsForApps,
-                                                    outputsForPointChips = outputsForPointChips,
-                                                    outputsForPointsChips = outputsForPointsChips,
-                                                    sourceComesFromIntent = sourceComesFromIntent,
-                                                    onDismissHelpMessage = onDismissHelpMessage,
-                                                    onExecute = onExecute,
-                                                    onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                                    onSelect = { index ->
-                                                        onCancel()
-                                                        setSelectedPointIndex(index)
-                                                    },
-                                                )
-                                            }
+                                        if (currentState is ConversionState.HasDescription) {
+                                            // FIXME Wide result
+                                            // resultLoadingIndicator(
+                                            //     stateHistory = stateHistory,
+                                            //     onCancel = onCancel,
+                                            //     onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                            //     onRetry = onRetry,
+                                            // )
+                                        }
+                                        if (currentState is ConversionState.HasResult) {
+                                            ResultCoordinates(
+                                                points = currentState.points,
+                                                appDetails = appDetails,
+                                                coordinateConverter = coordinateConverter,
+                                                coordinateFormat = coordinateFormat,
+                                                dismissedHelpMessages = dismissedHelpMessages,
+                                                outputsForApps = outputsForApps,
+                                                outputsForPointChips = outputsForPointChips,
+                                                outputsForPointsChips = outputsForPointsChips,
+                                                sourceComesFromIntent = sourceComesFromIntent,
+                                                onDismissHelpMessage = onDismissHelpMessage,
+                                                onExecute = onExecute,
+                                                onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                                onSelect = { index ->
+                                                    onCancel()
+                                                    setSelectedPointIndex(index)
+                                                },
+                                            )
                                         }
                                     }
                                 }
@@ -730,8 +694,6 @@ private fun MainScreen(
                         },
                     ) {
                         when (currentState) {
-                            is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null -> {}
-
                             is ConversionState.HasResult ->
                                 item {
                                     ResultApps(
@@ -836,20 +798,15 @@ private fun MainScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun MainTitle(
     currentState: ConversionState,
     billingAppNameResId: Int,
     billingStatus: BillingStatus,
-    largeLoadingIndicator: LoadingIndicator.Large?,
     maxLines: Int,
 ) {
     when (currentState) {
-        is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
-            currentState.getLoadingIndicator(LocalResources.current)?.title?.let { title ->
-                Text(title, overflow = TextOverflow.Ellipsis, maxLines = maxLines)
-            }
-
         is ConversionState.HasError ->
             Text(stringResource(R.string.conversion_error_title), overflow = TextOverflow.Ellipsis, maxLines = maxLines)
 
@@ -875,6 +832,9 @@ private fun MainTitle(
                 },
                 modifier = Modifier.offset(x = -(12).dp),
             )
+
+        is ConversionState.HasDescription ->
+            LoadingIndicator(Modifier.size(46.dp), color = MaterialTheme.colorScheme.tertiary)
     }
 }
 
@@ -987,8 +947,9 @@ private fun DefaultPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val currentState = Initial
         MainScreen(
-            currentState = Initial,
+            currentState = currentState,
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -998,7 +959,6 @@ private fun DefaultPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -1041,8 +1001,9 @@ private fun DarkPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val currentState = Initial
         MainScreen(
-            currentState = Initial,
+            currentState = currentState,
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1052,7 +1013,6 @@ private fun DarkPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -1095,8 +1055,9 @@ private fun SmallPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val currentState = Initial
         MainScreen(
-            currentState = Initial,
+            currentState = currentState,
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1106,7 +1067,6 @@ private fun SmallPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -1149,8 +1109,9 @@ private fun TabletPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val currentState = Initial
         MainScreen(
-            currentState = Initial,
+            currentState = currentState,
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1160,7 +1121,6 @@ private fun TabletPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -1206,19 +1166,20 @@ private fun SucceededPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        MainScreen(
-            currentState = ActionCompleted(
-                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                points = persistentListOf(
-                    WGS84Point(NaivePoint.genRandomPoint()),
-                    WGS84Point(
-                        NaivePoint.example,
-                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-                        "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
-                    ),
+        val currentState = ActionCompleted(
+            source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            points = persistentListOf(
+                WGS84Point(NaivePoint.genRandomPoint()),
+                WGS84Point(
+                    NaivePoint.example,
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
                 ),
-                actionResult = ActionResult.SUCCEEDED,
             ),
+            actionResult = ActionResult.SUCCEEDED,
+        )
+        MainScreen(
+            currentState = currentState,
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1233,7 +1194,6 @@ private fun SucceededPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
                 mapOf(
@@ -1319,19 +1279,20 @@ private fun DarkSucceededPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        MainScreen(
-            currentState = ActionCompleted(
-                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                points = persistentListOf(
-                    WGS84Point(NaivePoint.genRandomPoint()),
-                    WGS84Point(
-                        NaivePoint.example,
-                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-                        "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
-                    ),
+        val currentState = ActionCompleted(
+            source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            points = persistentListOf(
+                WGS84Point(NaivePoint.genRandomPoint()),
+                WGS84Point(
+                    NaivePoint.example,
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
                 ),
-                actionResult = ActionResult.SUCCEEDED,
             ),
+            actionResult = ActionResult.SUCCEEDED,
+        )
+        MainScreen(
+            currentState = currentState,
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1346,7 +1307,6 @@ private fun DarkSucceededPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
                 mapOf(
@@ -1432,18 +1392,19 @@ private fun SmallSucceededPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        MainScreen(
-            currentState = ActionCompleted(
-                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                points = persistentListOf(
-                    WGS84Point(NaivePoint.genRandomPoint()),
-                    WGS84Point(
-                        NaivePoint.example,
-                        name = "Wikimedia Foundation, Inc.",
-                    ),
+        val currentState = ActionCompleted(
+            source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            points = persistentListOf(
+                WGS84Point(NaivePoint.genRandomPoint()),
+                WGS84Point(
+                    NaivePoint.example,
+                    name = "Wikimedia Foundation, Inc.",
                 ),
-                actionResult = ActionResult.SUCCEEDED,
             ),
+            actionResult = ActionResult.SUCCEEDED,
+        )
+        MainScreen(
+            currentState = currentState,
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1458,7 +1419,6 @@ private fun SmallSucceededPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
                 mapOf(
@@ -1544,19 +1504,20 @@ private fun TabletSucceededPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        MainScreen(
-            currentState = ActionCompleted(
-                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                points = persistentListOf(
-                    WGS84Point(NaivePoint.genRandomPoint()),
-                    WGS84Point(
-                        NaivePoint.example,
-                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-                        "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
-                    ),
+        val currentState = ActionCompleted(
+            source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            points = persistentListOf(
+                WGS84Point(NaivePoint.genRandomPoint()),
+                WGS84Point(
+                    NaivePoint.example,
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
                 ),
-                actionResult = ActionResult.SUCCEEDED,
             ),
+            actionResult = ActionResult.SUCCEEDED,
+        )
+        MainScreen(
+            currentState = currentState,
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1571,7 +1532,6 @@ private fun TabletSucceededPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
                 mapOf(
@@ -1654,11 +1614,13 @@ private fun ErrorPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val currentState = ConversionFailed(
+            source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            message = stringResource(R.string.conversion_failed_reason_no_points),
+        )
+        val timeSource = TestTimeSource()
         MainScreen(
-            currentState = ConversionFailed(
-                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                message = stringResource(R.string.conversion_failed_reason_no_points),
-            ),
+            currentState = currentState,
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1673,7 +1635,6 @@ private fun ErrorPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -1682,7 +1643,7 @@ private fun ErrorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(emptyList()),
+            stateHistory = MutableStateFlow(listOf(ConversionStateHistoryItem(currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -1716,11 +1677,13 @@ private fun DarkErrorPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val currentState = ConversionFailed(
+            source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            message = stringResource(R.string.conversion_failed_reason_no_points),
+        )
+        val timeSource = TestTimeSource()
         MainScreen(
-            currentState = ConversionFailed(
-                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                message = stringResource(R.string.conversion_failed_reason_no_points),
-            ),
+            currentState = currentState,
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1735,7 +1698,6 @@ private fun DarkErrorPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -1744,7 +1706,7 @@ private fun DarkErrorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(emptyList()),
+            stateHistory = MutableStateFlow(listOf(ConversionStateHistoryItem(currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -1778,11 +1740,13 @@ private fun TabletErrorPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val currentState = ConversionFailed(
+            source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            message = stringResource(R.string.conversion_failed_reason_no_points),
+        )
+        val timeSource = TestTimeSource()
         MainScreen(
-            currentState = ConversionFailed(
-                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                message = stringResource(R.string.conversion_failed_reason_no_points),
-            ),
+            currentState = currentState,
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1797,7 +1761,6 @@ private fun TabletErrorPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -1806,7 +1769,7 @@ private fun TabletErrorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(emptyList()),
+            stateHistory = MutableStateFlow(listOf(ConversionStateHistoryItem(currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -1840,12 +1803,14 @@ private fun WarningPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val currentState = ConversionFailed(
+            source = "https://share.google/diIxnYa8dIA6dZfpy",
+            message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
+            warning = true,
+        )
+        val timeSource = TestTimeSource()
         MainScreen(
-            currentState = ConversionFailed(
-                source = "https://share.google/diIxnYa8dIA6dZfpy",
-                message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
-                warning = true,
-            ),
+            currentState = currentState,
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1860,7 +1825,6 @@ private fun WarningPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -1869,7 +1833,7 @@ private fun WarningPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(emptyList()),
+            stateHistory = MutableStateFlow(listOf(ConversionStateHistoryItem(currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -1903,12 +1867,14 @@ private fun DarkWarningPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val currentState = ConversionFailed(
+            source = "https://share.google/diIxnYa8dIA6dZfpy",
+            message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
+            warning = true,
+        )
+        val timeSource = TestTimeSource()
         MainScreen(
-            currentState = ConversionFailed(
-                source = "https://share.google/diIxnYa8dIA6dZfpy",
-                message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
-                warning = true,
-            ),
+            currentState = currentState,
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1923,7 +1889,6 @@ private fun DarkWarningPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -1932,7 +1897,7 @@ private fun DarkWarningPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(emptyList()),
+            stateHistory = MutableStateFlow(listOf(ConversionStateHistoryItem(currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -1964,7 +1929,6 @@ private fun DarkWarningPreview() {
 private fun LoadingIndicatorPreview() {
     AppTheme {
         val context = LocalContext.current
-        val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         val currentState = PermissionGrantedBasicInput(
@@ -1976,6 +1940,7 @@ private fun LoadingIndicatorPreview() {
             results = emptyMap(),
             lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )
+        val timeSource = TestTimeSource()
         MainScreen(
             currentState = currentState,
             appDetails = emptyMap(),
@@ -1992,7 +1957,6 @@ private fun LoadingIndicatorPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = currentState.getLoadingIndicator(resources),
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -2001,7 +1965,7 @@ private fun LoadingIndicatorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(emptyList()),
+            stateHistory = MutableStateFlow(listOf(ConversionStateHistoryItem(currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -2033,7 +1997,6 @@ private fun LoadingIndicatorPreview() {
 private fun DarkLoadingIndicatorPreview() {
     AppTheme {
         val context = LocalContext.current
-        val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         val currentState = PermissionGrantedBasicInput(
@@ -2045,6 +2008,7 @@ private fun DarkLoadingIndicatorPreview() {
             results = emptyMap(),
             lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )
+        val timeSource = TestTimeSource()
         MainScreen(
             currentState = currentState,
             appDetails = emptyMap(),
@@ -2061,7 +2025,6 @@ private fun DarkLoadingIndicatorPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = currentState.getLoadingIndicator(resources),
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -2070,7 +2033,7 @@ private fun DarkLoadingIndicatorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(emptyList()),
+            stateHistory = MutableStateFlow(listOf(ConversionStateHistoryItem(currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -2102,7 +2065,6 @@ private fun DarkLoadingIndicatorPreview() {
 private fun TabletLoadingIndicatorPreview() {
     AppTheme {
         val context = LocalContext.current
-        val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         val currentState = PermissionGrantedBasicInput(
@@ -2114,6 +2076,7 @@ private fun TabletLoadingIndicatorPreview() {
             results = emptyMap(),
             lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )
+        val timeSource = TestTimeSource()
         MainScreen(
             currentState = currentState,
             appDetails = emptyMap(),
@@ -2130,7 +2093,6 @@ private fun TabletLoadingIndicatorPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = currentState.getLoadingIndicator(resources),
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -2139,7 +2101,7 @@ private fun TabletLoadingIndicatorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(emptyList()),
+            stateHistory = MutableStateFlow(listOf(ConversionStateHistoryItem(currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -2171,7 +2133,6 @@ private fun TabletLoadingIndicatorPreview() {
 private fun WebViewPreview() {
     AppTheme {
         val context = LocalContext.current
-        val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         val currentState = PermissionGrantedWebViewInput(
@@ -2180,6 +2141,7 @@ private fun WebViewPreview() {
             permission = Permission.ALWAYS,
             results = emptyMap(),
         )
+        val timeSource = TestTimeSource()
         MainScreen(
             currentState = currentState,
             appDetails = emptyMap(),
@@ -2196,7 +2158,6 @@ private fun WebViewPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = currentState.getLoadingIndicator(resources),
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -2205,7 +2166,7 @@ private fun WebViewPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(emptyList()),
+            stateHistory = MutableStateFlow(listOf(ConversionStateHistoryItem(currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -2237,7 +2198,6 @@ private fun WebViewPreview() {
 private fun DarkWebViewPreview() {
     AppTheme {
         val context = LocalContext.current
-        val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         val currentState = PermissionGrantedWebViewInput(
@@ -2246,6 +2206,7 @@ private fun DarkWebViewPreview() {
             permission = Permission.ALWAYS,
             results = emptyMap(),
         )
+        val timeSource = TestTimeSource()
         MainScreen(
             currentState = currentState,
             appDetails = emptyMap(),
@@ -2262,7 +2223,6 @@ private fun DarkWebViewPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = currentState.getLoadingIndicator(resources),
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -2271,7 +2231,7 @@ private fun DarkWebViewPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(emptyList()),
+            stateHistory = MutableStateFlow(listOf(ConversionStateHistoryItem(currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -2303,7 +2263,6 @@ private fun DarkWebViewPreview() {
 private fun TabletWebViewPreview() {
     AppTheme {
         val context = LocalContext.current
-        val resources = LocalResources.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         val currentState = PermissionGrantedWebViewInput(
@@ -2312,6 +2271,7 @@ private fun TabletWebViewPreview() {
             permission = Permission.ALWAYS,
             results = emptyMap(),
         )
+        val timeSource = TestTimeSource()
         MainScreen(
             currentState = currentState,
             appDetails = emptyMap(),
@@ -2328,7 +2288,6 @@ private fun TabletWebViewPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = currentState.getLoadingIndicator(resources),
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -2337,7 +2296,7 @@ private fun TabletWebViewPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(emptyList()),
+            stateHistory = MutableStateFlow(listOf(ConversionStateHistoryItem(currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -2371,11 +2330,12 @@ private fun EmptyPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val currentState = ConversionSucceeded(
+            source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            points = persistentListOf(),
+        )
         MainScreen(
-            currentState = ConversionSucceeded(
-                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                points = persistentListOf(),
-            ),
+            currentState = currentState,
             appDetails = emptyMap(),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -2390,7 +2350,6 @@ private fun EmptyPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
-            largeLoadingIndicator = null,
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),

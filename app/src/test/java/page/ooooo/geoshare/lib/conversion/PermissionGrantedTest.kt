@@ -40,6 +40,8 @@ class PermissionGrantedTest {
     @Test
     fun transition_whenInputIsWebViewInput_returnsPermissionGrantedWebViewInput() = runTest {
         val input = object : WebViewInput {
+            override fun getName(resources: Resources) = "Test Input"
+
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
@@ -63,7 +65,9 @@ class PermissionGrantedTest {
 
     @Test
     fun transition_whenInputIsNoopInput_returnsDataParsed() = runTest {
-        val input = object : NoopInput {}
+        val input = object : NoopInput {
+            override fun getName(resources: Resources) = "Test Input"
+        }
         val matchedInput = MatchedInput<NoopInput>(input, source)
         val state = PermissionGranted(source, matchedInput, permission, results)
         assertEquals(

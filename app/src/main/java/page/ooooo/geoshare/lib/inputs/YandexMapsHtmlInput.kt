@@ -23,6 +23,8 @@ class YandexMapsHtmlInput @Inject constructor(
     override val log: Log,
     override val uriQuote: UriQuote,
 ) : BodyAsChannelInput {
+    override fun getName(resources: Resources) = "Yandex HTML"
+
     @StringRes
     override val permissionTitleResId = R.string.converter_yandex_maps_permission_title
 

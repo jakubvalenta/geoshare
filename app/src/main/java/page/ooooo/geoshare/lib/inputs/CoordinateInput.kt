@@ -17,6 +17,8 @@ import javax.inject.Singleton
 
 @Singleton
 class CoordinateInput @Inject constructor() : TextInput, Input.HasRandomUri {
+    override fun getName(resources: Resources) = "coordinates"
+
     override val group = InputGroup.COORDINATES
     override val changelog = persistentListOf(
         InputChangelogItem.Text(20) {

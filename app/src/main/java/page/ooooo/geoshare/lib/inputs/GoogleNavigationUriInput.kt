@@ -31,6 +31,8 @@ class GoogleNavigationUriInput @Inject constructor(
     private val googleMapsAddressApiInput: dagger.Lazy<GoogleMapsAddressApiInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
+    override fun getName(resources: Resources) = "Google Navigation URI"
+
     override val group = InputGroup.GOOGLE_NAVIGATION_URI
     override val changelog = persistentListOf(
         InputChangelogItem.Text(45) {

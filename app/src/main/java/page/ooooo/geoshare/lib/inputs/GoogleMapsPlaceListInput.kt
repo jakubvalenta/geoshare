@@ -1,3 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
-interface GoogleMapsPlaceListInput : NoopInput
+import android.content.res.Resources
+
+interface GoogleMapsPlaceListInput : NoopInput {
+    override fun getName(resources: Resources) = "Google Maps Place List"
+}

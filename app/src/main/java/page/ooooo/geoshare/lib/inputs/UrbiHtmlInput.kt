@@ -20,6 +20,8 @@ class UrbiHtmlInput @Inject constructor(
     override val log: Log,
     override val uriQuote: UriQuote,
 ) : BodyAsChannelInput {
+    override fun getName(resources: Resources) = "2GIS / Urbi HTML"
+
     @StringRes
     override val permissionTitleResId = R.string.converter_urbi_permission_title
 

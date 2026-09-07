@@ -20,6 +20,8 @@ class AppleMapsUriInput @Inject constructor(
     private val appleMapsHtmlInput: dagger.Lazy<AppleMapsHtmlInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
+    override fun getName(resources: Resources) = "Apple Maps"
+
     override val group = InputGroup.APPLE_MAPS
     override val changelog = persistentListOf(
         InputChangelogItem.Url(18, "https://maps.apple"),

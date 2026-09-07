@@ -29,6 +29,8 @@ class GoogleMapsUriInput @Inject constructor(
     private val googleMapsPlaceListInput: dagger.Lazy<GoogleMapsPlaceListInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
+    override fun getName(resources: Resources) = "Google Maps"
+
     override val group = InputGroup.GOOGLE_MAPS
     override val changelog = persistentListOf(
         InputChangelogItem.Url(5, "https://maps.google.com"),

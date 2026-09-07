@@ -21,6 +21,8 @@ class BaiduMapWebViewInput @Inject constructor(
     @Serializable
     private data class ExtractedPoint(val lat: Double?, val lon: Double?, val z: Double?, val name: String?)
 
+    override fun getName(resources: Resources) = "Baidu Map Short Link"
+
     @StringRes
     override val permissionTitleResId = R.string.converter_baidu_map_permission_title
 

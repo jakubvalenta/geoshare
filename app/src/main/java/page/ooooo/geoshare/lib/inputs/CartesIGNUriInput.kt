@@ -17,6 +17,8 @@ import javax.inject.Singleton
 class CartesIGNUriInput @Inject constructor(
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
+    override fun getName(resources: Resources) = "Cartes IGN"
+
     override val group = InputGroup.CARTES_IGN
     override val changelog = persistentListOf(
         InputChangelogItem.Url(39, "https://cartes-ign.ign.fr"),

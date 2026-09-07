@@ -20,6 +20,8 @@ import javax.inject.Singleton
 class MapyComUriInput @Inject constructor(
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
+    override fun getName(resources: Resources) = "Mapy.com"
+
     override val group = InputGroup.MAPY_COM
     override val changelog = persistentListOf(
         InputChangelogItem.Url(23, "https://mapy.com"),

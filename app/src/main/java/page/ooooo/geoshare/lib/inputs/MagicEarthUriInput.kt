@@ -21,6 +21,8 @@ import javax.inject.Singleton
 class MagicEarthUriInput @Inject constructor(
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
+    override fun getName(resources: Resources) = "Magic Earth"
+
     override val group = InputGroup.MAGIC_EARTH
     override val changelog = persistentListOf(
         InputChangelogItem.Url(20, "https://magicearth.com/"),

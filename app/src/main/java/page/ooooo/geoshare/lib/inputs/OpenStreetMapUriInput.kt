@@ -21,6 +21,8 @@ class OpenStreetMapUriInput @Inject constructor(
     private val openStreetMapApiInput: dagger.Lazy<OpenStreetMapApiInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
+    override fun getName(resources: Resources) = "OpenStreetMap"
+
     override val group = InputGroup.OPEN_STREET_MAP
     override val changelog = persistentListOf(
         InputChangelogItem.Url(20, "https://www.openstreetmap.org/"),

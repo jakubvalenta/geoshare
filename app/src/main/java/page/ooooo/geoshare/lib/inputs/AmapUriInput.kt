@@ -17,6 +17,8 @@ import javax.inject.Singleton
 class AmapUriInput @Inject constructor(
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
+    override fun getName(resources: Resources) = "Amap"
+
     override val group = InputGroup.AMAP
     override val changelog = persistentListOf(
         InputChangelogItem.Url(27, "https://wb.amap.com/"),

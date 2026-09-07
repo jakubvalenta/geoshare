@@ -58,9 +58,13 @@ interface ConversionState {
         val source: String
     }
 
-    interface HasError : HasSource {
-        val message: String
-        val details: String?
+    interface HasDescription {
+        fun getDescription(resources: Resources): String
+        fun getDetails(resources: Resources): String? = null
+        val uri: String? get() = null
+    }
+
+    interface HasError : HasSource, HasDescription {
         val warning: Boolean
     }
 
@@ -81,10 +85,6 @@ interface ConversionState {
 
     interface HasSmallLoadingIndicator {
         fun getLoadingIndicator(resources: Resources): LoadingIndicator.Small
-    }
-
-    interface HasLargeLoadingIndicator {
-        fun getLoadingIndicator(resources: Resources): LoadingIndicator.Large?
     }
 }
 
@@ -232,7 +232,7 @@ data class PermissionGrantedBasicInput<T>(
     override val lastAttempt: Attempt<RecoverableNetworkException>? = null,
     val maxAttempts: Int = 10,
     val dispatcher: CoroutineContext = Dispatchers.Default,
-) : ConversionState, ConversionState.HasSource, ConversionState.HasAttempt, ConversionState.HasLargeLoadingIndicator {
+) : ConversionState, ConversionState.HasSource, ConversionState.HasDescription, ConversionState.HasAttempt {
     override suspend fun transition(stateContext: ConversionStateContext): ConversionState = try {
         withContext(dispatcher) {
             val attemptNumber = lastAttempt?.number?.plus(1) ?: 1
@@ -279,20 +279,25 @@ data class PermissionGrantedBasicInput<T>(
         ConversionFailed(source, stateContext.resources.getString(R.string.conversion_failed_cancelled))
     }
 
-    override fun getLoadingIndicator(resources: Resources) =
-        (matchedInput.input as? Input.HasPermission)?.loadingIndicatorTitleResId?.let { loadingIndicatorTitleResId ->
-            LoadingIndicator.Large(
-                title = resources.getString(loadingIndicatorTitleResId),
-                description = lastAttempt?.let {
-                    resources.getString(
-                        R.string.conversion_loading_indicator_description,
-                        it.number + 1,
-                        maxAttempts,
-                        it.cause.getMessage(resources),
-                    )
-                },
-            )
+    override fun getDescription(resources: Resources) =
+        matchedInput.input.getName(resources).let { name ->
+            if ((matchedInput.input as? Input.HasPermission)?.loadingIndicatorTitleResId != null) {
+                "Connecting to $name" // TODO Replace loading indicator title
+            } else {
+                "Processing as $name" // TODO Translate
+            }
         }
+
+    override fun getDetails(resources: Resources) = lastAttempt?.let {
+        resources.getString(
+            R.string.conversion_loading_indicator_description,
+            it.number + 1,
+            maxAttempts,
+            it.cause.getMessage(resources),
+        )
+    }
+
+    override val uri = matchedInput.match
 
     override fun toString() =
         "$TAG(source=$source, matchedInput=$matchedInput, permission=$permission, results=$results, lastAttempt=$lastAttempt)"
@@ -326,7 +331,7 @@ data class PermissionGrantedWebViewInput(
     override val lastAttempt: Attempt<RecoverableNetworkException>? = null,
     val maxAttempts: Int = 3,
     val dispatcher: CoroutineContext = Dispatchers.Default,
-) : ConversionState, ConversionState.HasSource, ConversionState.HasAttempt, ConversionState.HasLargeLoadingIndicator {
+) : ConversionState, ConversionState.HasSource, ConversionState.HasDescription, ConversionState.HasAttempt {
     val pendingData: CompletableDeferred<String> = CompletableDeferred()
 
     override suspend fun transition(stateContext: ConversionStateContext): ConversionState = try {
@@ -367,20 +372,20 @@ data class PermissionGrantedWebViewInput(
         ConversionFailed(source, stateContext.resources.getString(R.string.conversion_failed_cancelled))
     }
 
-    override fun getLoadingIndicator(resources: Resources) =
-        (matchedInput.input as? Input.HasPermission)?.loadingIndicatorTitleResId?.let { loadingIndicatorTitleResId ->
-            LoadingIndicator.Large(
-                title = resources.getString(loadingIndicatorTitleResId),
-                description = lastAttempt?.let {
-                    resources.getString(
-                        R.string.conversion_loading_indicator_description,
-                        it.number + 1,
-                        maxAttempts,
-                        it.cause.getMessage(resources),
-                    )
-                },
-            )
-        }
+    override fun getDescription(resources: Resources) =
+        (matchedInput.input as? Input.HasPermission)?.loadingIndicatorTitleResId?.let { resources.getString(it) }
+            ?: "Processing link..."
+
+    override fun getDetails(resources: Resources) = lastAttempt?.let {
+        resources.getString(
+            R.string.conversion_loading_indicator_description,
+            it.number + 1,
+            maxAttempts,
+            it.cause.getMessage(resources),
+        )
+    }
+
+    override val uri = matchedInput.match
 
     override fun toString() =
         "$TAG(source=$source, matchedInput=$matchedInput, permission=$permission, results=$results)"
@@ -394,9 +399,11 @@ data class PermissionDenied(
     override val source: String,
     val matchedInput: MatchedInput<*>,
     val results: Results,
-) : ConversionState, ConversionState.HasSource {
+) : ConversionState, ConversionState.HasSource, ConversionState.HasDescription {
     override suspend fun transition(stateContext: ConversionStateContext) =
         DataParsed(source, matchedInput, Permission.NEVER, results + (matchedInput to ParseResult.Success()))
+
+    override fun getDescription(resources: Resources) = "Permission denied"
 
     override fun toString() = "$TAG(source=$source, matchedInput=$matchedInput, results=$results)"
 
@@ -549,10 +556,16 @@ data class ConversionSucceeded(
 
 data class ConversionFailed(
     override val source: String,
-    override val message: String,
-    override val details: String? = null,
+    val message: String,
+    val stackTrace: String? = null,
     override val warning: Boolean = false,
 ) : ConversionState, ConversionState.HasError {
+    override fun getDescription(resources: Resources) = message
+
+    override fun getDetails(resources: Resources) = stackTrace
+
+    override val uri = source
+
     override fun toString() = "$TAG(source=$source, message=$message, warning=$warning)"
 
     private companion object {

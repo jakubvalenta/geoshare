@@ -21,6 +21,8 @@ class BaiduMapUriInput @Inject constructor(
     private val baiduMapWebViewInput: dagger.Lazy<BaiduMapWebViewInput>,
     override val uriQuote: UriQuote,
 ) : UriInput {
+    override fun getName(resources: Resources) = "Baidu Map"
+
     override val group = InputGroup.BAIDU_MAP
     override val changelog = persistentListOf(
         InputChangelogItem.Url(33, "https://map.baidu.com"),

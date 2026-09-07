@@ -14,6 +14,8 @@ import javax.inject.Singleton
  */
 @Singleton
 class DebugWebViewInput @Inject constructor() : WebViewInput {
+    override fun getName(resources: Resources) = "Debug WebView"
+
     @StringRes
     override val permissionTitleResId = R.string.converter_debug_permission_title
 

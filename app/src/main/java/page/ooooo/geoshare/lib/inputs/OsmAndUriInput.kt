@@ -20,6 +20,8 @@ import javax.inject.Singleton
 class OsmAndUriInput @Inject constructor(
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
+    override fun getName(resources: Resources) = "OsmAnd"
+
     override val group = InputGroup.OSM_AND
     override val changelog = persistentListOf(
         InputChangelogItem.Url(20, "https://osmand.net/map"),

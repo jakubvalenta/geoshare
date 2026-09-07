@@ -29,6 +29,8 @@ class BodyAsChannelInputTest {
         }
     }
     val input = object : BodyAsChannelInput {
+        override fun getName(resources: Resources) = "Test Input"
+
         override val engine = this@BodyAsChannelInputTest.engine
         override val log = FakeLog
         override val uriQuote = FakeUriQuote

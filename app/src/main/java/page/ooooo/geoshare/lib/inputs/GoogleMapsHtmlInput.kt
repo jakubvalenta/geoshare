@@ -1,3 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
-interface GoogleMapsHtmlInput : NoopInput
+import android.content.res.Resources
+
+interface GoogleMapsHtmlInput : NoopInput {
+    override fun getName(resources: Resources) = "Google Maps HTML"
+}
