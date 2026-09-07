@@ -75,6 +75,10 @@ interface ConversionState {
         suspend fun deny(stateContext: ConversionStateContext, doNotAsk: Boolean): ConversionState
     }
 
+    interface HasAttempt : HasSource {
+        val lastAttempt: Attempt<RecoverableNetworkException>?
+    }
+
     interface HasSmallLoadingIndicator {
         fun getLoadingIndicator(resources: Resources): LoadingIndicator.Small
     }
@@ -225,10 +229,10 @@ data class PermissionGrantedBasicInput<T>(
     val matchedInput: MatchedInput<BasicInput<T>>,
     val permission: Permission?,
     val results: Results,
-    val lastAttempt: Attempt<RecoverableNetworkException>? = null,
+    override val lastAttempt: Attempt<RecoverableNetworkException>? = null,
     val maxAttempts: Int = 10,
     val dispatcher: CoroutineContext = Dispatchers.Default,
-) : ConversionState, ConversionState.HasSource, ConversionState.HasLargeLoadingIndicator {
+) : ConversionState, ConversionState.HasSource, ConversionState.HasAttempt, ConversionState.HasLargeLoadingIndicator {
     override suspend fun transition(stateContext: ConversionStateContext): ConversionState = try {
         withContext(dispatcher) {
             val attemptNumber = lastAttempt?.number?.plus(1) ?: 1
@@ -319,10 +323,10 @@ data class PermissionGrantedWebViewInput(
     val matchedInput: MatchedInput<WebViewInput>,
     val permission: Permission?,
     val results: Results,
-    val lastAttempt: Attempt<RecoverableNetworkException>? = null,
+    override val lastAttempt: Attempt<RecoverableNetworkException>? = null,
     val maxAttempts: Int = 3,
     val dispatcher: CoroutineContext = Dispatchers.Default,
-) : ConversionState, ConversionState.HasSource, ConversionState.HasLargeLoadingIndicator {
+) : ConversionState, ConversionState.HasSource, ConversionState.HasAttempt, ConversionState.HasLargeLoadingIndicator {
     val pendingData: CompletableDeferred<String> = CompletableDeferred()
 
     override suspend fun transition(stateContext: ConversionStateContext): ConversionState = try {

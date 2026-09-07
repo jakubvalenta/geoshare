@@ -21,14 +21,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -45,7 +41,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
@@ -136,7 +131,6 @@ import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.ConversionWebView
 import page.ooooo.geoshare.ui.components.HelpMessageCard
 import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
-import page.ooooo.geoshare.ui.components.LoadingIndicatorHistory
 import page.ooooo.geoshare.ui.components.MainForm
 import page.ooooo.geoshare.ui.components.MainHeadline
 import page.ooooo.geoshare.ui.components.MainHelp
@@ -153,6 +147,7 @@ import page.ooooo.geoshare.ui.components.ResultTitle
 import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
 import page.ooooo.geoshare.ui.components.StyledSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.checkeredBackground
+import page.ooooo.geoshare.ui.components.resultLoadingIndicator
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.math.floor
@@ -438,6 +433,7 @@ private fun MainScreen(
     val (errorMessageResId, setErrorMessageResId) = retain { mutableStateOf<Int?>(null) }
     val (selectedPointIndex, setSelectedPointIndex) = retain { mutableStateOf<Int?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
+    val stateHistory by stateHistory.collectAsStateWithLifecycle()
 
     BackHandler(currentState !is Initial) {
         onReset()
@@ -508,13 +504,10 @@ private fun MainScreen(
                             if (!wide) {
                                 when (currentState) {
                                     is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
-                                        item {
-                                            MainLoadingIndicator(
-                                                loadingIndicator = largeLoadingIndicator,
-                                                stateHistory = stateHistory,
-                                                onCancel = onCancel,
-                                            )
-                                        }
+                                        resultLoadingIndicator(
+                                            stateHistory = stateHistory,
+                                            onCancel = onCancel,
+                                        )
 
                                     is ConversionState.HasError ->
                                         item {
@@ -630,11 +623,12 @@ private fun MainScreen(
 
                                         when (currentState) {
                                             is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicator != null ->
-                                                MainLoadingIndicator(
-                                                    loadingIndicator = largeLoadingIndicator,
-                                                    stateHistory = stateHistory,
-                                                    onCancel = onCancel,
-                                                )
+                                                LazyColumn {
+                                                    resultLoadingIndicator(
+                                                        stateHistory = stateHistory,
+                                                        onCancel = onCancel,
+                                                    )
+                                                }
 
                                             is ConversionState.HasError ->
                                                 ResultError(
@@ -881,53 +875,6 @@ private fun MainTitle(
                 },
                 modifier = Modifier.offset(x = -(12).dp),
             )
-    }
-}
-
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-private fun MainLoadingIndicator(
-    loadingIndicator: LoadingIndicator.Large,
-    stateHistory: StateFlow<ConversionStateHistory>,
-    onCancel: () -> Unit,
-) {
-    val spacing = LocalSpacing.current
-
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .padding(horizontal = spacing.windowPadding)
-    ) {
-        LoadingIndicator(
-            Modifier
-                .size(96.dp)
-                .align(Alignment.CenterHorizontally),
-            color = MaterialTheme.colorScheme.tertiary,
-        )
-        Button(
-            onCancel,
-            Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(vertical = spacing.small)
-                .testTag("geoShareMainLoadingIndicatorCancel"),
-            colors = ButtonDefaults.elevatedButtonColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                contentColor = MaterialTheme.colorScheme.onSurface,
-            ),
-        ) {
-            Text(stringResource(R.string.conversion_loading_indicator_cancel))
-        }
-        loadingIndicator.description?.let { description ->
-            Text(
-                description,
-                Modifier
-                    .padding(bottom = spacing.small)
-                    .testTag("geoShareMainLoadingIndicatorDescription"),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyMedium,
-            )
-        }
-        LoadingIndicatorHistory(stateHistory)
     }
 }
 
