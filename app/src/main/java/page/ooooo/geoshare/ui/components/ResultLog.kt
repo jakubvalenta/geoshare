@@ -6,17 +6,15 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -43,28 +41,45 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TestTimeSource
+import kotlin.time.TimeSource
 
 @Composable
 fun ResultLog(
     stateLog: StateFlow<List<ConversionStateLogItem>>,
+    modifier: Modifier = Modifier,
     animationsEnabled: Boolean = false,
     initialExpanded: Boolean = false,
 ) {
+    val colors = ListItemDefaults.segmentedColors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+    )
     val stateLog by stateLog.collectAsStateWithLifecycle()
 
-    SelectionContainer {
-        Column {
-            stateLog
-                .filterIsInstance<ConversionStateLogItem.Finished>()
-                .forEach { item ->
-                    key(item.id) {
-                        ResultLogItem(
-                            item = item,
-                            animationsEnabled = animationsEnabled,
-                            initialExpanded = initialExpanded,
-                        )
+    if (stateLog.isNotEmpty()) {
+        SelectionContainer {
+            Column(
+                modifier,
+                verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+            ) {
+                stateLog
+                    .filterIsInstance<ConversionStateLogItem.Finished>()
+                    .run {
+                        forEachIndexed { index, item ->
+                            SegmentedListItem(
+                                shapes = ListItemDefaults.segmentedShapes(index, size),
+                                colors = colors,
+                            ) {
+                                key(item.id) {
+                                    ResultLogItem(
+                                        item = item,
+                                        animationsEnabled = animationsEnabled,
+                                        initialExpanded = initialExpanded,
+                                    )
+                                }
+                            }
+                        }
                     }
-                }
+            }
         }
     }
 }
@@ -91,20 +106,94 @@ fun ResultLogItem(
         visible = visible,
         enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 }),
     ) {
-        Column {
-            HorizontalDivider(color = LocalContentColor.current.copy(alpha = 0.5f))
-            ResultDescription(
-                item.state,
-                modifier = Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.tiny),
-                icon = { Icon(if (item.succeeded) Icons.Default.Check else Icons.Default.Close, null) },
-                initialExpanded = initialExpanded,
-                verticalArrangement = Arrangement.spacedBy(spacing.extraTiny),
-            ) {
-                ResultTime(item.elapsedTime)
-            }
+        ResultDescription(
+            item.state,
+            icon = { Icon(if (item.succeeded) Icons.Default.Check else Icons.Default.Close, null) },
+            initialExpanded = initialExpanded,
+            verticalArrangement = Arrangement.spacedBy(spacing.extraTiny),
+        ) {
+            ResultTime(item.elapsedTime)
         }
     }
 }
+
+@Composable
+fun fakeStateLog(
+    source: String = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+    timeSource: TimeSource.WithComparableMarks = TestTimeSource(),
+) = listOf(
+    ConversionStateLogItem.Pending(
+        id = 5,
+        state = PermissionGrantedBasicInput(
+            source,
+            matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
+            permission = Permission.ALWAYS,
+            results = emptyMap(),
+            lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
+        ),
+        startTimeMark = timeSource.markNow(),
+    ),
+    ConversionStateLogItem.Finished(
+        id = 4,
+        state = ConversionFailed(
+            source,
+            message = stringResource(R.string.conversion_failed_reason_no_points),
+            stackTrace = NotImplementedError().stackTraceToString(),
+        ),
+        succeeded = false,
+        startTimeMark = timeSource.markNow(),
+        elapsedTime = 92.milliseconds,
+    ),
+    ConversionStateLogItem.Finished(
+        id = 3,
+        state = PermissionGrantedBasicInput(
+            source,
+            matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
+            permission = Permission.ALWAYS,
+            results = emptyMap(),
+            lastAttempt = Attempt(1, ConnectTimeoutNetworkException(Exception())),
+        ),
+        succeeded = false,
+        startTimeMark = timeSource.markNow(),
+        elapsedTime = 200.milliseconds,
+    ),
+    ConversionStateLogItem.Finished(
+        id = 2,
+        state = PermissionGrantedBasicInput(
+            source,
+            matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
+            permission = Permission.ALWAYS,
+            results = emptyMap(),
+        ),
+        succeeded = false,
+        startTimeMark = timeSource.markNow(),
+        elapsedTime = 111.milliseconds,
+    ),
+    ConversionStateLogItem.Finished(
+        id = 1,
+        state = PermissionGrantedBasicInput(
+            source,
+            matchedInput = MatchedInput(FakeInputRepository.googleMapsUriInput, source),
+            permission = Permission.ALWAYS,
+            results = emptyMap(),
+        ),
+        succeeded = true,
+        startTimeMark = timeSource.markNow(),
+        elapsedTime = 30.milliseconds,
+    ),
+    ConversionStateLogItem.Finished(
+        id = 0,
+        state = PermissionGrantedBasicInput(
+            source,
+            matchedInput = MatchedInput(FakeInputRepository.googleMapsShortLinkInput, source),
+            permission = Permission.ALWAYS,
+            results = emptyMap(),
+        ),
+        succeeded = true,
+        startTimeMark = timeSource.markNow(),
+        elapsedTime = 657.milliseconds,
+    ),
+)
 
 // Previews
 
@@ -112,88 +201,10 @@ fun ResultLogItem(
 @Composable
 private fun DefaultPreview() {
     AppTheme {
-        Surface(color = MaterialTheme.colorScheme.errorContainer) {
-            val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
-            val timeSource = TestTimeSource()
-            ResultLog(
-                stateLog = MutableStateFlow(
-                    listOf(
-                        ConversionStateLogItem.Pending(
-                            id = 5,
-                            state = PermissionGrantedBasicInput(
-                                source,
-                                matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
-                                permission = Permission.ALWAYS,
-                                results = emptyMap(),
-                                lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
-                            ),
-                            startTimeMark = timeSource.markNow(),
-                        ),
-                        ConversionStateLogItem.Finished(
-                            id = 4,
-                            state = ConversionFailed(
-                                source,
-                                message = stringResource(R.string.conversion_failed_reason_no_points),
-                                stackTrace = NotImplementedError().stackTraceToString(),
-                            ),
-                            succeeded = false,
-                            startTimeMark = timeSource.markNow(),
-                            elapsedTime = 92.milliseconds,
-                        ),
-                        ConversionStateLogItem.Finished(
-                            id = 3,
-                            state = PermissionGrantedBasicInput(
-                                source,
-                                matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
-                                permission = Permission.ALWAYS,
-                                results = emptyMap(),
-                                lastAttempt = Attempt(1, ConnectTimeoutNetworkException(Exception())),
-                            ),
-                            succeeded = false,
-                            startTimeMark = timeSource.markNow(),
-                            elapsedTime = 200.milliseconds,
-                        ),
-                        ConversionStateLogItem.Finished(
-                            id = 2,
-                            state = PermissionGrantedBasicInput(
-                                source,
-                                matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
-                                permission = Permission.ALWAYS,
-                                results = emptyMap(),
-                            ),
-                            succeeded = false,
-                            startTimeMark = timeSource.markNow(),
-                            elapsedTime = 111.milliseconds,
-                        ),
-                        ConversionStateLogItem.Finished(
-                            id = 1,
-                            state = PermissionGrantedBasicInput(
-                                source,
-                                matchedInput = MatchedInput(FakeInputRepository.googleMapsUriInput, source),
-                                permission = Permission.ALWAYS,
-                                results = emptyMap(),
-                            ),
-                            succeeded = true,
-                            startTimeMark = timeSource.markNow(),
-                            elapsedTime = 30.milliseconds,
-                        ),
-                        ConversionStateLogItem.Finished(
-                            id = 0,
-                            state = PermissionGrantedBasicInput(
-                                source,
-                                matchedInput = MatchedInput(FakeInputRepository.googleMapsShortLinkInput, source),
-                                permission = Permission.ALWAYS,
-                                results = emptyMap(),
-                            ),
-                            succeeded = true,
-                            startTimeMark = timeSource.markNow(),
-                            elapsedTime = 657.milliseconds,
-                        ),
-                    ),
-                ),
-                animationsEnabled = false,
-            )
-        }
+        ResultLog(
+            stateLog = MutableStateFlow(fakeStateLog()),
+            animationsEnabled = false,
+        )
     }
 }
 
@@ -201,87 +212,9 @@ private fun DefaultPreview() {
 @Composable
 private fun DarkPreview() {
     AppTheme {
-        Surface(color = MaterialTheme.colorScheme.errorContainer) {
-            val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
-            val timeSource = TestTimeSource()
-            ResultLog(
-                stateLog = MutableStateFlow(
-                    listOf(
-                        ConversionStateLogItem.Pending(
-                            id = 5,
-                            state = PermissionGrantedBasicInput(
-                                source,
-                                matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
-                                permission = Permission.ALWAYS,
-                                results = emptyMap(),
-                                lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
-                            ),
-                            startTimeMark = timeSource.markNow(),
-                        ),
-                        ConversionStateLogItem.Finished(
-                            id = 4,
-                            state = ConversionFailed(
-                                source,
-                                message = stringResource(R.string.conversion_failed_reason_no_points),
-                                stackTrace = NotImplementedError().stackTraceToString(),
-                            ),
-                            succeeded = false,
-                            startTimeMark = timeSource.markNow(),
-                            elapsedTime = 92.milliseconds,
-                        ),
-                        ConversionStateLogItem.Finished(
-                            id = 3,
-                            state = PermissionGrantedBasicInput(
-                                source,
-                                matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
-                                permission = Permission.ALWAYS,
-                                results = emptyMap(),
-                                lastAttempt = Attempt(1, ConnectTimeoutNetworkException(Exception())),
-                            ),
-                            succeeded = false,
-                            startTimeMark = timeSource.markNow(),
-                            elapsedTime = 200.milliseconds,
-                        ),
-                        ConversionStateLogItem.Finished(
-                            id = 2,
-                            state = PermissionGrantedBasicInput(
-                                source,
-                                matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
-                                permission = Permission.ALWAYS,
-                                results = emptyMap(),
-                            ),
-                            succeeded = false,
-                            startTimeMark = timeSource.markNow(),
-                            elapsedTime = 111.milliseconds,
-                        ),
-                        ConversionStateLogItem.Finished(
-                            id = 1,
-                            state = PermissionGrantedBasicInput(
-                                source,
-                                matchedInput = MatchedInput(FakeInputRepository.googleMapsUriInput, source),
-                                permission = Permission.ALWAYS,
-                                results = emptyMap(),
-                            ),
-                            succeeded = true,
-                            startTimeMark = timeSource.markNow(),
-                            elapsedTime = 30.milliseconds,
-                        ),
-                        ConversionStateLogItem.Finished(
-                            id = 0,
-                            state = PermissionGrantedBasicInput(
-                                source,
-                                matchedInput = MatchedInput(FakeInputRepository.googleMapsShortLinkInput, source),
-                                permission = Permission.ALWAYS,
-                                results = emptyMap(),
-                            ),
-                            succeeded = true,
-                            startTimeMark = timeSource.markNow(),
-                            elapsedTime = 657.milliseconds,
-                        ),
-                    ),
-                ),
-                animationsEnabled = false,
-            )
-        }
+        ResultLog(
+            stateLog = MutableStateFlow(fakeStateLog()),
+            animationsEnabled = false,
+        )
     }
 }

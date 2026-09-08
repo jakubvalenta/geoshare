@@ -63,7 +63,7 @@ class ConversionViewModel @Inject constructor(
     private val billing: Billing,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-    private val timeSource = TimeSource.Monotonic
+    private val timeSource: TimeSource.WithComparableMarks = TimeSource.Monotonic
 
     private val _currentState = MutableStateFlow<ConversionState>(Initial)
     val currentState: StateFlow<ConversionState> = _currentState.asStateFlow()

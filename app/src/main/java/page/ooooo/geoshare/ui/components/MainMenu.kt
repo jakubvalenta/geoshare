@@ -32,6 +32,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
@@ -46,8 +49,8 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun MainMenu(
     currentState: ConversionState,
     billingAppNameResId: Int,
-    billingStatus: BillingStatus,
-    changelogShown: Boolean = true,
+    billingStatus: StateFlow<BillingStatus>,
+    changelogShown: StateFlow<Boolean>,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
@@ -56,6 +59,9 @@ fun MainMenu(
 ) {
     val spacing = LocalSpacing.current
     var expanded by retain { mutableStateOf(false) }
+
+    val billingStatus by billingStatus.collectAsStateWithLifecycle()
+    val changelogShown by changelogShown.collectAsStateWithLifecycle()
 
     if (currentState is Initial && billingStatus !is BillingStatus.Loading && billingStatus !is BillingStatus.Purchased) {
         FeatureBadgeSmall(
@@ -132,7 +138,7 @@ fun MainMenu(
             if (
                 billingStatus is BillingStatus.Pending ||
                 billingStatus is BillingStatus.NotPurchased ||
-                billingStatus is BillingStatus.Purchased && billingStatus.product.type != BillingProduct.Type.DONATION
+                (billingStatus as? BillingStatus.Purchased)?.product?.type != BillingProduct.Type.DONATION
             ) {
                 DropdownMenuItem(
                     text = { Text(stringResource(billingAppNameResId)) },
@@ -172,8 +178,8 @@ private fun DefaultPreview() {
                         MainMenu(
                             currentState = Initial,
                             billingAppNameResId = R.string.app_name_pro,
-                            billingStatus = BillingStatus.NotPurchased(),
-                            changelogShown = false,
+                            billingStatus = MutableStateFlow(BillingStatus.NotPurchased()),
+                            changelogShown = MutableStateFlow(false),
                             onNavigateToAboutScreen = {},
                             onNavigateToBillingScreen = {},
                             onNavigateToFaqScreen = {},
@@ -202,8 +208,8 @@ private fun DarkPreview() {
                         MainMenu(
                             currentState = Initial,
                             billingAppNameResId = R.string.app_name_pro,
-                            billingStatus = BillingStatus.NotPurchased(),
-                            changelogShown = false,
+                            billingStatus = MutableStateFlow(BillingStatus.NotPurchased()),
+                            changelogShown = MutableStateFlow(false),
                             onNavigateToAboutScreen = {},
                             onNavigateToBillingScreen = {},
                             onNavigateToFaqScreen = {},
@@ -232,13 +238,15 @@ private fun DonationPreview() {
                         MainMenu(
                             currentState = Initial,
                             billingAppNameResId = R.string.app_name_pro,
-                            billingStatus = BillingStatus.Purchased(
-                                product = BillingProduct("test", BillingProduct.Type.DONATION),
-                                expired = false,
-                                refundable = true,
-                                token = "test_purchased",
+                            billingStatus = MutableStateFlow(
+                                BillingStatus.Purchased(
+                                    product = BillingProduct("test", BillingProduct.Type.DONATION),
+                                    expired = false,
+                                    refundable = true,
+                                    token = "test_purchased",
+                                )
                             ),
-                            changelogShown = false,
+                            changelogShown = MutableStateFlow(false),
                             onNavigateToAboutScreen = {},
                             onNavigateToBillingScreen = {},
                             onNavigateToFaqScreen = {},
@@ -267,13 +275,15 @@ private fun DarkDonationPreview() {
                         MainMenu(
                             currentState = Initial,
                             billingAppNameResId = R.string.app_name_pro,
-                            billingStatus = BillingStatus.Purchased(
-                                product = BillingProduct("test", BillingProduct.Type.DONATION),
-                                expired = false,
-                                refundable = true,
-                                token = "test_purchased",
+                            billingStatus = MutableStateFlow(
+                                BillingStatus.Purchased(
+                                    product = BillingProduct("test", BillingProduct.Type.DONATION),
+                                    expired = false,
+                                    refundable = true,
+                                    token = "test_purchased",
+                                )
                             ),
-                            changelogShown = false,
+                            changelogShown = MutableStateFlow(false),
                             onNavigateToAboutScreen = {},
                             onNavigateToBillingScreen = {},
                             onNavigateToFaqScreen = {},

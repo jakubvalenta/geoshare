@@ -10,6 +10,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -80,9 +81,10 @@ import page.ooooo.geoshare.data.InputRepository
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
-import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
+import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.data.local.preferences.Permission
+import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.data.local.preferences.shouldAppFinish
 import page.ooooo.geoshare.lib.Attempt
 import page.ooooo.geoshare.lib.Message
@@ -150,6 +152,7 @@ import page.ooooo.geoshare.ui.components.ResultTitle
 import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
 import page.ooooo.geoshare.ui.components.StyledSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.checkeredBackground
+import page.ooooo.geoshare.ui.components.fakeStateLog
 import page.ooooo.geoshare.ui.components.mainContainerColor
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -183,22 +186,6 @@ fun MainScreen(
 
     val currentState by conversionViewModel.currentState.collectAsStateWithLifecycle()
 
-    val appDetails by outputViewModel.appDetails.collectAsStateWithLifecycle()
-    val billingAppNameResId = billingViewModel.billingAppNameResId
-    val billingFeatures = billingViewModel.billingFeatures
-    val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
-    val changelogShown by inputViewModel.changelogShown.collectAsStateWithLifecycle()
-    val linkMessage by linkViewModel.message.collectAsStateWithLifecycle()
-    val outputsForApps by outputViewModel.outputsForApps.collectAsStateWithLifecycle()
-    val outputsForLinks by outputViewModel.outputsForLinks.collectAsStateWithLifecycle()
-    val outputsForPoint by outputViewModel.outputsForPoint.collectAsStateWithLifecycle()
-    val outputsForPointChips by outputViewModel.outputsForPointChips.collectAsStateWithLifecycle()
-    val outputsForPoints by outputViewModel.outputsForPoints.collectAsStateWithLifecycle()
-    val outputsForPointsChips by outputViewModel.outputsForPointsChips.collectAsStateWithLifecycle()
-    val outputsForSharing by outputViewModel.outputsForSharing.collectAsStateWithLifecycle()
-    val userPreferencesMessage by userPreferenceViewModel.message.collectAsStateWithLifecycle()
-    val userPreferencesValues by userPreferenceViewModel.values.collectAsStateWithLifecycle()
-
     // Action
 
     var locationJob by remember { mutableStateOf<Job?>(null) }
@@ -221,7 +208,7 @@ fun MainScreen(
                 is BasicActionReady -> {
                     val actionContext = ActionContext(context = context, clipboard = clipboard, resources = resources)
                     val actionResult = currentState.action.execute(actionContext)
-                    if (userPreferencesValues.finish.shouldAppFinish(actionResult)) {
+                    if (userPreferenceViewModel.values.value.finish.shouldAppFinish(actionResult)) {
                         onFinish()
                     }
                     conversionViewModel.completeBasicAction(actionResult)
@@ -246,7 +233,7 @@ fun MainScreen(
                 is FileActionReady -> {
                     val actionContext = ActionContext(context = context, clipboard = clipboard, resources = resources)
                     val actionResult = currentState.action.execute(currentState.uri, actionContext)
-                    if (userPreferencesValues.finish.shouldAppFinish(actionResult)) {
+                    if (userPreferenceViewModel.values.value.finish.shouldAppFinish(actionResult)) {
                         onFinish()
                     }
                     conversionViewModel.completeFileAction(actionResult)
@@ -284,7 +271,7 @@ fun MainScreen(
                 is LocationActionReady -> {
                     val actionContext = ActionContext(context = context, clipboard = clipboard, resources = resources)
                     val actionResult = currentState.action.execute(currentState.location, actionContext)
-                    if (userPreferencesValues.finish.shouldAppFinish(actionResult)) {
+                    if (userPreferenceViewModel.values.value.finish.shouldAppFinish(actionResult)) {
                         onFinish()
                     }
                     conversionViewModel.completeLocationAction(actionResult)
@@ -295,29 +282,29 @@ fun MainScreen(
 
     MainScreen(
         currentState = currentState,
-        appDetails = appDetails,
-        billingAppNameResId = billingAppNameResId,
-        billingFeatures = billingFeatures,
-        billingStatus = billingStatus,
-        changelogShown = changelogShown,
+        appDetails = userPreferenceViewModel.appDetails,
+        billingAppNameResId = billingViewModel.billingAppNameResId,
+        billingFeatures = billingViewModel.billingFeatures,
+        billingStatus = billingViewModel.billingStatus,
+        changelogShown = inputViewModel.changelogShown,
         coordinateConverter = outputViewModel.coordinateConverter,
-        coordinateFormat = userPreferencesValues.coordinateFormat,
         dismissedHelpMessages = helpViewModel.dismissedHelpMessages,
         elapsedTime = conversionViewModel.elapsedTime,
         inputRepository = inputViewModel.inputRepository,
-        linkMessage = linkMessage,
-        outputsForApps = outputsForApps,
-        outputsForLinks = outputsForLinks,
-        outputsForPoint = outputsForPoint,
-        outputsForPointChips = outputsForPointChips,
-        outputsForPoints = outputsForPoints,
-        outputsForPointsChips = outputsForPointsChips,
-        outputsForSharing = outputsForSharing,
+        linkMessage = linkViewModel.message,
+        outputsForApps = outputViewModel.outputsForApps,
+        outputsForLinks = outputViewModel.outputsForLinks,
+        outputsForPoint = outputViewModel.outputsForPoint,
+        outputsForPointChips = outputViewModel.outputsForPointChips,
+        outputsForPoints = outputViewModel.outputsForPoints,
+        outputsForPointsChips = outputViewModel.outputsForPointsChips,
+        outputsForSharing = outputViewModel.outputsForSharing,
         startTimeMark = conversionViewModel.startTimeMark,
         stateLog = conversionViewModel.stateLog,
         source = conversionViewModel.source,
         sourceComesFromIntent = conversionViewModel.sourceComesFromIntent,
-        userPreferenceMessage = userPreferencesMessage,
+        userPreferenceMessage = userPreferenceViewModel.message,
+        userPreferencesValues = userPreferenceViewModel.values,
         onCancel = {
             locationJob?.cancel()
             conversionViewModel.cancel()
@@ -372,29 +359,29 @@ fun MainScreen(
 @Composable
 private fun MainScreen(
     currentState: ConversionState,
-    appDetails: AppDetails,
+    appDetails: StateFlow<AppDetails>,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
-    billingStatus: BillingStatus,
-    changelogShown: Boolean,
+    billingStatus: StateFlow<BillingStatus>,
+    changelogShown: StateFlow<Boolean>,
     coordinateConverter: CoordinateConverter,
-    coordinateFormat: CoordinateFormat,
     dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
     elapsedTime: StateFlow<Duration>,
     inputRepository: InputRepository,
-    linkMessage: Message?,
-    outputsForApps: Map<String, List<Output>>,
-    outputsForLinks: Map<String?, List<Output>>,
-    outputsForPoint: List<PointOutput>,
-    outputsForPointChips: List<PointOutput>,
-    outputsForPoints: List<PointsOutput>,
-    outputsForPointsChips: List<PointsOutput>,
-    outputsForSharing: List<Output>,
+    linkMessage: StateFlow<Message?>,
+    outputsForApps: StateFlow<Map<String, List<Output>>>,
+    outputsForLinks: StateFlow<Map<String?, List<Output>>>,
+    outputsForPoint: StateFlow<List<PointOutput>>,
+    outputsForPointChips: StateFlow<List<PointOutput>>,
+    outputsForPoints: StateFlow<List<PointsOutput>>,
+    outputsForPointsChips: StateFlow<List<PointsOutput>>,
+    outputsForSharing: StateFlow<List<Output>>,
     source: StateFlow<String>,
     sourceComesFromIntent: StateFlow<Boolean>,
     startTimeMark: StateFlow<ComparableTimeMark?>,
     stateLog: StateFlow<List<ConversionStateLogItem>>,
-    userPreferenceMessage: Message?,
+    userPreferenceMessage: StateFlow<Message?>,
+    userPreferencesValues: StateFlow<UserPreferencesValues>,
     onCancel: () -> Unit,
     onDeny: (Boolean) -> Unit,
     onDisableLinkGroup: (String?) -> Unit,
@@ -420,6 +407,9 @@ private fun MainScreen(
     val mainContentColor = contentColorFor(mainContainerColor)
     val spacing = LocalSpacing.current
 
+    val linkMessage by linkMessage.collectAsStateWithLifecycle()
+    val userPreferenceMessage by userPreferenceMessage.collectAsStateWithLifecycle()
+
     val (errorMessageResId, setErrorMessageResId) = retain { mutableStateOf<Int?>(null) }
     val (selectedPointIndex, setSelectedPointIndex) = retain { mutableStateOf<Int?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -431,14 +421,14 @@ private fun MainScreen(
     // Message
 
     LaunchedEffect(linkMessage) {
-        if (linkMessage != null) {
+        linkMessage?.let { linkMessage ->
             snackbarHostState.showSnackbar(MessageSnackbarVisuals(linkMessage))
             onDismissLinkMessage()
         }
     }
 
     LaunchedEffect(userPreferenceMessage) {
-        if (userPreferenceMessage != null) {
+        userPreferenceMessage?.let { userPreferenceMessage ->
             snackbarHostState.showSnackbar(MessageSnackbarVisuals(userPreferenceMessage))
             onDismissUserPreferenceMessage()
         }
@@ -490,38 +480,36 @@ private fun MainScreen(
                             },
                         ) {
                             if (!wide) {
+                                // Not wide
                                 when (currentState) {
-                                    is ConversionState.HasError ->
-                                        item {
-                                            ResultError(
-                                                state = currentState,
-                                                elapsedTime = elapsedTime,
-                                                onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                                onRetry = onRetry,
-                                            )
-                                        }
+                                    is ConversionState.HasError -> item {
+                                        ResultError(
+                                            state = currentState,
+                                            elapsedTime = elapsedTime,
+                                            onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                            onRetry = onRetry,
+                                        )
+                                    }
 
-                                    is ConversionState.HasResult -> {
-                                        item {
-                                            ResultCoordinates(
-                                                points = currentState.points,
-                                                appDetails = appDetails,
-                                                coordinateConverter = coordinateConverter,
-                                                coordinateFormat = coordinateFormat,
-                                                dismissedHelpMessages = dismissedHelpMessages,
-                                                outputsForApps = outputsForApps,
-                                                outputsForPointChips = outputsForPointChips,
-                                                outputsForPointsChips = outputsForPointsChips,
-                                                sourceComesFromIntent = sourceComesFromIntent,
-                                                onDismissHelpMessage = onDismissHelpMessage,
-                                                onExecute = onExecute,
-                                                onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                                onSelect = { index ->
-                                                    onCancel()
-                                                    setSelectedPointIndex(index)
-                                                },
-                                            )
-                                        }
+                                    is ConversionState.HasResult -> item {
+                                        ResultCoordinates(
+                                            points = currentState.points,
+                                            appDetails = appDetails,
+                                            coordinateConverter = coordinateConverter,
+                                            dismissedHelpMessages = dismissedHelpMessages,
+                                            outputsForApps = outputsForApps,
+                                            outputsForPointChips = outputsForPointChips,
+                                            outputsForPointsChips = outputsForPointsChips,
+                                            sourceComesFromIntent = sourceComesFromIntent,
+                                            userPreferencesValues = userPreferencesValues,
+                                            onDismissHelpMessage = onDismissHelpMessage,
+                                            onExecute = onExecute,
+                                            onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                            onSelect = { index ->
+                                                onCancel()
+                                                setSelectedPointIndex(index)
+                                            },
+                                        )
                                     }
 
                                     is Initial -> {
@@ -548,30 +536,39 @@ private fun MainScreen(
                                         }
                                     }
 
-                                    is ConversionState.HasDescription ->
-                                        item {
-                                            ResultLoadingIndicator(
-                                                state = currentState,
-                                                startTimeMark = startTimeMark,
-                                                onCancel = onCancel,
-                                            )
-                                        }
-                                }
-
-                                if (currentState is ConversionState.HasDescription) {
-                                    item {
-                                        ResultLog(stateLog = stateLog)
+                                    is ConversionState.HasDescription -> item {
+                                        ResultLoadingIndicator(
+                                            state = currentState,
+                                            startTimeMark = startTimeMark,
+                                            onCancel = onCancel,
+                                        )
                                     }
                                 }
 
-                                if (currentState is ConversionState.HasResult) {
-                                    item {
+                                when (currentState) {
+                                    !is Initial -> item {
+                                        Column(Modifier.background(MaterialTheme.colorScheme.surface)) {
+                                            ResultLog(
+                                                stateLog = stateLog,
+                                                modifier = Modifier.padding(top = spacing.extraTiny),
+                                            )
+                                        }
+                                    }
+                                }
+
+                                when (currentState) {
+                                    is ConversionState.HasResult -> item {
                                         Column(
-                                            // This column must not have weight(1f), otherwise the last row of app icons gets shrunk
+                                            // This column must not have weight(1f), otherwise the last row of app
+                                            // icons gets shrunk
                                             Modifier
                                                 .fillMaxWidth()
                                                 .background(MaterialTheme.colorScheme.surface)
                                         ) {
+                                            ResultLog(
+                                                stateLog = stateLog,
+                                                modifier = Modifier.padding(top = spacing.extraTiny),
+                                            )
                                             CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
                                                 ResultTitle(
                                                     currentState = currentState,
@@ -599,64 +596,66 @@ private fun MainScreen(
                                         }
                                     }
                                 }
-                            } else if (currentState is Initial) {
-                                item {
-                                    MainForm(
-                                        source = source,
-                                        errorMessageResId = errorMessageResId,
-                                        onSetErrorMessageResId = setErrorMessageResId,
-                                        onSetSource = onSetSource,
-                                        onSubmit = onSubmit,
-                                    )
-                                }
                             } else {
-                                item {
-                                    Card(
-                                        colors = CardDefaults.cardColors(
-                                            containerColor = mainContainerColor,
-                                            contentColor = mainContentColor,
-                                        ),
-                                    ) {
-                                        Spacer(Modifier.height(spacing.small))
+                                // Wide
+                                when (currentState) {
+                                    is Initial -> item {
+                                        MainForm(
+                                            source = source,
+                                            errorMessageResId = errorMessageResId,
+                                            onSetErrorMessageResId = setErrorMessageResId,
+                                            onSetSource = onSetSource,
+                                            onSubmit = onSubmit,
+                                        )
+                                    }
 
-                                        when (currentState) {
-                                            is ConversionState.HasError ->
-                                                ResultError(
-                                                    state = currentState,
-                                                    elapsedTime = elapsedTime,
-                                                    onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                                    onRetry = onRetry,
-                                                )
+                                    else -> item {
+                                        Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
+                                            Card(
+                                                colors = CardDefaults.cardColors(
+                                                    containerColor = mainContainerColor,
+                                                    contentColor = mainContentColor,
+                                                ),
+                                            ) {
+                                                Spacer(Modifier.height(spacing.small))
 
-                                            is ConversionState.HasResult ->
-                                                ResultCoordinates(
-                                                    points = currentState.points,
-                                                    appDetails = appDetails,
-                                                    coordinateConverter = coordinateConverter,
-                                                    coordinateFormat = coordinateFormat,
-                                                    dismissedHelpMessages = dismissedHelpMessages,
-                                                    outputsForApps = outputsForApps,
-                                                    outputsForPointChips = outputsForPointChips,
-                                                    outputsForPointsChips = outputsForPointsChips,
-                                                    sourceComesFromIntent = sourceComesFromIntent,
-                                                    onDismissHelpMessage = onDismissHelpMessage,
-                                                    onExecute = onExecute,
-                                                    onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                                    onSelect = { index ->
-                                                        onCancel()
-                                                        setSelectedPointIndex(index)
-                                                    },
-                                                )
+                                                when (currentState) {
+                                                    is ConversionState.HasError ->
+                                                        ResultError(
+                                                            state = currentState,
+                                                            elapsedTime = elapsedTime,
+                                                            onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                                            onRetry = onRetry,
+                                                        )
 
-                                            is ConversionState.HasDescription ->
-                                                ResultLoadingIndicator(
-                                                    state = currentState,
-                                                    startTimeMark = startTimeMark,
-                                                    onCancel = onCancel,
-                                                )
-                                        }
+                                                    is ConversionState.HasResult ->
+                                                        ResultCoordinates(
+                                                            points = currentState.points,
+                                                            appDetails = appDetails,
+                                                            coordinateConverter = coordinateConverter,
+                                                            dismissedHelpMessages = dismissedHelpMessages,
+                                                            outputsForApps = outputsForApps,
+                                                            outputsForPointChips = outputsForPointChips,
+                                                            outputsForPointsChips = outputsForPointsChips,
+                                                            sourceComesFromIntent = sourceComesFromIntent,
+                                                            userPreferencesValues = userPreferencesValues,
+                                                            onDismissHelpMessage = onDismissHelpMessage,
+                                                            onExecute = onExecute,
+                                                            onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                                            onSelect = { index ->
+                                                                onCancel()
+                                                                setSelectedPointIndex(index)
+                                                            },
+                                                        )
 
-                                        if (currentState is ConversionState.HasDescription) {
+                                                    is ConversionState.HasDescription ->
+                                                        ResultLoadingIndicator(
+                                                            state = currentState,
+                                                            startTimeMark = startTimeMark,
+                                                            onCancel = onCancel,
+                                                        )
+                                                }
+                                            }
                                             ResultLog(stateLog = stateLog)
                                         }
                                     }
@@ -680,6 +679,7 @@ private fun MainScreen(
                             }
                         }
                     }
+                    // TODO Replace main bottom bar with result log
                     MainBottomBar(
                         containerColor = if (!wide) {
                             MaterialTheme.colorScheme.surfaceContainer
@@ -837,9 +837,11 @@ private fun MainScreen(
 private fun MainTitle(
     currentState: ConversionState,
     billingAppNameResId: Int,
-    billingStatus: BillingStatus,
+    billingStatus: StateFlow<BillingStatus>,
     maxLines: Int,
 ) {
+    val billingStatus by billingStatus.collectAsStateWithLifecycle()
+
     when (currentState) {
         is ConversionState.HasError ->
             Text(stringResource(R.string.conversion_error_title), overflow = TextOverflow.Ellipsis, maxLines = maxLines)
@@ -991,29 +993,29 @@ private fun DefaultPreview() {
         val currentState = Initial
         MainScreen(
             currentState = currentState,
-            appDetails = emptyMap(),
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.NotPurchased(),
-            changelogShown = false,
+            billingStatus = MutableStateFlow(BillingStatus.NotPurchased()),
+            changelogShown = MutableStateFlow(false),
             coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
-            linkMessage = null,
-            outputsForApps = emptyMap(),
-            outputsForLinks = emptyMap(),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = emptyList(),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = emptyList(),
-            outputsForSharing = emptyList(),
+            linkMessage = MutableStateFlow(null),
+            outputsForApps = MutableStateFlow(emptyMap()),
+            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPointsChips = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             stateLog = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
-            userPreferenceMessage = null,
+            userPreferenceMessage = MutableStateFlow(null),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
@@ -1047,29 +1049,29 @@ private fun DarkPreview() {
         val currentState = Initial
         MainScreen(
             currentState = currentState,
-            appDetails = emptyMap(),
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.NotPurchased(),
-            changelogShown = false,
+            billingStatus = MutableStateFlow(BillingStatus.NotPurchased()),
+            changelogShown = MutableStateFlow(false),
             coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
-            linkMessage = null,
-            outputsForApps = emptyMap(),
-            outputsForLinks = emptyMap(),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = emptyList(),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = emptyList(),
-            outputsForSharing = emptyList(),
+            linkMessage = MutableStateFlow(null),
+            outputsForApps = MutableStateFlow(emptyMap()),
+            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPointsChips = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             stateLog = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
-            userPreferenceMessage = null,
+            userPreferenceMessage = MutableStateFlow(null),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
@@ -1103,29 +1105,29 @@ private fun SmallPreview() {
         val currentState = Initial
         MainScreen(
             currentState = currentState,
-            appDetails = emptyMap(),
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.NotPurchased(),
-            changelogShown = false,
+            billingStatus = MutableStateFlow(BillingStatus.NotPurchased()),
+            changelogShown = MutableStateFlow(false),
             coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
-            linkMessage = null,
-            outputsForApps = emptyMap(),
-            outputsForLinks = emptyMap(),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = emptyList(),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = emptyList(),
-            outputsForSharing = emptyList(),
+            linkMessage = MutableStateFlow(null),
+            outputsForApps = MutableStateFlow(emptyMap()),
+            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPointsChips = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             stateLog = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
-            userPreferenceMessage = null,
+            userPreferenceMessage = MutableStateFlow(null),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
@@ -1159,29 +1161,29 @@ private fun TabletPreview() {
         val currentState = Initial
         MainScreen(
             currentState = currentState,
-            appDetails = emptyMap(),
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.NotPurchased(),
-            changelogShown = false,
+            billingStatus = MutableStateFlow(BillingStatus.NotPurchased()),
+            changelogShown = MutableStateFlow(false),
             coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
-            linkMessage = null,
-            outputsForApps = emptyMap(),
-            outputsForLinks = emptyMap(),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = emptyList(),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = emptyList(),
-            outputsForSharing = emptyList(),
+            linkMessage = MutableStateFlow(null),
+            outputsForApps = MutableStateFlow(emptyMap()),
+            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPointsChips = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             stateLog = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
-            userPreferenceMessage = null,
+            userPreferenceMessage = MutableStateFlow(null),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
@@ -1229,74 +1231,78 @@ private fun SucceededPreview() {
         )
         MainScreen(
             currentState = currentState,
-            appDetails = emptyMap(),
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
+            billingStatus = MutableStateFlow(
+                BillingStatus.Purchased(
+                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
+                    refundable = true,
+                    token = "test_purchased",
+                )
             ),
-            changelogShown = true,
+            changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
             elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
-            linkMessage = null,
-            outputsForApps = outputRepository.getOutputsForApps(
-                mapOf(
-                    PackageNames.COMAPS_FDROID to App(
-                        packageName = PackageNames.COMAPS_FDROID,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+            linkMessage = MutableStateFlow(null),
+            outputsForApps = MutableStateFlow(
+                outputRepository.getOutputsForApps(
+                    mapOf(
+                        PackageNames.COMAPS_FDROID to App(
+                            packageName = PackageNames.COMAPS_FDROID,
+                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                        ),
+                        PackageNames.GMAPS_WV to App(
+                            packageName = PackageNames.GMAPS_WV,
+                            dataTypes = setOf(DataType.GEO_URI)
+                        ),
+                        PackageNames.GOOGLE_MAPS to App(
+                            packageName = PackageNames.GOOGLE_MAPS,
+                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                        ),
+                        PackageNames.HERE_WEGO to App(
+                            packageName = PackageNames.HERE_WEGO,
+                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                        ),
+                        PackageNames.MAGIC_EARTH to App(
+                            packageName = PackageNames.MAGIC_EARTH,
+                            dataTypes = setOf(DataType.MAGIC_EARTH_URI)
+                        ),
+                        PackageNames.MAPY_COM to App(
+                            packageName = PackageNames.MAPY_COM,
+                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                        ),
+                        PackageNames.ORGANIC_MAPS to App(
+                            packageName = PackageNames.ORGANIC_MAPS,
+                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                        ),
+                        PackageNames.OSMAND_PLUS to App(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            dataTypes = setOf(DataType.GPX_DATA)
+                        ),
+                        PackageNames.TOMTOM to App(
+                            packageName = PackageNames.TOMTOM,
+                            dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
+                        ),
                     ),
-                    PackageNames.GMAPS_WV to App(
-                        packageName = PackageNames.GMAPS_WV,
-                        dataTypes = setOf(DataType.GEO_URI)
-                    ),
-                    PackageNames.GOOGLE_MAPS to App(
-                        packageName = PackageNames.GOOGLE_MAPS,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                    ),
-                    PackageNames.HERE_WEGO to App(
-                        packageName = PackageNames.HERE_WEGO,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                    ),
-                    PackageNames.MAGIC_EARTH to App(
-                        packageName = PackageNames.MAGIC_EARTH,
-                        dataTypes = setOf(DataType.MAGIC_EARTH_URI)
-                    ),
-                    PackageNames.MAPY_COM to App(
-                        packageName = PackageNames.MAPY_COM,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                    ),
-                    PackageNames.ORGANIC_MAPS to App(
-                        packageName = PackageNames.ORGANIC_MAPS,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                    ),
-                    PackageNames.OSMAND_PLUS to App(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        dataTypes = setOf(DataType.GPX_DATA)
-                    ),
-                    PackageNames.TOMTOM to App(
-                        packageName = PackageNames.TOMTOM,
-                        dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
-                    ),
-                ),
-                emptySet(),
+                    emptySet(),
+                )
             ),
-            outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
-            outputsForSharing = outputRepository.getOutputsForSharing(),
+            outputsForLinks = MutableStateFlow(outputRepository.getOutputsForLinks(defaultFakeLinks)),
+            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPointChips = MutableStateFlow(outputRepository.getOutputsForPointChips(defaultFakeLinks)),
+            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
+            outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            stateLog = MutableStateFlow(emptyList()),
+            stateLog = MutableStateFlow(fakeStateLog()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(true),
-            userPreferenceMessage = null,
+            userPreferenceMessage = MutableStateFlow(null),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
@@ -1344,74 +1350,78 @@ private fun DarkSucceededPreview() {
         )
         MainScreen(
             currentState = currentState,
-            appDetails = emptyMap(),
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
+            billingStatus = MutableStateFlow(
+                BillingStatus.Purchased(
+                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
+                    refundable = true,
+                    token = "test_purchased",
+                )
             ),
-            changelogShown = true,
+            changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
             elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
-            linkMessage = null,
-            outputsForApps = outputRepository.getOutputsForApps(
-                mapOf(
-                    PackageNames.COMAPS_FDROID to App(
-                        packageName = PackageNames.COMAPS_FDROID,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+            linkMessage = MutableStateFlow(null),
+            outputsForApps = MutableStateFlow(
+                outputRepository.getOutputsForApps(
+                    mapOf(
+                        PackageNames.COMAPS_FDROID to App(
+                            packageName = PackageNames.COMAPS_FDROID,
+                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                        ),
+                        PackageNames.GMAPS_WV to App(
+                            packageName = PackageNames.GMAPS_WV,
+                            dataTypes = setOf(DataType.GEO_URI)
+                        ),
+                        PackageNames.GOOGLE_MAPS to App(
+                            packageName = PackageNames.GOOGLE_MAPS,
+                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                        ),
+                        PackageNames.HERE_WEGO to App(
+                            packageName = PackageNames.HERE_WEGO,
+                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                        ),
+                        PackageNames.MAGIC_EARTH to App(
+                            packageName = PackageNames.MAGIC_EARTH,
+                            dataTypes = setOf(DataType.MAGIC_EARTH_URI)
+                        ),
+                        PackageNames.MAPY_COM to App(
+                            packageName = PackageNames.MAPY_COM,
+                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                        ),
+                        PackageNames.ORGANIC_MAPS to App(
+                            packageName = PackageNames.ORGANIC_MAPS,
+                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                        ),
+                        PackageNames.OSMAND_PLUS to App(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            dataTypes = setOf(DataType.GPX_DATA)
+                        ),
+                        PackageNames.TOMTOM to App(
+                            packageName = PackageNames.TOMTOM,
+                            dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
+                        ),
                     ),
-                    PackageNames.GMAPS_WV to App(
-                        packageName = PackageNames.GMAPS_WV,
-                        dataTypes = setOf(DataType.GEO_URI)
-                    ),
-                    PackageNames.GOOGLE_MAPS to App(
-                        packageName = PackageNames.GOOGLE_MAPS,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                    ),
-                    PackageNames.HERE_WEGO to App(
-                        packageName = PackageNames.HERE_WEGO,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                    ),
-                    PackageNames.MAGIC_EARTH to App(
-                        packageName = PackageNames.MAGIC_EARTH,
-                        dataTypes = setOf(DataType.MAGIC_EARTH_URI)
-                    ),
-                    PackageNames.MAPY_COM to App(
-                        packageName = PackageNames.MAPY_COM,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                    ),
-                    PackageNames.ORGANIC_MAPS to App(
-                        packageName = PackageNames.ORGANIC_MAPS,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                    ),
-                    PackageNames.OSMAND_PLUS to App(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        dataTypes = setOf(DataType.GPX_DATA)
-                    ),
-                    PackageNames.TOMTOM to App(
-                        packageName = PackageNames.TOMTOM,
-                        dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
-                    ),
-                ),
-                emptySet(),
+                    emptySet(),
+                )
             ),
-            outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
-            outputsForSharing = outputRepository.getOutputsForSharing(),
+            outputsForLinks = MutableStateFlow(outputRepository.getOutputsForLinks(defaultFakeLinks)),
+            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPointChips = MutableStateFlow(outputRepository.getOutputsForPointChips(defaultFakeLinks)),
+            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
+            outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            stateLog = MutableStateFlow(emptyList()),
+            stateLog = MutableStateFlow(fakeStateLog()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(true),
-            userPreferenceMessage = null,
+            userPreferenceMessage = MutableStateFlow(null),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
@@ -1458,74 +1468,78 @@ private fun SmallSucceededPreview() {
         )
         MainScreen(
             currentState = currentState,
-            appDetails = emptyMap(),
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
+            billingStatus = MutableStateFlow(
+                BillingStatus.Purchased(
+                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
+                    refundable = true,
+                    token = "test_purchased",
+                )
             ),
-            changelogShown = true,
+            changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
             elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
-            linkMessage = null,
-            outputsForApps = outputRepository.getOutputsForApps(
-                mapOf(
-                    PackageNames.COMAPS_FDROID to App(
-                        packageName = PackageNames.COMAPS_FDROID,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+            linkMessage = MutableStateFlow(null),
+            outputsForApps = MutableStateFlow(
+                outputRepository.getOutputsForApps(
+                    mapOf(
+                        PackageNames.COMAPS_FDROID to App(
+                            packageName = PackageNames.COMAPS_FDROID,
+                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                        ),
+                        PackageNames.GMAPS_WV to App(
+                            packageName = PackageNames.GMAPS_WV,
+                            dataTypes = setOf(DataType.GEO_URI)
+                        ),
+                        PackageNames.GOOGLE_MAPS to App(
+                            packageName = PackageNames.GOOGLE_MAPS,
+                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                        ),
+                        PackageNames.HERE_WEGO to App(
+                            packageName = PackageNames.HERE_WEGO,
+                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                        ),
+                        PackageNames.MAGIC_EARTH to App(
+                            packageName = PackageNames.MAGIC_EARTH,
+                            dataTypes = setOf(DataType.MAGIC_EARTH_URI)
+                        ),
+                        PackageNames.MAPY_COM to App(
+                            packageName = PackageNames.MAPY_COM,
+                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                        ),
+                        PackageNames.ORGANIC_MAPS to App(
+                            packageName = PackageNames.ORGANIC_MAPS,
+                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                        ),
+                        PackageNames.OSMAND_PLUS to App(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            dataTypes = setOf(DataType.GPX_DATA)
+                        ),
+                        PackageNames.TOMTOM to App(
+                            packageName = PackageNames.TOMTOM,
+                            dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
+                        ),
                     ),
-                    PackageNames.GMAPS_WV to App(
-                        packageName = PackageNames.GMAPS_WV,
-                        dataTypes = setOf(DataType.GEO_URI)
-                    ),
-                    PackageNames.GOOGLE_MAPS to App(
-                        packageName = PackageNames.GOOGLE_MAPS,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                    ),
-                    PackageNames.HERE_WEGO to App(
-                        packageName = PackageNames.HERE_WEGO,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                    ),
-                    PackageNames.MAGIC_EARTH to App(
-                        packageName = PackageNames.MAGIC_EARTH,
-                        dataTypes = setOf(DataType.MAGIC_EARTH_URI)
-                    ),
-                    PackageNames.MAPY_COM to App(
-                        packageName = PackageNames.MAPY_COM,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                    ),
-                    PackageNames.ORGANIC_MAPS to App(
-                        packageName = PackageNames.ORGANIC_MAPS,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                    ),
-                    PackageNames.OSMAND_PLUS to App(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        dataTypes = setOf(DataType.GPX_DATA)
-                    ),
-                    PackageNames.TOMTOM to App(
-                        packageName = PackageNames.TOMTOM,
-                        dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
-                    ),
-                ),
-                emptySet(),
+                    emptySet(),
+                )
             ),
-            outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
-            outputsForSharing = outputRepository.getOutputsForSharing(),
+            outputsForLinks = MutableStateFlow(outputRepository.getOutputsForLinks(defaultFakeLinks)),
+            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPointChips = MutableStateFlow(outputRepository.getOutputsForPointChips(defaultFakeLinks)),
+            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
+            outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            stateLog = MutableStateFlow(emptyList()),
+            stateLog = MutableStateFlow(fakeStateLog()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(true),
-            userPreferenceMessage = null,
+            userPreferenceMessage = MutableStateFlow(null),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
@@ -1573,74 +1587,78 @@ private fun TabletSucceededPreview() {
         )
         MainScreen(
             currentState = currentState,
-            appDetails = emptyMap(),
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
+            billingStatus = MutableStateFlow(
+                BillingStatus.Purchased(
+                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
+                    refundable = true,
+                    token = "test_purchased",
+                )
             ),
-            changelogShown = true,
+            changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
             elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
-            linkMessage = null,
-            outputsForApps = outputRepository.getOutputsForApps(
-                mapOf(
-                    PackageNames.COMAPS_FDROID to App(
-                        packageName = PackageNames.COMAPS_FDROID,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+            linkMessage = MutableStateFlow(null),
+            outputsForApps = MutableStateFlow(
+                outputRepository.getOutputsForApps(
+                    mapOf(
+                        PackageNames.COMAPS_FDROID to App(
+                            packageName = PackageNames.COMAPS_FDROID,
+                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                        ),
+                        PackageNames.GMAPS_WV to App(
+                            packageName = PackageNames.GMAPS_WV,
+                            dataTypes = setOf(DataType.GEO_URI)
+                        ),
+                        PackageNames.GOOGLE_MAPS to App(
+                            packageName = PackageNames.GOOGLE_MAPS,
+                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                        ),
+                        PackageNames.HERE_WEGO to App(
+                            packageName = PackageNames.HERE_WEGO,
+                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                        ),
+                        PackageNames.MAGIC_EARTH to App(
+                            packageName = PackageNames.MAGIC_EARTH,
+                            dataTypes = setOf(DataType.MAGIC_EARTH_URI)
+                        ),
+                        PackageNames.MAPY_COM to App(
+                            packageName = PackageNames.MAPY_COM,
+                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                        ),
+                        PackageNames.ORGANIC_MAPS to App(
+                            packageName = PackageNames.ORGANIC_MAPS,
+                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                        ),
+                        PackageNames.OSMAND_PLUS to App(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            dataTypes = setOf(DataType.GPX_DATA)
+                        ),
+                        PackageNames.TOMTOM to App(
+                            packageName = PackageNames.TOMTOM,
+                            dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
+                        ),
                     ),
-                    PackageNames.GMAPS_WV to App(
-                        packageName = PackageNames.GMAPS_WV,
-                        dataTypes = setOf(DataType.GEO_URI)
-                    ),
-                    PackageNames.GOOGLE_MAPS to App(
-                        packageName = PackageNames.GOOGLE_MAPS,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                    ),
-                    PackageNames.HERE_WEGO to App(
-                        packageName = PackageNames.HERE_WEGO,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                    ),
-                    PackageNames.MAGIC_EARTH to App(
-                        packageName = PackageNames.MAGIC_EARTH,
-                        dataTypes = setOf(DataType.MAGIC_EARTH_URI)
-                    ),
-                    PackageNames.MAPY_COM to App(
-                        packageName = PackageNames.MAPY_COM,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                    ),
-                    PackageNames.ORGANIC_MAPS to App(
-                        packageName = PackageNames.ORGANIC_MAPS,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                    ),
-                    PackageNames.OSMAND_PLUS to App(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        dataTypes = setOf(DataType.GPX_DATA)
-                    ),
-                    PackageNames.TOMTOM to App(
-                        packageName = PackageNames.TOMTOM,
-                        dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
-                    ),
-                ),
-                emptySet(),
+                    emptySet(),
+                )
             ),
-            outputsForLinks = outputRepository.getOutputsForLinks(defaultFakeLinks),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
-            outputsForSharing = outputRepository.getOutputsForSharing(),
+            outputsForLinks = MutableStateFlow(outputRepository.getOutputsForLinks(defaultFakeLinks)),
+            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPointChips = MutableStateFlow(outputRepository.getOutputsForPointChips(defaultFakeLinks)),
+            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
+            outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            stateLog = MutableStateFlow(emptyList()),
+            stateLog = MutableStateFlow(fakeStateLog()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
-            userPreferenceMessage = null,
+            userPreferenceMessage = MutableStateFlow(null),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
@@ -1675,37 +1693,38 @@ private fun ErrorPreview() {
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             message = stringResource(R.string.conversion_failed_reason_no_points),
         )
-        val timeSource = TestTimeSource()
         MainScreen(
             currentState = currentState,
-            appDetails = emptyMap(),
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
+            billingStatus = MutableStateFlow(
+                BillingStatus.Purchased(
+                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
+                    refundable = true,
+                    token = "test_purchased",
+                )
             ),
-            changelogShown = true,
+            changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
-            linkMessage = null,
-            outputsForApps = emptyMap(),
-            outputsForLinks = emptyMap(),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = emptyList(),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = emptyList(),
-            outputsForSharing = emptyList(),
+            linkMessage = MutableStateFlow(null),
+            outputsForApps = MutableStateFlow(emptyMap()),
+            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPointsChips = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
+            stateLog = MutableStateFlow(fakeStateLog()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
-            userPreferenceMessage = null,
+            userPreferenceMessage = MutableStateFlow(null),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
@@ -1740,37 +1759,38 @@ private fun DarkErrorPreview() {
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             message = stringResource(R.string.conversion_failed_reason_no_points),
         )
-        val timeSource = TestTimeSource()
         MainScreen(
             currentState = currentState,
-            appDetails = emptyMap(),
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
+            billingStatus = MutableStateFlow(
+                BillingStatus.Purchased(
+                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
+                    refundable = true,
+                    token = "test_purchased",
+                )
             ),
-            changelogShown = true,
+            changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
-            linkMessage = null,
-            outputsForApps = emptyMap(),
-            outputsForLinks = emptyMap(),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = emptyList(),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = emptyList(),
-            outputsForSharing = emptyList(),
+            linkMessage = MutableStateFlow(null),
+            outputsForApps = MutableStateFlow(emptyMap()),
+            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPointsChips = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
+            stateLog = MutableStateFlow(fakeStateLog()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
-            userPreferenceMessage = null,
+            userPreferenceMessage = MutableStateFlow(null),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
@@ -1805,37 +1825,38 @@ private fun TabletErrorPreview() {
             source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             message = stringResource(R.string.conversion_failed_reason_no_points),
         )
-        val timeSource = TestTimeSource()
         MainScreen(
             currentState = currentState,
-            appDetails = emptyMap(),
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
+            billingStatus = MutableStateFlow(
+                BillingStatus.Purchased(
+                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
+                    refundable = true,
+                    token = "test_purchased",
+                )
             ),
-            changelogShown = true,
+            changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
-            linkMessage = null,
-            outputsForApps = emptyMap(),
-            outputsForLinks = emptyMap(),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = emptyList(),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = emptyList(),
-            outputsForSharing = emptyList(),
+            linkMessage = MutableStateFlow(null),
+            outputsForApps = MutableStateFlow(emptyMap()),
+            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPointsChips = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
+            stateLog = MutableStateFlow(fakeStateLog()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
-            userPreferenceMessage = null,
+            userPreferenceMessage = MutableStateFlow(null),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
@@ -1871,37 +1892,38 @@ private fun WarningPreview() {
             message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
             warning = true,
         )
-        val timeSource = TestTimeSource()
         MainScreen(
             currentState = currentState,
-            appDetails = emptyMap(),
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
+            billingStatus = MutableStateFlow(
+                BillingStatus.Purchased(
+                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
+                    refundable = true,
+                    token = "test_purchased",
+                )
             ),
-            changelogShown = true,
+            changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
-            linkMessage = null,
-            outputsForApps = emptyMap(),
-            outputsForLinks = emptyMap(),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = emptyList(),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = emptyList(),
-            outputsForSharing = emptyList(),
+            linkMessage = MutableStateFlow(null),
+            outputsForApps = MutableStateFlow(emptyMap()),
+            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPointsChips = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
+            stateLog = MutableStateFlow(fakeStateLog()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
-            userPreferenceMessage = null,
+            userPreferenceMessage = MutableStateFlow(null),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
@@ -1937,37 +1959,38 @@ private fun DarkWarningPreview() {
             message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
             warning = true,
         )
-        val timeSource = TestTimeSource()
         MainScreen(
             currentState = currentState,
-            appDetails = emptyMap(),
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
+            billingStatus = MutableStateFlow(
+                BillingStatus.Purchased(
+                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
+                    refundable = true,
+                    token = "test_purchased",
+                )
             ),
-            changelogShown = true,
+            changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
-            linkMessage = null,
-            outputsForApps = emptyMap(),
-            outputsForLinks = emptyMap(),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = emptyList(),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = emptyList(),
-            outputsForSharing = emptyList(),
+            linkMessage = MutableStateFlow(null),
+            outputsForApps = MutableStateFlow(emptyMap()),
+            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPointsChips = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
+            stateLog = MutableStateFlow(fakeStateLog()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
-            userPreferenceMessage = null,
+            userPreferenceMessage = MutableStateFlow(null),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
@@ -2007,37 +2030,38 @@ private fun LoadingIndicatorPreview() {
             results = emptyMap(),
             lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )
-        val timeSource = TestTimeSource()
         MainScreen(
             currentState = currentState,
-            appDetails = emptyMap(),
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
+            billingStatus = MutableStateFlow(
+                BillingStatus.Purchased(
+                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
+                    refundable = true,
+                    token = "test_purchased",
+                )
             ),
-            changelogShown = true,
+            changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
-            linkMessage = null,
-            outputsForApps = emptyMap(),
-            outputsForLinks = emptyMap(),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = emptyList(),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = emptyList(),
-            outputsForSharing = emptyList(),
+            linkMessage = MutableStateFlow(null),
+            outputsForApps = MutableStateFlow(emptyMap()),
+            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPointsChips = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
+            stateLog = MutableStateFlow(fakeStateLog()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
-            userPreferenceMessage = null,
+            userPreferenceMessage = MutableStateFlow(null),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
@@ -2077,37 +2101,38 @@ private fun DarkLoadingIndicatorPreview() {
             results = emptyMap(),
             lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )
-        val timeSource = TestTimeSource()
         MainScreen(
             currentState = currentState,
-            appDetails = emptyMap(),
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
+            billingStatus = MutableStateFlow(
+                BillingStatus.Purchased(
+                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
+                    refundable = true,
+                    token = "test_purchased",
+                )
             ),
-            changelogShown = true,
+            changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
-            linkMessage = null,
-            outputsForApps = emptyMap(),
-            outputsForLinks = emptyMap(),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = emptyList(),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = emptyList(),
-            outputsForSharing = emptyList(),
+            linkMessage = MutableStateFlow(null),
+            outputsForApps = MutableStateFlow(emptyMap()),
+            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPointsChips = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
+            stateLog = MutableStateFlow(fakeStateLog()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
-            userPreferenceMessage = null,
+            userPreferenceMessage = MutableStateFlow(null),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
@@ -2147,37 +2172,38 @@ private fun TabletLoadingIndicatorPreview() {
             results = emptyMap(),
             lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
         )
-        val timeSource = TestTimeSource()
         MainScreen(
             currentState = currentState,
-            appDetails = emptyMap(),
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
+            billingStatus = MutableStateFlow(
+                BillingStatus.Purchased(
+                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
+                    refundable = true,
+                    token = "test_purchased",
+                )
             ),
-            changelogShown = true,
+            changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
-            linkMessage = null,
-            outputsForApps = emptyMap(),
-            outputsForLinks = emptyMap(),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = emptyList(),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = emptyList(),
-            outputsForSharing = emptyList(),
+            linkMessage = MutableStateFlow(null),
+            outputsForApps = MutableStateFlow(emptyMap()),
+            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPointsChips = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
+            stateLog = MutableStateFlow(fakeStateLog()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
-            userPreferenceMessage = null,
+            userPreferenceMessage = MutableStateFlow(null),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
@@ -2214,37 +2240,38 @@ private fun WebViewPreview() {
             permission = Permission.ALWAYS,
             results = emptyMap(),
         )
-        val timeSource = TestTimeSource()
         MainScreen(
             currentState = currentState,
-            appDetails = emptyMap(),
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
+            billingStatus = MutableStateFlow(
+                BillingStatus.Purchased(
+                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
+                    refundable = true,
+                    token = "test_purchased",
+                )
             ),
-            changelogShown = true,
+            changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
-            linkMessage = null,
-            outputsForApps = emptyMap(),
-            outputsForLinks = emptyMap(),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = emptyList(),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = emptyList(),
-            outputsForSharing = emptyList(),
+            linkMessage = MutableStateFlow(null),
+            outputsForApps = MutableStateFlow(emptyMap()),
+            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPointsChips = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
+            stateLog = MutableStateFlow(fakeStateLog()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
-            userPreferenceMessage = null,
+            userPreferenceMessage = MutableStateFlow(null),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
@@ -2281,37 +2308,38 @@ private fun DarkWebViewPreview() {
             permission = Permission.ALWAYS,
             results = emptyMap(),
         )
-        val timeSource = TestTimeSource()
         MainScreen(
             currentState = currentState,
-            appDetails = emptyMap(),
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
+            billingStatus = MutableStateFlow(
+                BillingStatus.Purchased(
+                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
+                    refundable = true,
+                    token = "test_purchased",
+                )
             ),
-            changelogShown = true,
+            changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
-            linkMessage = null,
-            outputsForApps = emptyMap(),
-            outputsForLinks = emptyMap(),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = emptyList(),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = emptyList(),
-            outputsForSharing = emptyList(),
+            linkMessage = MutableStateFlow(null),
+            outputsForApps = MutableStateFlow(emptyMap()),
+            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPointsChips = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
+            stateLog = MutableStateFlow(fakeStateLog()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
-            userPreferenceMessage = null,
+            userPreferenceMessage = MutableStateFlow(null),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
@@ -2348,37 +2376,38 @@ private fun TabletWebViewPreview() {
             permission = Permission.ALWAYS,
             results = emptyMap(),
         )
-        val timeSource = TestTimeSource()
         MainScreen(
             currentState = currentState,
-            appDetails = emptyMap(),
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
+            billingStatus = MutableStateFlow(
+                BillingStatus.Purchased(
+                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
+                    refundable = true,
+                    token = "test_purchased",
+                )
             ),
-            changelogShown = true,
+            changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
-            linkMessage = null,
-            outputsForApps = emptyMap(),
-            outputsForLinks = emptyMap(),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = emptyList(),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = emptyList(),
-            outputsForSharing = emptyList(),
+            linkMessage = MutableStateFlow(null),
+            outputsForApps = MutableStateFlow(emptyMap()),
+            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPointsChips = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
+            stateLog = MutableStateFlow(fakeStateLog()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
-            userPreferenceMessage = null,
+            userPreferenceMessage = MutableStateFlow(null),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},
@@ -2415,34 +2444,36 @@ private fun EmptyPreview() {
         )
         MainScreen(
             currentState = currentState,
-            appDetails = emptyMap(),
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
+            billingStatus = MutableStateFlow(
+                BillingStatus.Purchased(
+                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
+                    refundable = true,
+                    token = "test_purchased",
+                )
             ),
-            changelogShown = true,
+            changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
-            coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
             elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
-            linkMessage = null,
-            outputsForApps = emptyMap(),
-            outputsForLinks = emptyMap(),
-            outputsForPoint = emptyList(),
-            outputsForPointChips = emptyList(),
-            outputsForPoints = emptyList(),
-            outputsForPointsChips = emptyList(),
-            outputsForSharing = emptyList(),
+            linkMessage = MutableStateFlow(null),
+            outputsForApps = MutableStateFlow(emptyMap()),
+            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPointsChips = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             stateLog = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
-            userPreferenceMessage = null,
+            userPreferenceMessage = MutableStateFlow(null),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancel = {},
             onDeny = {},
             onDisableLinkGroup = {},

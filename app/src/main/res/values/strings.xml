@@ -301,7 +301,6 @@
     <string name="network_exception_unresolved_address">Unresolved address</string>
     <string name="network_exception_webview">WebView exception</string>
     <string name="reset">reset</string>
-    <string name="seconds_short">%1$ss</string>
     <string name="seconds_unit">seconds</string>
     <plurals name="seconds">
         <item quantity="one">%1$d second</item>

@@ -51,8 +51,10 @@ import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
+import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
+import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.android.App
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
@@ -79,13 +81,13 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @Composable
 fun ResultCoordinates(
     points: Points,
-    appDetails: AppDetails,
-    coordinateFormat: CoordinateFormat,
+    appDetails: StateFlow<AppDetails>,
     coordinateConverter: CoordinateConverter,
     dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
-    outputsForApps: Map<String, List<Output>>,
-    outputsForPointChips: List<PointOutput>,
-    outputsForPointsChips: List<PointsOutput>,
+    userPreferencesValues: StateFlow<UserPreferencesValues>,
+    outputsForApps: StateFlow<Map<String, List<Output>>>,
+    outputsForPointChips: StateFlow<List<PointOutput>>,
+    outputsForPointsChips: StateFlow<List<PointsOutput>>,
     sourceComesFromIntent: StateFlow<Boolean>,
     onDismissHelpMessage: (helpMessage: HelpMessage) -> Unit,
     onExecute: (action: Action<*>) -> Unit,
@@ -99,6 +101,12 @@ fun ResultCoordinates(
     val resources = LocalResources.current
     val lastPoint = points.lastOrNull() ?: return
     val spacing = LocalSpacing.current
+
+    val appDetails by appDetails.collectAsStateWithLifecycle()
+    val outputsForApps by outputsForApps.collectAsStateWithLifecycle()
+    val outputsForPointChips by outputsForPointChips.collectAsStateWithLifecycle()
+    val outputsForPointsChips by outputsForPointsChips.collectAsStateWithLifecycle()
+    val userPreferencesValues by userPreferencesValues.collectAsStateWithLifecycle()
 
     var expanded by remember { mutableStateOf(initialExpanded) }
     val sourceComesFromIntent by sourceComesFromIntent.collectAsStateWithLifecycle()
@@ -115,7 +123,7 @@ fun ResultCoordinates(
             if (lastPoint.hasCoordinates()) {
                 SelectionContainer {
                     Text(
-                        when (coordinateFormat) {
+                        when (userPreferencesValues.coordinateFormat) {
                             CoordinateFormat.DEC -> CoordinateFormatter.formatDecCoords(
                                 coordinateConverter.toWGS84(lastPoint)
                             )
@@ -274,10 +282,7 @@ fun ResultCoordinates(
             }
         }
         points.takeIf { points.size > 1 }?.let { points ->
-            Surface(
-                color = MaterialTheme.colorScheme.surfaceContainer,
-                contentColor = MaterialTheme.colorScheme.onSurface,
-            ) {
+            Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh) {
                 Column(Modifier.padding(top = spacing.small)) {
                     ExpandablePane(
                         expanded = expanded,
@@ -314,7 +319,7 @@ fun ResultCoordinates(
                                 ResultPoint(
                                     point = point,
                                     index = index,
-                                    coordinateFormat = coordinateFormat,
+                                    coordinateFormat = userPreferencesValues.coordinateFormat,
                                     coordinateConverter = coordinateConverter,
                                     onSelect = { onSelect(index) },
                                 )
@@ -395,28 +400,32 @@ private fun DefaultPreview() {
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultCoordinates(
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
-                appDetails = mapOf(
-                    PackageNames.OSMAND_PLUS to AppDetail(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        label = "OsmAnd",
-                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                    ),
+                appDetails = MutableStateFlow(
+                    mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    )
                 ),
-                coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
                 dismissedHelpMessages = MutableStateFlow(emptySet()),
-                outputsForApps = outputRepository.getOutputsForApps(
-                    mapOf(
-                        PackageNames.OSMAND_PLUS to App(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            dataTypes = setOf(DataType.GEO_URI)
+                outputsForApps = MutableStateFlow(
+                    outputRepository.getOutputsForApps(
+                        mapOf(
+                            PackageNames.OSMAND_PLUS to App(
+                                packageName = PackageNames.OSMAND_PLUS,
+                                dataTypes = setOf(DataType.GEO_URI)
+                            ),
                         ),
-                    ),
-                    hiddenApps = emptySet(),
+                        hiddenApps = emptySet(),
+                    )
                 ),
-                outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
-                outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
+                outputsForPointChips = MutableStateFlow(outputRepository.getOutputsForPointChips(defaultFakeLinks)),
+                outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
                 sourceComesFromIntent = MutableStateFlow(false),
+                userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onDismissHelpMessage = {},
                 onExecute = {},
                 onNavigateToFaqScreen = {},
@@ -443,28 +452,32 @@ private fun DarkPreview() {
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultCoordinates(
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
-                appDetails = mapOf(
-                    PackageNames.OSMAND_PLUS to AppDetail(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        label = "OsmAnd",
-                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                    ),
+                appDetails = MutableStateFlow(
+                    mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    )
                 ),
-                coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
                 dismissedHelpMessages = MutableStateFlow(emptySet()),
-                outputsForApps = outputRepository.getOutputsForApps(
-                    mapOf(
-                        PackageNames.OSMAND_PLUS to App(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            dataTypes = setOf(DataType.GEO_URI)
+                outputsForApps = MutableStateFlow(
+                    outputRepository.getOutputsForApps(
+                        mapOf(
+                            PackageNames.OSMAND_PLUS to App(
+                                packageName = PackageNames.OSMAND_PLUS,
+                                dataTypes = setOf(DataType.GEO_URI)
+                            ),
                         ),
-                    ),
-                    hiddenApps = emptySet(),
+                        hiddenApps = emptySet(),
+                    )
                 ),
-                outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
-                outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
+                outputsForPointChips = MutableStateFlow(outputRepository.getOutputsForPointChips(defaultFakeLinks)),
+                outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
                 sourceComesFromIntent = MutableStateFlow(false),
+                userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onDismissHelpMessage = {},
                 onExecute = {},
                 onNavigateToFaqScreen = {},
@@ -488,28 +501,32 @@ private fun DescriptionPreview() {
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultCoordinates(
                 points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI)),
-                appDetails = mapOf(
-                    PackageNames.OSMAND_PLUS to AppDetail(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        label = "OsmAnd",
-                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                    ),
+                appDetails = MutableStateFlow(
+                    mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    )
                 ),
-                coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
                 dismissedHelpMessages = MutableStateFlow(null),
-                outputsForApps = outputRepository.getOutputsForApps(
-                    mapOf(
-                        PackageNames.OSMAND_PLUS to App(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            dataTypes = setOf(DataType.GEO_URI)
+                outputsForApps = MutableStateFlow(
+                    outputRepository.getOutputsForApps(
+                        mapOf(
+                            PackageNames.OSMAND_PLUS to App(
+                                packageName = PackageNames.OSMAND_PLUS,
+                                dataTypes = setOf(DataType.GEO_URI)
+                            ),
                         ),
-                    ),
-                    hiddenApps = emptySet(),
+                        hiddenApps = emptySet(),
+                    )
                 ),
-                outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
-                outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
+                outputsForPointChips = MutableStateFlow(outputRepository.getOutputsForPointChips(defaultFakeLinks)),
+                outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
                 sourceComesFromIntent = MutableStateFlow(false),
+                userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onDismissHelpMessage = {},
                 onExecute = {},
                 onNavigateToFaqScreen = {},
@@ -533,28 +550,32 @@ private fun DarkDescriptionPreview() {
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultCoordinates(
                 points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI)),
-                appDetails = mapOf(
-                    PackageNames.OSMAND_PLUS to AppDetail(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        label = "OsmAnd",
-                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                    ),
+                appDetails = MutableStateFlow(
+                    mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    )
                 ),
-                coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
                 dismissedHelpMessages = MutableStateFlow(null),
-                outputsForApps = outputRepository.getOutputsForApps(
-                    mapOf(
-                        PackageNames.OSMAND_PLUS to App(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            dataTypes = setOf(DataType.GEO_URI)
+                outputsForApps = MutableStateFlow(
+                    outputRepository.getOutputsForApps(
+                        mapOf(
+                            PackageNames.OSMAND_PLUS to App(
+                                packageName = PackageNames.OSMAND_PLUS,
+                                dataTypes = setOf(DataType.GEO_URI)
+                            ),
                         ),
-                    ),
-                    hiddenApps = emptySet(),
+                        hiddenApps = emptySet(),
+                    )
                 ),
-                outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
-                outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
+                outputsForPointChips = MutableStateFlow(outputRepository.getOutputsForPointChips(defaultFakeLinks)),
+                outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
                 sourceComesFromIntent = MutableStateFlow(false),
+                userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onDismissHelpMessage = {},
                 onExecute = {},
                 onNavigateToFaqScreen = {},
@@ -581,28 +602,32 @@ private fun NamePreview() {
                     WGS84Point(NaivePoint.example),
                     GCJ02Point(31.22850685422705, 121.47552456472106, z = 11.0, source = Source.MAP_CENTER),
                 ),
-                appDetails = mapOf(
-                    PackageNames.OSMAND_PLUS to AppDetail(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        label = "OsmAnd",
-                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                    ),
+                appDetails = MutableStateFlow(
+                    mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    )
                 ),
-                coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
                 dismissedHelpMessages = MutableStateFlow(null),
-                outputsForApps = outputRepository.getOutputsForApps(
-                    mapOf(
-                        PackageNames.OSMAND_PLUS to App(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            dataTypes = setOf(DataType.GEO_URI)
+                outputsForApps = MutableStateFlow(
+                    outputRepository.getOutputsForApps(
+                        mapOf(
+                            PackageNames.OSMAND_PLUS to App(
+                                packageName = PackageNames.OSMAND_PLUS,
+                                dataTypes = setOf(DataType.GEO_URI)
+                            ),
                         ),
-                    ),
-                    hiddenApps = emptySet(),
+                        hiddenApps = emptySet(),
+                    )
                 ),
-                outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
-                outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
+                outputsForPointChips = MutableStateFlow(outputRepository.getOutputsForPointChips(defaultFakeLinks)),
+                outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
                 sourceComesFromIntent = MutableStateFlow(false),
+                userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onDismissHelpMessage = {},
                 onExecute = {},
                 onNavigateToFaqScreen = {},
@@ -629,28 +654,32 @@ private fun DarkNamePreview() {
                     WGS84Point(NaivePoint.example),
                     GCJ02Point(31.22850685422705, 121.47552456472106, z = 11.0, source = Source.MAP_CENTER),
                 ),
-                appDetails = mapOf(
-                    PackageNames.OSMAND_PLUS to AppDetail(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        label = "OsmAnd",
-                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                    ),
+                appDetails = MutableStateFlow(
+                    mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    )
                 ),
-                coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
                 dismissedHelpMessages = MutableStateFlow(null),
-                outputsForApps = outputRepository.getOutputsForApps(
-                    mapOf(
-                        PackageNames.OSMAND_PLUS to App(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            dataTypes = setOf(DataType.GEO_URI)
+                outputsForApps = MutableStateFlow(
+                    outputRepository.getOutputsForApps(
+                        mapOf(
+                            PackageNames.OSMAND_PLUS to App(
+                                packageName = PackageNames.OSMAND_PLUS,
+                                dataTypes = setOf(DataType.GEO_URI)
+                            ),
                         ),
-                    ),
-                    hiddenApps = emptySet(),
+                        hiddenApps = emptySet(),
+                    )
                 ),
-                outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
-                outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
+                outputsForPointChips = MutableStateFlow(outputRepository.getOutputsForPointChips(defaultFakeLinks)),
+                outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
                 sourceComesFromIntent = MutableStateFlow(false),
+                userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onDismissHelpMessage = {},
                 onExecute = {},
                 onNavigateToFaqScreen = {},
@@ -682,29 +711,33 @@ private fun PointsPreview() {
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.genRandomPoint()),
                 ),
-                appDetails = mapOf(
-                    PackageNames.OSMAND_PLUS to AppDetail(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        label = "OsmAnd",
-                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                    ),
+                appDetails = MutableStateFlow(
+                    mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    )
                 ),
-                coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
                 dismissedHelpMessages = MutableStateFlow(null),
-                outputsForApps = outputRepository.getOutputsForApps(
-                    mapOf(
-                        PackageNames.OSMAND_PLUS to App(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            dataTypes = setOf(DataType.GEO_URI)
+                outputsForApps = MutableStateFlow(
+                    outputRepository.getOutputsForApps(
+                        mapOf(
+                            PackageNames.OSMAND_PLUS to App(
+                                packageName = PackageNames.OSMAND_PLUS,
+                                dataTypes = setOf(DataType.GEO_URI)
+                            ),
                         ),
-                    ),
-                    hiddenApps = emptySet(),
+                        hiddenApps = emptySet(),
+                    )
                 ),
-                outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
-                outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
+                outputsForPointChips = MutableStateFlow(outputRepository.getOutputsForPointChips(defaultFakeLinks)),
+                outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
                 initialExpanded = true,
                 sourceComesFromIntent = MutableStateFlow(false),
+                userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onDismissHelpMessage = {},
                 onExecute = {},
                 onNavigateToFaqScreen = {},
@@ -736,29 +769,33 @@ private fun DarkPointsPreview() {
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.genRandomPoint()),
                 ),
-                appDetails = mapOf(
-                    PackageNames.OSMAND_PLUS to AppDetail(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        label = "OsmAnd",
-                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                    ),
+                appDetails = MutableStateFlow(
+                    mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    )
                 ),
-                coordinateFormat = CoordinateFormat.DEC,
                 coordinateConverter = coordinateConverter,
                 dismissedHelpMessages = MutableStateFlow(null),
-                outputsForApps = outputRepository.getOutputsForApps(
-                    mapOf(
-                        PackageNames.OSMAND_PLUS to App(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            dataTypes = setOf(DataType.GEO_URI)
+                outputsForApps = MutableStateFlow(
+                    outputRepository.getOutputsForApps(
+                        mapOf(
+                            PackageNames.OSMAND_PLUS to App(
+                                packageName = PackageNames.OSMAND_PLUS,
+                                dataTypes = setOf(DataType.GEO_URI)
+                            ),
                         ),
-                    ),
-                    hiddenApps = emptySet(),
+                        hiddenApps = emptySet(),
+                    )
                 ),
-                outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
-                outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
+                outputsForPointChips = MutableStateFlow(outputRepository.getOutputsForPointChips(defaultFakeLinks)),
+                outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
                 initialExpanded = true,
                 sourceComesFromIntent = MutableStateFlow(false),
+                userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onDismissHelpMessage = {},
                 onExecute = {},
                 onNavigateToFaqScreen = {},
@@ -786,29 +823,37 @@ private fun PointsWithNamePreview() {
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.genRandomPoint(name = "Berlin, Germany", z = 13.0)),
                 ),
-                appDetails = mapOf(
-                    PackageNames.OSMAND_PLUS to AppDetail(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        label = "OsmAnd",
-                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                    ),
+                appDetails = MutableStateFlow(
+                    mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    )
                 ),
-                coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
                 coordinateConverter = coordinateConverter,
                 dismissedHelpMessages = MutableStateFlow(null),
-                outputsForApps = outputRepository.getOutputsForApps(
-                    mapOf(
-                        PackageNames.OSMAND_PLUS to App(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            dataTypes = setOf(DataType.GEO_URI)
+                outputsForApps = MutableStateFlow(
+                    outputRepository.getOutputsForApps(
+                        mapOf(
+                            PackageNames.OSMAND_PLUS to App(
+                                packageName = PackageNames.OSMAND_PLUS,
+                                dataTypes = setOf(DataType.GEO_URI)
+                            ),
                         ),
-                    ),
-                    hiddenApps = emptySet(),
+                        hiddenApps = emptySet(),
+                    )
                 ),
-                outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
-                outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
+                outputsForPointChips = MutableStateFlow(outputRepository.getOutputsForPointChips(defaultFakeLinks)),
+                outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
                 initialExpanded = true,
                 sourceComesFromIntent = MutableStateFlow(false),
+                userPreferencesValues = MutableStateFlow(
+                    defaultFakeUserPreferences.copy(
+                        coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
+                    )
+                ),
                 onDismissHelpMessage = {},
                 onExecute = {},
                 onNavigateToFaqScreen = {},
@@ -836,29 +881,37 @@ private fun DarkPointsWithNamePreview() {
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.genRandomPoint(name = "Berlin, Germany", z = 13.0)),
                 ),
-                appDetails = mapOf(
-                    PackageNames.OSMAND_PLUS to AppDetail(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        label = "OsmAnd",
-                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                    ),
+                appDetails = MutableStateFlow(
+                    mapOf(
+                        PackageNames.OSMAND_PLUS to AppDetail(
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    )
                 ),
-                coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
                 coordinateConverter = coordinateConverter,
                 dismissedHelpMessages = MutableStateFlow(null),
-                outputsForApps = outputRepository.getOutputsForApps(
-                    mapOf(
-                        PackageNames.OSMAND_PLUS to App(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            dataTypes = setOf(DataType.GEO_URI)
+                outputsForApps = MutableStateFlow(
+                    outputRepository.getOutputsForApps(
+                        mapOf(
+                            PackageNames.OSMAND_PLUS to App(
+                                packageName = PackageNames.OSMAND_PLUS,
+                                dataTypes = setOf(DataType.GEO_URI)
+                            ),
                         ),
-                    ),
-                    hiddenApps = emptySet(),
+                        hiddenApps = emptySet(),
+                    )
                 ),
-                outputsForPointChips = outputRepository.getOutputsForPointChips(defaultFakeLinks),
-                outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
+                outputsForPointChips = MutableStateFlow(outputRepository.getOutputsForPointChips(defaultFakeLinks)),
+                outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
                 initialExpanded = true,
                 sourceComesFromIntent = MutableStateFlow(false),
+                userPreferencesValues = MutableStateFlow(
+                    defaultFakeUserPreferences.copy(
+                        coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
+                    )
+                ),
                 onDismissHelpMessage = {},
                 onExecute = {},
                 onNavigateToFaqScreen = {},
