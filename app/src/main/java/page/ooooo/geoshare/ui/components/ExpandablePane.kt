@@ -44,10 +44,7 @@ fun ExpandablePane(
         ) {
             CompositionLocalProvider(LocalContentColor provides color) {
                 title()
-                Icon(
-                    imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = null,
-                )
+                Icon(if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, null)
             }
         }
         AnimatedVisibility(expanded) {

@@ -277,7 +277,7 @@ data class PermissionGrantedBasicInput<T>(
 
     override fun getDescription(resources: Resources) =
         if (matchedInput.input is Input.HasPermission) {
-            resources.getString(matchedInput.input.loadingIndicatorTitleResId)
+            resources.getString(matchedInput.input.loadingIndicatorTitleResId) // TODO Differentiate Google Maps URI, Google Maps HTML etc
         } else {
             resources.getString(
                 R.string.conversion_processing,
@@ -370,7 +370,7 @@ data class PermissionGrantedWebViewInput(
     }
 
     override fun getDescription(resources: Resources) =
-        resources.getString(matchedInput.input.loadingIndicatorTitleResId)
+        resources.getString(matchedInput.input.loadingIndicatorTitleResId) // TODO Differentiate Google Maps URI, Google Maps HTML etc
 
     override fun getDetails(resources: Resources) = lastAttempt?.let {
         resources.getString(
