@@ -99,8 +99,7 @@ import page.ooooo.geoshare.lib.conversion.ActionCompleted
 import page.ooooo.geoshare.lib.conversion.BasicActionReady
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
 import page.ooooo.geoshare.lib.conversion.ConversionState
-import page.ooooo.geoshare.lib.conversion.ConversionStateHistory
-import page.ooooo.geoshare.lib.conversion.ConversionStateHistoryItem
+import page.ooooo.geoshare.lib.conversion.ConversionStateLogItem
 import page.ooooo.geoshare.lib.conversion.ConversionSucceeded
 import page.ooooo.geoshare.lib.conversion.FileActionReady
 import page.ooooo.geoshare.lib.conversion.FileUriRequested
@@ -142,12 +141,15 @@ import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.PermissionDialog
 import page.ooooo.geoshare.ui.components.ResultApps
 import page.ooooo.geoshare.ui.components.ResultCoordinates
+import page.ooooo.geoshare.ui.components.ResultError
+import page.ooooo.geoshare.ui.components.ResultLoadingIndicator
+import page.ooooo.geoshare.ui.components.ResultLog
 import page.ooooo.geoshare.ui.components.ResultSheet
 import page.ooooo.geoshare.ui.components.ResultTitle
 import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
 import page.ooooo.geoshare.ui.components.StyledSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.checkeredBackground
-import page.ooooo.geoshare.ui.components.resultDescription
+import page.ooooo.geoshare.ui.components.mainContainerColor
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.math.floor
@@ -306,7 +308,7 @@ fun MainScreen(
         outputsForPoints = outputsForPoints,
         outputsForPointsChips = outputsForPointsChips,
         outputsForSharing = outputsForSharing,
-        stateHistory = conversionViewModel.stateHistory,
+        stateLog = conversionViewModel.stateLog,
         source = conversionViewModel.source,
         sourceComesFromIntent = conversionViewModel.sourceComesFromIntent,
         userPreferenceMessage = userPreferencesMessage,
@@ -383,7 +385,7 @@ private fun MainScreen(
     outputsForSharing: List<Output>,
     source: StateFlow<String>,
     sourceComesFromIntent: StateFlow<Boolean>,
-    stateHistory: StateFlow<ConversionStateHistory>,
+    stateLog: StateFlow<List<ConversionStateLogItem>>,
     userPreferenceMessage: Message?,
     onCancel: () -> Unit,
     onDeny: (Boolean) -> Unit,
@@ -406,20 +408,13 @@ private fun MainScreen(
     onSubmit: () -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
-    val mainContainerColor = when (currentState) {
-        is ConversionState.HasError if currentState.warning -> MaterialTheme.colorScheme.surfaceContainerHighest
-        is ConversionState.HasError -> MaterialTheme.colorScheme.errorContainer
-        is ConversionState.HasResult -> MaterialTheme.colorScheme.secondaryContainer
-        is ConversionState.HasDescription -> MaterialTheme.colorScheme.surfaceContainer
-        else -> MaterialTheme.colorScheme.surface
-    }
+    val mainContainerColor = mainContainerColor(currentState)
     val mainContentColor = contentColorFor(mainContainerColor)
     val spacing = LocalSpacing.current
 
     val (errorMessageResId, setErrorMessageResId) = retain { mutableStateOf<Int?>(null) }
     val (selectedPointIndex, setSelectedPointIndex) = retain { mutableStateOf<Int?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
-    val stateHistory by stateHistory.collectAsStateWithLifecycle()
 
     BackHandler(currentState !is Initial) {
         onReset()
@@ -487,15 +482,16 @@ private fun MainScreen(
                             },
                         ) {
                             if (!wide) {
-                                if (currentState is ConversionState.HasDescription) {
-                                    resultDescription(
-                                        stateHistory = stateHistory,
-                                        onCancel = onCancel,
-                                        onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                        onRetry = onRetry,
-                                    )
-                                }
                                 when (currentState) {
+                                    is ConversionState.HasError ->
+                                        item {
+                                            ResultError(
+                                                state = currentState,
+                                                onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                                onRetry = onRetry,
+                                            )
+                                        }
+
                                     is ConversionState.HasResult -> {
                                         item {
                                             ResultCoordinates(
@@ -516,39 +512,6 @@ private fun MainScreen(
                                                     setSelectedPointIndex(index)
                                                 },
                                             )
-                                        }
-                                        item {
-                                            Column(
-                                                // This column must not have weight(1f), otherwise the last row of app icons gets shrunk
-                                                Modifier
-                                                    .fillMaxWidth()
-                                                    .background(MaterialTheme.colorScheme.surface)
-                                            ) {
-                                                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                                                    ResultTitle(
-                                                        currentState = currentState,
-                                                        appDetails = appDetails,
-                                                        billingFeatures = billingFeatures,
-                                                        billingStatus = billingStatus,
-                                                        modifier = Modifier
-                                                            .padding(horizontal = spacing.windowPadding)
-                                                            .padding(top = spacing.medium),
-                                                        onCancel = onCancel,
-                                                        onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
-                                                    )
-                                                    ResultApps(
-                                                        appDetails = appDetails,
-                                                        outputsForApps = outputsForApps,
-                                                        outputsForLinks = outputsForLinks,
-                                                        outputsForSharing = outputsForSharing,
-                                                        points = currentState.points,
-                                                        onDisableLinkGroup = onDisableLinkGroup,
-                                                        onExecute = onExecute,
-                                                        onHideApp = onHideApp,
-                                                        onNavigateToLinkScreen = onNavigateToLinkScreen,
-                                                    )
-                                                }
-                                            }
                                         }
                                     }
 
@@ -575,6 +538,56 @@ private fun MainScreen(
                                             )
                                         }
                                     }
+
+                                    is ConversionState.HasDescription ->
+                                        item {
+                                            ResultLoadingIndicator(
+                                                state = currentState,
+                                                onCancel = onCancel,
+                                            )
+                                        }
+                                }
+
+                                if (currentState is ConversionState.HasDescription) {
+                                    item {
+                                        ResultLog(stateLog = stateLog)
+                                    }
+                                }
+
+                                if (currentState is ConversionState.HasResult) {
+                                    item {
+                                        Column(
+                                            // This column must not have weight(1f), otherwise the last row of app icons gets shrunk
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .background(MaterialTheme.colorScheme.surface)
+                                        ) {
+                                            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                                                ResultTitle(
+                                                    currentState = currentState,
+                                                    appDetails = appDetails,
+                                                    billingFeatures = billingFeatures,
+                                                    billingStatus = billingStatus,
+                                                    modifier = Modifier
+                                                        .padding(horizontal = spacing.windowPadding)
+                                                        .padding(top = spacing.medium),
+                                                    onCancel = onCancel,
+                                                    onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
+                                                )
+                                                ResultApps(
+                                                    appDetails = appDetails,
+                                                    outputsForApps = outputsForApps,
+                                                    outputsForLinks = outputsForLinks,
+                                                    outputsForSharing = outputsForSharing,
+                                                    points = currentState.points,
+                                                    onDisableLinkGroup = onDisableLinkGroup,
+                                                    onExecute = onExecute,
+                                                    onHideApp = onHideApp,
+                                                    onNavigateToLinkScreen = onNavigateToLinkScreen,
+                                                )
+                                            }
+                                        }
+                                    }
                                 }
                             } else if (currentState is Initial) {
                                 item {
@@ -596,34 +609,43 @@ private fun MainScreen(
                                     ) {
                                         Spacer(Modifier.height(spacing.small))
 
-                                        if (currentState is ConversionState.HasDescription) {
-                                            // FIXME Wide result
-                                            // resultLoadingIndicator(
-                                            //     stateHistory = stateHistory,
-                                            //     onCancel = onCancel,
-                                            //     onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                            //     onRetry = onRetry,
-                                            // )
+                                        when (currentState) {
+                                            is ConversionState.HasError ->
+                                                ResultError(
+                                                    state = currentState,
+                                                    onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                                    onRetry = onRetry,
+                                                )
+
+                                            is ConversionState.HasResult ->
+                                                ResultCoordinates(
+                                                    points = currentState.points,
+                                                    appDetails = appDetails,
+                                                    coordinateConverter = coordinateConverter,
+                                                    coordinateFormat = coordinateFormat,
+                                                    dismissedHelpMessages = dismissedHelpMessages,
+                                                    outputsForApps = outputsForApps,
+                                                    outputsForPointChips = outputsForPointChips,
+                                                    outputsForPointsChips = outputsForPointsChips,
+                                                    sourceComesFromIntent = sourceComesFromIntent,
+                                                    onDismissHelpMessage = onDismissHelpMessage,
+                                                    onExecute = onExecute,
+                                                    onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                                    onSelect = { index ->
+                                                        onCancel()
+                                                        setSelectedPointIndex(index)
+                                                    },
+                                                )
+
+                                            is ConversionState.HasDescription ->
+                                                ResultLoadingIndicator(
+                                                    state = currentState,
+                                                    onCancel = onCancel,
+                                                )
                                         }
-                                        if (currentState is ConversionState.HasResult) {
-                                            ResultCoordinates(
-                                                points = currentState.points,
-                                                appDetails = appDetails,
-                                                coordinateConverter = coordinateConverter,
-                                                coordinateFormat = coordinateFormat,
-                                                dismissedHelpMessages = dismissedHelpMessages,
-                                                outputsForApps = outputsForApps,
-                                                outputsForPointChips = outputsForPointChips,
-                                                outputsForPointsChips = outputsForPointsChips,
-                                                sourceComesFromIntent = sourceComesFromIntent,
-                                                onDismissHelpMessage = onDismissHelpMessage,
-                                                onExecute = onExecute,
-                                                onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                                onSelect = { index ->
-                                                    onCancel()
-                                                    setSelectedPointIndex(index)
-                                                },
-                                            )
+
+                                        if (currentState is ConversionState.HasDescription) {
+                                            ResultLog(stateLog = stateLog)
                                         }
                                     }
                                 }
@@ -967,7 +989,7 @@ private fun DefaultPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(emptyList()),
+            stateLog = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -1021,7 +1043,7 @@ private fun DarkPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(emptyList()),
+            stateLog = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -1075,7 +1097,7 @@ private fun SmallPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(emptyList()),
+            stateLog = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -1129,7 +1151,7 @@ private fun TabletPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(emptyList()),
+            stateLog = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -1242,7 +1264,7 @@ private fun SucceededPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
-            stateHistory = MutableStateFlow(emptyList()),
+            stateLog = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(true),
             userPreferenceMessage = null,
@@ -1355,7 +1377,7 @@ private fun DarkSucceededPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
-            stateHistory = MutableStateFlow(emptyList()),
+            stateLog = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(true),
             userPreferenceMessage = null,
@@ -1467,7 +1489,7 @@ private fun SmallSucceededPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
-            stateHistory = MutableStateFlow(emptyList()),
+            stateLog = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(true),
             userPreferenceMessage = null,
@@ -1580,7 +1602,7 @@ private fun TabletSucceededPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
-            stateHistory = MutableStateFlow(emptyList()),
+            stateLog = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -1643,7 +1665,7 @@ private fun ErrorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(listOf(ConversionStateHistoryItem(currentState, timeSource.markNow()))),
+            stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -1706,7 +1728,7 @@ private fun DarkErrorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(listOf(ConversionStateHistoryItem(currentState, timeSource.markNow()))),
+            stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -1769,7 +1791,7 @@ private fun TabletErrorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(listOf(ConversionStateHistoryItem(currentState, timeSource.markNow()))),
+            stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -1833,7 +1855,7 @@ private fun WarningPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(listOf(ConversionStateHistoryItem(currentState, timeSource.markNow()))),
+            stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -1897,7 +1919,7 @@ private fun DarkWarningPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(listOf(ConversionStateHistoryItem(currentState, timeSource.markNow()))),
+            stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -1965,7 +1987,7 @@ private fun LoadingIndicatorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(listOf(ConversionStateHistoryItem(currentState, timeSource.markNow()))),
+            stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -2033,7 +2055,7 @@ private fun DarkLoadingIndicatorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(listOf(ConversionStateHistoryItem(currentState, timeSource.markNow()))),
+            stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -2101,7 +2123,7 @@ private fun TabletLoadingIndicatorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(listOf(ConversionStateHistoryItem(currentState, timeSource.markNow()))),
+            stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -2166,7 +2188,7 @@ private fun WebViewPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(listOf(ConversionStateHistoryItem(currentState, timeSource.markNow()))),
+            stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -2231,7 +2253,7 @@ private fun DarkWebViewPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(listOf(ConversionStateHistoryItem(currentState, timeSource.markNow()))),
+            stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -2296,7 +2318,7 @@ private fun TabletWebViewPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(listOf(ConversionStateHistoryItem(currentState, timeSource.markNow()))),
+            stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,
@@ -2358,7 +2380,7 @@ private fun EmptyPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
-            stateHistory = MutableStateFlow(emptyList()),
+            stateLog = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = null,

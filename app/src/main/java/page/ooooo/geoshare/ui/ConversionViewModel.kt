@@ -29,8 +29,7 @@ import page.ooooo.geoshare.lib.conversion.BasicActionReady
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
 import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.ConversionStateContext
-import page.ooooo.geoshare.lib.conversion.ConversionStateHistory
-import page.ooooo.geoshare.lib.conversion.ConversionStateHistoryItem
+import page.ooooo.geoshare.lib.conversion.ConversionStateLogItem
 import page.ooooo.geoshare.lib.conversion.FileActionReady
 import page.ooooo.geoshare.lib.conversion.FileUriRequested
 import page.ooooo.geoshare.lib.conversion.Initial
@@ -61,8 +60,8 @@ class ConversionViewModel @Inject constructor(
     private val _currentState = MutableStateFlow<ConversionState>(Initial)
     val currentState: StateFlow<ConversionState> = _currentState.asStateFlow()
 
-    private val _stateHistory = MutableStateFlow<ConversionStateHistory>(emptyList())
-    val stateHistory: StateFlow<ConversionStateHistory> = _stateHistory.asStateFlow()
+    private val _stateLog = MutableStateFlow<List<ConversionStateLogItem>>(emptyList())
+    val stateLog: StateFlow<List<ConversionStateLogItem>> = _stateLog.asStateFlow()
 
     private val timeSource = TimeSource.Monotonic
 
@@ -77,10 +76,27 @@ class ConversionViewModel @Inject constructor(
         Log.d(TAG, "Transitioned state to $newState")
         _currentState.value = newState
         if (newState is SourceReceived) {
-            _stateHistory.value = emptyList()
+            _stateLog.value = emptyList()
         }
         if (newState is ConversionState.HasDescription) {
-            _stateHistory.value += ConversionStateHistoryItem(newState, timeSource.markNow())
+            _stateLog.value = _stateLog.value.run {
+                val newLogItem = ConversionStateLogItem.Pending(
+                    id = size,
+                    state = newState,
+                    timeMark = timeSource.markNow(),
+                )
+                val lastLogItem = lastOrNull() as? ConversionStateLogItem.Pending
+                if (lastLogItem != null) {
+                    // If last log item was pending, replace it with a finished one
+                    val lastLogItemSucceeded = (
+                        newState !is ConversionState.HasError &&
+                            (newState as? ConversionState.HasAttempt)?.lastAttempt == null
+                        )
+                    take(size - 1) + lastLogItem.finish(lastLogItemSucceeded, timeSource) + newLogItem
+                } else {
+                    plus(newLogItem)
+                }
+            }
         }
     }
 
