@@ -43,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
@@ -153,6 +154,9 @@ import page.ooooo.geoshare.ui.components.mainContainerColor
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.math.floor
+import kotlin.time.ComparableTimeMark
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TestTimeSource
 
 @Composable
@@ -299,6 +303,7 @@ fun MainScreen(
         coordinateConverter = outputViewModel.coordinateConverter,
         coordinateFormat = userPreferencesValues.coordinateFormat,
         dismissedHelpMessages = helpViewModel.dismissedHelpMessages,
+        elapsedTime = conversionViewModel.elapsedTime,
         inputRepository = inputViewModel.inputRepository,
         linkMessage = linkMessage,
         outputsForApps = outputsForApps,
@@ -308,6 +313,7 @@ fun MainScreen(
         outputsForPoints = outputsForPoints,
         outputsForPointsChips = outputsForPointsChips,
         outputsForSharing = outputsForSharing,
+        startTimeMark = conversionViewModel.startTimeMark,
         stateLog = conversionViewModel.stateLog,
         source = conversionViewModel.source,
         sourceComesFromIntent = conversionViewModel.sourceComesFromIntent,
@@ -374,6 +380,7 @@ private fun MainScreen(
     coordinateConverter: CoordinateConverter,
     coordinateFormat: CoordinateFormat,
     dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
+    elapsedTime: StateFlow<Duration>,
     inputRepository: InputRepository,
     linkMessage: Message?,
     outputsForApps: Map<String, List<Output>>,
@@ -385,6 +392,7 @@ private fun MainScreen(
     outputsForSharing: List<Output>,
     source: StateFlow<String>,
     sourceComesFromIntent: StateFlow<Boolean>,
+    startTimeMark: StateFlow<ComparableTimeMark?>,
     stateLog: StateFlow<List<ConversionStateLogItem>>,
     userPreferenceMessage: Message?,
     onCancel: () -> Unit,
@@ -487,6 +495,7 @@ private fun MainScreen(
                                         item {
                                             ResultError(
                                                 state = currentState,
+                                                elapsedTime = elapsedTime,
                                                 onNavigateToInputsScreen = onNavigateToInputsScreen,
                                                 onRetry = onRetry,
                                             )
@@ -543,6 +552,7 @@ private fun MainScreen(
                                         item {
                                             ResultLoadingIndicator(
                                                 state = currentState,
+                                                startTimeMark = startTimeMark,
                                                 onCancel = onCancel,
                                             )
                                         }
@@ -613,6 +623,7 @@ private fun MainScreen(
                                             is ConversionState.HasError ->
                                                 ResultError(
                                                     state = currentState,
+                                                    elapsedTime = elapsedTime,
                                                     onNavigateToInputsScreen = onNavigateToInputsScreen,
                                                     onRetry = onRetry,
                                                 )
@@ -640,6 +651,7 @@ private fun MainScreen(
                                             is ConversionState.HasDescription ->
                                                 ResultLoadingIndicator(
                                                     state = currentState,
+                                                    startTimeMark = startTimeMark,
                                                     onCancel = onCancel,
                                                 )
                                         }
@@ -856,7 +868,14 @@ private fun MainTitle(
             )
 
         is ConversionState.HasDescription ->
-            LoadingIndicator(Modifier.size(46.dp), color = MaterialTheme.colorScheme.tertiary)
+            Column(Modifier.fillMaxWidth()) {
+                LoadingIndicator(
+                    Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .size(46.dp),
+                    color = MaterialTheme.colorScheme.tertiary,
+                )
+            }
     }
 }
 
@@ -980,6 +999,7 @@ private fun DefaultPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
+            elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -989,6 +1009,7 @@ private fun DefaultPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             stateLog = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
@@ -1034,6 +1055,7 @@ private fun DarkPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
+            elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -1043,6 +1065,7 @@ private fun DarkPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             stateLog = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
@@ -1088,6 +1111,7 @@ private fun SmallPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
+            elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -1097,6 +1121,7 @@ private fun SmallPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             stateLog = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
@@ -1142,6 +1167,7 @@ private fun TabletPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
+            elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -1151,6 +1177,7 @@ private fun TabletPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             stateLog = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
@@ -1215,6 +1242,7 @@ private fun SucceededPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
+            elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
@@ -1264,6 +1292,7 @@ private fun SucceededPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
+            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             stateLog = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(true),
@@ -1328,6 +1357,7 @@ private fun DarkSucceededPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
+            elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
@@ -1377,6 +1407,7 @@ private fun DarkSucceededPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
+            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             stateLog = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(true),
@@ -1440,6 +1471,7 @@ private fun SmallSucceededPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
+            elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
@@ -1489,6 +1521,7 @@ private fun SmallSucceededPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
+            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             stateLog = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(true),
@@ -1553,6 +1586,7 @@ private fun TabletSucceededPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
+            elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
             linkMessage = null,
             outputsForApps = outputRepository.getOutputsForApps(
@@ -1602,6 +1636,7 @@ private fun TabletSucceededPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = outputRepository.getOutputsForPointsChips(),
             outputsForSharing = outputRepository.getOutputsForSharing(),
+            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             stateLog = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
@@ -1656,6 +1691,7 @@ private fun ErrorPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
+            elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -1665,6 +1701,7 @@ private fun ErrorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
@@ -1719,6 +1756,7 @@ private fun DarkErrorPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
+            elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -1728,6 +1766,7 @@ private fun DarkErrorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
@@ -1782,6 +1821,7 @@ private fun TabletErrorPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
+            elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -1791,6 +1831,7 @@ private fun TabletErrorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
@@ -1846,6 +1887,7 @@ private fun WarningPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
+            elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -1855,6 +1897,7 @@ private fun WarningPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
@@ -1910,6 +1953,7 @@ private fun DarkWarningPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
+            elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -1919,6 +1963,7 @@ private fun DarkWarningPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
@@ -1978,6 +2023,7 @@ private fun LoadingIndicatorPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
+            elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -1987,6 +2033,7 @@ private fun LoadingIndicatorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
@@ -2046,6 +2093,7 @@ private fun DarkLoadingIndicatorPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
+            elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -2055,6 +2103,7 @@ private fun DarkLoadingIndicatorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
@@ -2114,6 +2163,7 @@ private fun TabletLoadingIndicatorPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
+            elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -2123,6 +2173,7 @@ private fun TabletLoadingIndicatorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
@@ -2179,6 +2230,7 @@ private fun WebViewPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
+            elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -2188,6 +2240,7 @@ private fun WebViewPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
@@ -2244,6 +2297,7 @@ private fun DarkWebViewPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
+            elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -2253,6 +2307,7 @@ private fun DarkWebViewPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
@@ -2309,6 +2364,7 @@ private fun TabletWebViewPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
+            elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -2318,6 +2374,7 @@ private fun TabletWebViewPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             stateLog = MutableStateFlow(listOf(ConversionStateLogItem.Pending(0, currentState, timeSource.markNow()))),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),
@@ -2371,6 +2428,7 @@ private fun EmptyPreview() {
             coordinateConverter = coordinateConverter,
             coordinateFormat = CoordinateFormat.DEC,
             dismissedHelpMessages = MutableStateFlow(null),
+            elapsedTime = MutableStateFlow(3200.milliseconds),
             inputRepository = FakeInputRepository,
             linkMessage = null,
             outputsForApps = emptyMap(),
@@ -2380,6 +2438,7 @@ private fun EmptyPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             stateLog = MutableStateFlow(emptyList()),
             source = MutableStateFlow(""),
             sourceComesFromIntent = MutableStateFlow(false),

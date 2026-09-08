@@ -6,9 +6,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -16,11 +14,9 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -28,14 +24,10 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
@@ -49,9 +41,7 @@ import page.ooooo.geoshare.lib.inputs.MatchedInput
 import page.ooooo.geoshare.lib.network.ConnectTimeoutNetworkException
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.DurationUnit
 import kotlin.time.TestTimeSource
 
 @Composable
@@ -64,15 +54,17 @@ fun ResultLog(
 
     SelectionContainer {
         Column {
-            for (item in stateLog) {
-                key(item.id) {
-                    ResultLogItem(
-                        item = item,
-                        animationsEnabled = animationsEnabled,
-                        initialExpanded = initialExpanded,
-                    )
+            stateLog
+                .filterIsInstance<ConversionStateLogItem.Finished>()
+                .forEach { item ->
+                    key(item.id) {
+                        ResultLogItem(
+                            item = item,
+                            animationsEnabled = animationsEnabled,
+                            initialExpanded = initialExpanded,
+                        )
+                    }
                 }
-            }
         }
     }
 }
@@ -80,11 +72,10 @@ fun ResultLog(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ResultLogItem(
-    item: ConversionStateLogItem,
+    item: ConversionStateLogItem.Finished,
     animationsEnabled: Boolean = true,
     initialExpanded: Boolean = false,
 ) {
-    val resources = LocalResources.current
     val spacing = LocalSpacing.current
 
     var visible by remember { mutableStateOf(!animationsEnabled) }
@@ -102,69 +93,17 @@ fun ResultLogItem(
     ) {
         Column {
             HorizontalDivider(color = LocalContentColor.current.copy(alpha = 0.5f))
-            Column(
-                Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.tiny),
+            ResultDescription(
+                item.state,
+                modifier = Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.tiny),
+                icon = { Icon(if (item.succeeded) Icons.Default.Check else Icons.Default.Close, null) },
+                initialExpanded = initialExpanded,
                 verticalArrangement = Arrangement.spacedBy(spacing.extraTiny),
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(spacing.tiny),
-                ) {
-                    when (item) {
-                        is ConversionStateLogItem.Finished ->
-                            Icon(if (item.succeeded) Icons.Default.Check else Icons.Default.Close, null)
-
-                        is ConversionStateLogItem.Pending ->
-                            LoadingIndicator(Modifier.size(24.dp), color = LocalContentColor.current.copy(alpha = 0.9f))
-                    }
-                    Text(
-                        item.state.getDescription(resources),
-                        Modifier.weight(1f),
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                    ResultLogItemTimeElapsed(item)
-                }
-                item.state.getDetails(resources)?.let { details ->
-                    ResultDetails(details, Modifier.padding(start = 24.dp + spacing.tiny), initialExpanded)
-                }
-                item.state.uri?.let { uri ->
-                    ResultUri(uri, Modifier.padding(start = 24.dp + spacing.tiny))
-                }
+                ResultTime(item.elapsedTime)
             }
         }
     }
-}
-
-@Composable
-private fun ResultLogItemTimeElapsed(item: ConversionStateLogItem) {
-    var elapsedTime by remember {
-        mutableStateOf(
-            when (item) {
-                is ConversionStateLogItem.Finished -> item.elapsedTime
-                is ConversionStateLogItem.Pending -> Duration.ZERO
-            }
-        )
-    }
-
-    LaunchedEffect(item) {
-        when (item) {
-            is ConversionStateLogItem.Finished -> {
-                elapsedTime = item.elapsedTime
-            }
-
-            is ConversionStateLogItem.Pending -> {
-                while (true) {
-                    elapsedTime = item.timeMark.elapsedNow()
-                    delay(100.milliseconds)
-                }
-            }
-        }
-    }
-
-    Text(
-        elapsedTime.toString(DurationUnit.SECONDS, 2),
-        style = MaterialTheme.typography.bodySmall,
-    )
 }
 
 // Previews
@@ -188,7 +127,7 @@ private fun DefaultPreview() {
                                 results = emptyMap(),
                                 lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
                             ),
-                            timeMark = timeSource.apply { plusAssign(30.milliseconds) }.markNow(),
+                            startTimeMark = timeSource.markNow(),
                         ),
                         ConversionStateLogItem.Finished(
                             id = 4,
@@ -198,6 +137,7 @@ private fun DefaultPreview() {
                                 stackTrace = NotImplementedError().stackTraceToString(),
                             ),
                             succeeded = false,
+                            startTimeMark = timeSource.markNow(),
                             elapsedTime = 92.milliseconds,
                         ),
                         ConversionStateLogItem.Finished(
@@ -210,6 +150,7 @@ private fun DefaultPreview() {
                                 lastAttempt = Attempt(1, ConnectTimeoutNetworkException(Exception())),
                             ),
                             succeeded = false,
+                            startTimeMark = timeSource.markNow(),
                             elapsedTime = 200.milliseconds,
                         ),
                         ConversionStateLogItem.Finished(
@@ -221,6 +162,7 @@ private fun DefaultPreview() {
                                 results = emptyMap(),
                             ),
                             succeeded = false,
+                            startTimeMark = timeSource.markNow(),
                             elapsedTime = 111.milliseconds,
                         ),
                         ConversionStateLogItem.Finished(
@@ -232,6 +174,7 @@ private fun DefaultPreview() {
                                 results = emptyMap(),
                             ),
                             succeeded = true,
+                            startTimeMark = timeSource.markNow(),
                             elapsedTime = 30.milliseconds,
                         ),
                         ConversionStateLogItem.Finished(
@@ -243,6 +186,7 @@ private fun DefaultPreview() {
                                 results = emptyMap(),
                             ),
                             succeeded = true,
+                            startTimeMark = timeSource.markNow(),
                             elapsedTime = 657.milliseconds,
                         ),
                     ),
@@ -272,7 +216,7 @@ private fun DarkPreview() {
                                 results = emptyMap(),
                                 lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
                             ),
-                            timeMark = timeSource.apply { plusAssign(30.milliseconds) }.markNow(),
+                            startTimeMark = timeSource.markNow(),
                         ),
                         ConversionStateLogItem.Finished(
                             id = 4,
@@ -282,6 +226,7 @@ private fun DarkPreview() {
                                 stackTrace = NotImplementedError().stackTraceToString(),
                             ),
                             succeeded = false,
+                            startTimeMark = timeSource.markNow(),
                             elapsedTime = 92.milliseconds,
                         ),
                         ConversionStateLogItem.Finished(
@@ -294,6 +239,7 @@ private fun DarkPreview() {
                                 lastAttempt = Attempt(1, ConnectTimeoutNetworkException(Exception())),
                             ),
                             succeeded = false,
+                            startTimeMark = timeSource.markNow(),
                             elapsedTime = 200.milliseconds,
                         ),
                         ConversionStateLogItem.Finished(
@@ -305,6 +251,7 @@ private fun DarkPreview() {
                                 results = emptyMap(),
                             ),
                             succeeded = false,
+                            startTimeMark = timeSource.markNow(),
                             elapsedTime = 111.milliseconds,
                         ),
                         ConversionStateLogItem.Finished(
@@ -316,6 +263,7 @@ private fun DarkPreview() {
                                 results = emptyMap(),
                             ),
                             succeeded = true,
+                            startTimeMark = timeSource.markNow(),
                             elapsedTime = 30.milliseconds,
                         ),
                         ConversionStateLogItem.Finished(
@@ -327,6 +275,7 @@ private fun DarkPreview() {
                                 results = emptyMap(),
                             ),
                             succeeded = true,
+                            startTimeMark = timeSource.markNow(),
                             elapsedTime = 657.milliseconds,
                         ),
                     ),

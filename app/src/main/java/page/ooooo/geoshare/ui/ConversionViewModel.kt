@@ -11,9 +11,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.InputRepository
@@ -44,6 +49,8 @@ import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.ActionResult
 import page.ooooo.geoshare.lib.outputs.LocationAction
 import javax.inject.Inject
+import kotlin.time.ComparableTimeMark
+import kotlin.time.Duration
 import kotlin.time.TimeSource
 
 @HiltViewModel
@@ -56,6 +63,7 @@ class ConversionViewModel @Inject constructor(
     private val billing: Billing,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+    private val timeSource = TimeSource.Monotonic
 
     private val _currentState = MutableStateFlow<ConversionState>(Initial)
     val currentState: StateFlow<ConversionState> = _currentState.asStateFlow()
@@ -63,7 +71,21 @@ class ConversionViewModel @Inject constructor(
     private val _stateLog = MutableStateFlow<List<ConversionStateLogItem>>(emptyList())
     val stateLog: StateFlow<List<ConversionStateLogItem>> = _stateLog.asStateFlow()
 
-    private val timeSource = TimeSource.Monotonic
+    private val _startTimeMarkFlow: Flow<ComparableTimeMark?> = _stateLog.map { it.firstOrNull()?.startTimeMark }
+    val startTimeMark: StateFlow<ComparableTimeMark?> = _startTimeMarkFlow
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            null,
+        )
+    val elapsedTime: StateFlow<Duration> = _startTimeMarkFlow
+        .filterNotNull()
+        .map { it.elapsedNow() }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            Duration.ZERO,
+        )
 
     val stateContext = ConversionStateContext(
         inputs = inputRepository.all,
@@ -73,8 +95,11 @@ class ConversionViewModel @Inject constructor(
         userPreferencesRepository = userPreferencesRepository,
         billing = billing,
     ) { newState ->
+        // Update current state
         Log.d(TAG, "Transitioned state to $newState")
         _currentState.value = newState
+
+        // Update state log
         if (newState is SourceReceived) {
             _stateLog.value = emptyList()
         }
@@ -83,16 +108,22 @@ class ConversionViewModel @Inject constructor(
                 val newLogItem = ConversionStateLogItem.Pending(
                     id = size,
                     state = newState,
-                    timeMark = timeSource.markNow(),
+                    startTimeMark = timeSource.markNow(),
                 )
-                val lastLogItem = lastOrNull() as? ConversionStateLogItem.Pending
-                if (lastLogItem != null) {
+                val pendingLogItem = lastOrNull() as? ConversionStateLogItem.Pending
+                if (pendingLogItem != null) {
                     // If last log item was pending, replace it with a finished one
-                    val lastLogItemSucceeded = (
-                        newState !is ConversionState.HasError &&
-                            (newState as? ConversionState.HasAttempt)?.lastAttempt == null
-                        )
-                    take(size - 1) + lastLogItem.finish(lastLogItemSucceeded, timeSource) + newLogItem
+                    val finishedLogItem = ConversionStateLogItem.Finished(
+                        id = pendingLogItem.id,
+                        state = pendingLogItem.state,
+                        startTimeMark = pendingLogItem.startTimeMark,
+                        elapsedTime = timeSource.markNow() - pendingLogItem.startTimeMark,
+                        succeeded = (
+                            newState !is ConversionState.HasError &&
+                                (newState as? ConversionState.HasAttempt)?.lastAttempt == null
+                            ),
+                    )
+                    take(size - 1) + finishedLogItem + newLogItem
                 } else {
                     plus(newLogItem)
                 }
