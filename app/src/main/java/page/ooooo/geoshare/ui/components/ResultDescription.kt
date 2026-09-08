@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -97,8 +96,7 @@ private fun ResultDetails(details: String, modifier: Modifier = Modifier, initia
             ) {
                 Text(
                     details,
-                    modifier.padding(top = LocalSpacing.current.tiny),
-                    fontFamily = FontFamily.Monospace,
+                    modifier.padding(vertical = LocalSpacing.current.tiny),
                     maxLines = 25,
                 )
             }

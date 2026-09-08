@@ -22,12 +22,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -44,7 +41,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
@@ -783,7 +779,7 @@ private fun MainScreen(
     }
 
     when (currentState) {
-        is PermissionRequested -> {
+        is PermissionRequested ->
             PermissionDialog(
                 title = stringResource(currentState.permissionTitleResId),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
@@ -805,9 +801,8 @@ private fun MainScreen(
                     style = TextStyle(lineBreak = LineBreak.Paragraph),
                 )
             }
-        }
 
-        is LocationRationaleShown -> {
+        is LocationRationaleShown ->
             ConfirmationDialog(
                 title = stringResource(currentState.permissionTitleResId),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
@@ -828,11 +823,9 @@ private fun MainScreen(
                     )
                 }
             }
-        }
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun MainTitle(
     currentState: ConversionState,
@@ -868,16 +861,6 @@ private fun MainTitle(
                 },
                 modifier = Modifier.offset(x = -(12).dp),
             )
-
-        is ConversionState.HasDescription ->
-            Column(Modifier.fillMaxWidth()) {
-                LoadingIndicator(
-                    Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .size(46.dp),
-                    color = MaterialTheme.colorScheme.tertiary,
-                )
-            }
     }
 }
 
