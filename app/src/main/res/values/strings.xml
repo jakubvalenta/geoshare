@@ -26,6 +26,7 @@
     <string name="billing_subscription_cancel_description">Cancel anytime</string>
     <string name="billing_subscription_monthly">Monthly subscription</string>
     <string name="billing_terms_of_service">terms of service</string>
+    <string name="conversion_processing">Processing link to map service %1$s…</string>
     <string name="conversion_succeeded_check_experimental">Location might be inaccurate due to an experimental extraction method.</string>
     <string name="conversion_succeeded_check_map_center">Location might be a map center, not a pin.</string>
     <string name="conversion_succeeded_check_name_only">Failed to find coordinates, using a place name.</string>

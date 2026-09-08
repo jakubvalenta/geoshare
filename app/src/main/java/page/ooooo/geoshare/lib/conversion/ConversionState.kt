@@ -276,12 +276,13 @@ data class PermissionGrantedBasicInput<T>(
     }
 
     override fun getDescription(resources: Resources) =
-        matchedInput.input.getName(resources).let { name ->
-            if ((matchedInput.input as? Input.HasPermission)?.loadingIndicatorTitleResId != null) {
-                "Connecting to $name" // TODO Replace loading indicator title
-            } else {
-                "Processing as $name" // TODO Translate
-            }
+        if (matchedInput.input is Input.HasPermission) {
+            resources.getString(matchedInput.input.loadingIndicatorTitleResId)
+        } else {
+            resources.getString(
+                R.string.conversion_processing,
+                matchedInput.input.getName(resources),
+            )
         }
 
     override fun getDetails(resources: Resources) = lastAttempt?.let {
@@ -369,8 +370,7 @@ data class PermissionGrantedWebViewInput(
     }
 
     override fun getDescription(resources: Resources) =
-        (matchedInput.input as? Input.HasPermission)?.loadingIndicatorTitleResId?.let { resources.getString(it) }
-            ?: "Processing link..."
+        resources.getString(matchedInput.input.loadingIndicatorTitleResId)
 
     override fun getDetails(resources: Resources) = lastAttempt?.let {
         resources.getString(
@@ -395,11 +395,9 @@ data class PermissionDenied(
     override val source: String,
     val matchedInput: MatchedInput<*>,
     val results: Results,
-) : ConversionState, ConversionState.HasSource, ConversionState.HasDescription {
+) : ConversionState, ConversionState.HasSource {
     override suspend fun transition(stateContext: ConversionStateContext) =
         DataParsed(source, matchedInput, Permission.NEVER, results + (matchedInput to ParseResult.Success()))
-
-    override fun getDescription(resources: Resources) = "Permission denied"
 
     override fun toString() = "$TAG(source=$source, matchedInput=$matchedInput, results=$results)"
 
