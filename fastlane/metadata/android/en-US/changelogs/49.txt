@@ -1,2 +1,4 @@
 - Added the option to copy point name to clipboard.
+- Improved loading and error screens by adding elapsed time.
+- Improved result screen by moving the "Copy original link" button to the top.
 - Replaced intro screen with contextual help messages.
