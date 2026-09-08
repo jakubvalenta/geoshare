@@ -1,14 +1,10 @@
 package page.ooooo.geoshare.lib.conversion
 
-import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
@@ -17,30 +13,14 @@ import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 
 class LocationPermissionReceivedTest {
     private val coordinateConverter: CoordinateConverter = mock()
-    private val resources: Resources = mock {
-        on { getString(R.string.conversion_succeeded_location_loading_indicator_title) } doReturn "Finding your location..."
-    }
     private val source = "https://maps.apple.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter).toAction(points.last())
-    private val stateContext: ConversionStateContext = mock {
-        on { this@on.resources } doReturn resources
-    }
+    private val stateContext: ConversionStateContext = mock()
 
     @Test
     fun transition_returnsNull() = runTest {
         val state = LocationPermissionReceived(source, points, action, isAutomation = false)
         assertNull(state.transition(stateContext))
-    }
-
-    @Test
-    fun getLoadingIndicator_returnsSmallLoadingIndicator() = runTest {
-        val state = LocationPermissionReceived(source, points, action, isAutomation = false)
-        assertEquals(
-            LoadingIndicator.Small(
-                resources.getString(R.string.conversion_succeeded_location_loading_indicator_title)
-            ),
-            state.getLoadingIndicator(resources),
-        )
     }
 }

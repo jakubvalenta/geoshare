@@ -82,10 +82,6 @@ interface ConversionState {
     interface HasAttempt : HasSource {
         val lastAttempt: Attempt<RecoverableNetworkException>?
     }
-
-    interface HasSmallLoadingIndicator {
-        fun getLoadingIndicator(resources: Resources): LoadingIndicator.Small
-    }
 }
 
 object Initial : ConversionState {
@@ -877,11 +873,7 @@ data class LocationPermissionReceived(
     override val points: Points,
     val action: LocationAction<*>,
     val isAutomation: Boolean,
-) : ConversionState, ConversionState.HasSmallLoadingIndicator, ConversionState.HasResult {
-    override fun getLoadingIndicator(resources: Resources): LoadingIndicator.Small = LoadingIndicator.Small(
-        resources.getString(R.string.conversion_succeeded_location_loading_indicator_title)
-    )
-
+) : ConversionState, ConversionState.HasResult {
     override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
 
     private companion object {

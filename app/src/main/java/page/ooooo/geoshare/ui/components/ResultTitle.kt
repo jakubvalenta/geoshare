@@ -33,7 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -95,13 +94,18 @@ fun ResultTitle(
     AnimatedMessage(
         state = currentState,
         isMessageShown = { state ->
-            state is ActionWaiting ||
-                state is ActionSucceeded ||
-                state is ActionAutomationSucceeded ||
-                state is ActionFailed ||
-                state is ActionAutomationFailed ||
-                state is LocationFindingFailed ||
-                state is ConversionState.HasSmallLoadingIndicator
+            when (state) {
+                is ActionWaiting,
+                is ActionSucceeded,
+                is ActionAutomationSucceeded,
+                is ActionFailed,
+                is ActionAutomationFailed,
+                is LocationFindingFailed,
+                is LocationPermissionReceived,
+                    -> true
+
+                else -> false
+            }
         },
         modifier = modifier
             .fillMaxWidth()
@@ -174,9 +178,9 @@ fun ResultTitle(
                 )
             }
 
-            is ConversionState.HasSmallLoadingIndicator -> ResultMessageRow {
+            is LocationPermissionReceived -> ResultMessageRow {
                 ResultMessageText(
-                    targetState.getLoadingIndicator(LocalResources.current).message,
+                    stringResource(R.string.conversion_succeeded_location_loading_indicator_title),
                     Modifier.testTag("geoShareResultSmallLoadingIndicatorMessage"),
                 )
                 FilledIconButton(
