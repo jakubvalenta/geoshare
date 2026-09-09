@@ -14,23 +14,19 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,7 +36,6 @@ import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
@@ -54,7 +49,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.LineBreak
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -128,6 +122,8 @@ import page.ooooo.geoshare.ui.components.ConversionWebView
 import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
 import page.ooooo.geoshare.ui.components.MainHeadline
 import page.ooooo.geoshare.ui.components.MainHelp
+import page.ooooo.geoshare.ui.components.MainLoadingIndicator
+import page.ooooo.geoshare.ui.components.MainLog
 import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.components.MainSource
 import page.ooooo.geoshare.ui.components.MainSubmit
@@ -135,14 +131,13 @@ import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
 import page.ooooo.geoshare.ui.components.PermissionDialog
 import page.ooooo.geoshare.ui.components.ResultApps
+import page.ooooo.geoshare.ui.components.HelpOpenByDefaultMessage
 import page.ooooo.geoshare.ui.components.ResultCoordinates
+import page.ooooo.geoshare.ui.components.HelpShareSourceMessage
+import page.ooooo.geoshare.ui.components.HelpWelcomeMessage
 import page.ooooo.geoshare.ui.components.ResultError
-import page.ooooo.geoshare.ui.components.MainLoadingIndicator
-import page.ooooo.geoshare.ui.components.MainLog
-import page.ooooo.geoshare.ui.components.ResultAppsHelpMessage
 import page.ooooo.geoshare.ui.components.ResultSheet
 import page.ooooo.geoshare.ui.components.ResultTitle
-import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
 import page.ooooo.geoshare.ui.components.StyledSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.checkeredBackground
 import page.ooooo.geoshare.ui.components.fakeStateLog
@@ -435,18 +430,10 @@ private fun MainScreen(
             },
         ) {
             StyledSupportingPaneScaffold(
-                mainPane = { innerPadding, wide -> // TODO Use inner padding
+                mainPane = { innerPadding, wide ->
                     Column(Modifier.weight(1f)) {
                         LargeTopAppBarPane(
                             modifier = Modifier.testTag("geoShareMainPane"),
-                            title = { maxLines ->
-                                MainTitle(
-                                    currentState = currentState,
-                                    billingAppNameResId = billingAppNameResId,
-                                    billingStatus = billingStatus,
-                                    maxLines = maxLines,
-                                )
-                            },
                             onBack = if (currentState !is Initial) {
                                 onReset
                             } else {
@@ -467,71 +454,59 @@ private fun MainScreen(
                                     )
                                 }
                             },
-                            expandedHeight = if (currentState is Initial) {
-                                spacing.largeTopAppBarExpandedHeight + spacing.medium
-                            } else {
-                                spacing.largeTopAppBarExpandedHeight
-                            },
                         ) {
                             // Both phone and tablet
 
-                            item {
-                                MainSource(
-                                    state = currentState,
-                                    elapsedTime = elapsedTime,
-                                    errorMessageResId = errorMessageResId,
-                                    finishedStateLog = finishedStateLog,
-                                    logExpanded = logExpanded,
-                                    source = source,
-                                    startTimeMark = startTimeMark,
-                                    onSetLogExpanded = setLogExpanded,
-                                    onSetErrorMessageResId = setErrorMessageResId,
-                                    onSetSource = onSetSource,
-                                    onSubmit = onSubmit,
-                                )
+                            when (currentState) {
+                                is Initial ->
+                                    item {
+                                        val billingStatus by billingStatus.collectAsStateWithLifecycle()
+                                        MainHeadline(
+                                            appNameResId = if (billingStatus is BillingStatus.Purchased) {
+                                                billingAppNameResId
+                                            } else {
+                                                R.string.app_name
+                                            },
+                                            modifier = Modifier
+                                                .padding(horizontal = spacing.windowPadding)
+                                                .run {
+                                                    if (!wide) {
+                                                        padding(top = spacing.large)
+                                                    } else {
+                                                        this
+                                                    }
+                                                }
+                                                .padding(bottom = spacing.tiny)
+                                                .offset(x = -(12).dp),
+                                        )
+                                    }
                             }
                             item {
-                                MainLog(
-                                    expanded = logExpanded,
-                                    finishedStateLog = finishedStateLog,
-                                )
+                                Column {
+                                    MainSource(
+                                        state = currentState,
+                                        elapsedTime = elapsedTime,
+                                        errorMessageResId = errorMessageResId,
+                                        finishedStateLog = finishedStateLog,
+                                        logExpanded = logExpanded,
+                                        source = source,
+                                        startTimeMark = startTimeMark,
+                                        onSetLogExpanded = setLogExpanded,
+                                        onSetErrorMessageResId = setErrorMessageResId,
+                                        onSetSource = onSetSource,
+                                        onSubmit = onSubmit,
+                                    )
+                                    MainLog(
+                                        expanded = logExpanded,
+                                        finishedStateLog = finishedStateLog,
+                                    )
+                                }
                             }
 
                             if (!wide) {
                                 // Phone
 
                                 when (currentState) {
-                                    is ConversionState.HasError ->
-                                        item {
-                                            ResultError(
-                                                state = currentState,
-                                                onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                                onRetry = onRetry,
-                                            )
-                                        }
-
-                                    is ConversionState.HasResult ->
-                                        item {
-                                            ResultCoordinates(
-                                                points = currentState.points,
-                                                appDetails = appDetails,
-                                                coordinateConverter = coordinateConverter,
-                                                dismissedHelpMessages = dismissedHelpMessages,
-                                                outputsForApps = outputsForApps,
-                                                outputsForPointChips = outputsForPointChips,
-                                                outputsForPointsChips = outputsForPointsChips,
-                                                sourceComesFromIntent = sourceComesFromIntent,
-                                                userPreferencesValues = userPreferencesValues,
-                                                onDismissHelpMessage = onDismissHelpMessage,
-                                                onExecute = onExecute,
-                                                onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                                onSelect = { index ->
-                                                    onCancel()
-                                                    setSelectedPointIndex(index)
-                                                },
-                                            )
-                                        }
-
                                     is Initial -> {
                                         item {
                                             MainSubmit(
@@ -542,38 +517,83 @@ private fun MainScreen(
                                         }
                                         item {
                                             MainHelp(
-                                                dismissedHelpMessages = dismissedHelpMessages,
                                                 inputRepository = inputRepository,
-                                                modifier = Modifier.padding(top = spacing.medium),
-                                                onDismissHelpMessage = onDismissHelpMessage,
                                                 onNavigateToFaqScreen = onNavigateToFaqScreen,
                                                 onNavigateToInputsScreen = onNavigateToInputsScreen,
                                                 onSetErrorMessageResId = setErrorMessageResId,
                                                 onSetSource = onSetSource,
-                                            )
+                                            ) {
+                                                HelpWelcomeMessage(
+                                                    dismissedHelpMessages = dismissedHelpMessages,
+                                                    onDismissHelpMessage = onDismissHelpMessage,
+                                                )
+                                            }
                                         }
                                     }
 
-                                    is ConversionState.HasDescription ->
+                                    else -> {
                                         item {
-                                            MainLoadingIndicator(
-                                                state = currentState,
-                                                onCancel = onCancel,
-                                            )
-                                        }
-                                }
-
-                                when (currentState) {
-                                    is ConversionState.HasResult ->
-                                        item {
-                                            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                                                Column(
-                                                    // This column must not have weight(1f), otherwise the last row of app
-                                                    // icons gets shrunk
-                                                    Modifier
-                                                        .fillMaxWidth()
-                                                        .background(MaterialTheme.colorScheme.surface)
+                                            Column {
+                                                Card(
+                                                    colors = CardDefaults.cardColors(
+                                                        containerColor = mainContainerColor,
+                                                        contentColor = mainContentColor,
+                                                    ),
                                                 ) {
+                                                    when (currentState) {
+                                                        is ConversionState.HasError ->
+                                                            ResultError(
+                                                                state = currentState,
+                                                                onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                                                onRetry = onRetry,
+                                                            )
+
+                                                        is ConversionState.HasResult -> Column {
+                                                            ResultCoordinates(
+                                                                points = currentState.points,
+                                                                appDetails = appDetails,
+                                                                coordinateConverter = coordinateConverter,
+                                                                outputsForPointChips = outputsForPointChips,
+                                                                outputsForPointsChips = outputsForPointsChips,
+                                                                userPreferencesValues = userPreferencesValues,
+                                                                onExecute = onExecute,
+                                                                onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                                                onSelect = { index ->
+                                                                    onCancel()
+                                                                    setSelectedPointIndex(index)
+                                                                },
+                                                            ) {
+                                                                HelpShareSourceMessage(
+                                                                    appDetails = appDetails,
+                                                                    dismissedHelpMessages = dismissedHelpMessages,
+                                                                    outputsForApps = outputsForApps,
+                                                                    sourceComesFromIntent = sourceComesFromIntent,
+                                                                    onDismissHelpMessage = onDismissHelpMessage,
+                                                                )
+                                                            }
+                                                        }
+
+                                                        is ConversionState.HasDescription ->
+                                                            MainLoadingIndicator(
+                                                                state = currentState,
+                                                                onCancel = onCancel,
+                                                            )
+                                                    }
+                                                }
+
+                                                when (currentState) {
+                                                    is PermissionGrantedWebViewInput ->
+                                                        MainWebView(
+                                                            matchedInput = currentState.matchedInput,
+                                                            pendingData = currentState.pendingData,
+                                                        )
+                                                }
+                                            }
+                                        }
+
+                                        when (currentState) {
+                                            is ConversionState.HasResult -> {
+                                                item {
                                                     ResultTitle(
                                                         currentState = currentState,
                                                         appDetails = appDetails,
@@ -585,26 +605,36 @@ private fun MainScreen(
                                                         onCancel = onCancel,
                                                         onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
                                                     )
-                                                    ResultApps(
-                                                        appDetails = appDetails,
-                                                        outputsForApps = outputsForApps,
-                                                        outputsForLinks = outputsForLinks,
-                                                        outputsForSharing = outputsForSharing,
-                                                        points = currentState.points,
-                                                        onDisableLinkGroup = onDisableLinkGroup,
-                                                        onExecute = onExecute,
-                                                        onHideApp = onHideApp,
-                                                        onNavigateToLinkScreen = onNavigateToLinkScreen,
-                                                    )
-                                                    ResultAppsHelpMessage(
-                                                        dismissedHelpMessages = dismissedHelpMessages,
-                                                        sourceComesFromIntent = sourceComesFromIntent,
-                                                        onDismissHelpMessage = onDismissHelpMessage,
-                                                        onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                                    )
+                                                }
+                                                item {
+                                                    Column(
+                                                        Modifier
+                                                            .padding(innerPadding)
+                                                            .consumeWindowInsets(innerPadding)
+                                                    ) {
+                                                        ResultApps(
+                                                            appDetails = appDetails,
+                                                            outputsForApps = outputsForApps,
+                                                            outputsForLinks = outputsForLinks,
+                                                            outputsForSharing = outputsForSharing,
+                                                            points = currentState.points,
+                                                            onDisableLinkGroup = onDisableLinkGroup,
+                                                            onExecute = onExecute,
+                                                            onHideApp = onHideApp,
+                                                            onNavigateToLinkScreen = onNavigateToLinkScreen,
+                                                        ) {
+                                                            HelpOpenByDefaultMessage(
+                                                                dismissedHelpMessages = dismissedHelpMessages,
+                                                                sourceComesFromIntent = sourceComesFromIntent,
+                                                                onDismissHelpMessage = onDismissHelpMessage,
+                                                                onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                                            )
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
+                                    }
                                 }
                             } else {
                                 // Tablet
@@ -612,24 +642,33 @@ private fun MainScreen(
                                 when (currentState) {
                                     is Initial ->
                                         item {
-                                            MainSubmit(
-                                                source = source,
-                                                onSetErrorMessageResId = setErrorMessageResId,
-                                                onSubmit = onSubmit,
-                                            )
+                                            Column(
+                                                Modifier
+                                                    .padding(innerPadding)
+                                                    .consumeWindowInsets(innerPadding)
+                                            ) {
+                                                MainSubmit(
+                                                    source = source,
+                                                    onSetErrorMessageResId = setErrorMessageResId,
+                                                    onSubmit = onSubmit,
+                                                )
+                                            }
                                         }
 
                                     else ->
                                         item {
-                                            Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
+                                            Column(
+                                                Modifier
+                                                    .padding(innerPadding)
+                                                    .consumeWindowInsets(innerPadding),
+                                                verticalArrangement = Arrangement.spacedBy(spacing.tiny),
+                                            ) {
                                                 Card(
                                                     colors = CardDefaults.cardColors(
                                                         containerColor = mainContainerColor,
                                                         contentColor = mainContentColor,
                                                     ),
                                                 ) {
-                                                    Spacer(Modifier.height(spacing.small))
-
                                                     when (currentState) {
                                                         is ConversionState.HasError ->
                                                             ResultError(
@@ -643,13 +682,9 @@ private fun MainScreen(
                                                                 points = currentState.points,
                                                                 appDetails = appDetails,
                                                                 coordinateConverter = coordinateConverter,
-                                                                dismissedHelpMessages = dismissedHelpMessages,
-                                                                outputsForApps = outputsForApps,
                                                                 outputsForPointChips = outputsForPointChips,
                                                                 outputsForPointsChips = outputsForPointsChips,
-                                                                sourceComesFromIntent = sourceComesFromIntent,
                                                                 userPreferencesValues = userPreferencesValues,
-                                                                onDismissHelpMessage = onDismissHelpMessage,
                                                                 onExecute = onExecute,
                                                                 onNavigateToFaqScreen = onNavigateToFaqScreen,
                                                                 onSelect = { index ->
@@ -665,24 +700,16 @@ private fun MainScreen(
                                                             )
                                                     }
                                                 }
+
+                                                when (currentState) {
+                                                    is PermissionGrantedWebViewInput ->
+                                                        MainWebView(
+                                                            matchedInput = currentState.matchedInput,
+                                                            pendingData = currentState.pendingData,
+                                                        )
+                                                }
                                             }
                                         }
-                                }
-                            }
-                        }
-
-                        Column(
-                            Modifier
-                                .weight(1f)
-                                .fillMaxWidth()
-                                .background(MaterialTheme.colorScheme.surface)
-                        ) {
-                            if (currentState is PermissionGrantedWebViewInput) {
-                                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                                    MainWebView(
-                                        matchedInput = currentState.matchedInput,
-                                        pendingData = currentState.pendingData,
-                                    )
                                 }
                             }
                         }
@@ -724,6 +751,15 @@ private fun MainScreen(
                         when (currentState) {
                             is ConversionState.HasResult -> {
                                 item {
+                                    HelpShareSourceMessage(
+                                        appDetails = appDetails,
+                                        dismissedHelpMessages = dismissedHelpMessages,
+                                        outputsForApps = outputsForApps,
+                                        sourceComesFromIntent = sourceComesFromIntent,
+                                        onDismissHelpMessage = onDismissHelpMessage,
+                                    )
+                                }
+                                item {
                                     ResultApps(
                                         appDetails = appDetails,
                                         outputsForApps = outputsForApps,
@@ -734,40 +770,35 @@ private fun MainScreen(
                                         onExecute = onExecute,
                                         onHideApp = onHideApp,
                                         onNavigateToLinkScreen = onNavigateToLinkScreen,
-                                    )
-                                }
-                                item {
-                                    ResultAppsHelpMessage(
-                                        dismissedHelpMessages = dismissedHelpMessages,
-                                        sourceComesFromIntent = sourceComesFromIntent,
-                                        onDismissHelpMessage = onDismissHelpMessage,
-                                        onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                    )
+                                    ) {
+                                        HelpOpenByDefaultMessage(
+                                            dismissedHelpMessages = dismissedHelpMessages,
+                                            sourceComesFromIntent = sourceComesFromIntent,
+                                            onDismissHelpMessage = onDismissHelpMessage,
+                                            onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                        )
+                                    }
                                 }
                             }
 
                             is Initial ->
                                 item {
                                     MainHelp(
-                                        dismissedHelpMessages = dismissedHelpMessages,
                                         inputRepository = inputRepository,
-                                        modifier = Modifier.padding(top = spacing.medium),
-                                        onDismissHelpMessage = onDismissHelpMessage,
                                         onNavigateToFaqScreen = onNavigateToFaqScreen,
                                         onNavigateToInputsScreen = onNavigateToInputsScreen,
                                         onSetErrorMessageResId = setErrorMessageResId,
                                         onSetSource = onSetSource,
-                                    )
+                                    ) {
+                                        HelpWelcomeMessage(
+                                            dismissedHelpMessages = dismissedHelpMessages,
+                                            onDismissHelpMessage = onDismissHelpMessage,
+                                        )
+                                    }
                                 }
                         }
                     }
                 },
-                colors = StyledPaneScaffoldDefaults.colors(
-                    mainContainerColor = mainContainerColor,
-                    mainContentColor = mainContentColor,
-                    wideMainContainerColor = Color.Transparent,
-                    wideMainContentColor = MaterialTheme.colorScheme.onSurface,
-                ),
                 shouldAutoFocusCurrentDestination = false,
             )
         }
@@ -830,57 +861,6 @@ private fun MainScreen(
                     )
                 }
             }
-    }
-}
-
-@Composable
-private fun MainTitle(
-    currentState: ConversionState,
-    billingAppNameResId: Int,
-    billingStatus: StateFlow<BillingStatus>,
-    maxLines: Int,
-) {
-    val resources = LocalResources.current
-
-    val billingStatus by billingStatus.collectAsStateWithLifecycle()
-
-    when (currentState) {
-        is ConversionState.HasError ->
-            Text(
-                stringResource(R.string.conversion_error_title),
-                overflow = TextOverflow.Ellipsis,
-                maxLines = maxLines,
-            )
-
-        is ConversionState.HasResult ->
-            Text(
-                currentState.points.lastOrNull()?.cleanName?.takeIf { it.isNotEmpty() }
-                    ?: if (currentState.points.size > 1) {
-                        stringResource(R.string.conversion_succeeded_point_last)
-                    } else {
-                        stringResource(R.string.conversion_succeeded_title)
-                    },
-                Modifier.testTag("geoShareResultLastPointName"),
-                overflow = TextOverflow.Ellipsis,
-                maxLines = maxLines,
-            )
-
-        is Initial ->
-            MainHeadline(
-                appNameResId = if (billingStatus is BillingStatus.Purchased) {
-                    billingAppNameResId
-                } else {
-                    R.string.app_name
-                },
-                modifier = Modifier.offset(x = -(12).dp),
-            )
-
-        is ConversionState.HasDescription ->
-            Text(
-                currentState.getDescription(resources),
-                overflow = TextOverflow.Ellipsis,
-                maxLines = maxLines,
-            )
     }
 }
 
@@ -1180,7 +1160,7 @@ private fun SucceededPreview() {
             ),
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
-            dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
+            dismissedHelpMessages = MutableStateFlow(emptySet()),
             elapsedTime = MutableStateFlow(3200.milliseconds),
             finishedStateLog = MutableStateFlow(fakeStateLog()),
             inputRepository = FakeInputRepository,
@@ -1236,7 +1216,7 @@ private fun SucceededPreview() {
             outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             source = MutableStateFlow(""),
-            sourceComesFromIntent = MutableStateFlow(true),
+            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancel = {},
@@ -1298,7 +1278,7 @@ private fun DarkSucceededPreview() {
             ),
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
-            dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
+            dismissedHelpMessages = MutableStateFlow(emptySet()),
             elapsedTime = MutableStateFlow(3200.milliseconds),
             finishedStateLog = MutableStateFlow(fakeStateLog()),
             inputRepository = FakeInputRepository,
@@ -1354,7 +1334,7 @@ private fun DarkSucceededPreview() {
             outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             source = MutableStateFlow(""),
-            sourceComesFromIntent = MutableStateFlow(true),
+            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancel = {},

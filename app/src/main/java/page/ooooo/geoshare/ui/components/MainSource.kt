@@ -151,6 +151,7 @@ fun MainSource(
 
         is ConversionState.HasSource -> {
             OutlinedCard(
+                Modifier.padding(bottom = spacing.tiny),
                 shape = OutlinedTextFieldDefaults.shape,
                 border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
             ) {
@@ -167,10 +168,6 @@ fun MainSource(
                             .padding(start = spacing.small)
                     ) {
                         Column {
-                            // Text(
-                            //     "Source", // TODO translate
-                            //     style = MaterialTheme.typography.bodyMedium,
-                            // )
                             Text(
                                 state.source,
                                 modifier = Modifier.clickable {
@@ -178,7 +175,6 @@ fun MainSource(
                                         AndroidTools.copyToClipboard(clipboard, state.source)
                                     }
                                 },
-                                // color = MaterialTheme.colorScheme.onSurfaceVariant, // TODO
                                 textDecoration = TextDecoration.Underline,
                                 overflow = TextOverflow.Ellipsis,
                                 maxLines = 1,
@@ -186,15 +182,17 @@ fun MainSource(
                             )
                         }
                     }
-                    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                        when (state) {
-                            is ConversionState.HasError,
-                            is ConversionState.HasResult,
-                                ->
-                                SecondsTimeText(elapsedTime)
+                    Column(Modifier.padding(start = spacing.extraTiny)) {
+                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                            when (state) {
+                                is ConversionState.HasError,
+                                is ConversionState.HasResult,
+                                    ->
+                                    SecondsTimeText(elapsedTime)
 
-                            is ConversionState.HasDescription ->
-                                ElapsedTimeText(startTimeMark)
+                                is ConversionState.HasDescription ->
+                                    ElapsedTimeText(startTimeMark)
+                            }
                         }
                     }
                     if (finishedStateLog.isNotEmpty()) {

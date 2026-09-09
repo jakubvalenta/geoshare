@@ -57,13 +57,17 @@ fun MainLog(
     initialItemsExpanded: Boolean = false,
 ) {
     val colors = ListItemDefaults.segmentedColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
+    val spacing = LocalSpacing.current
 
     val finishedStateLog by finishedStateLog.collectAsStateWithLifecycle()
 
     if (finishedStateLog.isNotEmpty()) {
         AnimatedVisibility(expanded) {
             SelectionContainer {
-                Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
+                Column(
+                    Modifier.padding(bottom = spacing.tiny),
+                    verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+                ) {
                     finishedStateLog.forEachIndexed { index, item ->
                         SegmentedListItem(
                             shapes = ListItemDefaults.segmentedShapes(index, finishedStateLog.size),

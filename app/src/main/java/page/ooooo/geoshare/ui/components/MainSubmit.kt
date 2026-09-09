@@ -28,6 +28,7 @@ fun MainSubmit(
     LargeButton(
         stringResource(R.string.main_create_geo_uri),
         Modifier
+            .padding(horizontal = spacing.windowPadding)
             .padding(top = spacing.small)
             .testTag("geoShareMainSubmitButton"),
     ) {

@@ -3,6 +3,7 @@ package page.ooooo.geoshare.ui.components
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
@@ -35,7 +36,14 @@ fun ResultError(
     val resources = LocalResources.current
     val spacing = LocalSpacing.current
 
-    Column {
+    Column(Modifier.fillMaxWidth()) {
+        Text(
+            stringResource(R.string.conversion_error_title),
+            Modifier
+                .padding(horizontal = spacing.windowPadding)
+                .padding(top = spacing.small, bottom = spacing.small),
+            style = MaterialTheme.typography.headlineSmall,
+        )
         SelectionContainer {
             Column(
                 Modifier.padding(horizontal = spacing.windowPadding),

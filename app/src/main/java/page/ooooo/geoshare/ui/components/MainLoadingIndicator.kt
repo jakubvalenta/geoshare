@@ -46,9 +46,13 @@ fun MainLoadingIndicator(
         Modifier
             .fillMaxWidth()
             .padding(horizontal = spacing.windowPadding)
-            .padding(bottom = spacing.small),
+            .padding(top = spacing.small, bottom = spacing.small),
         verticalArrangement = Arrangement.spacedBy(spacing.small),
     ) {
+        Text(
+            state.getDescription(resources),
+            style = MaterialTheme.typography.headlineSmall,
+        )
         LoadingIndicator(
             Modifier
                 .size(96.dp)
