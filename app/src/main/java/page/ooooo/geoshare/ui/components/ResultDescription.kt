@@ -1,9 +1,6 @@
 package page.ooooo.geoshare.ui.components
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
@@ -15,64 +12,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
-fun ResultDescription(
-    state: ConversionState.HasDescription,
-    modifier: Modifier = Modifier,
-    icon: (@Composable () -> Unit)? = null,
-    initialExpanded: Boolean = false,
-    testTag: String? = null,
-    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
-    time: @Composable () -> Unit,
-) {
-    val resources = LocalResources.current
-    val spacing = LocalSpacing.current
-
-    Column(modifier, verticalArrangement) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(spacing.tiny),
-        ) {
-            icon?.invoke()
-            Text(
-                state.getDescription(resources),
-                Modifier
-                    .weight(1f)
-                    .run { testTag?.let { testTag(it) } ?: this },
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            time()
-        }
-        state.getDetails(resources)?.let { details ->
-            ResultDetails(
-                details,
-                Modifier.run { if (icon != null) padding(start = 24.dp + spacing.tiny) else this },
-                initialExpanded = initialExpanded
-            )
-        }
-        state.uri?.let { uri ->
-            ResultUri(
-                uri,
-                Modifier.run { if (icon != null) padding(start = 24.dp + spacing.tiny) else this },
-            )
-        }
-    }
-}
-
-@Composable
-private fun ResultDetails(details: String, modifier: Modifier = Modifier, initialExpanded: Boolean = false) {
+fun ResultDetails(details: String, modifier: Modifier = Modifier, initialExpanded: Boolean = false) {
     CompositionLocalProvider(
         LocalContentColor provides LocalContentColor.current.copy(alpha = 0.9f),
         LocalTextStyle provides MaterialTheme.typography.bodySmall,
@@ -107,7 +55,7 @@ private fun ResultDetails(details: String, modifier: Modifier = Modifier, initia
 }
 
 @Composable
-private fun ResultUri(uri: String, modifier: Modifier = Modifier) {
+fun ResultUri(uri: String, modifier: Modifier = Modifier) {
     CompositionLocalProvider(
         LocalContentColor provides LocalContentColor.current.copy(alpha = 0.9f),
         LocalTextStyle provides MaterialTheme.typography.bodySmall,

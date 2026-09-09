@@ -3,9 +3,9 @@ package page.ooooo.geoshare.ui.components
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -14,21 +14,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.local.preferences.Permission
@@ -39,23 +31,20 @@ import page.ooooo.geoshare.lib.inputs.MatchedInput
 import page.ooooo.geoshare.lib.network.ConnectTimeoutNetworkException
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
-import kotlin.time.ComparableTimeMark
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.TestTimeSource
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun ResultLoadingIndicator(
+fun MainLoadingIndicator(
     state: ConversionState.HasDescription,
-    startTimeMark: StateFlow<ComparableTimeMark?>,
     initialExpanded: Boolean = false,
     onCancel: () -> Unit,
 ) {
+    val resources = LocalResources.current
     val spacing = LocalSpacing.current
 
     Column(
         Modifier
+            .fillMaxWidth()
             .padding(horizontal = spacing.windowPadding)
             .padding(bottom = spacing.small),
         verticalArrangement = Arrangement.spacedBy(spacing.small),
@@ -66,16 +55,6 @@ fun ResultLoadingIndicator(
                 .align(Alignment.CenterHorizontally),
             color = MaterialTheme.colorScheme.tertiary,
         )
-        SelectionContainer {
-            ResultDescription(
-                state,
-                initialExpanded = initialExpanded,
-                testTag = "geoShareMainLoadingIndicatorDescription",
-                verticalArrangement = Arrangement.spacedBy(spacing.tiny),
-            ) {
-                ResultLoadingIndicatorElapsedTime(startTimeMark)
-            }
-        }
         Button(
             onCancel,
             Modifier
@@ -88,25 +67,14 @@ fun ResultLoadingIndicator(
         ) {
             Text(stringResource(R.string.conversion_loading_indicator_cancel))
         }
-    }
-}
-
-@Composable
-private fun ResultLoadingIndicatorElapsedTime(startTime: StateFlow<ComparableTimeMark?>) {
-    val startTime by startTime.collectAsStateWithLifecycle()
-
-    var elapsedTime by remember { mutableStateOf(startTime?.elapsedNow() ?: Duration.ZERO) }
-
-    LaunchedEffect(startTime) {
-        startTime?.let { startTime ->
-            while (true) {
-                elapsedTime = startTime.elapsedNow()
-                delay(100.milliseconds)
-            }
+        state.getDetails(resources)?.let { details ->
+            ResultDetails(
+                details,
+                Modifier.testTag("geoShareMainLoadingIndicatorDescription"),
+                initialExpanded = initialExpanded,
+            )
         }
     }
-
-    ResultTime(elapsedTime)
 }
 
 // Previews
@@ -123,11 +91,9 @@ private fun DefaultPreview() {
             results = emptyMap(),
             lastAttempt = Attempt(3, ConnectTimeoutNetworkException(Exception())),
         )
-        val timeSource = TestTimeSource()
         Surface(color = mainContainerColor(state)) {
-            ResultLoadingIndicator(
+            MainLoadingIndicator(
                 state = state,
-                startTimeMark = MutableStateFlow(timeSource.apply { plusAssign(123.milliseconds) }.markNow()),
                 onCancel = {},
             )
         }
@@ -146,11 +112,9 @@ private fun DarkPreview() {
             results = emptyMap(),
             lastAttempt = Attempt(3, ConnectTimeoutNetworkException(Exception())),
         )
-        val timeSource = TestTimeSource()
         Surface(color = mainContainerColor(state)) {
-            ResultLoadingIndicator(
+            MainLoadingIndicator(
                 state = state,
-                startTimeMark = MutableStateFlow(timeSource.apply { plusAssign(123.milliseconds) }.markNow()),
                 onCancel = {},
             )
         }

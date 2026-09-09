@@ -69,7 +69,13 @@ class ConversionViewModel @Inject constructor(
     val currentState: StateFlow<ConversionState> = _currentState.asStateFlow()
 
     private val _stateLog = MutableStateFlow<List<ConversionStateLogItem>>(emptyList())
-    val stateLog: StateFlow<List<ConversionStateLogItem>> = _stateLog.asStateFlow()
+    val finishedStateLog: StateFlow<List<ConversionStateLogItem.Finished>> = _stateLog
+        .map { it.filterIsInstance<ConversionStateLogItem.Finished>() }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            emptyList(),
+        )
 
     private val _startTimeMarkFlow: Flow<ComparableTimeMark?> = _stateLog.map { it.firstOrNull()?.startTimeMark }
     val startTimeMark: StateFlow<ComparableTimeMark?> = _startTimeMarkFlow

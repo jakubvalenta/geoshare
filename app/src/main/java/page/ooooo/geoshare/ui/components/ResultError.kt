@@ -8,47 +8,53 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
 import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun ResultError(
     state: ConversionState.HasError,
-    elapsedTime: StateFlow<Duration>,
     initialExpanded: Boolean = false,
     onNavigateToInputsScreen: () -> Unit,
     onRetry: () -> Unit,
 ) {
+    val resources = LocalResources.current
     val spacing = LocalSpacing.current
-
-    val elapsedTime by elapsedTime.collectAsStateWithLifecycle()
 
     Column {
         SelectionContainer {
-            ResultDescription(
-                state,
-                modifier = Modifier.padding(horizontal = spacing.windowPadding),
-                initialExpanded = initialExpanded,
+            Column(
+                Modifier.padding(horizontal = spacing.windowPadding),
                 verticalArrangement = Arrangement.spacedBy(spacing.tiny),
-                testTag = "geoShareConversionErrorMessage",
             ) {
-                ResultTime(elapsedTime)
+                Text(
+                    state.getDescription(resources),
+                    Modifier.testTag("geoShareConversionErrorMessage"),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                state.getDetails(resources)?.let { details ->
+                    ResultDetails(
+                        details,
+                        initialExpanded = initialExpanded,
+                    )
+                }
+                state.uri?.let { uri ->
+                    ResultUri(uri)
+                }
             }
         }
         ScrollableChips {
@@ -101,7 +107,6 @@ private fun DefaultPreview() {
             ResultError(
                 state = state,
                 onNavigateToInputsScreen = {},
-                elapsedTime = MutableStateFlow(123.milliseconds),
                 onRetry = {},
             )
         }
@@ -121,7 +126,6 @@ private fun DarkPreview() {
         Surface(color = mainContainerColor(state)) {
             ResultError(
                 state = state,
-                elapsedTime = MutableStateFlow(123.milliseconds),
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -142,7 +146,6 @@ private fun ExpandedPreview() {
         Surface(color = mainContainerColor(state)) {
             ResultError(
                 state = state,
-                elapsedTime = MutableStateFlow(123.milliseconds),
                 initialExpanded = true,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
@@ -164,7 +167,6 @@ private fun DarkExpandedPreview() {
         Surface(color = mainContainerColor(state)) {
             ResultError(
                 state = state,
-                elapsedTime = MutableStateFlow(123.milliseconds),
                 initialExpanded = true,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
@@ -185,7 +187,6 @@ private fun NoDetailsPreview() {
         Surface(color = mainContainerColor(state)) {
             ResultError(
                 state = state,
-                elapsedTime = MutableStateFlow(123.milliseconds),
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -205,7 +206,6 @@ private fun DarkNoDetailsPreview() {
         Surface(color = mainContainerColor(state)) {
             ResultError(
                 state = state,
-                elapsedTime = MutableStateFlow(123.milliseconds),
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -225,7 +225,6 @@ private fun WarningPreview() {
         Surface(color = mainContainerColor(state)) {
             ResultError(
                 state = state,
-                elapsedTime = MutableStateFlow(123.milliseconds),
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -245,7 +244,6 @@ private fun DarkWarningPreview() {
         Surface(color = mainContainerColor(state)) {
             ResultError(
                 state = state,
-                elapsedTime = MutableStateFlow(123.milliseconds),
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
