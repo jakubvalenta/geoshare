@@ -2,6 +2,7 @@ package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -13,9 +14,11 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import kotlinx.coroutines.flow.MutableStateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.InputRepository
 import page.ooooo.geoshare.data.di.FakeInputRepository
+import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.Input
@@ -30,7 +33,7 @@ fun MainHelp(
     onNavigateToInputsScreen: () -> Unit,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
     onSetSource: (newSource: String) -> Unit,
-    message: (@Composable () -> Unit)? = null,
+    message: (@Composable (paddingValues: PaddingValues) -> Unit)? = null,
 ) {
     val resources = LocalResources.current
     val spacing = LocalSpacing.current
@@ -40,11 +43,7 @@ fun MainHelp(
             .padding(horizontal = spacing.windowPadding)
             .padding(top = spacing.medium)
     ) {
-        message?.let { message ->
-            Column(Modifier.padding(bottom = spacing.small)) {
-                message()
-            }
-        }
+        message?.invoke(PaddingValues(bottom = spacing.small))
         TextButton(onNavigateToInputsScreen) {
             Icon(
                 painterResource(R.drawable.map_24px),
@@ -119,6 +118,68 @@ private fun DarkPreview() {
                 onSetErrorMessageResId = {},
                 onSetSource = {},
             )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MessagePreview() {
+    AppTheme {
+        Surface {
+            MainHelp(
+                inputRepository = FakeInputRepository,
+                onNavigateToFaqScreen = {},
+                onNavigateToInputsScreen = {},
+                onSetErrorMessageResId = {},
+                onSetSource = {},
+            ) { paddingValues ->
+                HelpMessageCard(
+                    helpMessage = HelpMessage.WELCOME,
+                    dismissedHelpMessages = MutableStateFlow(emptySet()),
+                    title = { Text(stringResource(R.string.help_welcome_title)) },
+                    modifier = Modifier.padding(paddingValues),
+                    onDismiss = {},
+                ) {
+                    ParagraphText(
+                        stringResource(
+                            R.string.help_welcome_text,
+                            stringResource(R.string.main_create_geo_uri),
+                        )
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkMessagePreview() {
+    AppTheme {
+        Surface {
+            MainHelp(
+                inputRepository = FakeInputRepository,
+                onNavigateToFaqScreen = {},
+                onNavigateToInputsScreen = {},
+                onSetErrorMessageResId = {},
+                onSetSource = {},
+            ) { paddingValues ->
+                HelpMessageCard(
+                    helpMessage = HelpMessage.WELCOME,
+                    dismissedHelpMessages = MutableStateFlow(emptySet()),
+                    title = { Text(stringResource(R.string.help_welcome_title)) },
+                    modifier = Modifier.padding(paddingValues),
+                    onDismiss = {},
+                ) {
+                    ParagraphText(
+                        stringResource(
+                            R.string.help_welcome_text,
+                            stringResource(R.string.main_create_geo_uri),
+                        )
+                    )
+                }
+            }
         }
     }
 }

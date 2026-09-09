@@ -2,13 +2,13 @@ package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
 import android.view.KeyEvent
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
@@ -18,13 +18,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,6 +41,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -70,6 +70,7 @@ fun MainSource(
     errorMessageResId: Int?,
     startTimeMark: StateFlow<ComparableTimeMark?>,
     finishedStateLog: StateFlow<List<ConversionStateLogItem.Finished>>,
+    height: Dp = 30.dp,
     logExpanded: Boolean,
     source: StateFlow<String>,
     onSetLogExpanded: (logExpanded: Boolean) -> Unit,
@@ -150,23 +151,15 @@ fun MainSource(
         }
 
         is ConversionState.HasSource -> {
-            OutlinedCard(
-                Modifier.padding(bottom = spacing.tiny),
-                shape = OutlinedTextFieldDefaults.shape,
-                border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
-            ) {
+            Card(Modifier.padding(bottom = spacing.tiny)) {
                 Row(
                     Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                        .fillMaxWidth()
+                        .height(height)
+                        .padding(start = spacing.small),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    SelectionContainer(
-                        Modifier
-                            .weight(1f)
-                            .padding(vertical = spacing.tiny)
-                            .padding(start = spacing.small)
-                    ) {
+                    SelectionContainer(Modifier.weight(1f)) {
                         Column {
                             Text(
                                 state.source,
@@ -182,28 +175,39 @@ fun MainSource(
                             )
                         }
                     }
-                    Column(Modifier.padding(start = spacing.extraTiny)) {
+                    Row(
+                        Modifier
+                            .clickable(
+                                enabled = finishedStateLog.isNotEmpty(),
+                            ) {
+                                onSetLogExpanded(!logExpanded)
+                            }
+                            .fillMaxHeight()
+                            .padding(start = spacing.tiny),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
                         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                             when (state) {
                                 is ConversionState.HasError,
                                 is ConversionState.HasResult,
                                     ->
-                                    SecondsTimeText(elapsedTime)
+                                    if (elapsedTime > 10.milliseconds) {
+                                        SecondsTimeText(elapsedTime)
+                                    }
 
                                 is ConversionState.HasDescription ->
                                     ElapsedTimeText(startTimeMark)
                             }
                         }
-                    }
-                    if (finishedStateLog.isNotEmpty()) {
-                        IconButton({ onSetLogExpanded(!logExpanded) }) {
+                        if (finishedStateLog.isNotEmpty()) {
                             Icon(
                                 if (logExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                                 contentDescription = null,
+                                modifier = Modifier.padding(end = spacing.extraTiny)
                             )
+                        } else {
+                            Spacer(Modifier.width(spacing.small))
                         }
-                    } else {
-                        Spacer(Modifier.width(spacing.small))
                     }
                 }
             }

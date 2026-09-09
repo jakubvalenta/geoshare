@@ -1,7 +1,7 @@
 package page.ooooo.geoshare.ui.components
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.runtime.Composable
@@ -13,8 +13,8 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @Composable
 fun MainSupportingPaneScaffold(
     actions: @Composable () -> Unit,
-    topContent: LazyListScope.(innerPadding: PaddingValues) -> Unit,
-    bottomContent: LazyListScope.(innerPadding: PaddingValues) -> Unit,
+    topContent: LazyListScope.() -> Unit,
+    bottomContent: LazyListScope.() -> Unit,
     mainExpandedHeight: Dp = LocalSpacing.current.largeTopAppBarExpandedHeight,
     mainTitle: (@Composable (maxLines: Int) -> Unit)? = null,
     supportingTitle: (@Composable (maxLines: Int) -> Unit)? = null,
@@ -22,9 +22,11 @@ fun MainSupportingPaneScaffold(
 ) {
     StyledSupportingPaneScaffold(
         mainPane = { innerPadding, wide ->
-            // TODO Column(Modifier.weight(1f)) {
             LargeTopAppBarPane(
-                modifier = Modifier.testTag("geoShareMainPane"),
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+                    .testTag("geoShareMainPane"),
                 title = mainTitle,
                 onBack = onBack,
                 actions = {
@@ -34,7 +36,7 @@ fun MainSupportingPaneScaffold(
                 },
                 expandedHeight = mainExpandedHeight,
             ) {
-                topContent(innerPadding)
+                topContent()
                 if (!wide) {
                     supportingTitle?.let { supportingTitle ->
                         item {
@@ -42,16 +44,15 @@ fun MainSupportingPaneScaffold(
                             Column(
                                 Modifier
                                     .padding(horizontal = spacing.windowPadding)
-                                    .padding(top = spacing.medium)
+                                    .padding(top = spacing.small)
                             ) {
                                 supportingTitle(Int.MAX_VALUE)
                             }
                         }
                     }
-                    bottomContent(innerPadding)
+                    bottomContent()
                 }
             }
-            // }
         },
         supportingPane = { wide ->
             LargeTopAppBarPane(
@@ -64,7 +65,7 @@ fun MainSupportingPaneScaffold(
                 },
             ) {
                 if (wide) {
-                    bottomContent(PaddingValues.Zero)
+                    bottomContent()
                 }
             }
         },

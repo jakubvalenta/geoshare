@@ -2,8 +2,8 @@ package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -62,7 +62,11 @@ fun MainLog(
     val finishedStateLog by finishedStateLog.collectAsStateWithLifecycle()
 
     if (finishedStateLog.isNotEmpty()) {
-        AnimatedVisibility(expanded) {
+        AnimatedVisibility(
+            expanded,
+            enter = expandVertically(),
+            exit = shrinkVertically(),
+        ) {
             SelectionContainer {
                 Column(
                     Modifier.padding(bottom = spacing.tiny),
@@ -109,7 +113,8 @@ fun ResultLogItem(
 
     AnimatedVisibility(
         visible = visible,
-        enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 }),
+        enter = expandVertically(),
+        exit = shrinkVertically(),
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.extraTiny)) {
             Row(

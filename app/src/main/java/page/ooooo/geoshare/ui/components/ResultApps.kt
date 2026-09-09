@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,8 +17,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -42,6 +44,7 @@ import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
+import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.lib.android.App
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
@@ -75,7 +78,7 @@ fun ResultApps(
     onExecute: (Action<*>) -> Unit,
     onHideApp: (packageName: String) -> Unit,
     onNavigateToLinkScreen: () -> Unit,
-    message: (@Composable () -> Unit)? = null,
+    message: (@Composable (paddingValues: PaddingValues) -> Unit)? = null,
 ) {
     val lastPoint = points.lastOrNull() ?: return
     val spacing = LocalSpacing.current
@@ -151,7 +154,12 @@ fun ResultApps(
         // Links
         if (outputsForLinks.isNotEmpty()) {
             ResultAppsHeadline(stringResource(R.string.links_title)) {
-                IconButton({ onNavigateToLinkScreen() }) {
+                FilledIconButton(
+                    { onNavigateToLinkScreen() },
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    ),
+                ) {
                     Icon(
                         Icons.Default.Add,
                         contentDescription = stringResource(R.string.conversion_succeeded_apps_links_configure),
@@ -169,15 +177,13 @@ fun ResultApps(
         }
 
         // Message
-        message?.let { message ->
-            Column(
-                Modifier
-                    .padding(horizontal = spacing.windowPadding)
-                    .padding(top = spacing.tiny)
-            ) {
-                message()
-            }
-        }
+        message?.invoke(
+            PaddingValues(
+                start = spacing.windowPadding,
+                top = spacing.tiny,
+                end = spacing.windowPadding,
+            )
+        )
     }
 }
 
@@ -200,7 +206,7 @@ private fun ResultAppsHeadline(text: String, extra: (@Composable RowScope.() -> 
         Text(
             text,
             Modifier.semantics { heading() },
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.headlineSmall,
         )
         extra?.invoke(this)
     }
@@ -577,7 +583,22 @@ private fun LoadingPreview() {
                 onExecute = {},
                 onHideApp = {},
                 onNavigateToLinkScreen = {},
-            )
+            ) { paddingValues ->
+                HelpMessageCard(
+                    helpMessage = HelpMessage.WELCOME,
+                    dismissedHelpMessages = MutableStateFlow(emptySet()),
+                    title = { Text(stringResource(R.string.help_welcome_title)) },
+                    modifier = Modifier.padding(paddingValues),
+                    onDismiss = {},
+                ) {
+                    ParagraphText(
+                        stringResource(
+                            R.string.help_welcome_text,
+                            stringResource(R.string.main_create_geo_uri),
+                        )
+                    )
+                }
+            }
         }
     }
 }
@@ -617,7 +638,22 @@ private fun DarkLoadingPreview() {
                 onExecute = {},
                 onHideApp = {},
                 onNavigateToLinkScreen = {},
-            )
+            ) { paddingValues ->
+                HelpMessageCard(
+                    helpMessage = HelpMessage.WELCOME,
+                    dismissedHelpMessages = MutableStateFlow(emptySet()),
+                    title = { Text(stringResource(R.string.help_welcome_title)) },
+                    modifier = Modifier.padding(paddingValues),
+                    onDismiss = {},
+                ) {
+                    ParagraphText(
+                        stringResource(
+                            R.string.help_welcome_text,
+                            stringResource(R.string.main_create_geo_uri),
+                        )
+                    )
+                }
+            }
         }
     }
 }

@@ -214,7 +214,7 @@ fun ResultTitle(
                     Button(
                         { onNavigateToUserPreferencesScreen(UserPreferenceGroupId.AUTOMATION) },
                         modifier.testTag("geoShareResultAutomationButton"),
-                        colors = ButtonDefaults.elevatedButtonColors(
+                        colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                             contentColor = MaterialTheme.colorScheme.onSurface,
                         ),

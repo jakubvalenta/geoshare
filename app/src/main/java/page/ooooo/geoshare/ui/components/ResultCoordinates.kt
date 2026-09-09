@@ -43,6 +43,7 @@ import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
+import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
@@ -74,7 +75,7 @@ fun ResultCoordinates(
     onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
     onSelect: (index: Int?) -> Unit,
     initialExpanded: Boolean = false,
-    message: (@Composable () -> Unit)? = null,
+    message: (@Composable (padding: PaddingValues) -> Unit)? = null,
 ) {
     val lastPoint = points.lastOrNull() ?: return
     val spacing = LocalSpacing.current
@@ -96,7 +97,7 @@ fun ResultCoordinates(
                 },
             Modifier
                 .padding(horizontal = spacing.windowPadding)
-                .padding(top = spacing.small, bottom = spacing.tiny)
+                .padding(top = spacing.small, bottom = spacing.extraTiny)
                 .testTag("geoShareResultLastPointName"),
             overflow = TextOverflow.Ellipsis,
             maxLines = 3,
@@ -199,15 +200,13 @@ fun ResultCoordinates(
                 }
             }
         }
-        message?.let { message ->
-            Column(
-                Modifier
-                    .padding(horizontal = spacing.windowPadding)
-                    .padding(bottom = spacing.tiny + spacing.extraTiny)
-            ) {
-                message()
-            }
-        }
+        message?.invoke(
+            PaddingValues(
+                start = spacing.windowPadding,
+                end = spacing.windowPadding,
+                bottom = spacing.tiny + spacing.extraTiny,
+            )
+        )
         points.takeIf { points.size > 1 }?.let { points ->
             Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh) {
                 Column(Modifier.padding(top = spacing.small)) {
@@ -410,7 +409,22 @@ private fun DescriptionPreview() {
                 onExecute = {},
                 onNavigateToFaqScreen = {},
                 onSelect = {},
-            )
+            ) { paddingValues ->
+                HelpMessageCard(
+                    helpMessage = HelpMessage.WELCOME,
+                    dismissedHelpMessages = MutableStateFlow(emptySet()),
+                    title = { Text(stringResource(R.string.help_welcome_title)) },
+                    modifier = Modifier.padding(paddingValues),
+                    onDismiss = {},
+                ) {
+                    ParagraphText(
+                        stringResource(
+                            R.string.help_welcome_text,
+                            stringResource(R.string.main_create_geo_uri),
+                        )
+                    )
+                }
+            }
         }
     }
 }
@@ -445,7 +459,22 @@ private fun DarkDescriptionPreview() {
                 onExecute = {},
                 onNavigateToFaqScreen = {},
                 onSelect = {},
-            )
+            ) { paddingValues ->
+                HelpMessageCard(
+                    helpMessage = HelpMessage.WELCOME,
+                    dismissedHelpMessages = MutableStateFlow(emptySet()),
+                    title = { Text(stringResource(R.string.help_welcome_title)) },
+                    modifier = Modifier.padding(paddingValues),
+                    onDismiss = {},
+                ) {
+                    ParagraphText(
+                        stringResource(
+                            R.string.help_welcome_text,
+                            stringResource(R.string.main_create_geo_uri),
+                        )
+                    )
+                }
+            }
         }
     }
 }

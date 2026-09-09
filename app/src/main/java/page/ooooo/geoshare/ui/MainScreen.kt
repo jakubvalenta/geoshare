@@ -13,7 +13,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -418,7 +417,6 @@ private fun MainScreen(
         }
     }
 
-    // TODO Box(Modifier.fillMaxSize()) {
     Scaffold(
         snackbarHost = {
             MessageSnackbarHost(snackbarHostState)
@@ -438,7 +436,7 @@ private fun MainScreen(
                     onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
                 )
             },
-            topContent = { innerPadding ->
+            topContent = {
                 item {
                     Column {
                         MainSource(
@@ -465,9 +463,6 @@ private fun MainScreen(
                     if (currentState is Initial) {
                         MainSubmit(
                             source = source,
-                            modifier = Modifier
-                                .padding(innerPadding)
-                                .consumeWindowInsets(innerPadding),
                             onSetErrorMessageResId = setErrorMessageResId,
                             onSubmit = onSubmit,
                         )
@@ -476,9 +471,6 @@ private fun MainScreen(
                             colors = CardDefaults.cardColors(
                                 containerColor = mainContainerColor(currentState),
                             ),
-                            modifier = Modifier
-                                .padding(innerPadding)
-                                .consumeWindowInsets(innerPadding),
                         ) {
                             when (currentState) {
                                 is ConversionState.HasError ->
@@ -502,12 +494,13 @@ private fun MainScreen(
                                             onCancel()
                                             setSelectedPointIndex(index)
                                         },
-                                    ) {
+                                    ) { paddingValues ->
                                         HelpShareSourceMessage(
                                             appDetails = appDetails,
                                             dismissedHelpMessages = dismissedHelpMessages,
                                             outputsForApps = outputsForApps,
                                             sourceComesFromIntent = sourceComesFromIntent,
+                                            modifier = Modifier.padding(paddingValues),
                                             onDismissHelpMessage = onDismissHelpMessage,
                                         )
                                     }
@@ -534,7 +527,7 @@ private fun MainScreen(
                     }
                 }
             },
-            bottomContent = { innerPadding ->
+            bottomContent = {
                 when (currentState) {
                     is Initial ->
                         item {
@@ -544,9 +537,10 @@ private fun MainScreen(
                                 onNavigateToInputsScreen = onNavigateToInputsScreen,
                                 onSetErrorMessageResId = setErrorMessageResId,
                                 onSetSource = onSetSource,
-                            ) {
+                            ) { paddingValues ->
                                 HelpWelcomeMessage(
                                     dismissedHelpMessages = dismissedHelpMessages,
+                                    modifier = Modifier.padding(paddingValues),
                                     onDismissHelpMessage = onDismissHelpMessage,
                                 )
                             }
@@ -560,9 +554,6 @@ private fun MainScreen(
                                 outputsForLinks = outputsForLinks,
                                 outputsForSharing = outputsForSharing,
                                 points = currentState.points,
-                                modifier = Modifier
-                                    .padding(innerPadding)
-                                    .consumeWindowInsets(innerPadding),
                                 onDisableLinkGroup = onDisableLinkGroup,
                                 onExecute = onExecute,
                                 onHideApp = onHideApp,

@@ -1,9 +1,7 @@
 package page.ooooo.geoshare.lib.conversion
 
-import android.Manifest
 import android.content.res.Resources
 import android.net.Uri
-import androidx.annotation.StringRes
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers

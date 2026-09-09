@@ -47,6 +47,7 @@ fun HelpShareSourceMessage(
     dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
     outputsForApps: StateFlow<Map<String, List<Output>>>,
     sourceComesFromIntent: StateFlow<Boolean>,
+    modifier: Modifier = Modifier,
     onDismissHelpMessage: (helpMessage: HelpMessage) -> Unit,
 ) {
     val clipboard = LocalClipboard.current
@@ -82,6 +83,7 @@ fun HelpShareSourceMessage(
             helpMessage = HelpMessage.SHARE_SOURCE,
             dismissedHelpMessages = dismissedHelpMessages,
             title = { Text(stringResource(R.string.help_share_source_title)) },
+            modifier = modifier,
             actionText = exampleAppOutput?.let { exampleAppOutput ->
                 appDetails[exampleAppOutput.packageName]?.label?.let { exampleAppLabel ->
                     {

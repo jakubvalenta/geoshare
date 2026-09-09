@@ -24,6 +24,7 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 @Composable
 fun HelpWelcomeMessage(
     dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
+    modifier: Modifier = Modifier,
     onDismissHelpMessage: (helpMessage: HelpMessage) -> Unit,
 ) {
     val clipboard = LocalClipboard.current
@@ -38,6 +39,7 @@ fun HelpWelcomeMessage(
         helpMessage = HelpMessage.WELCOME,
         dismissedHelpMessages = dismissedHelpMessages,
         title = { Text(stringResource(R.string.help_welcome_title)) },
+        modifier = modifier,
         after = exampleSource?.let {
             {
                 SelectionContainer {
