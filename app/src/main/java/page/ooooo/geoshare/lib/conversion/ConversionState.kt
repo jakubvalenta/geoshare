@@ -61,6 +61,8 @@ interface ConversionState {
         fun getDescription(resources: Resources): String
         fun getDetails(resources: Resources): String? = null
         fun getLoadingIndicatorTitle(resources: Resources): String? = null
+
+        @Suppress("SameReturnValue")
         val uri: String? get() = null
     }
 
