@@ -136,7 +136,7 @@ import page.ooooo.geoshare.ui.components.ResultError
 import page.ooooo.geoshare.ui.components.ResultSheet
 import page.ooooo.geoshare.ui.components.ResultTitle
 import page.ooooo.geoshare.ui.components.checkeredBackground
-import page.ooooo.geoshare.ui.components.fakeStateLog
+import page.ooooo.geoshare.ui.components.fakeFinishedStateLog
 import page.ooooo.geoshare.ui.components.mainContainerColor
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -974,7 +974,7 @@ private fun SucceededPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeStateLog()),
+            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(
@@ -1092,7 +1092,7 @@ private fun DarkSucceededPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeStateLog()),
+            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(
@@ -1209,7 +1209,7 @@ private fun SmallSucceededPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
             elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeStateLog()),
+            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(
@@ -1327,7 +1327,7 @@ private fun TabletSucceededPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
             elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeStateLog()),
+            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(
@@ -1434,7 +1434,7 @@ private fun ErrorPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
             elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeStateLog()),
+            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -1499,7 +1499,7 @@ private fun DarkErrorPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
             elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeStateLog()),
+            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -1564,7 +1564,7 @@ private fun TabletErrorPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
             elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeStateLog()),
+            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -1630,7 +1630,7 @@ private fun WarningPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
             elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeStateLog()),
+            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -1696,7 +1696,7 @@ private fun DarkWarningPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
             elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeStateLog()),
+            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -1766,7 +1766,7 @@ private fun LoadingIndicatorPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
             elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeStateLog()),
+            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -1836,7 +1836,7 @@ private fun DarkLoadingIndicatorPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
             elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeStateLog()),
+            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -1906,7 +1906,7 @@ private fun TabletLoadingIndicatorPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
             elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeStateLog()),
+            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -1973,7 +1973,7 @@ private fun WebViewPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
             elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeStateLog()),
+            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -2040,7 +2040,7 @@ private fun DarkWebViewPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
             elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeStateLog()),
+            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -2108,7 +2108,7 @@ private fun TabletWebViewPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
             elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeStateLog()),
+            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),

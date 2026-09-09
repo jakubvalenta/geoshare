@@ -3,17 +3,17 @@ package page.ooooo.geoshare.ui.components
 import android.content.res.Configuration
 import android.view.KeyEvent
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -41,9 +42,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -53,6 +54,7 @@ import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.ConversionStateLogItem
+import page.ooooo.geoshare.lib.conversion.ConversionSucceeded
 import page.ooooo.geoshare.lib.conversion.Initial
 import page.ooooo.geoshare.lib.conversion.PermissionGrantedBasicInput
 import page.ooooo.geoshare.lib.inputs.MatchedInput
@@ -70,7 +72,6 @@ fun MainSource(
     errorMessageResId: Int?,
     startTimeMark: StateFlow<ComparableTimeMark?>,
     finishedStateLog: StateFlow<List<ConversionStateLogItem.Finished>>,
-    height: Dp = 30.dp,
     logExpanded: Boolean,
     source: StateFlow<String>,
     onSetLogExpanded: (logExpanded: Boolean) -> Unit,
@@ -152,66 +153,130 @@ fun MainSource(
 
         is ConversionState.HasSource -> {
             Card(Modifier.padding(bottom = spacing.tiny)) {
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(height)
-                        .padding(start = spacing.small),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    SelectionContainer(Modifier.weight(1f)) {
-                        Column {
-                            Text(
-                                state.source,
-                                modifier = Modifier.clickable {
-                                    coroutineScope.launch {
-                                        AndroidTools.copyToClipboard(clipboard, state.source)
-                                    }
-                                },
-                                textDecoration = TextDecoration.Underline,
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
-                                style = MaterialTheme.typography.bodySmall,
-                            )
-                        }
-                    }
-                    Row(
-                        Modifier
-                            .clickable(
-                                enabled = finishedStateLog.isNotEmpty(),
-                            ) {
-                                onSetLogExpanded(!logExpanded)
-                            }
-                            .fillMaxHeight()
-                            .padding(start = spacing.tiny),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                            when (state) {
-                                is ConversionState.HasError,
-                                is ConversionState.HasResult,
-                                    ->
-                                    if (elapsedTime > 10.milliseconds) {
-                                        SecondsTimeText(elapsedTime)
-                                    }
+                TwoSlotRow(
+                    modifier = Modifier.height(30.dp),
+                    firstContent = { paddingValues ->
+                        MainSourceUriButton(
+                            source = source,
+                            paddingValues = paddingValues,
+                        )
+                    },
+                    secondContent = mainSourceTimeButton(
+                        state = state,
+                        elapsedTime = elapsedTime,
+                        startTimeMark = startTimeMark,
+                        finishedStateLog = finishedStateLog,
+                        logExpanded = logExpanded,
+                        onSetLogExpanded = onSetLogExpanded,
+                    ),
+                    gap = spacing.tiny,
+                    paddingValues = PaddingValues(horizontal = spacing.small),
+                )
+            }
+        }
+    }
+}
 
-                                is ConversionState.HasDescription ->
-                                    ElapsedTimeText(startTimeMark)
-                            }
-                        }
-                        if (finishedStateLog.isNotEmpty()) {
-                            Icon(
-                                if (logExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                                contentDescription = null,
-                                modifier = Modifier.padding(end = spacing.extraTiny)
-                            )
-                        } else {
-                            Spacer(Modifier.width(spacing.small))
-                        }
+@Composable
+private fun RowScope.MainSourceUriButton(
+    source: String,
+    paddingValues: PaddingValues,
+) {
+    val clipboard = LocalClipboard.current
+    val coroutineScope = rememberCoroutineScope()
+
+    Row(
+        modifier = Modifier
+            .clickable {
+                coroutineScope.launch {
+                    AndroidTools.copyToClipboard(clipboard, source)
+                }
+            }
+            .weight(1f)
+            .fillMaxHeight()
+            .padding(paddingValues),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            source,
+            textDecoration = TextDecoration.Underline,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1,
+            style = MaterialTheme.typography.bodySmall,
+        )
+    }
+}
+
+private fun mainSourceTimeButton(
+    state: ConversionState,
+    elapsedTime: Duration,
+    startTimeMark: StateFlow<ComparableTimeMark?>,
+    finishedStateLog: List<ConversionStateLogItem.Finished>,
+    logExpanded: Boolean,
+    onSetLogExpanded: (logExpanded: Boolean) -> Unit,
+): (@Composable RowScope.(paddingValues: PaddingValues) -> Unit)? {
+    val text: (@Composable RowScope.(paddingValues: PaddingValues) -> Unit)? = when (state) {
+        is ConversionState.HasError,
+        is ConversionState.HasResult,
+            ->
+            if (elapsedTime > 10.milliseconds) {
+                { paddingValues ->
+                    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                        SecondsTimeText(elapsedTime, Modifier.padding(paddingValues))
                     }
+                }
+            } else {
+                null
+            }
+
+        is ConversionState.HasDescription -> {
+            { paddingValues ->
+                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                    ElapsedTimeText(startTimeMark, Modifier.padding(paddingValues))
                 }
             }
         }
+
+        else -> null
+    }
+    val icon: (@Composable RowScope.(paddingValues: PaddingValues) -> Unit)? = if (finishedStateLog.isNotEmpty()) {
+        { paddingValues ->
+            val layoutDirection = LocalLayoutDirection.current
+            Icon(
+                if (logExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                contentDescription = null,
+                modifier = Modifier.padding(
+                    PaddingValues(
+                        start = paddingValues.calculateStartPadding(layoutDirection),
+                        top = paddingValues.calculateTopPadding(),
+                        // Adjust end padding, because the icon visually has empty space at the end
+                        end = paddingValues.calculateEndPadding(layoutDirection) - 10.dp,
+                        bottom = paddingValues.calculateTopPadding(),
+                    )
+                ),
+            )
+        }
+    } else {
+        null
+    }
+
+    return if (icon != null || text != null) {
+        { paddingValues ->
+            TwoSlotRow(
+                Modifier
+                    .clickable(
+                        enabled = finishedStateLog.isNotEmpty(),
+                        onClick = { onSetLogExpanded(!logExpanded) },
+                    )
+                    .fillMaxHeight(),
+                firstContent = text,
+                secondContent = icon,
+                paddingValues = paddingValues,
+                verticalAlignment = Alignment.CenterVertically,
+            )
+        }
+    } else {
+        null
     }
 }
 
@@ -363,7 +428,7 @@ private fun SubmittedPreview() {
             ),
             elapsedTime = MutableStateFlow(Duration.ZERO),
             errorMessageResId = null,
-            finishedStateLog = MutableStateFlow(fakeStateLog()),
+            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             logExpanded = false,
             source = MutableStateFlow(source),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
@@ -389,8 +454,60 @@ private fun DarkSubmittedPreview() {
             ),
             elapsedTime = MutableStateFlow(Duration.ZERO),
             errorMessageResId = null,
-            finishedStateLog = MutableStateFlow(fakeStateLog()),
+            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             logExpanded = false,
+            source = MutableStateFlow(source),
+            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
+            onSetLogExpanded = {},
+            onSetErrorMessageResId = {},
+            onSetSource = {},
+            onSubmit = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SubmittedExpandedLogPreview() {
+    AppTheme {
+        val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
+        MainSource(
+            state = PermissionGrantedBasicInput(
+                source = source,
+                matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
+                permission = Permission.ALWAYS,
+                results = emptyMap(),
+            ),
+            elapsedTime = MutableStateFlow(Duration.ZERO),
+            errorMessageResId = null,
+            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
+            logExpanded = true,
+            source = MutableStateFlow(source),
+            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
+            onSetLogExpanded = {},
+            onSetErrorMessageResId = {},
+            onSetSource = {},
+            onSubmit = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkSubmittedExpandedLogPreview() {
+    AppTheme {
+        val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
+        MainSource(
+            state = PermissionGrantedBasicInput(
+                source = source,
+                matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
+                permission = Permission.ALWAYS,
+                results = emptyMap(),
+            ),
+            elapsedTime = MutableStateFlow(Duration.ZERO),
+            errorMessageResId = null,
+            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
+            logExpanded = true,
             source = MutableStateFlow(source),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             onSetLogExpanded = {},
@@ -456,20 +573,18 @@ private fun DarkSubmittedEmptyLogPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun SubmittedExpandedLogPreview() {
+private fun SubmittedNoTimePreview() {
     AppTheme {
         val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
         MainSource(
-            state = PermissionGrantedBasicInput(
+            state = ConversionSucceeded(
                 source = source,
-                matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
-                permission = Permission.ALWAYS,
-                results = emptyMap(),
+                points = persistentListOf(),
             ),
             elapsedTime = MutableStateFlow(Duration.ZERO),
             errorMessageResId = null,
             finishedStateLog = MutableStateFlow(emptyList()),
-            logExpanded = true,
+            logExpanded = false,
             source = MutableStateFlow(source),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             onSetLogExpanded = {},
@@ -482,22 +597,21 @@ private fun SubmittedExpandedLogPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkSubmittedExpandedLogPreview() {
+private fun DarkSubmittedNoTimePreview() {
     AppTheme {
         val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
+        val timeSource = TestTimeSource()
         MainSource(
-            state = PermissionGrantedBasicInput(
+            state = ConversionSucceeded(
                 source = source,
-                matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
-                permission = Permission.ALWAYS,
-                results = emptyMap(),
+                points = persistentListOf(),
             ),
             elapsedTime = MutableStateFlow(Duration.ZERO),
             errorMessageResId = null,
             finishedStateLog = MutableStateFlow(emptyList()),
-            logExpanded = true,
+            logExpanded = false,
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
             source = MutableStateFlow(source),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             onSetLogExpanded = {},
             onSetErrorMessageResId = {},
             onSetSource = {},

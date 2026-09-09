@@ -147,7 +147,7 @@ fun ResultLogItem(
 }
 
 @Composable
-fun fakeStateLog(
+fun fakeFinishedStateLog(
     source: String = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
     timeSource: TimeSource.WithComparableMarks = TestTimeSource(),
 ) = listOf(
@@ -221,7 +221,7 @@ private fun DefaultPreview() {
     AppTheme {
         MainLog(
             expanded = true,
-            finishedStateLog = MutableStateFlow(fakeStateLog()),
+            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             animationsEnabled = false,
             initialItemsExpanded = true,
         )
@@ -234,7 +234,7 @@ private fun DarkPreview() {
     AppTheme {
         MainLog(
             expanded = true,
-            finishedStateLog = MutableStateFlow(fakeStateLog()),
+            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             animationsEnabled = false,
             initialItemsExpanded = true,
         )
