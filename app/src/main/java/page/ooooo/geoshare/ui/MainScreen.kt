@@ -10,7 +10,6 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -25,7 +24,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -119,7 +117,9 @@ import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.ConversionWebView
-import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
+import page.ooooo.geoshare.ui.components.HelpOpenByDefaultMessage
+import page.ooooo.geoshare.ui.components.HelpShareSourceMessage
+import page.ooooo.geoshare.ui.components.HelpWelcomeMessage
 import page.ooooo.geoshare.ui.components.MainHeadline
 import page.ooooo.geoshare.ui.components.MainHelp
 import page.ooooo.geoshare.ui.components.MainLoadingIndicator
@@ -127,18 +127,15 @@ import page.ooooo.geoshare.ui.components.MainLog
 import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.components.MainSource
 import page.ooooo.geoshare.ui.components.MainSubmit
+import page.ooooo.geoshare.ui.components.MainSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
 import page.ooooo.geoshare.ui.components.PermissionDialog
 import page.ooooo.geoshare.ui.components.ResultApps
-import page.ooooo.geoshare.ui.components.HelpOpenByDefaultMessage
 import page.ooooo.geoshare.ui.components.ResultCoordinates
-import page.ooooo.geoshare.ui.components.HelpShareSourceMessage
-import page.ooooo.geoshare.ui.components.HelpWelcomeMessage
 import page.ooooo.geoshare.ui.components.ResultError
 import page.ooooo.geoshare.ui.components.ResultSheet
 import page.ooooo.geoshare.ui.components.ResultTitle
-import page.ooooo.geoshare.ui.components.StyledSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.checkeredBackground
 import page.ooooo.geoshare.ui.components.fakeStateLog
 import page.ooooo.geoshare.ui.components.mainContainerColor
@@ -390,10 +387,8 @@ private fun MainScreen(
     onSetSource: (String) -> Unit,
     onSubmit: () -> Unit,
 ) {
-    val appName = stringResource(R.string.app_name)
-    val mainContainerColor = mainContainerColor(currentState)
-    val mainContentColor = contentColorFor(mainContainerColor)
     val spacing = LocalSpacing.current
+    val resources = LocalResources.current
 
     val linkMessage by linkMessage.collectAsStateWithLifecycle()
     val userPreferenceMessage by userPreferenceMessage.collectAsStateWithLifecycle()
@@ -423,386 +418,208 @@ private fun MainScreen(
         }
     }
 
-    Box(Modifier.fillMaxSize()) {
-        Scaffold(
-            snackbarHost = {
-                MessageSnackbarHost(snackbarHostState)
+    // TODO Box(Modifier.fillMaxSize()) {
+    Scaffold(
+        snackbarHost = {
+            MessageSnackbarHost(snackbarHostState)
+        },
+    ) {
+        MainSupportingPaneScaffold(
+            actions = {
+                MainMenu(
+                    currentState = currentState,
+                    billingAppNameResId = billingAppNameResId,
+                    billingStatus = billingStatus,
+                    changelogShown = changelogShown,
+                    onNavigateToAboutScreen = onNavigateToAboutScreen,
+                    onNavigateToBillingScreen = onNavigateToBillingScreen,
+                    onNavigateToFaqScreen = onNavigateToFaqScreen,
+                    onNavigateToInputsScreen = onNavigateToInputsScreen,
+                    onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
+                )
             },
-        ) {
-            StyledSupportingPaneScaffold(
-                mainPane = { innerPadding, wide ->
-                    Column(Modifier.weight(1f)) {
-                        LargeTopAppBarPane(
-                            modifier = Modifier.testTag("geoShareMainPane"),
-                            onBack = if (currentState !is Initial) {
-                                onReset
-                            } else {
-                                null
-                            },
-                            actions = {
-                                if (!wide) {
-                                    MainMenu(
-                                        currentState = currentState,
-                                        billingAppNameResId = billingAppNameResId,
-                                        billingStatus = billingStatus,
-                                        changelogShown = changelogShown,
-                                        onNavigateToAboutScreen = onNavigateToAboutScreen,
-                                        onNavigateToBillingScreen = onNavigateToBillingScreen,
-                                        onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                        onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                        onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
-                                    )
-                                }
-                            },
-                        ) {
-                            // Both phone and tablet
-
-                            when (currentState) {
-                                is Initial ->
-                                    item {
-                                        val billingStatus by billingStatus.collectAsStateWithLifecycle()
-                                        MainHeadline(
-                                            appNameResId = if (billingStatus is BillingStatus.Purchased) {
-                                                billingAppNameResId
-                                            } else {
-                                                R.string.app_name
-                                            },
-                                            modifier = Modifier
-                                                .padding(horizontal = spacing.windowPadding)
-                                                .run {
-                                                    if (!wide) {
-                                                        padding(top = spacing.large)
-                                                    } else {
-                                                        this
-                                                    }
-                                                }
-                                                .padding(bottom = spacing.tiny)
-                                                .offset(x = -(12).dp),
-                                        )
-                                    }
-                            }
-                            item {
-                                Column {
-                                    MainSource(
-                                        state = currentState,
-                                        elapsedTime = elapsedTime,
-                                        errorMessageResId = errorMessageResId,
-                                        finishedStateLog = finishedStateLog,
-                                        logExpanded = logExpanded,
-                                        source = source,
-                                        startTimeMark = startTimeMark,
-                                        onSetLogExpanded = setLogExpanded,
-                                        onSetErrorMessageResId = setErrorMessageResId,
-                                        onSetSource = onSetSource,
-                                        onSubmit = onSubmit,
-                                    )
-                                    MainLog(
-                                        expanded = logExpanded,
-                                        finishedStateLog = finishedStateLog,
-                                    )
-                                }
-                            }
-
-                            if (!wide) {
-                                // Phone
-
-                                when (currentState) {
-                                    is Initial -> {
-                                        item {
-                                            MainSubmit(
-                                                source = source,
-                                                onSetErrorMessageResId = setErrorMessageResId,
-                                                onSubmit = onSubmit,
-                                            )
-                                        }
-                                        item {
-                                            MainHelp(
-                                                inputRepository = inputRepository,
-                                                onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                                onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                                onSetErrorMessageResId = setErrorMessageResId,
-                                                onSetSource = onSetSource,
-                                            ) {
-                                                HelpWelcomeMessage(
-                                                    dismissedHelpMessages = dismissedHelpMessages,
-                                                    onDismissHelpMessage = onDismissHelpMessage,
-                                                )
-                                            }
-                                        }
-                                    }
-
-                                    else -> {
-                                        item {
-                                            Column {
-                                                Card(
-                                                    colors = CardDefaults.cardColors(
-                                                        containerColor = mainContainerColor,
-                                                        contentColor = mainContentColor,
-                                                    ),
-                                                ) {
-                                                    when (currentState) {
-                                                        is ConversionState.HasError ->
-                                                            ResultError(
-                                                                state = currentState,
-                                                                onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                                                onRetry = onRetry,
-                                                            )
-
-                                                        is ConversionState.HasResult -> Column {
-                                                            ResultCoordinates(
-                                                                points = currentState.points,
-                                                                appDetails = appDetails,
-                                                                coordinateConverter = coordinateConverter,
-                                                                outputsForPointChips = outputsForPointChips,
-                                                                outputsForPointsChips = outputsForPointsChips,
-                                                                userPreferencesValues = userPreferencesValues,
-                                                                onExecute = onExecute,
-                                                                onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                                                onSelect = { index ->
-                                                                    onCancel()
-                                                                    setSelectedPointIndex(index)
-                                                                },
-                                                            ) {
-                                                                HelpShareSourceMessage(
-                                                                    appDetails = appDetails,
-                                                                    dismissedHelpMessages = dismissedHelpMessages,
-                                                                    outputsForApps = outputsForApps,
-                                                                    sourceComesFromIntent = sourceComesFromIntent,
-                                                                    onDismissHelpMessage = onDismissHelpMessage,
-                                                                )
-                                                            }
-                                                        }
-
-                                                        is ConversionState.HasDescription ->
-                                                            MainLoadingIndicator(
-                                                                state = currentState,
-                                                                onCancel = onCancel,
-                                                            )
-                                                    }
-                                                }
-
-                                                when (currentState) {
-                                                    is PermissionGrantedWebViewInput ->
-                                                        MainWebView(
-                                                            matchedInput = currentState.matchedInput,
-                                                            pendingData = currentState.pendingData,
-                                                        )
-                                                }
-                                            }
-                                        }
-
-                                        when (currentState) {
-                                            is ConversionState.HasResult -> {
-                                                item {
-                                                    ResultTitle(
-                                                        currentState = currentState,
-                                                        appDetails = appDetails,
-                                                        billingFeatures = billingFeatures,
-                                                        billingStatus = billingStatus,
-                                                        modifier = Modifier
-                                                            .padding(horizontal = spacing.windowPadding)
-                                                            .padding(top = spacing.medium),
-                                                        onCancel = onCancel,
-                                                        onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
-                                                    )
-                                                }
-                                                item {
-                                                    Column(
-                                                        Modifier
-                                                            .padding(innerPadding)
-                                                            .consumeWindowInsets(innerPadding)
-                                                    ) {
-                                                        ResultApps(
-                                                            appDetails = appDetails,
-                                                            outputsForApps = outputsForApps,
-                                                            outputsForLinks = outputsForLinks,
-                                                            outputsForSharing = outputsForSharing,
-                                                            points = currentState.points,
-                                                            onDisableLinkGroup = onDisableLinkGroup,
-                                                            onExecute = onExecute,
-                                                            onHideApp = onHideApp,
-                                                            onNavigateToLinkScreen = onNavigateToLinkScreen,
-                                                        ) {
-                                                            HelpOpenByDefaultMessage(
-                                                                dismissedHelpMessages = dismissedHelpMessages,
-                                                                sourceComesFromIntent = sourceComesFromIntent,
-                                                                onDismissHelpMessage = onDismissHelpMessage,
-                                                                onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                                            )
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            } else {
-                                // Tablet
-
-                                when (currentState) {
-                                    is Initial ->
-                                        item {
-                                            Column(
-                                                Modifier
-                                                    .padding(innerPadding)
-                                                    .consumeWindowInsets(innerPadding)
-                                            ) {
-                                                MainSubmit(
-                                                    source = source,
-                                                    onSetErrorMessageResId = setErrorMessageResId,
-                                                    onSubmit = onSubmit,
-                                                )
-                                            }
-                                        }
-
-                                    else ->
-                                        item {
-                                            Column(
-                                                Modifier
-                                                    .padding(innerPadding)
-                                                    .consumeWindowInsets(innerPadding),
-                                                verticalArrangement = Arrangement.spacedBy(spacing.tiny),
-                                            ) {
-                                                Card(
-                                                    colors = CardDefaults.cardColors(
-                                                        containerColor = mainContainerColor,
-                                                        contentColor = mainContentColor,
-                                                    ),
-                                                ) {
-                                                    when (currentState) {
-                                                        is ConversionState.HasError ->
-                                                            ResultError(
-                                                                state = currentState,
-                                                                onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                                                onRetry = onRetry,
-                                                            )
-
-                                                        is ConversionState.HasResult ->
-                                                            ResultCoordinates(
-                                                                points = currentState.points,
-                                                                appDetails = appDetails,
-                                                                coordinateConverter = coordinateConverter,
-                                                                outputsForPointChips = outputsForPointChips,
-                                                                outputsForPointsChips = outputsForPointsChips,
-                                                                userPreferencesValues = userPreferencesValues,
-                                                                onExecute = onExecute,
-                                                                onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                                                onSelect = { index ->
-                                                                    onCancel()
-                                                                    setSelectedPointIndex(index)
-                                                                },
-                                                            )
-
-                                                        is ConversionState.HasDescription ->
-                                                            MainLoadingIndicator(
-                                                                state = currentState,
-                                                                onCancel = onCancel,
-                                                            )
-                                                    }
-                                                }
-
-                                                when (currentState) {
-                                                    is PermissionGrantedWebViewInput ->
-                                                        MainWebView(
-                                                            matchedInput = currentState.matchedInput,
-                                                            pendingData = currentState.pendingData,
-                                                        )
-                                                }
-                                            }
-                                        }
-                                }
-                            }
-                        }
+            topContent = { innerPadding ->
+                item {
+                    Column {
+                        MainSource(
+                            state = currentState,
+                            elapsedTime = elapsedTime,
+                            errorMessageResId = errorMessageResId,
+                            finishedStateLog = finishedStateLog,
+                            logExpanded = logExpanded,
+                            source = source,
+                            startTimeMark = startTimeMark,
+                            onSetLogExpanded = setLogExpanded,
+                            onSetErrorMessageResId = setErrorMessageResId,
+                            onSetSource = onSetSource,
+                            onSubmit = onSubmit,
+                        )
+                        MainLog(
+                            expanded = logExpanded,
+                            finishedStateLog = finishedStateLog,
+                        )
                     }
-                },
-                supportingPane = { wide ->
-                    LargeTopAppBarPane(
-                        modifier = Modifier.testTag("geoShareMainSupportingPane"),
-                        title = if (currentState is ConversionState.HasResult) {
-                            {
-                                ResultTitle(
-                                    currentState = currentState,
-                                    appDetails = appDetails,
-                                    billingFeatures = billingFeatures,
-                                    billingStatus = billingStatus,
-                                    onCancel = onCancel,
-                                    onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
-                                )
-                            }
-                        } else {
-                            null
-                        },
-                        actions = {
-                            if (wide) {
-                                MainMenu(
-                                    currentState = currentState,
-                                    billingAppNameResId = billingAppNameResId,
-                                    billingStatus = billingStatus,
-                                    changelogShown = changelogShown,
-                                    onNavigateToAboutScreen = onNavigateToAboutScreen,
-                                    onNavigateToBillingScreen = onNavigateToBillingScreen,
-                                    onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                    onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                    onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
-                                )
-                            }
-                        },
-                    ) {
-                        when (currentState) {
-                            is ConversionState.HasResult -> {
-                                item {
-                                    HelpShareSourceMessage(
-                                        appDetails = appDetails,
-                                        dismissedHelpMessages = dismissedHelpMessages,
-                                        outputsForApps = outputsForApps,
-                                        sourceComesFromIntent = sourceComesFromIntent,
-                                        onDismissHelpMessage = onDismissHelpMessage,
+                }
+
+                item {
+                    if (currentState is Initial) {
+                        MainSubmit(
+                            source = source,
+                            modifier = Modifier
+                                .padding(innerPadding)
+                                .consumeWindowInsets(innerPadding),
+                            onSetErrorMessageResId = setErrorMessageResId,
+                            onSubmit = onSubmit,
+                        )
+                    } else {
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = mainContainerColor(currentState),
+                            ),
+                            modifier = Modifier
+                                .padding(innerPadding)
+                                .consumeWindowInsets(innerPadding),
+                        ) {
+                            when (currentState) {
+                                is ConversionState.HasError ->
+                                    ResultError(
+                                        state = currentState,
+                                        onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                        onRetry = onRetry,
                                     )
-                                }
-                                item {
-                                    ResultApps(
-                                        appDetails = appDetails,
-                                        outputsForApps = outputsForApps,
-                                        outputsForLinks = outputsForLinks,
-                                        outputsForSharing = outputsForSharing,
+
+                                is ConversionState.HasResult ->
+                                    ResultCoordinates(
                                         points = currentState.points,
-                                        onDisableLinkGroup = onDisableLinkGroup,
+                                        appDetails = appDetails,
+                                        coordinateConverter = coordinateConverter,
+                                        outputsForPointChips = outputsForPointChips,
+                                        outputsForPointsChips = outputsForPointsChips,
+                                        userPreferencesValues = userPreferencesValues,
                                         onExecute = onExecute,
-                                        onHideApp = onHideApp,
-                                        onNavigateToLinkScreen = onNavigateToLinkScreen,
+                                        onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                        onSelect = { index ->
+                                            onCancel()
+                                            setSelectedPointIndex(index)
+                                        },
                                     ) {
-                                        HelpOpenByDefaultMessage(
+                                        HelpShareSourceMessage(
+                                            appDetails = appDetails,
                                             dismissedHelpMessages = dismissedHelpMessages,
+                                            outputsForApps = outputsForApps,
                                             sourceComesFromIntent = sourceComesFromIntent,
                                             onDismissHelpMessage = onDismissHelpMessage,
-                                            onNavigateToFaqScreen = onNavigateToFaqScreen,
                                         )
                                     }
-                                }
-                            }
 
-                            is Initial ->
-                                item {
-                                    MainHelp(
-                                        inputRepository = inputRepository,
-                                        onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                        onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                        onSetErrorMessageResId = setErrorMessageResId,
-                                        onSetSource = onSetSource,
-                                    ) {
-                                        HelpWelcomeMessage(
-                                            dismissedHelpMessages = dismissedHelpMessages,
-                                            onDismissHelpMessage = onDismissHelpMessage,
+                                is ConversionState.HasDescription ->
+                                    currentState.getLoadingIndicatorTitle(resources)?.let { title ->
+                                        MainLoadingIndicator(
+                                            state = currentState,
+                                            title = title,
+                                            onCancel = onCancel,
                                         )
                                     }
-                                }
+                            }
                         }
                     }
-                },
-                shouldAutoFocusCurrentDestination = false,
-            )
-        }
+                }
+
+                if (currentState is PermissionGrantedWebViewInput) {
+                    item {
+                        MainWebView(
+                            matchedInput = currentState.matchedInput,
+                            pendingData = currentState.pendingData,
+                        )
+                    }
+                }
+            },
+            bottomContent = { innerPadding ->
+                when (currentState) {
+                    is Initial ->
+                        item {
+                            MainHelp(
+                                inputRepository = inputRepository,
+                                onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                onSetErrorMessageResId = setErrorMessageResId,
+                                onSetSource = onSetSource,
+                            ) {
+                                HelpWelcomeMessage(
+                                    dismissedHelpMessages = dismissedHelpMessages,
+                                    onDismissHelpMessage = onDismissHelpMessage,
+                                )
+                            }
+                        }
+
+                    is ConversionState.HasResult ->
+                        item {
+                            ResultApps(
+                                appDetails = appDetails,
+                                outputsForApps = outputsForApps,
+                                outputsForLinks = outputsForLinks,
+                                outputsForSharing = outputsForSharing,
+                                points = currentState.points,
+                                modifier = Modifier
+                                    .padding(innerPadding)
+                                    .consumeWindowInsets(innerPadding),
+                                onDisableLinkGroup = onDisableLinkGroup,
+                                onExecute = onExecute,
+                                onHideApp = onHideApp,
+                                onNavigateToLinkScreen = onNavigateToLinkScreen,
+                            ) {
+                                HelpOpenByDefaultMessage(
+                                    dismissedHelpMessages = dismissedHelpMessages,
+                                    sourceComesFromIntent = sourceComesFromIntent,
+                                    onDismissHelpMessage = onDismissHelpMessage,
+                                    onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                )
+                            }
+                        }
+                }
+            },
+            mainExpandedHeight = if (currentState is Initial) {
+                spacing.largeTopAppBarExpandedHeight + spacing.medium
+            } else {
+                spacing.largeTopAppBarExpandedHeight
+            },
+            mainTitle = if (currentState is Initial) {
+                {
+                    val billingStatus by billingStatus.collectAsStateWithLifecycle()
+                    MainHeadline(
+                        appNameResId = if (billingStatus is BillingStatus.Purchased) {
+                            billingAppNameResId
+                        } else {
+                            R.string.app_name
+                        },
+                        modifier = Modifier.offset(x = -(12).dp),
+                    )
+                }
+            } else {
+                null
+            },
+            supportingTitle = if (currentState is ConversionState.HasResult) {
+                {
+                    ResultTitle(
+                        currentState = currentState,
+                        appDetails = appDetails,
+                        billingFeatures = billingFeatures,
+                        billingStatus = billingStatus,
+                        onCancel = onCancel,
+                        onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
+                    )
+                }
+            } else {
+                null
+            },
+            onBack = if (currentState !is Initial) {
+                onReset
+            } else {
+                null
+            },
+        )
     }
+    // }
 
     if (currentState is ConversionState.HasResult && selectedPointIndex != null) {
         ResultSheet(
@@ -819,7 +636,10 @@ private fun MainScreen(
     when (currentState) {
         is PermissionRequested ->
             PermissionDialog(
-                title = stringResource(currentState.permissionTitleResId),
+                title = stringResource(
+                    R.string.conversion_permission,
+                    currentState.matchedInput.input.getName(resources),
+                ),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
                 dismissText = stringResource(R.string.conversion_permission_common_deny),
                 onConfirmation = onGrant,
@@ -828,6 +648,7 @@ private fun MainScreen(
                     .semantics { testTagsAsResourceId = true }
                     .testTag("geoShareConnectionPermissionDialog"),
             ) {
+                val appName = stringResource(R.string.app_name)
                 Text(
                     AnnotatedString.fromHtml(
                         stringResource(
@@ -842,7 +663,7 @@ private fun MainScreen(
 
         is LocationRationaleShown ->
             ConfirmationDialog(
-                title = stringResource(currentState.permissionTitleResId),
+                title = stringResource(R.string.conversion_succeeded_location_rationale_dialog_title),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
                 dismissText = stringResource(R.string.conversion_permission_common_deny),
                 onConfirmation = { onGrant(false) },

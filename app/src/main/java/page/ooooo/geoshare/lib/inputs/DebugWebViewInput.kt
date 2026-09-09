@@ -1,9 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
-import androidx.annotation.StringRes
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import javax.inject.Inject
@@ -15,12 +13,6 @@ import javax.inject.Singleton
 @Singleton
 class DebugWebViewInput @Inject constructor() : WebViewInput {
     override fun getName(resources: Resources) = "Debug WebView"
-
-    @StringRes
-    override val permissionTitleResId = R.string.converter_debug_permission_title
-
-    @StringRes
-    override val loadingIndicatorTitleResId = R.string.converter_debug_loading_indicator_title
 
     // language=JavaScript
     override fun getUnsafeExtractionJavaScript(match: String) = """

@@ -46,8 +46,6 @@ class HeadLocationHeaderUriInputTest {
         override val uriQuote = FakeUriQuote
 
         override val pattern get() = throw NotImplementedError()
-        override val permissionTitleResId get() = throw NotImplementedError()
-        override val loadingIndicatorTitleResId get() = throw NotImplementedError()
 
         override suspend fun parse(
             data: Uri,

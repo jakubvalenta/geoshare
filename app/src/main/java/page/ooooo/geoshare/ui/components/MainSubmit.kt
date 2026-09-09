@@ -18,6 +18,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @Composable
 fun MainSubmit(
     source: StateFlow<String>,
+    modifier: Modifier = Modifier,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
     onSubmit: () -> Unit,
 ) {
@@ -27,7 +28,7 @@ fun MainSubmit(
 
     LargeButton(
         stringResource(R.string.main_create_geo_uri),
-        Modifier
+        modifier
             .padding(horizontal = spacing.windowPadding)
             .padding(top = spacing.small)
             .testTag("geoShareMainSubmitButton"),

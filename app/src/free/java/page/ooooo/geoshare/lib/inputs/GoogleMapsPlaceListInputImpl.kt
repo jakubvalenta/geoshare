@@ -2,11 +2,9 @@ package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
 import android.webkit.WebSettings
-import androidx.annotation.StringRes
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
@@ -19,12 +17,6 @@ class GoogleMapsPlaceListInputImpl @Inject constructor(
 ) : GoogleMapsPlaceListInput, WebViewInput {
     @Serializable
     private data class ExtractedPoint(val lat: Double?, val lon: Double?)
-
-    @StringRes
-    override val permissionTitleResId = R.string.converter_google_maps_permission_title
-
-    @StringRes
-    override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
     /**
      * Parse APP_INITIALIZATION_STATE, which has this structure:

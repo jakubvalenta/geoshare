@@ -1,12 +1,10 @@
 package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
-import androidx.annotation.StringRes
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.cookies.ConstantCookiesStorage
 import io.ktor.http.Cookie
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
@@ -31,12 +29,6 @@ class GoogleMapsShortLinkInput @Inject constructor(
         InputChangelogItem.Url(5, "https://maps.app.goo.gl"),
     )
     override val pattern = Regex("""((?:https?://)?(?:(?:maps\.)?(?:app\.)?goo\.gl|g\.co)/[/A-Za-z0-9_-]+)""")
-
-    @StringRes
-    override val permissionTitleResId = R.string.converter_google_maps_permission_title
-
-    @StringRes
-    override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
     override val cookies = COOKIES
     override val userAgent = USER_AGENT

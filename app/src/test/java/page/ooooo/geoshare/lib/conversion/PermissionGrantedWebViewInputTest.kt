@@ -44,8 +44,6 @@ class PermissionGrantedWebViewInputTest {
     private val input = object : WebViewInput {
         override fun getName(resources: Resources) = "Test Input"
 
-        override val permissionTitleResId = R.string.converter_google_maps_permission_title
-        override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
         override val timeout = 7.seconds
 
         override fun getUnsafeExtractionJavaScript(match: String) = "undefined"
@@ -110,9 +108,6 @@ class PermissionGrantedWebViewInputTest {
         runTest {
             val input = object : WebViewInput {
                 override fun getName(resources: Resources) = "Test Input"
-
-                override val permissionTitleResId = R.string.converter_google_maps_permission_title
-                override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
                 override fun getUnsafeExtractionJavaScript(match: String) = "undefined"
 
@@ -287,8 +282,6 @@ class PermissionGrantedWebViewInputTest {
         val input = object : WebViewInput {
             override fun getName(resources: Resources) = "Test Input"
 
-            override val permissionTitleResId = R.string.converter_google_maps_permission_title
-            override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
             override val timeout = 7.seconds
 
             override fun getUnsafeExtractionJavaScript(match: String) = "undefined"

@@ -52,7 +52,7 @@ class InputMatchedTest {
         }
         val state = InputMatched(source, matchedInput, Permission.ASK, results)
         assertEquals(
-            PermissionRequested(source, matchedInput, results, input.permissionTitleResId),
+            PermissionRequested(source, matchedInput, results),
             state.transition(stateContext),
         )
     }
@@ -101,7 +101,7 @@ class InputMatchedTest {
         }
         val state = InputMatched(source, matchedInput, permission = null, results)
         assertEquals(
-            PermissionRequested(source, matchedInput, results, input.permissionTitleResId),
+            PermissionRequested(source, matchedInput, results),
             state.transition(stateContext),
         )
     }

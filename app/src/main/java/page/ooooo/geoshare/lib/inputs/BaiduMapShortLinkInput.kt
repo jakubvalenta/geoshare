@@ -26,12 +26,6 @@ class BaiduMapShortLinkInput @Inject constructor(
     )
     override val pattern = Regex("""((?:https?://)?j\.map\.baidu\.com/\S+)""")
 
-    @StringRes
-    override val permissionTitleResId = R.string.converter_baidu_map_permission_title
-
-    @StringRes
-    override val loadingIndicatorTitleResId = R.string.converter_baidu_map_loading_indicator_title
-
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         next = MatchedInput(baiduMapUriInput.get(), data.toString())
     }

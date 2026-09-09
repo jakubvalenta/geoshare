@@ -24,12 +24,6 @@ class AppleMapsHtmlInput @Inject constructor(
 ) : BodyAsChannelInput {
     override fun getName(resources: Resources) = "Apple Maps HTML"
 
-    @StringRes
-    override val permissionTitleResId = R.string.converter_apple_maps_permission_title
-
-    @StringRes
-    override val loadingIndicatorTitleResId = R.string.converter_apple_maps_loading_indicator_title
-
     // Use custom user agent instead of BrowserUserAgent, so that Apple Maps doesn't show "Unsupported browser"
     override val userAgent = DESKTOP_USER_AGENT
 

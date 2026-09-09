@@ -1,9 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
-import androidx.annotation.StringRes
 import io.ktor.client.engine.HttpClientEngine
-import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
@@ -18,12 +16,6 @@ class YandexMapsShortLinkInput @Inject constructor(
     override val uriQuote: UriQuote,
 ) : HeadLocationHeaderInput {
     override fun getName(resources: Resources) = "Yandex Short Link"
-
-    @StringRes
-    override val permissionTitleResId = R.string.converter_yandex_maps_permission_title
-
-    @StringRes
-    override val loadingIndicatorTitleResId = R.string.converter_yandex_maps_loading_indicator_title
 
     override val pattern = Regex("""((?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/maps/-/\S+)""")
 

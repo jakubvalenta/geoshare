@@ -23,12 +23,6 @@ class BaiduMapWebViewInput @Inject constructor(
 
     override fun getName(resources: Resources) = "Baidu Map Short Link"
 
-    @StringRes
-    override val permissionTitleResId = R.string.converter_baidu_map_permission_title
-
-    @StringRes
-    override val loadingIndicatorTitleResId = R.string.converter_baidu_map_loading_indicator_title
-
     /**
      * Notice that we don't take coordinates from `_appStateFromUrl.loc`, because these have a longitude offset.
      */

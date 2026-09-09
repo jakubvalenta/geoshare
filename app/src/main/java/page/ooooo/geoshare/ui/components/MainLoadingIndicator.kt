@@ -36,6 +36,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @Composable
 fun MainLoadingIndicator(
     state: ConversionState.HasDescription,
+    title: String,
     initialExpanded: Boolean = false,
     onCancel: () -> Unit,
 ) {
@@ -50,7 +51,7 @@ fun MainLoadingIndicator(
         verticalArrangement = Arrangement.spacedBy(spacing.small),
     ) {
         Text(
-            state.getDescription(resources),
+            title,
             style = MaterialTheme.typography.headlineSmall,
         )
         LoadingIndicator(
@@ -98,6 +99,10 @@ private fun DefaultPreview() {
         Surface(color = mainContainerColor(state)) {
             MainLoadingIndicator(
                 state = state,
+                title = stringResource(
+                    R.string.conversion_connecting,
+                    state.matchedInput.input.getName(LocalResources.current),
+                ),
                 onCancel = {},
             )
         }
@@ -119,6 +124,10 @@ private fun DarkPreview() {
         Surface(color = mainContainerColor(state)) {
             MainLoadingIndicator(
                 state = state,
+                title = stringResource(
+                    R.string.conversion_connecting,
+                    state.matchedInput.input.getName(LocalResources.current),
+                ),
                 onCancel = {},
             )
         }

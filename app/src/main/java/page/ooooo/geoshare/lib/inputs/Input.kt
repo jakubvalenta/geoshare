@@ -15,12 +15,9 @@ sealed interface Input {
 
     fun match(source: String): String? = null
 
-    fun getName(resources: Resources): String
+    fun getName(resources: Resources): String // TODO Translate all names
 
-    interface HasPermission {
-        val permissionTitleResId: Int
-        val loadingIndicatorTitleResId: Int
-    }
+    interface HasPermission
 
     interface HasRandomUri {
         fun genRandomUri(point: Point): String?

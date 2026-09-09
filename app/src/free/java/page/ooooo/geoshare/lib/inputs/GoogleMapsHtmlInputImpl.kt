@@ -1,12 +1,10 @@
 package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
-import androidx.annotation.StringRes
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readLine
 import kotlinx.collections.immutable.toImmutableList
-import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
@@ -28,12 +26,6 @@ class GoogleMapsHtmlInputImpl @Inject constructor(
     override val engine: HttpClientEngine,
     override val uriQuote: UriQuote,
 ) : GoogleMapsHtmlInput, BodyAsChannelInput {
-    @StringRes
-    override val permissionTitleResId = R.string.converter_google_maps_permission_title
-
-    @StringRes
-    override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
-
     override val cookies = GoogleMapsShortLinkInput.COOKIES
     override val userAgent = GoogleMapsShortLinkInput.USER_AGENT
 

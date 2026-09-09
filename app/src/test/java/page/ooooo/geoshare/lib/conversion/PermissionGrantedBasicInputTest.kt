@@ -48,8 +48,6 @@ class PermissionGrantedBasicInputTest {
         override suspend fun parse(data: String, match: String, resources: Resources) =
             result.copy(next = next.copy(match = data)) // Store data in MatchedInput, so we can test it
 
-        override val permissionTitleResId = R.string.converter_google_maps_permission_title
-        override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
     }
     private val matchedInput = MatchedInput<BasicInput<String>>(input, source)
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))

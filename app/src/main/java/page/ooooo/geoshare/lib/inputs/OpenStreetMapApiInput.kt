@@ -1,10 +1,8 @@
 package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
-import androidx.annotation.StringRes
 import io.ktor.client.engine.HttpClientEngine
 import kotlinx.collections.immutable.toImmutableList
-import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
@@ -20,12 +18,6 @@ class OpenStreetMapApiInput @Inject constructor(
     override val uriQuote: UriQuote,
 ) : BodyAsTextInput {
     override fun getName(resources: Resources) = "OpenStreetMap API"
-
-    @StringRes
-    override val permissionTitleResId = R.string.converter_open_street_map_permission_title
-
-    @StringRes
-    override val loadingIndicatorTitleResId = R.string.converter_open_street_map_loading_indicator_title
 
     override suspend fun parse(data: String, match: String, resources: Resources) = parseResult {
         // Use a simple regex instead of JSON parsing, because it works fine

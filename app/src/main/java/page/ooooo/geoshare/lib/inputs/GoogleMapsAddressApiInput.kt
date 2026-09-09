@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
-import androidx.annotation.StringRes
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.accept
@@ -14,7 +13,6 @@ import io.ktor.serialization.JsonConvertException
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.json.Json
-import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.ServerRepository
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
@@ -36,12 +34,6 @@ class GoogleMapsAddressApiInput @Inject constructor(
     private val uriQuote: UriQuote,
 ) : BasicInput<Uri>, Input.HasPermission {
     override fun getName(resources: Resources) = "Google Maps Address API"
-
-    @StringRes
-    override val permissionTitleResId = R.string.converter_google_maps_permission_title
-
-    @StringRes
-    override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
     override suspend fun fetch(match: String, block: suspend (Uri) -> ParseResult) =
         block(Uri.parse(match, uriQuote))
