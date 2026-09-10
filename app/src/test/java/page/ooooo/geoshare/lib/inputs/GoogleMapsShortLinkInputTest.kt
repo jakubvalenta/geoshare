@@ -1,12 +1,15 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
 
 class GoogleMapsShortLinkInputTest : InputTest {
+    override val resources: Resources = mock()
     private val input = FakeInputRepository.googleMapsShortLinkInput
 
     @Test
@@ -94,7 +97,7 @@ class GoogleMapsShortLinkInputTest : InputTest {
     @Test
     fun parse_returnsNextStep() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     FakeInputRepository.googleMapsUriInput,
                     "https://www.google.com/maps/search/39.920439,+116.331538",
@@ -107,7 +110,7 @@ class GoogleMapsShortLinkInputTest : InputTest {
     @Test
     fun parse_googleMapsGo_returnsNextStep() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     FakeInputRepository.googleMapsUriInput,
                     "https://www.google.com/maps/dir//The+Station,+1+Mends+St,+South+Perth+WA+6151/@-31.9614112,115.8523381,14z/data=!4m6!4m5!1m0!1m2!1m1!1s0x2a32a529928d7447:0x4a1084749ffdee05!3e0!11m1!6b1?entry=ml&utm_campaign=ml-navnp-dr&coh=230964"

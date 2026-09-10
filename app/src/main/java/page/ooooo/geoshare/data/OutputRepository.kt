@@ -2,6 +2,7 @@
 
 package page.ooooo.geoshare.data
 
+import page.ooooo.geoshare.data.local.database.InitialLinks
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
@@ -37,7 +38,7 @@ import page.ooooo.geoshare.data.local.preferences.SharePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareRouteGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareStreetViewGoogleUriAutomation
 import page.ooooo.geoshare.lib.android.DataType
-import page.ooooo.geoshare.lib.android.DataTypes
+import page.ooooo.geoshare.lib.android.Apps
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.outputs.CopyCoordsDecOutput
 import page.ooooo.geoshare.lib.outputs.CopyCoordsDegMinSecOutput
@@ -105,37 +106,39 @@ class OutputRepository @Inject constructor(
             SavePointsGpxOutput(coordinateConverter),
         )
 
-    fun getOutputsForApps(apps: DataTypes, hiddenApps: Set<String>?): Map<String, List<Output>> =
-        apps.filterKeys { hiddenApps?.contains(it) != true }.mapValues { (packageName, dataTypes) ->
-            buildList {
-                if (DataType.GEO_URI in dataTypes) {
-                    add(OpenDisplayGeoUriOutput(packageName, coordinateConverter))
-                }
-                if (DataType.CARTES_IGN_URL in dataTypes) {
-                    add(OpenDisplayCartesIGNUrlOutput(packageName, coordinateConverter))
-                }
-                if (DataType.MAGIC_EARTH_URI in dataTypes) {
-                    add(OpenDisplayMagicEarthUriOutput(packageName, coordinateConverter))
-                    add(OpenNavigationMagicEarthUriOutput(packageName, coordinateConverter))
-                }
-                if (DataType.GOOGLE_NAVIGATION_URI in dataTypes) {
-                    add(OpenNavigationGoogleUriOutput(packageName, coordinateConverter))
-                }
-                if (DataType.GOOGLE_STREET_VIEW_URI in dataTypes) {
-                    add(OpenStreetViewGoogleUriOutput(packageName, coordinateConverter))
-                }
-                if (DataType.GPX_DATA in dataTypes) {
-                    add(OpenRouteGpxOutput(packageName, coordinateConverter))
-                    add(OpenPointsGpxOutput(packageName, coordinateConverter))
-                }
-                if (DataType.GPX_ONE_POINT_DATA in dataTypes) {
-                    add(OpenRouteOnePointGpxOutput(packageName, coordinateConverter))
-                }
-                if (DataType.SEND_PLAIN_TEXT in dataTypes) {
-                    add(SendPointOutput(packageName, coordinateConverter))
+    fun getOutputsForApps(apps: Apps, hiddenApps: Set<String>?): Map<String, List<Output>> =
+        apps
+            .filterKeys { hiddenApps?.contains(it) != true }
+            .mapValues { (packageName, app) ->
+                buildList {
+                    if (DataType.GEO_URI in app.dataTypes) {
+                        add(OpenDisplayGeoUriOutput(packageName, coordinateConverter))
+                    }
+                    if (DataType.CARTES_IGN_URL in app.dataTypes) {
+                        add(OpenDisplayCartesIGNUrlOutput(packageName, coordinateConverter))
+                    }
+                    if (DataType.MAGIC_EARTH_URI in app.dataTypes) {
+                        add(OpenDisplayMagicEarthUriOutput(packageName, coordinateConverter))
+                        add(OpenNavigationMagicEarthUriOutput(packageName, coordinateConverter))
+                    }
+                    if (DataType.GOOGLE_NAVIGATION_URI in app.dataTypes) {
+                        add(OpenNavigationGoogleUriOutput(packageName, coordinateConverter))
+                    }
+                    if (DataType.GOOGLE_STREET_VIEW_URI in app.dataTypes) {
+                        add(OpenStreetViewGoogleUriOutput(packageName, coordinateConverter))
+                    }
+                    if (DataType.GPX_DATA in app.dataTypes) {
+                        add(OpenRouteGpxOutput(packageName, coordinateConverter))
+                        add(OpenPointsGpxOutput(packageName, coordinateConverter))
+                    }
+                    if (DataType.GPX_ONE_POINT_DATA in app.dataTypes) {
+                        add(OpenRouteOnePointGpxOutput(packageName, coordinateConverter))
+                    }
+                    if (DataType.SEND_PLAIN_TEXT in app.dataTypes) {
+                        add(SendPointOutput(packageName, coordinateConverter))
+                    }
                 }
             }
-        }
 
     fun getOutputsForLinks(links: List<Link>): Map<String?, List<Output>> =
         links
@@ -191,12 +194,12 @@ class OutputRepository @Inject constructor(
                 }
 
             is CopyLinkDisplayAppleMapsUriAutomation ->
-                getLinkByUUID(UUID.fromString("ce900ea1-2c5d-4641-82f3-a5429a68d603"))?.let { link ->
+                getLinkByUUID(UUID.fromString(InitialLinks.APPLE_MAPS_DISPLAY_UUID))?.let { link ->
                     CopyLinkUriOutput(link, coordinateConverter)
                 }
 
             is CopyLinkDisplayGoogleMapsUriAutomation ->
-                getLinkByUUID(UUID.fromString("7bd96da4-beba-4a30-9dbd-b437a49a1dc0"))?.let { link ->
+                getLinkByUUID(UUID.fromString(InitialLinks.GOOGLE_MAPS_DISPLAY_UUID))?.let { link ->
                     CopyLinkUriOutput(link, coordinateConverter)
                 }
 
@@ -206,7 +209,7 @@ class OutputRepository @Inject constructor(
                 }
 
             is CopyLinkNavigationAppleMapsUriAutomation ->
-                getLinkByUUID(UUID.fromString("a5092c63-cf5c-4225-9059-e888ae12e215"))?.let { link ->
+                getLinkByUUID(UUID.fromString(InitialLinks.APPLE_MAPS_NAVIGATION_UUID))?.let { link ->
                     CopyLinkUriOutput(link, coordinateConverter)
                 }
 

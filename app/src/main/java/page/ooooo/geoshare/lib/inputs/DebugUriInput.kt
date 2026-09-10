@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import javax.inject.Inject
@@ -15,13 +16,10 @@ class DebugUriInput @Inject constructor(
     private val debugWebViewInput: dagger.Lazy<DebugWebViewInput>,
     override val uriQuote: UriQuote,
 ) : UriInput {
+    override val group = InputGroup.DEBUG
     override val pattern = Regex("""((?:https?://)?(?:www\.)?example\.com(?:/\S+|$))""")
-    override val documentation = InputDocumentation(
-        group = InputDocumentationGroup.DEBUG,
-        items = emptyList(),
-    )
 
-    override suspend fun parse(data: Uri, match: String) = parseResult {
+    override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         next = MatchedInput(debugWebViewInput.get(), match)
     }
 

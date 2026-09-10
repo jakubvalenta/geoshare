@@ -10,7 +10,7 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class UriFormatterTest {
     @Test
-    fun formatUriString_whenPointHasCoordinatesAndZoomAndName_returnsCoordsTemplateWithFilledVariables() {
+    fun formatUriString_whenPointHasCoordsAndZoomAndName_returnsCoordsTemplateWithFilledVariables() {
         assertEquals(
             "https://maps.apple.com/?ll=50.123456%2C-120.123456&z=3.4&q=foo%20bar",
             UriFormatter.formatUriString(
@@ -38,7 +38,7 @@ class UriFormatterTest {
     }
 
     @Test
-    fun formatUriString_whenPointHasCoordinatesAndZoomAndNameAndTemplateIsMissingVariables_returnsCoordsTemplateUnchanged() {
+    fun formatUriString_whenPointHasCoordsAndZoomAndNameAndTemplateIsMissingVariables_returnsCoordsTemplateUnchanged() {
         assertEquals(
             "https://maps.apple.com/",
             UriFormatter.formatUriString(
@@ -50,12 +50,24 @@ class UriFormatterTest {
     }
 
     @Test
-    fun formatUriString_whenPointHasCoordinatesOnly_returnsCoordsTemplateWithEmptyNameVariableAndDefaultZoomVariable() {
+    fun formatUriString_whenPointHasCoordsOnly_returnsCoordsTemplateWithEmptyNameVariableAndDefaultZoomVariable() {
         assertEquals(
             "https://maps.apple.com/?ll=50.123456%2C-120.123456&z=16&q=",
             UriFormatter.formatUriString(
                 WGS84Point(50.123456, -120.123456, source = Source.GENERATED),
                 coordsUriTemplate = "https://maps.apple.com/?ll={lat}%2C{lon}&z={z}&q={name}",
+                uriQuote = FakeUriQuote,
+            ),
+        )
+    }
+
+    @Test
+    fun formatUriString_whenPointHasCoordsOnly_returnsCoordsTemplateWithCoordsInQueryVariable() {
+        assertEquals(
+            "https://www.google.com/maps/search/?api=1&query=50.123456%2C-120.123456",
+            UriFormatter.formatUriString(
+                WGS84Point(50.123456, -120.123456, source = Source.GENERATED),
+                coordsUriTemplate = "https://www.google.com/maps/search/?api=1&query={q}",
                 uriQuote = FakeUriQuote,
             ),
         )
@@ -97,9 +109,9 @@ class UriFormatterTest {
     }
 
     @Test
-    fun formatUriString_whenPointHasNameAndZoomOnly_returnsNameTemplateWithFilledQueryVariableAndZoomVariableUnchanged() {
+    fun formatUriString_whenPointHasNameAndZoomOnly_returnsNameTemplateWithFilledQueryVariableAndZoomVariable() {
         assertEquals(
-            "https://maps.apple.com/?q=foo%20bar&z={z}",
+            "https://maps.apple.com/?q=foo%20bar&z=3.4",
             UriFormatter.formatUriString(
                 WGS84Point(name = "foo bar", z = 3.4, source = Source.GENERATED),
                 coordsUriTemplate = "https://maps.apple.com/?ll={lat}%2C{lon}&z={z}&q={name}",

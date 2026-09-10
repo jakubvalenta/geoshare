@@ -1,15 +1,18 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class UrbiUriInputTest : InputTest {
+    override val resources: Resources = mock()
     private val input = FakeInputRepository.urbiUriInput
 
     @Test
@@ -146,7 +149,7 @@ class UrbiUriInputTest : InputTest {
     @Test
     fun parse_point() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(25.284889, 55.172173, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(25.284889, 55.172173, source = Source.URI))),
             input.parse("https://maps.urbi.ae/dubai/geo/55.172173%2C25.284889"),
         )
     }
@@ -154,7 +157,7 @@ class UrbiUriInputTest : InputTest {
     @Test
     fun parse_pointWithMarker() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(25.25915, 55.225263, z = 12.77, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(25.25915, 55.225263, z = 12.77, source = Source.URI))),
             input.parse("https://maps.urbi.ae/dubai/geo/55.171971%2C25.289452?m=55.225263%2C25.25915%2F12.77"),
         )
     }
@@ -162,7 +165,7 @@ class UrbiUriInputTest : InputTest {
     @Test
     fun parse_geo() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     FakeInputRepository.urbiHtmlInput,
                     "https://maps.urbi.ae/dubai/geo/13933621232533580"
@@ -175,7 +178,7 @@ class UrbiUriInputTest : InputTest {
     @Test
     fun parse_firm() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     FakeInputRepository.urbiHtmlInput,
                     "https://2gis.uz/tashkent/firm/70000001060803297"
@@ -188,7 +191,7 @@ class UrbiUriInputTest : InputTest {
     @Test
     fun parse_firmWithCoordinates() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(25.19925, 55.332211, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(25.19925, 55.332211, source = Source.URI))),
             input.parse("https://maps.urbi.ae/dubai/firm/70000001043503020/55.332211%2C25.19925"),
         )
     }
@@ -196,7 +199,7 @@ class UrbiUriInputTest : InputTest {
     @Test
     fun parse_firmWithMarker() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(25.196707, 55.320748, z = 14.82, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(25.196707, 55.320748, z = 14.82, source = Source.URI))),
             input.parse("https://maps.urbi.ae/dubai/firm/70000001043503020/55.332211%2C25.19925?m=55.320748%2C25.196707%2F14.82"),
         )
     }
@@ -204,7 +207,7 @@ class UrbiUriInputTest : InputTest {
     @Test
     fun parse_shortLink() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     FakeInputRepository.urbiHtmlInput,
                     "https://go.2gis.com/WSTdK"
@@ -213,7 +216,7 @@ class UrbiUriInputTest : InputTest {
             input.parse("https://go.2gis.com/WSTdK"),
         )
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     FakeInputRepository.urbiHtmlInput,
                     "https://go.urbi.ae/3JtpM"
@@ -226,7 +229,7 @@ class UrbiUriInputTest : InputTest {
     @Test
     fun parse_api() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         41.285765, 69.234083,
@@ -243,7 +246,16 @@ class UrbiUriInputTest : InputTest {
     @Test
     fun parse_apiWithoutTitle() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(41.285765, 69.234083, z = 17.0, source = Source.MAP_CENTER))),
+            ParseResult.Success(
+                persistentListOf(
+                    WGS84Point(
+                        41.285765,
+                        69.234083,
+                        z = 17.0,
+                        source = Source.MAP_CENTER
+                    )
+                )
+            ),
             input.parse("https://share.api.2gis.ru/getimage?city=tashkent&zoom=17&center=69.234083%2C41.285765"),
         )
     }

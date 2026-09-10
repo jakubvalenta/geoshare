@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
@@ -16,19 +17,18 @@ import javax.inject.Singleton
 
 @Singleton
 class CoordinateInput @Inject constructor() : TextInput, Input.HasRandomUri {
-    override val pattern = Regex("""([\d.\-\p{Zs},°'′"″NSWE]*\d[\d.\-\p{Zs},°'′"″NSWE]*)""")
-    override val documentation = InputDocumentation(
-        group = InputDocumentationGroup.COORDINATES,
-        items = listOf(
-            InputDocumentationItem.Text(20) {
-                stringResource(
-                    R.string.example, CoordinateFormatter.formatDegMinSecCoords(WGS84Point(NaivePoint.example))
-                )
-            },
-        ),
+    override val group = InputGroup.COORDINATES
+    override val changelog = persistentListOf(
+        InputChangelogItem.Text(20) {
+            stringResource(
+                R.string.example,
+                CoordinateFormatter.formatDegMinSecCoords(WGS84Point(NaivePoint.example))
+            )
+        },
     )
+    override val pattern = Regex("""([\d.\-\p{Zs},°'′"″NSWE]*\d[\d.\-\p{Zs},°'′"″NSWE]*)""")
 
-    override suspend fun parse(data: String, match: String) = parseResult {
+    override suspend fun parse(data: String, match: String, resources: Resources) = parseResult {
         // Decimal
         // e.g. `N 41.40338, E 2.17403`
         Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""")

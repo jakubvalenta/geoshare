@@ -1,12 +1,15 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
 
 class YandexMapsShortLinkInputTest : InputTest {
+    override val resources: Resources = mock()
     private val input = FakeInputRepository.yandexMapsShortLinkInput
 
     @Test
@@ -30,7 +33,7 @@ class YandexMapsShortLinkInputTest : InputTest {
     @Test
     fun parse_returnsNextStep() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     FakeInputRepository.yandexMapsUriInput,
                     "https://yandex.com/maps/org/94933420809/?display-text=Cafes&ll=8.668963,50.111192"

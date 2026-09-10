@@ -31,3 +31,5 @@ object FakeUriQuote : UriQuote {
 
     override fun decode(s: String): String = URLDecoder.decode(s, "utf-8")
 }
+
+fun String.encodeURI(uriQuote: UriQuote): String = uriQuote.encode(this)

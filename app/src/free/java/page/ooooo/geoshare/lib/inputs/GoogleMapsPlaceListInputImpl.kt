@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import android.webkit.WebSettings
 import androidx.annotation.StringRes
 import kotlinx.collections.immutable.toImmutableList
@@ -45,7 +46,7 @@ class GoogleMapsPlaceListInputImpl @Inject constructor(
      * ```
      */
     // language=JavaScript
-    override val unsafeExtractionJavascript = $$"""
+    override fun getUnsafeExtractionJavaScript(match: String) = $$"""
         () => {
             function findPointsInAppInitState(obj) {
                 const MAX_PRECISION = 17;
@@ -85,7 +86,7 @@ class GoogleMapsPlaceListInputImpl @Inject constructor(
         }
     """.trimIndent()
 
-    override suspend fun parse(data: String, match: String) = parseResult {
+    override suspend fun parse(data: String, match: String, resources: Resources) = parseResult {
         val json = Json {
             explicitNulls = false
         }

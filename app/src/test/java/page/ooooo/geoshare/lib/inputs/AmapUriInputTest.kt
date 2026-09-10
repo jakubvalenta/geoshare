@@ -10,7 +10,11 @@ import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.GCJ02GreaterChinaAndTaiwanPoint
 import page.ooooo.geoshare.lib.geo.Source
 
+import android.content.res.Resources
+import org.mockito.kotlin.mock
+
 class AmapUriInputTest : InputTest {
+    override val resources: Resources = mock()
     private val input = FakeInputRepository.amapUriInput
 
     @Test
@@ -60,9 +64,9 @@ class AmapUriInputTest : InputTest {
 
     @Test
     fun parse_unknownPathOrParams() = runTest {
-        assertEquals(ParseResult(), input.parse("https://wb.amap.com"))
-        assertEquals(ParseResult(), input.parse("https://wb.amap.com/"))
-        assertEquals(ParseResult(), input.parse("https://wb.amap.com/?spam=1"))
+        assertEquals(ParseResult.Success(), input.parse("https://wb.amap.com"))
+        assertEquals(ParseResult.Success(), input.parse("https://wb.amap.com/"))
+        assertEquals(ParseResult.Success(), input.parse("https://wb.amap.com/?spam=1"))
     }
 
     @Test
@@ -70,7 +74,7 @@ class AmapUriInputTest : InputTest {
         // TODO Add support for Amap desktop URLs
         assumeTrue(false)
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     GCJ02GreaterChinaAndTaiwanPoint(
                         31.222811749011463, 121.46840706467624,
@@ -86,7 +90,7 @@ class AmapUriInputTest : InputTest {
     @Test
     fun parse_qParamWithName() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     GCJ02GreaterChinaAndTaiwanPoint(
                         31.222811749011463, 121.46840706467624,
@@ -102,7 +106,7 @@ class AmapUriInputTest : InputTest {
     @Test
     fun parse_qParamWithoutName() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     GCJ02GreaterChinaAndTaiwanPoint(
                         31.222811749011463,
@@ -118,7 +122,7 @@ class AmapUriInputTest : InputTest {
     @Test
     fun parse_qParamWithOtherParams() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     GCJ02GreaterChinaAndTaiwanPoint(
                         34.36875865823159, 131.1821490526199,
@@ -134,7 +138,7 @@ class AmapUriInputTest : InputTest {
     @Test
     fun parse_pParamWithName() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     GCJ02GreaterChinaAndTaiwanPoint(
                         45.8289525077221, 1.266689300537103,
@@ -151,7 +155,7 @@ class AmapUriInputTest : InputTest {
     @Test
     fun parse_pParamWithoutName() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     GCJ02GreaterChinaAndTaiwanPoint(
                         45.8289525077221,

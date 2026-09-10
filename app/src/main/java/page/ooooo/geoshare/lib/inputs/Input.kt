@@ -2,19 +2,18 @@ package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
 import android.webkit.WebSettings
-import page.ooooo.geoshare.R
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.lib.geo.Point
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 sealed interface Input {
     @Suppress("SameReturnValue")
-    val documentation: InputDocumentation? get() = null
+    val group: InputGroup? get() = null
+    val changelog: ImmutableList<InputChangelogItem> get() = persistentListOf()
 
     fun match(source: String): String? = null
-
-    fun getErrorMessage(resources: Resources): String =
-        resources.getString(R.string.conversion_failed_reason_no_points)
 
     interface HasPermission {
         val permissionTitleResId: Int
@@ -33,7 +32,7 @@ sealed interface Input {
 interface BasicInput<T> : Input {
     suspend fun fetch(match: String, block: suspend (T) -> ParseResult): ParseResult
 
-    suspend fun parse(data: T, match: String): ParseResult
+    suspend fun parse(data: T, match: String, resources: Resources): ParseResult
 }
 
 /**
@@ -42,9 +41,10 @@ interface BasicInput<T> : Input {
  */
 interface WebViewInput : Input, Input.HasPermission {
     val timeout: Duration get() = 60.seconds
-    val unsafeExtractionJavascript: String
 
-    suspend fun parse(data: String, match: String): ParseResult
+    fun getUnsafeExtractionJavaScript(match: String): String
+
+    suspend fun parse(data: String, match: String, resources: Resources): ParseResult
 
     fun extendWebSettings(settings: WebSettings) {}
     fun shouldInterceptRequest(requestUrlString: String): Boolean = false

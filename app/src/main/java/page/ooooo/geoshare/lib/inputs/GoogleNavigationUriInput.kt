@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableMap
@@ -30,22 +31,20 @@ class GoogleNavigationUriInput @Inject constructor(
     private val googleMapsAddressApiInput: dagger.Lazy<GoogleMapsAddressApiInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
-    override val pattern = Regex("""(google.navigation:$URI_REST)""")
-    override val documentation = InputDocumentation(
-        group = InputDocumentationGroup.GOOGLE_NAVIGATION_URI,
-        items = listOf(
-            InputDocumentationItem.Text(45) {
-                stringResource(
-                    R.string.example,
-                    GoogleMapsUriFormatter.formatNavigationUriString(
-                        GCJ02MainlandChinaPoint(NaivePoint.example), uriQuote
-                    )
+    override val group = InputGroup.GOOGLE_NAVIGATION_URI
+    override val changelog = persistentListOf(
+        InputChangelogItem.Text(45) {
+            stringResource(
+                R.string.example,
+                GoogleMapsUriFormatter.formatNavigationUriString(
+                    GCJ02MainlandChinaPoint(NaivePoint.example), uriQuote
                 )
-            },
-        ),
+            )
+        },
     )
+    override val pattern = Regex("""(google.navigation:$URI_REST)""")
 
-    override suspend fun parse(data: Uri, match: String) = parseResult {
+    override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         data.run {
             val q = Regex("""(?:^|.*&)q=([^&]+).*""").matchEntire(pathParts.firstOrNull())?.groupOrNull()
 

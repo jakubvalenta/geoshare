@@ -60,6 +60,7 @@ interface ConversionState : State {
     interface HasError : HasSource {
         val message: String
         val details: String?
+        val warning: Boolean
     }
 
     interface HasResult : HasSource {
@@ -86,7 +87,7 @@ class Initial : ConversionState {
     override fun toString() = "Initial"
 }
 
-typealias Results = Map<MatchedInput<*>, ParseResult>
+typealias Results = Map<MatchedInput<*>, ParseResult.Success>
 
 data class SourceReceived(
     val stateContext: ConversionStateContext,
@@ -201,7 +202,9 @@ data class PermissionGranted(
                 )
 
             is NoopInput ->
-                DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to ParseResult()))
+                DataParsed(
+                    stateContext, source, matchedInput, permission, results + (matchedInput to ParseResult.Success())
+                )
         }
 
     override fun toString() =
@@ -250,10 +253,21 @@ data class PermissionGrantedBasicInput<T>(
                         )
                         delay(delayMillis.milliseconds)
                     }
-                    val result = matchedInput.input.fetch(matchedInput.match) { data ->
-                        matchedInput.input.parse(data, matchedInput.match)
+                    when (
+                        val result = matchedInput.input.fetch(matchedInput.match) { data ->
+                            matchedInput.input.parse(data, matchedInput.match, stateContext.resources)
+                        }
+                    ) {
+                        is ParseResult.Success -> DataParsed(
+                            stateContext,
+                            source,
+                            matchedInput,
+                            permission,
+                            results + (matchedInput to result),
+                        )
+
+                        is ParseResult.Warning -> ConversionFailed(source, result.message, warning = true)
                     }
-                    DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to result))
                 }
             } catch (_: MalformedURLException) {
                 ConversionFailed(
@@ -302,7 +316,7 @@ data class PermissionGrantedBasicInput<T>(
  * When this state is the current state, the UI should:
  *
  * 1. Load [matchedInput]'s match as a page URL in a WebView.
- * 2. Call [WebViewInput.unsafeExtractionJavascript] periodically.
+ * 2. Get JavaScript code using [WebViewInput.getUnsafeExtractionJavaScript] and call it periodically.
  * 3. Once the result of the extraction JavaScript stops changing, complete [pendingData].
  *
  * When it fails, it retries up to [maxAttempts] times. Retrying is done by recursively transitioning this state while
@@ -337,8 +351,17 @@ data class PermissionGrantedWebViewInput(
                     val data = withTimeout(matchedInput.input.timeout) {
                         pendingData.await()
                     }
-                    val result = matchedInput.input.parse(data, matchedInput.match)
-                    DataParsed(stateContext, source, matchedInput, permission, results + (matchedInput to result))
+                    when (val result = matchedInput.input.parse(data, matchedInput.match, stateContext.resources)) {
+                        is ParseResult.Success -> DataParsed(
+                            stateContext,
+                            source,
+                            matchedInput,
+                            permission,
+                            results + (matchedInput to result),
+                        )
+
+                        is ParseResult.Warning -> ConversionFailed(source, result.message, warning = true)
+                    }
                 }
             } catch (tr: RecoverableNetworkException) {
                 val attempt = Attempt(attemptNumber, tr)
@@ -389,7 +412,13 @@ data class PermissionDenied(
     val results: Results,
 ) : ConversionState, ConversionState.HasSource {
     override suspend fun transition() =
-        DataParsed(stateContext, source, matchedInput, Permission.NEVER, results + (matchedInput to ParseResult()))
+        DataParsed(
+            stateContext,
+            source,
+            matchedInput,
+            Permission.NEVER,
+            results + (matchedInput to ParseResult.Success())
+        )
 
     override fun toString() = "$TAG(source=$source, matchedInput=$matchedInput, results=$results)"
 
@@ -418,7 +447,10 @@ data class DataParsed(
                         TAG,
                         "Failed to extract point with coordinates from $matchedInput and next matched input creates a loop"
                     )
-                    ConversionFailed(source, matchedInput.input.getErrorMessage(stateContext.resources))
+                    ConversionFailed(
+                        source,
+                        stateContext.resources.getString(R.string.conversion_failed_reason_no_points),
+                    )
                 } else {
                     stateContext.log.i(
                         TAG, "Failed to extract point with coordinates from $matchedInput, going to next matched input"
@@ -442,7 +474,10 @@ data class DataParsed(
                 stateContext.log.i(
                     TAG, "Failed to extract point from $matchedInput"
                 )
-                ConversionFailed(source, matchedInput.input.getErrorMessage(stateContext.resources))
+                ConversionFailed(
+                    source,
+                    stateContext.resources.getString(R.string.conversion_failed_reason_no_points),
+                )
             }
         }
 
@@ -540,8 +575,9 @@ data class ConversionFailed(
     override val source: String,
     override val message: String,
     override val details: String? = null,
+    override val warning: Boolean = false,
 ) : ConversionState, ConversionState.HasError {
-    override fun toString() = "$TAG(source=$source, message=$message)"
+    override fun toString() = "$TAG(source=$source, message=$message, warning=$warning)"
 
     private companion object {
         private const val TAG = "ConversionFailed"
@@ -563,7 +599,7 @@ data class ActionWaiting(
         }
         ActionReady(source, points, action, isAutomation)
     } catch (_: CancellationException) {
-        ActionFinished(source, points, ActionResult.Failed)
+        ActionCompleted(source, points, ActionResult.FAILED)
     }
 
     override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
@@ -645,34 +681,34 @@ data class ActionRan(
     override suspend fun transition(): State = action.output.let { output ->
         if (!isAutomation) {
             when (actionResult) {
-                ActionResult.Succeeded, ActionResult.SucceededAndFinish ->
+                ActionResult.SUCCEEDED, ActionResult.SUCCEEDED_AND_OPENED_APP ->
                     if (output is Output.HasSuccessText) {
                         ActionSucceeded(source, points, actionResult, output)
                     } else {
-                        ActionFinished(source, points, actionResult)
+                        ActionCompleted(source, points, actionResult)
                     }
 
-                ActionResult.Failed ->
+                ActionResult.FAILED ->
                     if (output is Output.HasErrorText) {
                         ActionFailed(source, points, actionResult, output)
                     } else {
-                        ActionFinished(source, points, actionResult)
+                        ActionCompleted(source, points, actionResult)
                     }
             }
         } else {
             when (actionResult) {
-                ActionResult.Succeeded, ActionResult.SucceededAndFinish ->
+                ActionResult.SUCCEEDED, ActionResult.SUCCEEDED_AND_OPENED_APP ->
                     if (output is Output.HasAutomationSuccessText) {
                         ActionAutomationSucceeded(source, points, actionResult, output)
                     } else {
-                        ActionFinished(source, points, actionResult)
+                        ActionCompleted(source, points, actionResult)
                     }
 
-                ActionResult.Failed ->
+                ActionResult.FAILED ->
                     if (output is Output.HasAutomationErrorText) {
                         ActionAutomationFailed(source, points, actionResult, output)
                     } else {
-                        ActionFinished(source, points, actionResult)
+                        ActionCompleted(source, points, actionResult)
                     }
             }
         }
@@ -698,7 +734,7 @@ data class ActionSucceeded(
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return ActionFinished(source, points, actionResult)
+        return ActionCompleted(source, points, actionResult)
     }
 
     override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
@@ -720,7 +756,7 @@ data class ActionAutomationSucceeded(
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return ActionFinished(source, points, actionResult)
+        return ActionCompleted(source, points, actionResult)
     }
 
     override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
@@ -742,7 +778,7 @@ data class ActionFailed(
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return ActionFinished(source, points, actionResult)
+        return ActionCompleted(source, points, actionResult)
     }
 
     override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
@@ -764,7 +800,7 @@ data class ActionAutomationFailed(
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return ActionFinished(source, points, actionResult)
+        return ActionCompleted(source, points, actionResult)
     }
 
     override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
@@ -774,7 +810,7 @@ data class ActionAutomationFailed(
     }
 }
 
-data class ActionFinished(
+data class ActionCompleted(
     override val source: String,
     override val points: Points,
     val actionResult: ActionResult,
@@ -782,7 +818,7 @@ data class ActionFinished(
     override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
 
     private companion object {
-        private const val TAG = "ActionFinished"
+        private const val TAG = "ActionCompleted"
     }
 }
 
@@ -825,7 +861,7 @@ data class LocationRationaleShown(
         LocationRationaleConfirmed(source, points, action, isAutomation)
 
     override suspend fun deny(doNotAsk: Boolean): State =
-        ActionFinished(source, points, ActionResult.Failed)
+        ActionCompleted(source, points, ActionResult.FAILED)
 
     override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
 
@@ -873,7 +909,7 @@ data class LocationReceived(
     val location: Point?,
 ) : ConversionState, ConversionState.HasResult {
     override suspend fun transition(): State = if (location == null) {
-        LocationFindingFailed(source, points, ActionResult.Failed)
+        LocationFindingFailed(source, points, ActionResult.FAILED)
     } else {
         LocationActionReady(source, points, action, isAutomation, location)
     }
@@ -897,7 +933,7 @@ data class LocationFindingFailed(
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return ActionFinished(source, points, actionResult)
+        return ActionCompleted(source, points, actionResult)
     }
 
     override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"

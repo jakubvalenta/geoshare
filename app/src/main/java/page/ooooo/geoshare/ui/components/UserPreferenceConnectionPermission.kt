@@ -27,8 +27,8 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 fun UserPreferenceConnectionPermissionListItem(
     index: Int,
     count: Int,
-    values: UserPreferencesValues,
     selected: Boolean,
+    values: UserPreferencesValues,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
@@ -99,7 +99,6 @@ private fun ConnectionPermissionPreferenceValue(value: Permission, modifier: Mod
     )
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Preview(showBackground = true)
 @Composable
 private fun ListItemPreview() {
@@ -118,7 +117,6 @@ private fun ListItemPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DarkListItemPreview() {

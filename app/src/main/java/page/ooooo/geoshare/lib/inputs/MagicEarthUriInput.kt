@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
@@ -20,15 +21,13 @@ import javax.inject.Singleton
 class MagicEarthUriInput @Inject constructor(
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
-    override val pattern = Regex("""((?:(?:https?://)?magicearth.com|magicearth:/)/\?$URI_REST)""")
-    override val documentation = InputDocumentation(
-        group = InputDocumentationGroup.MAGIC_EARTH,
-        items = listOf(
-            InputDocumentationItem.Url(20, "https://magicearth.com/"),
-        ),
+    override val group = InputGroup.MAGIC_EARTH
+    override val changelog = persistentListOf(
+        InputChangelogItem.Url(20, "https://magicearth.com/"),
     )
+    override val pattern = Regex("""((?:(?:https?://)?magicearth.com|magicearth:/)/\?$URI_REST)""")
 
-    override suspend fun parse(data: Uri, match: String) = parseResult {
+    override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         data.run {
             val z = listOf("z", "zoom")
                 .firstNotNullOfOrNull { key -> Z_PATTERN.matchEntire(queryParams[key])?.doubleGroupOrNull() }

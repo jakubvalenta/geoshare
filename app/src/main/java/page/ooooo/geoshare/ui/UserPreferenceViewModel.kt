@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
@@ -17,6 +18,8 @@ import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.HiddenAppsPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.Message
+import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.Apps
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,15 +29,15 @@ class UserPreferenceViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _message = MutableStateFlow<Message?>(null)
-    val message: StateFlow<Message?> = _message
+    val message: StateFlow<Message?> = _message.asStateFlow()
 
-    val apps = appsRepository.apps
+    val apps: StateFlow<Apps> = appsRepository.apps
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
             emptyMap(),
         )
-    val appDetails = appsRepository.appDetails
+    val appDetails: StateFlow<AppDetails> = appsRepository.appDetails
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
@@ -57,7 +60,7 @@ class UserPreferenceViewModel @Inject constructor(
         editUserPreferences { preferences ->
             HiddenAppsPreference.setValue(
                 preferences,
-                (HiddenAppsPreference.getValue(preferences) ?: emptySet()) + packageName,
+                HiddenAppsPreference.getValue(preferences).orEmpty() + packageName,
             )
         }
         _message.value = Message(resources.getString(R.string.user_preferences_apps_message_hidden))

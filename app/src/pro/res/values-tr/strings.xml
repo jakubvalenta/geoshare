@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="conversion_failed_unsupported_source">Bu bağlantı desteklenmiyor</string>
-    <string name="server_list_google_maps_none_description">Koordinatlar yerine arama terimini çıkartın</string>
+    <string name="server_list_google_maps_none_description">Koordinatlar yerine yer adını çıkartın</string>
+    <string name="billing_manage_error">Google Play açılamadı</string>
+    <string name="billing_offers_error">Teklifler alınamadı</string>
+    <string name="billing_purchase_error_cancelled">Satın alma iptal edildi</string>
+    <string name="billing_purchase_error_unknown">Satın alma başarısız oldu</string>
+    <string name="billing_setup_error_unknown">Satın alımlar alınamadı</string>
 </resources>

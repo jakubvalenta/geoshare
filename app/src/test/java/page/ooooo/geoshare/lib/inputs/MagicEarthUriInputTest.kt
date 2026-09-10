@@ -1,15 +1,18 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class MagicEarthUriInputTest : InputTest {
+    override val resources: Resources = mock()
     private val input = FakeInputRepository.magicEarthUriInput
 
     @Test
@@ -63,14 +66,14 @@ class MagicEarthUriInputTest : InputTest {
 
     @Test
     fun parse_unknownPathOrParams() = runTest {
-        assertEquals(ParseResult(), input.parse("https://magicearth.com/"))
-        assertEquals(ParseResult(), input.parse("https://magicearth.com/?spam=1"))
+        assertEquals(ParseResult.Success(), input.parse("https://magicearth.com/"))
+        assertEquals(ParseResult.Success(), input.parse("https://magicearth.com/?spam=1"))
     }
 
     @Test
     fun parse_coordinates() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(48.85649, 2.35216, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(48.85649, 2.35216, source = Source.URI))),
             input.parse("https://magicearth.com/?show_on_map&lat=48.85649&lon=2.35216&name=48.85649,+2.35216&img_id=12345"),
         )
     }
@@ -78,7 +81,7 @@ class MagicEarthUriInputTest : InputTest {
     @Test
     fun parse_place() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(name = "Central Park", source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(name = "Central Park", source = Source.URI))),
             input.parse("https://magicearth.com/?name=Central Park"),
         )
     }
@@ -86,7 +89,7 @@ class MagicEarthUriInputTest : InputTest {
     @Test
     fun parse_search() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(name = "Paris", z = 5.0, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(name = "Paris", z = 5.0, source = Source.URI))),
             input.parse("https://magicearth.com/?q=Paris&mapmode=standard&z=5"),
         )
     }
@@ -94,7 +97,7 @@ class MagicEarthUriInputTest : InputTest {
     @Test
     fun parse_destinationAddress() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(name = "CH1 6BJ United Kingdom", source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(name = "CH1 6BJ United Kingdom", source = Source.URI))),
             input.parse("https://magicearth.com/?daddr=CH1+6BJ+United+Kingdom"),
         )
     }
@@ -102,7 +105,7 @@ class MagicEarthUriInputTest : InputTest {
     @Test
     fun parse_parametersLatAndLonTakePrecedenceOverQ() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         -17.2165721, -149.9470294,
@@ -118,7 +121,7 @@ class MagicEarthUriInputTest : InputTest {
     @Test
     fun parse_parameterDestinationAddressTakesPrecedenceOverQ() = runTest {
         assertEquals(
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") ParseResult(
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         name = "Reuterplatz 3, 12047 Berlin, Germany",
@@ -133,7 +136,7 @@ class MagicEarthUriInputTest : InputTest {
     @Test
     fun parse_parameterNameTakesPrecedenceOverQ() = runTest {
         assertEquals(
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") ParseResult(
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         name = "Reuterplatz",
@@ -148,7 +151,7 @@ class MagicEarthUriInputTest : InputTest {
     @Test
     fun parse_customScheme() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         50.123456, -120.123456,

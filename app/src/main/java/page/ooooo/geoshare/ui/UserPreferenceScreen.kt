@@ -35,10 +35,11 @@ import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.preferences.Automation
+import page.ooooo.geoshare.data.local.preferences.DynamicColorPreference
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.android.DataTypes
+import page.ooooo.geoshare.lib.android.Apps
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.CustomLinkFeature
@@ -59,6 +60,10 @@ import page.ooooo.geoshare.ui.components.UserPreferenceCoordinateFormatControls
 import page.ooooo.geoshare.ui.components.UserPreferenceCoordinateFormatListItem
 import page.ooooo.geoshare.ui.components.UserPreferenceDeveloperOptionsControls
 import page.ooooo.geoshare.ui.components.UserPreferenceDeveloperOptionsListItem
+import page.ooooo.geoshare.ui.components.UserPreferenceDynamicColorControls
+import page.ooooo.geoshare.ui.components.UserPreferenceDynamicColorListItem
+import page.ooooo.geoshare.ui.components.UserPreferenceFinishControls
+import page.ooooo.geoshare.ui.components.UserPreferenceFinishListItem
 import page.ooooo.geoshare.ui.components.UserPreferenceHiddenAppsControls
 import page.ooooo.geoshare.ui.components.UserPreferenceHiddenAppsListItem
 import page.ooooo.geoshare.ui.components.UserPreferenceLinksListItem
@@ -69,11 +74,13 @@ import java.util.UUID
 
 @Keep
 enum class UserPreferenceGroupId {
+    APPEARANCE_DYNAMIC_COLOR,
     AUTOMATION,
     AUTOMATION_DELAY,
     CONNECTION_PERMISSION,
     COORDINATE_FORMAT,
     DEVELOPER_OPTIONS,
+    FINISH,
     HIDDEN_APPS,
     LINKS,
     SERVERS,
@@ -125,7 +132,7 @@ fun UserPreferenceScreen(
 @Composable
 private fun UserPreferenceScreen(
     initialGroupId: UserPreferenceGroupId?,
-    apps: DataTypes,
+    apps: Apps,
     appDetails: AppDetails,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
@@ -221,7 +228,7 @@ private fun UserPreferenceScreen(
 private fun UserPreferenceListPane(
     currentGroupId: UserPreferenceGroupId?,
     values: UserPreferencesValues,
-    apps: DataTypes,
+    apps: Apps,
     appDetails: AppDetails,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
@@ -330,7 +337,7 @@ private fun UserPreferenceListPane(
             ) {
                 UserPreferenceHiddenAppsListItem(
                     index = 0,
-                    count = 3,
+                    count = 4,
                     apps = apps,
                     selected = currentGroupId == UserPreferenceGroupId.HIDDEN_APPS,
                     values = values,
@@ -339,20 +346,53 @@ private fun UserPreferenceListPane(
                 )
                 UserPreferenceLinksListItem(
                     index = 1,
-                    count = 3,
+                    count = 4,
                     links = links,
                     selected = currentGroupId == UserPreferenceGroupId.LINKS,
                     modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.LINKS}"),
                     onClick = onNavigateToLinkScreen,
                 )
                 UserPreferenceCoordinateFormatListItem(
-                    index = 1,
-                    count = 2,
+                    index = 2,
+                    count = 4,
                     selected = currentGroupId == UserPreferenceGroupId.COORDINATE_FORMAT,
                     values = values,
                     modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.COORDINATE_FORMAT}"),
                     onClick = { onNavigateToGroup(UserPreferenceGroupId.COORDINATE_FORMAT) },
                 )
+                UserPreferenceFinishListItem(
+                    index = 3,
+                    count = 4,
+                    selected = currentGroupId == UserPreferenceGroupId.FINISH,
+                    values = values,
+                    modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.FINISH}"),
+                    onClick = { onNavigateToGroup(UserPreferenceGroupId.FINISH) },
+                )
+            }
+        }
+        if (DynamicColorPreference.isAvailable()) {
+            item {
+                SegmentedListLabel(
+                    stringResource(R.string.user_preferences_section_appearance),
+                    modifier = Modifier.padding(horizontal = spacing.windowPadding),
+                )
+            }
+            item {
+                Column(
+                    modifier = Modifier
+                        .selectableGroup()
+                        .padding(horizontal = spacing.windowPadding),
+                    verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+                ) {
+                    UserPreferenceDynamicColorListItem(
+                        index = 0,
+                        count = 1,
+                        selected = currentGroupId == UserPreferenceGroupId.APPEARANCE_DYNAMIC_COLOR,
+                        values = values,
+                        modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.APPEARANCE_DYNAMIC_COLOR}"),
+                        onClick = { onNavigateToGroup(UserPreferenceGroupId.APPEARANCE_DYNAMIC_COLOR) },
+                    )
+                }
             }
         }
         if (BuildConfig.DEBUG) {
@@ -385,7 +425,7 @@ private fun UserPreferenceListPane(
 @Composable
 private fun UserPreferenceDetailPane(
     currentGroupId: UserPreferenceGroupId,
-    apps: DataTypes,
+    apps: Apps,
     appDetails: AppDetails,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
@@ -399,6 +439,15 @@ private fun UserPreferenceDetailPane(
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
     when (currentGroupId) {
+        UserPreferenceGroupId.APPEARANCE_DYNAMIC_COLOR -> UserPreferenceDynamicColorControls(
+            billingAppNameResId = billingAppNameResId,
+            onBack = onBack,
+            onNavigateToBillingScreen = onNavigateToBillingScreen,
+            onValueChange = onValueChange,
+            values = values,
+            wide = wide,
+        )
+
         UserPreferenceGroupId.AUTOMATION -> UserPreferenceAutomationControls(
             appDetails = appDetails,
             apps = apps,
@@ -452,6 +501,15 @@ private fun UserPreferenceDetailPane(
             wide = wide,
         )
 
+        UserPreferenceGroupId.FINISH -> UserPreferenceFinishControls(
+            billingAppNameResId = billingAppNameResId,
+            onBack = onBack,
+            onNavigateToBillingScreen = onNavigateToBillingScreen,
+            onValueChange = onValueChange,
+            values = values,
+            wide = wide,
+        )
+
         UserPreferenceGroupId.HIDDEN_APPS -> UserPreferenceHiddenAppsControls(
             appDetails = appDetails,
             apps = apps,
@@ -471,7 +529,7 @@ private fun UserPreferenceDetailPane(
 
 // Previews
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, device = "spec:width=1080px,height=3200px,dpi=440")
 @Composable
 private fun DefaultPreview() {
     AppTheme {
@@ -500,7 +558,11 @@ private fun DefaultPreview() {
     }
 }
 
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(
+    showBackground = true,
+    device = "spec:width=1080px,height=3200px,dpi=440",
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
 @Composable
 private fun DarkPreview() {
     AppTheme {

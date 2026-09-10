@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
@@ -23,48 +24,50 @@ import javax.inject.Singleton
 class GeoUriInput @Inject constructor(
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
-    override val pattern = Regex("""(geo:$URI_REST)""")
-    override val documentation = InputDocumentation(
-        group = InputDocumentationGroup.GEO_URI,
-        items = listOf(
-            InputDocumentationItem.Text(3) {
-                stringResource(R.string.example, GeoUriFormatter.formatGeoUriString(WGS84Point(NaivePoint.example)))
-            },
-        ),
+    override val group = InputGroup.GEO_URI
+    override val changelog = persistentListOf(
+        InputChangelogItem.Text(3) {
+            stringResource(
+                R.string.example,
+                GeoUriFormatter.formatGeoUriString(WGS84Point(NaivePoint.example))
+            )
+        },
     )
+    override val pattern = Regex("""(geo:$URI_REST)""")
 
-    override suspend fun parse(data: Uri, match: String) = parseResult {
+    override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         data.run {
             val z = Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()
 
-            // Name in separate param
-            // ?q={lat},{lon}&({name})
+            // Name in separate query param
+            // ?q=...&({name})
             val name = queryParams
                 .filter { (key, value) -> key != "q" && key != "z" && value.isEmpty() }
                 .firstNotNullOfOrNull { (key) -> Regex(NAME_REGEX).matchEntire(key)?.groupOrNull() }
-            // Query
-            // ?q={name}
-                ?: Q_PARAM_PATTERN.matchEntire(queryParams["q"])?.groupOrNull()
 
             // Pin without name
             // ?q={lat},{lon}
             // Pin with name
             // ?q={lat},{lon}({name})
-            Regex("""$LAT$COORD_SEP$LON(?:$NAME_REGEX)?""").matchEntire(queryParams["q"])
+            Regex("""$LAT$COORD_SEP$LON\s?(?:$NAME_REGEX)?.*""").matchEntire(queryParams["q"])
                 ?.toLatLonNamePoint(Source.URI)?.let {
                     points = persistentListOf(WGS84Point(it, z, name))
                     return@run
                 }
 
+            // Query unless it contained coordinates
+            // ?q={name}
+            val query = Q_PARAM_PATTERN.matchEntire(queryParams["q"])?.groupOrNull()
+
             // Coordinates
             // geo:{lat},{lon}
-            LAT_LON_PATTERN.matchEntire(pathParts.firstOrNull())?.toLatLonPoint(Source.URI)?.let {
-                points = persistentListOf(WGS84Point(it, z, name))
+            Regex("""$LAT_LON_PATTERN.*""").matchEntire(pathParts.firstOrNull())?.toLatLonPoint(Source.URI)?.let {
+                points = persistentListOf(WGS84Point(it, z, name ?: query))
                 return@run
             }
 
-            if (name != null) {
-                points = persistentListOf(WGS84Point(z = z, name = name, source = Source.URI))
+            if (name != null || query != null) {
+                points = persistentListOf(WGS84Point(z = z, name = name ?: query, source = Source.URI))
             }
         }
     }

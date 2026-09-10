@@ -58,7 +58,7 @@ class OpenPointsGpxOutputTest : GeoTest {
             value = points,
             actionContext = mockActionContext(parentDir),
         )
-        assertEquals(ActionResult.SucceededAndFinish, actionResult)
+        assertEquals(ActionResult.SUCCEEDED_AND_OPENED_APP, actionResult)
         val resFiles = childDir.listFiles()
         assertEquals(1, resFiles?.size)
         val resFile = resFiles?.first()

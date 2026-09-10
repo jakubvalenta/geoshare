@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import androidx.annotation.StringRes
 import io.ktor.client.engine.HttpClientEngine
 import kotlinx.collections.immutable.toImmutableList
@@ -24,7 +25,7 @@ class OpenStreetMapApiInput @Inject constructor(
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_open_street_map_loading_indicator_title
 
-    override suspend fun parse(data: String, match: String) = parseResult {
+    override suspend fun parse(data: String, match: String, resources: Resources) = parseResult {
         // Use a simple regex instead of JSON parsing, because it works fine
         val pattern = Regex(""""lat":$LAT,"lon":$LON""")
 

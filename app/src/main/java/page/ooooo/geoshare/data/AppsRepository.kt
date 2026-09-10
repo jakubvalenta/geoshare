@@ -11,14 +11,14 @@ import kotlinx.coroutines.flow.shareIn
 import page.ooooo.geoshare.data.di.ApplicationScope
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.android.DataTypes
+import page.ooooo.geoshare.lib.android.Apps
 import javax.inject.Inject
 
 class AppsRepository @Inject constructor(
     @param:ApplicationScope private val applicationScope: CoroutineScope,
     @param:ApplicationContext private val context: Context,
 ) {
-    val apps: SharedFlow<DataTypes> =
+    val apps: SharedFlow<Apps> =
         flow { emit(AndroidTools.queryApps(context.packageManager)) }
             .shareIn(applicationScope, SharingStarted.WhileSubscribed(5000), replay = 1)
     val appDetails: SharedFlow<AppDetails> =

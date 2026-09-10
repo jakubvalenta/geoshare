@@ -50,7 +50,7 @@ class ActionWaitingTest {
     }
 
     @Test
-    fun transition_whenExecutionIsCancelled_returnsActionFinished() = runTest {
+    fun transition_whenExecutionIsCancelled_returnsActionCompleted() = runTest {
         val state = ActionWaiting(stateContext, source, points, action, output, isAutomation = true, 3.seconds)
         var res: State? = null
         val job = launch {
@@ -65,7 +65,7 @@ class ActionWaitingTest {
         }
         assertEquals(
             res,
-            ActionFinished(source, points, ActionResult.Failed),
+            ActionCompleted(source, points, ActionResult.FAILED),
         )
     }
 }

@@ -2,20 +2,12 @@
 <resources>
     <string name="faq_title">FAQ</string>
     <string name="nav_menu_content_description">Menu</string>
-    <string name="intro_open_by_default_headline">Configura Android per aprire i link a Google Maps in mappe alternative (opzionale)</string>
-    <string name="intro_nav_next">Prossimo</string>
-    <string name="intro_title">Introduzione</string>
     <string name="nav_back_content_description">Torna alla schermata principale</string>
-    <string name="intro_how_to_share_google_maps_content_description">Screenshot menu di condivisione di Google Maps</string>
-    <string name="intro_how_to_share_headline">Come visualizzare le posizioni in altre app di mappe</string>
-    <string name="intro_how_to_share_app_content_description">Screenshot menu di condivisione di %1$s</string>
     <string name="intro_open_by_default_google_maps_button">Apri impostazioni di Google Maps</string>
     <string name="intro_open_by_default_app_button">Apri impostazioni di %1$s</string>
-    <string name="intro_nav_finish">Iniziamo</string>
     <string name="main_input_uri_clear_content_description">Cancella</string>
     <string name="intro_settings_activity_not_found">Impossibile aprire le impostazioni</string>
     <string name="main_input_uri_label">Incolla qui un link della mappa</string>
-    <string name="main_navigate_to_intro">Scopri altre funzionalità dell’app</string>
     <string name="main_create_geo_uri">Mostra coordinate</string>
     <string name="conversion_permission_common_text"><![CDATA[Il link <tt>%1$s</tt> non contiene coordinate o nomi di luoghi. %2$s deve connettersi a Google per ottenere le informazioni.]]></string>
     <string name="about_title">Info su</string>
@@ -27,7 +19,6 @@
     <string name="copying_finished">Link geo: copiato</string>
     <string name="conversion_succeeded_apps_not_found">Nessuna app in grado di aprire link geo: installata</string>
     <string name="conversion_failed_connection_permission_denied">Questo link non è supportato senza collegarsi a Google</string>
-    <string name="intro_how_to_share_google_maps_caption">Condividi una posizione dall’applicazione di mappe o dal browser web.</string>
     <string name="about_app_icon_content_description">Icona app</string>
     <string name="intro_open_by_default_google_maps_content_description">Screenshot menu Apri come impostazione predefinita di Google Maps</string>
     <string name="converter_google_maps_permission_title">Connettersi a Google?</string>
@@ -42,11 +33,8 @@
     <string name="intro_nav_close">Chiudi</string>
     <string name="conversion_permission_common_grant">OK</string>
     <string name="user_preferences_connection_option_ask">Chiedi prima di connettersi</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[Scegli <i>%1$s</i> e l’applicazione permette di aprire la posizione in qualsiasi applicazione di mappe installata.]]></string>
     <string name="conversion_error_report">Segnala un problema</string>
     <string name="user_preferences_connection_description">Per supportare i link abbreviati a Google Maps e per ottenere le coordinate dalla pagina web di Google Maps quando il collegamento non le contiene, %1$s può collegarsi a Google. Per ulteriori informazioni, consulta la schermata delle FAQ.</string>
-    <string name="intro_how_to_share_google_maps_screenshot_title">Condivisione con</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_messaging">Messaggi</string>
     <string name="conversion_succeeded_apps_headline">Apri con…</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">Mappe</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">Scegli come aprire i link web per questa applicazione</string>

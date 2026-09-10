@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
@@ -49,6 +50,7 @@ class HeadLocationHeaderUriInputTest {
         override suspend fun parse(
             data: Uri,
             match: String,
+            resources: Resources,
         ) = throw NotImplementedError()
     }
     private val nextInput = FakeInputRepository.osmAndUriInput
@@ -57,7 +59,7 @@ class HeadLocationHeaderUriInputTest {
     fun whenMatchIsInvalidURL_throwsMalformedURLException() = runTest {
         val match = "https://[invalid:ipv6]/"
         input.fetch(match) {
-            ParseResult()
+            ParseResult.Success()
         }
     }
 
@@ -65,9 +67,9 @@ class HeadLocationHeaderUriInputTest {
     fun whenMatchHasScheme_makesHeadRequestWithRedirectsFalseAndReturnsLocationHeader() = runTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
-            ParseResult(next = MatchedInput(nextInput, "https://maps.google.com/redirected")),
+            ParseResult.Success(next = MatchedInput(nextInput, "https://maps.google.com/redirected")),
             input.fetch(match) { data ->
-                ParseResult(
+                ParseResult.Success(
                     next = MatchedInput(nextInput, data.toString()) // Store data in MatchedInput, so we can test it
                 )
             }
@@ -81,9 +83,9 @@ class HeadLocationHeaderUriInputTest {
     fun whenMatchHasNoScheme_makesHeadRequestToUrlWithHttpsSchemeAndReturnsLocationHeader() = runTest {
         val match = "maps.google.com/foo"
         assertEquals(
-            ParseResult(next = MatchedInput(nextInput, "https://maps.google.com/redirected")),
+            ParseResult.Success(next = MatchedInput(nextInput, "https://maps.google.com/redirected")),
             input.fetch(match) { data ->
-                ParseResult(
+                ParseResult.Success(
                     next = MatchedInput(nextInput, data.toString()) // Store data in MatchedInput, so we can test it
                 )
             }
@@ -94,9 +96,9 @@ class HeadLocationHeaderUriInputTest {
     fun whenHttpClientRespondsLocationHeaderAsRelativeUrl_returnsItAsAbsoluteUrl() = runTest {
         val match = "https://maps.google.com/respond-relative"
         assertEquals(
-            ParseResult(next = MatchedInput(nextInput, "https://maps.google.com/respond-relative/redirected")),
+            ParseResult.Success(next = MatchedInput(nextInput, "https://maps.google.com/respond-relative/redirected")),
             input.fetch(match) { data ->
-                ParseResult(
+                ParseResult.Success(
                     next = MatchedInput(nextInput, data.toString()) // Store data in MatchedInput, so we can test it
                 )
             }
@@ -107,7 +109,7 @@ class HeadLocationHeaderUriInputTest {
     fun whenHttpClientRespondsError_throwsNetworkException() = runTest {
         val match = "https://maps.google.com/not-found"
         input.fetch(match) {
-            ParseResult()
+            ParseResult.Success()
         }
     }
 }

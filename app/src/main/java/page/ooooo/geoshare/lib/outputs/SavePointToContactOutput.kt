@@ -29,7 +29,7 @@ class SavePointToContactOutput @Inject constructor(
             CoordinateFormatter.formatDecCoords(
                 coordinateConverter.toWGS84(value)
             ),
-        ).let { success -> if (success) ActionResult.Succeeded else ActionResult.Failed }
+        ).let { success -> if (success) ActionResult.SUCCEEDED else ActionResult.FAILED }
 
     @Composable
     override fun label(appDetails: AppDetails) =

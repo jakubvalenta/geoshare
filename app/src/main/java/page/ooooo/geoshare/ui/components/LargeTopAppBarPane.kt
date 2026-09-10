@@ -38,13 +38,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import page.ooooo.geoshare.R
@@ -79,7 +77,7 @@ fun LargeTopAppBarPane(
         subtitleContentColor = LocalContentColor.current,
     ),
     titleTextStyle: TextStyle = MaterialTheme.typography.headlineMedium,
-    titleBottomPadding: Dp = 20.dp, // This seems to be the padding size that the default LargeTopAppBar uses
+    titleBottomPadding: Dp = LocalSpacing.current.small, // The default LargeTopAppBar has 20.dp bottom padding
     content: LazyListScope.() -> Unit,
 ) {
     val density = LocalDensity.current
@@ -121,15 +119,7 @@ fun LargeTopAppBarPane(
         },
         navigationIcon = {
             if (onBack != null) {
-                IconButton(
-                    onBack,
-                    Modifier.testTag("geoShareBack"),
-                ) {
-                    Icon(
-                        imageVector = backIcon,
-                        contentDescription = stringResource(R.string.nav_back_content_description),
-                    )
-                }
+                NavigationBackButton(onBack, backIcon)
             }
         },
         actions = actions,

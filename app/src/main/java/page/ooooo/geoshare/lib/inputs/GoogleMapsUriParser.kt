@@ -38,6 +38,13 @@ fun googleMapsParseResult(block: GoogleMapsParseResultScope.() -> Unit): GoogleM
 object GoogleMapsUriParser {
     fun parse(uri: Uri): GoogleMapsParseResult = googleMapsParseResult {
         uri.run {
+            // Google Search
+            // https://www.google.com/share.google?q={id}
+            // https://www.google.com/search
+            if (!host.contains("maps") && pathParts.getOrNull(1) in setOf("search", "share.google")) {
+                return@run
+            }
+
             val z = Z_PATTERN.matchEntire(queryParams["zoom"])?.doubleGroupOrNull()
 
             // API directions

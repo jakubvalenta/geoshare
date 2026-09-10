@@ -8,10 +8,10 @@ class RetryTest {
     fun calcExponentialBackoffMillis() {
         mapOf(
             0L to 1,
-            1000L to 2,
-            2000L to 3,
-            4000L to 4,
-            256000L to 10,
+            1_000L to 2,
+            2_000L to 3,
+            4_000L to 4,
+            256_000L to 10,
         ).run {
             assertEquals(
                 keys.toList(),

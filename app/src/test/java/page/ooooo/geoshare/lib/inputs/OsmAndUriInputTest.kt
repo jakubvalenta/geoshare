@@ -1,15 +1,18 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class OsmAndUriInputTest : InputTest {
+    override val resources: Resources = mock()
     private val input = FakeInputRepository.osmAndUriInput
 
     @Test
@@ -57,7 +60,7 @@ class OsmAndUriInputTest : InputTest {
     @Test
     fun parse_pin() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(52.51628, 13.37771, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(52.51628, 13.37771, source = Source.URI))),
             input.parse("https://osmand.net/map?pin=52.51628,13.37771"),
         )
     }
@@ -65,7 +68,7 @@ class OsmAndUriInputTest : InputTest {
     @Test
     fun parse_directions() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(52.5, 13.5, source = Source.URI),
                     WGS84Point(52.51628, 13.37771, source = Source.URI),
@@ -74,11 +77,11 @@ class OsmAndUriInputTest : InputTest {
             input.parse("https://osmand.net/map?start=52.5,13.5&finish=52.51628,13.37771"),
         )
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(52.5, 13.5, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(52.5, 13.5, source = Source.URI))),
             input.parse("https://osmand.net/map?start=52.5,13.5"),
         )
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(52.51628, 13.37771, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(52.51628, 13.37771, source = Source.URI))),
             input.parse("https://osmand.net/map?finish=52.51628,13.37771"),
         )
     }
@@ -86,7 +89,7 @@ class OsmAndUriInputTest : InputTest {
     @Test
     fun parse_directionsTakesPrecedenceOverPin() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(52.5, 13.5, source = Source.URI),
                     WGS84Point(52.51628, 13.37771, source = Source.URI),
@@ -99,7 +102,16 @@ class OsmAndUriInputTest : InputTest {
     @Test
     fun parse_fragment() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(-53.347932, -13.2347, z = 12.5, source = Source.MAP_CENTER))),
+            ParseResult.Success(
+                persistentListOf(
+                    WGS84Point(
+                        -53.347932,
+                        -13.2347,
+                        z = 12.5,
+                        source = Source.MAP_CENTER
+                    )
+                )
+            ),
             input.parse("https://osmand.net/map#12.5/-53.347932/-13.2347"),
         )
     }
@@ -107,7 +119,7 @@ class OsmAndUriInputTest : InputTest {
     @Test
     fun parse_parameterPinTakesPrecedenceOverFragment() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(52.51628, 13.37771, z = 12.5, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(52.51628, 13.37771, z = 12.5, source = Source.URI))),
             input.parse("https://osmand.net/map?pin=52.51628,13.37771#12.5/-53.347932/-13.2347"),
         )
     }

@@ -2,8 +2,7 @@ package page.ooooo.geoshare.lib.formatters
 
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.extensions.toScale
-import page.ooooo.geoshare.lib.extensions.toTrimmedString
+import page.ooooo.geoshare.lib.encodeURI
 import page.ooooo.geoshare.lib.geo.Point
 
 object UriFormatter {
@@ -11,31 +10,32 @@ object UriFormatter {
         point: Point,
         coordsUriTemplate: String,
         nameUriTemplate: String = "",
-        defaultZ: Double = 16.0,
         uriQuote: UriQuote = DefaultUriQuote,
     ): String? = point.run {
-        latStr?.let { latStr ->
-            lonStr?.let { lonStr ->
-                val zOrDefaultStr = (z ?: defaultZ).toScale(7).toTrimmedString()
-                coordsUriTemplate
-                    .replace("{lat}", uriQuote.encode(latStr))
-                    .replace("{lon}", uriQuote.encode(lonStr))
-                    .replace("{z}", uriQuote.encode(zOrDefaultStr))
-                    .replace("{name}", uriQuote.encode(cleanName.orEmpty()))
-                    .replace(
-                        "{plus_code}",
-                        if ("{plus_code}" in coordsUriTemplate) {
-                            PlusCodeFormatter.formatPlusCode(point)?.let { uriQuote.encode(it) } ?: ""
-                        } else {
-                            ""
-                        },
-                    )
-                    .takeIf { it.isNotEmpty() }
-            }
-        } ?: cleanName?.let { cleanName ->
-            nameUriTemplate
-                .replace("{q}", uriQuote.encode(cleanName))
-                .takeIf { it.isNotEmpty() }
+        val template = when {
+            coordsUriTemplate.isNotEmpty() && hasCoordinates() -> coordsUriTemplate
+            nameUriTemplate.isNotEmpty() && hasName() -> nameUriTemplate
+            else -> return null
         }
+        val q by lazy {
+            when {
+                cleanName != null -> cleanName
+                latStr != null && lonStr != null -> "$latStr,$lonStr"
+                else -> {
+                    // This branch can't be reached, because we make sure the point has coordinates or name when
+                    // selecting the template, but let's keep the branch anyway, in case the template selection
+                    // changes in the future.
+                    null
+                }
+            }
+        }
+        val plusCode by lazy { PlusCodeFormatter.formatPlusCode(this) }
+        return template
+            .replace("{lat}", latStr?.encodeURI(uriQuote).orEmpty())
+            .replace("{lon}", lonStr?.encodeURI(uriQuote).orEmpty())
+            .replace("{z}", zOrDefaultStr.encodeURI(uriQuote))
+            .replace("{name}", cleanName?.encodeURI(uriQuote).orEmpty())
+            .replace("{plus_code}", plusCode?.encodeURI(uriQuote).orEmpty())
+            .replace("{q}", q?.encodeURI(uriQuote).orEmpty())
     }
 }

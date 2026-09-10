@@ -1,15 +1,18 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class MapsMeUriInputTest : InputTest {
+    override val resources: Resources = mock()
     private val input = FakeInputRepository.mapsMeUriInput
 
     @Test
@@ -71,21 +74,21 @@ class MapsMeUriInputTest : InputTest {
 
     @Test
     fun parse_noPath() = runTest {
-        assertEquals(ParseResult(), input.parse("ge0:"))
-        assertEquals(ParseResult(), input.parse("http://ge0.me"))
-        assertEquals(ParseResult(), input.parse("https://omaps.app"))
-        assertEquals(ParseResult(), input.parse("https://comaps.at"))
-        assertEquals(ParseResult(), input.parse("ge0:/"))
-        assertEquals(ParseResult(), input.parse("ge0://"))
-        assertEquals(ParseResult(), input.parse("http://ge0.me/"))
-        assertEquals(ParseResult(), input.parse("https://omaps.app/"))
-        assertEquals(ParseResult(), input.parse("https://comaps.at/"))
+        assertEquals(ParseResult.Success(), input.parse("ge0:"))
+        assertEquals(ParseResult.Success(), input.parse("http://ge0.me"))
+        assertEquals(ParseResult.Success(), input.parse("https://omaps.app"))
+        assertEquals(ParseResult.Success(), input.parse("https://comaps.at"))
+        assertEquals(ParseResult.Success(), input.parse("ge0:/"))
+        assertEquals(ParseResult.Success(), input.parse("ge0://"))
+        assertEquals(ParseResult.Success(), input.parse("http://ge0.me/"))
+        assertEquals(ParseResult.Success(), input.parse("https://omaps.app/"))
+        assertEquals(ParseResult.Success(), input.parse("https://comaps.at/"))
     }
 
     @Test
     fun parse_shortLink() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         51.0000004,
@@ -99,7 +102,7 @@ class MapsMeUriInputTest : InputTest {
             input.parse("ge0://ApYSV0YTAl/América_do_Norte"),
         )
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         -18.9249432,
@@ -113,7 +116,7 @@ class MapsMeUriInputTest : InputTest {
             input.parse("http://ge0.me/AbCMCNp0LO/Madagascar"),
         )
         assertEquals(
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") ParseResult(
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         40.7127405,
@@ -127,7 +130,7 @@ class MapsMeUriInputTest : InputTest {
             input.parse("https://omaps.app/Umse5f0H8a/Nova_Iorque"),
         )
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(WGS84Point(52.4877386, 13.3815233, z = 14.0, name = "Kreuzberg", source = Source.HASH))
             ),
             input.parse("https://comaps.at/o4MnIOApKp/Kreuzberg"),
@@ -137,25 +140,25 @@ class MapsMeUriInputTest : InputTest {
     @Test
     fun parse_shortLinkWithoutName() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(51.0000004, -108.9999868, z = 4.0, source = Source.HASH))),
+            ParseResult.Success(persistentListOf(WGS84Point(51.0000004, -108.9999868, z = 4.0, source = Source.HASH))),
             input.parse("ge0://ApYSV0YTAl"),
         )
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(51.0000004, -108.9999868, z = 4.0, source = Source.HASH))),
+            ParseResult.Success(persistentListOf(WGS84Point(51.0000004, -108.9999868, z = 4.0, source = Source.HASH))),
             input.parse("ge0://ApYSV0YTAl/"),
         )
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(-18.9249432, 46.4416404, z = 4.0, source = Source.HASH))),
+            ParseResult.Success(persistentListOf(WGS84Point(-18.9249432, 46.4416404, z = 4.0, source = Source.HASH))),
             input.parse("http://ge0.me/AbCMCNp0LO"),
         )
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(-18.9249432, 46.4416404, z = 4.0, source = Source.HASH))),
+            ParseResult.Success(persistentListOf(WGS84Point(-18.9249432, 46.4416404, z = 4.0, source = Source.HASH))),
             input.parse("http://ge0.me/AbCMCNp0LO/"),
         )
     }
 
     @Test
     fun parse_hostThatLooksLikeHash() = runTest {
-        assertEquals(ParseResult(), input.parse("https://ApYSV0YTAl/"))
+        assertEquals(ParseResult.Success(), input.parse("https://ApYSV0YTAl/"))
     }
 }

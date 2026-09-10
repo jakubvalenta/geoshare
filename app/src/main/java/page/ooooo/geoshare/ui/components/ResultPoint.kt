@@ -37,13 +37,6 @@ fun ResultPoint(
     onSelect: () -> Unit,
 ) {
     ListItem(
-        headlineContent = {
-            SelectionContainer {
-                Text(
-                    point.cleanName ?: stringResource(R.string.conversion_succeeded_point_number, index + 1)
-                )
-            }
-        },
         supportingContent = if (point.hasCoordinates()) {
             {
                 SelectionContainer {
@@ -77,7 +70,13 @@ fun ResultPoint(
         colors = ListItemDefaults.colors(
             containerColor = Color.Transparent,
         ),
-    )
+    ) {
+        SelectionContainer {
+            Text(
+                point.cleanName ?: stringResource(R.string.conversion_succeeded_point_number, index + 1)
+            )
+        }
+    }
 }
 
 @Preview(showBackground = true)

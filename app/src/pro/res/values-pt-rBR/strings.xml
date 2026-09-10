@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="conversion_failed_unsupported_source">Esse link não é suportado</string>
-    <string name="server_list_google_maps_none_description">Extrair um termo de busca em vez das coordenadas</string>
+    <string name="server_list_google_maps_none_description">Extrair o nome do lugar em vez das coordenadas</string>
+    <string name="billing_manage_error">Falha ao abrir a Google Play</string>
+    <string name="billing_offers_error">Falha ao carregar as ofertas</string>
+    <string name="billing_purchase_error_cancelled">Compra cancelada</string>
+    <string name="billing_purchase_error_unknown">Falha ao fazer a compra</string>
+    <string name="billing_setup_error_unknown">Falha ao carregar compras</string>
 </resources>

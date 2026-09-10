@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
@@ -19,16 +20,14 @@ class AppleMapsUriInput @Inject constructor(
     private val appleMapsHtmlInput: dagger.Lazy<AppleMapsHtmlInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
-    override val pattern = Regex("""((?:https?://)?maps\.apple(\.com)?[/?#]$URI_REST)""")
-    override val documentation = InputDocumentation(
-        group = InputDocumentationGroup.APPLE_MAPS,
-        items = listOf(
-            InputDocumentationItem.Url(18, "https://maps.apple"),
-            InputDocumentationItem.Url(18, "https://maps.apple.com"),
-        ),
+    override val group = InputGroup.APPLE_MAPS
+    override val changelog = persistentListOf(
+        InputChangelogItem.Url(18, "https://maps.apple"),
+        InputChangelogItem.Url(18, "https://maps.apple.com"),
     )
+    override val pattern = Regex("""((?:https?://)?maps\.apple(\.com)?[/?#]$URI_REST)""")
 
-    override suspend fun parse(data: Uri, match: String) = parseResult {
+    override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         data.run {
             val z = Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()
 

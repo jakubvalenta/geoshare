@@ -22,6 +22,7 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -56,7 +57,7 @@ import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.conversion.ActionAutomationFailed
 import page.ooooo.geoshare.lib.conversion.ActionAutomationSucceeded
 import page.ooooo.geoshare.lib.conversion.ActionFailed
-import page.ooooo.geoshare.lib.conversion.ActionFinished
+import page.ooooo.geoshare.lib.conversion.ActionCompleted
 import page.ooooo.geoshare.lib.conversion.ActionSucceeded
 import page.ooooo.geoshare.lib.conversion.ActionWaiting
 import page.ooooo.geoshare.lib.conversion.ConversionState
@@ -117,10 +118,11 @@ fun ResultTitle(
                 }
                 ResultMessageText(
                     targetState.output.automationWaitingText(counterSec, appDetails),
-                    Modifier.testTag("geoShareResultSuccessAutomationCounter"),
+                    Modifier.testTag("geoShareResultAutomationCounter"),
                 )
                 FilledIconButton(
                     onCancel,
+                    Modifier.testTag("geoShareResultAutomationCancel"),
                     colors = IconButtonDefaults.filledIconButtonColors(
                         containerColor = MaterialTheme.colorScheme.tertiary,
                         contentColor = MaterialTheme.colorScheme.onTertiary,
@@ -136,45 +138,45 @@ fun ResultTitle(
             is ActionSucceeded -> ResultMessageRow {
                 ResultMessageText(
                     targetState.output.successText(appDetails),
-                    Modifier.testTag("geoShareResultSuccessMessage"),
+                    Modifier.testTag("geoShareResultMessageSuccess"),
                 )
             }
 
             is ActionFailed -> ResultMessageRow {
                 ResultMessageText(
                     targetState.output.errorText(appDetails),
+                    Modifier.testTag("geoShareResultMessageError"),
                     containerColor = MaterialTheme.colorScheme.errorContainer,
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
                 )
             }
 
             is ActionAutomationSucceeded -> ResultMessageRow {
                 ResultMessageText(
                     targetState.output.automationSuccessText(appDetails),
-                    Modifier.testTag("geoShareResultSuccessMessage"),
+                    Modifier.testTag("geoShareResultMessageSuccess"),
                 )
             }
 
             is ActionAutomationFailed -> ResultMessageRow {
                 ResultMessageText(
                     targetState.output.automationErrorText(appDetails),
+                    Modifier.testTag("geoShareResultMessageError"),
                     containerColor = MaterialTheme.colorScheme.errorContainer,
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
                 )
             }
 
             is LocationFindingFailed -> ResultMessageRow {
                 ResultMessageText(
                     stringResource(R.string.conversion_succeeded_location_failed),
+                    Modifier.testTag("geoShareResultMessageError"),
                     containerColor = MaterialTheme.colorScheme.errorContainer,
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
                 )
             }
 
             is ConversionState.HasSmallLoadingIndicator -> ResultMessageRow {
                 ResultMessageText(
                     targetState.getLoadingIndicator().message,
-                    Modifier.testTag("geoShareResultSuccessSmallLoadingIndicatorMessage"),
+                    Modifier.testTag("geoShareResultSmallLoadingIndicatorMessage"),
                 )
                 FilledIconButton(
                     onCancel,
@@ -234,8 +236,8 @@ private fun ResultMessageRow(content: @Composable RowScope.() -> Unit) {
 private fun RowScope.ResultMessageText(
     text: String,
     modifier: Modifier = Modifier,
-    containerColor: Color = MaterialTheme.colorScheme.tertiaryContainer,
-    contentColor: Color = MaterialTheme.colorScheme.onTertiaryContainer,
+    containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
+    contentColor: Color = contentColorFor(containerColor),
 ) {
     val spacing = LocalSpacing.current
     Row(
@@ -260,21 +262,22 @@ private fun RowScope.ResultMessageText(
 
 @Preview(showBackground = true)
 @Composable
-private fun ActionFinishedPreview() {
+private fun ActionCompletedPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultTitle(
-                currentState = ActionFinished(
+                currentState = ActionCompleted(
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    actionResult = ActionResult.Succeeded,
+                    actionResult = ActionResult.SUCCEEDED,
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -294,21 +297,22 @@ private fun ActionFinishedPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkActionFinishedPreview() {
+private fun DarkActionCompletedPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultTitle(
-                currentState = ActionFinished(
+                currentState = ActionCompleted(
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    actionResult = ActionResult.Succeeded,
+                    actionResult = ActionResult.SUCCEEDED,
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -328,22 +332,23 @@ private fun DarkActionFinishedPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun ActionFinishedFeatureNotAvailablePreview() {
+private fun ActionCompletedFeatureNotAvailablePreview() {
     AppTheme {
         Surface {
             Column {
                 val context = LocalContext.current
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultTitle(
-                    currentState = ActionFinished(
+                    currentState = ActionCompleted(
                         source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         points = persistentListOf(WGS84Point(NaivePoint.example)),
-                        actionResult = ActionResult.Succeeded,
+                        actionResult = ActionResult.SUCCEEDED,
                     ),
                     appDetails = mapOf(
                         PackageNames.OSMAND_PLUS to AppDetail(
-                            "OsmAnd",
-                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -360,22 +365,23 @@ private fun ActionFinishedFeatureNotAvailablePreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkActionFinishedFeatureNotAvailablePreview() {
+private fun DarkActionCompletedFeatureNotAvailablePreview() {
     AppTheme {
         Surface {
             Column {
                 val context = LocalContext.current
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultTitle(
-                    currentState = ActionFinished(
+                    currentState = ActionCompleted(
                         source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         points = persistentListOf(WGS84Point(NaivePoint.example)),
-                        actionResult = ActionResult.Succeeded,
+                        actionResult = ActionResult.SUCCEEDED,
                     ),
                     appDetails = mapOf(
                         PackageNames.OSMAND_PLUS to AppDetail(
-                            "OsmAnd",
-                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -422,8 +428,9 @@ private fun ActionWaitingPreview() {
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -473,8 +480,9 @@ private fun DarkActionWaitingPreview() {
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -522,8 +530,9 @@ private fun LocationPermissionReceivedPreview() {
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -571,8 +580,9 @@ private fun DarkLocationPermissionReceivedPreview() {
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -604,12 +614,13 @@ private fun SucceededPreview() {
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     output = SavePointsGpxOutput(coordinateConverter),
-                    actionResult = ActionResult.Succeeded,
+                    actionResult = ActionResult.SUCCEEDED,
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -641,12 +652,13 @@ private fun DarSucceededPreview() {
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     output = SavePointsGpxOutput(coordinateConverter),
-                    actionResult = ActionResult.Succeeded,
+                    actionResult = ActionResult.SUCCEEDED,
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -678,12 +690,13 @@ private fun FailedPreview() {
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     output = SavePointsGpxOutput(coordinateConverter),
-                    actionResult = ActionResult.Failed,
+                    actionResult = ActionResult.FAILED,
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -715,12 +728,13 @@ private fun DarkFailedPreview() {
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     output = SavePointsGpxOutput(coordinateConverter),
-                    actionResult = ActionResult.Failed,
+                    actionResult = ActionResult.FAILED,
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),

@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
@@ -16,15 +17,13 @@ import javax.inject.Singleton
 class CartesIGNUriInput @Inject constructor(
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
-    override val pattern = Regex("""((?:https?://)?cartes-ign\.ign\.fr$URI_REST)""")
-    override val documentation = InputDocumentation(
-        group = InputDocumentationGroup.CARTES_IGN,
-        items = listOf(
-            InputDocumentationItem.Url(39, "https://cartes-ign.ign.fr"),
-        ),
+    override val group = InputGroup.CARTES_IGN
+    override val changelog = persistentListOf(
+        InputChangelogItem.Url(39, "https://cartes-ign.ign.fr"),
     )
+    override val pattern = Regex("""((?:https?://)?cartes-ign\.ign\.fr$URI_REST)""")
 
-    override suspend fun parse(data: Uri, match: String) = parseResult {
+    override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         data.run {
             // Coordinates
             // https://cartes-ign.ign.fr?lng={lon}&lat={lat}&z={z}

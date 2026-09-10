@@ -37,10 +37,11 @@ import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.AutomationPreference
 import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
+import page.ooooo.geoshare.lib.android.App
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.DataType
-import page.ooooo.geoshare.lib.android.DataTypes
+import page.ooooo.geoshare.lib.android.Apps
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingProduct
@@ -101,7 +102,7 @@ fun UserPreferenceAutomationListItem(
 @Composable
 fun UserPreferenceAutomationControls(
     appDetails: AppDetails,
-    apps: DataTypes,
+    apps: Apps,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
@@ -126,12 +127,7 @@ fun UserPreferenceAutomationControls(
     ) {
         userPreferenceOptionsControl(
             userPreference = AutomationPreference,
-            optionGroups = AutomationPreference.getOptionGroups(
-                apps,
-                appDetails,
-                values.hiddenApps,
-                links
-            ),
+            optionGroups = AutomationPreference.getOptionGroups(apps, appDetails, values.hiddenApps, links),
             values = values,
             enabled = AutomationFeature in billingFeatures && billingStatus is BillingStatus.Purchased,
             itemTestTag = { option ->
@@ -221,8 +217,9 @@ private fun ListItemPreview() {
                     ),
                     appDetails = mapOf(
                         PackageNames.OSMAND_PLUS to AppDetail(
-                            "OsmAnd",
-                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
                     links = emptyList(),
@@ -238,7 +235,6 @@ private fun ListItemPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DarkListItemPreview() {
@@ -262,8 +258,9 @@ private fun DarkListItemPreview() {
                     ),
                     appDetails = mapOf(
                         PackageNames.OSMAND_PLUS to AppDetail(
-                            "OsmAnd",
-                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
                     links = emptyList(),
@@ -279,7 +276,6 @@ private fun DarkListItemPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Preview(showBackground = true)
 @Composable
 private fun NoneListItemPreview() {
@@ -303,8 +299,9 @@ private fun NoneListItemPreview() {
                     ),
                     appDetails = mapOf(
                         PackageNames.OSMAND_PLUS to AppDetail(
-                            "OsmAnd",
-                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
                     links = emptyList(),
@@ -320,7 +317,6 @@ private fun NoneListItemPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DarkNoneListItemPreview() {
@@ -344,8 +340,9 @@ private fun DarkNoneListItemPreview() {
                     ),
                     appDetails = mapOf(
                         PackageNames.OSMAND_PLUS to AppDetail(
-                            "OsmAnd",
-                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                            packageName = PackageNames.OSMAND_PLUS,
+                            label = "OsmAnd",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
                     links = emptyList(),
@@ -374,12 +371,16 @@ private fun ControlsPreview() {
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
                 apps = mapOf(
-                    PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.OSMAND_PLUS to App(
+                        packageName = PackageNames.OSMAND_PLUS,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 links = defaultFakeLinks,
@@ -416,12 +417,16 @@ private fun DarkControlsPreview() {
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
                 apps = mapOf(
-                    PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.OSMAND_PLUS to App(
+                        packageName = PackageNames.OSMAND_PLUS,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 links = defaultFakeLinks,
@@ -458,12 +463,16 @@ private fun TabletControlsPreview() {
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
                 apps = mapOf(
-                    PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.OSMAND_PLUS to App(
+                        packageName = PackageNames.OSMAND_PLUS,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 links = defaultFakeLinks,
@@ -500,12 +509,16 @@ private fun NotPurchasedControlsPreview() {
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
                 apps = mapOf(
-                    PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.OSMAND_PLUS to App(
+                        packageName = PackageNames.OSMAND_PLUS,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 links = defaultFakeLinks,
@@ -537,12 +550,16 @@ private fun DarkNotPurchasedControlsPreview() {
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
                 apps = mapOf(
-                    PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.OSMAND_PLUS to App(
+                        packageName = PackageNames.OSMAND_PLUS,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 links = defaultFakeLinks,
@@ -574,12 +591,16 @@ private fun TabletNotPurchasedControlsPreview() {
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
                 apps = mapOf(
-                    PackageNames.OSMAND_PLUS to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    PackageNames.OSMAND_PLUS to App(
+                        packageName = PackageNames.OSMAND_PLUS,
+                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
+                    ),
                 ),
                 appDetails = mapOf(
                     PackageNames.OSMAND_PLUS to AppDetail(
-                        "OsmAnd",
-                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        packageName = PackageNames.OSMAND_PLUS,
+                        label = "OsmAnd",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 links = defaultFakeLinks,

@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
@@ -38,6 +39,7 @@ class BodyAsChannelInputTest {
         override suspend fun parse(
             data: ByteReadChannel,
             match: String,
+            resources: Resources,
         ) = throw NotImplementedError()
     }
     private val nextInput = FakeInputRepository.osmAndUriInput
@@ -46,7 +48,7 @@ class BodyAsChannelInputTest {
     fun whenMatchIsInvalidURL_throwsMalformedURLException() = runTest {
         val match = "https://[invalid:ipv6]/"
         input.fetch(match) {
-            ParseResult()
+            ParseResult.Success()
         }
     }
 
@@ -54,9 +56,9 @@ class BodyAsChannelInputTest {
     fun whenMatchHasScheme_makesGetRequestWithFollowRedirectsAndReturnsResponse() = runTest {
         val match = "https://maps.google.com/foo"
         assertEquals(
-            ParseResult(next = MatchedInput(nextInput, "test data")),
+            ParseResult.Success(next = MatchedInput(nextInput, "test data")),
             input.fetch(match) { data ->
-                ParseResult(
+                ParseResult.Success(
                     next = MatchedInput(
                         nextInput,
                         data.readLine()!!
@@ -73,9 +75,9 @@ class BodyAsChannelInputTest {
     fun whenMatchHasNoScheme_makesGetRequestToUrlWithHttpsSchemeAndReturnsResponse() = runTest {
         val match = "maps.google.com/foo"
         assertEquals(
-            ParseResult(next = MatchedInput(nextInput, "test data")),
+            ParseResult.Success(next = MatchedInput(nextInput, "test data")),
             input.fetch(match) { data ->
-                ParseResult(
+                ParseResult.Success(
                     next = MatchedInput(
                         nextInput,
                         data.readLine()!!
@@ -89,7 +91,7 @@ class BodyAsChannelInputTest {
     fun whenHttpClientRespondsError_throwsNetworkException() = runTest {
         val match = "https://maps.google.com/not-found"
         input.fetch(match) {
-            ParseResult()
+            ParseResult.Success()
         }
     }
 }

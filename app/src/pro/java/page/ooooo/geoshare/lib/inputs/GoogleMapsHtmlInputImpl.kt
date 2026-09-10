@@ -8,7 +8,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Not available in this build flavor.
+ * This input is not available in this build flavor.
+ *
+ * It defaults to URI parsing like [GoogleMapsUriInput] does, and shows a warning if no points were found.
  */
 @Singleton
 class GoogleMapsHtmlInputImpl @Inject constructor(
@@ -17,14 +19,16 @@ class GoogleMapsHtmlInputImpl @Inject constructor(
     override suspend fun fetch(match: String, block: suspend (Uri) -> ParseResult) =
         block(Uri.parse(match, uriQuote))
 
-    override suspend fun parse(data: Uri, match: String) = parseResult {
-        // Parse URI, so that we return at least points with names
+    override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
+        // Default to URI parsing
         val googleMapsParseResult = GoogleMapsUriParser.parse(data)
         points = googleMapsParseResult.points
-    }
 
-    override fun getErrorMessage(resources: Resources) =
-        resources.getString(R.string.conversion_failed_unsupported_source)
+        // Show a warning if no points were found
+        if (points.isEmpty()) {
+            warningMessage = resources.getString(R.string.conversion_failed_unsupported_source)
+        }
+    }
 
     override fun toString() = "GoogleMapsHtmlInput"
 }

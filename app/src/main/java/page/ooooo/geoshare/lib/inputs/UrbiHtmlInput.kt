@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import androidx.annotation.StringRes
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.utils.io.ByteReadChannel
@@ -28,6 +29,7 @@ class UrbiHtmlInput @Inject constructor(
     override suspend fun parse(
         data: ByteReadChannel,
         match: String,
+        resources: Resources,
     ) = parseResult {
         val pattern = Regex("""property="twitter:image" content="([^"]+)""")
 

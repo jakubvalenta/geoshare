@@ -1,14 +1,17 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.kotlin.mock
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 
 class GoogleMapsPlaceListInputTest : InputTest {
+    override val resources: Resources = mock()
     private val input = GoogleMapsPlaceListInputImpl(
         log = FakeLog,
     )
@@ -16,7 +19,7 @@ class GoogleMapsPlaceListInputTest : InputTest {
     @Test
     fun parse_whenDataIsValidJsonObject_returnsPoints() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(59.1293656, 11.4585672, source = Source.JAVASCRIPT),
                     GCJ02MainlandChinaPoint(59.4154007, 11.659710599999999, source = Source.JAVASCRIPT),
@@ -36,7 +39,7 @@ class GoogleMapsPlaceListInputTest : InputTest {
             ),
         )
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(59.1293656, source = Source.JAVASCRIPT),
                 )
@@ -52,7 +55,7 @@ class GoogleMapsPlaceListInputTest : InputTest {
             ),
         )
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(source = Source.JAVASCRIPT),
                 )
@@ -64,7 +67,7 @@ class GoogleMapsPlaceListInputTest : InputTest {
             ),
         )
         assertEquals(
-            ParseResult(),
+            ParseResult.Success(),
             input.parse(
                 // language=Json
                 "[]",
@@ -88,12 +91,12 @@ class GoogleMapsPlaceListInputTest : InputTest {
             "null",
         )) {
             assertEquals(
-                ParseResult(),
+                ParseResult.Success(),
                 input.parse(data, "https://maps.google.com/original"),
             )
         }
         assertEquals(
-            ParseResult(),
+            ParseResult.Success(),
             input.parse(
                 // language=Json
                 """{"lat":  "spam"}""",
@@ -101,7 +104,7 @@ class GoogleMapsPlaceListInputTest : InputTest {
             ),
         )
         assertEquals(
-            ParseResult(),
+            ParseResult.Success(),
             input.parse(
                 // language=Json
                 "[]",
@@ -118,7 +121,7 @@ class GoogleMapsPlaceListInputTest : InputTest {
             "",
         )) {
             assertEquals(
-                ParseResult(),
+                ParseResult.Success(),
                 input.parse(data, "https://maps.google.com/original"),
             )
         }

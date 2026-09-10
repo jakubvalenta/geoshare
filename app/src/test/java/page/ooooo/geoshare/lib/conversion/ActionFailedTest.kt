@@ -22,14 +22,14 @@ class ActionFailedTest {
     private val source = "https://maps.google.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val output = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-    private val actionResult = ActionResult.Failed
+    private val actionResult = ActionResult.FAILED
 
     @Test
-    fun transition_whenExecutionIsNotCancelled_waitsAndReturnsActionFinished() = runTest {
+    fun transition_whenExecutionIsNotCancelled_waitsAndReturnsActionCompleted() = runTest {
         val state = ActionFailed(source, points, actionResult, output)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
-                ActionFinished(source, points, actionResult),
+                ActionCompleted(source, points, actionResult),
                 state.transition(),
             )
         }
@@ -37,7 +37,7 @@ class ActionFailedTest {
     }
 
     @Test
-    fun transition_whenExecutionIsCancelled_returnsActionFinished() = runTest {
+    fun transition_whenExecutionIsCancelled_returnsActionCompleted() = runTest {
         val state = ActionFailed(source, points, actionResult, output)
         var res: State? = null
         val job = launch {
@@ -52,7 +52,7 @@ class ActionFailedTest {
         }
         assertEquals(
             res,
-            ActionFinished(source, points, actionResult),
+            ActionCompleted(source, points, actionResult),
         )
     }
 }

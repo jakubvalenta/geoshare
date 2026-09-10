@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
 import page.ooooo.geoshare.lib.Uri
@@ -25,20 +26,17 @@ class WazeUriInput @Inject constructor(
     private val wazeHtmlInput: dagger.Lazy<WazeHtmlInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
+    override val group = InputGroup.WAZE
+    override val changelog = persistentListOf(
+        InputChangelogItem.Url(21, "https://waze.com/live-map"),
+        InputChangelogItem.Url(21, "https://waze.com/ul"),
+        InputChangelogItem.Url(21, "https://www.waze.com/live-map"),
+        InputChangelogItem.Url(21, "https://www.waze.com/ul"),
+        InputChangelogItem.Url(21, "https://ul.waze.com/ul"),
+    )
     override val pattern = Regex("""((?:https?://)?(?:(?:www|ul)\.)?waze\.com/$URI_REST)""")
 
-    override val documentation = InputDocumentation(
-        group = InputDocumentationGroup.WAZE,
-        items = listOf(
-            InputDocumentationItem.Url(21, "https://waze.com/live-map"),
-            InputDocumentationItem.Url(21, "https://waze.com/ul"),
-            InputDocumentationItem.Url(21, "https://www.waze.com/live-map"),
-            InputDocumentationItem.Url(21, "https://www.waze.com/ul"),
-            InputDocumentationItem.Url(21, "https://ul.waze.com/ul"),
-        ),
-    )
-
-    override suspend fun parse(data: Uri, match: String) = parseResult {
+    override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         data.run {
             // Short link
             // https://waze.com/ul/h{hash}

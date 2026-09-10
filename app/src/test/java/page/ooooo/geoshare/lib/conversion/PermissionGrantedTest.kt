@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.conversion
 
+import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -21,7 +22,7 @@ class PermissionGrantedTest {
     private val source = "https://maps.google.com/foo"
     private val permission = Permission.ALWAYS
     private val oldPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-    private val oldResult = ParseResult(oldPoints)
+    private val oldResult = ParseResult.Success(oldPoints)
     private val results: Results = mapOf(MatchedInput(FakeInputRepository.debugUriInput, source) to oldResult)
     private val stateContext: ConversionStateContext = mock()
 
@@ -41,11 +42,13 @@ class PermissionGrantedTest {
         val input = object : WebViewInput {
             override val permissionTitleResId = R.string.converter_google_maps_permission_title
             override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
-            override val unsafeExtractionJavascript = "undefined"
+
+            override fun getUnsafeExtractionJavaScript(match: String) = "undefined"
 
             override suspend fun parse(
                 data: String,
                 match: String,
+                resources: Resources,
             ) = throw NotImplementedError()
         }
         val matchedInput = MatchedInput<WebViewInput>(input, source)
@@ -65,7 +68,7 @@ class PermissionGrantedTest {
         val state = PermissionGranted(stateContext, source, matchedInput, permission, results)
         assertEquals(
             DataParsed(
-                stateContext, source, matchedInput, permission, results + (matchedInput to ParseResult())
+                stateContext, source, matchedInput, permission, results + (matchedInput to ParseResult.Success())
             ),
             state.transition(),
         )

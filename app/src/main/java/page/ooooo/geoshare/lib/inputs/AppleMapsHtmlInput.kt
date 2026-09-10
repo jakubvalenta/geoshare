@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import androidx.annotation.StringRes
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.utils.io.ByteReadChannel
@@ -30,7 +31,7 @@ class AppleMapsHtmlInput @Inject constructor(
     // Use custom user agent instead of BrowserUserAgent, so that Apple Maps doesn't show "Unsupported browser"
     override val userAgent = DESKTOP_USER_AGENT
 
-    override suspend fun parse(data: ByteReadChannel, match: String) = parseResult {
+    override suspend fun parse(data: ByteReadChannel, match: String, resources: Resources) = parseResult {
         val latPattern = Regex("""<meta property="place:location:latitude" content="$LAT"""")
         val lonPattern = Regex("""<meta property="place:location:longitude" content="$LON"""")
 

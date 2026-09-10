@@ -173,9 +173,6 @@ width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/3.png)
 [<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/4.png"
 alt="Screenshot of GeoShare asking for permission to connect to Google"
 width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/4.png)
-[<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/5.png"
-alt="Screenshot of GeoShare’s intro screen"
-width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/5.png)
 
 ## Installation
 
@@ -240,6 +237,30 @@ package_name("page.ooooo.geoshare.pro")
 
 ```shell
 fastlane metadata
+```
+
+### Taking screenshots for F-Droid and Google Play listing
+
+1. Start an emulator of a device of type `phone`.
+
+2. Install CoMaps and OsmAnd, so these apps appear on the screenshots on the
+   conversion result screen.
+
+3. Take the screenshots:
+
+    ```shell
+    SCREENGRAB_DEVICE_TYPE=phone fastlane screenshots
+    ```
+
+Repeat the process for the `sevenInch` and `tenInch` device types.
+
+### Taking screenshots for documentation (Weblate translations)
+
+```shell
+./gradlew :app:mediumPhoneApi37FreeDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=page.ooooo.geoshare.screenshots
+./gradlew :app:mediumPhoneApi37ProDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=page.ooooo.geoshare.screenshots
+./gradlew :app:mediumPhoneApi37DemoDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=page.ooooo.geoshare.screenshots
+./gradlew :app:copyScreenshots
 ```
 
 ### Manual testing

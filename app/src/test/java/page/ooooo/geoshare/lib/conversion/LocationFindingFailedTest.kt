@@ -16,14 +16,14 @@ import kotlin.time.measureTime
 class LocationFindingFailedTest {
     private val source = "https://maps.apple.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-    private val actionResult = ActionResult.Failed
+    private val actionResult = ActionResult.FAILED
 
     @Test
-    fun locationFindingFailed_executionIsNotCancelled_waitsAndReturnsActionFinished() = runTest {
+    fun locationFindingFailed_executionIsNotCancelled_waitsAndReturnsActionCompleted() = runTest {
         val state = LocationFindingFailed(source, points, actionResult)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
-                ActionFinished(source, points, actionResult),
+                ActionCompleted(source, points, actionResult),
                 state.transition(),
             )
         }
@@ -31,7 +31,7 @@ class LocationFindingFailedTest {
     }
 
     @Test
-    fun locationFindingFailed_executionIsCancelled_returnsActionFinished() = runTest {
+    fun locationFindingFailed_executionIsCancelled_returnsActionCompleted() = runTest {
         val state = LocationFindingFailed(source, points, actionResult)
         var res: State? = null
         val job = launch {
@@ -46,7 +46,7 @@ class LocationFindingFailedTest {
         }
         assertEquals(
             res,
-            ActionFinished(source, points, actionResult),
+            ActionCompleted(source, points, actionResult),
         )
     }
 }

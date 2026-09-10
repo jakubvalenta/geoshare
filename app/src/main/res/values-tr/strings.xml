@@ -7,15 +7,6 @@
     <string name="conversion_succeeded_skip">Orijinal bağlantıyı kopyala</string>
     <string name="nav_menu_content_description">Menü</string>
     <string name="nav_back_content_description">Ana ekrana dön</string>
-    <string name="intro_title">İntro</string>
-    <string name="intro_how_to_share_headline">Başka bir harita uygulamasında harita konumu nasıl gösterilir</string>
-    <string name="intro_how_to_share_google_maps_caption">Harita uygulamanızdan veya web tarayıcınızdan bir konumu paylaşın.</string>
-    <string name="intro_how_to_share_google_maps_content_description">Google Haritalar’ın paylaşım ekranının ekran görüntüsü</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_messaging">Mesajlaşma</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[<i>%1$s</i>’i seçin ve uygulama aynı konumu herhangi bir yüklü harita uygulamasında açmanıza izin verecek.]]></string>
-    <string name="intro_how_to_share_app_content_description">%1$s’in paylaşım ekranının ekran görüntüsü</string>
-    <string name="intro_open_by_default_headline">Android’i Google Haritalar bağlantılarını alternatif haritalarda açacak şekilde yapılandırın (isteğe bağlı)</string>
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[Önce, Ayarlar ➞ Uygulamalar ➞ Haritalar ➞ <i>Varsayılan olarak aç</i> ve bu uygulamada bağlantıların açılmasını kapatın.]]></string>
     <string name="intro_open_by_default_google_maps_content_description">Google Haritalar’ın Varsayılan olarak aç ayarlarının ekran görüntüsü</string>
     <string name="intro_open_by_default_google_maps_button">Google Haritalar ayarlarını açın</string>
@@ -32,14 +23,11 @@
     <string name="intro_open_by_default_app_screenshot_cancel">İptal</string>
     <string name="intro_open_by_default_app_screenshot_add">Ekle</string>
     <string name="intro_nav_close">Kapat</string>
-    <string name="intro_nav_next">Sonraki</string>
-    <string name="intro_nav_finish">Başlayın</string>
     <string name="main_input_uri_label">Buraya bir harita bağlantısı yapıştırın</string>
     <string name="main_input_uri_clear_content_description">Temizle</string>
     <string name="main_input_uri_paste_content_description">Yapıştır</string>
     <string name="main_input_uri_supporting_text">örneğin https://maps.app.goo.gl/… veya maps.apple.com/…</string>
     <string name="main_create_geo_uri">Koordinatları göster</string>
-    <string name="main_navigate_to_intro">Daha fazla uygulama özelliği keşfedin</string>
     <string name="main_random">Rastgele bağlantı</string>
     <string name="converter_amap_loading_indicator_title">Amap’e bağlanılıyor…</string>
     <string name="converter_amap_permission_title">Amap’e bağlanılsın mı?</string>
@@ -63,13 +51,11 @@
     <string name="conversion_automation_copy_link_succeeded">Bağlantı otomatik olarak kopyalandı</string>
     <string name="conversion_automation_copy_succeeded">Koordinatlar otomatik olarak kopyalandı</string>
     <string name="conversion_automation_open_app_failed">%1$s otomatik olarak açılamadı</string>
-    <string name="conversion_automation_open_app_succeeded">%1$s otomatik olarak açıldı</string>
     <plurals name="conversion_automation_open_app_waiting">
         <item quantity="one">%1$s %2$ds’de otomatik olarak açılıyor</item>
         <item quantity="other">%1$s %2$ds’de otomatik olarak açılıyor</item>
     </plurals>
     <string name="conversion_automation_share_failed">Bağlantı otomatik olarak paylaşılamadı</string>
-    <string name="conversion_automation_share_succeeded">Bağlantı otomatik olarak paylaşıldı</string>
     <string name="intro_settings_activity_not_found">Ayarlar açılamadı</string>
     <plurals name="conversion_automation_share_waiting">
         <item quantity="one">Bağlantı otomatik olarak %1$ds’de paylaşılıyor</item>
@@ -120,7 +106,6 @@
     <string name="conversion_succeeded_save_gpx_filename">%1$s sonuç %2$s.gpx</string>
     <string name="donation_button">Ko-fi üzerinden bağış yapın</string>
     <string name="donation_description">Bu uygulama size zaman kazandırıyor mu?</string>
-    <string name="intro_how_to_share_google_maps_screenshot_title">Şununla paylaş</string>
     <string name="conversion_succeeded_apps_headline">Şununla aç</string>
     <string name="intro_open_by_default_app_caption"><![CDATA[Sonra Ayarlar ➞ Uygulamalar ➞ %1$s ➞ <i>Varsayılan olarak aç</i>, bağlantıların uygulamada açılmasını etkinleştirin ve <i>Bağlantılar ekle</i>’ye tıklayın.]]></string>
     <string name="output_gpx_location_permission">%1$s mevcut konumunuzdan başlayan bir rota oluşturacaktır.</string>
@@ -150,8 +135,8 @@
     <string name="conversion_automation_save_gpx_succeeded">GPX otomatik olarak kaydedildi</string>
     <string name="conversion_loading_indicator_description" tools:ignore="PluralsCandidate">Şu nedenden dolayı %2$d denemeden %1$d’i başarısız oldu: %3$s</string>
     <string name="faq_how_headline">Nasıl çalışır</string>
-    <string name="faq_how_text_2_item_http">ya HTTP başlıkları,</string>
-    <string name="faq_how_text_2_item_html">ya HTML belgesi,</string>
+    <string name="faq_how_text_2_item_http">HTTP başlıkları,</string>
+    <string name="faq_how_text_2_item_html">HTML belgesi,</string>
     <string name="faq_how_text_2_item_web">ya da JavaScript içeren canlı web sayfası.</string>
     <string name="faq_how_text_4_preferences_button">tercihler</string>
     <string name="faq_location_permission_headline">Konum izni</string>
@@ -200,10 +185,10 @@
     <string name="faq_privacy_text">Mümkün olduğunda, %1$s harita bağlantılarını çevrimdışı olarak dönüştürür. Harita bağlantısı çevrimiçi dönüştürme gerektiriyorsa, uygulama harita servisine (Google Haritalar, Apple Haritalar vb.) bağlanmadan önce size soracaktır. Bağlantıya izin verirseniz, harita servisi harita bağlantısını alacak ve IP adresinizi okuyabilecektir.</string>
     <string name="faq_how_text_1">%1$s, harita bağlantılarını diğer harita uygulamaları tarafından açılabilecek geo: bağlantılarına dönüştürür. Bir geo: bağlantısı oluşturmak için coğrafi koordinatlar gereklidir. %1$s bunları harita URL’sinden çıkarır.</string>
     <string name="faq_how_text_2">Ancak, tüm harita URL’leri koordinat içermez. Bu gibi durumlarda, %1$s sizden harita servisine (Google Haritalar, Apple Haritalar vb.) bağlanmak ve koordinatları almak için izin isteyecektir:</string>
-    <string name="faq_how_text_3">Harita servisine bağlanmaya izin vermezseniz, %1$s koordinatlar yerine bir arama terimi içeren bir geo: bağlantısı oluşturur veya çalışmayı durdurur, söz konusu bağlantıya bağlı olarak.</string>
+    <string name="faq_how_text_3">Harita servisine bağlanmaya izin vermezseniz, %1$s koordinatlar yerine yer adıyla bir geo: bağlantısı oluşturur veya söz konusu bağlantıya bağlı olarak durur.</string>
     <string name="faq_how_text_4">Harita servisine bağlanmayı her zaman sormak (varsayılan) yerine kalıcı olarak izin vermek veya reddetmek için uygulamanın %1$s bölümüne gidin.</string>
     <string name="conversion_succeeded_apps_links_configure">Web haritalarını yapılandırın</string>
-    <string name="intro_open_by_default_app_note">Bazı bağlantılar gri renkteyse, diğer harita uygulamaları varsayılan olarak bu bağlantıları açacak şekilde ayarlanmıştır. Bu uygulamaları bulabilir ve tıpkı Google Haritalar için yaptığımız gibi, bu uygulamalar için bağlantıların açılmasını kapatabilirsiniz.</string>
+    <string name="intro_open_by_default_app_note">Bazı bağlantılar gri renkteyse, diğer harita uygulamaları varsayılan olarak bu bağlantıları açacak şekilde ayarlanmıştır. Bu uygulamaları bulabilir ve tıpkı Google Haritalar için yaptığımız gibi, bu uygulamalar için bağlantıların açılmasını kapatabilirsiniz. Ayrıca, bu Android özelliğini kullanıyorsanız özel alana yüklenmiş uygulamaları da kontrol edin.</string>
     <string name="links_form_enabled_option_app">Uygulamalar listesinde göster</string>
     <string name="user_preferences_apps_message_hidden">Uygulama gizlendi. Tercihler bölümünden tekrar gösterebilirsiniz.</string>
     <string name="user_preferences_apps_title">Uygulamalar</string>
@@ -236,7 +221,7 @@
     <string name="links_form_srs">Koordinat sistemi</string>
     <string name="links_form_type">Bağlam menüsü simgesi</string>
     <string name="links_form_uri_template_coords">URL şablonu</string>
-    <string name="links_form_uri_template_name">Yalnızca arama terimi mevcut olduğunda kullanılan URL şablonu</string>
+    <string name="links_form_uri_template_name">Yalnızca yer adı mevcut olduğunda kullanılan URL şablonu</string>
     <string name="links_insert">Web haritası ekle</string>
     <string name="links_message_deleted">Web haritası silindi</string>
     <string name="links_message_disabled_group">Web haritası gizlendi. Tercihlerden tekrar gösterebilirsiniz.</string>
@@ -253,7 +238,7 @@
         <item quantity="other">%2$d uygulamadan %1$d’i görünür</item>
     </plurals>
     <string name="intro_how_to_share_google_maps_screenshot_place">Bırakılan işaretçi</string>
-    <string name="about_text"><![CDATA[<p>%1$s, ücretsiz ve açık kaynaklı bir uygulamadır <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> veya daha sonraki lisans altında dağıtılmaktadır.</p><br><p>Kodu <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>’ta bulabilirsiniz, ayrıca <a href="https://github.com/jakubvalenta/geoshare/issues">sorun bildirebilirsiniz</a>.</p><br><p>Görüşleriniz bizim için değerlidir. Bana <a href="mailto:%2$s">%2$s</a>’den ulaşabilirsiniz.</p>]]></string>
+    <string name="about_text"><![CDATA[<p>%1$s, ücretsiz ve açık kaynaklı bir uygulamadır <a href=\"https://www.gnu.org/licenses/gpl-3.0.txt\">GPL 3.0</a> veya daha sonraki lisans altında dağıtılmaktadır.</p><br><p>Kodu <a href=\"https://github.com/jakubvalenta/geoshare\">GitHub</a>’ta bulabilirsiniz, ayrıca <a href=\"https://github.com/jakubvalenta/geoshare/issues\">sorun bildirebilirsiniz</a>.</p><br><p>Görüşleriniz bizim için değerlidir. Bana <a href=\"mailto:%2$s\">%2$s</a>’ten ulaşabilirsiniz.</p>]]></string>
     <string name="conversion_succeeded_check_experimental">Deneysel bir ekstraksiyon yöntemi nedeniyle konum doğruluğunda hatalar olabilir.</string>
     <string name="licenses">Lisanslar</string>
     <string name="conversion_succeeded_check_map_center">Konum, bir işaretçi değil harita merkezi olabilir.</string>
@@ -268,7 +253,7 @@
     <string name="conversion_failed_reason_exception">Bilinmeyen istisna</string>
     <string name="output_save_to_contact_failed">Nokta rehbere kaydedilemedi</string>
     <string name="output_save_to_contact_automation_failed">Nokta otomatik olarak rehbere kaydedilemedi</string>
-    <string name="faq_how_text_2_item_api">veya harita servisinin API’si,</string>
+    <string name="faq_how_text_2_item_api">harita servisinin API’si,</string>
     <string name="conversion_failed_unsupported_source_place_list">Yer listeleri desteklenmiyor</string>
     <string name="network_exception_connect_exception">Bağlantı reddedildi</string>
     <string name="network_exception_unauthorized">Yetkisiz</string>
@@ -298,4 +283,41 @@
     <string name="server_restore_initial_data_title">Sunucular fabrika ayarlarına sıfırlansın mı?</string>
     <string name="server_update">Sunucuyu düzenle</string>
     <string name="server_url_template">URL şablonu</string>
+    <string name="billing_feature_all">Temel sürümün tüm özellikleri</string>
+    <string name="billing_feature_automation_description">Harita bağlantısı koordinatlara dönüştürüldüğünde otomatik olarak bir işlem gerçekleştirerek zamandan tasarruf edin: haritayı uygulamasını açın, navigasyonu başlatın (TomTom, Waze vb.), panoya kopyalayın, GPX olarak kaydedin.</string>
+    <string name="billing_feature_custom_link">Özel web haritaları</string>
+    <string name="billing_feature_custom_link_description">Favori (veya özel) web haritanızda bir konum açın.</string>
+    <string name="billing_intro_not_purchased">Yükselt</string>
+    <string name="billing_intro_purchased">Sahipsiniz</string>
+    <string name="billing_manage_subscription">Aboneliğinizi yönetin</string>
+    <string name="billing_manage_subscription_description">Ödeme yöntemini iptal edin, duraklatın veya değiştirin</string>
+    <string name="billing_offers_empty">%1$s bölgenizde mevcut değil</string>
+    <string name="billing_one_time">Tek seferlik ödeme</string>
+    <string name="billing_order_history">Sipariş geçmişi</string>
+    <string name="billing_pricing">Fiyatlandırma</string>
+    <string name="billing_pro_feature">Pro özellik</string>
+    <string name="billing_purchase_button">Çıkış yap</string>
+    <string name="billing_purchase_success">%1$s’yu satın aldığınız için teşekkürler</string>
+    <string name="billing_refund_description">Satın alımdan itibaren 48 saat içinde para iadesi yapılır</string>
+    <string name="billing_status_expired">Aboneliğiniz yakında sona erecek</string>
+    <string name="billing_status_pending">Ödemeniz beklemede</string>
+    <string name="billing_subscription_cancel_description">İstediğiniz zaman iptal edin</string>
+    <string name="billing_subscription_monthly">Aylık abonelik</string>
+    <string name="billing_terms_of_service">hizmet şartları</string>
+    <string name="conversion_succeeded_check_name_only">Yer adı kullanılarak koordinat bulunamadı.</string>
+    <string name="conversion_succeeded_check_name_only_points">Bazı noktaların koordinatları bulunamadı.</string>
+    <string name="converter_google_navigation_uri_name">Google Navigasyon URI’si</string>
+    <string name="faq_name_only_title">Yer adı kullanılarak koordinat bulunamadı</string>
+    <string name="faq_name_only_text_1">%1$s belirli harita bağlantılarından yalnızca yer adını, örneğin \"Kilimanjaro Dağı\"nı çıkarabiliyor. Bu konumu başka bir harita uygulamasında açtığınızda orijinal bağlantıdan farklı bir yer gösterebilir, çünkü aynı ada sahip birden fazla yer olabilir.</string>
+    <string name="faq_name_only_text_2">Sadece isimleriyle tanımlanan noktalar GPX rotalarına dahil edilmez.</string>
+    <string name="faq_privacy_text_server">Bazı harita bağlantıları için, %1$s uzak bir sunucu olan açık kaynaklı %3$s’ı çağırır. Bu sunucu daha sonra harita servis API’ını (örneğin Google Haritalar API’ı) çağırır. %2$s harita bağlantılarının kaydını tutmaz. Hız sınırlaması uygulamak için, cihazınızı tanımlayan bir genel anahtarı ve IP adresinizi sınırlı bir süre için ayrı olarak saklar.</string>
+    <string name="faq_privacy_text_html">Bazı harita bağlantıları için, %1$s harita servisinin canlı web sayfasını yükler ve JavaScript kodunu çalıştırır. Bu işlem, izleme komut dosyalarını engelleyen ve çerezleri saklamayan kısıtlı bir ortamda gerçekleşir.</string>
+    <string name="network_exception_webview">WebView istisnası</string>
+    <string name="server_challenge_url">Challenge URL</string>
+    <string name="server_list_description">Harita servis bağlantısına izin verildiğinde, %1$s belirli bağlantıları koordinatlara dönüştürmek için API sunucularını kullanır. Kendi kimlik bilgilerinizle resmi sunucuları, proxy sunucularını kullanmayı veya hiçbirini kullanmamayı seçebilirsiniz.</string>
+    <string name="server_list_search_title">Ara</string>
+    <string name="server_name">Ad</string>
+    <string name="network_exception_too_many_requests_wait">Çok fazla istek, %1$d sn bekleyin</string>
+    <string name="user_preferences_dynamic_color_title">Dinamik renk</string>
+    <string name="user_preferences_section_appearance">Görünüm</string>
 </resources>

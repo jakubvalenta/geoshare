@@ -34,7 +34,7 @@ fun Screenshot(
     Box(
         Modifier
             .sizeIn(maxWidth = 400.dp)
-            .padding(horizontal = spacing.largeAdaptive)
+            .padding(horizontal = spacing.large)
             .clip(MaterialTheme.shapes.large),
     ) {
         Image(

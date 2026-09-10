@@ -5,15 +5,8 @@
     <string name="intro_open_by_default_app_screenshot_cancel">Отменить</string>
     <string name="intro_open_by_default_app_screenshot_add">Добавить</string>
     <string name="nav_back_content_description">Назад на главную</string>
-    <string name="intro_title">Введение</string>
-    <string name="intro_how_to_share_headline">Как показать местоположение на карте в другом картографическом приложении</string>
-    <string name="intro_how_to_share_google_maps_caption">Поделитесь местоположением из приложения для карт или браузера.</string>
-    <string name="intro_how_to_share_google_maps_screenshot_title">Поделиться с</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Поставлен маркер</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_messaging">Сообщения</string>
     <string name="conversion_succeeded_apps_headline">Открыть с помощью</string>
-    <string name="intro_open_by_default_headline">Настройте Android на открытие ссылок на Google Карты в других картах (необязательно)</string>
-    <string name="intro_how_to_share_app_content_description">Снимок экрана приложения %1$s с диалогом «Поделиться ссылкой»</string>
     <string name="intro_open_by_default_google_maps_button">Открыть настройки Google Карт</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">Карты</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">Выберите способ открытия ссылок для этого приложения</string>
@@ -28,13 +21,10 @@
         <item quantity="other">%1$d поддерживаемых ссылок</item>
     </plurals>
     <string name="intro_nav_close">Закрыть</string>
-    <string name="intro_nav_next">Далее</string>
-    <string name="intro_nav_finish">Приступим</string>
     <string name="intro_settings_activity_not_found">Не удалось открыть настройки</string>
     <string name="main_input_uri_label">Вставьте сюда ссылку на карту</string>
     <string name="intro_open_by_default_google_maps_content_description">Снимок экрана настроек Google Maps «Открыть по умолчанию»</string>
     <string name="intro_open_by_default_app_caption"><![CDATA[Затем перейдите в настройки ➞ приложения ➞ %1$s ➞ <i>Открывать по умолчанию</i>, включите открытие ссылок в этом приложении и нажмите <i>Добавить ссылки</i>.]]></string>
-    <string name="main_navigate_to_intro">Узнать больше возможностей приложения</string>
     <string name="converter_google_maps_permission_title">Подключиться к Google?</string>
     <string name="converter_apple_maps_permission_title">Подключиться к Apple?</string>
     <string name="conversion_permission_common_grant">Хорошо</string>
@@ -50,8 +40,6 @@
     <string name="user_preferences_connection_option_ask">Спросить перед подключением</string>
     <string name="copying_finished">Скопировано в буфер обмена</string>
     <string name="conversion_failed_unsupported_service">Неподдерживаемый картографический сервис</string>
-    <string name="intro_how_to_share_google_maps_content_description">Снимок экрана Google Карт с диалогом «Поделится ссылкой»</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
     <string name="conversion_succeeded_apps_not_found">Никакое приложение для карты не установлено</string>
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[Сначала, перейдите в настройки ➞ приложения ➞ карты ➞ <i>Открывать по умолчанию</i> и отключите открытие ссылок в этом приложении.]]></string>
     <string name="yes">Да</string>
@@ -59,10 +47,9 @@
     <string name="about_title">О приложении</string>
     <string name="conversion_failed_connection_permission_denied">Эта ссылка не поддерживается без подключения к картографическому сервису</string>
     <string name="main_input_uri_supporting_text">Например, https://maps.app.goo.gl/… или maps.apple.com/…</string>
-    <string name="intro_open_by_default_app_note">Если некоторые ссылки выделены серым цветом, значит, другие приложения Google открывают их по умолчанию. Вы можете найти эти приложения и отключить открытие ссылок для них, как мы это сделали для Google Карт.</string>
+    <string name="intro_open_by_default_app_note">Если некоторые ссылки выделены серым цветом, значит, другие приложения Google открывают их по умолчанию. Вы можете найти эти приложения и отключить открытие ссылок для них, как мы это сделали для Google Карт. Также проверьте приложения, установленные в личном (втором) пространстве, если вы используете эту функцию Android.</string>
     <string name="conversion_failed_missing_url">Отсутствует URL-адрес</string>
     <string name="conversion_permission_common_text"><![CDATA[Эта ссылка <tt>%1$s</tt> не содержит координат. Для %2$s необходимо подключиться к картографическому сервису, чтобы получить их.]]></string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[Выберете <i>%1$s</i> и приложение позволит вам открыть то же место в любом установленном приложении для работы с картами.]]></string>
     <string name="about_text"><![CDATA[<p>%1$s — это бесплатное приложение с открытым исходным кодом, распространяемое по лицензии <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> или более поздней версии.</p><br><p>Вы можете найти код на <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, где вы также можете <a href="https://github.com/jakubvalenta/geoshare/issues">сообщать о проблемах</a>.</p><br><p>Мы будем рады вашим отзывам. Вы можете связаться со мной по адресу <a href="mailto:%2$s">%2$s</a>.</p>]]></string>
     <string name="user_preferences_connection_description">Для поддержки коротких ссылок и ссылок без географических координат в URL-адресе, %1$s может подключаться к картографическому сервису (Google Карты, Карты Apple и др.).</string>
     <string name="converter_google_maps_loading_indicator_title">Подключение к Google…</string>
@@ -120,7 +107,6 @@
     <string name="conversion_automation_copy_link_succeeded">Ссылка автоматически скопирована</string>
     <string name="conversion_automation_copy_succeeded">Координаты автоматически скопированы</string>
     <string name="conversion_automation_open_app_failed">Не удалось автоматически открыть %1$s</string>
-    <string name="conversion_automation_open_app_succeeded">Автоматически открыт %1$s</string>
     <plurals name="conversion_automation_open_app_waiting">
         <item quantity="one">Автоматическое открытие %1$s через %2$d сек.</item>
         <item quantity="few">Автоматическое открытие %1$s через %2$d сек.</item>
@@ -135,12 +121,11 @@
         <item quantity="other">Автоматическое сохранение GPX через %1$d сек.</item>
     </plurals>
     <string name="conversion_automation_share_failed">Не удалось автоматически поделиться ссылкой</string>
-    <string name="conversion_automation_share_succeeded">Поделились ссылкой автоматически</string>
     <plurals name="conversion_automation_share_waiting">
-        <item quantity="one">Поделимся ссылкой автоматически через %1$d сек.</item>
-        <item quantity="few">Поделимся ссылкой автоматически через %1$d сек.</item>
-        <item quantity="many">Поделимся ссылкой автоматически через %1$d сек.</item>
-        <item quantity="other">Поделимся ссылкой автоматически через %1$d сек.</item>
+        <item quantity="one">Автоматический обмен ссылкой через %1$d сек.</item>
+        <item quantity="few">Автоматический обмен ссылкой через %1$d сек.</item>
+        <item quantity="many">Автоматический обмен ссылкой через %1$d сек.</item>
+        <item quantity="other">Автоматический обмен ссылкой через %1$d сек.</item>
     </plurals>
     <string name="conversion_loading_indicator_description" tools:ignore="PluralsCandidate">Попытка %1$d из %2$d по причине: %3$s</string>
     <string name="faq_location_permission_headline">Разрешение местоположения</string>
@@ -178,7 +163,7 @@
     <string name="faq_how_text_2_item_http">либо HTTP-заголовков,</string>
     <string name="faq_how_text_2_item_html">либо HTML-документа,</string>
     <string name="faq_how_text_2_item_web">либо полной web-страницы, включая JavaScript.</string>
-    <string name="faq_how_text_3">Если вы не разрешаете подключаться к картографическому сервису, то %1$s создаёт geo-ссылку с поисковым запросом вместо координат или прерывает выполнение, в зависимости от конкретной ссылки.</string>
+    <string name="faq_how_text_3">Если вы не разрешаете подключаться к картографическому сервису, то %1$s создаёт geo-ссылку с названием места вместо координат или прерывает выполнение, в зависимости от конкретной ссылки.</string>
     <string name="faq_how_text_4">Чтобы навсегда разрешить или запретить подключение к картографическому сервису вместо постоянного запроса (по умолчанию), перейдите в %1$s приложения.</string>
     <string name="faq_how_text_4_preferences_button">настройки</string>
     <string name="faq_privacy_headline">Вопросы конфиденциальности</string>
@@ -231,7 +216,7 @@
     <string name="links_form_srs">Система координат</string>
     <string name="links_form_type">Значок контекстного меню</string>
     <string name="links_form_uri_template_coords">Шаблон URL</string>
-    <string name="links_form_uri_template_name">Шаблон URL, когда доступен только поисковый запрос</string>
+    <string name="links_form_uri_template_name">Шаблон URL, когда доступно только название места</string>
     <string name="links_insert">Добавить web-карту</string>
     <string name="links_message_deleted">Web-карта удалена</string>
     <string name="links_message_factory_reset">Настройки web-карт восстановлены на значения по умолчанию</string>
@@ -320,4 +305,49 @@
     <string name="server_restore_initial_data_title">Сбросить серверы до настроек по умолчанию?</string>
     <string name="server_update">Редактировать сервер</string>
     <string name="server_url_template">Шаблон URL</string>
+    <string name="billing_feature_all">Все функции базовой версии</string>
+    <string name="billing_feature_automation_description">Экономия времени за счёт автоматического выполнения действий при преобразовании ссылки на карту в координаты: открытие картографического приложения, запуск навигации (TomTom, Waze и т. д.), копирование в буфер обмена, сохранение GPX.</string>
+    <string name="billing_feature_custom_link">Пользовательские web-карты</string>
+    <string name="billing_feature_custom_link_description">Возможность открыть местоположение на вашей любимой (или личной) web-карте.</string>
+    <string name="billing_intro_not_purchased">Перейти на</string>
+    <string name="billing_pricing">Цены</string>
+    <string name="billing_pro_feature">Функция Pro</string>
+    <string name="billing_purchase_button">Оплатить</string>
+    <string name="billing_purchase_success">Спасибо за покупку %1$s</string>
+    <string name="billing_refund_description">Возврат в течение 48 часов с момента платежа</string>
+    <string name="billing_subscription_cancel_description">Отмена в любое время</string>
+    <string name="billing_subscription_monthly">Ежемесячная подписка</string>
+    <string name="billing_terms_of_service">условия обслуживания</string>
+    <string name="conversion_succeeded_check_name_only">Координаты не найдены, используется название места.</string>
+    <string name="conversion_succeeded_check_name_only_points">Для некоторых точек координаты не найдены.</string>
+    <string name="converter_google_navigation_uri_name">Ссылка навигации Google</string>
+    <string name="faq_name_only_title">Координаты не найдены, используется название места</string>
+    <string name="faq_name_only_text_1">%1$s может извлекать только название места (например, «Гора Килиманджаро») из определённых ссылок на карту. Когда вы откроете это место в другом картографическом приложении, оно может показать совсем другое место, а не то, на которое указывает исходная ссылка, поскольку может существовать несколько мест с одинаковым названием.</string>
+    <string name="faq_name_only_text_2">Точки, указанные только названием, не включаются в маршруты GPX.</string>
+    <string name="network_exception_webview">ошибка WebView</string>
+    <string name="billing_intro_purchased">У вас</string>
+    <string name="billing_manage_subscription">Управление подпиской</string>
+    <string name="billing_manage_subscription_description">Отмена, приостановка или изменение способа оплаты</string>
+    <string name="billing_offers_empty">%1$s недоступно в вашем регионе</string>
+    <string name="billing_one_time">Единовременный платёж</string>
+    <string name="billing_order_history">Платёжная история</string>
+    <string name="network_exception_too_many_requests_wait">слишком много запросов, пауза %1$d сек.</string>
+    <string name="user_preferences_dynamic_color_title">Динамический цвет</string>
+    <string name="user_preferences_section_appearance">Внешний вид</string>
+    <string name="user_preferences_finish_description">Выберите, когда приложение должно автоматически закрываться. Закрытое приложение не появляется после использования жеста «назад».</string>
+    <string name="user_preferences_finish_never">Не закрывать приложение автоматически</string>
+    <string name="user_preferences_finish_title">Закрытие</string>
+    <string name="user_preferences_finish_after_action_succeeded">Закрывать приложение после обмена с ним ссылкой и выполнения какого-либо действия (запуск картографического приложения, копирование координат, сохранение GPX и т.д.)</string>
+    <string name="user_preferences_finish_after_action_succeeded_and_opened_app">Закрывать приложение после обмена с ним ссылкой и запуска картографического приложения</string>
+    <string name="conversion_failed_unsupported_source_google_search">Ссылки Google Поиска не поддерживаются</string>
+    <string name="help_open_by_default_action">Подробнее в ЧаВо</string>
+    <string name="help_open_by_default_text">Можно настроить Android так, чтобы при нажатии ссылки на карту всегда открывалось приложение %1$s вместо стандартного картографического приложения.</string>
+    <string name="help_open_by_default_title">Всегда открывать ссылки на карты в %1$s</string>
+    <string name="help_share_source_action">Попробовать в %1$s</string>
+    <string name="help_share_source_text">В большинстве картографический приложений можно использовать кнопку %1$s, чтобы открыть местоположение в %2$s.</string>
+    <string name="help_share_source_title">Запуск GeoShare из картографического приложения</string>
+    <string name="help_welcome_action">Или скопируйте этот пример:</string>
+    <string name="help_welcome_text">Уже есть готовая ссылка на карту? Введите её в поле ввода и нажмите «%1$s».</string>
+    <string name="help_welcome_title">Добро пожаловать</string>
+    <string name="faq_open_by_default_headline">Как всегда открывать ссылки в %1$s</string>
 </resources>

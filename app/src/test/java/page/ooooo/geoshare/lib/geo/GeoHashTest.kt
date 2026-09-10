@@ -131,4 +131,45 @@ class GeoHashTest {
             decodeGe0Hash(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Emse5f0H8a"),
         )
     }
+
+    @Test
+    fun decodeMapyComGeoHash() {
+        assertEquals(
+            listOf(
+                NaivePoint(50.124510526657104, 14.40574899315834, source = Source.HASH),
+                NaivePoint(50.123878195881844, 14.410104900598526, source = Source.HASH),
+            ),
+            decodeMapyComGeoHash(
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "9gz-HxYH7ngonA6"
+            ),
+        )
+    }
+
+    @Test
+    fun decodeMapyComGeoHash_nullIsland_returnsPointWithZeroCoordinates() {
+        assertEquals(
+            listOf(NaivePoint(0.0, 0.0, source = Source.HASH)),
+            decodeMapyComGeoHash("9000090000"),
+        )
+    }
+
+    @Test
+    fun decodeMapyComGeoHash_invalid_returnsNoPoints() {
+        assertEquals(
+            emptyList<NaivePoint>(),
+            decodeMapyComGeoHash(""),
+        )
+        assertEquals(
+            emptyList<NaivePoint>(),
+            decodeMapyComGeoHash("?"),
+        )
+        assertEquals(
+            emptyList<NaivePoint>(),
+            decodeMapyComGeoHash("spam"),
+        )
+        assertEquals(
+            emptyList<NaivePoint>(),
+            decodeMapyComGeoHash("9gz-H"),
+        )
+    }
 }

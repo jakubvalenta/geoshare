@@ -35,10 +35,10 @@ fun Grid(modifier: Modifier = Modifier, content: GridScope.() -> Unit) {
 
     Column(
         modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive),
+        verticalArrangement = Arrangement.spacedBy(spacing.tiny),
     ) {
         scope.items.chunked(columnCount).forEach { row ->
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(spacing.smallAdaptive)) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(spacing.tiny)) {
                 row.forEach { item ->
                     item()
                 }

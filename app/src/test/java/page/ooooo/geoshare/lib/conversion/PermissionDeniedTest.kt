@@ -17,7 +17,7 @@ class PermissionDeniedTest {
     private val input = FakeInputRepository.googleMapsShortLinkInput
     private val matchedInput = MatchedInput(input, source)
     private val oldPoints = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-    private val oldResult = ParseResult(oldPoints)
+    private val oldResult = ParseResult.Success(oldPoints)
     private val results: Results = mapOf(MatchedInput(FakeInputRepository.debugUriInput, source) to oldResult)
     private val stateContext: ConversionStateContext = mock()
 
@@ -26,7 +26,7 @@ class PermissionDeniedTest {
         val state = PermissionDenied(stateContext, source, matchedInput, results)
         assertEquals(
             DataParsed(
-                stateContext, source, matchedInput, Permission.NEVER, results + (matchedInput to ParseResult())
+                stateContext, source, matchedInput, Permission.NEVER, results + (matchedInput to ParseResult.Success())
             ),
             state.transition(),
         )

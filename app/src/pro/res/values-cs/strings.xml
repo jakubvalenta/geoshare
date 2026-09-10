@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="conversion_failed_unsupported_source">Tento odkaz není podporován</string>
-    <string name="server_list_google_maps_none_description">Vytvořit odkaz na vyhledávání místa místo souřadnic</string>
+    <string name="server_list_google_maps_none_description">Přečíst název místa místo souřadnic</string>
+    <string name="billing_manage_error">Nepodařilo se otevřít Google Play</string>
+    <string name="billing_offers_error">Nepodařilo se stáhnout nabídky</string>
+    <string name="billing_purchase_error_cancelled">Nákup byl zrušen</string>
+    <string name="billing_purchase_error_unknown">Nepodařilo se uskutečnit nákup</string>
+    <string name="billing_setup_error_unknown">Nepodařilo se stáhnout nákupy</string>
 </resources>

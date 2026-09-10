@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import android.webkit.WebSettings
 import androidx.annotation.StringRes
 import kotlinx.collections.immutable.persistentListOf
@@ -17,7 +18,6 @@ import javax.inject.Singleton
 class BaiduMapWebViewInput @Inject constructor(
     private val log: Log,
 ) : WebViewInput {
-
     @Serializable
     private data class ExtractedPoint(val lat: Double?, val lon: Double?, val z: Double?, val name: String?)
 
@@ -31,7 +31,7 @@ class BaiduMapWebViewInput @Inject constructor(
      * Notice that we don't take coordinates from `_appStateFromUrl.loc`, because these have a longitude offset.
      */
     // language=JavaScript
-    override val unsafeExtractionJavascript = """
+    override fun getUnsafeExtractionJavaScript(match: String) = """
         () => {
             function deepGet(obj, ...keys) {
                 return keys.reduce((acc, key) => {
@@ -75,7 +75,7 @@ class BaiduMapWebViewInput @Inject constructor(
         };
     """.trimIndent()
 
-    override suspend fun parse(data: String, match: String) = parseResult {
+    override suspend fun parse(data: String, match: String, resources: Resources) = parseResult {
         val json = Json {
             explicitNulls = false
         }

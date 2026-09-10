@@ -2,22 +2,13 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="nav_menu_content_description">菜单</string>
     <string name="nav_back_content_description">返回主屏幕</string>
-    <string name="intro_title">介绍</string>
-    <string name="intro_how_to_share_headline">如何在其他地图应用中显示地图位置</string>
-    <string name="intro_how_to_share_google_maps_caption">从地图应用或您的网络浏览器分享位置。</string>
-    <string name="intro_how_to_share_google_maps_content_description">Google 地图分享屏幕的屏幕截图</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[选择 <i>%1$s</i>，该应用将允许您在任何已安装的地图应用中打开同一位置。]]></string>
-    <string name="intro_how_to_share_app_content_description">%1$s 分享屏幕的屏幕截图</string>
     <string name="intro_open_by_default_google_maps_content_description">Google 地图默认打开设置的屏幕截图</string>
     <string name="intro_open_by_default_google_maps_button">打开 Google 地图设置</string>
     <string name="intro_open_by_default_app_caption"><![CDATA[然后转到设置 ➞ 应用 ➞ %1$s ➞ <i>默认打开</i>，开启在此应用中打开链接，然后点击<i>添加链接</i>。]]></string>
     <string name="intro_open_by_default_app_button">打开 %1$s 设置</string>
     <string name="intro_nav_close">关闭</string>
-    <string name="intro_nav_next">下一页</string>
-    <string name="intro_nav_finish">开始</string>
     <string name="main_input_uri_label">在此处粘贴地图链接</string>
     <string name="main_input_uri_clear_content_description">清除</string>
-    <string name="main_navigate_to_intro">发现更多应用功能</string>
     <string name="converter_google_maps_permission_title">连接到 Google？</string>
     <string name="conversion_permission_common_deny">取消</string>
     <string name="about_title">关于</string>
@@ -35,20 +26,16 @@
     <string name="conversion_succeeded_apps_not_found">未安装地图应用</string>
     <string name="copying_finished">已复制到剪贴板</string>
     <string name="conversion_failed_connection_permission_denied">如果不连接到地图服务，则不支持此链接</string>
-    <string name="intro_open_by_default_headline">配置 Android 以在替代地图中打开 Google 地图的链接（可选）</string>
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[首先，转到设置 ➞ 应用 ➞ 地图 ➞ <i>默认打开</i>，并关闭在此应用中打开链接。]]></string>
     <string name="main_input_uri_supporting_text">例如：https://maps.app.goo.gl/… 或 maps.apple.com/…</string>
     <string name="intro_settings_activity_not_found">无法打开设置</string>
-    <string name="intro_open_by_default_app_note">如果部分链接显示为灰色，则其他 Google 应用已设置为默认打开它们。您可以找到这些应用并关闭在应用中打开链接，就像我们为 Google 地图所做的那样。</string>
+    <string name="intro_open_by_default_app_note">如果部分链接显示为灰色，则其他 Google 应用已设置为默认打开它们。您可以找到这些应用并关闭在应用中打开链接，就像我们为 Google 地图所做的那样。如果您使用此 Android 功能，还请检查私密空间中安装的应用。</string>
     <string name="main_create_geo_uri">显示坐标</string>
     <string name="conversion_error_report">报告问题</string>
     <string name="conversion_permission_common_grant">确定</string>
     <string name="conversion_permission_common_text"><![CDATA[链接 <tt>%1$s</tt> 不包含坐标。%2$s 需要连接到地图服务才能获取坐标。]]></string>
     <string name="about_text"><![CDATA[<p>%1$s 是根据 <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> 或更高版本许可协议分发的自由及开源应用。</p><br><p>您可以在 <a href="https://github.com/jakubvalenta/geoshare">GitHub</a> 找到代码，也可以在那里<a href="https://github.com/jakubvalenta/geoshare/issues">报告问题</a>。</p><br><p>欢迎您的反馈。您可以通过 <a href="mailto:%2$s">%2$s</a>与我联系。</p>]]></string>
     <string name="intro_how_to_share_google_maps_screenshot_place">位置标记</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_messaging">短信</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">蓝牙</string>
-    <string name="intro_how_to_share_google_maps_screenshot_title">分享方式</string>
     <string name="converter_apple_maps_permission_title">连接到 Apple？</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">地图</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">选择如何打开此应用的网络链接</string>
@@ -96,7 +83,6 @@
     <string name="conversion_automation_copy_link_succeeded">已自动复制链接</string>
     <string name="conversion_automation_copy_succeeded">已自动复制坐标</string>
     <string name="conversion_automation_open_app_failed">无法自动打开 %1$s</string>
-    <string name="conversion_automation_open_app_succeeded">已自动打开 %1$s</string>
     <plurals name="conversion_automation_open_app_waiting">
         <item quantity="other">将在 %2$d 秒后自动打开 %1$s</item>
     </plurals>
@@ -105,7 +91,6 @@
         <item quantity="other">将在 %1$d 秒后自动保存 GPX</item>
     </plurals>
     <string name="conversion_automation_share_failed">无法自动分享链接</string>
-    <string name="conversion_automation_share_succeeded">已自动分享链接</string>
     <plurals name="conversion_automation_share_waiting">
         <item quantity="other">将在 %1$d 秒后自动分享链接</item>
     </plurals>
@@ -165,7 +150,7 @@
     <string name="faq_how_text_2_item_http">HTTP 标头，</string>
     <string name="faq_how_text_2_item_html">HTML 文档，</string>
     <string name="faq_how_text_2_item_web">包含 JavaScript 的实时网页。</string>
-    <string name="faq_how_text_3">如果您拒绝连接到地图服务，%1$s 会根据具体链接类型，要么创建包含搜索词而非坐标的 geo: 链接，要么直接停止转换。</string>
+    <string name="faq_how_text_3">如果您不允许连接到地图服务，%1$s 会根据具体链接类型，创建包含地名而非坐标的 geo: 链接，或直接停止转换。</string>
     <string name="faq_how_text_4">如需永久允许或拒绝连接到地图服务（替代默认的始终询问），请前往应用的%1$s。</string>
     <string name="faq_privacy_headline">隐私考量</string>
     <string name="faq_privacy_text">%1$s 会在可能的情况下离线转换地图链接。如果地图链接需要在线转换，应用会在连接到地图服务（例如 Google 地图、Apple 地图等）之前询问您。如果您允许连接，地图服务将接收到地图链接，并能够读取您的 IP 地址。</string>
@@ -213,7 +198,7 @@
     <string name="links_form_srs">坐标系</string>
     <string name="links_form_type">上下文菜单图标</string>
     <string name="links_form_uri_template_coords">URL 模板</string>
-    <string name="links_form_uri_template_name">仅搜索词可用时的 URL 模板</string>
+    <string name="links_form_uri_template_name">仅地名可用时的 URL 模板</string>
     <string name="links_insert">添加网络地图</string>
     <string name="links_message_deleted">网络地图已删除</string>
     <string name="links_message_factory_reset">网络地图已重置为出厂默认设置</string>
@@ -285,7 +270,7 @@
     <string name="server_url_template">URL 模板</string>
     <string name="server_login_url">登录 URL</string>
     <string name="server_list_search_none_description">搜索将不可用</string>
-    <string name="conversion_failed_unsupported_source_place_list">地点列表不受支持</string>
+    <string name="conversion_failed_unsupported_source_place_list">不支持地点列表</string>
     <string name="server_api_key_supporting_text">为了避免意外成本，请使用具有严格服务限制和配额的密钥。</string>
     <string name="server_attestation">硬件支持的密钥认证</string>
     <string name="server_auth_type">身份验证</string>
@@ -299,4 +284,49 @@
     <string name="faq_privacy_text_server">对于一些地图链接，%1$s 调用远程服务器，开源的 %3$s。此服务器然后调用地图服务 API（如 Google 地图 API）。%2$s 不保留地图链接的记录。为了施加速率限制，它会在有限期限内存储 IP 地址和识别设备的公钥。</string>
     <string name="faq_privacy_text_html">对于一些地图链接，%1$s 加载地图服务的实时网页并执行其 JavaScript。这一动作发生在受限环境中，会拦截跟踪脚本且不存储 cookies。</string>
     <string name="server_list_description">允许地图服务连接时，%1$s 使用 API 服务器来转换某些链接到坐标。选择用官方服务器（搭配自己的凭证）、代理服务器还是不使用。</string>
+    <string name="billing_feature_automation_description">地图链接转换为坐标时自动执行一系列操作以节约时间：打开地图应用、启动导航应用（TomTom、Waze 等）、复制到剪贴板、保存 GPX。</string>
+    <string name="conversion_succeeded_check_name_only">无法找到坐标，使用地名。</string>
+    <string name="conversion_succeeded_check_name_only_points">无法找到某些点的坐标。</string>
+    <string name="faq_name_only_text_2">GPX 路线中不包括仅根据名称识别的点。</string>
+    <string name="billing_feature_custom_link_description">在喜爱的（或私密的）web 地图中打开位置。</string>
+    <string name="billing_feature_all">基础版全部功能</string>
+    <string name="billing_feature_custom_link">自定义 web 地图</string>
+    <string name="billing_manage_subscription_description">取消、暂停或更改付款方式</string>
+    <string name="billing_intro_not_purchased">升级到</string>
+    <string name="billing_intro_purchased">您拥有</string>
+    <string name="billing_manage_subscription">管理您的订阅</string>
+    <string name="billing_offers_empty">%1$s 在您所在的地区不可用</string>
+    <string name="billing_one_time">一次性付款</string>
+    <string name="billing_order_history">订单记录</string>
+    <string name="billing_pricing">价格</string>
+    <string name="billing_pro_feature">专业版功能</string>
+    <string name="billing_purchase_button">结账</string>
+    <string name="billing_purchase_success">感谢您购买 %1$s</string>
+    <string name="billing_refund_description">购买后 48 小时内可退款</string>
+    <string name="billing_subscription_cancel_description">随时取消</string>
+    <string name="billing_subscription_monthly">月度订阅</string>
+    <string name="billing_terms_of_service">服务条款</string>
+    <string name="converter_google_navigation_uri_name">Google 导航 URI</string>
+    <string name="faq_name_only_title">无法找到坐标，使用地名</string>
+    <string name="faq_name_only_text_1">%1$s 只能从某些地图链接中提取地名，例如“乞力马扎罗山”。当您在其他地图应用中打开此位置时，它可能会显示与原始链接不同的位置，因为可能存在多个同名地点。</string>
+    <string name="network_exception_webview">WebView 异常</string>
+    <string name="network_exception_too_many_requests_wait">请求过多，请等待 %1$d 秒</string>
+    <string name="user_preferences_dynamic_color_title">动态配色</string>
+    <string name="user_preferences_section_appearance">外观</string>
+    <string name="user_preferences_finish_title">关闭</string>
+    <string name="user_preferences_finish_never">不自动关闭应用</string>
+    <string name="user_preferences_finish_description">选择应用何时自动关闭。关闭后的应用在使用返回手势后不会显示。</string>
+    <string name="user_preferences_finish_after_action_succeeded_and_opened_app">在通过该应用分享链接并打开地图应用后关闭应用</string>
+    <string name="user_preferences_finish_after_action_succeeded">在通过该应用分享链接并执行任何操作（打开地图应用、复制坐标、保存 GPX 等）后关闭应用</string>
+    <string name="conversion_failed_unsupported_source_google_search">不支持 Google 搜索链接</string>
+    <string name="help_open_by_default_text">您可以配置 Android 系统，使点击地图链接始终打开 %1$s 而不是默认地图。</string>
+    <string name="help_share_source_text">在许多地图应用中，您可以使用分享按钮 %1$s 在 %2$s 中打开位置。</string>
+    <string name="help_welcome_text">您有地图链接了吗？请在表单中输入，然后按 %1$s。</string>
+    <string name="help_welcome_title">欢迎</string>
+    <string name="help_open_by_default_action">在常见问题中了解详情</string>
+    <string name="help_open_by_default_title">始终在 %1$s 中打开地图链接</string>
+    <string name="help_share_source_action">在 %1$s 中试试</string>
+    <string name="help_share_source_title">从地图应用中启动 GeoShare</string>
+    <string name="help_welcome_action">或者复制此示例：</string>
+    <string name="faq_open_by_default_headline">如何始终在 %1$s 中打开链接</string>
 </resources>

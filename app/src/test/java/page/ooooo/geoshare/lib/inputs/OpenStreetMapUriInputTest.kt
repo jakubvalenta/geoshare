@@ -1,15 +1,18 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class OpenStreetMapUriInputTest : InputTest {
+    override val resources: Resources = mock()
     private val input = FakeInputRepository.openStreetMapUriInput
 
     @Test
@@ -84,31 +87,47 @@ class OpenStreetMapUriInputTest : InputTest {
     @Test
     fun parse_coordinates() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(51.49, -0.13, z = 16.0, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(51.49, -0.13, z = 16.0, source = Source.URI))),
             input.parse("https://www.openstreetmap.org/?lat=51.49&lon=-0.13&zoom=16"),
         )
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(51.49, -0.13, z = 16.0, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(51.49, -0.13, z = 16.0, source = Source.URI))),
             input.parse("https://www.openstreetmap.org/?lat=51.49&lon=-0.13&z=16"),
         )
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(51.49, -0.13, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(51.49, -0.13, source = Source.URI))),
             input.parse("https://www.openstreetmap.org/?lat=51.49&lon=-0.13"),
+        )
+    }
+
+    @Test
+    fun parse_pin() = runTest {
+        assertEquals(
+            ParseResult.Success(persistentListOf(WGS84Point(51.0528, 51.0528, z = 16.0, source = Source.URI))),
+            input.parse("https://www.openstreetmap.org/?mlat=51.0528&mlon=51.0528&zoom=16"),
+        )
+    }
+
+    @Test
+    fun parse_pinTakesPrecedenceOverCoordinates() = runTest {
+        assertEquals(
+            ParseResult.Success(persistentListOf(WGS84Point(51.0528, 51.0528, z = 16.0, source = Source.URI))),
+            input.parse("https://www.openstreetmap.org/?lat=51.49&lon=-0.13&mlat=51.0528&mlon=51.0528&zoom=16"),
         )
     }
 
     @Test
     fun parse_mapCenter() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(51.49, -0.13, z = 16.0, source = Source.MAP_CENTER))),
+            ParseResult.Success(persistentListOf(WGS84Point(51.49, -0.13, z = 16.0, source = Source.MAP_CENTER))),
             input.parse("https://www.openstreetmap.org/#map=16/51.49/-0.13"),
         )
     }
 
     @Test
-    fun parse_coordinatesEncoded() = runTest {
+    fun parse_mapCenterEncoded() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(51.49, -0.13, z = 16.0, source = Source.MAP_CENTER))),
+            ParseResult.Success(persistentListOf(WGS84Point(51.49, -0.13, z = 16.0, source = Source.MAP_CENTER))),
             input.parse("https://www.openstreetmap.org/#map%3D16%2F51.49%2F-0.13"),
         )
     }
@@ -116,7 +135,7 @@ class OpenStreetMapUriInputTest : InputTest {
     @Test
     fun parse_directions() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(51.0528, 13.7364, source = Source.URI))),
+            ParseResult.Success(persistentListOf(WGS84Point(51.0528, 13.7364, source = Source.URI))),
             input.parse("https://www.openstreetmap.org/directions?to=51.0528,13.7364"),
         )
     }
@@ -124,7 +143,7 @@ class OpenStreetMapUriInputTest : InputTest {
     @Test
     fun parse_element() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     FakeInputRepository.openStreetMapApiInput,
                     "https://www.openstreetmap.org/api/0.6/node/6284640534.json"
@@ -133,7 +152,7 @@ class OpenStreetMapUriInputTest : InputTest {
             input.parse("https://www.openstreetmap.org/node/6284640534"),
         )
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     FakeInputRepository.openStreetMapApiInput,
                     "https://www.openstreetmap.org/api/0.6/relation/910699/full.json"
@@ -142,7 +161,7 @@ class OpenStreetMapUriInputTest : InputTest {
             input.parse("https://www.openstreetmap.org/relation/910699"),
         )
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 next = MatchedInput(
                     FakeInputRepository.openStreetMapApiInput,
                     "https://www.openstreetmap.org/api/0.6/way/596674456/full.json"
@@ -155,7 +174,7 @@ class OpenStreetMapUriInputTest : InputTest {
     @Test
     fun parse_shortLink() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         51.510772705078125, 0.054931640625,
@@ -167,7 +186,7 @@ class OpenStreetMapUriInputTest : InputTest {
             input.parse("https://osm.org/go/0EEQjE--"),
         )
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         51.510772705078125, 0.054931640625,
@@ -183,7 +202,7 @@ class OpenStreetMapUriInputTest : InputTest {
     @Test
     fun parse_shortLinkNegative() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(
                     WGS84Point(
                         -16.23152732849121, -49.08348083496094,

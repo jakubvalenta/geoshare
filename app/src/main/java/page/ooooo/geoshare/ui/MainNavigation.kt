@@ -1,17 +1,16 @@
 package page.ooooo.geoshare.ui
 
+import android.util.Log
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
-import page.ooooo.geoshare.lib.inputs.InputDocumentationGroup
+import page.ooooo.geoshare.lib.inputs.InputGroupId
 
 @Serializable
 object AboutRoute
@@ -23,10 +22,7 @@ object BillingRoute
 data class FaqRoute(val itemId: FaqItemId? = null)
 
 @Serializable
-data class InputsRoute(val group: InputDocumentationGroup? = null)
-
-@Serializable
-object IntroRoute
+data class InputsRoute(val groupId: InputGroupId? = null)
 
 @Serializable
 object LicensesRoute
@@ -43,23 +39,25 @@ object ServerRoute
 @Serializable
 data class UserPreferencesRoute(val groupId: UserPreferenceGroupId? = null)
 
+private const val TAG = "MainNavigation"
+
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun MainNavigation(
     billingViewModel: BillingViewModel,
     conversionViewModel: ConversionViewModel = hiltViewModel(),
-    introEnabled: Boolean = true,
     onFinish: () -> Unit = {},
-    introViewModel: IntroViewModel = hiltViewModel(),
 ) {
     val navController = rememberNavController()
-    val introShown by introViewModel.shown.collectAsStateWithLifecycle()
+    val source = conversionViewModel.source
 
-    LaunchedEffect(introEnabled, introShown) {
-        if (introEnabled && !introShown) {
-            navController.navigate(IntroRoute) {
-                popUpTo(MainRoute) { inclusive = false }
-            }
+    /**
+     * Go to main screen if we're on another screen and a new map link has been shared with the app.
+     */
+    LaunchedEffect(source) {
+        if (navController.currentBackStackEntry != MainRoute) {
+            Log.d(TAG, "Navigating to main screen")
+            navController.navigate(MainRoute)
         }
     }
 
@@ -81,12 +79,6 @@ fun MainNavigation(
                 },
             )
         }
-        composable<IntroRoute> {
-            IntroScreen(
-                onClose = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
-                viewModel = introViewModel,
-            )
-        }
         composable<MainRoute> {
             MainScreen(
                 onFinish = onFinish,
@@ -94,7 +86,6 @@ fun MainNavigation(
                 onNavigateToBillingScreen = { navController.navigate(BillingRoute) },
                 onNavigateToFaqScreen = { itemId -> navController.navigate(FaqRoute(itemId)) },
                 onNavigateToInputsScreen = { navController.navigate(InputsRoute()) },
-                onNavigateToIntroScreen = { navController.navigate(IntroRoute) },
                 onNavigateToLinkScreen = { navController.navigate(LinkRoute) },
                 onNavigateToUserPreferencesScreen = { groupId -> navController.navigate(UserPreferencesRoute(groupId)) },
                 billingViewModel = billingViewModel,
@@ -104,7 +95,7 @@ fun MainNavigation(
         composable<InputsRoute> { backStackEntry ->
             val route: InputsRoute = backStackEntry.toRoute()
             InputsScreen(
-                initialDocumentationGroup = route.group,
+                initialGroupId = route.groupId,
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
             )
         }

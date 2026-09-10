@@ -15,6 +15,7 @@ import page.ooooo.geoshare.data.di.FakeMagicEarthNavigationLink
 import page.ooooo.geoshare.data.di.FakeOpenStreetMapDisplayLink
 import page.ooooo.geoshare.data.di.FakeOpenStreetMapNavigationLink
 import page.ooooo.geoshare.data.di.defaultFakeLinks
+import page.ooooo.geoshare.data.local.database.InitialLinks
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.database.findByUUID
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
@@ -40,6 +41,7 @@ import page.ooooo.geoshare.data.local.preferences.ShareNavigationGoogleUriAutoma
 import page.ooooo.geoshare.data.local.preferences.SharePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareRouteGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareStreetViewGoogleUriAutomation
+import page.ooooo.geoshare.lib.android.App
 import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
@@ -148,18 +150,36 @@ class OutputRepositoryTest {
             ),
             outputRepository.getOutputsForApps(
                 mapOf(
-                    PackageNames.TEST to setOf(DataType.GEO_URI),
-                    PackageNames.GOOGLE_MAPS to setOf(
-                        DataType.GEO_URI,
-                        DataType.GOOGLE_NAVIGATION_URI,
-                        DataType.GOOGLE_STREET_VIEW_URI,
-                        DataType.GPX_DATA,
+                    PackageNames.TEST to App(packageName = PackageNames.TEST, dataTypes = setOf(DataType.GEO_URI)),
+                    PackageNames.GOOGLE_MAPS to App(
+                        packageName = PackageNames.GOOGLE_MAPS,
+                        dataTypes = setOf(
+                            DataType.GEO_URI,
+                            DataType.GOOGLE_NAVIGATION_URI,
+                            DataType.GOOGLE_STREET_VIEW_URI,
+                            DataType.GPX_DATA,
+                        ),
                     ),
-                    PackageNames.CARTES_IGN to setOf(DataType.CARTES_IGN_URL),
-                    PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
-                    PackageNames.SIGNAL to setOf(DataType.SEND_PLAIN_TEXT),
-                    PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
-                    "${PackageNames.TEST}.empty" to emptySet(),
+                    PackageNames.CARTES_IGN to App(
+                        packageName = PackageNames.CARTES_IGN,
+                        dataTypes = setOf(DataType.CARTES_IGN_URL)
+                    ),
+                    PackageNames.MAGIC_EARTH to App(
+                        packageName = PackageNames.MAGIC_EARTH,
+                        dataTypes = setOf(DataType.MAGIC_EARTH_URI)
+                    ),
+                    PackageNames.SIGNAL to App(
+                        packageName = PackageNames.SIGNAL,
+                        dataTypes = setOf(DataType.SEND_PLAIN_TEXT)
+                    ),
+                    PackageNames.TOMTOM to App(
+                        packageName = PackageNames.TOMTOM,
+                        dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
+                    ),
+                    "${PackageNames.TEST}.empty" to App(
+                        packageName = "${PackageNames.TEST}.empty",
+                        dataTypes = emptySet()
+                    ),
                 ),
                 emptySet(),
             ),
@@ -179,10 +199,19 @@ class OutputRepositoryTest {
             ),
             outputRepository.getOutputsForApps(
                 mapOf(
-                    PackageNames.TEST to setOf(DataType.GEO_URI),
-                    PackageNames.GOOGLE_MAPS to setOf(DataType.GOOGLE_NAVIGATION_URI),
-                    PackageNames.MAGIC_EARTH to setOf(DataType.MAGIC_EARTH_URI),
-                    PackageNames.TOMTOM to setOf(DataType.GPX_ONE_POINT_DATA),
+                    PackageNames.TEST to App(packageName = PackageNames.TEST, dataTypes = setOf(DataType.GEO_URI)),
+                    PackageNames.GOOGLE_MAPS to App(
+                        packageName = PackageNames.GOOGLE_MAPS,
+                        dataTypes = setOf(DataType.GOOGLE_NAVIGATION_URI)
+                    ),
+                    PackageNames.MAGIC_EARTH to App(
+                        packageName = PackageNames.MAGIC_EARTH,
+                        dataTypes = setOf(DataType.MAGIC_EARTH_URI)
+                    ),
+                    PackageNames.TOMTOM to App(
+                        packageName = PackageNames.TOMTOM,
+                        dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
+                    ),
                 ),
                 setOf(
                     PackageNames.GOOGLE_MAPS,
@@ -445,14 +474,14 @@ class OutputRepositoryTest {
                 ShareRouteGpxOutput(coordinateConverter),
             ),
             listOf(
-                CopyLinkUriAutomation(UUID.fromString("a5092c63-cf5c-4225-9059-e888ae12e215")),
-                CopyLinkUriAutomation(UUID.fromString("ce900ea1-2c5d-4641-82f3-a5429a68d603")),
+                CopyLinkUriAutomation(UUID.fromString(InitialLinks.APPLE_MAPS_NAVIGATION_UUID)),
+                CopyLinkUriAutomation(UUID.fromString(InitialLinks.APPLE_MAPS_DISPLAY_UUID)),
                 CopyCoordsDecAutomation,
                 CopyCoordsDegMinSecAutomation,
                 CopyGeoUriAutomation,
                 CopyLinkUriAutomation(UUID.fromString("64b0b360-24ec-4113-9056-314223c6e19a")),
                 CopyLinkUriAutomation(UUID.fromString("9d7cd113-ce01-4b8b-82fe-856956b8b20a")),
-                CopyLinkUriAutomation(UUID.fromString("7bd96da4-beba-4a30-9dbd-b437a49a1dc0")),
+                CopyLinkUriAutomation(UUID.fromString(InitialLinks.GOOGLE_MAPS_DISPLAY_UUID)),
                 CopyLinkUriAutomation(UUID.fromString("ee4f961c-44b0-4cb6-baad-1ed28edb8ec7")),
                 CopyLinkUriAutomation(UUID.fromString("b109970a-aef8-4482-9879-52e128fd0e07")),
                 NoopAutomation,
@@ -469,9 +498,9 @@ class OutputRepositoryTest {
                     automation = automation,
                     getLinkByUUID = {
                         when (it) {
-                            UUID.fromString("ce900ea1-2c5d-4641-82f3-a5429a68d603") -> FakeAppleMapsDisplayLink
-                            UUID.fromString("a5092c63-cf5c-4225-9059-e888ae12e215") -> FakeAppleMapsNavigationLink
-                            UUID.fromString("7bd96da4-beba-4a30-9dbd-b437a49a1dc0") -> FakeGoogleMapsDisplayLink
+                            UUID.fromString(InitialLinks.APPLE_MAPS_DISPLAY_UUID) -> FakeAppleMapsDisplayLink
+                            UUID.fromString(InitialLinks.APPLE_MAPS_NAVIGATION_UUID) -> FakeAppleMapsNavigationLink
+                            UUID.fromString(InitialLinks.GOOGLE_MAPS_DISPLAY_UUID) -> FakeGoogleMapsDisplayLink
                             UUID.fromString("64b0b360-24ec-4113-9056-314223c6e19a") -> FakeGoogleMapsNavigationLink
                             UUID.fromString("9d7cd113-ce01-4b8b-82fe-856956b8b20a") -> FakeGoogleMapsStreetViewLink
                             UUID.fromString("b109970a-aef8-4482-9879-52e128fd0e07") -> FakeMagicEarthDisplayLink

@@ -1,5 +1,7 @@
 package page.ooooo.geoshare.data.local.database
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Delete
@@ -15,6 +17,7 @@ import page.ooooo.geoshare.lib.extensions.firstGraphemeOrNull
 import page.ooooo.geoshare.lib.geo.Srs
 import page.ooooo.geoshare.ui.components.CharacterIconDescriptor
 import page.ooooo.geoshare.ui.components.IconDescriptor
+import page.ooooo.geoshare.ui.components.ImageVectorIconDescriptor
 import page.ooooo.geoshare.ui.components.ResourceIconDescriptor
 import java.util.UUID
 import kotlin.uuid.ExperimentalUuidApi
@@ -50,6 +53,7 @@ data class Link(
         get() = when (type) {
             LinkType.DISPLAY -> ResourceIconDescriptor(R.drawable.location_on_24px)
             LinkType.NAVIGATION -> ResourceIconDescriptor(R.drawable.navigation_24px)
+            LinkType.SEARCH -> ImageVectorIconDescriptor(Icons.Default.Search)
             LinkType.STREET_VIEW -> ResourceIconDescriptor(R.drawable.streetview_24px)
         }
 

@@ -8,13 +8,17 @@ import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
+import android.content.res.Resources
+import org.mockito.kotlin.mock
+
 class AppleMapsHtmlInputTest : InputTest {
+    override val resources: Resources = mock()
     private val input = FakeInputRepository.appleMapsHtmlInput
 
     @Test
     fun parse_success() = runTest {
         assertEquals(
-            ParseResult(persistentListOf(WGS84Point(52.4735927, 13.4050798, source = Source.HTML))),
+            ParseResult.Success(persistentListOf(WGS84Point(52.4735927, 13.4050798, source = Source.HTML))),
             @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
             input.parse(
                 """<html>
@@ -32,6 +36,6 @@ class AppleMapsHtmlInputTest : InputTest {
 
     @Test
     fun parse_failure() = runTest {
-        assertEquals(ParseResult(), input.parse("spam"))
+        assertEquals(ParseResult.Success(), input.parse("spam"))
     }
 }

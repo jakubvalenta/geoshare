@@ -21,14 +21,14 @@ class ActionSucceededTest {
     private val source = "https://maps.google.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val output = SavePointsGpxOutput(coordinateConverter)
-    private val actionResult = ActionResult.SucceededAndFinish
+    private val actionResult = ActionResult.SUCCEEDED_AND_OPENED_APP
 
     @Test
-    fun transition_whenExecutionIsNotCancelled_waitsAndReturnsActionFinished() = runTest {
+    fun transition_whenExecutionIsNotCancelled_waitsAndReturnsActionCompleted() = runTest {
         val state = ActionSucceeded(source, points, actionResult, output)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
-                ActionFinished(source, points, actionResult),
+                ActionCompleted(source, points, actionResult),
                 state.transition(),
             )
         }
@@ -36,7 +36,7 @@ class ActionSucceededTest {
     }
 
     @Test
-    fun transition_whenExecutionIsCancelled_returnsActionFinished() = runTest {
+    fun transition_whenExecutionIsCancelled_returnsActionCompleted() = runTest {
         val state = ActionSucceeded(source, points, actionResult, output)
         var res: State? = null
         val job = launch {
@@ -51,7 +51,7 @@ class ActionSucceededTest {
         }
         assertEquals(
             res,
-            ActionFinished(source, points, actionResult),
+            ActionCompleted(source, points, actionResult),
         )
     }
 }

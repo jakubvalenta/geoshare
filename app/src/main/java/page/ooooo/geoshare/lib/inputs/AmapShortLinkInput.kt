@@ -1,7 +1,9 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import androidx.annotation.StringRes
 import io.ktor.client.engine.HttpClientEngine
+import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
@@ -16,13 +18,11 @@ class AmapShortLinkInput @Inject constructor(
     override val log: Log,
     override val uriQuote: UriQuote,
 ) : HeadLocationHeaderInput {
-    override val pattern = Regex("""((?:https?://)?surl\.amap\.com/\S+)""")
-    override val documentation = InputDocumentation(
-        group = InputDocumentationGroup.AMAP,
-        items = listOf(
-            InputDocumentationItem.Url(27, "https://surl.amap.com/"),
-        ),
+    override val group = InputGroup.AMAP
+    override val changelog = persistentListOf(
+        InputChangelogItem.Url(27, "https://surl.amap.com/"),
     )
+    override val pattern = Regex("""((?:https?://)?surl\.amap\.com/\S+)""")
 
     @StringRes
     override val permissionTitleResId = R.string.converter_amap_permission_title
@@ -30,7 +30,7 @@ class AmapShortLinkInput @Inject constructor(
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_amap_loading_indicator_title
 
-    override suspend fun parse(data: Uri, match: String) = parseResult {
+    override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         next = MatchedInput(amapUriInput.get(), data.toString())
     }
 

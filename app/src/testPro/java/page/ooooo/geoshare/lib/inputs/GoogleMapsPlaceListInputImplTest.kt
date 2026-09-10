@@ -9,13 +9,16 @@ import org.mockito.kotlin.mock
 import page.ooooo.geoshare.R
 
 class GoogleMapsPlaceListInputImplTest : InputTest {
-    private val input = GoogleMapsPlaceListInputImpl()
-    private val resources: Resources = mock {
+    override val resources: Resources = mock {
         on { getString(R.string.conversion_failed_unsupported_source_place_list) } doReturn "Place lists are not supported"
     }
+    private val input = GoogleMapsPlaceListInputImpl()
 
     @Test
-    fun getErrorMessage_returnsCustomMessage() = runTest {
-        assertEquals("Place lists are not supported", input.getErrorMessage(resources))
+    fun parse_returnsWarning() = runTest {
+        assertEquals(
+            ParseResult.Warning(resources.getString(R.string.conversion_failed_unsupported_source_place_list)),
+            input.fetchAndParse("https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg"),
+        )
     }
 }

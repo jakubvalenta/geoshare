@@ -51,8 +51,6 @@ import kotlin.time.Duration.Companion.seconds
 
 object AndroidTools {
 
-    const val TAG = "AndroidTools"
-
     fun getIntentUriString(intent: Intent): String? =
         when (val intentAction = intent.action) {
             Intent.ACTION_VIEW -> {
@@ -90,8 +88,9 @@ object AndroidTools {
         }
         return try {
             AppDetail(
-                applicationInfo.loadLabel(packageManager).toString(),
-                applicationInfo.loadIcon(packageManager),
+                packageName = packageName,
+                label = applicationInfo.loadLabel(packageManager).toString(),
+                icon = applicationInfo.loadIcon(packageManager),
             )
         } catch (e: Exception) {
             Log.e(TAG, "Error when loading info about an app", e)
@@ -106,7 +105,7 @@ object AndroidTools {
      */
     suspend fun queryAppDetails(
         packageManager: PackageManager,
-        apps: DataTypes,
+        apps: Apps,
     ): AppDetails = withContext(Dispatchers.Default) {
         apps.mapValues { (packageName) -> queryAppDetails(packageManager, packageName) }
     }
@@ -125,7 +124,8 @@ object AndroidTools {
                 Log.e(TAG, "Error when loading info about an installed app", e)
                 null
             }
-            packageName?.takeUnless { it == BuildConfig.APPLICATION_ID }
+            // Exclude GeoShare itself and all its build flavors
+            packageName?.takeUnless { it == PackageNames.GEOSHARE || it.startsWith(PackageNames.GEOSHARE_PREFIX) }
         }
     }
 
@@ -137,8 +137,8 @@ object AndroidTools {
         PackageNames.WHATSAPP,
     )
 
-    fun queryApps(packageManager: PackageManager): DataTypes =
-        buildMap<String, MutableSet<DataType>> {
+    fun queryApps(packageManager: PackageManager): Apps =
+        buildMap {
             for (packageName in queryPackageNames(
                 packageManager,
                 Intent(Intent.ACTION_VIEW, "geo:".toUri()),
@@ -199,7 +199,7 @@ object AndroidTools {
                     getOrPut(packageName) { mutableSetOf() }.add(DataType.SEND_PLAIN_TEXT)
                 }
             }
-        }
+        }.mapValues { (packageName, dataTypes) -> App(packageName = packageName, dataTypes = dataTypes) }
 
     private fun startActivity(context: Context, intent: Intent): Boolean =
         try {
@@ -377,7 +377,7 @@ object AndroidTools {
             ?.let { WGS84Point(it.latitude, it.longitude, source = Source.GPS_SENSOR) }
 
     suspend fun getLocation(context: Context): Point? {
-        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val locationManager = context.getSystemService(LocationManager::class.java)
         return try {
             val lastKnownLocation = getLastKnownLocation(locationManager)
             if (lastKnownLocation != null) {
@@ -447,7 +447,7 @@ object AndroidTools {
         clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("Geographic coordinates", text)))
 
     suspend fun pasteFromClipboard(clipboard: Clipboard): String =
-        clipboard.getClipEntry()?.clipData?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.text?.toString() ?: ""
+        clipboard.getClipEntry()?.clipData?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.text?.toString().orEmpty()
 
     fun openFileUri(context: Context, uri: Uri, block: Appendable.() -> Unit): Boolean {
         val outputStream = try {
@@ -467,4 +467,6 @@ object AndroidTools {
         }
         return true
     }
+
+    private const val TAG = "AndroidTools"
 }

@@ -1,7 +1,7 @@
 package page.ooooo.geoshare.lib.outputs
 
 enum class ActionResult {
-    Succeeded,
-    SucceededAndFinish,
-    Failed,
+    SUCCEEDED,
+    SUCCEEDED_AND_OPENED_APP,
+    FAILED,
 }

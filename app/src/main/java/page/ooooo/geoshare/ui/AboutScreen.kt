@@ -8,16 +8,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -46,6 +43,7 @@ import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.ui.components.ClickableLink
 import page.ooooo.geoshare.ui.components.LargeButton
+import page.ooooo.geoshare.ui.components.NavigationBackButton
 import page.ooooo.geoshare.ui.components.ParagraphHtml
 import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.ScaffoldAction
@@ -86,12 +84,7 @@ private fun AboutScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.about_title)) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                            contentDescription = stringResource(R.string.nav_back_content_description),
-                        )
-                    }
+                    NavigationBackButton(onBack)
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent,
@@ -161,7 +154,7 @@ private fun ColumnScope.AboutMainPane(
     val appName = stringResource(R.string.app_name)
     Text(
         stringResource(R.string.about_app_name_and_version, appName, BuildConfig.VERSION_NAME),
-        Modifier.padding(bottom = spacing.mediumAdaptive),
+        Modifier.padding(bottom = spacing.small),
         style = MaterialTheme.typography.headlineSmall,
     )
     CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
@@ -174,15 +167,16 @@ private fun ColumnScope.AboutMainPane(
         )
         ParagraphText(
             buildAnnotatedString {
-                ClickableLink(stringResource(R.string.licenses), onNavigateToLicensesScreen)
+                ClickableLink(stringResource(R.string.licenses), onClick = onNavigateToLicensesScreen)
             }
         )
         if (donationVisible) {
-            ElevatedCard(
-                modifier = Modifier.padding(top = spacing.largeAdaptive),
+            Card(
+                modifier = Modifier
+                    .widthIn(max = 600.dp)
+                    .padding(top = spacing.large),
                 colors = CardDefaults.elevatedCardColors(
                     containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
                 ),
             ) {
                 ParagraphText(

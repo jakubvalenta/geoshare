@@ -40,14 +40,15 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeGoogleMapsStreetViewLink
 import page.ooooo.geoshare.data.local.database.Link
@@ -58,7 +59,6 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.NaivePoint
-import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.Srs
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.CopyLinkUriOutput
@@ -69,16 +69,16 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LinkForm(
-    appEnabled: Boolean,
-    chipEnabled: Boolean,
+    appEnabled: StateFlow<Boolean>,
+    chipEnabled: StateFlow<Boolean>,
     coordinateConverter: CoordinateConverter,
-    coordsUriTemplate: String,
-    group: String,
-    name: String,
-    nameUriTemplate: String,
-    sheetEnabled: Boolean,
-    srs: Srs,
-    type: LinkType,
+    coordsUriTemplate: StateFlow<String>,
+    group: StateFlow<String>,
+    name: StateFlow<String>,
+    nameUriTemplate: StateFlow<String>,
+    sheetEnabled: StateFlow<Boolean>,
+    srs: StateFlow<Srs>,
+    type: StateFlow<LinkType>,
     onSaveForm: () -> Unit,
     onSetAppEnabled: (Boolean) -> Unit,
     onSetChipEnabled: (Boolean) -> Unit,
@@ -96,11 +96,17 @@ fun LinkForm(
     val context = LocalContext.current
     val spacing = LocalSpacing.current
 
-    var expanded by retain { mutableStateOf(initialExpanded) }
     val appDetails: AppDetails = emptyMap()
-    val isValid = remember(name, coordsUriTemplate) {
-        name.isNotEmpty() && coordsUriTemplate.isNotEmpty()
-    }
+    var expanded by retain { mutableStateOf(initialExpanded) }
+    val appEnabled by appEnabled.collectAsStateWithLifecycle()
+    val chipEnabled by chipEnabled.collectAsStateWithLifecycle()
+    val coordsUriTemplate by coordsUriTemplate.collectAsStateWithLifecycle()
+    val group by group.collectAsStateWithLifecycle()
+    val name by name.collectAsStateWithLifecycle()
+    val nameUriTemplate by nameUriTemplate.collectAsStateWithLifecycle()
+    val sheetEnabled by sheetEnabled.collectAsStateWithLifecycle()
+    val srs by srs.collectAsStateWithLifecycle()
+    val type by type.collectAsStateWithLifecycle()
     val link = remember(
         appEnabled,
         chipEnabled,
@@ -123,6 +129,9 @@ fun LinkForm(
             coordsUriTemplate = coordsUriTemplate,
             nameUriTemplate = nameUriTemplate,
         )
+    }
+    val isValid = remember(name, coordsUriTemplate) {
+        name.isNotEmpty() && coordsUriTemplate.isNotEmpty()
     }
     val copyOutput = remember(link) { CopyLinkUriOutput(link, coordinateConverter) }
     val shareOutput = remember(link) { ShareLinkUriOutput(link, coordinateConverter) }
@@ -180,17 +189,11 @@ fun LinkForm(
             isError = coordsUriTemplate.isEmpty(),
         )
         listOf(
-            WGS84Point(
-                -3.075833, 37.353333,
-                source = Source.GENERATED,
-            ) to stringResource(R.string.links_form_test_world),
-            WGS84Point(
-                39.915833, 116.390833,
-                source = Source.GENERATED,
-            ) to stringResource(R.string.links_form_test_china),
+            WGS84Point.Kilimanjaro to stringResource(R.string.links_form_test_world),
+            WGS84Point.ForbiddenCity to stringResource(R.string.links_form_test_china),
         ).let { testPointsWithName ->
             Column(verticalArrangement = Arrangement.spacedBy(spacing.small)) {
-                ScrollableChips(PaddingValues(horizontal = LocalSpacing.current.windowPadding)) {
+                ScrollableChips(paddingValues = PaddingValues(horizontal = LocalSpacing.current.windowPadding)) {
                     testPointsWithName.forEach { (point, name) ->
                         item {
                             SuggestionChip(
@@ -234,8 +237,8 @@ fun LinkForm(
                 value = appEnabled,
                 onCheckedChange = onSetAppEnabled,
                 label = stringResource(R.string.links_form_enabled_option_app),
+                modifier = Modifier.testTag("geoShareLinkFormAppEnabled"),
                 enabled = enabled,
-                testTag = "geoShareLinkFormAppEnabled",
             ) {
                 Box(
                     Modifier
@@ -260,8 +263,8 @@ fun LinkForm(
                 value = sheetEnabled,
                 onCheckedChange = onSetSheetEnabled,
                 label = stringResource(R.string.links_form_enabled_option_sheet),
+                modifier = Modifier.testTag("geoShareLinkFormSheetEnabled"),
                 enabled = enabled,
-                testTag = "geoShareLinkFormSheetEnabled",
             ) {
                 Surface(shape = BottomSheetDefaults.ExpandedShape) {
                     Column {
@@ -281,8 +284,8 @@ fun LinkForm(
                 value = chipEnabled,
                 onCheckedChange = onSetChipEnabled,
                 label = stringResource(R.string.links_form_enabled_option_chip),
+                modifier = Modifier.testTag("geoShareLinkFormChipEnabled"),
                 enabled = enabled,
-                testTag = "geoShareLinkFormChipEnabled",
             ) {
                 Surface(
                     Modifier.fillMaxWidth(),
@@ -316,7 +319,9 @@ fun LinkForm(
                     style = MaterialTheme.typography.bodyLarge,
                 )
             },
-            modifier = Modifier.padding(horizontal = spacing.windowPadding),
+            modifier = Modifier
+                .padding(horizontal = spacing.windowPadding)
+                .testTag("geoShareLinkFormAdvanced"),
             enabled = enabled,
         ) {
             Column {
@@ -361,6 +366,7 @@ fun LinkForm(
                         .padding(top = spacing.medium),
                     enabled = enabled,
                     label = { Text(stringResource(R.string.links_form_srs)) },
+                    testTagPrefix = "geoShareLinkFormSRS",
                 )
                 TextField(
                     value = nameUriTemplate,
@@ -440,14 +446,14 @@ private fun LinkFormCheckbox(
     value: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     label: String,
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    testTag: String? = null,
     content: @Composable () -> Unit,
 ) {
     val spacing = LocalSpacing.current
 
     Row(
-        Modifier
+        modifier
             .padding(spacing.small)
             .toggleable(value = value, enabled = enabled, role = Role.Checkbox, onValueChange = onCheckedChange),
         horizontalArrangement = Arrangement.spacedBy(spacing.small),
@@ -455,11 +461,6 @@ private fun LinkFormCheckbox(
         Checkbox(
             checked = value,
             onCheckedChange = null,
-            modifier = Modifier.semantics {
-                if (testTag != null) {
-                    this.testTag = if (value) "${testTag}_checked" else "${testTag}_unchecked"
-                }
-            },
             enabled = enabled,
         )
         Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
@@ -480,16 +481,16 @@ private fun DefaultPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             LinkForm(
-                appEnabled = false,
-                chipEnabled = false,
+                appEnabled = MutableStateFlow(false),
+                chipEnabled = MutableStateFlow(false),
                 coordinateConverter = coordinateConverter,
-                coordsUriTemplate = "",
-                group = "",
-                name = "",
-                nameUriTemplate = "",
-                sheetEnabled = false,
-                srs = Srs.WGS84,
-                type = LinkType.DISPLAY,
+                coordsUriTemplate = MutableStateFlow(""),
+                group = MutableStateFlow(""),
+                name = MutableStateFlow(""),
+                nameUriTemplate = MutableStateFlow(""),
+                sheetEnabled = MutableStateFlow(false),
+                srs = MutableStateFlow(Srs.WGS84),
+                type = MutableStateFlow(LinkType.DISPLAY),
                 onSaveForm = {},
                 onSetAppEnabled = {},
                 onSetChipEnabled = {},
@@ -514,16 +515,16 @@ private fun DarkPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             LinkForm(
-                appEnabled = false,
-                chipEnabled = false,
+                appEnabled = MutableStateFlow(false),
+                chipEnabled = MutableStateFlow(false),
                 coordinateConverter = coordinateConverter,
-                coordsUriTemplate = "",
-                group = "",
-                name = "",
-                nameUriTemplate = "",
-                sheetEnabled = false,
-                srs = Srs.WGS84,
-                type = LinkType.DISPLAY,
+                coordsUriTemplate = MutableStateFlow(""),
+                group = MutableStateFlow(""),
+                name = MutableStateFlow(""),
+                nameUriTemplate = MutableStateFlow(""),
+                sheetEnabled = MutableStateFlow(false),
+                srs = MutableStateFlow(Srs.WGS84),
+                type = MutableStateFlow(LinkType.DISPLAY),
                 onSaveForm = {},
                 onSetAppEnabled = {},
                 onSetChipEnabled = {},
@@ -549,16 +550,16 @@ private fun UpdatePreview() {
             val coordinateConverter = CoordinateConverter(geometries)
             val item = FakeGoogleMapsStreetViewLink
             LinkForm(
-                appEnabled = item.appEnabled,
-                chipEnabled = item.chipEnabled,
+                appEnabled = MutableStateFlow(item.appEnabled),
+                chipEnabled = MutableStateFlow(item.chipEnabled),
                 coordinateConverter = coordinateConverter,
-                coordsUriTemplate = item.coordsUriTemplate,
-                group = item.group,
-                name = item.name,
-                nameUriTemplate = item.nameUriTemplate,
-                sheetEnabled = item.sheetEnabled,
-                srs = item.srs,
-                type = item.type,
+                coordsUriTemplate = MutableStateFlow(item.coordsUriTemplate),
+                group = MutableStateFlow(item.group),
+                name = MutableStateFlow(item.name),
+                nameUriTemplate = MutableStateFlow(item.nameUriTemplate),
+                sheetEnabled = MutableStateFlow(item.sheetEnabled),
+                srs = MutableStateFlow(item.srs),
+                type = MutableStateFlow(item.type),
                 onSaveForm = {},
                 onSetAppEnabled = {},
                 onSetChipEnabled = {},
@@ -588,16 +589,16 @@ private fun DarkUpdatePreview() {
             val coordinateConverter = CoordinateConverter(geometries)
             val item = FakeGoogleMapsStreetViewLink
             LinkForm(
-                appEnabled = item.appEnabled,
-                chipEnabled = item.chipEnabled,
+                appEnabled = MutableStateFlow(item.appEnabled),
+                chipEnabled = MutableStateFlow(item.chipEnabled),
                 coordinateConverter = coordinateConverter,
-                coordsUriTemplate = item.coordsUriTemplate,
-                group = item.group,
-                name = item.name,
-                nameUriTemplate = item.nameUriTemplate,
-                sheetEnabled = item.sheetEnabled,
-                srs = item.srs,
-                type = item.type,
+                coordsUriTemplate = MutableStateFlow(item.coordsUriTemplate),
+                group = MutableStateFlow(item.group),
+                name = MutableStateFlow(item.name),
+                nameUriTemplate = MutableStateFlow(item.nameUriTemplate),
+                sheetEnabled = MutableStateFlow(item.sheetEnabled),
+                srs = MutableStateFlow(item.srs),
+                type = MutableStateFlow(item.type),
                 onSaveForm = {},
                 onSetAppEnabled = {},
                 onSetChipEnabled = {},
@@ -623,16 +624,16 @@ private fun UpdateExpandedPreview() {
             val coordinateConverter = CoordinateConverter(geometries)
             val item = FakeGoogleMapsStreetViewLink
             LinkForm(
-                appEnabled = item.appEnabled,
-                chipEnabled = item.chipEnabled,
+                appEnabled = MutableStateFlow(item.appEnabled),
+                chipEnabled = MutableStateFlow(item.chipEnabled),
                 coordinateConverter = coordinateConverter,
-                coordsUriTemplate = item.coordsUriTemplate,
-                group = item.group,
-                name = item.name,
-                nameUriTemplate = item.nameUriTemplate,
-                sheetEnabled = item.sheetEnabled,
-                srs = item.srs,
-                type = item.type,
+                coordsUriTemplate = MutableStateFlow(item.coordsUriTemplate),
+                group = MutableStateFlow(item.group),
+                name = MutableStateFlow(item.name),
+                nameUriTemplate = MutableStateFlow(item.nameUriTemplate),
+                sheetEnabled = MutableStateFlow(item.sheetEnabled),
+                srs = MutableStateFlow(item.srs),
+                type = MutableStateFlow(item.type),
                 onSaveForm = {},
                 onSetAppEnabled = {},
                 onSetChipEnabled = {},
@@ -663,16 +664,16 @@ private fun DarkUpdateExpandedPreview() {
             val coordinateConverter = CoordinateConverter(geometries)
             val item = FakeGoogleMapsStreetViewLink
             LinkForm(
-                appEnabled = item.appEnabled,
-                chipEnabled = item.chipEnabled,
+                appEnabled = MutableStateFlow(item.appEnabled),
+                chipEnabled = MutableStateFlow(item.chipEnabled),
                 coordinateConverter = coordinateConverter,
-                coordsUriTemplate = item.coordsUriTemplate,
-                group = item.group,
-                name = item.name,
-                nameUriTemplate = item.nameUriTemplate,
-                sheetEnabled = item.sheetEnabled,
-                srs = item.srs,
-                type = item.type,
+                coordsUriTemplate = MutableStateFlow(item.coordsUriTemplate),
+                group = MutableStateFlow(item.group),
+                name = MutableStateFlow(item.name),
+                nameUriTemplate = MutableStateFlow(item.nameUriTemplate),
+                sheetEnabled = MutableStateFlow(item.sheetEnabled),
+                srs = MutableStateFlow(item.srs),
+                type = MutableStateFlow(item.type),
                 onSaveForm = {},
                 onSetAppEnabled = {},
                 onSetChipEnabled = {},

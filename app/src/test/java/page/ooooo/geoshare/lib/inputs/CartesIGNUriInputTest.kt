@@ -1,15 +1,18 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class CartesIGNUriInputTest : InputTest {
+    override val resources: Resources = mock()
     private val input = FakeInputRepository.cartesIGNUriInput
 
     @Test
@@ -59,14 +62,14 @@ class CartesIGNUriInputTest : InputTest {
 
     @Test
     fun parse_unknownPathOrParams() = runTest {
-        assertEquals(ParseResult(), input.parse("https://cartes-ign.ign.fr/"))
-        assertEquals(ParseResult(), input.parse("https://cartes-ign.ign.fr/?spam=1"))
+        assertEquals(ParseResult.Success(), input.parse("https://cartes-ign.ign.fr/"))
+        assertEquals(ParseResult.Success(), input.parse("https://cartes-ign.ign.fr/?spam=1"))
     }
 
     @Test
     fun parse_coordinates() = runTest {
         assertEquals(
-            ParseResult(
+            ParseResult.Success(
                 persistentListOf(WGS84Point(50.123456, -120.123456, z = 3.14, source = Source.URI))
             ),
             input.parse("https://cartes-ign.ign.fr?lng=-120.123456&lat=50.123456&z=3.14"),

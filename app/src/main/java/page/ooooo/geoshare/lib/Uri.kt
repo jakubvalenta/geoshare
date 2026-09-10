@@ -89,8 +89,8 @@ data class Uri(
             } else {
                 query.split('&').associate { rawParam ->
                     val paramParts = rawParam.split('=')
-                    val rawParamName = paramParts.firstOrNull() ?: ""
-                    val rawParamValue = paramParts.drop(1).firstOrNull() ?: ""
+                    val rawParamName = paramParts.firstOrNull().orEmpty()
+                    val rawParamValue = paramParts.drop(1).firstOrNull().orEmpty()
                     val paramName = uriQuote.decode(rawParamName)
                     val paramValue = uriQuote.decode(rawParamValue)
                     paramName to paramValue
@@ -178,7 +178,7 @@ data class Uri(
                     }
                     this.copy(
                         scheme = scheme.ifEmpty { "https" },
-                        host = pathParts.firstOrNull() ?: "",
+                        host = pathParts.firstOrNull().orEmpty(),
                         pathParts = persistentListOf("", *pathParts.drop(1).toTypedArray()),
                     )
                 }

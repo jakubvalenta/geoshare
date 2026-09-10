@@ -19,6 +19,8 @@ sealed interface Point {
         get() = lon?.toScale(7)?.toTrimmedString()
     val zStr: String?
         get() = z?.toScale(7)?.toTrimmedString()
+    val zOrDefaultStr: String
+        get() = (z ?: 16.0).toScale(7).toTrimmedString()
     val cleanName: String?
         get() = name?.replace('+', ' ')
 
@@ -62,6 +64,15 @@ data class WGS84Point(
     )
 
     override fun isAccurate() = true
+
+    companion object {
+        val Kilimanjaro by lazy {
+            WGS84Point(-3.075833, 37.353333, source = Source.GENERATED)
+        }
+        val ForbiddenCity by lazy {
+            WGS84Point(39.915833, 116.390833, source = Source.GENERATED)
+        }
+    }
 }
 
 /**
