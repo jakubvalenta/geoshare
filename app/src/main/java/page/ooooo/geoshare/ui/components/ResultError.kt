@@ -14,7 +14,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -33,7 +32,6 @@ fun ResultError(
     onNavigateToInputsScreen: () -> Unit,
     onRetry: () -> Unit,
 ) {
-    val resources = LocalResources.current
     val spacing = LocalSpacing.current
 
     Column(Modifier.fillMaxWidth()) {
@@ -50,19 +48,17 @@ fun ResultError(
                 verticalArrangement = Arrangement.spacedBy(spacing.tiny),
             ) {
                 Text(
-                    state.getDescription(resources),
+                    state.message,
                     Modifier.testTag("geoShareConversionErrorMessage"),
                     style = MaterialTheme.typography.bodyMedium,
                 )
-                state.getDetails(resources)?.let { details ->
+                state.stackTrace?.let { details ->
                     ResultDetails(
                         details,
                         initialExpanded = initialExpanded,
                     )
                 }
-                state.uri?.let { uri ->
-                    ResultUri(uri)
-                }
+                ResultUri(state.source)
             }
         }
         ScrollableChips {

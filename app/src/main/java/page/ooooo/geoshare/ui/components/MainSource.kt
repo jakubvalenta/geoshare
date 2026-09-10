@@ -202,7 +202,6 @@ private fun MainSourceTimeButton(
         is ConversionStateLogItem.Pending -> {
             @Composable {
                 CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                    // TODO Shows too large time after rotating the screen
                     ElapsedTimeText(startTimeMark)
                 }
             }
@@ -219,6 +218,7 @@ private fun MainSourceTimeButton(
     if (icon != null || text != null) {
         ThinButton(
             { onSetLogExpanded(!logExpanded) },
+            modifier = Modifier.testTag("geoShareMainSourceIcon"),
             enabled = stateLog.isNotEmpty(),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainer,

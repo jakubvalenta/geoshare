@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
+import android.content.res.Resources
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -33,7 +34,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -43,7 +43,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.Attempt
-import page.ooooo.geoshare.lib.conversion.ConversionFailed
+import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.ConversionStateLogItem
 import page.ooooo.geoshare.lib.conversion.PermissionGrantedBasicInput
 import page.ooooo.geoshare.lib.inputs.MatchedInput
@@ -165,11 +165,15 @@ fun ResultLogItem(
 fun fakeStateLog(source: String, timeSource: TestTimeSource) = listOf(
     ConversionStateLogItem.Finished(
         id = 0,
-        state = ConversionFailed(
-            source,
-            message = stringResource(R.string.conversion_failed_reason_no_points),
-            stackTrace = NotImplementedError().stackTraceToString(),
-        ),
+        state = object : ConversionState, ConversionState.HasDescription {
+            override fun getDescription(resources: Resources) =
+                resources.getString(R.string.conversion_failed_reason_no_points)
+
+            override fun getDetails(resources: Resources) =
+                NotImplementedError().stackTraceToString()
+
+            override val uri = source
+        },
         succeeded = false,
         startTimeMark = timeSource.markNow(),
         endTimeMark = timeSource.apply { plusAssign(30.milliseconds) }.markNow(),

@@ -66,7 +66,9 @@ interface ConversionState {
         val uri: String? get() = null
     }
 
-    interface HasError : HasSource, HasDescription {
+    interface HasError : HasSource {
+        val message: String
+        val stackTrace: String?
         val warning: Boolean
     }
 
@@ -544,16 +546,10 @@ data class ConversionSucceeded(
 
 data class ConversionFailed(
     override val source: String,
-    val message: String,
-    val stackTrace: String? = null,
+    override val message: String,
+    override val stackTrace: String? = null,
     override val warning: Boolean = false,
 ) : ConversionState, ConversionState.HasError {
-    override fun getDescription(resources: Resources) = message
-
-    override fun getDetails(resources: Resources) = stackTrace
-
-    override val uri = source
-
     override fun toString() = "$TAG(source=$source, message=$message, warning=$warning)"
 
     private companion object {
