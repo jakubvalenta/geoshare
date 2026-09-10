@@ -16,6 +16,7 @@ import page.ooooo.geoshare.data.local.preferences.CopyLinkNavigationGoogleUriAut
 import page.ooooo.geoshare.data.local.preferences.CopyLinkNavigationMagicEarthUriAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyLinkStreetViewGoogleUriAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyLinkUriAutomation
+import page.ooooo.geoshare.data.local.preferences.CopyNameAutomation
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayCartesIGNUrlAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation
@@ -227,6 +228,9 @@ class OutputRepository @Inject constructor(
                 getLinkByUUID(UUID.fromString("9d7cd113-ce01-4b8b-82fe-856956b8b20a"))?.let { link ->
                     CopyLinkUriOutput(link, coordinateConverter)
                 }
+
+            is CopyNameAutomation ->
+                CopyNameOutput()
 
             is NoopAutomation ->
                 NoopOutput()

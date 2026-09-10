@@ -22,6 +22,7 @@ import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDegMinSecAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyLinkUriAutomation
+import page.ooooo.geoshare.data.local.preferences.CopyNameAutomation
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayCartesIGNUrlAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation
@@ -349,6 +350,7 @@ class OutputRepositoryTest {
                     CopyCoordsDecOutput(coordinateConverter),
                     CopyCoordsDegMinSecOutput(coordinateConverter),
                     CopyGeoUriOutput(coordinateConverter),
+                    CopyNameOutput(),
                     ShareDisplayGeoUriOutput(coordinateConverter),
                     ShareNavigationGoogleUriOutput(coordinateConverter),
                     ShareStreetViewGoogleUriOutput(coordinateConverter),
@@ -398,6 +400,7 @@ class OutputRepositoryTest {
                     CopyCoordsDecAutomation,
                     CopyCoordsDegMinSecAutomation,
                     CopyGeoUriAutomation,
+                    CopyNameAutomation,
                     ShareDisplayGeoUriAutomation,
                     ShareNavigationGoogleUriAutomation,
                     ShareStreetViewGoogleUriAutomation,

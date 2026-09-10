@@ -60,6 +60,10 @@ object CopyLinkNavigationMagicEarthUriAutomation : Automation
 object CopyLinkStreetViewGoogleUriAutomation : Automation
 
 @Serializable
+@SerialName("COPY_NAME")
+object CopyNameAutomation : Automation
+
+@Serializable
 @SerialName("NOOP")
 object NoopAutomation : Automation
 
