@@ -12,7 +12,8 @@ import javax.inject.Singleton
  */
 @Singleton
 class DebugWebViewInput @Inject constructor() : WebViewInput {
-    override fun getName(resources: Resources) = "Debug WebView"
+    override val group = InputGroup.DEBUG
+    override fun getName(resources: Resources) = "Debug Input (WebView)"
 
     // language=JavaScript
     override fun getUnsafeExtractionJavaScript(match: String) = """

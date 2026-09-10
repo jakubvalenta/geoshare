@@ -29,14 +29,14 @@ class GoogleMapsUriInput @Inject constructor(
     private val googleMapsPlaceListInput: dagger.Lazy<GoogleMapsPlaceListInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
-    override fun getName(resources: Resources) = "Google Maps"
-
+    override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.GOOGLE_MAPS
     override val changelog = persistentListOf(
         InputChangelogItem.Url(5, "https://maps.google.com"),
         InputChangelogItem.Url(5, "https://google.com/maps"),
         InputChangelogItem.Url(5, "https://www.google.com/maps"),
     )
+
     override val pattern =
         Regex("""((?:https?://)?(?:(?:www|maps)\.)?google(?:\.[a-z]{2,3})?\.[a-z]{2,3}[/?#]$URI_REST)""")
 

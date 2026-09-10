@@ -31,8 +31,7 @@ class GoogleNavigationUriInput @Inject constructor(
     private val googleMapsAddressApiInput: dagger.Lazy<GoogleMapsAddressApiInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
-    override fun getName(resources: Resources) = "Google Navigation URI"
-
+    override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.GOOGLE_NAVIGATION_URI
     override val changelog = persistentListOf(
         InputChangelogItem.Text(45) {
@@ -44,6 +43,7 @@ class GoogleNavigationUriInput @Inject constructor(
             )
         },
     )
+
     override val pattern = Regex("""(google.navigation:$URI_REST)""")
 
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {

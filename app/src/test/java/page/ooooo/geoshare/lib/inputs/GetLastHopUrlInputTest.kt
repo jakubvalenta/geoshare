@@ -38,6 +38,7 @@ class GetLastHopUrlInputTest {
     }
     val input = object : GetLastHopUrlInput {
         override fun getName(resources: Resources) = "Test Input"
+        override val group = InputGroup.DEBUG
 
         override val engine = this@GetLastHopUrlInputTest.engine
         override val log = FakeLog

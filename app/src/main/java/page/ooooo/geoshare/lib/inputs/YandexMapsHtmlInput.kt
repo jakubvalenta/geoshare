@@ -5,6 +5,7 @@ import io.ktor.client.engine.HttpClientEngine
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readLine
 import kotlinx.collections.immutable.persistentListOf
+import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
@@ -21,7 +22,8 @@ class YandexMapsHtmlInput @Inject constructor(
     override val log: Log,
     override val uriQuote: UriQuote,
 ) : BodyAsChannelInput {
-    override fun getName(resources: Resources) = "Yandex HTML"
+    override fun getName(resources: Resources) = resources.getString(R.string.input_yandex_html_name)
+    override val group = InputGroup.YANDEX_MAPS
 
     override suspend fun parse(data: ByteReadChannel, match: String, resources: Resources) = parseResult {
         val pointPattern = Regex("""pt=$LON%2C$LAT""")

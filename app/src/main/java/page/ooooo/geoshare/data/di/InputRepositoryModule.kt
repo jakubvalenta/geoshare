@@ -30,6 +30,7 @@ import page.ooooo.geoshare.lib.inputs.GoogleMapsUriInput
 import page.ooooo.geoshare.lib.inputs.GoogleNavigationUriInput
 import page.ooooo.geoshare.lib.inputs.GoogleSearchUriInput
 import page.ooooo.geoshare.lib.inputs.HereWeGoUriInput
+import page.ooooo.geoshare.lib.inputs.InputGroup
 import page.ooooo.geoshare.lib.inputs.MagicEarthUriInput
 import page.ooooo.geoshare.lib.inputs.MapsMeUriInput
 import page.ooooo.geoshare.lib.inputs.MapyComShortLinkInput
@@ -192,8 +193,12 @@ object FakeInputRepository : InputRepository {
         serverRepository = serverRepository,
         uriQuote = uriQuote,
     )
-    val googleMapsHtmlInput = object : GoogleMapsHtmlInput {}
-    val googleMapsPlaceListInput = object : GoogleMapsPlaceListInput {}
+    val googleMapsHtmlInput = object : GoogleMapsHtmlInput {
+        override val group = InputGroup.GOOGLE_MAPS
+    }
+    val googleMapsPlaceListInput = object : GoogleMapsPlaceListInput {
+        override val group = InputGroup.GOOGLE_MAPS
+    }
     override val googleNavigationUriInput = GoogleNavigationUriInput(
         googleMapsAddressApiInput = { googleMapsAddressApiInput },
         uriQuote = uriQuote,

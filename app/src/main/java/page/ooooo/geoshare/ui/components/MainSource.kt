@@ -153,6 +153,7 @@ fun MainSource(
 
         is ConversionState.HasSource -> {
             Card(Modifier.padding(bottom = spacing.tiny)) {
+                // TODO Split in two buttons
                 TwoSlotRow(
                     modifier = Modifier.height(30.dp),
                     firstContent = { paddingValues ->

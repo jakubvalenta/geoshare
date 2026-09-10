@@ -629,7 +629,7 @@ private fun MainScreen(
             PermissionDialog(
                 title = stringResource(
                     R.string.conversion_permission,
-                    currentState.matchedInput.input.getName(resources),
+                    currentState.matchedInput.input.group.getName(resources),
                 ),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
                 dismissText = stringResource(R.string.conversion_permission_common_deny),

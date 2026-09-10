@@ -28,6 +28,7 @@ class BodyAsTextInputTest {
     }
     val input = object : BodyAsTextInput {
         override fun getName(resources: Resources) = "Test Input"
+        override val group = InputGroup.DEBUG
 
         override val engine = this@BodyAsTextInputTest.engine
         override val log = FakeLog

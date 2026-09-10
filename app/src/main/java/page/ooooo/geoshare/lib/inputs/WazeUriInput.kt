@@ -26,8 +26,7 @@ class WazeUriInput @Inject constructor(
     private val wazeHtmlInput: dagger.Lazy<WazeHtmlInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
-    override fun getName(resources: Resources) = "Waze"
-
+    override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.WAZE
     override val changelog = persistentListOf(
         InputChangelogItem.Url(21, "https://waze.com/live-map"),
@@ -36,6 +35,7 @@ class WazeUriInput @Inject constructor(
         InputChangelogItem.Url(21, "https://www.waze.com/ul"),
         InputChangelogItem.Url(21, "https://ul.waze.com/ul"),
     )
+
     override val pattern = Regex("""((?:https?://)?(?:(?:www|ul)\.)?waze\.com/$URI_REST)""")
 
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {

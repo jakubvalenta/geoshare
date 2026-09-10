@@ -22,8 +22,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 class HereWeGoUriInput @Inject constructor(
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
-    override fun getName(resources: Resources) = "HERE WeGo"
-
+    override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.HERE_WEGO
     override val changelog = persistentListOf(
         InputChangelogItem.Url(20, "https://share.here.com/l/"),
@@ -31,6 +30,7 @@ class HereWeGoUriInput @Inject constructor(
         InputChangelogItem.Url(20, "https://wego.here.com/"),
         InputChangelogItem.Url(20, "https://wego.here.com/p/"),
     )
+
     override val pattern = Regex("""((?:https?://)?(?:share|wego)\.here\.com/$URI_REST)""")
 
     @OptIn(ExperimentalEncodingApi::class)

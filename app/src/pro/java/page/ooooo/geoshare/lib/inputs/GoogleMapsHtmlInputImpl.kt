@@ -16,6 +16,8 @@ import javax.inject.Singleton
 class GoogleMapsHtmlInputImpl @Inject constructor(
     private val uriQuote: UriQuote,
 ) : GoogleMapsHtmlInput, BasicInput<Uri> {
+    override val group = InputGroup.GOOGLE_MAPS
+
     override suspend fun fetch(match: String, block: suspend (Uri) -> ParseResult) =
         block(Uri.parse(match, uriQuote))
 

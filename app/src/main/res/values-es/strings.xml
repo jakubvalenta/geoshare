@@ -12,7 +12,7 @@
     <string name="intro_open_by_default_google_maps_button">Abrir los ajustes de Google Maps</string>
     <string name="intro_nav_close">Cerrar</string>
     <string name="conversion_error_report">Reportar incidente</string>
-    <string name="converter_google_maps_permission_title">¿Conectarse a Google?</string>
+    <string name="conversion_permission">¿Conectarse a %1$s?</string>
     <string name="conversion_permission_common_grant">Aceptar</string>
     <string name="about_title">Acerca de</string>
     <string name="about_app_icon_content_description">Ícono de aplicación</string>
@@ -50,16 +50,12 @@
     </plurals>
     <string name="intro_open_by_default_app_screenshot_cancel">Cancelar</string>
     <string name="intro_open_by_default_app_screenshot_add">Agregar</string>
-    <string name="converter_google_maps_loading_indicator_title">Conectándose a Google…</string>
-    <string name="converter_apple_maps_permission_title">¿Conectarse a Apple?</string>
-    <string name="converter_apple_maps_loading_indicator_title">Conectándose a Apple…</string>
+    <string name="conversion_connecting">Conectándose a %1$s…</string>
     <string name="conversion_succeeded_title">Coordenadas</string>
     <string name="conversion_error_title">Error</string>
     <string name="conversion_loading_indicator_cancel">Cancelar</string>
     <string name="conversion_failed_unsupported_service">Servicio de mapas no soportado</string>
     <string name="conversion_failed_cancelled">Cancelado</string>
-    <string name="converter_yandex_maps_permission_title">¿Conectarse a Yandex?</string>
-    <string name="converter_yandex_maps_loading_indicator_title">Conectándose a Yandex…</string>
     <string name="inputs_title">Servicios de mapa soportados</string>
     <string name="inputs_detail_text">Puedes compartir los siguientes enlaces de mapa con %1$s o pegarlos en la aplicación.</string>
     <string name="converter_coordinates_name">coordenadas</string>
@@ -68,14 +64,8 @@
     <string name="conversion_succeeded_save_gpx">Guardar GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s resultado %2$s.gpx</string>
     <string name="conversion_succeeded_share">Compartir</string>
-    <string name="converter_waze_permission_title">¿Conectarse a Waze?</string>
-    <string name="converter_waze_loading_indicator_title">Conectándose a Waze…</string>
     <string name="conversion_error_retry">Intentar de nuevo</string>
     <string name="conversion_succeeded_point_number">punto %1$d</string>
-    <string name="converter_mapy_com_permission_title">¿Conectarse a Mapy.com?</string>
-    <string name="converter_mapy_com_loading_indicator_title">Conectándose a Mapy.com…</string>
-    <string name="converter_open_street_map_permission_title">¿Conectarse a OpenStreetMap?</string>
-    <string name="converter_open_street_map_loading_indicator_title">Conectándose a OpenStreetMap…</string>
     <string name="inputs_all">Todos los servicios de mapas</string>
     <string name="inputs_recent">Recientemente agregado</string>
     <string name="inputs_default_handler">Abre por defecto en %1$s</string>
@@ -110,11 +100,7 @@
     <string name="user_preferences_automation_title">Automatización</string>
     <string name="conversion_succeeded_open_app_display">Mostrar mapa en %1$s</string>
     <string name="conversion_succeeded_open_app_navigate_to">Navegar en %1$s</string>
-    <string name="converter_amap_loading_indicator_title">Conectándose a Amap…</string>
-    <string name="converter_amap_permission_title">¿Conectarse a Amap?</string>
     <string name="conversion_succeeded_open_app_street_view">Mostrar vista de calle en %1$s</string>
-    <string name="converter_urbi_permission_title">¿Conectarse a 2GIS / Urbi?</string>
-    <string name="converter_urbi_loading_indicator_title">Conectándose a 2GIS / Urbi…</string>
     <string name="not_available">No disponible</string>
     <string name="conversion_succeeded_location_failed">No fue posible encontrar la ubicación</string>
     <string name="conversion_succeeded_location_loading_indicator_title">Encontrando tu ubicación…</string>
@@ -146,7 +132,6 @@
         <item quantity="many">%1$d segundos</item>
         <item quantity="other">%1$d segundos</item>
     </plurals>
-    <string name="converter_baidu_map_permission_title">¿Conectarse a Baidu Map?</string>
     <string name="faq_how_headline">Cómo funciona</string>
     <string name="faq_how_text_1">%1$s convierte enlaces de mapa a enlaces geo: que pueden ser abiertos por otras aplicaciones de mapa. Para crear un enlace geo:, coordenadas geográficas son requeridas. %1$s las extrae del URL del mapa.</string>
     <string name="faq_how_text_2">Sin embargo, no todos los URLs de mapa incluyen coordenadas. En estos casos, %1$s pedirá permiso para conectarse al servicio de mapa (Google Maps, Apple Maps, etc.) y recibir las coordenadas desde:</string>
@@ -171,7 +156,6 @@
     <string name="converter_amap_name">Amap (AutoNavi)</string>
     <string name="converter_apple_maps_name">Mapas de Apple</string>
     <string name="converter_baidu_map_name">Baidu Map</string>
-    <string name="converter_baidu_map_loading_indicator_title">Conectándose a Baidu Map…</string>
     <string name="converter_ge0_name">Maps.me, Organic Maps, CoMaps</string>
     <string name="converter_google_maps_name">Google Maps</string>
     <string name="converter_here_wego_name">HERE WeGo</string>

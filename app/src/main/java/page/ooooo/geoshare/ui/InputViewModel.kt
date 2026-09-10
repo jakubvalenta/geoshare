@@ -31,9 +31,8 @@ class InputViewModel @Inject constructor(
     private val allChangelogsByGroupFlow: Flow<Map<InputGroup, ImmutableList<InputChangelogItem>>> = flow {
         emit(
             inputRepository.all
-                .mapNotNull { input -> input.group?.let { group -> group to input } }
-                .groupBy { (group) -> group }
-                .mapValues { (_, inputs) -> inputs.flatMap { (_, input) -> input.changelog }.toImmutableList() }
+                .groupBy { input -> input.group }
+                .mapValues { (_, inputs) -> inputs.flatMap { input -> input.changelog }.toImmutableList() }
         )
     }
     val allChangelogsByGroup: StateFlow<Map<InputGroup, ImmutableList<InputChangelogItem>>> =

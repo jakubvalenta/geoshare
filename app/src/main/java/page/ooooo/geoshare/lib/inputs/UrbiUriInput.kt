@@ -26,8 +26,7 @@ class UrbiUriInput @Inject constructor(
     private val urbiHtmlInput: dagger.Lazy<UrbiHtmlInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
-    override fun getName(resources: Resources) = "2GIS / Urbi"
-
+    override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.URBI
     override val changelog = persistentListOf(
         InputChangelogItem.Url(27, "https://2gis.ae/"),
@@ -54,6 +53,7 @@ class UrbiUriInput @Inject constructor(
         InputChangelogItem.Url(27, "https://urbi.bh/"),
         InputChangelogItem.Url(27, "https://urbi.qa/"),
     )
+
     override val pattern =
         Regex("""((?:https?://)?(?:www\.)?(?:(?:go|maps)\.)?(?:2gis|urbi|urbi-[a-z]{2})(?:\.[a-z]{2,3})?\.[a-z]{2,3}/$URI_REST)""")
 

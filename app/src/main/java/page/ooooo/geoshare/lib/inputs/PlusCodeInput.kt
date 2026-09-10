@@ -26,8 +26,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class PlusCodeInput @Inject constructor() : TextInput, Input.HasRandomUri {
-    override fun getName(resources: Resources) = "Plus Codes"
-
+    override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.PLUS_CODE
     override val changelog = persistentListOf(
         InputChangelogItem.Url(39, "https://plus.codes"),
@@ -38,6 +37,7 @@ class PlusCodeInput @Inject constructor() : TextInput, Input.HasRandomUri {
             )
         },
     )
+
     override val pattern = Regex(
         """(?:^|\s|https://www\.google\.com/maps/place/|https://plus\.codes/)($GLOBAL_CODE)(?:\s|/|$)""",
         RegexOption.IGNORE_CASE,

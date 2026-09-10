@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -164,6 +165,7 @@ private fun InputsListPane(
     onNavigateToGroup: (id: InputGroupId) -> Unit,
 ) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val spacing = LocalSpacing.current
     val appName = stringResource(R.string.app_name)
 
@@ -204,7 +206,7 @@ private fun InputsListPane(
                 SegmentedList(
                     values = recentChangelogsByGroup.keys.toList(),
                     modifier = Modifier.padding(horizontal = spacing.windowPadding),
-                    itemHeadline = { stringResource(it.nameResId) },
+                    itemHeadline = { it.getName(resources) },
                     itemIsSelected = { it.id == currentGroupId },
                     itemOnClick = { onNavigateToGroup(it.id) },
                     itemTestTag = { "geoShareInputListRecent_${it.id}" },
@@ -226,7 +228,7 @@ private fun InputsListPane(
             SegmentedList(
                 values = allChangelogsByGroup.keys.toList(),
                 modifier = Modifier.padding(horizontal = spacing.windowPadding),
-                itemHeadline = { stringResource(it.nameResId) },
+                itemHeadline = { it.getName(resources) },
                 itemIsSelected = { it.id == currentGroupId },
                 itemOnClick = { onNavigateToGroup(it.id) },
                 itemTestTag = { "geoShareInputListAll_${it.id}" },
@@ -264,6 +266,7 @@ private fun InputsDetailPane(
     onBack: () -> Unit,
 ) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val spacing = LocalSpacing.current
     val appName = stringResource(R.string.app_name)
     val maxWidth = 600.dp
@@ -281,7 +284,7 @@ private fun InputsDetailPane(
     LargeTopAppBarPane(
         title = { maxLines ->
             Text(
-                stringResource(group.nameResId),
+                group.getName(resources),
                 overflow = TextOverflow.Ellipsis,
                 maxLines = maxLines,
             )
@@ -363,6 +366,12 @@ private fun InputsDetailPane(
     }
 }
 
+private val fakeAllChangelogsByGroup by lazy {
+    FakeInputRepository.all
+        .groupBy { input -> input.group }
+        .mapValues { (_, inputs) -> inputs.flatMap { input -> input.changelog }.toImmutableList() }
+}
+
 // Previews
 
 @Preview(showBackground = true)
@@ -371,14 +380,10 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             Column {
-                val allChangelogsByGroup = FakeInputRepository.all
-                    .mapNotNull { input -> input.group?.let { group -> group to input } }
-                    .groupBy { (group) -> group }
-                    .mapValues { (_, inputs) -> inputs.flatMap { (_, input) -> input.changelog }.toImmutableList() }
                 InputsScreen(
                     initialGroupId = null,
-                    allChangelogsByGroup = allChangelogsByGroup,
-                    recentChangelogsByGroup = allChangelogsByGroup.filterValues { changelog ->
+                    allChangelogsByGroup = fakeAllChangelogsByGroup,
+                    recentChangelogsByGroup = fakeAllChangelogsByGroup.filterValues { changelog ->
                         changelog.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -394,14 +399,10 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             Column {
-                val allChangelogsByGroup = FakeInputRepository.all
-                    .mapNotNull { input -> input.group?.let { group -> group to input } }
-                    .groupBy { (group) -> group }
-                    .mapValues { (_, inputs) -> inputs.flatMap { (_, input) -> input.changelog }.toImmutableList() }
                 InputsScreen(
                     initialGroupId = null,
-                    allChangelogsByGroup = allChangelogsByGroup,
-                    recentChangelogsByGroup = allChangelogsByGroup.filterValues { changelog ->
+                    allChangelogsByGroup = fakeAllChangelogsByGroup,
+                    recentChangelogsByGroup = fakeAllChangelogsByGroup.filterValues { changelog ->
                         changelog.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -417,14 +418,10 @@ private fun TabletPreview() {
     AppTheme {
         Surface {
             Column {
-                val allChangelogsByGroup = FakeInputRepository.all
-                    .mapNotNull { input -> input.group?.let { group -> group to input } }
-                    .groupBy { (group) -> group }
-                    .mapValues { (_, inputs) -> inputs.flatMap { (_, input) -> input.changelog }.toImmutableList() }
                 InputsScreen(
                     initialGroupId = null,
-                    allChangelogsByGroup = allChangelogsByGroup,
-                    recentChangelogsByGroup = allChangelogsByGroup.filterValues { changelog ->
+                    allChangelogsByGroup = fakeAllChangelogsByGroup,
+                    recentChangelogsByGroup = fakeAllChangelogsByGroup.filterValues { changelog ->
                         changelog.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -440,13 +437,9 @@ private fun NoRecentPreview() {
     AppTheme {
         Surface {
             Column {
-                val allChangelogsByGroup = FakeInputRepository.all
-                    .mapNotNull { input -> input.group?.let { group -> group to input } }
-                    .groupBy { (group) -> group }
-                    .mapValues { (_, inputs) -> inputs.flatMap { (_, input) -> input.changelog }.toImmutableList() }
                 InputsScreen(
                     initialGroupId = null,
-                    allChangelogsByGroup = allChangelogsByGroup,
+                    allChangelogsByGroup = fakeAllChangelogsByGroup,
                     recentChangelogsByGroup = emptyMap(),
                     onBack = {},
                 )
@@ -461,13 +454,9 @@ private fun DarkNoRecentPreview() {
     AppTheme {
         Surface {
             Column {
-                val allChangelogsByGroup = FakeInputRepository.all
-                    .mapNotNull { input -> input.group?.let { group -> group to input } }
-                    .groupBy { (group) -> group }
-                    .mapValues { (_, inputs) -> inputs.flatMap { (_, input) -> input.changelog }.toImmutableList() }
                 InputsScreen(
                     initialGroupId = null,
-                    allChangelogsByGroup = allChangelogsByGroup,
+                    allChangelogsByGroup = fakeAllChangelogsByGroup,
                     recentChangelogsByGroup = emptyMap(),
                     onBack = {},
                 )
@@ -482,13 +471,9 @@ private fun TabletNoRecentPreview() {
     AppTheme {
         Surface {
             Column {
-                val allChangelogsByGroup = FakeInputRepository.all
-                    .mapNotNull { input -> input.group?.let { group -> group to input } }
-                    .groupBy { (group) -> group }
-                    .mapValues { (_, inputs) -> inputs.flatMap { (_, input) -> input.changelog }.toImmutableList() }
                 InputsScreen(
                     initialGroupId = null,
-                    allChangelogsByGroup = allChangelogsByGroup,
+                    allChangelogsByGroup = fakeAllChangelogsByGroup,
                     recentChangelogsByGroup = emptyMap(),
                     onBack = {},
                 )
@@ -503,14 +488,10 @@ private fun OpenStreetMapPreview() {
     AppTheme {
         Surface {
             Column {
-                val allChangelogsByGroup = FakeInputRepository.all
-                    .mapNotNull { input -> input.group?.let { group -> group to input } }
-                    .groupBy { (group) -> group }
-                    .mapValues { (_, inputs) -> inputs.flatMap { (_, input) -> input.changelog }.toImmutableList() }
                 InputsScreen(
                     initialGroupId = InputGroupId.OPEN_STREET_MAP,
-                    allChangelogsByGroup = allChangelogsByGroup,
-                    recentChangelogsByGroup = allChangelogsByGroup.filterValues { changelog ->
+                    allChangelogsByGroup = fakeAllChangelogsByGroup,
+                    recentChangelogsByGroup = fakeAllChangelogsByGroup.filterValues { changelog ->
                         changelog.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -526,14 +507,10 @@ private fun DarkOpenStreetMapPreview() {
     AppTheme {
         Surface {
             Column {
-                val allChangelogsByGroup = FakeInputRepository.all
-                    .mapNotNull { input -> input.group?.let { group -> group to input } }
-                    .groupBy { (group) -> group }
-                    .mapValues { (_, inputs) -> inputs.flatMap { (_, input) -> input.changelog }.toImmutableList() }
                 InputsScreen(
                     initialGroupId = InputGroupId.OPEN_STREET_MAP,
-                    allChangelogsByGroup = allChangelogsByGroup,
-                    recentChangelogsByGroup = allChangelogsByGroup.filterValues { changelog ->
+                    allChangelogsByGroup = fakeAllChangelogsByGroup,
+                    recentChangelogsByGroup = fakeAllChangelogsByGroup.filterValues { changelog ->
                         changelog.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -549,14 +526,10 @@ private fun TabletOpenStreetMapPreview() {
     AppTheme {
         Surface {
             Column {
-                val allChangelogsByGroup = FakeInputRepository.all
-                    .mapNotNull { input -> input.group?.let { group -> group to input } }
-                    .groupBy { (group) -> group }
-                    .mapValues { (_, inputs) -> inputs.flatMap { (_, input) -> input.changelog }.toImmutableList() }
                 InputsScreen(
                     initialGroupId = InputGroupId.OPEN_STREET_MAP,
-                    allChangelogsByGroup = allChangelogsByGroup,
-                    recentChangelogsByGroup = allChangelogsByGroup.filterValues { changelog ->
+                    allChangelogsByGroup = fakeAllChangelogsByGroup,
+                    recentChangelogsByGroup = fakeAllChangelogsByGroup.filterValues { changelog ->
                         changelog.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -572,14 +545,10 @@ private fun GeoUriPreview() {
     AppTheme {
         Surface {
             Column {
-                val allChangelogsByGroup = FakeInputRepository.all
-                    .mapNotNull { input -> input.group?.let { group -> group to input } }
-                    .groupBy { (group) -> group }
-                    .mapValues { (_, inputs) -> inputs.flatMap { (_, input) -> input.changelog }.toImmutableList() }
                 InputsScreen(
                     initialGroupId = InputGroupId.GEO_URI,
-                    allChangelogsByGroup = allChangelogsByGroup,
-                    recentChangelogsByGroup = allChangelogsByGroup.filterValues { changelog ->
+                    allChangelogsByGroup = fakeAllChangelogsByGroup,
+                    recentChangelogsByGroup = fakeAllChangelogsByGroup.filterValues { changelog ->
                         changelog.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -595,14 +564,10 @@ private fun DarkGeoUriPreview() {
     AppTheme {
         Surface {
             Column {
-                val allChangelogsByGroup = FakeInputRepository.all
-                    .mapNotNull { input -> input.group?.let { group -> group to input } }
-                    .groupBy { (group) -> group }
-                    .mapValues { (_, inputs) -> inputs.flatMap { (_, input) -> input.changelog }.toImmutableList() }
                 InputsScreen(
                     initialGroupId = InputGroupId.GEO_URI,
-                    allChangelogsByGroup = allChangelogsByGroup,
-                    recentChangelogsByGroup = allChangelogsByGroup.filterValues { changelog ->
+                    allChangelogsByGroup = fakeAllChangelogsByGroup,
+                    recentChangelogsByGroup = fakeAllChangelogsByGroup.filterValues { changelog ->
                         changelog.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},
@@ -618,14 +583,10 @@ private fun TabletGeoUriPreview() {
     AppTheme {
         Surface {
             Column {
-                val allChangelogsByGroup = FakeInputRepository.all
-                    .mapNotNull { input -> input.group?.let { group -> group to input } }
-                    .groupBy { (group) -> group }
-                    .mapValues { (_, inputs) -> inputs.flatMap { (_, input) -> input.changelog }.toImmutableList() }
                 InputsScreen(
                     initialGroupId = InputGroupId.GEO_URI,
-                    allChangelogsByGroup = allChangelogsByGroup,
-                    recentChangelogsByGroup = allChangelogsByGroup.filterValues { changelog ->
+                    allChangelogsByGroup = fakeAllChangelogsByGroup,
+                    recentChangelogsByGroup = fakeAllChangelogsByGroup.filterValues { changelog ->
                         changelog.any { it.addedInVersionCode > 25 }
                     },
                     onBack = {},

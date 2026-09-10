@@ -7,8 +7,7 @@
     <string name="main_input_uri_clear_content_description">Löschen</string>
     <string name="main_input_uri_supporting_text">z.B. https://maps.app.goo.gl/… oder maps.apple.com/…</string>
     <string name="main_create_geo_uri">Koordinaten anzeigen</string>
-    <string name="converter_google_maps_permission_title">Mit Google verbinden?</string>
-    <string name="converter_apple_maps_permission_title">Mit Apple verbinden?</string>
+    <string name="conversion_permission">Mit %1$s verbinden?</string>
     <string name="conversion_permission_common_deny">Abbrechen</string>
     <string name="conversion_permission_common_text"><![CDATA[Der Link <tt>%1$s</tt> enthält keine Koordinaten. %2$s muss sich mit dem Kartendienst verbinden, um sie zu erhalten.]]></string>
     <string name="conversion_succeeded_apps_headline">Öffnen mit</string>
@@ -28,8 +27,7 @@
     <string name="about_app_name_and_version">%1$s %2$s</string>
     <string name="faq_title">FAQ</string>
     <string name="about_text"><![CDATA[<p>%1$s ist eine Kostenlose und quelloffene App veröffentlicht unter der <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> oder späterer Lizenz.</p><br><p>Den Code findest du unter <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, wo du auch <a href="https://github.com/jakubvalenta/geoshare/issues">einen Fehler Melden kannst</a>.</p><br><p>Du kannst gerne hier Feedback hinterlassen. Erreichen kannst du mich per E-Mail unter <a href="mailto:%2$s">%2$s</a>.</p>]]></string>
-    <string name="converter_google_maps_loading_indicator_title">Verbinden mit Google…</string>
-    <string name="converter_apple_maps_loading_indicator_title">Verbinden mit Apple…</string>
+    <string name="conversion_connecting">Verbinden mit %1$s…</string>
     <string name="intro_open_by_default_app_screenshot_cancel">Abbrechen</string>
     <string name="conversion_loading_indicator_cancel">Abbrechen</string>
     <string name="conversion_failed_cancelled">Abgebrochen</string>
@@ -47,8 +45,6 @@
         <item quantity="other">%1$d unterstützte Links</item>
     </plurals>
     <string name="intro_open_by_default_app_screenshot_add">Hinzufügen</string>
-    <string name="converter_yandex_maps_permission_title">Mit Yandex verbinden?</string>
-    <string name="converter_yandex_maps_loading_indicator_title">Verbindung mit Yandex…</string>
     <string name="inputs_title">Unterstützte Kartendienste</string>
     <string name="inputs_detail_text">Du kannst die folgenden Kartenlinks mit %1$s teilen oder in die App einfügen.</string>
     <string name="converter_coordinates_name">Koordinaten</string>
@@ -69,12 +65,6 @@
     <string name="conversion_succeeded_share">Teilen</string>
     <string name="conversion_succeeded_point_number">Punkt %1$d</string>
     <string name="conversion_succeeded_save_gpx">GPX-Punkte speichern</string>
-    <string name="converter_waze_permission_title">Mit Waze verbinden?</string>
-    <string name="converter_waze_loading_indicator_title">Verbindung mit Waze…</string>
-    <string name="converter_mapy_com_permission_title">Mit Mapy.com verbinden?</string>
-    <string name="converter_mapy_com_loading_indicator_title">Verbindung mit Mapy.com…</string>
-    <string name="converter_open_street_map_permission_title">Mit OpenStreetMap verbinden?</string>
-    <string name="converter_open_street_map_loading_indicator_title">Verbindung mit OpenStreetMap…</string>
     <string name="inputs_all">Alle Kartendienste</string>
     <string name="inputs_recent">Kürzlich hinzugefügt</string>
     <string name="inputs_default_handler">Öffnet standardmäßig in %1$s</string>
@@ -86,8 +76,6 @@
     <string name="conversion_succeeded_open_app_navigate_to">In %1$s navigieren</string>
     <string name="conversion_succeeded_save_gpx_failed">Fehler beim Speichern der GPX-Datei</string>
     <string name="main_random">Zufälliger Link</string>
-    <string name="converter_amap_loading_indicator_title">Verbinden mit Amap…</string>
-    <string name="converter_amap_permission_title">Mit Amap verbinden?</string>
     <string name="conversion_automation_copy_link_succeeded">Link wurde automatisch kopiert</string>
     <string name="conversion_automation_copy_succeeded">Koordinaten wurden automatisch kopiert</string>
     <string name="conversion_automation_copy_name_succeeded">Name wurde automatisch kopiert</string>
@@ -111,8 +99,6 @@
     <string name="user_preferences_automation_nothing">Nichts</string>
     <string name="user_preferences_automation_title">Automatisierung</string>
     <string name="conversion_succeeded_open_app_street_view">Street View in %1$s anzeigen</string>
-    <string name="converter_urbi_permission_title">Mit 2GIS / Urbi verbinden?</string>
-    <string name="converter_urbi_loading_indicator_title">Verbindung mit 2GIS / Urbi…</string>
     <string name="not_available">Nicht verfügbar</string>
     <string name="conversion_succeeded_location_failed">Standort konnte nicht ermittelt werden</string>
     <string name="conversion_succeeded_location_loading_indicator_title">Ermittlung deines Standorts…</string>
@@ -147,7 +133,6 @@
     <string name="converter_amap_name">Amap (AutoNavi)</string>
     <string name="converter_apple_maps_name">Apple Maps</string>
     <string name="converter_baidu_map_name">Baidu Map</string>
-    <string name="converter_baidu_map_permission_title">Mit Baidu Map verbinden?</string>
     <string name="converter_ge0_name">Maps.me, Organic Maps, CoMaps</string>
     <string name="converter_google_maps_name">Google Maps</string>
     <string name="converter_here_wego_name">HERE WeGo</string>
@@ -201,7 +186,6 @@
     <string name="output_save_to_contact_failed">Fehler beim Speichern des Punktes in einem Kontakt</string>
     <string name="output_send">Punkt senden</string>
     <string name="output_send_via">Punkt über %1$s senden</string>
-    <string name="converter_baidu_map_loading_indicator_title">Verbinden mit Baidu Map…</string>
     <string name="converter_cartes_ign_name">Cartes IGN</string>
     <string name="converter_plus_code_name">Plus Codes</string>
     <string name="user_preferences_connection_option_always">Erlauben</string>

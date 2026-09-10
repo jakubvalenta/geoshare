@@ -25,8 +25,7 @@
     <string name="main_input_uri_label">Вставьте сюда ссылку на карту</string>
     <string name="intro_open_by_default_google_maps_content_description">Снимок экрана настроек Google Maps «Открыть по умолчанию»</string>
     <string name="intro_open_by_default_app_caption"><![CDATA[Затем перейдите в настройки ➞ приложения ➞ %1$s ➞ <i>Открывать по умолчанию</i>, включите открытие ссылок в этом приложении и нажмите <i>Добавить ссылки</i>.]]></string>
-    <string name="converter_google_maps_permission_title">Подключиться к Google?</string>
-    <string name="converter_apple_maps_permission_title">Подключиться к Apple?</string>
+    <string name="conversion_permission">Подключиться к %1$s?</string>
     <string name="conversion_permission_common_grant">Хорошо</string>
     <string name="conversion_permission_common_deny">Отмена</string>
     <string name="main_input_uri_clear_content_description">Очистить</string>
@@ -52,8 +51,7 @@
     <string name="conversion_permission_common_text"><![CDATA[Эта ссылка <tt>%1$s</tt> не содержит координат. Для %2$s необходимо подключиться к картографическому сервису, чтобы получить их.]]></string>
     <string name="about_text"><![CDATA[<p>%1$s — это бесплатное приложение с открытым исходным кодом, распространяемое по лицензии <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> или более поздней версии.</p><br><p>Вы можете найти код на <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, где вы также можете <a href="https://github.com/jakubvalenta/geoshare/issues">сообщать о проблемах</a>.</p><br><p>Мы будем рады вашим отзывам. Вы можете связаться со мной по адресу <a href="mailto:%2$s">%2$s</a>.</p>]]></string>
     <string name="user_preferences_connection_description">Для поддержки коротких ссылок и ссылок без географических координат в URL-адресе, %1$s может подключаться к картографическому сервису (Google Карты, Карты Apple и др.).</string>
-    <string name="converter_google_maps_loading_indicator_title">Подключение к Google…</string>
-    <string name="converter_apple_maps_loading_indicator_title">Подключение к Apple…</string>
+    <string name="conversion_connecting">Подключение к %1$s…</string>
     <string name="conversion_loading_indicator_cancel">Отмена</string>
     <string name="conversion_failed_cancelled">Отменено</string>
     <string name="conversion_succeeded_skip">Копировать изначальную ссылку</string>
@@ -62,21 +60,13 @@
     <string name="conversion_succeeded_save_gpx">Сохранить точки как GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s результат %2$s.gpx</string>
     <string name="conversion_succeeded_share">Поделиться</string>
-    <string name="converter_mapy_com_permission_title">Подключиться к Mapy.com?</string>
     <string name="conversion_succeeded_point_number">точка %1$d</string>
-    <string name="converter_mapy_com_loading_indicator_title">Подключение к Mapy.com…</string>
-    <string name="converter_yandex_maps_permission_title">Подключиться к Яндексу?</string>
-    <string name="converter_yandex_maps_loading_indicator_title">Подключение к Яндексу…</string>
-    <string name="converter_waze_permission_title">Подключиться к Waze?</string>
-    <string name="converter_waze_loading_indicator_title">Подключение к Waze…</string>
     <string name="conversion_error_retry">Попробуйте снова</string>
     <string name="inputs_title">Поддерживаемые карты</string>
     <string name="inputs_detail_text">Вы можете поделиться следующими ссылками на карту с %1$s или вставить их в приложение.</string>
     <string name="converter_coordinates_name">координаты</string>
     <string name="example">например, %1$s</string>
     <string name="converter_geo_name">geo:</string>
-    <string name="converter_open_street_map_permission_title">Подключиться к OpenStreetMap?</string>
-    <string name="converter_open_street_map_loading_indicator_title">Подключение к OpenStreetMap…</string>
     <string name="not_available">Недоступно</string>
     <string name="conversion_succeeded_copy_coordinates">Копировать координаты</string>
     <string name="conversion_succeeded_copy_link">Копировать ссылку %1$s</string>
@@ -100,10 +90,6 @@
         <item quantity="many">Автоматически поделиться GPX через %1$d сек.</item>
         <item quantity="other">Автоматически поделиться GPX через %1$d сек.</item>
     </plurals>
-    <string name="converter_amap_loading_indicator_title">Подключение к Amap…</string>
-    <string name="converter_amap_permission_title">Подключиться к Amap?</string>
-    <string name="converter_urbi_permission_title">Подключиться к 2ГИС / Urbi?</string>
-    <string name="converter_urbi_loading_indicator_title">Подключение к 2ГИС / Urbi…</string>
     <string name="conversion_automation_copy_link_succeeded">Ссылка автоматически скопирована</string>
     <string name="conversion_automation_copy_succeeded">Координаты автоматически скопированы</string>
     <string name="conversion_automation_open_app_failed">Не удалось автоматически открыть %1$s</string>
@@ -146,7 +132,6 @@
     <string name="converter_amap_name">Amap (AutoNavi)</string>
     <string name="converter_apple_maps_name">Карты Apple</string>
     <string name="converter_baidu_map_name">Baidu Map</string>
-    <string name="converter_baidu_map_permission_title">Подключиться к Baidu Map?</string>
     <string name="converter_ge0_name">Maps.me, Organic Maps, CoMaps</string>
     <string name="converter_google_maps_name">Google Карты</string>
     <string name="converter_here_wego_name">HERE WeGo</string>
@@ -187,7 +172,6 @@
     <string name="network_exception_server_response_error">ошибка в ответе сервера %1$d</string>
     <string name="network_exception_unresolved_address">не получен адрес</string>
     <string name="network_exception_socket_timeout">истекло время ожидания сокета</string>
-    <string name="converter_baidu_map_loading_indicator_title">Подключение к Baidu Map…</string>
     <string name="conversion_succeeded_save_gpx_succeeded">Файл GPX сохранён</string>
     <string name="conversion_succeeded_apps_links_configure">Настройка web-карт</string>
     <string name="output_gpx_point_save">Сохранить GPX с одной точкой</string>

@@ -5,6 +5,7 @@ import android.webkit.WebSettings
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
 import page.ooooo.geoshare.lib.geo.Source
@@ -19,7 +20,8 @@ class BaiduMapWebViewInput @Inject constructor(
     @Serializable
     private data class ExtractedPoint(val lat: Double?, val lon: Double?, val z: Double?, val name: String?)
 
-    override fun getName(resources: Resources) = "Baidu Map Short Link"
+    override fun getName(resources: Resources) = resources.getString(R.string.input_baidu_map_web_view_name)
+    override val group = InputGroup.BAIDU_MAP
 
     /**
      * Notice that we don't take coordinates from `_appStateFromUrl.loc`, because these have a longitude offset.

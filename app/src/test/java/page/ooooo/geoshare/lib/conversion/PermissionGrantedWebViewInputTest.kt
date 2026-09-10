@@ -26,6 +26,7 @@ import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.inputs.InputGroup
 import page.ooooo.geoshare.lib.inputs.MatchedInput
 import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.inputs.WebViewInput
@@ -43,6 +44,7 @@ class PermissionGrantedWebViewInputTest {
     private val source = "https://maps.google.com/foo"
     private val input = object : WebViewInput {
         override fun getName(resources: Resources) = "Test Input"
+        override val group = InputGroup.DEBUG
 
         override val timeout = 7.seconds
 
@@ -63,7 +65,6 @@ class PermissionGrantedWebViewInputTest {
     private val maxAttempts = 3
     private val resources: Resources = mock {
         on { getString(R.string.conversion_failed_unsupported_source_place_list) } doReturn "Place lists are not supported"
-        on { getString(R.string.converter_google_maps_loading_indicator_title) } doReturn "Connecting to Google..."
         on { getString(R.string.conversion_failed_cancelled) } doReturn "Cancelled"
         on { getString(R.string.conversion_failed_reason_timeout) } doReturn "Timeout"
         on {
@@ -108,6 +109,7 @@ class PermissionGrantedWebViewInputTest {
         runTest {
             val input = object : WebViewInput {
                 override fun getName(resources: Resources) = "Test Input"
+                override val group = InputGroup.DEBUG
 
                 override fun getUnsafeExtractionJavaScript(match: String) = "undefined"
 
@@ -281,6 +283,7 @@ class PermissionGrantedWebViewInputTest {
     fun transition_whenInputParseThrowsCancellationException_returnsConversionFailed() = runTest {
         val input = object : WebViewInput {
             override fun getName(resources: Resources) = "Test Input"
+            override val group = InputGroup.DEBUG
 
             override val timeout = 7.seconds
 

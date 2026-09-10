@@ -9,10 +9,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.retain.retain
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -23,6 +27,7 @@ import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.inputs.InputGroup
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -76,7 +81,10 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             PermissionDialog(
-                title = stringResource(R.string.converter_google_maps_permission_title),
+                title = stringResource(
+                    R.string.conversion_permission,
+                    InputGroup.GOOGLE_MAPS.getName(LocalResources.current),
+                ),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
                 dismissText = stringResource(R.string.conversion_permission_common_deny),
                 onConfirmation = {},
@@ -106,7 +114,10 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             PermissionDialog(
-                title = stringResource(R.string.converter_google_maps_permission_title),
+                title = stringResource(
+                    R.string.conversion_permission,
+                    InputGroup.GOOGLE_MAPS.getName(LocalResources.current),
+                ),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
                 dismissText = stringResource(R.string.conversion_permission_common_deny),
                 onConfirmation = {},
@@ -136,7 +147,10 @@ private fun ParseHtmlPermissionPreview() {
     AppTheme {
         Surface {
             PermissionDialog(
-                title = stringResource(R.string.converter_google_maps_permission_title),
+                title = stringResource(
+                    R.string.conversion_permission,
+                    InputGroup.GOOGLE_MAPS.getName(LocalResources.current),
+                ),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
                 dismissText = stringResource(R.string.conversion_permission_common_deny),
                 onConfirmation = {},
@@ -168,7 +182,10 @@ private fun DarkParseHtmlPermissionPreview() {
     AppTheme {
         Surface {
             PermissionDialog(
-                title = stringResource(R.string.converter_google_maps_permission_title),
+                title = stringResource(
+                    R.string.conversion_permission,
+                    InputGroup.GOOGLE_MAPS.getName(LocalResources.current),
+                ),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
                 dismissText = stringResource(R.string.conversion_permission_common_deny),
                 onConfirmation = {},

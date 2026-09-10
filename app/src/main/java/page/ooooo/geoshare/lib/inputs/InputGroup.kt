@@ -1,8 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import androidx.annotation.Keep
-import androidx.annotation.StringRes
-import androidx.compose.runtime.Immutable
 import page.ooooo.geoshare.R
 
 @Keep
@@ -28,28 +27,105 @@ enum class InputGroupId {
     YANDEX_MAPS,
 }
 
-@Immutable
-data class InputGroup(val id: InputGroupId, @param:StringRes val nameResId: Int) {
+interface InputGroup {
+    val id: InputGroupId
+    fun getName(resources: Resources): String
+
     companion object {
-        val AMAP = InputGroup(InputGroupId.AMAP, R.string.converter_amap_name)
-        val APPLE_MAPS = InputGroup(InputGroupId.APPLE_MAPS, R.string.converter_apple_maps_name)
-        val BAIDU_MAP = InputGroup(InputGroupId.BAIDU_MAP, R.string.converter_baidu_map_name)
-        val CARTES_IGN = InputGroup(InputGroupId.CARTES_IGN, R.string.converter_cartes_ign_name)
-        val COORDINATES = InputGroup(InputGroupId.COORDINATES, R.string.converter_coordinates_name)
-        val DEBUG = InputGroup(InputGroupId.DEBUG, R.string.converter_debug_name)
-        val GEO_URI = InputGroup(InputGroupId.GEO_URI, R.string.converter_geo_name)
-        val GOOGLE_MAPS = InputGroup(InputGroupId.GOOGLE_MAPS, R.string.converter_google_maps_name)
+        val AMAP = object : InputGroup {
+            override val id = InputGroupId.AMAP
+            override fun getName(resources: Resources) =
+                resources.getString(R.string.converter_amap_name)
+        }
+        val APPLE_MAPS = object : InputGroup {
+            override val id = InputGroupId.APPLE_MAPS
+            override fun getName(resources: Resources) =
+                resources.getString(R.string.converter_apple_maps_name)
+        }
+        val BAIDU_MAP = object : InputGroup {
+            override val id = InputGroupId.BAIDU_MAP
+            override fun getName(resources: Resources) =
+                resources.getString(R.string.converter_baidu_map_name)
+        }
+        val CARTES_IGN = object : InputGroup {
+            override val id = InputGroupId.CARTES_IGN
+            override fun getName(resources: Resources) =
+                resources.getString(R.string.converter_cartes_ign_name)
+        }
+        val COORDINATES = object : InputGroup {
+            override val id = InputGroupId.COORDINATES
+            override fun getName(resources: Resources) =
+                resources.getString(R.string.converter_coordinates_name)
+        }
+        val DEBUG = object : InputGroup {
+            override val id = InputGroupId.DEBUG
+            override fun getName(resources: Resources) = "Debug Input"
+        }
+        val GEO_URI = object : InputGroup {
+            override val id = InputGroupId.GEO_URI
+            override fun getName(resources: Resources) =
+                resources.getString(R.string.converter_geo_name)
+        }
+        val GOOGLE_MAPS = object : InputGroup {
+            override val id = InputGroupId.GOOGLE_MAPS
+            override fun getName(resources: Resources) =
+                resources.getString(R.string.converter_google_maps_name)
+        }
         val GOOGLE_NAVIGATION_URI =
-            InputGroup(InputGroupId.GOOGLE_NAVIGATION_URI, R.string.converter_google_navigation_uri_name)
-        val HERE_WEGO = InputGroup(InputGroupId.HERE_WEGO, R.string.converter_here_wego_name)
-        val MAGIC_EARTH = InputGroup(InputGroupId.MAGIC_EARTH, R.string.converter_magic_earth_name)
-        val MAPS_ME = InputGroup(InputGroupId.MAPS_ME, R.string.converter_ge0_name)
-        val MAPY_COM = InputGroup(InputGroupId.MAPY_COM, R.string.converter_mapy_com_name)
-        val OPEN_STREET_MAP = InputGroup(InputGroupId.OPEN_STREET_MAP, R.string.converter_open_street_map_name)
-        val OSM_AND = InputGroup(InputGroupId.OSM_AND, R.string.converter_osm_and_name)
-        val PLUS_CODE = InputGroup(InputGroupId.PLUS_CODE, R.string.converter_plus_code_name)
-        val URBI = InputGroup(InputGroupId.URBI, R.string.converter_urbi_name)
-        val WAZE = InputGroup(InputGroupId.WAZE, R.string.converter_waze_name)
-        val YANDEX_MAPS = InputGroup(InputGroupId.YANDEX_MAPS, R.string.converter_yandex_maps_name)
+            object : InputGroup {
+                override val id = InputGroupId.GOOGLE_NAVIGATION_URI
+                override fun getName(resources: Resources) =
+                    resources.getString(R.string.converter_google_navigation_uri_name)
+            }
+        val HERE_WEGO = object : InputGroup {
+            override val id = InputGroupId.HERE_WEGO
+            override fun getName(resources: Resources) =
+                resources.getString(R.string.converter_here_wego_name)
+        }
+        val MAGIC_EARTH = object : InputGroup {
+            override val id = InputGroupId.MAGIC_EARTH
+            override fun getName(resources: Resources) =
+                resources.getString(R.string.converter_magic_earth_name)
+        }
+        val MAPS_ME = object : InputGroup {
+            override val id = InputGroupId.MAPS_ME
+            override fun getName(resources: Resources) =
+                resources.getString(R.string.converter_ge0_name)
+        }
+        val MAPY_COM = object : InputGroup {
+            override val id = InputGroupId.MAPY_COM
+            override fun getName(resources: Resources) =
+                resources.getString(R.string.converter_mapy_com_name)
+        }
+        val OPEN_STREET_MAP = object : InputGroup {
+            override val id = InputGroupId.OPEN_STREET_MAP
+            override fun getName(resources: Resources) =
+                resources.getString(R.string.converter_open_street_map_name)
+        }
+        val OSM_AND = object : InputGroup {
+            override val id = InputGroupId.OSM_AND
+            override fun getName(resources: Resources) =
+                resources.getString(R.string.converter_osm_and_name)
+        }
+        val PLUS_CODE = object : InputGroup {
+            override val id = InputGroupId.PLUS_CODE
+            override fun getName(resources: Resources) =
+                resources.getString(R.string.converter_plus_code_name)
+        }
+        val URBI = object : InputGroup {
+            override val id = InputGroupId.URBI
+            override fun getName(resources: Resources) =
+                resources.getString(R.string.converter_urbi_name)
+        }
+        val WAZE = object : InputGroup {
+            override val id = InputGroupId.WAZE
+            override fun getName(resources: Resources) =
+                resources.getString(R.string.converter_waze_name)
+        }
+        val YANDEX_MAPS = object : InputGroup {
+            override val id = InputGroupId.YANDEX_MAPS
+            override fun getName(resources: Resources) =
+                resources.getString(R.string.converter_yandex_maps_name)
+        }
     }
 }

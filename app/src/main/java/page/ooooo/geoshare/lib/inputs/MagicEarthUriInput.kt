@@ -21,12 +21,12 @@ import javax.inject.Singleton
 class MagicEarthUriInput @Inject constructor(
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
-    override fun getName(resources: Resources) = "Magic Earth"
-
+    override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.MAGIC_EARTH
     override val changelog = persistentListOf(
         InputChangelogItem.Url(20, "https://magicearth.com/"),
     )
+
     override val pattern = Regex("""((?:(?:https?://)?magicearth.com|magicearth:/)/\?$URI_REST)""")
 
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {

@@ -2,6 +2,7 @@ package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
 import io.ktor.client.engine.HttpClientEngine
+import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
@@ -15,7 +16,8 @@ class MapyComShortLinkInput @Inject constructor(
     override val log: Log,
     override val uriQuote: UriQuote,
 ) : GetLastHopUrlInput {
-    override fun getName(resources: Resources) = "Mapy.com Short Link"
+    override fun getName(resources: Resources) = resources.getString(R.string.input_mapy_com_short_link_name)
+    override val group = InputGroup.MAPY_COM
 
     override val pattern = Regex("""((?:https?://)?(?:www\.)?mapy\.[a-z]{2,3}/s/\S+)""")
 

@@ -20,12 +20,12 @@ import javax.inject.Singleton
 class OsmAndUriInput @Inject constructor(
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
-    override fun getName(resources: Resources) = "OsmAnd"
-
+    override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.OSM_AND
     override val changelog = persistentListOf(
         InputChangelogItem.Url(20, "https://osmand.net/map"),
     )
+
     override val pattern = Regex("""((?:https?://)?(?:www\.)?osmand\.net/$URI_REST)""")
 
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {

@@ -12,6 +12,7 @@ import io.ktor.http.headers
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.json.Json
+import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.ServerRepository
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
@@ -29,7 +30,8 @@ class GoogleMapsPlaceApiInput @Inject constructor(
     private val serverRepository: ServerRepository,
     private val uriQuote: UriQuote,
 ) : BasicInput<Uri>, Input.HasPermission {
-    override fun getName(resources: Resources) = "Google Maps Place API"
+    override fun getName(resources: Resources) = resources.getString(R.string.input_google_maps_place_api_name)
+    override val group = InputGroup.GOOGLE_MAPS
 
     override suspend fun fetch(match: String, block: suspend (Uri) -> ParseResult) =
         block(Uri.parse(match, uriQuote))

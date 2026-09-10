@@ -26,9 +26,9 @@
     <string name="billing_subscription_cancel_description">Cancel anytime</string>
     <string name="billing_subscription_monthly">Monthly subscription</string>
     <string name="billing_terms_of_service">terms of service</string>
-    <string name="conversion_connecting">Connecting to map service %1$s…</string>
-    <string name="conversion_permission">Connect to map service %1$s?</string>
-    <string name="conversion_processing">Processing link to map service %1$s…</string>
+    <string name="conversion_connecting">Connecting to %1$s…</string>
+    <string name="conversion_permission">Connect to %1$s?</string>
+    <string name="conversion_processing">Processing link to %1$s…</string>
     <string name="conversion_succeeded_check_experimental">Location might be inaccurate due to an experimental extraction method.</string>
     <string name="conversion_succeeded_check_map_center">Location might be a map center, not a pin.</string>
     <string name="conversion_succeeded_check_name_only">Failed to find coordinates, using a place name.</string>
@@ -65,6 +65,23 @@
     <string name="help_welcome_action">Or copy this example:</string>
     <string name="help_welcome_text">Do you have a map link ready? Enter it in the form and press %1$s.</string>
     <string name="help_welcome_title">Welcome</string>
+    <string name="input_amap_short_link_name" translatable="false">Amap (short link)</string>
+    <string name="input_apple_maps_html_name" translatable="false">Apple Maps (HTML)</string>
+    <string name="input_baidu_map_short_link_name" translatable="false">Baidu Map (short link)</string>
+    <string name="input_baidu_map_web_view_name" translatable="false">Baidu Map (WebView)</string>
+    <string name="input_google_maps_address_api_name" translatable="false">Google Maps (address API)</string>
+    <string name="input_google_maps_html_name" translatable="false">Google Maps (HTML)</string>
+    <string name="input_google_maps_place_api_name" translatable="false">Google Maps (place API)</string>
+    <string name="input_google_maps_place_list_name" translatable="false">Google Maps (place list)</string>
+    <string name="input_google_maps_short_link_name" translatable="false">Google Maps (short link)</string>
+    <string name="input_google_maps_web_view_name" translatable="false">Google Maps (WebView)</string>
+    <string name="input_google_search_name" translatable="false">Google Search</string>
+    <string name="input_mapy_com_short_link_name" translatable="false">Mapy.com (short link)</string>
+    <string name="input_open_street_map_api_name" translatable="false">OpenStreetMap (API)</string>
+    <string name="input_urbi_html_name" translatable="false">2GIS / Urbi (HTML)</string>
+    <string name="input_waze_html_name" translatable="false">Waze (HTML)</string>
+    <string name="input_yandex_html_name" translatable="false">Yandex (HTML)</string>
+    <string name="input_yandex_short_link_name" translatable="false">Yandex (short link)</string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="nav_back_content_description">Back to main screen</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Dropped pin</string>
@@ -123,45 +140,24 @@
     <string name="output_send">Send point</string>
     <string name="output_send_via">Send point via %1$s</string>
     <string name="converter_amap_name">Amap (AutoNavi)</string>
-    <string name="converter_amap_loading_indicator_title">Connecting to Amap…</string>
-    <string name="converter_amap_permission_title">Connect to Amap?</string>
-    <string name="converter_apple_maps_loading_indicator_title">Connecting to Apple…</string>
     <string name="converter_apple_maps_name">Apple Maps</string>
-    <string name="converter_apple_maps_permission_title">Connect to Apple?</string>
     <string name="converter_baidu_map_name">Baidu Map</string>
-    <string name="converter_baidu_map_permission_title">Connect to Baidu Map?</string>
-    <string name="converter_baidu_map_loading_indicator_title">Connecting to Baidu Map…</string>
     <string name="converter_cartes_ign_name">Cartes IGN</string>
     <string name="converter_coordinates_name">coordinates</string>
     <string name="example">e.g. %1$s</string>
-    <string name="converter_debug_name" translatable="false">Debug Input</string>
-    <string name="converter_debug_permission_title" translatable="false">Connect to Debug Input?</string>
-    <string name="converter_debug_loading_indicator_title" translatable="false">Connecting to Debug Input…</string>
     <string name="converter_ge0_name">Maps.me, Organic Maps, CoMaps</string>
     <string name="converter_geo_name">geo:</string>
-    <string name="converter_google_maps_loading_indicator_title">Connecting to Google…</string>
     <string name="converter_google_maps_name">Google Maps</string>
-    <string name="converter_google_maps_permission_title">Connect to Google?</string>
     <string name="converter_google_navigation_uri_name">Google Navigation URI</string>
     <string name="converter_here_wego_name">HERE WeGo</string>
     <string name="converter_magic_earth_name">Magic Earth</string>
-    <string name="converter_mapy_com_loading_indicator_title">Connecting to Mapy.com…</string>
     <string name="converter_mapy_com_name">Mapy.com</string>
-    <string name="converter_mapy_com_permission_title">Connect to Mapy.com?</string>
     <string name="converter_plus_code_name">Plus Codes</string>
-    <string name="converter_open_street_map_loading_indicator_title">Connecting to OpenStreetMap…</string>
     <string name="converter_open_street_map_name">OpenStreetMap</string>
-    <string name="converter_open_street_map_permission_title">Connect to OpenStreetMap?</string>
     <string name="converter_osm_and_name">OsmAnd</string>
     <string name="converter_urbi_name">2GIS / Urbi</string>
-    <string name="converter_urbi_permission_title">Connect to 2GIS / Urbi?</string>
-    <string name="converter_urbi_loading_indicator_title">Connecting to 2GIS / Urbi…</string>
-    <string name="converter_waze_loading_indicator_title">Connecting to Waze…</string>
     <string name="converter_waze_name">Waze</string>
-    <string name="converter_waze_permission_title">Connect to Waze?</string>
-    <string name="converter_yandex_maps_loading_indicator_title">Connecting to Yandex…</string>
     <string name="converter_yandex_maps_name">Yandex Maps</string>
-    <string name="converter_yandex_maps_permission_title">Connect to Yandex?</string>
     <string name="conversion_succeeded_title">Coordinates</string>
     <string name="conversion_automation_copy_link_succeeded">Automatically copied link</string>
     <string name="conversion_automation_copy_succeeded">Automatically copied coordinates</string>

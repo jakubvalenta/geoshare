@@ -18,6 +18,8 @@ class GoogleMapsPlaceListInputImpl @Inject constructor(
     @Serializable
     private data class ExtractedPoint(val lat: Double?, val lon: Double?)
 
+    override val group = InputGroup.GOOGLE_MAPS
+
     /**
      * Parse APP_INITIALIZATION_STATE, which has this structure:
      *

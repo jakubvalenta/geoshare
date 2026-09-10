@@ -17,12 +17,12 @@ import javax.inject.Singleton
 class AmapUriInput @Inject constructor(
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
-    override fun getName(resources: Resources) = "Amap"
-
+    override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.AMAP
     override val changelog = persistentListOf(
         InputChangelogItem.Url(27, "https://wb.amap.com/"),
     )
+
     override val pattern = Regex("""((?:https?://)?wb\.amap\.com/$URI_REST)""")
 
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {

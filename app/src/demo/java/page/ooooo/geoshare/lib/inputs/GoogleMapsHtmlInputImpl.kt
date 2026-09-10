@@ -8,5 +8,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class GoogleMapsHtmlInputImpl @Inject constructor() : GoogleMapsHtmlInput, NoopInput {
+    override val group = InputGroup.GOOGLE_MAPS
+
     override fun toString() = "GoogleMapsHtmlInput"
 }

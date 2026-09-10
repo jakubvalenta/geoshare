@@ -10,6 +10,8 @@ import javax.inject.Singleton
  */
 @Singleton
 class GoogleMapsPlaceListInputImpl @Inject constructor() : GoogleMapsPlaceListInput, BasicInput<String> {
+    override val group = InputGroup.GOOGLE_MAPS
+
     override suspend fun fetch(match: String, block: suspend (String) -> ParseResult) = block(match)
 
     override suspend fun parse(data: String, match: String, resources: Resources) = parseResult {

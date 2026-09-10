@@ -12,6 +12,7 @@ import page.ooooo.geoshare.lib.Uri
 class UriInputTest {
     val input = object : UriInput {
         override fun getName(resources: Resources) = "Test Input"
+        override val group = InputGroup.DEBUG
 
         override val uriQuote = FakeUriQuote
 

@@ -21,8 +21,7 @@ class OpenStreetMapUriInput @Inject constructor(
     private val openStreetMapApiInput: dagger.Lazy<OpenStreetMapApiInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
-    override fun getName(resources: Resources) = "OpenStreetMap"
-
+    override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.OPEN_STREET_MAP
     override val changelog = persistentListOf(
         InputChangelogItem.Url(20, "https://www.openstreetmap.org/"),
@@ -33,6 +32,7 @@ class OpenStreetMapUriInput @Inject constructor(
         InputChangelogItem.Url(23, "https://osm.org/"),
         InputChangelogItem.Url(23, "https://osm.org/go/"),
     )
+
     override val pattern = Regex("""((?:https?://)?(?:www\.)?(?:openstreetmap|osm)\.org/$URI_REST)""")
 
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {

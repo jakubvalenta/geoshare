@@ -101,7 +101,7 @@ private fun DefaultPreview() {
                 state = state,
                 title = stringResource(
                     R.string.conversion_connecting,
-                    state.matchedInput.input.getName(LocalResources.current),
+                    state.matchedInput.input.group.getName(LocalResources.current),
                 ),
                 onCancel = {},
             )
@@ -126,7 +126,7 @@ private fun DarkPreview() {
                 state = state,
                 title = stringResource(
                     R.string.conversion_connecting,
-                    state.matchedInput.input.getName(LocalResources.current),
+                    state.matchedInput.input.group.getName(LocalResources.current),
                 ),
                 onCancel = {},
             )

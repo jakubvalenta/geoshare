@@ -21,7 +21,7 @@
     <string name="conversion_failed_connection_permission_denied">Questo link non è supportato senza collegarsi a Google</string>
     <string name="about_app_icon_content_description">Icona app</string>
     <string name="intro_open_by_default_google_maps_content_description">Screenshot menu Apri come impostazione predefinita di Google Maps</string>
-    <string name="converter_google_maps_permission_title">Connettersi a Google?</string>
+    <string name="conversion_permission">Connettersi a %1$s?</string>
     <string name="conversion_permission_common_deny">Annulla</string>
     <string name="permission_do_not_ask">Non chiedermelo più</string>
     <string name="user_preferences_title">Preferenze</string>
@@ -42,15 +42,7 @@
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">Nel browser</string>
     <string name="intro_open_by_default_app_screenshot_cancel">Annulla</string>
     <string name="intro_open_by_default_app_screenshot_add">Aggiungi</string>
-    <string name="converter_google_maps_loading_indicator_title">Connessione a Google…</string>
-    <string name="converter_apple_maps_permission_title">Connettersi a Apple?</string>
-    <string name="converter_apple_maps_loading_indicator_title">Connessione a Apple…</string>
-    <string name="converter_mapy_com_permission_title">Connettersi a Mapy.com?</string>
-    <string name="converter_mapy_com_loading_indicator_title">Connessione a Mapy.com…</string>
-    <string name="converter_waze_loading_indicator_title">Connessione a Waze…</string>
-    <string name="converter_waze_permission_title">Connettersi a Waze?</string>
-    <string name="converter_yandex_maps_loading_indicator_title">Connessione a Yandex…</string>
-    <string name="converter_yandex_maps_permission_title">Connettersi a Yandex?</string>
+    <string name="conversion_connecting">Connessione a %1$s…</string>
     <string name="conversion_succeeded_title">Coordinate</string>
     <string name="conversion_error_title">Errore</string>
     <string name="conversion_error_retry">Riprova</string>

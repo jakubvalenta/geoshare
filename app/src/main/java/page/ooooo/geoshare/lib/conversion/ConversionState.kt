@@ -280,7 +280,7 @@ data class PermissionGrantedBasicInput<T>(
 
     override fun getLoadingIndicatorTitle(resources: Resources) =
         if (matchedInput.input is Input.HasPermission) {
-            resources.getString(R.string.conversion_connecting, matchedInput.input.getName(resources))
+            resources.getString(R.string.conversion_connecting, matchedInput.input.group.getName(resources))
         } else {
             null
         }
@@ -373,7 +373,7 @@ data class PermissionGrantedWebViewInput(
     }
 
     override fun getLoadingIndicatorTitle(resources: Resources) =
-        resources.getString(R.string.conversion_connecting, matchedInput.input.getName(resources))
+        resources.getString(R.string.conversion_connecting, matchedInput.input.group.getName(resources))
 
     override val uri = matchedInput.match
 

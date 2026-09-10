@@ -13,6 +13,7 @@ import io.ktor.serialization.JsonConvertException
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.json.Json
+import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.ServerRepository
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.Uri
@@ -33,7 +34,8 @@ class GoogleMapsAddressApiInput @Inject constructor(
     private val serverRepository: ServerRepository,
     private val uriQuote: UriQuote,
 ) : BasicInput<Uri>, Input.HasPermission {
-    override fun getName(resources: Resources) = "Google Maps Address API"
+    override fun getName(resources: Resources) = resources.getString(R.string.input_google_maps_address_api_name)
+    override val group = InputGroup.GOOGLE_MAPS
 
     override suspend fun fetch(match: String, block: suspend (Uri) -> ParseResult) =
         block(Uri.parse(match, uriQuote))

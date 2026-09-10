@@ -24,6 +24,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.BasicInput
 import page.ooooo.geoshare.lib.inputs.Input
+import page.ooooo.geoshare.lib.inputs.InputGroup
 import page.ooooo.geoshare.lib.inputs.MatchedInput
 import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.network.ConnectionClosedNetworkException
@@ -41,6 +42,7 @@ class PermissionGrantedBasicInputTest {
     private val source = "https://maps.google.com/foo"
     private val input = object : BasicInput<String>, Input.HasPermission {
         override fun getName(resources: Resources) = "Test Input"
+        override val group = InputGroup.DEBUG
 
         override suspend fun fetch(match: String, block: suspend (String) -> ParseResult) =
             block("$match-data")
@@ -61,7 +63,6 @@ class PermissionGrantedBasicInputTest {
     private val maxAttempts = 3
     private val resources: Resources = mock {
         on { getString(R.string.conversion_failed_unsupported_source_place_list) } doReturn "Place lists are not supported"
-        on { getString(R.string.converter_google_maps_loading_indicator_title) } doReturn "Connecting to Google..."
         on { getString(R.string.conversion_failed_cancelled) } doReturn "Cancelled"
         on { getString(R.string.conversion_failed_reason_invalid_url) } doReturn "Invalid URL"
         on { getString(R.string.conversion_failed_reason_missing_header) } doReturn "missing HTTP header"
@@ -107,6 +108,7 @@ class PermissionGrantedBasicInputTest {
         runTest {
             val input = object : BasicInput<String> {
                 override fun getName(resources: Resources) = "Test Input"
+                override val group = InputGroup.DEBUG
 
                 override suspend fun fetch(match: String, block: suspend (String) -> ParseResult) =
                     block("$match-data")
@@ -140,6 +142,7 @@ class PermissionGrantedBasicInputTest {
     fun transition_whenInputFetchThrowsCancellationException_returnsConversionFailed() = runTest {
         val input = object : BasicInput<String> {
             override fun getName(resources: Resources) = "Test Input"
+            override val group = InputGroup.DEBUG
 
             override suspend fun fetch(match: String, block: suspend (String) -> ParseResult) =
                 throw CancellationException()
@@ -167,6 +170,7 @@ class PermissionGrantedBasicInputTest {
     fun transition_whenInputFetchThrowsMalformedURLException_returnsConversionFailed() = runTest {
         val input = object : BasicInput<String> {
             override fun getName(resources: Resources) = "Test Input"
+            override val group = InputGroup.DEBUG
 
             override suspend fun fetch(match: String, block: suspend (String) -> ParseResult) =
                 throw MalformedURLException()
@@ -198,6 +202,7 @@ class PermissionGrantedBasicInputTest {
         val cause = SocketTimeoutNetworkException(SocketTimeoutException())
         val input = object : BasicInput<String> {
             override fun getName(resources: Resources) = "Test Input"
+            override val group = InputGroup.DEBUG
 
             override suspend fun fetch(match: String, block: suspend (String) -> ParseResult) =
                 throw cause
@@ -236,6 +241,7 @@ class PermissionGrantedBasicInputTest {
         val cause = SocketTimeoutNetworkException(SocketTimeoutException())
         val input = object : BasicInput<String> {
             override fun getName(resources: Resources) = "Test Input"
+            override val group = InputGroup.DEBUG
 
             override suspend fun fetch(match: String, block: suspend (String) -> ParseResult) =
                 throw cause
@@ -275,6 +281,7 @@ class PermissionGrantedBasicInputTest {
         runTest {
             val input = object : BasicInput<String> {
                 override fun getName(resources: Resources) = "Test Input"
+                override val group = InputGroup.DEBUG
 
                 override suspend fun fetch(match: String, block: suspend (String) -> ParseResult) =
                     throw NotImplementedError()
@@ -321,6 +328,7 @@ class PermissionGrantedBasicInputTest {
         val cause = ResponseNetworkException(response, Exception())
         val input = object : BasicInput<String> {
             override fun getName(resources: Resources) = "Test Input"
+            override val group = InputGroup.DEBUG
 
             override suspend fun fetch(match: String, block: suspend (String) -> ParseResult) =
                 throw cause

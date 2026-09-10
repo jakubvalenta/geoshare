@@ -17,8 +17,7 @@ import javax.inject.Singleton
 
 @Singleton
 class CoordinateInput @Inject constructor() : TextInput, Input.HasRandomUri {
-    override fun getName(resources: Resources) = "coordinates"
-
+    override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.COORDINATES
     override val changelog = persistentListOf(
         InputChangelogItem.Text(20) {
@@ -28,6 +27,7 @@ class CoordinateInput @Inject constructor() : TextInput, Input.HasRandomUri {
             )
         },
     )
+
     override val pattern = Regex("""([\d.\-\p{Zs},°'′"″NSWE]*\d[\d.\-\p{Zs},°'′"″NSWE]*)""")
 
     override suspend fun parse(data: String, match: String, resources: Resources) = parseResult {

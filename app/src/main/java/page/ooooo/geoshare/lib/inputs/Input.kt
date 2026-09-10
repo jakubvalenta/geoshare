@@ -9,13 +9,11 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 sealed interface Input {
-    @Suppress("SameReturnValue")
-    val group: InputGroup? get() = null
+    fun getName(resources: Resources): String
+    val group: InputGroup
     val changelog: ImmutableList<InputChangelogItem> get() = persistentListOf()
 
     fun match(source: String): String? = null
-
-    fun getName(resources: Resources): String // TODO Translate all names
 
     interface HasPermission
 
@@ -25,8 +23,8 @@ sealed interface Input {
 }
 
 /**
- * Input whose [parse] method doesn't need data other than a match, or that fetches the data itself, for example makes a
- * HEAD request to resolve a short link.
+ * Input that fetches the data it needs, for examples make s HEAD request to resolve a short link, in the [fetch] method
+ * and then parses the data in the [parse] method.
  */
 interface BasicInput<T> : Input {
     suspend fun fetch(match: String, block: suspend (T) -> ParseResult): ParseResult
@@ -35,8 +33,8 @@ interface BasicInput<T> : Input {
 }
 
 /**
- * Input whose [parse] method suspends until the caller provides data and then continues parsing the provided data. It's
- * for example [WebViewInput], which requires the UI layer to render a WebView and provide the data extracted from it.
+ * Input that waits for the UI layer to render a WebView and to provide the data extracted from the WebView to the
+ * [parse] method.
  */
 interface WebViewInput : Input, Input.HasPermission {
     val timeout: Duration get() = 60.seconds

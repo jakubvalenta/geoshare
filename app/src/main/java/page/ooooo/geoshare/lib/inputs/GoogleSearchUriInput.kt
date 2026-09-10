@@ -14,7 +14,8 @@ import javax.inject.Singleton
 class GoogleSearchUriInput @Inject constructor(
     override val uriQuote: UriQuote,
 ) : UriInput {
-    override fun getName(resources: Resources) = "Google Search"
+    override fun getName(resources: Resources) = resources.getString(R.string.input_google_search_name)
+    override val group = InputGroup.GOOGLE_MAPS
 
     override val pattern =
         Regex("""((?:https?://)?(?:(?:www\.)?google.com/(?:search|share)$URI_REST|share\.google[/?#]$URI_REST))""")

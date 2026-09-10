@@ -17,12 +17,12 @@ import javax.inject.Singleton
 class CartesIGNUriInput @Inject constructor(
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
-    override fun getName(resources: Resources) = "Cartes IGN"
-
+    override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.CARTES_IGN
     override val changelog = persistentListOf(
         InputChangelogItem.Url(39, "https://cartes-ign.ign.fr"),
     )
+
     override val pattern = Regex("""((?:https?://)?cartes-ign\.ign\.fr$URI_REST)""")
 
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {

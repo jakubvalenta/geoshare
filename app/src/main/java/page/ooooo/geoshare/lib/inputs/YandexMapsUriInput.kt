@@ -22,8 +22,7 @@ class YandexMapsUriInput @Inject constructor(
     private val yandexMapsHtmlInput: dagger.Lazy<YandexMapsHtmlInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
-    override fun getName(resources: Resources) = "Yandex"
-
+    override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.YANDEX_MAPS
     override val changelog = persistentListOf(
         InputChangelogItem.Url(20, "https://ya.ru/maps"),
@@ -48,6 +47,7 @@ class YandexMapsUriInput @Inject constructor(
         InputChangelogItem.Url(22, "https://yandex.ua/maps"),
         InputChangelogItem.Url(22, "https://yandex.uz/maps"),
     )
+
     override val pattern = Regex("""((?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/$URI_REST)""")
 
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {

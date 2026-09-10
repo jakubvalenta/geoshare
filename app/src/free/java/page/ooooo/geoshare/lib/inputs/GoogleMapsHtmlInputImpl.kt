@@ -26,6 +26,8 @@ class GoogleMapsHtmlInputImpl @Inject constructor(
     override val engine: HttpClientEngine,
     override val uriQuote: UriQuote,
 ) : GoogleMapsHtmlInput, BodyAsChannelInput {
+    override val group = InputGroup.GOOGLE_MAPS
+
     override val cookies = GoogleMapsShortLinkInput.COOKIES
     override val userAgent = GoogleMapsShortLinkInput.USER_AGENT
 
