@@ -164,7 +164,7 @@ fun MainScreen(
     val resources = LocalResources.current
     val coroutineScope = rememberCoroutineScope()
 
-    val currentState by conversionViewModel.currentState.collectAsStateWithLifecycle()
+    val currentState by conversionViewModel.stateContext.currentState.collectAsStateWithLifecycle()
 
     // Action
 

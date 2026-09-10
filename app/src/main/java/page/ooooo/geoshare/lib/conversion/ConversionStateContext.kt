@@ -1,6 +1,9 @@
 package page.ooooo.geoshare.lib.conversion
 
 import android.content.res.Resources
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
@@ -20,18 +23,24 @@ class ConversionStateContext(
     val log: Log = DefaultLog,
     val billing: Billing,
     val uriQuote: UriQuote = DefaultUriQuote,
-    val onStateChange: (ConversionState) -> Unit = {},
 ) {
-    var currentState: ConversionState = Initial
-        set(value) {
-            field = value
-            onStateChange(value)
-        }
+    private var _currentState: MutableStateFlow<ConversionState> = MutableStateFlow(Initial)
+    val currentState: StateFlow<ConversionState> = _currentState.asStateFlow()
 
-    suspend fun transition() {
+    /**
+     * Sets [newState] as [currentState] and transition it. Then continues transitioning the current state as long as it
+     * keeps returning a state.
+     *
+     * Throws [IllegalStateException] if the chain of transitions reaches [MAX_ITERATIONS].
+     */
+    suspend fun transition(newState: ConversionState) {
+        log.d(TAG, "Set state to $newState")
+        _currentState.value = newState
         var i = 0
         while (i < MAX_ITERATIONS) {
-            currentState = currentState.transition(this) ?: break
+            val newState = _currentState.value.transition(this) ?: break
+            log.d(TAG, "Transitioned to $newState")
+            _currentState.value = newState
             i++
         }
         if (i >= MAX_ITERATIONS) {
@@ -39,7 +48,19 @@ class ConversionStateContext(
         }
     }
 
+    fun reset() {
+        if (_currentState.value != Initial) {
+            _currentState.value = Initial
+        }
+    }
+
+    fun setExceptionState(tr: Throwable, newState: ConversionState) {
+        log.e(TAG, "Exception when transitioning state", tr)
+        _currentState.value = newState
+    }
+
     companion object {
         const val MAX_ITERATIONS = 30
+        const val TAG = "ConversionStateContext"
     }
 }

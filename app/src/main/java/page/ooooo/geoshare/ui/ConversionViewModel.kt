@@ -3,7 +3,6 @@ package page.ooooo.geoshare.ui
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,10 +10,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -35,7 +34,6 @@ import page.ooooo.geoshare.lib.conversion.ConversionStateContext
 import page.ooooo.geoshare.lib.conversion.ConversionStateLogItem
 import page.ooooo.geoshare.lib.conversion.FileActionReady
 import page.ooooo.geoshare.lib.conversion.FileUriRequested
-import page.ooooo.geoshare.lib.conversion.Initial
 import page.ooooo.geoshare.lib.conversion.LocationActionReady
 import page.ooooo.geoshare.lib.conversion.LocationPermissionReceived
 import page.ooooo.geoshare.lib.conversion.LocationRationaleConfirmed
@@ -62,19 +60,6 @@ class ConversionViewModel @Inject constructor(
 ) : ViewModel() {
     private val timeSource: TimeSource.WithComparableMarks = TimeSource.Monotonic
 
-    private val _currentState = MutableStateFlow<ConversionState>(Initial)
-    val currentState: StateFlow<ConversionState> = _currentState.asStateFlow()
-
-    private val _stateLog = MutableStateFlow<List<ConversionStateLogItem>>(emptyList())
-    val stateLog: StateFlow<List<ConversionStateLogItem>> = _stateLog.asStateFlow()
-    val startTimeMark: StateFlow<ComparableTimeMark> = _stateLog
-        .map { it.firstOrNull()?.startTimeMark ?: timeSource.markNow() }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            timeSource.markNow(),
-        )
-
     val stateContext = ConversionStateContext(
         inputs = inputRepository.all,
         linkRepository = linkRepository,
@@ -82,45 +67,62 @@ class ConversionViewModel @Inject constructor(
         resources = context.resources,
         userPreferencesRepository = userPreferencesRepository,
         billing = billing,
-    ) { newState ->
-        // Update current state
-        Log.d(TAG, "Transitioned state to $newState")
-        _currentState.value = newState
+    )
 
-        // Update state log
-        // TODO Test
-        if (newState is SourceReceived) {
-            _stateLog.value = emptyList()
-        }
-        val finishedLogItem = (_stateLog.value.lastOrNull() as? ConversionStateLogItem.Pending)?.let { pendingLogItem ->
-            ConversionStateLogItem.Finished(
-                id = pendingLogItem.id,
-                state = pendingLogItem.state,
-                startTimeMark = pendingLogItem.startTimeMark,
-                endTimeMark = timeSource.markNow(),
-                succeeded = (
-                    newState !is ConversionState.HasError &&
-                        (newState as? ConversionState.HasAttempt)?.lastAttempt == null
-                    ),
-            )
-        }
-        val newLogItem = (newState as? ConversionState.HasDescription)?.let { newState ->
-            ConversionStateLogItem.Pending(
-                id = _stateLog.value.size,
-                state = newState,
-                startTimeMark = timeSource.markNow(),
-            )
-        }
-        if (finishedLogItem != null) {
-            if (newLogItem != null) {
-                _stateLog.value = _stateLog.value.run { take(size - 1) + finishedLogItem + newLogItem }
-            } else {
-                _stateLog.value = _stateLog.value.run { take(size - 1) + finishedLogItem }
+    val stateLog: StateFlow<List<ConversionStateLogItem>> = stateContext.currentState
+        .map { currentState ->
+            stateLog.value.run {
+                if (currentState is SourceReceived) {
+                    emptyList()
+                } else {
+                    val finishedLogItem =
+                        (lastOrNull() as? ConversionStateLogItem.Pending)?.let { pendingLogItem ->
+                            ConversionStateLogItem.Finished(
+                                id = pendingLogItem.id,
+                                state = pendingLogItem.state,
+                                startTimeMark = pendingLogItem.startTimeMark,
+                                endTimeMark = timeSource.markNow(),
+                                succeeded = (
+                                    currentState !is ConversionState.HasError &&
+                                        (currentState as? ConversionState.HasAttempt)?.lastAttempt == null
+                                    ),
+                            )
+                        }
+                    val newLogItem = (currentState as? ConversionState.HasDescription)?.let { newState ->
+                        ConversionStateLogItem.Pending(
+                            id = size,
+                            state = newState,
+                            startTimeMark = timeSource.markNow(),
+                        )
+                    }
+                    if (finishedLogItem != null) {
+                        if (newLogItem != null) {
+                            take(size - 1) + finishedLogItem + newLogItem
+                        } else {
+                            take(size - 1) + finishedLogItem
+                        }
+                    } else if (newLogItem != null) {
+                        this + newLogItem
+                    } else {
+                        this
+                    }
+                }
             }
-        } else if (newLogItem != null) {
-            _stateLog.value += newLogItem
         }
-    }
+        .distinctUntilChanged()
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            emptyList(),
+        )
+
+    val startTimeMark: StateFlow<ComparableTimeMark> = stateLog
+        .map { it.firstOrNull()?.startTimeMark ?: timeSource.markNow() }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            timeSource.markNow(),
+        )
 
     private val _source = savedStateHandle.getMutableStateFlow("source", "")
     val source: StateFlow<String> = _source.asStateFlow()
@@ -130,11 +132,13 @@ class ConversionViewModel @Inject constructor(
 
     private var transitionJob: Job? = null
     private val transitionExceptionHandler = CoroutineExceptionHandler { _, tr ->
-        stateContext.log.e(TAG, "Exception when transitioning state", tr)
-        stateContext.currentState = ConversionFailed(
-            _source.value,
-            stateContext.resources.getString(R.string.conversion_failed_reason_exception),
-            stackTrace = tr.stackTraceToString(),
+        stateContext.setExceptionState(
+            tr,
+            ConversionFailed(
+                _source.value,
+                stateContext.resources.getString(R.string.conversion_failed_reason_exception),
+                stackTrace = tr.stackTraceToString(),
+            )
         )
     }
 
@@ -148,19 +152,18 @@ class ConversionViewModel @Inject constructor(
     private fun transition(initialState: (suspend () -> ConversionState)) {
         transitionJob?.cancel()
         transitionJob = viewModelScope.launch(transitionExceptionHandler) {
-            stateContext.currentState = initialState()
-            stateContext.transition()
+            stateContext.transition(initialState())
         }
     }
 
     fun grant(doNotAsk: Boolean) {
-        (stateContext.currentState as? ConversionState.HasPermission)?.apply {
+        (stateContext.currentState.value as? ConversionState.HasPermission)?.apply {
             transition { grant(stateContext, doNotAsk) }
         }
     }
 
     fun deny(doNotAsk: Boolean) {
-        (stateContext.currentState as? ConversionState.HasPermission)?.apply {
+        (stateContext.currentState.value as? ConversionState.HasPermission)?.apply {
             transition { deny(stateContext, doNotAsk) }
         }
     }
@@ -170,13 +173,11 @@ class ConversionViewModel @Inject constructor(
     }
 
     fun reset() {
-        if (stateContext.currentState !is Initial) {
-            stateContext.currentState = Initial
-        }
+        stateContext.reset()
     }
 
     fun retry() {
-        (stateContext.currentState as? ConversionState.HasError)?.apply {
+        (stateContext.currentState.value as? ConversionState.HasError)?.apply {
             transition { SourceReceived(source) }
         }
     }
@@ -188,13 +189,13 @@ class ConversionViewModel @Inject constructor(
     // Any action
 
     fun startAction(action: Action<*>) {
-        (stateContext.currentState as? ConversionState.HasResult)?.apply {
+        (stateContext.currentState.value as? ConversionState.HasResult)?.apply {
             transition { ActionReady(source, points, action, isAutomation = false) }
         }
     }
 
     fun completeBasicAction(actionResult: ActionResult) {
-        (stateContext.currentState as? BasicActionReady)?.apply {
+        (stateContext.currentState.value as? BasicActionReady)?.apply {
             transition { ActionRan(source, points, action, actionResult, isAutomation) }
         }
     }
@@ -202,19 +203,19 @@ class ConversionViewModel @Inject constructor(
     // File action
 
     fun receiveFileUri(uri: Uri) {
-        (stateContext.currentState as? FileUriRequested)?.apply {
+        (stateContext.currentState.value as? FileUriRequested)?.apply {
             transition { FileActionReady(source, points, action, isAutomation, uri) }
         }
     }
 
     fun cancelFileUriRequest() {
-        (stateContext.currentState as? FileUriRequested)?.apply {
+        (stateContext.currentState.value as? FileUriRequested)?.apply {
             transition { ActionCompleted(source, points, ActionResult.FAILED) }
         }
     }
 
     fun completeFileAction(actionResult: ActionResult) {
-        (stateContext.currentState as? FileActionReady)?.apply {
+        (stateContext.currentState.value as? FileActionReady)?.apply {
             transition { ActionRan(source, points, action, actionResult, isAutomation) }
         }
     }
@@ -222,37 +223,37 @@ class ConversionViewModel @Inject constructor(
     // Location action
 
     fun showLocationRationale(action: LocationAction<*>, isAutomation: Boolean) {
-        (stateContext.currentState as? ConversionState.HasResult)?.apply {
+        (stateContext.currentState.value as? ConversionState.HasResult)?.apply {
             transition { LocationRationaleShown(source, points, action, isAutomation) }
         }
     }
 
     fun skipLocationRationale(action: LocationAction<*>, isAutomation: Boolean) {
-        (stateContext.currentState as? ConversionState.HasResult)?.apply {
+        (stateContext.currentState.value as? ConversionState.HasResult)?.apply {
             transition { LocationPermissionReceived(source, points, action, isAutomation) }
         }
     }
 
     fun receiveLocationPermission() {
-        (stateContext.currentState as? LocationRationaleConfirmed)?.apply {
+        (stateContext.currentState.value as? LocationRationaleConfirmed)?.apply {
             transition { LocationPermissionReceived(source, points, action, isAutomation) }
         }
     }
 
     fun receiveLocation(action: LocationAction<*>, isAutomation: Boolean, location: Point?) {
-        (stateContext.currentState as? ConversionState.HasResult)?.apply {
+        (stateContext.currentState.value as? ConversionState.HasResult)?.apply {
             transition { LocationReceived(source, points, action, isAutomation, location) }
         }
     }
 
     fun cancelLocationFinding() {
-        (stateContext.currentState as? LocationPermissionReceived)?.apply {
+        (stateContext.currentState.value as? LocationPermissionReceived)?.apply {
             transition { ActionCompleted(source, points, ActionResult.FAILED) }
         }
     }
 
     fun completeLocationAction(actionResult: ActionResult) {
-        (stateContext.currentState as? LocationActionReady)?.apply {
+        (stateContext.currentState.value as? LocationActionReady)?.apply {
             transition { ActionRan(source, points, action, actionResult, isAutomation) }
         }
     }
@@ -262,9 +263,5 @@ class ConversionViewModel @Inject constructor(
     fun onCreateOrNewIntent(intent: Intent) {
         setSource(AndroidTools.getIntentUriString(intent).orEmpty())
         start(true)
-    }
-
-    private companion object {
-        private const val TAG = "ConversionViewModel"
     }
 }
