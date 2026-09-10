@@ -1,8 +1,8 @@
 package page.ooooo.geoshare.lib.conversion
 
+import android.content.Context
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -14,6 +14,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.OutputRepository
+import page.ooooo.geoshare.data.di.FakeBilling
 import page.ooooo.geoshare.data.di.FakeGoogleMapsDisplayLink
 import page.ooooo.geoshare.data.di.FakeLinkRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
@@ -28,11 +29,8 @@ import page.ooooo.geoshare.data.local.preferences.ShareLinkUriAutomation
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.android.PackageNames
-import page.ooooo.geoshare.lib.billing.AutomationFeature
-import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
-import page.ooooo.geoshare.lib.billing.CustomLinkFeature
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
@@ -44,6 +42,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ConversionSucceededTest {
+    private val context: Context = mock()
     private val coordinateConverter: CoordinateConverter = mock()
     private val linkRepository: LinkRepository = FakeLinkRepository()
     private val log = FakeLog
@@ -87,11 +86,7 @@ class ConversionSucceededTest {
     @Test
     fun transition_whenBillingStatusIsLoadingAndCachedProductIdIsNotSet_returnsNull() = runTest {
         val automation = CopyCoordsDecAutomation
-        val billing: Billing = mock {
-            on { status } doReturn MutableStateFlow(BillingStatus.Loading())
-            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
-        }
+        val billing = FakeBilling(context)
         val userPreferencesRepository = FakeUserPreferencesRepository(
             UserPreferencesValues(automation = automation)
         )
@@ -110,11 +105,7 @@ class ConversionSucceededTest {
     @Test
     fun transition_whenBillingStatusIsLoadingAndCachedProductIsAnUnknownProduct_returnsNull() = runTest {
         val automation = CopyCoordsDecAutomation
-        val billing: Billing = mock {
-            on { status } doReturn MutableStateFlow(BillingStatus.Loading())
-            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
-        }
+        val billing = FakeBilling(context)
         val userPreferencesRepository = FakeUserPreferencesRepository(
             UserPreferencesValues(
                 automation = automation,
@@ -140,15 +131,11 @@ class ConversionSucceededTest {
     fun transition_whenBillingStatusIsLoadingAndCachedProductIsAKnownProduct_returnsActionReady() = runTest {
         val automation = CopyCoordsDecAutomation
         val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
-        val billing: Billing = mock {
-            on { status } doReturn MutableStateFlow(BillingStatus.Loading())
-            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
-        }
+        val billing = FakeBilling(context)
         val userPreferencesRepository = FakeUserPreferencesRepository(
             UserPreferencesValues(
                 automation = automation,
-                cachedPurchase = CachedPurchase(productId = "test", token = "test_purchased"),
+                cachedPurchase = CachedPurchase(productId = "fake_one_time", token = "test_purchased"),
             )
         )
         val stateContext: ConversionStateContext = mock {
@@ -164,7 +151,7 @@ class ConversionSucceededTest {
             state.transition(stateContext),
         )
         assertEquals(
-            CachedPurchase(productId = "test", token = "test_purchased"),
+            CachedPurchase(productId = "fake_one_time", token = "test_purchased"),
             userPreferencesRepository.getValue(CachedPurchasePreference),
         )
     }
@@ -172,18 +159,16 @@ class ConversionSucceededTest {
     @Test
     fun transition_whenBillingStatusDoesNotContainAutomationFeature_returnsNull() = runTest {
         val automation = CopyCoordsDecAutomation
-        val billing: Billing = mock {
-            on { status } doReturn MutableStateFlow(
-                BillingStatus.Purchased(
-                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                    expired = false,
-                    refundable = true,
-                    token = "test_purchased",
-                )
-            )
-            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf()
-        }
+        val billing = FakeBilling(
+            context,
+            features = persistentListOf(),
+            initialStatus = BillingStatus.Purchased(
+                product = BillingProduct("fake_one_time", BillingProduct.Type.ONE_TIME),
+                expired = false,
+                refundable = true,
+                token = "test_purchased",
+            ),
+        )
         val userPreferencesRepository = FakeUserPreferencesRepository(
             UserPreferencesValues(automation = automation)
         )
@@ -197,7 +182,7 @@ class ConversionSucceededTest {
         val state = ConversionSucceeded(source, points)
         assertNull(state.transition(stateContext))
         assertEquals(
-            CachedPurchase(productId = "test", token = "test_purchased"),
+            CachedPurchase(productId = "fake_one_time", token = "test_purchased"),
             userPreferencesRepository.getValue(CachedPurchasePreference),
         )
     }
@@ -206,18 +191,15 @@ class ConversionSucceededTest {
     fun transition_whenBillingStatusContainsAutomationFeature_returnsActionReady() = runTest {
         val automation = CopyCoordsDecAutomation
         val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
-        val billing: Billing = mock {
-            on { status } doReturn MutableStateFlow(
-                BillingStatus.Purchased(
-                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                    expired = false,
-                    refundable = true,
-                    token = "test_purchased",
-                )
+        val billing = FakeBilling(
+            context,
+            initialStatus = BillingStatus.Purchased(
+                product = BillingProduct("fake_one_time", BillingProduct.Type.ONE_TIME),
+                expired = false,
+                refundable = true,
+                token = "test_purchased",
             )
-            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
-        }
+        )
         val userPreferencesRepository = FakeUserPreferencesRepository(
             UserPreferencesValues(automation = automation)
         )
@@ -234,7 +216,7 @@ class ConversionSucceededTest {
             state.transition(stateContext),
         )
         assertEquals(
-            CachedPurchase(productId = "test", token = "test_purchased"),
+            CachedPurchase(productId = "fake_one_time", token = "test_purchased"),
             userPreferencesRepository.getValue(CachedPurchasePreference),
         )
     }
@@ -243,12 +225,7 @@ class ConversionSucceededTest {
     fun transition_whenBillingStatusIsLoadingAndItBecomesPurchasedWithinTimeout_returnsActionReady() = runTest {
         val automation = CopyCoordsDecAutomation
         val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
-        val mockStatus = MutableStateFlow<BillingStatus>(BillingStatus.Loading())
-        val billing: Billing = mock {
-            on { status } doReturn mockStatus
-            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
-        }
+        val billing = FakeBilling(context)
         val userPreferencesRepository = FakeUserPreferencesRepository(
             UserPreferencesValues(automation = automation)
         )
@@ -265,11 +242,13 @@ class ConversionSucceededTest {
             res = state.transition(stateContext)
         }
         advanceTimeBy(2.seconds)
-        mockStatus.value = BillingStatus.Purchased(
-            product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-            expired = false,
-            refundable = true,
-            token = "test_purchased",
+        billing.setStatus(
+            BillingStatus.Purchased(
+                product = BillingProduct("fake_one_time", BillingProduct.Type.ONE_TIME),
+                expired = false,
+                refundable = true,
+                token = "test_purchased",
+            )
         )
         advanceUntilIdle()
         assertEquals(
@@ -277,7 +256,7 @@ class ConversionSucceededTest {
             res,
         )
         assertEquals(
-            CachedPurchase(productId = "test", token = "test_purchased"),
+            CachedPurchase(productId = "fake_one_time", token = "test_purchased"),
             userPreferencesRepository.getValue(CachedPurchasePreference),
         )
     }
@@ -285,12 +264,10 @@ class ConversionSucceededTest {
     @Test
     fun transition_whenBillingStatusIsNotPurchasedAndItBecomesPurchasedWithinTimeout_returnsNull() = runTest {
         val automation = CopyCoordsDecAutomation
-        val mockStatus = MutableStateFlow<BillingStatus>(BillingStatus.NotPurchased())
-        val billing: Billing = mock {
-            on { status } doReturn mockStatus
-            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
-        }
+        val billing = FakeBilling(
+            context,
+            initialStatus = BillingStatus.NotPurchased(),
+        )
         val userPreferencesRepository = FakeUserPreferencesRepository(
             UserPreferencesValues(automation = automation)
         )
@@ -307,11 +284,13 @@ class ConversionSucceededTest {
             res = state.transition(stateContext)
         }
         advanceTimeBy(2.seconds)
-        mockStatus.value = BillingStatus.Purchased(
-            product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-            expired = false,
-            refundable = true,
-            token = "test_purchased",
+        billing.setStatus(
+            BillingStatus.Purchased(
+                product = BillingProduct("fake_one_time", BillingProduct.Type.ONE_TIME),
+                expired = false,
+                refundable = true,
+                token = "test_purchased",
+            )
         )
         advanceUntilIdle()
         assertNull(res)
@@ -321,12 +300,7 @@ class ConversionSucceededTest {
     @Test
     fun transition_whenBillingStatusIsLoadingAndItBecomesPurchasedAfterTimeout_returnsNull() = runTest {
         val automation = CopyCoordsDecAutomation
-        val mockStatus = MutableStateFlow<BillingStatus>(BillingStatus.Loading())
-        val billing: Billing = mock {
-            on { status } doReturn mockStatus
-            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
-        }
+        val billing = FakeBilling(context)
         val userPreferencesRepository = FakeUserPreferencesRepository(
             UserPreferencesValues(automation = automation)
         )
@@ -343,11 +317,13 @@ class ConversionSucceededTest {
             res = state.transition(stateContext)
         }
         advanceTimeBy(5.seconds)
-        mockStatus.value = BillingStatus.Purchased(
-            product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-            expired = false,
-            refundable = true,
-            token = "test_purchased",
+        billing.setStatus(
+            BillingStatus.Purchased(
+                product = BillingProduct("fake_one_time", BillingProduct.Type.ONE_TIME),
+                expired = false,
+                refundable = true,
+                token = "test_purchased",
+            )
         )
         advanceUntilIdle()
         assertNull(res)
@@ -358,18 +334,15 @@ class ConversionSucceededTest {
     fun transition_whenUserPreferenceAutomationIsCopyCoords_returnsActionReady() = runTest {
         val automation = CopyCoordsDecAutomation
         val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
-        val billing: Billing = mock {
-            on { status } doReturn MutableStateFlow(
-                BillingStatus.Purchased(
-                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                    expired = false,
-                    refundable = true,
-                    token = "test_purchased",
-                )
+        val billing = FakeBilling(
+            context,
+            initialStatus = BillingStatus.Purchased(
+                product = BillingProduct("fake_one_time", BillingProduct.Type.ONE_TIME),
+                expired = false,
+                refundable = true,
+                token = "test_purchased",
             )
-            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
-        }
+        )
         val userPreferencesRepository = FakeUserPreferencesRepository(
             UserPreferencesValues(automation = automation)
         )
@@ -393,18 +366,15 @@ class ConversionSucceededTest {
         val output = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
         val action = output.toAction(points.last())
         val delay = 2.seconds
-        val billing: Billing = mock {
-            on { status } doReturn MutableStateFlow(
-                BillingStatus.Purchased(
-                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                    expired = false,
-                    refundable = true,
-                    token = "test_purchased",
-                )
+        val billing = FakeBilling(
+            context,
+            initialStatus = BillingStatus.Purchased(
+                product = BillingProduct("fake_one_time", BillingProduct.Type.ONE_TIME),
+                expired = false,
+                refundable = true,
+                token = "test_purchased",
             )
-            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
-        }
+        )
         val userPreferencesRepository = FakeUserPreferencesRepository(
             UserPreferencesValues(automation = automation, automationDelay = delay)
         )
@@ -428,18 +398,15 @@ class ConversionSucceededTest {
         val output = ShareLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter)
         val action = output.toAction(points.last())
         val delay = 2.seconds
-        val billing: Billing = mock {
-            on { status } doReturn MutableStateFlow(
-                BillingStatus.Purchased(
-                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                    expired = false,
-                    refundable = true,
-                    token = "test_purchased",
-                )
+        val billing = FakeBilling(
+            context,
+            initialStatus = BillingStatus.Purchased(
+                product = BillingProduct("fake_one_time", BillingProduct.Type.ONE_TIME),
+                expired = false,
+                refundable = true,
+                token = "test_purchased",
             )
-            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
-        }
+        )
         val userPreferencesRepository = FakeUserPreferencesRepository(
             UserPreferencesValues(automation = automation, automationDelay = delay)
         )
@@ -461,18 +428,15 @@ class ConversionSucceededTest {
     fun transition_whenUserPreferenceAutomationIsOpenLinkAndLinkIsUnknown_returnsNull() = runTest {
         val automation = ShareLinkUriAutomation(Link(name = "Link that is not in repository").uuid)
         val delay = 2.seconds
-        val billing: Billing = mock {
-            on { status } doReturn MutableStateFlow(
-                BillingStatus.Purchased(
-                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                    expired = false,
-                    refundable = true,
-                    token = "test_purchased",
-                )
+        val billing = FakeBilling(
+            context,
+            initialStatus = BillingStatus.Purchased(
+                product = BillingProduct("fake_one_time", BillingProduct.Type.ONE_TIME),
+                expired = false,
+                refundable = true,
+                token = "test_purchased",
             )
-            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
-        }
+        )
         val userPreferencesRepository = FakeUserPreferencesRepository(
             UserPreferencesValues(automation = automation, automationDelay = delay)
         )
@@ -493,18 +457,15 @@ class ConversionSucceededTest {
         val output = SavePointsGpxOutput(coordinateConverter)
         val action = output.toAction(points)
         val delay = 2.seconds
-        val billing: Billing = mock {
-            on { status } doReturn MutableStateFlow(
-                BillingStatus.Purchased(
-                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                    expired = false,
-                    refundable = true,
-                    token = "test_purchased",
-                )
+        val billing = FakeBilling(
+            context,
+            initialStatus = BillingStatus.Purchased(
+                product = BillingProduct("fake_one_time", BillingProduct.Type.ONE_TIME),
+                expired = false,
+                refundable = true,
+                token = "test_purchased",
             )
-            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
-        }
+        )
         val userPreferencesRepository = FakeUserPreferencesRepository(
             UserPreferencesValues(automation = automation, automationDelay = delay)
         )
@@ -528,18 +489,15 @@ class ConversionSucceededTest {
         val output = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
         val action = output.toAction(points.last())
         val delay = 2.seconds
-        val billing: Billing = mock {
-            on { status } doReturn MutableStateFlow(
-                BillingStatus.Purchased(
-                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                    expired = false,
-                    refundable = true,
-                    token = "test_purchased",
-                )
+        val billing = FakeBilling(
+            context,
+            initialStatus = BillingStatus.Purchased(
+                product = BillingProduct("fake_one_time", BillingProduct.Type.ONE_TIME),
+                expired = false,
+                refundable = true,
+                token = "test_purchased",
             )
-            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
-        }
+        )
         val userPreferencesRepository = FakeUserPreferencesRepository(
             UserPreferencesValues(automation = automation, automationDelay = delay)
         )
@@ -556,5 +514,4 @@ class ConversionSucceededTest {
             state.transition(stateContext),
         )
     }
-
 }

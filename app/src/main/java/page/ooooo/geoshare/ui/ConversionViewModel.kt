@@ -1,29 +1,21 @@
 package page.ooooo.geoshare.ui
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.InputRepository
-import page.ooooo.geoshare.data.LinkRepository
-import page.ooooo.geoshare.data.OutputRepository
-import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.lib.android.AndroidTools
-import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.conversion.ActionCompleted
 import page.ooooo.geoshare.lib.conversion.ActionRan
 import page.ooooo.geoshare.lib.conversion.ActionReady
@@ -31,97 +23,107 @@ import page.ooooo.geoshare.lib.conversion.BasicActionReady
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
 import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.ConversionStateContext
-import page.ooooo.geoshare.lib.conversion.ConversionStateLogItem
+import page.ooooo.geoshare.lib.conversion.ExtendedConversionStateLogItem
 import page.ooooo.geoshare.lib.conversion.FileActionReady
 import page.ooooo.geoshare.lib.conversion.FileUriRequested
+import page.ooooo.geoshare.lib.conversion.Initial
 import page.ooooo.geoshare.lib.conversion.LocationActionReady
 import page.ooooo.geoshare.lib.conversion.LocationPermissionReceived
 import page.ooooo.geoshare.lib.conversion.LocationRationaleConfirmed
 import page.ooooo.geoshare.lib.conversion.LocationRationaleShown
 import page.ooooo.geoshare.lib.conversion.LocationReceived
 import page.ooooo.geoshare.lib.conversion.SourceReceived
+import page.ooooo.geoshare.lib.extensions.zipWithNextLastNull
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.ActionResult
 import page.ooooo.geoshare.lib.outputs.LocationAction
 import javax.inject.Inject
 import kotlin.time.ComparableTimeMark
-import kotlin.time.TimeSource
 
 @HiltViewModel
 class ConversionViewModel @Inject constructor(
-    @ApplicationContext context: Context,
-    inputRepository: InputRepository,
-    private val linkRepository: LinkRepository,
-    private val outputRepository: OutputRepository,
-    private val userPreferencesRepository: UserPreferencesRepository,
-    private val billing: Billing,
+    private val stateContext: ConversionStateContext,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-    private val timeSource: TimeSource.WithComparableMarks = TimeSource.Monotonic
-
-    val stateContext = ConversionStateContext(
-        inputs = inputRepository.all,
-        linkRepository = linkRepository,
-        outputRepository = outputRepository,
-        resources = context.resources,
-        userPreferencesRepository = userPreferencesRepository,
-        billing = billing,
-    )
-
-    val stateLog: StateFlow<List<ConversionStateLogItem>> = stateContext.currentState
-        .map { currentState ->
-            stateLog.value.run {
-                if (currentState is SourceReceived) {
-                    emptyList()
-                } else {
-                    val finishedLogItem =
-                        (lastOrNull() as? ConversionStateLogItem.Pending)?.let { pendingLogItem ->
-                            ConversionStateLogItem.Finished(
-                                id = pendingLogItem.id,
-                                state = pendingLogItem.state,
-                                startTimeMark = pendingLogItem.startTimeMark,
-                                endTimeMark = timeSource.markNow(),
-                                succeeded = (
-                                    currentState !is ConversionState.HasError &&
-                                        (currentState as? ConversionState.HasAttempt)?.lastAttempt == null
-                                    ),
+    val currentState = stateContext.currentState
+    val extendedStateLog: StateFlow<List<ExtendedConversionStateLogItem>> = stateContext.stateLog
+        .map { stateLog ->
+            stateLog
+                .zipWithNextLastNull { logItem, nextLogItem ->
+                    if (logItem.state is ConversionState.HasDescription) {
+                        if (nextLogItem != null) {
+                            ExtendedConversionStateLogItem.Finished(
+                                id = logItem.id,
+                                state = logItem.state,
+                                startTimeMark = logItem.startTimeMark,
+                                endTimeMark = nextLogItem.startTimeMark,
+                                succeeded = when (nextLogItem.state) {
+                                    is ConversionState.HasError -> false
+                                    is ConversionState.HasAttempt if nextLogItem.state.lastAttempt != null -> false
+                                    else -> true
+                                },
+                            )
+                        } else {
+                            ExtendedConversionStateLogItem.Pending(
+                                id = logItem.id,
+                                state = logItem.state,
+                                startTimeMark = logItem.startTimeMark,
                             )
                         }
-                    val newLogItem = (currentState as? ConversionState.HasDescription)?.let { newState ->
-                        ConversionStateLogItem.Pending(
-                            id = size,
-                            state = newState,
-                            startTimeMark = timeSource.markNow(),
-                        )
-                    }
-                    if (finishedLogItem != null) {
-                        if (newLogItem != null) {
-                            take(size - 1) + finishedLogItem + newLogItem
-                        } else {
-                            take(size - 1) + finishedLogItem
-                        }
-                    } else if (newLogItem != null) {
-                        this + newLogItem
                     } else {
-                        this
+                        null
                     }
                 }
-            }
+                .filterNotNull()
         }
-        .distinctUntilChanged()
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
             emptyList(),
         )
 
-    val startTimeMark: StateFlow<ComparableTimeMark> = stateLog
-        .map { it.firstOrNull()?.startTimeMark ?: timeSource.markNow() }
+    // TODO Remove commented out code
+    // stateLog.map { state ->
+    //     val finishedLogItem =
+    //         (lastOrNull() as? ConversionStateLogItem.Pending)?.let { pendingLogItem ->
+    //             ConversionStateLogItem.Finished(
+    //                 id = pendingLogItem.id,
+    //                 state = pendingLogItem.state,
+    //                 startTimeMark = pendingLogItem.startTimeMark,
+    //                 endTimeMark = timeSource.markNow(),
+    //                 succeeded = (
+    //                     currentState !is ConversionState.HasError &&
+    //                         (currentState as? ConversionState.HasAttempt)?.lastAttempt == null
+    //                     ),
+    //             )
+    //         }
+    //     val newLogItem = (currentState as? ConversionState.HasDescription)?.let { newState ->
+    //         ConversionStateLogItem.Pending(
+    //             id = size,
+    //             state = newState,
+    //             startTimeMark = timeSource.markNow(),
+    //         )
+    //     }
+    //     if (finishedLogItem != null) {
+    //         if (newLogItem != null) {
+    //             take(size - 1) + finishedLogItem + newLogItem
+    //         } else {
+    //             take(size - 1) + finishedLogItem
+    //         }
+    //     } else if (newLogItem != null) {
+    //         this + newLogItem
+    //     } else {
+    //         this
+    //     }
+    // }
+
+    val startTimeMark: StateFlow<ComparableTimeMark?> = stateContext.stateLog
+        .map { it.firstOrNull()?.startTimeMark }
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
-            timeSource.markNow(),
+            null,
         )
 
     private val _source = savedStateHandle.getMutableStateFlow("source", "")
@@ -146,13 +148,13 @@ class ConversionViewModel @Inject constructor(
 
     fun start(sourceComesFromIntent: Boolean) {
         _sourceComesFromIntent.value = sourceComesFromIntent
-        transition { SourceReceived(_source.value) }
+        transition(resetLog = true) { SourceReceived(_source.value) }
     }
 
-    private fun transition(initialState: (suspend () -> ConversionState)) {
+    private fun transition(resetLog: Boolean = false, initialState: (suspend () -> ConversionState)) {
         transitionJob?.cancel()
         transitionJob = viewModelScope.launch(transitionExceptionHandler) {
-            stateContext.transition(initialState())
+            stateContext.transition(initialState(), resetLog)
         }
     }
 
@@ -173,7 +175,7 @@ class ConversionViewModel @Inject constructor(
     }
 
     fun reset() {
-        stateContext.reset()
+        transition(resetLog = true) { Initial }
     }
 
     fun retry() {

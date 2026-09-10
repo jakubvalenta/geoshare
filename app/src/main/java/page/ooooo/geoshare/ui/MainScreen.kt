@@ -84,8 +84,8 @@ import page.ooooo.geoshare.lib.conversion.ActionCompleted
 import page.ooooo.geoshare.lib.conversion.BasicActionReady
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
 import page.ooooo.geoshare.lib.conversion.ConversionState
-import page.ooooo.geoshare.lib.conversion.ConversionStateLogItem
 import page.ooooo.geoshare.lib.conversion.ConversionSucceeded
+import page.ooooo.geoshare.lib.conversion.ExtendedConversionStateLogItem
 import page.ooooo.geoshare.lib.conversion.FileActionReady
 import page.ooooo.geoshare.lib.conversion.FileUriRequested
 import page.ooooo.geoshare.lib.conversion.Initial
@@ -164,7 +164,7 @@ fun MainScreen(
     val resources = LocalResources.current
     val coroutineScope = rememberCoroutineScope()
 
-    val currentState by conversionViewModel.stateContext.currentState.collectAsStateWithLifecycle()
+    val currentState by conversionViewModel.currentState.collectAsStateWithLifecycle()
 
     // Action
 
@@ -279,7 +279,7 @@ fun MainScreen(
         outputsForPointsChips = outputViewModel.outputsForPointsChips,
         outputsForSharing = outputViewModel.outputsForSharing,
         startTimeMark = conversionViewModel.startTimeMark,
-        stateLog = conversionViewModel.stateLog,
+        stateLog = conversionViewModel.extendedStateLog,
         source = conversionViewModel.source,
         sourceComesFromIntent = conversionViewModel.sourceComesFromIntent,
         userPreferenceMessage = userPreferenceViewModel.message,
@@ -323,10 +323,7 @@ fun MainScreen(
             conversionViewModel.cancel()
             onNavigateToUserPreferencesScreen(groupId)
         },
-        onReset = {
-            conversionViewModel.cancel()
-            conversionViewModel.reset()
-        },
+        onReset = { conversionViewModel.reset() },
         onRetry = { conversionViewModel.retry() },
         onSetSource = { conversionViewModel.setSource(it) },
         onSubmit = { conversionViewModel.start(false) },
@@ -356,8 +353,8 @@ private fun MainScreen(
     outputsForSharing: StateFlow<List<Output>>,
     source: StateFlow<String>,
     sourceComesFromIntent: StateFlow<Boolean>,
-    startTimeMark: StateFlow<ComparableTimeMark>,
-    stateLog: StateFlow<List<ConversionStateLogItem>>,
+    startTimeMark: StateFlow<ComparableTimeMark?>,
+    stateLog: StateFlow<List<ExtendedConversionStateLogItem>>,
     userPreferenceMessage: StateFlow<Message?>,
     userPreferencesValues: StateFlow<UserPreferencesValues>,
     onCancel: () -> Unit,

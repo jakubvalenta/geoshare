@@ -46,8 +46,8 @@ import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.conversion.ConversionState
-import page.ooooo.geoshare.lib.conversion.ConversionStateLogItem
 import page.ooooo.geoshare.lib.conversion.ConversionSucceeded
+import page.ooooo.geoshare.lib.conversion.ExtendedConversionStateLogItem
 import page.ooooo.geoshare.lib.conversion.Initial
 import page.ooooo.geoshare.lib.conversion.PermissionGrantedBasicInput
 import page.ooooo.geoshare.lib.inputs.MatchedInput
@@ -63,8 +63,8 @@ fun MainSource(
     errorMessageResId: Int?,
     logExpanded: Boolean,
     source: StateFlow<String>,
-    startTimeMark: StateFlow<ComparableTimeMark>,
-    stateLog: StateFlow<List<ConversionStateLogItem>>,
+    startTimeMark: StateFlow<ComparableTimeMark?>,
+    stateLog: StateFlow<List<ExtendedConversionStateLogItem>>,
     onSetLogExpanded: (logExpanded: Boolean) -> Unit,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
     onSetSource: (newSource: String) -> Unit,
@@ -175,8 +175,8 @@ fun MainSource(
 
 @Composable
 private fun MainSourceTimeButton(
-    startTimeMark: StateFlow<ComparableTimeMark>,
-    stateLog: List<ConversionStateLogItem>,
+    startTimeMark: StateFlow<ComparableTimeMark?>,
+    stateLog: List<ExtendedConversionStateLogItem>,
     logExpanded: Boolean,
     textPadding: Dp = LocalSpacing.current.small,
     iconPadding: Dp = textPadding - 10.dp,
@@ -185,24 +185,26 @@ private fun MainSourceTimeButton(
     val lastLogItem = stateLog.lastOrNull() ?: return
     val startTimeMark by startTimeMark.collectAsStateWithLifecycle()
 
-    val text = when (lastLogItem) {
-        is ConversionStateLogItem.Finished -> {
-            val elapsedTime = lastLogItem.endTimeMark - startTimeMark
-            if (elapsedTime > 10.milliseconds) {
+    val text = startTimeMark?.let { startTimeMark ->
+        when (lastLogItem) {
+            is ExtendedConversionStateLogItem.Finished -> {
+                val elapsedTime = lastLogItem.endTimeMark - startTimeMark
+                if (elapsedTime > 10.milliseconds) {
+                    @Composable {
+                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                            SecondsTimeText(elapsedTime)
+                        }
+                    }
+                } else {
+                    null
+                }
+            }
+
+            is ExtendedConversionStateLogItem.Pending -> {
                 @Composable {
                     CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                        SecondsTimeText(elapsedTime)
+                        ElapsedTimeText(startTimeMark)
                     }
-                }
-            } else {
-                null
-            }
-        }
-
-        is ConversionStateLogItem.Pending -> {
-            @Composable {
-                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                    ElapsedTimeText(startTimeMark)
                 }
             }
         }
