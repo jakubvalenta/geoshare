@@ -54,19 +54,17 @@ import page.ooooo.geoshare.lib.inputs.MatchedInput
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.ComparableTimeMark
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TestTimeSource
 
 @Composable
 fun MainSource(
     state: ConversionState,
-    elapsedTime: StateFlow<Duration>,
     errorMessageResId: Int?,
-    startTimeMark: StateFlow<ComparableTimeMark?>,
-    finishedStateLog: StateFlow<List<ConversionStateLogItem.Finished>>,
     logExpanded: Boolean,
     source: StateFlow<String>,
+    startTimeMark: StateFlow<ComparableTimeMark>,
+    stateLog: StateFlow<List<ConversionStateLogItem>>,
     onSetLogExpanded: (logExpanded: Boolean) -> Unit,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
     onSetSource: (newSource: String) -> Unit,
@@ -76,9 +74,8 @@ fun MainSource(
     val coroutineScope = rememberCoroutineScope()
     val spacing = LocalSpacing.current
 
-    val elapsedTime by elapsedTime.collectAsStateWithLifecycle()
-    val finishedStateLog by finishedStateLog.collectAsStateWithLifecycle()
     val source by source.collectAsStateWithLifecycle()
+    val stateLog by stateLog.collectAsStateWithLifecycle()
 
     when (state) {
         is Initial -> {
@@ -166,10 +163,8 @@ fun MainSource(
                     )
                 }
                 MainSourceTimeButton(
-                    state = state,
-                    elapsedTime = elapsedTime,
                     startTimeMark = startTimeMark,
-                    finishedStateLog = finishedStateLog,
+                    stateLog = stateLog,
                     logExpanded = logExpanded,
                     onSetLogExpanded = onSetLogExpanded,
                 )
@@ -180,19 +175,19 @@ fun MainSource(
 
 @Composable
 private fun MainSourceTimeButton(
-    state: ConversionState,
-    elapsedTime: Duration,
-    startTimeMark: StateFlow<ComparableTimeMark?>,
-    finishedStateLog: List<ConversionStateLogItem.Finished>,
+    startTimeMark: StateFlow<ComparableTimeMark>,
+    stateLog: List<ConversionStateLogItem>,
     logExpanded: Boolean,
     textPadding: Dp = LocalSpacing.current.small,
     iconPadding: Dp = textPadding - 10.dp,
     onSetLogExpanded: (logExpanded: Boolean) -> Unit,
 ) {
-    val text = when (state) {
-        is ConversionState.HasError,
-        is ConversionState.HasResult,
-            ->
+    val lastLogItem = stateLog.lastOrNull() ?: return
+    val startTimeMark by startTimeMark.collectAsStateWithLifecycle()
+
+    val text = when (lastLogItem) {
+        is ConversionStateLogItem.Finished -> {
+            val elapsedTime = lastLogItem.endTimeMark - startTimeMark
             if (elapsedTime > 10.milliseconds) {
                 @Composable {
                     CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
@@ -202,8 +197,9 @@ private fun MainSourceTimeButton(
             } else {
                 null
             }
+        }
 
-        is ConversionState.HasDescription -> {
+        is ConversionStateLogItem.Pending -> {
             @Composable {
                 CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                     // TODO Shows too large time after rotating the screen
@@ -211,10 +207,8 @@ private fun MainSourceTimeButton(
                 }
             }
         }
-
-        else -> null
     }
-    val icon = if (finishedStateLog.isNotEmpty()) {
+    val icon = if (stateLog.isNotEmpty()) {
         @Composable {
             Icon(if (logExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, null)
         }
@@ -225,7 +219,7 @@ private fun MainSourceTimeButton(
     if (icon != null || text != null) {
         ThinButton(
             { onSetLogExpanded(!logExpanded) },
-            enabled = finishedStateLog.isNotEmpty(),
+            enabled = stateLog.isNotEmpty(),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainer,
                 contentColor = MaterialTheme.colorScheme.onSurface,
@@ -254,14 +248,14 @@ private fun MainSourceTimeButton(
 private fun DefaultPreview() {
     AppTheme {
         Surface {
+            val timeSource = TestTimeSource()
             MainSource(
                 state = Initial,
-                elapsedTime = MutableStateFlow(Duration.ZERO),
                 errorMessageResId = null,
-                finishedStateLog = MutableStateFlow(emptyList()),
                 logExpanded = false,
                 source = MutableStateFlow(""),
-                startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
+                startTimeMark = MutableStateFlow(timeSource.markNow()),
+                stateLog = MutableStateFlow(emptyList()),
                 onSetLogExpanded = {},
                 onSetErrorMessageResId = {},
                 onSetSource = {},
@@ -276,14 +270,14 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         Surface {
+            val timeSource = TestTimeSource()
             MainSource(
                 state = Initial,
-                elapsedTime = MutableStateFlow(Duration.ZERO),
                 errorMessageResId = null,
-                finishedStateLog = MutableStateFlow(emptyList()),
                 logExpanded = false,
                 source = MutableStateFlow(""),
-                startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
+                startTimeMark = MutableStateFlow(timeSource.markNow()),
+                stateLog = MutableStateFlow(emptyList()),
                 onSetLogExpanded = {},
                 onSetErrorMessageResId = {},
                 onSetSource = {},
@@ -298,14 +292,14 @@ private fun DarkPreview() {
 private fun FilledPreview() {
     AppTheme {
         Surface {
+            val timeSource = TestTimeSource()
             MainSource(
                 state = Initial,
-                elapsedTime = MutableStateFlow(Duration.ZERO),
                 errorMessageResId = null,
-                finishedStateLog = MutableStateFlow(emptyList()),
                 logExpanded = false,
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
-                startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
+                startTimeMark = MutableStateFlow(timeSource.markNow()),
+                stateLog = MutableStateFlow(emptyList()),
                 onSetLogExpanded = {},
                 onSetErrorMessageResId = {},
                 onSetSource = {},
@@ -320,14 +314,14 @@ private fun FilledPreview() {
 private fun DarkFilledPreview() {
     AppTheme {
         Surface {
+            val timeSource = TestTimeSource()
             MainSource(
                 state = Initial,
-                elapsedTime = MutableStateFlow(Duration.ZERO),
                 errorMessageResId = null,
-                finishedStateLog = MutableStateFlow(emptyList()),
                 logExpanded = false,
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
-                startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
+                startTimeMark = MutableStateFlow(timeSource.markNow()),
+                stateLog = MutableStateFlow(emptyList()),
                 onSetLogExpanded = {},
                 onSetErrorMessageResId = {},
                 onSetSource = {},
@@ -342,14 +336,14 @@ private fun DarkFilledPreview() {
 private fun ErrorPreview() {
     AppTheme {
         Surface {
+            val timeSource = TestTimeSource()
             MainSource(
                 state = Initial,
-                elapsedTime = MutableStateFlow(657.milliseconds),
                 errorMessageResId = R.string.conversion_failed_missing_url,
-                finishedStateLog = MutableStateFlow(emptyList()),
                 logExpanded = false,
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
-                startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
+                startTimeMark = MutableStateFlow(timeSource.markNow()),
+                stateLog = MutableStateFlow(emptyList()),
                 onSetLogExpanded = {},
                 onSetErrorMessageResId = {},
                 onSetSource = {},
@@ -364,14 +358,14 @@ private fun ErrorPreview() {
 private fun DarkErrorPreview() {
     AppTheme {
         Surface {
+            val timeSource = TestTimeSource()
             MainSource(
                 state = Initial,
-                elapsedTime = MutableStateFlow(657.milliseconds),
                 errorMessageResId = R.string.conversion_failed_missing_url,
-                finishedStateLog = MutableStateFlow(emptyList()),
                 logExpanded = false,
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
-                startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
+                startTimeMark = MutableStateFlow(timeSource.markNow()),
+                stateLog = MutableStateFlow(emptyList()),
                 onSetLogExpanded = {},
                 onSetErrorMessageResId = {},
                 onSetSource = {},
@@ -386,6 +380,7 @@ private fun DarkErrorPreview() {
 private fun SubmittedPreview() {
     AppTheme {
         val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
+        val timeSource = TestTimeSource()
         MainSource(
             state = PermissionGrantedBasicInput(
                 source = source,
@@ -393,12 +388,11 @@ private fun SubmittedPreview() {
                 permission = Permission.ALWAYS,
                 results = emptyMap(),
             ),
-            elapsedTime = MutableStateFlow(Duration.ZERO),
             errorMessageResId = null,
-            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             logExpanded = false,
             source = MutableStateFlow(source),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             onSetLogExpanded = {},
             onSetErrorMessageResId = {},
             onSetSource = {},
@@ -412,6 +406,7 @@ private fun SubmittedPreview() {
 private fun DarkSubmittedPreview() {
     AppTheme {
         val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
+        val timeSource = TestTimeSource()
         MainSource(
             state = PermissionGrantedBasicInput(
                 source = source,
@@ -419,12 +414,11 @@ private fun DarkSubmittedPreview() {
                 permission = Permission.ALWAYS,
                 results = emptyMap(),
             ),
-            elapsedTime = MutableStateFlow(Duration.ZERO),
             errorMessageResId = null,
-            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             logExpanded = false,
             source = MutableStateFlow(source),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             onSetLogExpanded = {},
             onSetErrorMessageResId = {},
             onSetSource = {},
@@ -438,6 +432,7 @@ private fun DarkSubmittedPreview() {
 private fun SubmittedExpandedLogPreview() {
     AppTheme {
         val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
+        val timeSource = TestTimeSource()
         MainSource(
             state = PermissionGrantedBasicInput(
                 source = source,
@@ -445,12 +440,11 @@ private fun SubmittedExpandedLogPreview() {
                 permission = Permission.ALWAYS,
                 results = emptyMap(),
             ),
-            elapsedTime = MutableStateFlow(Duration.ZERO),
             errorMessageResId = null,
-            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             logExpanded = true,
             source = MutableStateFlow(source),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             onSetLogExpanded = {},
             onSetErrorMessageResId = {},
             onSetSource = {},
@@ -464,6 +458,7 @@ private fun SubmittedExpandedLogPreview() {
 private fun DarkSubmittedExpandedLogPreview() {
     AppTheme {
         val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
+        val timeSource = TestTimeSource()
         MainSource(
             state = PermissionGrantedBasicInput(
                 source = source,
@@ -471,12 +466,59 @@ private fun DarkSubmittedExpandedLogPreview() {
                 permission = Permission.ALWAYS,
                 results = emptyMap(),
             ),
-            elapsedTime = MutableStateFlow(Duration.ZERO),
             errorMessageResId = null,
-            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             logExpanded = true,
             source = MutableStateFlow(source),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
+            onSetLogExpanded = {},
+            onSetErrorMessageResId = {},
+            onSetSource = {},
+            onSubmit = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SubmittedShortTimePreview() {
+    AppTheme {
+        val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
+        val timeSource = TestTimeSource()
+        MainSource(
+            state = ConversionSucceeded(
+                source = source,
+                points = persistentListOf(),
+            ),
+            errorMessageResId = null,
+            logExpanded = false,
+            source = MutableStateFlow(source),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(fakeStateLog(source, timeSource).take(1)),
+            onSetLogExpanded = {},
+            onSetErrorMessageResId = {},
+            onSetSource = {},
+            onSubmit = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkSubmittedShortTimePreview() {
+    AppTheme {
+        val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
+        val timeSource = TestTimeSource()
+        MainSource(
+            state = ConversionSucceeded(
+                source = source,
+                points = persistentListOf(),
+            ),
+            errorMessageResId = null,
+            logExpanded = false,
+            source = MutableStateFlow(source),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(fakeStateLog(source, timeSource).take(1)),
             onSetLogExpanded = {},
             onSetErrorMessageResId = {},
             onSetSource = {},
@@ -490,6 +532,7 @@ private fun DarkSubmittedExpandedLogPreview() {
 private fun SubmittedEmptyLogPreview() {
     AppTheme {
         val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
+        val timeSource = TestTimeSource()
         MainSource(
             state = PermissionGrantedBasicInput(
                 source = source,
@@ -497,12 +540,11 @@ private fun SubmittedEmptyLogPreview() {
                 permission = Permission.ALWAYS,
                 results = emptyMap(),
             ),
-            elapsedTime = MutableStateFlow(Duration.ZERO),
             errorMessageResId = null,
-            finishedStateLog = MutableStateFlow(emptyList()),
             logExpanded = false,
             source = MutableStateFlow(source),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(emptyList()),
             onSetLogExpanded = {},
             onSetErrorMessageResId = {},
             onSetSource = {},
@@ -524,61 +566,11 @@ private fun DarkSubmittedEmptyLogPreview() {
                 permission = Permission.ALWAYS,
                 results = emptyMap(),
             ),
-            elapsedTime = MutableStateFlow(Duration.ZERO),
             errorMessageResId = null,
-            finishedStateLog = MutableStateFlow(emptyList()),
             logExpanded = false,
+            source = MutableStateFlow(source),
             startTimeMark = MutableStateFlow(timeSource.markNow()),
-            source = MutableStateFlow(source),
-            onSetLogExpanded = {},
-            onSetErrorMessageResId = {},
-            onSetSource = {},
-            onSubmit = {},
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun SubmittedNoTimePreview() {
-    AppTheme {
-        val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
-        MainSource(
-            state = ConversionSucceeded(
-                source = source,
-                points = persistentListOf(),
-            ),
-            elapsedTime = MutableStateFlow(Duration.ZERO),
-            errorMessageResId = null,
-            finishedStateLog = MutableStateFlow(emptyList()),
-            logExpanded = false,
-            source = MutableStateFlow(source),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            onSetLogExpanded = {},
-            onSetErrorMessageResId = {},
-            onSetSource = {},
-            onSubmit = {},
-        )
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkSubmittedNoTimePreview() {
-    AppTheme {
-        val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
-        val timeSource = TestTimeSource()
-        MainSource(
-            state = ConversionSucceeded(
-                source = source,
-                points = persistentListOf(),
-            ),
-            elapsedTime = MutableStateFlow(Duration.ZERO),
-            errorMessageResId = null,
-            finishedStateLog = MutableStateFlow(emptyList()),
-            logExpanded = false,
-            startTimeMark = MutableStateFlow(timeSource.markNow()),
-            source = MutableStateFlow(source),
+            stateLog = MutableStateFlow(emptyList()),
             onSetLogExpanded = {},
             onSetErrorMessageResId = {},
             onSetSource = {},

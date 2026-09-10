@@ -7,10 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.StateFlow
 import kotlin.time.ComparableTimeMark
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -18,27 +15,20 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 @Composable
-fun ElapsedTimeText(startTimeMark: StateFlow<ComparableTimeMark?>, modifier: Modifier = Modifier) {
-    val startTimeMark by startTimeMark.collectAsStateWithLifecycle()
-
-    var elapsedTime by remember { mutableStateOf(startTimeMark?.elapsedNow() ?: Duration.ZERO) }
+fun ElapsedTimeText(startTimeMark: ComparableTimeMark) {
+    var elapsedTime by remember { mutableStateOf(startTimeMark.elapsedNow()) }
 
     LaunchedEffect(startTimeMark) {
-        startTimeMark?.let { startTime ->
-            while (true) {
-                elapsedTime = startTime.elapsedNow()
-                delay(100.milliseconds)
-            }
+        while (true) {
+            elapsedTime = startTimeMark.elapsedNow()
+            delay(100.milliseconds)
         }
     }
 
-    SecondsTimeText(elapsedTime, modifier)
+    SecondsTimeText(elapsedTime)
 }
 
 @Composable
-fun SecondsTimeText(time: Duration, modifier: Modifier = Modifier) {
-    Text(
-        time.toString(DurationUnit.SECONDS, if (time < 1.seconds) 2 else 0),
-        modifier,
-    )
+fun SecondsTimeText(time: Duration) {
+    Text(time.toString(DurationUnit.SECONDS, if (time < 1.seconds) 2 else 0))
 }

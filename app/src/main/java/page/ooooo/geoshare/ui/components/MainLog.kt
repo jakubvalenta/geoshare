@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -15,6 +16,8 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.LoadingIndicator
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedListItem
@@ -49,21 +52,20 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TestTimeSource
-import kotlin.time.TimeSource
 
 @Composable
 fun MainLog(
     expanded: Boolean,
-    finishedStateLog: StateFlow<List<ConversionStateLogItem.Finished>>,
+    stateLog: StateFlow<List<ConversionStateLogItem>>,
     animationsEnabled: Boolean = true,
     initialItemsExpanded: Boolean = false,
 ) {
     val colors = ListItemDefaults.segmentedColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
     val spacing = LocalSpacing.current
 
-    val finishedStateLog by finishedStateLog.collectAsStateWithLifecycle()
+    val stateLog by stateLog.collectAsStateWithLifecycle()
 
-    if (finishedStateLog.isNotEmpty()) {
+    if (stateLog.isNotEmpty()) {
         AnimatedVisibility(
             expanded,
             enter = expandVertically(),
@@ -74,9 +76,9 @@ fun MainLog(
                     Modifier.padding(bottom = spacing.tiny),
                     verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
                 ) {
-                    finishedStateLog.forEachIndexed { index, item ->
+                    stateLog.forEachIndexed { index, item ->
                         SegmentedListItem(
-                            shapes = ListItemDefaults.segmentedShapes(index, finishedStateLog.size),
+                            shapes = ListItemDefaults.segmentedShapes(index, stateLog.size),
                             colors = colors,
                         ) {
                             key(item.id) {
@@ -97,7 +99,7 @@ fun MainLog(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ResultLogItem(
-    item: ConversionStateLogItem.Finished,
+    item: ConversionStateLogItem,
     animationsEnabled: Boolean = true,
     initialExpanded: Boolean = false,
 ) {
@@ -123,14 +125,23 @@ fun ResultLogItem(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(spacing.tiny),
             ) {
-                Icon(if (item.succeeded) Icons.Default.Check else Icons.Default.Close, null)
+                when (item) {
+                    is ConversionStateLogItem.Finished ->
+                        Icon(if (item.succeeded) Icons.Default.Check else Icons.Default.Close, null)
+
+                    is ConversionStateLogItem.Pending ->
+                        LoadingIndicator(Modifier.size(24.dp), color = LocalContentColor.current)
+                }
                 Text(
                     item.state.getDescription(resources),
                     Modifier.weight(1f),
                     style = MaterialTheme.typography.bodyMedium,
                 )
                 CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodySmall) {
-                    SecondsTimeText(item.elapsedTime)
+                    when (item) {
+                        is ConversionStateLogItem.Finished -> SecondsTimeText(item.endTimeMark - item.startTimeMark)
+                        is ConversionStateLogItem.Pending -> ElapsedTimeText(item.startTimeMark)
+                    }
                 }
             }
             item.state.getDetails(resources)?.let { details ->
@@ -151,12 +162,20 @@ fun ResultLogItem(
 }
 
 @Composable
-fun fakeFinishedStateLog(
-    source: String = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-    timeSource: TimeSource.WithComparableMarks = TestTimeSource(),
-) = listOf(
+fun fakeStateLog(source: String, timeSource: TestTimeSource) = listOf(
     ConversionStateLogItem.Finished(
         id = 0,
+        state = ConversionFailed(
+            source,
+            message = stringResource(R.string.conversion_failed_reason_no_points),
+            stackTrace = NotImplementedError().stackTraceToString(),
+        ),
+        succeeded = false,
+        startTimeMark = timeSource.markNow(),
+        endTimeMark = timeSource.apply { plusAssign(30.milliseconds) }.markNow(),
+    ),
+    ConversionStateLogItem.Finished(
+        id = 1,
         state = PermissionGrantedBasicInput(
             source,
             matchedInput = MatchedInput(FakeInputRepository.googleMapsShortLinkInput, source),
@@ -165,10 +184,10 @@ fun fakeFinishedStateLog(
         ),
         succeeded = true,
         startTimeMark = timeSource.markNow(),
-        elapsedTime = 657.milliseconds,
+        endTimeMark = timeSource.apply { plusAssign(657.milliseconds) }.markNow(),
     ),
     ConversionStateLogItem.Finished(
-        id = 1,
+        id = 2,
         state = PermissionGrantedBasicInput(
             source,
             matchedInput = MatchedInput(FakeInputRepository.googleMapsUriInput, source),
@@ -177,19 +196,7 @@ fun fakeFinishedStateLog(
         ),
         succeeded = true,
         startTimeMark = timeSource.markNow(),
-        elapsedTime = 30.milliseconds,
-    ),
-    ConversionStateLogItem.Finished(
-        id = 2,
-        state = PermissionGrantedBasicInput(
-            source,
-            matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
-            permission = Permission.ALWAYS,
-            results = emptyMap(),
-        ),
-        succeeded = false,
-        startTimeMark = timeSource.markNow(),
-        elapsedTime = 2011.milliseconds,
+        endTimeMark = timeSource.apply { plusAssign(92.milliseconds) }.markNow(),
     ),
     ConversionStateLogItem.Finished(
         id = 3,
@@ -198,22 +205,21 @@ fun fakeFinishedStateLog(
             matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
             permission = Permission.ALWAYS,
             results = emptyMap(),
+        ),
+        succeeded = false,
+        startTimeMark = timeSource.markNow(),
+        endTimeMark = timeSource.apply { plusAssign(2011.milliseconds) }.markNow(),
+    ),
+    ConversionStateLogItem.Pending(
+        id = 4,
+        state = PermissionGrantedBasicInput(
+            source,
+            matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
+            permission = Permission.ALWAYS,
+            results = emptyMap(),
             lastAttempt = Attempt(1, ConnectTimeoutNetworkException(Exception())),
         ),
-        succeeded = false,
         startTimeMark = timeSource.markNow(),
-        elapsedTime = 200.milliseconds,
-    ),
-    ConversionStateLogItem.Finished(
-        id = 4,
-        state = ConversionFailed(
-            source,
-            message = stringResource(R.string.conversion_failed_reason_no_points),
-            stackTrace = NotImplementedError().stackTraceToString(),
-        ),
-        succeeded = false,
-        startTimeMark = timeSource.markNow(),
-        elapsedTime = 92.milliseconds,
     ),
 )
 
@@ -223,9 +229,11 @@ fun fakeFinishedStateLog(
 @Composable
 private fun DefaultPreview() {
     AppTheme {
+        val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+        val timeSource = TestTimeSource()
         MainLog(
             expanded = true,
-            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
+            stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             animationsEnabled = false,
             initialItemsExpanded = true,
         )
@@ -236,9 +244,11 @@ private fun DefaultPreview() {
 @Composable
 private fun DarkPreview() {
     AppTheme {
+        val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+        val timeSource = TestTimeSource()
         MainLog(
             expanded = true,
-            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
+            stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             animationsEnabled = false,
             initialItemsExpanded = true,
         )

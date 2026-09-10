@@ -134,14 +134,12 @@ import page.ooooo.geoshare.ui.components.ResultError
 import page.ooooo.geoshare.ui.components.ResultSheet
 import page.ooooo.geoshare.ui.components.ResultTitle
 import page.ooooo.geoshare.ui.components.checkeredBackground
-import page.ooooo.geoshare.ui.components.fakeFinishedStateLog
+import page.ooooo.geoshare.ui.components.fakeStateLog
 import page.ooooo.geoshare.ui.components.mainContainerColor
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.math.floor
 import kotlin.time.ComparableTimeMark
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TestTimeSource
 
 @Composable
@@ -271,8 +269,6 @@ fun MainScreen(
         changelogShown = inputViewModel.changelogShown,
         coordinateConverter = outputViewModel.coordinateConverter,
         dismissedHelpMessages = helpViewModel.dismissedHelpMessages,
-        elapsedTime = conversionViewModel.elapsedTime,
-        finishedStateLog = conversionViewModel.finishedStateLog,
         inputRepository = inputViewModel.inputRepository,
         linkMessage = linkViewModel.message,
         outputsForApps = outputViewModel.outputsForApps,
@@ -283,6 +279,7 @@ fun MainScreen(
         outputsForPointsChips = outputViewModel.outputsForPointsChips,
         outputsForSharing = outputViewModel.outputsForSharing,
         startTimeMark = conversionViewModel.startTimeMark,
+        stateLog = conversionViewModel.stateLog,
         source = conversionViewModel.source,
         sourceComesFromIntent = conversionViewModel.sourceComesFromIntent,
         userPreferenceMessage = userPreferenceViewModel.message,
@@ -348,8 +345,6 @@ private fun MainScreen(
     changelogShown: StateFlow<Boolean>,
     coordinateConverter: CoordinateConverter,
     dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
-    elapsedTime: StateFlow<Duration>,
-    finishedStateLog: StateFlow<List<ConversionStateLogItem.Finished>>,
     inputRepository: InputRepository,
     linkMessage: StateFlow<Message?>,
     outputsForApps: StateFlow<Map<String, List<Output>>>,
@@ -361,7 +356,8 @@ private fun MainScreen(
     outputsForSharing: StateFlow<List<Output>>,
     source: StateFlow<String>,
     sourceComesFromIntent: StateFlow<Boolean>,
-    startTimeMark: StateFlow<ComparableTimeMark?>,
+    startTimeMark: StateFlow<ComparableTimeMark>,
+    stateLog: StateFlow<List<ConversionStateLogItem>>,
     userPreferenceMessage: StateFlow<Message?>,
     userPreferencesValues: StateFlow<UserPreferencesValues>,
     onCancel: () -> Unit,
@@ -439,12 +435,11 @@ private fun MainScreen(
                     Column {
                         MainSource(
                             state = currentState,
-                            elapsedTime = elapsedTime,
                             errorMessageResId = errorMessageResId,
-                            finishedStateLog = finishedStateLog,
                             logExpanded = logExpanded,
                             source = source,
                             startTimeMark = startTimeMark,
+                            stateLog = stateLog,
                             onSetLogExpanded = setLogExpanded,
                             onSetErrorMessageResId = setErrorMessageResId,
                             onSetSource = onSetSource,
@@ -452,7 +447,7 @@ private fun MainScreen(
                         )
                         MainLog(
                             expanded = logExpanded,
-                            finishedStateLog = finishedStateLog,
+                            stateLog = stateLog,
                         )
                     }
                 }
@@ -721,6 +716,7 @@ private fun DefaultPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val timeSource = TestTimeSource()
         MainScreen(
             currentState = Initial,
             appDetails = MutableStateFlow(emptyMap()),
@@ -730,8 +726,6 @@ private fun DefaultPreview() {
             changelogShown = MutableStateFlow(false),
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
-            elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(emptyList()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -741,8 +735,9 @@ private fun DefaultPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             source = MutableStateFlow(""),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(emptyList()),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -776,6 +771,7 @@ private fun DarkPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val timeSource = TestTimeSource()
         MainScreen(
             currentState = Initial,
             appDetails = MutableStateFlow(emptyMap()),
@@ -785,8 +781,6 @@ private fun DarkPreview() {
             changelogShown = MutableStateFlow(false),
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
-            elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(emptyList()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -796,8 +790,9 @@ private fun DarkPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             source = MutableStateFlow(""),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(emptyList()),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -831,6 +826,7 @@ private fun SmallPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val timeSource = TestTimeSource()
         MainScreen(
             currentState = Initial,
             appDetails = MutableStateFlow(emptyMap()),
@@ -840,8 +836,6 @@ private fun SmallPreview() {
             changelogShown = MutableStateFlow(false),
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
-            elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(emptyList()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -851,8 +845,9 @@ private fun SmallPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             source = MutableStateFlow(""),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(emptyList()),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -886,6 +881,7 @@ private fun TabletPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val timeSource = TestTimeSource()
         MainScreen(
             currentState = Initial,
             appDetails = MutableStateFlow(emptyMap()),
@@ -895,8 +891,6 @@ private fun TabletPreview() {
             changelogShown = MutableStateFlow(false),
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
-            elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(emptyList()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -906,8 +900,9 @@ private fun TabletPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             source = MutableStateFlow(""),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(emptyList()),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -945,6 +940,7 @@ private fun SucceededPreview() {
             coordinateConverter = coordinateConverter,
         )
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+        val timeSource = TestTimeSource()
         MainScreen(
             currentState = ActionCompleted(
                 source = source,
@@ -972,8 +968,6 @@ private fun SucceededPreview() {
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
-            elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(
@@ -988,8 +982,9 @@ private fun SucceededPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
             outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             source = MutableStateFlow(source),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1027,6 +1022,7 @@ private fun DarkSucceededPreview() {
             coordinateConverter = coordinateConverter,
         )
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+        val timeSource = TestTimeSource()
         MainScreen(
             currentState = ActionCompleted(
                 source = source,
@@ -1054,8 +1050,6 @@ private fun DarkSucceededPreview() {
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
-            elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(
@@ -1070,8 +1064,9 @@ private fun DarkSucceededPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
             outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             source = MutableStateFlow(source),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1109,6 +1104,7 @@ private fun SmallSucceededPreview() {
             coordinateConverter = coordinateConverter,
         )
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+        val timeSource = TestTimeSource()
         MainScreen(
             currentState = ActionCompleted(
                 source = source,
@@ -1135,8 +1131,6 @@ private fun SmallSucceededPreview() {
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
-            elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(
@@ -1151,8 +1145,9 @@ private fun SmallSucceededPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
             outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             source = MutableStateFlow(source),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             sourceComesFromIntent = MutableStateFlow(true),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1190,6 +1185,7 @@ private fun TabletSucceededPreview() {
             coordinateConverter = coordinateConverter,
         )
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+        val timeSource = TestTimeSource()
         MainScreen(
             currentState = ActionCompleted(
                 source = source,
@@ -1217,8 +1213,6 @@ private fun TabletSucceededPreview() {
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
-            elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(
@@ -1233,8 +1227,9 @@ private fun TabletSucceededPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
             outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             source = MutableStateFlow(source),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1269,6 +1264,7 @@ private fun ErrorPreview() {
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+        val timeSource = TestTimeSource()
         MainScreen(
             currentState = ConversionFailed(
                 source = source,
@@ -1288,8 +1284,6 @@ private fun ErrorPreview() {
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
-            elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -1299,8 +1293,9 @@ private fun ErrorPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             source = MutableStateFlow(source),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1335,6 +1330,7 @@ private fun DarkErrorPreview() {
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+        val timeSource = TestTimeSource()
         MainScreen(
             currentState = ConversionFailed(
                 source = source,
@@ -1354,8 +1350,6 @@ private fun DarkErrorPreview() {
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
-            elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -1365,8 +1359,9 @@ private fun DarkErrorPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             source = MutableStateFlow(source),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1401,6 +1396,7 @@ private fun TabletErrorPreview() {
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+        val timeSource = TestTimeSource()
         MainScreen(
             currentState = ConversionFailed(
                 source = source,
@@ -1420,8 +1416,6 @@ private fun TabletErrorPreview() {
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
-            elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -1431,8 +1425,9 @@ private fun TabletErrorPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             source = MutableStateFlow(source),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1467,6 +1462,7 @@ private fun WarningPreview() {
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         val source = "https://share.google/diIxnYa8dIA6dZfpy"
+        val timeSource = TestTimeSource()
         MainScreen(
             currentState = ConversionFailed(
                 source = source,
@@ -1487,8 +1483,6 @@ private fun WarningPreview() {
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
-            elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -1498,8 +1492,9 @@ private fun WarningPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             source = MutableStateFlow(source),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1534,6 +1529,7 @@ private fun DarkWarningPreview() {
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         val source = "https://share.google/diIxnYa8dIA6dZfpy"
+        val timeSource = TestTimeSource()
         MainScreen(
             currentState = ConversionFailed(
                 source = source,
@@ -1554,8 +1550,6 @@ private fun DarkWarningPreview() {
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
-            elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -1565,8 +1559,9 @@ private fun DarkWarningPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             source = MutableStateFlow(source),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1601,6 +1596,7 @@ private fun LoadingIndicatorPreview() {
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+        val timeSource = TestTimeSource()
         MainScreen(
             currentState = PermissionGrantedBasicInput(
                 source = source,
@@ -1625,8 +1621,6 @@ private fun LoadingIndicatorPreview() {
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
-            elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -1636,8 +1630,9 @@ private fun LoadingIndicatorPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             source = MutableStateFlow(source),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1672,6 +1667,7 @@ private fun DarkLoadingIndicatorPreview() {
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+        val timeSource = TestTimeSource()
         MainScreen(
             currentState = PermissionGrantedBasicInput(
                 source = source,
@@ -1696,8 +1692,6 @@ private fun DarkLoadingIndicatorPreview() {
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
-            elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -1707,8 +1701,9 @@ private fun DarkLoadingIndicatorPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             source = MutableStateFlow(source),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1743,6 +1738,7 @@ private fun TabletLoadingIndicatorPreview() {
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+        val timeSource = TestTimeSource()
         MainScreen(
             currentState = PermissionGrantedBasicInput(
                 source = source,
@@ -1767,8 +1763,6 @@ private fun TabletLoadingIndicatorPreview() {
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
-            elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -1778,8 +1772,9 @@ private fun TabletLoadingIndicatorPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             source = MutableStateFlow(source),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1814,6 +1809,7 @@ private fun WebViewPreview() {
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+        val timeSource = TestTimeSource()
         MainScreen(
             currentState = PermissionGrantedWebViewInput(
                 source = source,
@@ -1835,8 +1831,6 @@ private fun WebViewPreview() {
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
-            elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -1846,8 +1840,9 @@ private fun WebViewPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             source = MutableStateFlow(source),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1882,6 +1877,7 @@ private fun DarkWebViewPreview() {
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+        val timeSource = TestTimeSource()
         MainScreen(
             currentState = PermissionGrantedWebViewInput(
                 source = source,
@@ -1903,8 +1899,6 @@ private fun DarkWebViewPreview() {
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
-            elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -1914,8 +1908,9 @@ private fun DarkWebViewPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             source = MutableStateFlow(source),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1950,6 +1945,7 @@ private fun TabletWebViewPreview() {
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+        val timeSource = TestTimeSource()
         val currentState = PermissionGrantedWebViewInput(
             source = source,
             matchedInput = MatchedInput(FakeInputRepository.debugWebViewInput, "https://www.example.com/"),
@@ -1972,8 +1968,6 @@ private fun TabletWebViewPreview() {
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
-            elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(fakeFinishedStateLog()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -1983,8 +1977,9 @@ private fun TabletWebViewPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             source = MutableStateFlow(source),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -2019,6 +2014,7 @@ private fun EmptyPreview() {
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+        val timeSource = TestTimeSource()
         val currentState = ConversionSucceeded(
             source = source,
             points = persistentListOf(),
@@ -2039,8 +2035,6 @@ private fun EmptyPreview() {
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
-            elapsedTime = MutableStateFlow(3200.milliseconds),
-            finishedStateLog = MutableStateFlow(emptyList()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(emptyMap()),
@@ -2050,8 +2044,9 @@ private fun EmptyPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
-            startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
             source = MutableStateFlow(source),
+            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),

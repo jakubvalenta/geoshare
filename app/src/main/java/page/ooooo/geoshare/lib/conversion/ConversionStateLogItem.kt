@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.conversion
 
 import kotlin.time.ComparableTimeMark
-import kotlin.time.Duration
 
 sealed interface ConversionStateLogItem {
     val id: Int
@@ -12,7 +11,7 @@ sealed interface ConversionStateLogItem {
         override val id: Int,
         override val state: ConversionState.HasDescription,
         override val startTimeMark: ComparableTimeMark,
-        val elapsedTime: Duration,
+        val endTimeMark: ComparableTimeMark,
         val succeeded: Boolean,
     ) : ConversionStateLogItem
 
