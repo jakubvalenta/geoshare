@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.ui.components
 
-import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,16 +30,14 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
+import page.ooooo.geoshare.data.di.fakeApps
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.database.findByUUID
 import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.AutomationPreference
 import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
-import page.ooooo.geoshare.lib.android.App
-import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.Apps
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.billing.AutomationFeature
@@ -204,7 +201,6 @@ private fun ListItemPreview() {
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
                 val outputRepository = OutputRepository(coordinateConverter)
-                @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferenceAutomationListItem(
                     index = 0,
                     count = 1,
@@ -215,13 +211,7 @@ private fun ListItemPreview() {
                         refundable = true,
                         token = "test_purchased",
                     ),
-                    appDetails = mapOf(
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    ),
+                    appDetails = fakeAppDetails(),
                     links = emptyList(),
                     selected = false,
                     values = UserPreferencesValues(automation = SavePointsGpxAutomation),
@@ -245,7 +235,6 @@ private fun DarkListItemPreview() {
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
                 val outputRepository = OutputRepository(coordinateConverter)
-                @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferenceAutomationListItem(
                     index = 0,
                     count = 1,
@@ -256,13 +245,7 @@ private fun DarkListItemPreview() {
                         refundable = true,
                         token = "test_purchased",
                     ),
-                    appDetails = mapOf(
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    ),
+                    appDetails = fakeAppDetails(),
                     links = emptyList(),
                     selected = false,
                     values = UserPreferencesValues(automation = SavePointsGpxAutomation),
@@ -286,7 +269,6 @@ private fun NoneListItemPreview() {
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
                 val outputRepository = OutputRepository(coordinateConverter)
-                @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferenceAutomationListItem(
                     index = 0,
                     count = 1,
@@ -297,13 +279,7 @@ private fun NoneListItemPreview() {
                         refundable = true,
                         token = "test_purchased",
                     ),
-                    appDetails = mapOf(
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    ),
+                    appDetails = fakeAppDetails(),
                     links = emptyList(),
                     selected = false,
                     values = defaultFakeUserPreferences,
@@ -327,7 +303,6 @@ private fun DarkNoneListItemPreview() {
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
                 val outputRepository = OutputRepository(coordinateConverter)
-                @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferenceAutomationListItem(
                     index = 0,
                     count = 1,
@@ -338,13 +313,7 @@ private fun DarkNoneListItemPreview() {
                         refundable = true,
                         token = "test_purchased",
                     ),
-                    appDetails = mapOf(
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    ),
+                    appDetails = fakeAppDetails(),
                     links = emptyList(),
                     selected = false,
                     values = defaultFakeUserPreferences,
@@ -367,22 +336,10 @@ private fun ControlsPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val outputRepository = OutputRepository(coordinateConverter)
-            @SuppressLint("LocalContextGetResourceValueCall")
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
-                apps = mapOf(
-                    PackageNames.OSMAND_PLUS to App(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                    ),
-                ),
-                appDetails = mapOf(
-                    PackageNames.OSMAND_PLUS to AppDetail(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        label = "OsmAnd",
-                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                    ),
-                ),
+                apps = fakeApps.filterKeys { it == PackageNames.OSMAND_PLUS },
+                appDetails = fakeAppDetails(),
                 links = defaultFakeLinks,
                 values = UserPreferencesValues(automation = SavePointsGpxAutomation),
                 wide = true,
@@ -413,22 +370,10 @@ private fun DarkControlsPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val outputRepository = OutputRepository(coordinateConverter)
-            @SuppressLint("LocalContextGetResourceValueCall")
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
-                apps = mapOf(
-                    PackageNames.OSMAND_PLUS to App(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                    ),
-                ),
-                appDetails = mapOf(
-                    PackageNames.OSMAND_PLUS to AppDetail(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        label = "OsmAnd",
-                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                    ),
-                ),
+                apps = fakeApps.filterKeys { it == PackageNames.OSMAND_PLUS },
+                appDetails = fakeAppDetails(),
                 links = defaultFakeLinks,
                 values = UserPreferencesValues(automation = SavePointsGpxAutomation),
                 wide = true,
@@ -459,22 +404,10 @@ private fun TabletControlsPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val outputRepository = OutputRepository(coordinateConverter)
-            @SuppressLint("LocalContextGetResourceValueCall")
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
-                apps = mapOf(
-                    PackageNames.OSMAND_PLUS to App(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                    ),
-                ),
-                appDetails = mapOf(
-                    PackageNames.OSMAND_PLUS to AppDetail(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        label = "OsmAnd",
-                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                    ),
-                ),
+                apps = fakeApps.filterKeys { it == PackageNames.OSMAND_PLUS },
+                appDetails = fakeAppDetails(),
                 links = defaultFakeLinks,
                 values = UserPreferencesValues(automation = SavePointsGpxAutomation),
                 wide = true,
@@ -505,22 +438,10 @@ private fun NotPurchasedControlsPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val outputRepository = OutputRepository(coordinateConverter)
-            @SuppressLint("LocalContextGetResourceValueCall")
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
-                apps = mapOf(
-                    PackageNames.OSMAND_PLUS to App(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                    ),
-                ),
-                appDetails = mapOf(
-                    PackageNames.OSMAND_PLUS to AppDetail(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        label = "OsmAnd",
-                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                    ),
-                ),
+                apps = fakeApps.filterKeys { it == PackageNames.OSMAND_PLUS },
+                appDetails = fakeAppDetails(),
                 links = defaultFakeLinks,
                 values = UserPreferencesValues(automation = SavePointsGpxAutomation),
                 wide = true,
@@ -546,22 +467,10 @@ private fun DarkNotPurchasedControlsPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val outputRepository = OutputRepository(coordinateConverter)
-            @SuppressLint("LocalContextGetResourceValueCall")
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
-                apps = mapOf(
-                    PackageNames.OSMAND_PLUS to App(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                    ),
-                ),
-                appDetails = mapOf(
-                    PackageNames.OSMAND_PLUS to AppDetail(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        label = "OsmAnd",
-                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                    ),
-                ),
+                apps = fakeApps.filterKeys { it == PackageNames.OSMAND_PLUS },
+                appDetails = fakeAppDetails(),
                 links = defaultFakeLinks,
                 values = UserPreferencesValues(automation = SavePointsGpxAutomation),
                 wide = true,
@@ -587,22 +496,10 @@ private fun TabletNotPurchasedControlsPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val outputRepository = OutputRepository(coordinateConverter)
-            @SuppressLint("LocalContextGetResourceValueCall")
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
-                apps = mapOf(
-                    PackageNames.OSMAND_PLUS to App(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                    ),
-                ),
-                appDetails = mapOf(
-                    PackageNames.OSMAND_PLUS to AppDetail(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        label = "OsmAnd",
-                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                    ),
-                ),
+                apps = fakeApps.filterKeys { it == PackageNames.OSMAND_PLUS },
+                appDetails = fakeAppDetails(),
                 links = defaultFakeLinks,
                 values = UserPreferencesValues(automation = SavePointsGpxAutomation),
                 wide = true,

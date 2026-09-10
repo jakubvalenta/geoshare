@@ -2,15 +2,9 @@ package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
 import android.view.KeyEvent
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -18,7 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.Card
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
@@ -30,11 +24,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.LocalClipboard
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -42,6 +34,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.persistentListOf
@@ -152,26 +145,33 @@ fun MainSource(
         }
 
         is ConversionState.HasSource -> {
-            Card(Modifier.padding(bottom = spacing.tiny)) {
-                // TODO Split in two buttons
-                TwoSlotRow(
-                    modifier = Modifier.height(30.dp),
-                    firstContent = { paddingValues ->
-                        MainSourceUriButton(
-                            source = source,
-                            paddingValues = paddingValues,
-                        )
+            Row(Modifier.padding(bottom = spacing.tiny)) {
+                ThinButton(
+                    {
+                        coroutineScope.launch {
+                            AndroidTools.copyToClipboard(clipboard, source)
+                        }
                     },
-                    secondContent = mainSourceTimeButton(
-                        state = state,
-                        elapsedTime = elapsedTime,
-                        startTimeMark = startTimeMark,
-                        finishedStateLog = finishedStateLog,
-                        logExpanded = logExpanded,
-                        onSetLogExpanded = onSetLogExpanded,
+                    Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                        contentColor = MaterialTheme.colorScheme.onSurface,
                     ),
-                    gap = spacing.tiny,
-                    paddingValues = PaddingValues(horizontal = spacing.small),
+                ) {
+                    Text(
+                        source,
+                        textDecoration = TextDecoration.Underline,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                    )
+                }
+                MainSourceTimeButton(
+                    state = state,
+                    elapsedTime = elapsedTime,
+                    startTimeMark = startTimeMark,
+                    finishedStateLog = finishedStateLog,
+                    logExpanded = logExpanded,
+                    onSetLogExpanded = onSetLogExpanded,
                 )
             }
         }
@@ -179,51 +179,24 @@ fun MainSource(
 }
 
 @Composable
-private fun RowScope.MainSourceUriButton(
-    source: String,
-    paddingValues: PaddingValues,
-) {
-    val clipboard = LocalClipboard.current
-    val coroutineScope = rememberCoroutineScope()
-
-    Row(
-        modifier = Modifier
-            .clickable {
-                coroutineScope.launch {
-                    AndroidTools.copyToClipboard(clipboard, source)
-                }
-            }
-            .weight(1f)
-            .fillMaxHeight()
-            .padding(paddingValues),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            source,
-            textDecoration = TextDecoration.Underline,
-            overflow = TextOverflow.Ellipsis,
-            maxLines = 1,
-            style = MaterialTheme.typography.bodySmall,
-        )
-    }
-}
-
-private fun mainSourceTimeButton(
+private fun MainSourceTimeButton(
     state: ConversionState,
     elapsedTime: Duration,
     startTimeMark: StateFlow<ComparableTimeMark?>,
     finishedStateLog: List<ConversionStateLogItem.Finished>,
     logExpanded: Boolean,
+    textPadding: Dp = LocalSpacing.current.small,
+    iconPadding: Dp = textPadding - 10.dp,
     onSetLogExpanded: (logExpanded: Boolean) -> Unit,
-): (@Composable RowScope.(paddingValues: PaddingValues) -> Unit)? {
-    val text: (@Composable RowScope.(paddingValues: PaddingValues) -> Unit)? = when (state) {
+) {
+    val text = when (state) {
         is ConversionState.HasError,
         is ConversionState.HasResult,
             ->
             if (elapsedTime > 10.milliseconds) {
-                { paddingValues ->
+                @Composable {
                     CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                        SecondsTimeText(elapsedTime, Modifier.padding(paddingValues))
+                        SecondsTimeText(elapsedTime)
                     }
                 }
             } else {
@@ -231,53 +204,46 @@ private fun mainSourceTimeButton(
             }
 
         is ConversionState.HasDescription -> {
-            { paddingValues ->
+            @Composable {
                 CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                    ElapsedTimeText(startTimeMark, Modifier.padding(paddingValues))
+                    // TODO Shows too large time after rotating the screen
+                    ElapsedTimeText(startTimeMark)
                 }
             }
         }
 
         else -> null
     }
-    val icon: (@Composable RowScope.(paddingValues: PaddingValues) -> Unit)? = if (finishedStateLog.isNotEmpty()) {
-        { paddingValues ->
-            val layoutDirection = LocalLayoutDirection.current
-            Icon(
-                if (logExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                contentDescription = null,
-                modifier = Modifier.padding(
-                    PaddingValues(
-                        start = paddingValues.calculateStartPadding(layoutDirection),
-                        top = paddingValues.calculateTopPadding(),
-                        // Adjust end padding, because the icon visually has empty space at the end
-                        end = paddingValues.calculateEndPadding(layoutDirection) - 10.dp,
-                        bottom = paddingValues.calculateTopPadding(),
-                    )
-                ),
-            )
+    val icon = if (finishedStateLog.isNotEmpty()) {
+        @Composable {
+            Icon(if (logExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, null)
         }
     } else {
         null
     }
 
-    return if (icon != null || text != null) {
-        { paddingValues ->
-            TwoSlotRow(
-                Modifier
-                    .clickable(
-                        enabled = finishedStateLog.isNotEmpty(),
-                        onClick = { onSetLogExpanded(!logExpanded) },
-                    )
-                    .fillMaxHeight(),
-                firstContent = text,
-                secondContent = icon,
-                paddingValues = paddingValues,
-                verticalAlignment = Alignment.CenterVertically,
-            )
+    if (icon != null || text != null) {
+        ThinButton(
+            { onSetLogExpanded(!logExpanded) },
+            enabled = finishedStateLog.isNotEmpty(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                disabledContentColor = MaterialTheme.colorScheme.onSurface,
+            ),
+            contentPadding = PaddingValues(
+                start = if (text != null) textPadding else iconPadding,
+                end = if (icon != null) iconPadding else textPadding,
+            ),
+        ) {
+            if (text != null) {
+                text()
+            }
+            if (icon != null) {
+                icon()
+            }
         }
-    } else {
-        null
     }
 }
 

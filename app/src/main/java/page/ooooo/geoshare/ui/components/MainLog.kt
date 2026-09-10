@@ -15,10 +15,12 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -127,7 +129,9 @@ fun ResultLogItem(
                     Modifier.weight(1f),
                     style = MaterialTheme.typography.bodyMedium,
                 )
-                SecondsTimeText(item.elapsedTime)
+                CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodySmall) {
+                    SecondsTimeText(item.elapsedTime)
+                }
             }
             item.state.getDetails(resources)?.let { details ->
                 ResultDetails(
@@ -185,7 +189,7 @@ fun fakeFinishedStateLog(
         ),
         succeeded = false,
         startTimeMark = timeSource.markNow(),
-        elapsedTime = 111.milliseconds,
+        elapsedTime = 2011.milliseconds,
     ),
     ConversionStateLogItem.Finished(
         id = 3,

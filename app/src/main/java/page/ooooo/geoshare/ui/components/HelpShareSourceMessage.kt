@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.ui.components
 
-import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.text.InlineTextContent
@@ -27,11 +26,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
+import page.ooooo.geoshare.data.di.fakeApps
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
-import page.ooooo.geoshare.lib.android.App
-import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
@@ -143,26 +140,12 @@ private fun DefaultPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        @SuppressLint("LocalContextGetResourceValueCall")
         HelpShareSourceMessage(
-            appDetails = MutableStateFlow(
-                mapOf(
-                    PackageNames.OSMAND_PLUS to AppDetail(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        label = "OsmAnd",
-                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                    ),
-                )
-            ),
+            appDetails = MutableStateFlow(fakeAppDetails()),
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             outputsForApps = MutableStateFlow(
                 outputRepository.getOutputsForApps(
-                    mapOf(
-                        PackageNames.OSMAND_PLUS to App(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            dataTypes = setOf(DataType.GEO_URI)
-                        ),
-                    ),
+                    apps = fakeApps,
                     hiddenApps = emptySet(),
                 )
             ),
@@ -182,26 +165,12 @@ private fun DarkPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
-        @SuppressLint("LocalContextGetResourceValueCall")
         HelpShareSourceMessage(
-            appDetails = MutableStateFlow(
-                mapOf(
-                    PackageNames.OSMAND_PLUS to AppDetail(
-                        packageName = PackageNames.OSMAND_PLUS,
-                        label = "OsmAnd",
-                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                    ),
-                )
-            ),
+            appDetails = MutableStateFlow(fakeAppDetails()),
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             outputsForApps = MutableStateFlow(
                 outputRepository.getOutputsForApps(
-                    mapOf(
-                        PackageNames.OSMAND_PLUS to App(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            dataTypes = setOf(DataType.GEO_URI)
-                        ),
-                    ),
+                    apps = fakeApps,
                     hiddenApps = emptySet(),
                 )
             ),

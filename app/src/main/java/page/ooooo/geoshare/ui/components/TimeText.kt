@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.ui.components
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -15,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlin.time.ComparableTimeMark
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 @Composable
@@ -37,5 +37,8 @@ fun ElapsedTimeText(startTimeMark: StateFlow<ComparableTimeMark?>, modifier: Mod
 
 @Composable
 fun SecondsTimeText(time: Duration, modifier: Modifier = Modifier) {
-    Text(time.toString(DurationUnit.SECONDS, 2), modifier, style = MaterialTheme.typography.bodySmall)
+    Text(
+        time.toString(DurationUnit.SECONDS, if (time < 1.seconds) 2 else 0),
+        modifier,
+    )
 }

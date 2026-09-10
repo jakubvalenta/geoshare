@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.ui.components
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -44,11 +45,10 @@ import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
+import page.ooooo.geoshare.data.di.fakeApps
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
-import page.ooooo.geoshare.lib.android.App
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
@@ -294,6 +294,63 @@ private fun ResultAppsLinksGrid(
     }
 }
 
+@SuppressLint("LocalContextGetResourceValueCall")
+@Composable
+fun fakeAppDetails(
+    context: Context = LocalContext.current,
+) = mapOf(
+    PackageNames.COMAPS_FDROID to AppDetail(
+        packageName = PackageNames.COMAPS_FDROID,
+        label = "CoMaps",
+        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+    ),
+    PackageNames.CONVERSATIONS to AppDetail(
+        packageName = PackageNames.CONVERSATIONS,
+        label = "Conversations",
+        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+    ),
+    PackageNames.ORGANIC_MAPS to AppDetail(
+        packageName = PackageNames.ORGANIC_MAPS,
+        label = "Organic Maps",
+        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+    ),
+    PackageNames.HERE_WEGO to AppDetail(
+        packageName = PackageNames.HERE_WEGO,
+        label = "HERE WeGo",
+        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+    ),
+    PackageNames.MAPY_COM to AppDetail(
+        packageName = PackageNames.MAPY_COM,
+        label = "Mapy.com",
+        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+    ),
+    PackageNames.OSMAND_PLUS to AppDetail(
+        packageName = PackageNames.OSMAND_PLUS,
+        label = "OsmAnd",
+        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+    ),
+    PackageNames.MAGIC_EARTH to AppDetail(
+        packageName = PackageNames.MAGIC_EARTH,
+        label = "Magic Earth",
+        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+    ),
+    PackageNames.GOOGLE_MAPS to AppDetail(
+        packageName = PackageNames.GOOGLE_MAPS,
+        label = "Google Maps",
+        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+    ),
+    PackageNames.GMAPS_WV to AppDetail(
+        packageName = PackageNames.GMAPS_WV,
+        label = @Suppress("SpellCheckingInspection", "GrazieInspectionRunner") "GMaps WV",
+        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+    ),
+    PackageNames.TOMTOM to AppDetail(
+        packageName = PackageNames.TOMTOM,
+        label = "TomTom",
+        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+    ),
+)
+
 // Previews
 
 @Preview(showBackground = true)
@@ -307,106 +364,11 @@ private fun DefaultPreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
-            @SuppressLint("LocalContextGetResourceValueCall")
             ResultApps(
-                appDetails = MutableStateFlow(
-                    mapOf(
-                        PackageNames.COMAPS_FDROID to AppDetail(
-                            packageName = PackageNames.COMAPS_FDROID,
-                            label = "CoMaps",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                        PackageNames.CONVERSATIONS to AppDetail(
-                            packageName = PackageNames.CONVERSATIONS,
-                            label = "Conversations",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                        PackageNames.ORGANIC_MAPS to AppDetail(
-                            packageName = PackageNames.ORGANIC_MAPS,
-                            label = "Organic Maps",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                        PackageNames.HERE_WEGO to AppDetail(
-                            packageName = PackageNames.HERE_WEGO,
-                            label = "HERE WeGo",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                        PackageNames.MAPY_COM to AppDetail(
-                            packageName = PackageNames.MAPY_COM,
-                            label = "Mapy.com",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                        PackageNames.MAGIC_EARTH to AppDetail(
-                            packageName = PackageNames.MAGIC_EARTH,
-                            label = "Magic Earth",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                        PackageNames.GOOGLE_MAPS to AppDetail(
-                            packageName = PackageNames.GOOGLE_MAPS,
-                            label = "Google Maps",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                        PackageNames.GMAPS_WV to AppDetail(
-                            packageName = PackageNames.GMAPS_WV,
-                            label = @Suppress("SpellCheckingInspection", "GrazieInspectionRunner") "GMaps WV",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                        PackageNames.TOMTOM to AppDetail(
-                            packageName = PackageNames.TOMTOM,
-                            label = "TomTom",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    )
-                ),
+                appDetails = MutableStateFlow(fakeAppDetails()),
                 outputsForApps = MutableStateFlow(
                     outputRepository.getOutputsForApps(
-                        mapOf(
-                            PackageNames.COMAPS_FDROID to App(
-                                packageName = PackageNames.COMAPS_FDROID,
-                                dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                            ),
-                            PackageNames.CONVERSATIONS to App(
-                                packageName = PackageNames.CONVERSATIONS,
-                                dataTypes = setOf(DataType.SEND_PLAIN_TEXT)
-                            ),
-                            PackageNames.GMAPS_WV to App(
-                                packageName = PackageNames.GMAPS_WV,
-                                dataTypes = setOf(DataType.GEO_URI)
-                            ),
-                            PackageNames.GOOGLE_MAPS to App(
-                                packageName = PackageNames.GOOGLE_MAPS,
-                                dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                            ),
-                            PackageNames.HERE_WEGO to App(
-                                packageName = PackageNames.HERE_WEGO,
-                                dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                            ),
-                            PackageNames.MAGIC_EARTH to App(
-                                packageName = PackageNames.MAGIC_EARTH,
-                                dataTypes = setOf(DataType.MAGIC_EARTH_URI)
-                            ),
-                            PackageNames.MAPY_COM to App(
-                                packageName = PackageNames.MAPY_COM,
-                                dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                            ),
-                            PackageNames.ORGANIC_MAPS to App(
-                                packageName = PackageNames.ORGANIC_MAPS,
-                                dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                            ),
-                            PackageNames.OSMAND_PLUS to App(
-                                packageName = PackageNames.OSMAND_PLUS,
-                                dataTypes = setOf(DataType.GPX_DATA)
-                            ),
-                            PackageNames.TOMTOM to App(
-                                packageName = PackageNames.TOMTOM,
-                                dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
-                            ),
-                        ),
+                        apps = fakeApps,
                         hiddenApps = emptySet(),
                     )
                 ),
@@ -433,106 +395,11 @@ private fun DarkPreview() {
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
             )
-            @SuppressLint("LocalContextGetResourceValueCall")
             ResultApps(
-                appDetails = MutableStateFlow(
-                    mapOf(
-                        PackageNames.COMAPS_FDROID to AppDetail(
-                            packageName = PackageNames.COMAPS_FDROID,
-                            label = "CoMaps",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                        PackageNames.CONVERSATIONS to AppDetail(
-                            packageName = PackageNames.CONVERSATIONS,
-                            label = "Conversations",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                        PackageNames.ORGANIC_MAPS to AppDetail(
-                            packageName = PackageNames.ORGANIC_MAPS,
-                            label = "Organic Maps",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                        PackageNames.HERE_WEGO to AppDetail(
-                            packageName = PackageNames.HERE_WEGO,
-                            label = "HERE WeGo",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                        PackageNames.MAPY_COM to AppDetail(
-                            packageName = PackageNames.MAPY_COM,
-                            label = "Mapy.com",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                        PackageNames.MAGIC_EARTH to AppDetail(
-                            packageName = PackageNames.MAGIC_EARTH,
-                            label = "Magic Earth",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                        PackageNames.GOOGLE_MAPS to AppDetail(
-                            packageName = PackageNames.GOOGLE_MAPS,
-                            label = "Google Maps",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                        PackageNames.GMAPS_WV to AppDetail(
-                            packageName = PackageNames.GMAPS_WV,
-                            label = @Suppress("SpellCheckingInspection", "GrazieInspectionRunner") "GMaps WV",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                        PackageNames.TOMTOM to AppDetail(
-                            packageName = PackageNames.TOMTOM,
-                            label = "TomTom",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    )
-                ),
+                appDetails = MutableStateFlow(fakeAppDetails()),
                 outputsForApps = MutableStateFlow(
                     outputRepository.getOutputsForApps(
-                        mapOf(
-                            PackageNames.COMAPS_FDROID to App(
-                                packageName = PackageNames.COMAPS_FDROID,
-                                dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                            ),
-                            PackageNames.CONVERSATIONS to App(
-                                packageName = PackageNames.CONVERSATIONS,
-                                dataTypes = setOf(DataType.SEND_PLAIN_TEXT)
-                            ),
-                            PackageNames.GMAPS_WV to App(
-                                packageName = PackageNames.GMAPS_WV,
-                                dataTypes = setOf(DataType.GEO_URI)
-                            ),
-                            PackageNames.GOOGLE_MAPS to App(
-                                packageName = PackageNames.GOOGLE_MAPS,
-                                dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                            ),
-                            PackageNames.HERE_WEGO to App(
-                                packageName = PackageNames.HERE_WEGO,
-                                dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                            ),
-                            PackageNames.MAGIC_EARTH to App(
-                                packageName = PackageNames.MAGIC_EARTH,
-                                dataTypes = setOf(DataType.MAGIC_EARTH_URI)
-                            ),
-                            PackageNames.MAPY_COM to App(
-                                packageName = PackageNames.MAPY_COM,
-                                dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                            ),
-                            PackageNames.ORGANIC_MAPS to App(
-                                packageName = PackageNames.ORGANIC_MAPS,
-                                dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                            ),
-                            PackageNames.OSMAND_PLUS to App(
-                                packageName = PackageNames.OSMAND_PLUS,
-                                dataTypes = setOf(DataType.GPX_DATA)
-                            ),
-                            PackageNames.TOMTOM to App(
-                                packageName = PackageNames.TOMTOM,
-                                dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
-                            ),
-                        ),
+                        apps = fakeApps,
                         hiddenApps = emptySet(),
                     )
                 ),
@@ -563,16 +430,12 @@ private fun LoadingPreview() {
                 appDetails = MutableStateFlow(emptyMap()),
                 outputsForApps = MutableStateFlow(
                     outputRepository.getOutputsForApps(
-                        mapOf(
-                            PackageNames.COMAPS_FDROID to App(
-                                packageName = PackageNames.COMAPS_FDROID,
-                                dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                            ),
-                            PackageNames.ORGANIC_MAPS to App(
-                                packageName = PackageNames.ORGANIC_MAPS,
-                                dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                            ),
-                        ),
+                        apps = fakeApps.filterKeys {
+                            it in setOf(
+                                PackageNames.COMAPS_FDROID,
+                                PackageNames.ORGANIC_MAPS,
+                            )
+                        },
                         hiddenApps = emptySet(),
                     )
                 ),
@@ -618,16 +481,12 @@ private fun DarkLoadingPreview() {
                 appDetails = MutableStateFlow(emptyMap()),
                 outputsForApps = MutableStateFlow(
                     outputRepository.getOutputsForApps(
-                        mapOf(
-                            PackageNames.COMAPS_FDROID to App(
-                                packageName = PackageNames.COMAPS_FDROID,
-                                dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                            ),
-                            PackageNames.ORGANIC_MAPS to App(
-                                packageName = PackageNames.ORGANIC_MAPS,
-                                dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                            ),
-                        ),
+                        apps = fakeApps.filterKeys {
+                            it in setOf(
+                                PackageNames.COMAPS_FDROID,
+                                PackageNames.ORGANIC_MAPS,
+                            )
+                        },
                         hiddenApps = emptySet(),
                     )
                 ),

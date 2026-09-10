@@ -44,7 +44,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.billing.AutomationFeature
@@ -270,23 +269,13 @@ private fun RowScope.ResultMessageText(
 private fun ActionCompletedPreview() {
     AppTheme {
         Surface {
-            val context = LocalContext.current
-            @SuppressLint("LocalContextGetResourceValueCall")
             ResultTitle(
                 currentState = ActionCompleted(
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     actionResult = ActionResult.SUCCEEDED,
                 ),
-                appDetails = MutableStateFlow(
-                    mapOf(
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    )
-                ),
+                appDetails = MutableStateFlow(fakeAppDetails()),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -309,23 +298,13 @@ private fun ActionCompletedPreview() {
 private fun DarkActionCompletedPreview() {
     AppTheme {
         Surface {
-            val context = LocalContext.current
-            @SuppressLint("LocalContextGetResourceValueCall")
             ResultTitle(
                 currentState = ActionCompleted(
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
                     actionResult = ActionResult.SUCCEEDED,
                 ),
-                appDetails = MutableStateFlow(
-                    mapOf(
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        )
-                    ),
-                ),
+                appDetails = MutableStateFlow(fakeAppDetails()),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -349,23 +328,13 @@ private fun ActionCompletedFeatureNotAvailablePreview() {
     AppTheme {
         Surface {
             Column {
-                val context = LocalContext.current
-                @SuppressLint("LocalContextGetResourceValueCall")
                 ResultTitle(
                     currentState = ActionCompleted(
                         source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         points = persistentListOf(WGS84Point(NaivePoint.example)),
                         actionResult = ActionResult.SUCCEEDED,
                     ),
-                    appDetails = MutableStateFlow(
-                        mapOf(
-                            PackageNames.OSMAND_PLUS to AppDetail(
-                                packageName = PackageNames.OSMAND_PLUS,
-                                label = "OsmAnd",
-                                icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                            ),
-                        )
-                    ),
+                    appDetails = MutableStateFlow(fakeAppDetails()),
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = MutableStateFlow(BillingStatus.NotPurchased()),
                     animationsEnabled = false,
@@ -384,23 +353,13 @@ private fun DarkActionCompletedFeatureNotAvailablePreview() {
     AppTheme {
         Surface {
             Column {
-                val context = LocalContext.current
-                @SuppressLint("LocalContextGetResourceValueCall")
                 ResultTitle(
                     currentState = ActionCompleted(
                         source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         points = persistentListOf(WGS84Point(NaivePoint.example)),
                         actionResult = ActionResult.SUCCEEDED,
                     ),
-                    appDetails = MutableStateFlow(
-                        mapOf(
-                            PackageNames.OSMAND_PLUS to AppDetail(
-                                packageName = PackageNames.OSMAND_PLUS,
-                                label = "OsmAnd",
-                                icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                            ),
-                        )
-                    ),
+                    appDetails = MutableStateFlow(fakeAppDetails()),
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = MutableStateFlow(BillingStatus.NotPurchased()),
                     animationsEnabled = false,
@@ -432,15 +391,7 @@ private fun ActionWaitingPreview() {
                     isAutomation = true,
                     delay = 3.seconds,
                 ),
-                appDetails = MutableStateFlow(
-                    mapOf(
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    )
-                ),
+                appDetails = MutableStateFlow(fakeAppDetails()),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -477,15 +428,7 @@ private fun DarkActionWaitingPreview() {
                     isAutomation = true,
                     delay = 3.seconds,
                 ),
-                appDetails = MutableStateFlow(
-                    mapOf(
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    )
-                ),
+                appDetails = MutableStateFlow(fakeAppDetails()),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -520,15 +463,7 @@ private fun LocationPermissionReceivedPreview() {
                         .toAction(WGS84Point(NaivePoint.example)),
                     isAutomation = true,
                 ),
-                appDetails = MutableStateFlow(
-                    mapOf(
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    )
-                ),
+                appDetails = MutableStateFlow(fakeAppDetails()),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -563,15 +498,7 @@ private fun DarkLocationPermissionReceivedPreview() {
                         .toAction(WGS84Point(NaivePoint.example)),
                     isAutomation = true,
                 ),
-                appDetails = MutableStateFlow(
-                    mapOf(
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    )
-                ),
+                appDetails = MutableStateFlow(fakeAppDetails()),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -605,15 +532,7 @@ private fun SucceededPreview() {
                     output = SavePointsGpxOutput(coordinateConverter),
                     actionResult = ActionResult.SUCCEEDED,
                 ),
-                appDetails = MutableStateFlow(
-                    mapOf(
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    )
-                ),
+                appDetails = MutableStateFlow(fakeAppDetails()),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -647,15 +566,7 @@ private fun DarSucceededPreview() {
                     output = SavePointsGpxOutput(coordinateConverter),
                     actionResult = ActionResult.SUCCEEDED,
                 ),
-                appDetails = MutableStateFlow(
-                    mapOf(
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    )
-                ),
+                appDetails = MutableStateFlow(fakeAppDetails()),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -689,15 +600,7 @@ private fun FailedPreview() {
                     output = SavePointsGpxOutput(coordinateConverter),
                     actionResult = ActionResult.FAILED,
                 ),
-                appDetails = MutableStateFlow(
-                    mapOf(
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    )
-                ),
+                appDetails = MutableStateFlow(fakeAppDetails()),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -731,15 +634,7 @@ private fun DarkFailedPreview() {
                     output = SavePointsGpxOutput(coordinateConverter),
                     actionResult = ActionResult.FAILED,
                 ),
-                appDetails = MutableStateFlow(
-                    mapOf(
-                        PackageNames.OSMAND_PLUS to AppDetail(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            label = "OsmAnd",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
-                        ),
-                    )
-                ),
+                appDetails = MutableStateFlow(fakeAppDetails()),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(

@@ -66,6 +66,7 @@ import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
+import page.ooooo.geoshare.data.di.fakeApps
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
@@ -73,10 +74,7 @@ import page.ooooo.geoshare.data.local.preferences.shouldAppFinish
 import page.ooooo.geoshare.lib.Attempt
 import page.ooooo.geoshare.lib.Message
 import page.ooooo.geoshare.lib.android.AndroidTools
-import page.ooooo.geoshare.lib.android.App
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.android.DataType
-import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
@@ -946,9 +944,10 @@ private fun SucceededPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
+        val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         MainScreen(
             currentState = ActionCompleted(
-                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                source = source,
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(
@@ -979,45 +978,8 @@ private fun SucceededPreview() {
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(
                 outputRepository.getOutputsForApps(
-                    mapOf(
-                        PackageNames.COMAPS_FDROID to App(
-                            packageName = PackageNames.COMAPS_FDROID,
-                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                        ),
-                        PackageNames.GMAPS_WV to App(
-                            packageName = PackageNames.GMAPS_WV,
-                            dataTypes = setOf(DataType.GEO_URI)
-                        ),
-                        PackageNames.GOOGLE_MAPS to App(
-                            packageName = PackageNames.GOOGLE_MAPS,
-                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                        ),
-                        PackageNames.HERE_WEGO to App(
-                            packageName = PackageNames.HERE_WEGO,
-                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                        ),
-                        PackageNames.MAGIC_EARTH to App(
-                            packageName = PackageNames.MAGIC_EARTH,
-                            dataTypes = setOf(DataType.MAGIC_EARTH_URI)
-                        ),
-                        PackageNames.MAPY_COM to App(
-                            packageName = PackageNames.MAPY_COM,
-                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                        ),
-                        PackageNames.ORGANIC_MAPS to App(
-                            packageName = PackageNames.ORGANIC_MAPS,
-                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                        ),
-                        PackageNames.OSMAND_PLUS to App(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            dataTypes = setOf(DataType.GPX_DATA)
-                        ),
-                        PackageNames.TOMTOM to App(
-                            packageName = PackageNames.TOMTOM,
-                            dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
-                        ),
-                    ),
-                    emptySet(),
+                    apps = fakeApps,
+                    hiddenApps = emptySet(),
                 )
             ),
             outputsForLinks = MutableStateFlow(outputRepository.getOutputsForLinks(defaultFakeLinks)),
@@ -1027,7 +989,7 @@ private fun SucceededPreview() {
             outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
             outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            source = MutableStateFlow(""),
+            source = MutableStateFlow(source),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1064,9 +1026,10 @@ private fun DarkSucceededPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
+        val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         MainScreen(
             currentState = ActionCompleted(
-                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                source = source,
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(
@@ -1097,45 +1060,8 @@ private fun DarkSucceededPreview() {
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(
                 outputRepository.getOutputsForApps(
-                    mapOf(
-                        PackageNames.COMAPS_FDROID to App(
-                            packageName = PackageNames.COMAPS_FDROID,
-                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                        ),
-                        PackageNames.GMAPS_WV to App(
-                            packageName = PackageNames.GMAPS_WV,
-                            dataTypes = setOf(DataType.GEO_URI)
-                        ),
-                        PackageNames.GOOGLE_MAPS to App(
-                            packageName = PackageNames.GOOGLE_MAPS,
-                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                        ),
-                        PackageNames.HERE_WEGO to App(
-                            packageName = PackageNames.HERE_WEGO,
-                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                        ),
-                        PackageNames.MAGIC_EARTH to App(
-                            packageName = PackageNames.MAGIC_EARTH,
-                            dataTypes = setOf(DataType.MAGIC_EARTH_URI)
-                        ),
-                        PackageNames.MAPY_COM to App(
-                            packageName = PackageNames.MAPY_COM,
-                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                        ),
-                        PackageNames.ORGANIC_MAPS to App(
-                            packageName = PackageNames.ORGANIC_MAPS,
-                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                        ),
-                        PackageNames.OSMAND_PLUS to App(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            dataTypes = setOf(DataType.GPX_DATA)
-                        ),
-                        PackageNames.TOMTOM to App(
-                            packageName = PackageNames.TOMTOM,
-                            dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
-                        ),
-                    ),
-                    emptySet(),
+                    apps = fakeApps,
+                    hiddenApps = emptySet(),
                 )
             ),
             outputsForLinks = MutableStateFlow(outputRepository.getOutputsForLinks(defaultFakeLinks)),
@@ -1145,7 +1071,7 @@ private fun DarkSucceededPreview() {
             outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
             outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            source = MutableStateFlow(""),
+            source = MutableStateFlow(source),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1182,9 +1108,10 @@ private fun SmallSucceededPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
+        val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         MainScreen(
             currentState = ActionCompleted(
-                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                source = source,
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(
@@ -1214,45 +1141,8 @@ private fun SmallSucceededPreview() {
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(
                 outputRepository.getOutputsForApps(
-                    mapOf(
-                        PackageNames.COMAPS_FDROID to App(
-                            packageName = PackageNames.COMAPS_FDROID,
-                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                        ),
-                        PackageNames.GMAPS_WV to App(
-                            packageName = PackageNames.GMAPS_WV,
-                            dataTypes = setOf(DataType.GEO_URI)
-                        ),
-                        PackageNames.GOOGLE_MAPS to App(
-                            packageName = PackageNames.GOOGLE_MAPS,
-                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                        ),
-                        PackageNames.HERE_WEGO to App(
-                            packageName = PackageNames.HERE_WEGO,
-                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                        ),
-                        PackageNames.MAGIC_EARTH to App(
-                            packageName = PackageNames.MAGIC_EARTH,
-                            dataTypes = setOf(DataType.MAGIC_EARTH_URI)
-                        ),
-                        PackageNames.MAPY_COM to App(
-                            packageName = PackageNames.MAPY_COM,
-                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                        ),
-                        PackageNames.ORGANIC_MAPS to App(
-                            packageName = PackageNames.ORGANIC_MAPS,
-                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                        ),
-                        PackageNames.OSMAND_PLUS to App(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            dataTypes = setOf(DataType.GPX_DATA)
-                        ),
-                        PackageNames.TOMTOM to App(
-                            packageName = PackageNames.TOMTOM,
-                            dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
-                        ),
-                    ),
-                    emptySet(),
+                    apps = fakeApps,
+                    hiddenApps = emptySet(),
                 )
             ),
             outputsForLinks = MutableStateFlow(outputRepository.getOutputsForLinks(defaultFakeLinks)),
@@ -1262,7 +1152,7 @@ private fun SmallSucceededPreview() {
             outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
             outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            source = MutableStateFlow(""),
+            source = MutableStateFlow(source),
             sourceComesFromIntent = MutableStateFlow(true),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1299,9 +1189,10 @@ private fun TabletSucceededPreview() {
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
         )
+        val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         MainScreen(
             currentState = ActionCompleted(
-                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                source = source,
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(
@@ -1332,45 +1223,8 @@ private fun TabletSucceededPreview() {
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(
                 outputRepository.getOutputsForApps(
-                    mapOf(
-                        PackageNames.COMAPS_FDROID to App(
-                            packageName = PackageNames.COMAPS_FDROID,
-                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                        ),
-                        PackageNames.GMAPS_WV to App(
-                            packageName = PackageNames.GMAPS_WV,
-                            dataTypes = setOf(DataType.GEO_URI)
-                        ),
-                        PackageNames.GOOGLE_MAPS to App(
-                            packageName = PackageNames.GOOGLE_MAPS,
-                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                        ),
-                        PackageNames.HERE_WEGO to App(
-                            packageName = PackageNames.HERE_WEGO,
-                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                        ),
-                        PackageNames.MAGIC_EARTH to App(
-                            packageName = PackageNames.MAGIC_EARTH,
-                            dataTypes = setOf(DataType.MAGIC_EARTH_URI)
-                        ),
-                        PackageNames.MAPY_COM to App(
-                            packageName = PackageNames.MAPY_COM,
-                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                        ),
-                        PackageNames.ORGANIC_MAPS to App(
-                            packageName = PackageNames.ORGANIC_MAPS,
-                            dataTypes = setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI)
-                        ),
-                        PackageNames.OSMAND_PLUS to App(
-                            packageName = PackageNames.OSMAND_PLUS,
-                            dataTypes = setOf(DataType.GPX_DATA)
-                        ),
-                        PackageNames.TOMTOM to App(
-                            packageName = PackageNames.TOMTOM,
-                            dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
-                        ),
-                    ),
-                    emptySet(),
+                    apps = fakeApps,
+                    hiddenApps = emptySet(),
                 )
             ),
             outputsForLinks = MutableStateFlow(outputRepository.getOutputsForLinks(defaultFakeLinks)),
@@ -1380,7 +1234,7 @@ private fun TabletSucceededPreview() {
             outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
             outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            source = MutableStateFlow(""),
+            source = MutableStateFlow(source),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1414,9 +1268,10 @@ private fun ErrorPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         MainScreen(
             currentState = ConversionFailed(
-                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                source = source,
                 message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
             appDetails = MutableStateFlow(emptyMap()),
@@ -1445,7 +1300,7 @@ private fun ErrorPreview() {
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            source = MutableStateFlow(""),
+            source = MutableStateFlow(source),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1479,9 +1334,10 @@ private fun DarkErrorPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         MainScreen(
             currentState = ConversionFailed(
-                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                source = source,
                 message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
             appDetails = MutableStateFlow(emptyMap()),
@@ -1510,7 +1366,7 @@ private fun DarkErrorPreview() {
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            source = MutableStateFlow(""),
+            source = MutableStateFlow(source),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1544,9 +1400,10 @@ private fun TabletErrorPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         MainScreen(
             currentState = ConversionFailed(
-                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                source = source,
                 message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
             appDetails = MutableStateFlow(emptyMap()),
@@ -1575,7 +1432,7 @@ private fun TabletErrorPreview() {
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            source = MutableStateFlow(""),
+            source = MutableStateFlow(source),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1609,9 +1466,10 @@ private fun WarningPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val source = "https://share.google/diIxnYa8dIA6dZfpy"
         MainScreen(
             currentState = ConversionFailed(
-                source = "https://share.google/diIxnYa8dIA6dZfpy",
+                source = source,
                 message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
                 warning = true,
             ),
@@ -1641,7 +1499,7 @@ private fun WarningPreview() {
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            source = MutableStateFlow(""),
+            source = MutableStateFlow(source),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1675,9 +1533,10 @@ private fun DarkWarningPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val source = "https://share.google/diIxnYa8dIA6dZfpy"
         MainScreen(
             currentState = ConversionFailed(
-                source = "https://share.google/diIxnYa8dIA6dZfpy",
+                source = source,
                 message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
                 warning = true,
             ),
@@ -1707,7 +1566,7 @@ private fun DarkWarningPreview() {
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            source = MutableStateFlow(""),
+            source = MutableStateFlow(source),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1741,9 +1600,10 @@ private fun LoadingIndicatorPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         MainScreen(
             currentState = PermissionGrantedBasicInput(
-                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                source = source,
                 matchedInput = MatchedInput(
                     FakeInputRepository.googleMapsShortLinkInput, "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
                 ),
@@ -1777,7 +1637,7 @@ private fun LoadingIndicatorPreview() {
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            source = MutableStateFlow(""),
+            source = MutableStateFlow(source),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1811,9 +1671,10 @@ private fun DarkLoadingIndicatorPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         MainScreen(
             currentState = PermissionGrantedBasicInput(
-                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                source = source,
                 matchedInput = MatchedInput(
                     FakeInputRepository.googleMapsShortLinkInput, "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
                 ),
@@ -1847,7 +1708,7 @@ private fun DarkLoadingIndicatorPreview() {
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            source = MutableStateFlow(""),
+            source = MutableStateFlow(source),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1881,9 +1742,10 @@ private fun TabletLoadingIndicatorPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         MainScreen(
             currentState = PermissionGrantedBasicInput(
-                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                source = source,
                 matchedInput = MatchedInput(
                     FakeInputRepository.googleMapsShortLinkInput, "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
                 ),
@@ -1917,7 +1779,7 @@ private fun TabletLoadingIndicatorPreview() {
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            source = MutableStateFlow(""),
+            source = MutableStateFlow(source),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -1951,9 +1813,10 @@ private fun WebViewPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         MainScreen(
             currentState = PermissionGrantedWebViewInput(
-                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                source = source,
                 matchedInput = MatchedInput(FakeInputRepository.debugWebViewInput, "https://www.example.com/"),
                 permission = Permission.ALWAYS,
                 results = emptyMap(),
@@ -1984,7 +1847,7 @@ private fun WebViewPreview() {
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            source = MutableStateFlow(""),
+            source = MutableStateFlow(source),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -2018,9 +1881,10 @@ private fun DarkWebViewPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         MainScreen(
             currentState = PermissionGrantedWebViewInput(
-                source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                source = source,
                 matchedInput = MatchedInput(FakeInputRepository.debugWebViewInput, "https://www.example.com/"),
                 permission = Permission.ALWAYS,
                 results = emptyMap(),
@@ -2051,7 +1915,7 @@ private fun DarkWebViewPreview() {
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            source = MutableStateFlow(""),
+            source = MutableStateFlow(source),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -2085,8 +1949,9 @@ private fun TabletWebViewPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val currentState = PermissionGrantedWebViewInput(
-            source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            source = source,
             matchedInput = MatchedInput(FakeInputRepository.debugWebViewInput, "https://www.example.com/"),
             permission = Permission.ALWAYS,
             results = emptyMap(),
@@ -2119,7 +1984,7 @@ private fun TabletWebViewPreview() {
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            source = MutableStateFlow(""),
+            source = MutableStateFlow(source),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -2153,8 +2018,9 @@ private fun EmptyPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val currentState = ConversionSucceeded(
-            source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            source = source,
             points = persistentListOf(),
         )
         MainScreen(
@@ -2185,7 +2051,7 @@ private fun EmptyPreview() {
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
             startTimeMark = MutableStateFlow(TestTimeSource().markNow()),
-            source = MutableStateFlow(""),
+            source = MutableStateFlow(source),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
