@@ -343,4 +343,6 @@
     <string name="help_welcome_text">Avez-vous un lien vers une carte ? Saisissez-le dans le formulaire et appuyez sur %1$s.</string>
     <string name="help_welcome_title">Bienvenue</string>
     <string name="faq_open_by_default_headline">Comment ouvrir systématiquement les liens dans %1$s</string>
+    <string name="conversion_succeeded_copy_name">Copier le nom</string>
+    <string name="conversion_automation_copy_name_succeeded">Nom copié automatiquement</string>
 </resources>
