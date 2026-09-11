@@ -189,7 +189,7 @@ fun MainScreen(
                     val actionContext = ActionContext(context = context, clipboard = clipboard, resources = resources)
                     val actionResult = currentState.action.execute(actionContext)
                     if (userPreferenceViewModel.values.value.finish.shouldAppFinish(actionResult)) {
-                        onFinish() // TODO Try destroying conversion state context
+                        onFinish()
                     }
                     conversionViewModel.completeBasicAction(actionResult)
                 }

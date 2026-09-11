@@ -5,7 +5,9 @@ import android.content.res.Resources
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.android.scopes.ViewModelScoped
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,15 +26,21 @@ import page.ooooo.geoshare.lib.conversion.ConversionStateLogItem
 import page.ooooo.geoshare.lib.conversion.DefaultConversionStateContext
 import page.ooooo.geoshare.lib.conversion.Initial
 import page.ooooo.geoshare.lib.inputs.Input
-import javax.inject.Singleton
 import kotlin.time.ComparableTimeMark
 
+/**
+ * Injects [ConversionStateContext] into a view model.
+ *
+ * Notice that it uses the [ViewModelScoped] scope, so that it gets destroyed when finishing the activity. If we used
+ * the [SingletonComponent] scope, then re-opening the app would load an old conversion state context while the other
+ * state would be reset.
+ */
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(ViewModelComponent::class)
 object ConversionStateContextModule {
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun provideConversionStateContext(
         @ApplicationContext context: Context,
         billing: Billing,

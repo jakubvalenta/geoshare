@@ -43,8 +43,6 @@ class ConversionBehaviorTest {
         launchApplication()
         waitForAppToBeVisible()
 
-        // FIXME Reset state before finishing the app
-
         // Shows main screen instead of result screen, because the app finished
         onElement { viewIdResourceName == "geoShareMainSourceTextField" }
     }
