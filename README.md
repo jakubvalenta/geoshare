@@ -213,6 +213,18 @@ or [Izzy on Droid](https://apt.izzysoft.de/packages/page.ooooo.geoshare).
 Open this repo in Android Studio to build and run the app, and to run unit tests
 and instrumented tests.
 
+### Running unit tests using the command line
+
+```shell
+./gradlew testFreeDebugUnitTest testProDebugUnitTest
+```
+
+### Lint using the command line
+
+```shell
+./gradlew lintFreeDebug lintProDebug
+```
+
 ### Generating a signed release APK
 
 ```shell
@@ -256,12 +268,48 @@ Repeat the process for the `sevenInch` and `tenInch` device types.
 
 ### Taking screenshots for documentation (Weblate translations)
 
-```shell
-./gradlew :app:mediumPhoneApi37FreeDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=page.ooooo.geoshare.screenshots
-./gradlew :app:mediumPhoneApi37ProDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=page.ooooo.geoshare.screenshots
-./gradlew :app:mediumPhoneApi37DemoDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=page.ooooo.geoshare.screenshots
-./gradlew :app:copyScreenshots
-```
+1. Most screenshots can be taken on a Gradle-managed device, so you don't need
+   to have an emulator set up. Run:
+
+    ```shell
+    ./gradlew :app:mediumPhoneApi37FreeDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=page.ooooo.geoshare.screenshots
+    ./gradlew :app:mediumPhoneApi37ProDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=page.ooooo.geoshare.screenshots
+    ./gradlew :app:mediumPhoneApi37DemoDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=page.ooooo.geoshare.screenshots
+    ./gradlew :app:copyScreenshots
+    ```
+
+2. Some screenshots require the OsmAnd~ and Conversations apps installed.
+   Install these apps in an emulator, start it, and run:
+
+    ```shell
+    ./gradlew :app:connectedFreeDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=page.ooooo.geoshare.screenshots
+    ```
+
+   Then copy the following screenshots from
+   `build/outputs/connected_android_test_additional_output/freeDebugAndroidTest/connected/<device>`
+   to `docs/screenshots`:
+
+    - `main_strings/automation_share_gpx_route_success.webp`
+    - `main_strings/automation_share_gpx_route_waiting.webp`
+    - `main_strings/automation_share_waiting.webp`
+    - `main_strings/conversion_result_app_messaging.webp`
+    - `main_strings/conversion_result_app_osmand.webp`
+
+3. A few screenshots require the TomTom app installed. It seems to be easier to
+   install the app on a physical device. So install the app on a physical
+   device, start it, and run:
+
+    ```shell
+    ./gradlew :app:connectedFreeDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=page.ooooo.geoshare.screenshots
+    ```
+
+   Then copy the following screenshots from
+   `build/outputs/connected_android_test_additional_output/freeDebugAndroidTest/connected/<device>`
+   to `docs/screenshots`:
+
+    - `main_strings/conversion_result_location_loading_indicator.webp`
+    - `main_strings/conversion_result_location_rationale.webp`
+    - `main_strings/conversion_result_message_error.webp`
 
 ### Manual testing
 
