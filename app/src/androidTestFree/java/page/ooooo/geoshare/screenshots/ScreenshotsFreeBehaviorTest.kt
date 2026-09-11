@@ -37,7 +37,6 @@ import page.ooooo.geoshare.tests.collapseSheet
 import page.ooooo.geoshare.tests.confirmDialog
 import page.ooooo.geoshare.tests.disableSystemUIDemoMode
 import page.ooooo.geoshare.tests.dismissDialog
-import page.ooooo.geoshare.tests.dismissHelpMessage
 import page.ooooo.geoshare.tests.enableDarkMode
 import page.ooooo.geoshare.tests.enableSystemUIDemoMode
 import page.ooooo.geoshare.tests.expandSheet
@@ -147,14 +146,14 @@ class ScreenshotsFreeBehaviorTest {
         // Help - Message - Welcome
         onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.WELCOME}" }
         saveScreenshot("main_strings/help_message_welcome")
-        dismissHelpMessage()
+        onElement { viewIdResourceName == "geoShareHelpMessageDismiss_${HelpMessage.WELCOME}" }.click()
 
         // Help - Message - Share source
         setMainInput()
         submitMainForm()
         onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.SHARE_SOURCE}" }
         saveScreenshot("main_strings/help_message_share_source")
-        dismissHelpMessage()
+        onElement { viewIdResourceName == "geoShareHelpMessageDismiss_${HelpMessage.SHARE_SOURCE}" }.click()
 
         // Help - Message - Open by default
         shareUri()
@@ -163,7 +162,7 @@ class ScreenshotsFreeBehaviorTest {
             .scroll(Direction.DOWN, 3f)
         onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.OPEN_BY_DEFAULT}" }
         saveScreenshot("main_strings/help_message_open_by_default")
-        dismissHelpMessage()
+        onElement { viewIdResourceName == "geoShareHelpMessageDismiss_${HelpMessage.OPEN_BY_DEFAULT}" }.click()
 
         goBackToMainForm()
     }

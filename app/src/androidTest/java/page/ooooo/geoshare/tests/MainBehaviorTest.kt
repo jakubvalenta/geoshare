@@ -48,7 +48,7 @@ class MainBehaviorTest {
         onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.WELCOME}" }
 
         // Dismiss help message WELCOME
-        dismissHelpMessage()
+        onElement { viewIdResourceName == "geoShareHelpMessageDismiss_${HelpMessage.WELCOME}" }.click()
         quickWaitForStableInActiveWindow() // Wait for help message exit animation
         assertNull(
             onElementOrNull(1_000) {
@@ -77,7 +77,7 @@ class MainBehaviorTest {
         onMainScrollablePane()
             // Scroll by percents not to element, because it's more reliable due to the lazy list loading
             .scroll(Direction.DOWN, 3f)
-        dismissHelpMessage()
+        onElement { viewIdResourceName == "geoShareHelpMessageDismiss_${HelpMessage.OPEN_BY_DEFAULT}" }.click()
         quickWaitForStableInActiveWindow() // Wait for help message exit animation
         assertNull(
             onElementOrNull(1_000) {
@@ -101,7 +101,7 @@ class MainBehaviorTest {
         )
 
         // Dismiss help message SHARE_SOURCE
-        dismissHelpMessage()
+        onElement { viewIdResourceName == "geoShareHelpMessageDismiss_${HelpMessage.SHARE_SOURCE}" }.click()
         quickWaitForStableInActiveWindow() // Wait for help message exit animation
         assertNull(
             onElementOrNull(1_000) {

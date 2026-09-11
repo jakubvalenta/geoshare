@@ -111,7 +111,7 @@ fun HelpMessageCard(
                     { onDismiss(helpMessage) },
                     Modifier
                         .align(Alignment.TopEnd)
-                        .testTag("geoShareHelpMessageDismiss"),
+                        .testTag("geoShareHelpMessageDismiss_$helpMessage"),
                 ) {
                     Icon(
                         Icons.Default.Close,
@@ -149,8 +149,8 @@ private fun DefaultPreview() {
                     inlineContent = mapOf(
                         shareIconId to InlineTextContent(
                             Placeholder(
-                                width = 14.sp,
-                                height = 14.sp,
+                                width = shareIconSize,
+                                height = shareIconSize,
                                 placeholderVerticalAlign = PlaceholderVerticalAlign.Center,
                             )
                         ) {
@@ -191,8 +191,8 @@ private fun DarkPreview() {
                     inlineContent = mapOf(
                         shareIconId to InlineTextContent(
                             Placeholder(
-                                width = 14.sp,
-                                height = 14.sp,
+                                width = shareIconSize,
+                                height = shareIconSize,
                                 placeholderVerticalAlign = PlaceholderVerticalAlign.Center,
                             )
                         ) {
@@ -233,8 +233,8 @@ private fun TabletPreview() {
                     inlineContent = mapOf(
                         shareIconId to InlineTextContent(
                             Placeholder(
-                                width = 14.sp,
-                                height = 14.sp,
+                                width = shareIconSize,
+                                height = shareIconSize,
                                 placeholderVerticalAlign = PlaceholderVerticalAlign.Center,
                             )
                         ) {

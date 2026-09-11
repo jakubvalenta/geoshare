@@ -7,12 +7,12 @@ import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Test
+import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.tests.assumeAppInstalled
 import page.ooooo.geoshare.tests.assumeDomainResolvable
 import page.ooooo.geoshare.tests.confirmDialog
 import page.ooooo.geoshare.tests.disableSystemUIDemoMode
-import page.ooooo.geoshare.tests.dismissHelpMessage
 import page.ooooo.geoshare.tests.enableDarkMode
 import page.ooooo.geoshare.tests.enableSystemUIDemoMode
 import page.ooooo.geoshare.tests.goBackToMainForm
@@ -79,7 +79,7 @@ class ScreenshotsProBehaviorTest {
         // Conversion - Check - Name only
         shareUri("https://www.google.com/maps/place/Hermannstr.+20,+Berlin/")
         onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
-        dismissHelpMessage()
+        onElement { viewIdResourceName == "geoShareHelpMessageDismiss_${HelpMessage.OPEN_BY_DEFAULT}" }.click()
         quickWaitForStableInActiveWindow() // Wait for help message exit animation
         saveScreenshot("main_strings/conversion_result_check_name_only")
 

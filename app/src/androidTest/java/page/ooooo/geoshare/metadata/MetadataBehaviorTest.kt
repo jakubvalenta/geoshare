@@ -6,6 +6,7 @@ import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
+import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.tests.assertConversionSucceeds
 import page.ooooo.geoshare.tests.confirmDialog
 import page.ooooo.geoshare.tests.disableDarkMode
@@ -14,7 +15,6 @@ import page.ooooo.geoshare.tests.enableSystemUIDemoMode
 import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import page.ooooo.geoshare.tests.dismissHelpMessage
 import page.ooooo.geoshare.tests.quickWaitForStableInActiveWindow
 import page.ooooo.geoshare.tests.shareUri
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
@@ -55,7 +55,7 @@ class MetadataBehaviorTest {
         waitForAppToBeVisible()
 
         // Main form
-        dismissHelpMessage()
+        onElement { viewIdResourceName == "geoShareHelpMessageDismiss_${HelpMessage.WELCOME}" }.click()
         quickWaitForStableInActiveWindow() // Wait for help message exit animation
         Screengrab.screenshot("1")
 
@@ -67,7 +67,7 @@ class MetadataBehaviorTest {
         // Result screen
         dialog.confirmDialog()
         assertConversionSucceeds(WGS84Point(42.5784957, 1.8955661, source = Source.URI))
-        dismissHelpMessage()
+        onElement { viewIdResourceName == "geoShareHelpMessageDismiss_${HelpMessage.OPEN_BY_DEFAULT}" }.click()
         quickWaitForStableInActiveWindow() // Wait for help message exit animation
         Screengrab.screenshot("2")
 

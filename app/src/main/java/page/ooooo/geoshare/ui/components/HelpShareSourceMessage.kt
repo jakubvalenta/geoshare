@@ -111,8 +111,8 @@ fun HelpShareSourceMessage(
                 inlineContent = mapOf(
                     shareIconId to InlineTextContent(
                         Placeholder(
-                            width = 14.sp,
-                            height = 14.sp,
+                            width = shareIconSize,
+                            height = shareIconSize,
                             placeholderVerticalAlign = PlaceholderVerticalAlign.Center,
                         )
                     ) {

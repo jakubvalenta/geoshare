@@ -203,10 +203,6 @@ fun assumeNotEmulator() {
     assumeTrue("This test only works on a physical device, not an emulator", Build.HARDWARE != "ranchu")
 }
 
-fun UiAutomatorTestScope.dismissHelpMessage() {
-    onElement { viewIdResourceName == "geoShareHelpMessageDismiss" }.click()
-}
-
 /**
  * Check that the result screen shows [expectedPoints]
  *
