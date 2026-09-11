@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.metadata
 
+import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.uiAutomator
 import org.junit.AfterClass
 import org.junit.BeforeClass
@@ -72,7 +73,8 @@ class MetadataBehaviorTest {
 
         // Automation preferences screen
         onElement { viewIdResourceName == "geoShareResultAutomationButton" }.click()
-        quickWaitForStableInActiveWindow()
+        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
+            .scroll(Direction.DOWN, 0.15f)
         Screengrab.screenshot("3")
     }
 }
