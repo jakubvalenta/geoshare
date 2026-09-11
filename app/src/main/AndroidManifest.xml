@@ -52,7 +52,8 @@
             android:excludeFromRecents="true"
             android:exported="true"
             android:launchMode="singleTop"
-            android:theme="@style/MainTheme">
+            android:theme="@style/MainTheme"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
 
