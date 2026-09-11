@@ -139,8 +139,8 @@ fun ResultLogItem(
                 )
                 CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodySmall) {
                     when (item) {
-                        is ExtendedConversionStateLogItem.Finished -> SecondsTimeText(item.endTimeMark - item.startTimeMark)
-                        is ExtendedConversionStateLogItem.Pending -> ElapsedTimeText(item.startTimeMark)
+                        is ExtendedConversionStateLogItem.Finished -> SecondsTimeText(item.end - item.start)
+                        is ExtendedConversionStateLogItem.Pending -> ElapsedTimeText(item.start)
                     }
                 }
             }
@@ -175,8 +175,8 @@ fun fakeStateLog(source: String, timeSource: TestTimeSource) = listOf(
             override val uri = source
         },
         succeeded = false,
-        startTimeMark = timeSource.markNow(),
-        endTimeMark = timeSource.apply { plusAssign(30.milliseconds) }.markNow(),
+        start = timeSource.markNow(),
+        end = timeSource.apply { plusAssign(30.milliseconds) }.markNow(),
     ),
     ExtendedConversionStateLogItem.Finished(
         id = 1,
@@ -187,8 +187,8 @@ fun fakeStateLog(source: String, timeSource: TestTimeSource) = listOf(
             results = emptyMap(),
         ),
         succeeded = true,
-        startTimeMark = timeSource.markNow(),
-        endTimeMark = timeSource.apply { plusAssign(657.milliseconds) }.markNow(),
+        start = timeSource.markNow(),
+        end = timeSource.apply { plusAssign(657.milliseconds) }.markNow(),
     ),
     ExtendedConversionStateLogItem.Finished(
         id = 2,
@@ -199,8 +199,8 @@ fun fakeStateLog(source: String, timeSource: TestTimeSource) = listOf(
             results = emptyMap(),
         ),
         succeeded = true,
-        startTimeMark = timeSource.markNow(),
-        endTimeMark = timeSource.apply { plusAssign(92.milliseconds) }.markNow(),
+        start = timeSource.markNow(),
+        end = timeSource.apply { plusAssign(92.milliseconds) }.markNow(),
     ),
     ExtendedConversionStateLogItem.Finished(
         id = 3,
@@ -211,8 +211,8 @@ fun fakeStateLog(source: String, timeSource: TestTimeSource) = listOf(
             results = emptyMap(),
         ),
         succeeded = false,
-        startTimeMark = timeSource.markNow(),
-        endTimeMark = timeSource.apply { plusAssign(2011.milliseconds) }.markNow(),
+        start = timeSource.markNow(),
+        end = timeSource.apply { plusAssign(2011.milliseconds) }.markNow(),
     ),
     ExtendedConversionStateLogItem.Pending(
         id = 4,
@@ -223,7 +223,7 @@ fun fakeStateLog(source: String, timeSource: TestTimeSource) = listOf(
             results = emptyMap(),
             lastAttempt = Attempt(1, ConnectTimeoutNetworkException(Exception())),
         ),
-        startTimeMark = timeSource.markNow(),
+        start = timeSource.markNow(),
     ),
 )
 

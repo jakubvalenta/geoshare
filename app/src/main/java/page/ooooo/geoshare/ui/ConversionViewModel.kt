@@ -56,8 +56,8 @@ class ConversionViewModel @Inject constructor(
                             ExtendedConversionStateLogItem.Finished(
                                 id = logItem.id,
                                 state = logItem.state,
-                                startTimeMark = logItem.startTimeMark,
-                                endTimeMark = nextLogItem.startTimeMark,
+                                start = logItem.start,
+                                end = nextLogItem.start,
                                 succeeded = when (nextLogItem.state) {
                                     is ConversionState.HasError -> false
                                     is ConversionState.HasAttempt if nextLogItem.state.lastAttempt != null -> false
@@ -68,7 +68,7 @@ class ConversionViewModel @Inject constructor(
                             ExtendedConversionStateLogItem.Pending(
                                 id = logItem.id,
                                 state = logItem.state,
-                                startTimeMark = logItem.startTimeMark,
+                                start = logItem.start,
                             )
                         }
                     } else {
@@ -83,43 +83,8 @@ class ConversionViewModel @Inject constructor(
             emptyList(),
         )
 
-    // TODO Remove commented out code
-    // stateLog.map { state ->
-    //     val finishedLogItem =
-    //         (lastOrNull() as? ConversionStateLogItem.Pending)?.let { pendingLogItem ->
-    //             ConversionStateLogItem.Finished(
-    //                 id = pendingLogItem.id,
-    //                 state = pendingLogItem.state,
-    //                 startTimeMark = pendingLogItem.startTimeMark,
-    //                 endTimeMark = timeSource.markNow(),
-    //                 succeeded = (
-    //                     currentState !is ConversionState.HasError &&
-    //                         (currentState as? ConversionState.HasAttempt)?.lastAttempt == null
-    //                     ),
-    //             )
-    //         }
-    //     val newLogItem = (currentState as? ConversionState.HasDescription)?.let { newState ->
-    //         ConversionStateLogItem.Pending(
-    //             id = size,
-    //             state = newState,
-    //             startTimeMark = timeSource.markNow(),
-    //         )
-    //     }
-    //     if (finishedLogItem != null) {
-    //         if (newLogItem != null) {
-    //             take(size - 1) + finishedLogItem + newLogItem
-    //         } else {
-    //             take(size - 1) + finishedLogItem
-    //         }
-    //     } else if (newLogItem != null) {
-    //         this + newLogItem
-    //     } else {
-    //         this
-    //     }
-    // }
-
-    val startTimeMark: StateFlow<ComparableTimeMark?> = stateContext.stateLog
-        .map { it.firstOrNull()?.startTimeMark }
+    val start: StateFlow<ComparableTimeMark?> = stateContext.stateLog
+        .map { it.firstOrNull()?.start }
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),

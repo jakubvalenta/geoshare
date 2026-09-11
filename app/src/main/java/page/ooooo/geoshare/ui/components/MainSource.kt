@@ -63,7 +63,7 @@ fun MainSource(
     errorMessageResId: Int?,
     logExpanded: Boolean,
     source: StateFlow<String>,
-    startTimeMark: StateFlow<ComparableTimeMark?>,
+    start: StateFlow<ComparableTimeMark?>,
     stateLog: StateFlow<List<ExtendedConversionStateLogItem>>,
     onSetLogExpanded: (logExpanded: Boolean) -> Unit,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
@@ -163,7 +163,7 @@ fun MainSource(
                     )
                 }
                 MainSourceTimeButton(
-                    startTimeMark = startTimeMark,
+                    start = start,
                     stateLog = stateLog,
                     logExpanded = logExpanded,
                     onSetLogExpanded = onSetLogExpanded,
@@ -175,7 +175,7 @@ fun MainSource(
 
 @Composable
 private fun MainSourceTimeButton(
-    startTimeMark: StateFlow<ComparableTimeMark?>,
+    start: StateFlow<ComparableTimeMark?>,
     stateLog: List<ExtendedConversionStateLogItem>,
     logExpanded: Boolean,
     textPadding: Dp = LocalSpacing.current.small,
@@ -183,12 +183,12 @@ private fun MainSourceTimeButton(
     onSetLogExpanded: (logExpanded: Boolean) -> Unit,
 ) {
     val lastLogItem = stateLog.lastOrNull() ?: return
-    val startTimeMark by startTimeMark.collectAsStateWithLifecycle()
+    val start by start.collectAsStateWithLifecycle()
 
-    val text = startTimeMark?.let { startTimeMark ->
+    val text = start?.let { start ->
         when (lastLogItem) {
             is ExtendedConversionStateLogItem.Finished -> {
-                val elapsedTime = lastLogItem.endTimeMark - startTimeMark
+                val elapsedTime = lastLogItem.end - start
                 if (elapsedTime > 10.milliseconds) {
                     @Composable {
                         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
@@ -203,7 +203,7 @@ private fun MainSourceTimeButton(
             is ExtendedConversionStateLogItem.Pending -> {
                 @Composable {
                     CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                        ElapsedTimeText(startTimeMark)
+                        ElapsedTimeText(start)
                     }
                 }
             }
@@ -256,7 +256,7 @@ private fun DefaultPreview() {
                 errorMessageResId = null,
                 logExpanded = false,
                 source = MutableStateFlow(""),
-                startTimeMark = MutableStateFlow(timeSource.markNow()),
+                start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(emptyList()),
                 onSetLogExpanded = {},
                 onSetErrorMessageResId = {},
@@ -278,7 +278,7 @@ private fun DarkPreview() {
                 errorMessageResId = null,
                 logExpanded = false,
                 source = MutableStateFlow(""),
-                startTimeMark = MutableStateFlow(timeSource.markNow()),
+                start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(emptyList()),
                 onSetLogExpanded = {},
                 onSetErrorMessageResId = {},
@@ -300,7 +300,7 @@ private fun FilledPreview() {
                 errorMessageResId = null,
                 logExpanded = false,
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
-                startTimeMark = MutableStateFlow(timeSource.markNow()),
+                start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(emptyList()),
                 onSetLogExpanded = {},
                 onSetErrorMessageResId = {},
@@ -322,7 +322,7 @@ private fun DarkFilledPreview() {
                 errorMessageResId = null,
                 logExpanded = false,
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
-                startTimeMark = MutableStateFlow(timeSource.markNow()),
+                start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(emptyList()),
                 onSetLogExpanded = {},
                 onSetErrorMessageResId = {},
@@ -344,7 +344,7 @@ private fun ErrorPreview() {
                 errorMessageResId = R.string.conversion_failed_missing_url,
                 logExpanded = false,
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
-                startTimeMark = MutableStateFlow(timeSource.markNow()),
+                start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(emptyList()),
                 onSetLogExpanded = {},
                 onSetErrorMessageResId = {},
@@ -366,7 +366,7 @@ private fun DarkErrorPreview() {
                 errorMessageResId = R.string.conversion_failed_missing_url,
                 logExpanded = false,
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
-                startTimeMark = MutableStateFlow(timeSource.markNow()),
+                start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(emptyList()),
                 onSetLogExpanded = {},
                 onSetErrorMessageResId = {},
@@ -393,7 +393,7 @@ private fun SubmittedPreview() {
             errorMessageResId = null,
             logExpanded = false,
             source = MutableStateFlow(source),
-            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             onSetLogExpanded = {},
             onSetErrorMessageResId = {},
@@ -419,7 +419,7 @@ private fun DarkSubmittedPreview() {
             errorMessageResId = null,
             logExpanded = false,
             source = MutableStateFlow(source),
-            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             onSetLogExpanded = {},
             onSetErrorMessageResId = {},
@@ -445,7 +445,7 @@ private fun SubmittedExpandedLogPreview() {
             errorMessageResId = null,
             logExpanded = true,
             source = MutableStateFlow(source),
-            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             onSetLogExpanded = {},
             onSetErrorMessageResId = {},
@@ -471,7 +471,7 @@ private fun DarkSubmittedExpandedLogPreview() {
             errorMessageResId = null,
             logExpanded = true,
             source = MutableStateFlow(source),
-            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             onSetLogExpanded = {},
             onSetErrorMessageResId = {},
@@ -495,7 +495,7 @@ private fun SubmittedShortTimePreview() {
             errorMessageResId = null,
             logExpanded = false,
             source = MutableStateFlow(source),
-            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource).take(1)),
             onSetLogExpanded = {},
             onSetErrorMessageResId = {},
@@ -519,7 +519,7 @@ private fun DarkSubmittedShortTimePreview() {
             errorMessageResId = null,
             logExpanded = false,
             source = MutableStateFlow(source),
-            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource).take(1)),
             onSetLogExpanded = {},
             onSetErrorMessageResId = {},
@@ -545,7 +545,7 @@ private fun SubmittedEmptyLogPreview() {
             errorMessageResId = null,
             logExpanded = false,
             source = MutableStateFlow(source),
-            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(emptyList()),
             onSetLogExpanded = {},
             onSetErrorMessageResId = {},
@@ -571,7 +571,7 @@ private fun DarkSubmittedEmptyLogPreview() {
             errorMessageResId = null,
             logExpanded = false,
             source = MutableStateFlow(source),
-            startTimeMark = MutableStateFlow(timeSource.markNow()),
+            start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(emptyList()),
             onSetLogExpanded = {},
             onSetErrorMessageResId = {},

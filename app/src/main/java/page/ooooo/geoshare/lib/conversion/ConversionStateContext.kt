@@ -65,12 +65,12 @@ class DefaultConversionStateContext(
         var i = 0
         while (i < MAX_ITERATIONS) {
             val newState = _currentState.value.transition(this) ?: break
-            log.d(TAG, "Transitioned to $newState")
+            log.d(TAG, "Transitioned state to $newState")
             setState(newState)
             i++
         }
         if (i >= MAX_ITERATIONS) {
-            throw IllegalStateException("Exceeded max state iterations")
+            throw IllegalStateException("Exceeded max transition iterations")
         }
     }
 

@@ -78,9 +78,9 @@ class FakeConversionStateContext(
     private var _stateLog: MutableStateFlow<List<ConversionStateLogItem>> = MutableStateFlow(emptyList())
     override val stateLog: StateFlow<List<ConversionStateLogItem>> = _stateLog.asStateFlow()
 
-    fun setState(newState: ConversionState, startTimeMark: ComparableTimeMark, resetLog: Boolean = false) {
+    fun setState(newState: ConversionState, start: ComparableTimeMark, resetLog: Boolean = false) {
         _currentState.value = newState
-        val newLogItem = ConversionStateLogItem(counter++, newState, startTimeMark)
+        val newLogItem = ConversionStateLogItem(counter++, newState, start)
         if (resetLog) {
             _stateLog.value = listOf(newLogItem)
         } else {

@@ -15,12 +15,12 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 @Composable
-fun ElapsedTimeText(startTimeMark: ComparableTimeMark) {
-    var elapsedTime by remember { mutableStateOf(startTimeMark.elapsedNow()) }
+fun ElapsedTimeText(start: ComparableTimeMark) {
+    var elapsedTime by remember { mutableStateOf(start.elapsedNow()) }
 
-    LaunchedEffect(startTimeMark) {
+    LaunchedEffect(start) {
         while (true) {
-            elapsedTime = startTimeMark.elapsedNow()
+            elapsedTime = start.elapsedNow()
             delay(100.milliseconds)
         }
     }
