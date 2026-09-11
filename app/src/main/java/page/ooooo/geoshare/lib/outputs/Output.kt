@@ -55,7 +55,7 @@ sealed interface PointOutput : Output {
     fun getDescription(value: Point, uriQuote: UriQuote = DefaultUriQuote): String? = null
 
     /**
-     * Whether this output can be executed for the given [value]. Outputs that return false are hidden from the UI.
+     * Returns true if the output can be executed for the given [value] and should be visible in the UI.
      */
     fun isAvailable(value: Point): Boolean = true
 
@@ -106,6 +106,11 @@ sealed interface PointsOutput : Output {
 
     @Suppress("SameReturnValue")
     fun getDescription(value: Points, uriQuote: UriQuote = DefaultUriQuote): String? = null
+
+    /**
+     * Returns true if the output can be executed for the given [value] and should be visible in the UI.
+     */
+    fun isAvailable(value: Points): Boolean = true
 
     /**
      * Output that takes a [Point] list.

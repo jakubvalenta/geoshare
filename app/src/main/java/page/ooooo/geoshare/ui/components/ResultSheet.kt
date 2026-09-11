@@ -110,7 +110,9 @@ fun ResultSheet(
                         null
                     },
                     appDetails = appDetails,
-                    actions = outputsForPoints.map { it.toAction(points) },
+                    actions = outputsForPoints
+                        .filter { it.isAvailable(points) }
+                        .map { it.toAction(points) },
                     value = points,
                     onClick = { action ->
                         hide()

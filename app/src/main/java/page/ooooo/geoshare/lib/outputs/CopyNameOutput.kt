@@ -9,9 +9,9 @@ import page.ooooo.geoshare.lib.geo.Point
 import javax.inject.Inject
 
 /**
- * Copies the name of the point (e.g. the name of a place or business parsed from the link) to the clipboard.
+ * Copies the name of the point to the clipboard.
  *
- * Only available when the point actually has a name, see [isAvailable].
+ * Only available when the point actually has a name.
  */
 class CopyNameOutput @Inject constructor() : CopyPointOutput {
     override fun getText(value: Point, uriQuote: UriQuote) =
