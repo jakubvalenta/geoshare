@@ -110,6 +110,7 @@ sealed interface PointsOutput : Output {
     /**
      * Returns true if the output can be executed for the given [value] and should be visible in the UI.
      */
+    @Suppress("SameReturnValue")
     fun isAvailable(value: Points): Boolean = true
 
     /**
