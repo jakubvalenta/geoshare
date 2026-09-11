@@ -214,8 +214,8 @@ object AutomationPreference : OptionsPreference<Automation> {
         listOf(
             CopyCoordsDecAutomation,
             CopyCoordsDegMinSecAutomation,
-            CopyGeoUriAutomation,
             CopyNameAutomation,
+            CopyGeoUriAutomation,
             ShareDisplayGeoUriAutomation,
             ShareNavigationGoogleUriAutomation,
             ShareStreetViewGoogleUriAutomation,

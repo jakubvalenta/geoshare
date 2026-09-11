@@ -34,8 +34,8 @@ class AutomationPreferenceTest {
                 listOf(
                     CopyCoordsDecAutomation,
                     CopyCoordsDegMinSecAutomation,
-                    CopyGeoUriAutomation,
                     CopyNameAutomation,
+                    CopyGeoUriAutomation,
                     ShareDisplayGeoUriAutomation,
                     ShareNavigationGoogleUriAutomation,
                     ShareStreetViewGoogleUriAutomation,
@@ -123,8 +123,8 @@ class AutomationPreferenceTest {
                 listOf(
                     CopyCoordsDecAutomation,
                     CopyCoordsDegMinSecAutomation,
-                    CopyGeoUriAutomation,
                     CopyNameAutomation,
+                    CopyGeoUriAutomation,
                     ShareDisplayGeoUriAutomation,
                     ShareNavigationGoogleUriAutomation,
                     ShareStreetViewGoogleUriAutomation,

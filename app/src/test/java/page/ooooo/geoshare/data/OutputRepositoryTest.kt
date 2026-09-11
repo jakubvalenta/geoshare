@@ -89,8 +89,8 @@ class OutputRepositoryTest {
             listOf(
                 CopyCoordsDecOutput(coordinateConverter),
                 CopyCoordsDegMinSecOutput(coordinateConverter),
-                CopyGeoUriOutput(coordinateConverter),
                 CopyNameOutput(),
+                CopyGeoUriOutput(coordinateConverter),
                 CopyLinkUriOutput(FakeAppleMapsDisplayLink, coordinateConverter),
                 CopyLinkUriOutput(FakeAppleMapsNavigationLink, coordinateConverter),
                 CopyLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter),
@@ -349,8 +349,8 @@ class OutputRepositoryTest {
                 listOf(
                     CopyCoordsDecOutput(coordinateConverter),
                     CopyCoordsDegMinSecOutput(coordinateConverter),
-                    CopyGeoUriOutput(coordinateConverter),
                     CopyNameOutput(),
+                    CopyGeoUriOutput(coordinateConverter),
                     ShareDisplayGeoUriOutput(coordinateConverter),
                     ShareNavigationGoogleUriOutput(coordinateConverter),
                     ShareStreetViewGoogleUriOutput(coordinateConverter),
@@ -399,8 +399,8 @@ class OutputRepositoryTest {
                 listOf(
                     CopyCoordsDecAutomation,
                     CopyCoordsDegMinSecAutomation,
-                    CopyGeoUriAutomation,
                     CopyNameAutomation,
+                    CopyGeoUriAutomation,
                     ShareDisplayGeoUriAutomation,
                     ShareNavigationGoogleUriAutomation,
                     ShareStreetViewGoogleUriAutomation,

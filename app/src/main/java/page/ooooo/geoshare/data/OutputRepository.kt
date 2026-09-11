@@ -82,8 +82,8 @@ class OutputRepository @Inject constructor(
         listOf(
             CopyCoordsDecOutput(coordinateConverter),
             CopyCoordsDegMinSecOutput(coordinateConverter),
-            CopyGeoUriOutput(coordinateConverter),
             CopyNameOutput(),
+            CopyGeoUriOutput(coordinateConverter),
             *links
                 .filter { it.sheetEnabled }
                 .groupBy { it.groupOrName }
