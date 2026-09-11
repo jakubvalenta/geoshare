@@ -39,7 +39,8 @@ class LinkBehaviorTest {
 
         // Tap copy link in the context menu
         scrollToLinkIcons()
-        onElement { viewIdResourceName == "geoShareAppLabel" && textAsString() == "My New Maps" }.longClick()
+        onElement { viewIdResourceName == "geoShareAppLabel" && textAsString() == "My New Maps" }
+            .longClick()
         onElement {
             viewIdResourceName == "geoShareAppOutput" && textAsString() in setOf(
                 "Copy My New Maps link",

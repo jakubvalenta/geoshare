@@ -203,6 +203,7 @@ class UserPreferencesBehaviorTest {
         shareUri()
 
         // Hide an app
+        quickWaitForStableInActiveWindow() // Wait for the result to render, to prevent stale element on Redmi 8
         onMainScrollablePane()
             .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareApp_${PackageNames.OSMAND_PLUS}" }
             .longClick()
