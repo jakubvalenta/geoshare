@@ -253,10 +253,10 @@ fastlane metadata
 
 ### Taking screenshots for F-Droid and Google Play listing
 
-1. Start an emulator of a device of type `phone`.
+1. Start a `Medium Phone` emulator.
 
-2. Install CoMaps and OsmAnd, so these apps appear on the screenshots on the
-   conversion result screen.
+2. Install CoMaps and OsmAnd, because these apps should appear on the
+   screenshots on the conversion result screen.
 
 3. Take the screenshots:
 
@@ -264,7 +264,22 @@ fastlane metadata
     SCREENGRAB_DEVICE_TYPE=phone fastlane screenshots
     ```
 
-Repeat the process for the `sevenInch` and `tenInch` device types.
+4. Repeat the process for a small tablet:
+
+    - Emulator: `Nexus 7` (portrait orientation)
+    - Command: `SCREENGRAB_DEVICE_TYPE=sevenInch fastlane screenshots`
+
+5. Repeat the process for a medium tablet:
+
+    - Emulator: `Medium Tablet` (landscape orientation)
+    - Command: `SCREENGRAB_DEVICE_TYPE=tenInch fastlane screenshots`
+
+6. Then install `optipng` and optimize all the screenshot PNG files:
+
+    ```shell
+    find ./fastlane/metadata/android/en-US/images -name '*.png' -exec optipng -preserve '{}' \;
+    find ./fastlane/metadata_pro/android/en-US/images -name '*.png' -exec optipng -preserve '{}' \;
+    ```
 
 ### Taking screenshots for documentation (Weblate translations)
 
