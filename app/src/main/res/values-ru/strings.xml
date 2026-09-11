@@ -350,4 +350,6 @@
     <string name="help_welcome_text">Уже есть готовая ссылка на карту? Введите её в поле ввода и нажмите «%1$s».</string>
     <string name="help_welcome_title">Добро пожаловать</string>
     <string name="faq_open_by_default_headline">Как всегда открывать ссылки в %1$s</string>
+    <string name="conversion_automation_copy_name_succeeded">Название автоматически скопировано</string>
+    <string name="conversion_succeeded_copy_name">Копировать название</string>
 </resources>
