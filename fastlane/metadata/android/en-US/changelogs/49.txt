@@ -1,1 +1,2 @@
+- Added the option to copy point name to clipboard.
 - Replaced intro screen with contextual help messages.
