@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.tests
 
+import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -59,9 +60,13 @@ class MainBehaviorTest {
         shareUri()
 
         // Help message OPEN_BY_DEFAULT is visible
+        onMainScrollablePane()
+            // Scroll by percents not to element, because it's more reliable due to the lazy list loading
+            .scroll(Direction.DOWN, 3f)
         onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.OPEN_BY_DEFAULT}" }
 
         // Help message SHARE_SOURCE is not visible
+        onMainScrollablePane().scroll(Direction.UP, 3f) // Scroll up to see the message
         assertNull(
             onElementOrNull(1_000) {
                 viewIdResourceName == "geoShareHelpMessage_${HelpMessage.SHARE_SOURCE}"
@@ -69,6 +74,9 @@ class MainBehaviorTest {
         )
 
         // Dismiss help message OPEN_BY_DEFAULT
+        onMainScrollablePane()
+            // Scroll by percents not to element, because it's more reliable due to the lazy list loading
+            .scroll(Direction.DOWN, 3f)
         dismissHelpMessage()
         quickWaitForStableInActiveWindow() // Wait for help message exit animation
         assertNull(
