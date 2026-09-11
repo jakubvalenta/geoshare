@@ -158,6 +158,9 @@ class ScreenshotsFreeBehaviorTest {
 
         // Help - Message - Open by default
         shareUri()
+        onMainScrollablePane()
+            // Scroll by percents not to element, because it's more reliable due to the lazy list loading
+            .scroll(Direction.DOWN, 3f)
         onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.OPEN_BY_DEFAULT}" }
         saveScreenshot("main_strings/help_message_open_by_default")
         dismissHelpMessage()
@@ -827,7 +830,7 @@ class ScreenshotsFreeBehaviorTest {
 
         // Preferences - Automation - Web maps
         onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
-            // Scroll by percent not to element, because scrolling to element is unreliable, due to the lazy list loading
+            // Scroll by percents not to element, because it's more reliable due to the lazy list loading
             .scroll(Direction.DOWN, 3f)
         saveScreenshot("main_strings/preferences_automation_web_maps")
         goBackToElement { viewIdResourceName == "geoShareUserPreferencesListPane" }
