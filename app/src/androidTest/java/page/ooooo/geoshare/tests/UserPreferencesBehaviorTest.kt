@@ -72,7 +72,7 @@ class UserPreferencesBehaviorTest {
     fun whenFinishIsAfterActionSucceeded_appClosesItselfAfterCopyingCoordinates() = uiAutomator {
         // Share a unique URI with the app
         val point = WGS84Point(NaivePoint.genRandomPoint())
-        sharePoint(point)
+        shareUri(point)
 
         // Shows result coordinates
         onElement {
@@ -136,7 +136,7 @@ class UserPreferencesBehaviorTest {
 
         // Share a unique URI with the app
         val point = WGS84Point(NaivePoint.genRandomPoint())
-        sharePoint(point)
+        shareUri(point)
 
         // Shows result coordinates
         onElement {
@@ -164,7 +164,7 @@ class UserPreferencesBehaviorTest {
         )
 
         // Share the URI with the app again
-        sharePoint(point)
+        shareUri(point)
 
         // Set finish preference to Never
         goToUserPreferencesDetail(UserPreferenceGroupId.FINISH)

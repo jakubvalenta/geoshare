@@ -180,7 +180,7 @@ class AutomationBehaviorTest {
 
         // Share a unique URI with the app
         val point = WGS84Point(NaivePoint.genRandomPoint())
-        sharePoint(point)
+        shareUri(point)
 
         // Insert or edit the test contact
         insertOrEditContact()

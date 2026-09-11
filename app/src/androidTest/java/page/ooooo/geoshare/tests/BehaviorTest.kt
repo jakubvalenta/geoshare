@@ -42,6 +42,7 @@ import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.calcExponentialBackoffMillis
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
+import page.ooooo.geoshare.lib.formatters.GeoUriFlavor
 import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
@@ -379,8 +380,8 @@ fun UiAutomatorTestScope.shareUri(unsafeUriString: String = "geo:52.47254,13.434
     )
 }
 
-fun UiAutomatorTestScope.sharePoint(point: WGS84Point) {
-    shareUri(GeoUriFormatter.formatGeoUriString(point))
+fun UiAutomatorTestScope.shareUri(point: WGS84Point) {
+    shareUri(GeoUriFormatter.formatGeoUriString(point, flavor = GeoUriFlavor.Best))
 }
 
 fun UiAutomatorTestScope.configureConnectionPermissionPreference(permission: Permission) {
@@ -421,6 +422,10 @@ fun UiAutomatorTestScope.testUriFails(
 fun UiAutomatorTestScope.setMainInput(unsafeText: String = "geo:52.47254,13.4345") {
     onElement { viewIdResourceName == "geoShareMainSourceTextField" }.setText(unsafeText)
     quickWaitForStableInActiveWindow() // Wait for the submit button to get its final position, after setting text
+}
+
+fun UiAutomatorTestScope.setMainInput(point: WGS84Point) {
+    setMainInput(GeoUriFormatter.formatGeoUriString(point, flavor = GeoUriFlavor.Best))
 }
 
 fun UiAutomatorTestScope.submitMainForm() {
@@ -552,6 +557,11 @@ fun UiAutomatorTestScope.launchNavigationInApp(@Suppress("SameParameterValue") p
 
 fun UiObject2.expandSheet() {
     swipe(Direction.UP, 1f)
+}
+
+fun UiObject2.collapseSheet() {
+    swipe(Direction.DOWN, 1f)
+    swipe(Direction.DOWN, 1f)
 }
 
 fun UiObject2.longScrollSheet(direction: Direction = Direction.DOWN) {

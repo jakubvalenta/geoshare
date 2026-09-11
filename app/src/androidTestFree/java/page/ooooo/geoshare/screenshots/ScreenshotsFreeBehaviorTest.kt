@@ -16,6 +16,7 @@ import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyLinkUriAutomation
+import page.ooooo.geoshare.data.local.preferences.CopyNameAutomation
 import page.ooooo.geoshare.data.local.preferences.DynamicColorPreference
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
@@ -26,10 +27,13 @@ import page.ooooo.geoshare.data.local.preferences.SendPointAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareRouteGpxAutomation
 import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.Srs
+import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.InputGroupId
 import page.ooooo.geoshare.tests.assumeDomainResolvable
 import page.ooooo.geoshare.tests.chooseFile
+import page.ooooo.geoshare.tests.collapseSheet
 import page.ooooo.geoshare.tests.confirmDialog
 import page.ooooo.geoshare.tests.disableSystemUIDemoMode
 import page.ooooo.geoshare.tests.dismissDialog
@@ -120,7 +124,8 @@ class ScreenshotsFreeBehaviorTest {
 
         // 3. Test all other screens in alphabetical order
         testAbout()
-        testAutomation()
+        testAutomationCopyAndSave()
+        testAutomationOpen()
         testAutomationShare()
         testFaq()
         testConversionErrors()
@@ -130,6 +135,7 @@ class ScreenshotsFreeBehaviorTest {
         testConversionResultAppsOsmAnd()
         testConversionResultChecks()
         testConversionResultLocation()
+        testConversionResultPointName()
         testConversionResultPoints()
         testMain()
         testInputs()
@@ -194,11 +200,7 @@ class ScreenshotsFreeBehaviorTest {
         goBackToMainForm()
     }
 
-    fun testAutomation() = uiAutomator {
-        if (!isAppInstalled(PackageNames.GOOGLE_MAPS)) {
-            return@uiAutomator
-        }
-
+    fun testAutomationCopyAndSave() = uiAutomator {
         // Automation - Copy coordinates - Success
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
         scrollToAutomationItem(CopyCoordsDecAutomation).click()
@@ -209,16 +211,15 @@ class ScreenshotsFreeBehaviorTest {
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/automation_copy_coords_success")
 
-        // Automation - Open app - Waiting
+        // Automation - Copy name - Success
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
-        scrollToAutomationItem(OpenDisplayGeoUriAutomation(PackageNames.GOOGLE_MAPS)).click()
+        scrollToAutomationItem(CopyNameAutomation).click()
         goBackToMainForm()
-        setMainInput()
+        setMainInput(WGS84Point(52.47254, 13.4345, name = "Marked Location", source = Source.GENERATED))
         submitMainForm()
-        onElement { viewIdResourceName == "geoShareResultAutomationCounter" }
+        onElement(pollIntervalMs = 50) { viewIdResourceName == "geoShareResultMessageSuccess" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("main_strings/automation_open_app_waiting")
-        onElement { viewIdResourceName == "geoShareResultAutomationCancel" }.click()
+        saveScreenshot("main_strings/automation_copy_name_success")
 
         // Automation - Copy link - Success
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
@@ -244,6 +245,29 @@ class ScreenshotsFreeBehaviorTest {
         chooseFile()
         onElement(pollIntervalMs = 50) { viewIdResourceName == "geoShareResultMessageSuccess" }
         saveScreenshot("main_strings/automation_save_gpx_success")
+
+        // Reset automation
+        goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
+        scrollToAutomationItem(NoopAutomation).click()
+
+        goBackToMainForm()
+    }
+
+    fun testAutomationOpen() = uiAutomator {
+        if (!isAppInstalled(PackageNames.GOOGLE_MAPS)) {
+            return@uiAutomator
+        }
+
+        // Automation - Open app - Waiting
+        goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
+        scrollToAutomationItem(OpenDisplayGeoUriAutomation(PackageNames.GOOGLE_MAPS)).click()
+        goBackToMainForm()
+        setMainInput()
+        submitMainForm()
+        onElement { viewIdResourceName == "geoShareResultAutomationCounter" }
+        quickWaitForStableInActiveWindow()
+        saveScreenshot("main_strings/automation_open_app_waiting")
+        onElement { viewIdResourceName == "geoShareResultAutomationCancel" }.click()
 
         // Reset automation
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
@@ -506,6 +530,20 @@ class ScreenshotsFreeBehaviorTest {
         goBackToMainForm()
     }
 
+    fun testConversionResultPointName() = uiAutomator {
+        shareUri(WGS84Point(52.47254, 13.4345, name = "Marked Location", source = Source.GENERATED))
+
+        // Conversion - Result - Sheet - Page 1 name
+        onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
+        val sheet = onElement { viewIdResourceName == "geoShareResultSheet" }
+        sheet.expandSheet()
+        quickWaitForStableInActiveWindow()
+        saveScreenshot("main_strings/conversion_result_sheet_page_1_name")
+        sheet.collapseSheet()
+
+        goBackToMainForm()
+    }
+
     fun testConversionResultPoints() = uiAutomator {
         if (!isAppInstalled(PackageNames.GOOGLE_MAPS)) {
             return@uiAutomator
@@ -523,13 +561,7 @@ class ScreenshotsFreeBehaviorTest {
         onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
         onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
             expandSheet()
-            scrollToSheetItem(Direction.UP) {
-                textAsString() in setOf(
-                    "Copy coordinates",
-                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Copier les coordonnées",
-                )
-            }
-                .click()
+            scrollToSheetItem(Direction.DOWN) { textAsString() == "Copy coordinates" }.click()
         }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_message_copy_success")
@@ -543,23 +575,12 @@ class ScreenshotsFreeBehaviorTest {
 
         // Conversion - Result - Sheet - Page 2
         sheet.longScrollSheet() // Speed up scrolling to the item, which is at the bottom of the sheet
-        sheet.scrollToSheetItem {
-            textAsString() in setOf(
-                "Save to contact",
-                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Enregistrer dans les contacts",
-            )
-        }
+        sheet.scrollToSheetItem { textAsString() == "Save to contact" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_sheet_page_2")
 
         // Conversion - Result - Save GPX - File chooser
-        sheet.onSheetItem {
-            textAsString() in setOf(
-                "Save GPX route",
-                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Enregistrer l’itinéraire GPX",
-            )
-        }
-            .click()
+        sheet.onSheetItem { textAsString() == "Save GPX route" }.click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_save_gpx_file_chooser")
 
