@@ -336,4 +336,5 @@
     <string name="faq_open_by_default_headline">Как всегда открывать ссылки в %1$s</string>
     <string name="conversion_automation_copy_name_succeeded">Название автоматически скопировано</string>
     <string name="conversion_succeeded_copy_name">Копировать название</string>
+    <string name="conversion_processing">Обработка ссылки формата %1$s…</string>
 </resources>
