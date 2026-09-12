@@ -60,7 +60,9 @@ import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Message
-import page.ooooo.geoshare.lib.android.AndroidTools
+import page.ooooo.geoshare.lib.android.composeEmail
+import page.ooooo.geoshare.lib.android.hasEmailApp
+import page.ooooo.geoshare.lib.android.openUriInDefaultApp
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingOffers
 import page.ooooo.geoshare.lib.billing.BillingProduct
@@ -394,7 +396,7 @@ private fun BillingLegalText(onConsumePurchases: () -> Unit) {
     val context = LocalContext.current
     val supportEmail = stringResource(R.string.about_support_email)
     val termsUrl = stringResource(R.string.about_terms_url)
-    val emailClickEnabled = AndroidTools.hasEmailApp(context)
+    val emailClickEnabled = context.packageManager.hasEmailApp()
 
     CompositionLocalProvider(
         LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant,
@@ -408,7 +410,7 @@ private fun BillingLegalText(onConsumePurchases: () -> Unit) {
             Text(
                 stringResource(R.string.billing_terms_of_service),
                 Modifier.clickable {
-                    AndroidTools.openWebUri(context, termsUrl)
+                    context.openUriInDefaultApp(termsUrl)
                 },
                 textDecoration = TextDecoration.Underline,
             )
@@ -417,7 +419,7 @@ private fun BillingLegalText(onConsumePurchases: () -> Unit) {
                 Text(
                     supportEmail,
                     Modifier.clickable(enabled = emailClickEnabled) {
-                        AndroidTools.composeEmail(context, supportEmail)
+                        context.composeEmail(supportEmail)
                     },
                     textDecoration = if (emailClickEnabled) TextDecoration.Underline else null,
                 )

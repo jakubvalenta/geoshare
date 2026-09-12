@@ -41,8 +41,10 @@ import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.android.openSettingsOpenByDefault
+import page.ooooo.geoshare.lib.android.openSettingsOpenByDefaultForPackage
+import page.ooooo.geoshare.lib.android.openUriInDefaultApp
 import page.ooooo.geoshare.ui.components.ExpandablePane
 import page.ooooo.geoshare.ui.components.FormatArg
 import page.ooooo.geoshare.ui.components.NavigationBackButton
@@ -85,10 +87,10 @@ fun FaqScreen(
         onBack = onBack,
         onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
         onShowOpenByDefaultSettings = {
-            AndroidTools.showOpenByDefaultSettings(context, settingsLauncher)
+            context.openSettingsOpenByDefault(settingsLauncher)
         },
         onShowOpenByDefaultSettingsForPackage = { packageName ->
-            AndroidTools.showOpenByDefaultSettingsForPackage(context, settingsLauncher, packageName)
+            context.openSettingsOpenByDefaultForPackage(settingsLauncher, packageName)
         }
     )
 }
@@ -204,7 +206,7 @@ private fun FaqScreen(
                         FormatArg.Text(appName),
                         FormatArg.Text(appServerName),
                         FormatArg.Link(appServerName) {
-                            AndroidTools.openWebUri(context, appServerUrl)
+                            context.openUriInDefaultApp(appServerUrl)
                         },
                     )
                 )

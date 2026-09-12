@@ -53,7 +53,10 @@ class ConversionViewModelTest {
     )
     private val linkRepository = FakeLinkRepository()
     private val log = FakeLog
-    private val outputRepository = OutputRepository(coordinateConverter)
+    private val outputRepository = OutputRepository(
+        coordinateConverter = coordinateConverter,
+        log = log,
+    )
     private val savedStateHandle = SavedStateHandle()
     private val source = "https://maps.google.com/foo"
     private val timeSource = TestTimeSource()

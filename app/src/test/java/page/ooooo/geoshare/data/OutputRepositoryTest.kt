@@ -42,6 +42,7 @@ import page.ooooo.geoshare.data.local.preferences.ShareNavigationGoogleUriAutoma
 import page.ooooo.geoshare.data.local.preferences.SharePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareRouteGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareStreetViewGoogleUriAutomation
+import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.android.App
 import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.PackageNames
@@ -79,8 +80,10 @@ class OutputRepositoryTest {
     private val mockContext: Context = mock {}
     private val geometries = Geometries(mockContext)
     private val coordinateConverter = CoordinateConverter(geometries)
+    private val log = DefaultLog
     private val outputRepository = OutputRepository(
         coordinateConverter = coordinateConverter,
+        log = log,
     )
 
     @Test
@@ -131,8 +134,8 @@ class OutputRepositoryTest {
                     OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter),
                     OpenNavigationGoogleUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter),
                     OpenStreetViewGoogleUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter),
-                    OpenRouteGpxOutput(PackageNames.GOOGLE_MAPS, coordinateConverter),
-                    OpenPointsGpxOutput(PackageNames.GOOGLE_MAPS, coordinateConverter),
+                    OpenRouteGpxOutput(PackageNames.GOOGLE_MAPS, coordinateConverter, log),
+                    OpenPointsGpxOutput(PackageNames.GOOGLE_MAPS, coordinateConverter, log),
                 ),
                 PackageNames.CARTES_IGN to listOf(
                     OpenDisplayCartesIGNUrlOutput(PackageNames.CARTES_IGN, coordinateConverter),
@@ -145,7 +148,7 @@ class OutputRepositoryTest {
                     SendPointOutput(PackageNames.SIGNAL, coordinateConverter),
                 ),
                 PackageNames.TOMTOM to listOf(
-                    OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter),
+                    OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter, log),
                 ),
                 "${PackageNames.TEST}.empty" to emptyList(),
             ),
@@ -195,7 +198,7 @@ class OutputRepositoryTest {
                     OpenDisplayGeoUriOutput(PackageNames.TEST, coordinateConverter)
                 ),
                 PackageNames.TOMTOM to listOf(
-                    OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter),
+                    OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter, log),
                 ),
             ),
             outputRepository.getOutputsForApps(
@@ -368,7 +371,7 @@ class OutputRepositoryTest {
                     OpenDisplayMagicEarthUriOutput(PackageNames.MAGIC_EARTH, coordinateConverter),
                     OpenNavigationMagicEarthUriOutput(PackageNames.MAGIC_EARTH, coordinateConverter),
                     SendPointOutput(PackageNames.SIGNAL, coordinateConverter),
-                    OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter),
+                    OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter, log),
                     OpenDisplayGeoUriOutput(PackageNames.TEST, coordinateConverter),
                 ),
                 listOf(
@@ -470,7 +473,7 @@ class OutputRepositoryTest {
                 OpenDisplayGeoUriOutput(PackageNames.TEST, coordinateConverter),
                 OpenNavigationGoogleUriOutput(PackageNames.TEST, coordinateConverter),
                 OpenStreetViewGoogleUriOutput(PackageNames.TEST, coordinateConverter),
-                OpenRouteOnePointGpxOutput(PackageNames.TEST, coordinateConverter),
+                OpenRouteOnePointGpxOutput(PackageNames.TEST, coordinateConverter, log),
                 OpenNavigationMagicEarthUriOutput(PackageNames.TEST, coordinateConverter),
                 SavePointsGpxOutput(coordinateConverter),
                 ShareDisplayGeoUriOutput(coordinateConverter),

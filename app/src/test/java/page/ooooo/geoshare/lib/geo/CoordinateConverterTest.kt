@@ -5,8 +5,8 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.extensions.toScale
 import kotlin.math.roundToLong
 
-class CoordinateConverterTest : GeoTest {
-    private val coordinateConverter = CoordinateConverter(mockGeometries())
+class CoordinateConverterTest {
+    private val coordinateConverter = CoordinateConverter(mockGeometries)
 
     private data class PointInDifferentSrs(
         val name: String,

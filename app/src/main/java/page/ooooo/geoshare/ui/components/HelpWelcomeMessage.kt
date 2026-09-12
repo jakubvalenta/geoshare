@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
-import page.ooooo.geoshare.lib.android.AndroidTools
+import page.ooooo.geoshare.lib.android.copy
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -58,7 +58,7 @@ fun HelpWelcomeMessage(
         onAction = {
             exampleSource?.let { exampleSource ->
                 coroutineScope.launch {
-                    AndroidTools.copyToClipboard(clipboard, exampleSource)
+                    clipboard.copy(exampleSource)
                 }
             }
         },

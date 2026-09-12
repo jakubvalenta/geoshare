@@ -5,8 +5,8 @@ import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.insertOrEditContactAddress
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
@@ -24,8 +24,7 @@ class SavePointToContactOutput @Inject constructor(
     Output.HasAutomationErrorText {
 
     override suspend fun execute(value: Point, actionContext: ActionContext) =
-        AndroidTools.insertOrEditContactAddress(
-            actionContext.context,
+        actionContext.context.insertOrEditContactAddress(
             CoordinateFormatter.formatDecCoords(
                 coordinateConverter.toWGS84(value)
             ),

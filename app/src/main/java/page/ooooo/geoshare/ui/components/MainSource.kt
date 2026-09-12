@@ -44,7 +44,8 @@ import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.local.preferences.Permission
-import page.ooooo.geoshare.lib.android.AndroidTools
+import page.ooooo.geoshare.lib.android.copy
+import page.ooooo.geoshare.lib.android.paste
 import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.ConversionSucceeded
 import page.ooooo.geoshare.lib.conversion.ExtendedConversionStateLogItem
@@ -114,7 +115,7 @@ fun MainSource(
                     } else {
                         IconButton({
                             coroutineScope.launch {
-                                onSetSource(AndroidTools.pasteFromClipboard(clipboard))
+                                onSetSource(clipboard.paste())
                                 onSetErrorMessageResId(null)
                             }
                         }) {
@@ -146,7 +147,7 @@ fun MainSource(
                 ThinButton(
                     {
                         coroutineScope.launch {
-                            AndroidTools.copyToClipboard(clipboard, source)
+                            clipboard.copy(source)
                         }
                     },
                     Modifier.weight(1f),

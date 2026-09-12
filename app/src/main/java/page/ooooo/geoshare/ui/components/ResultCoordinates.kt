@@ -44,6 +44,7 @@ import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
+import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
@@ -314,8 +315,10 @@ private fun DefaultPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
+                log = log,
             )
             ResultCoordinates(
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
@@ -340,8 +343,10 @@ private fun DarkPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
+                log = log,
             )
             ResultCoordinates(
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
@@ -366,8 +371,10 @@ private fun DescriptionPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
+                log = log,
             )
             ResultCoordinates(
                 points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI)),
@@ -407,8 +414,10 @@ private fun DarkDescriptionPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
+                log = log,
             )
             ResultCoordinates(
                 points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI)),
@@ -448,8 +457,10 @@ private fun NamePreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
+                log = log,
             )
             ResultCoordinates(
                 points = persistentListOf(
@@ -477,8 +488,10 @@ private fun DarkNamePreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
+                log = log,
             )
             ResultCoordinates(
                 points = persistentListOf(
@@ -506,8 +519,10 @@ private fun PointsPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
+                log = log,
             )
             ResultCoordinates(
                 points = persistentListOf(
@@ -541,8 +556,10 @@ private fun DarkPointsPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
+                log = log,
             )
             ResultCoordinates(
                 points = persistentListOf(
@@ -576,8 +593,10 @@ private fun PointsWithNamePreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
+                log = log,
             )
             ResultCoordinates(
                 points = persistentListOf(
@@ -611,8 +630,10 @@ private fun DarkPointsWithNamePreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
+                log = log,
             )
             ResultCoordinates(
                 points = persistentListOf(

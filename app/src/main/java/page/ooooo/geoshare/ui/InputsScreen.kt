@@ -46,7 +46,8 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeInputRepository
-import page.ooooo.geoshare.lib.android.AndroidTools
+import page.ooooo.geoshare.lib.android.isDefaultHandlerEnabled
+import page.ooooo.geoshare.lib.android.openSettingsOpenByDefault
 import page.ooooo.geoshare.lib.extensions.trimUrl
 import page.ooooo.geoshare.lib.inputs.InputChangelogItem
 import page.ooooo.geoshare.lib.inputs.InputGroup
@@ -189,7 +190,7 @@ private fun InputsListPane(
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     InputsSettingsButton {
-                        AndroidTools.showOpenByDefaultSettings(context, settingsLauncher)
+                        context.openSettingsOpenByDefault(settingsLauncher)
                     }
                 }
             }
@@ -251,7 +252,7 @@ private fun getChangelogDetails(
         ChangelogItemDetails(
             changelogItem,
             if (changelogItem is InputChangelogItem.Url) {
-                AndroidTools.isDefaultHandlerEnabled(packageManager, changelogItem.urlString)
+                packageManager.isDefaultHandlerEnabled(changelogItem.urlString)
             } else {
                 null
             },
@@ -303,7 +304,7 @@ private fun InputsDetailPane(
         }
         item {
             InputsSettingsButton(Modifier.padding(horizontal = spacing.windowPadding)) {
-                AndroidTools.showOpenByDefaultSettings(context, settingsLauncher)
+                context.openSettingsOpenByDefault(settingsLauncher)
             }
         }
         item {

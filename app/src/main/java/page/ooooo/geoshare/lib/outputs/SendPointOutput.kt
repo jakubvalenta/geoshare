@@ -7,6 +7,7 @@ import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.sendTextViaApp
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
@@ -34,7 +35,7 @@ class SendPointOutput @Inject constructor(
 
     override suspend fun execute(value: Point, actionContext: ActionContext) =
         getText(value, actionContext.uriQuote)?.let { text ->
-            actionContext.androidTools.sendViaApp(actionContext.context, packageName, text)
+            actionContext.context.sendTextViaApp(text, packageName)
         }.let { success -> if (success == true) ActionResult.SUCCEEDED_AND_OPENED_APP else ActionResult.FAILED }
 
     @Composable

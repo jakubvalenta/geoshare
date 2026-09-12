@@ -3,66 +3,28 @@ package page.ooooo.geoshare.lib.outputs
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.doThrow
-import org.mockito.kotlin.eq
-import org.mockito.kotlin.mock
+import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
-import page.ooooo.geoshare.lib.geo.GeoTest
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import java.io.File
-import kotlin.io.path.createTempDirectory
+import page.ooooo.geoshare.lib.geo.mockGeometries
 
-class OpenPointsGpxOutputTest : GeoTest {
-    private val geometries = mockGeometries()
-    private val coordinateConverter = CoordinateConverter(geometries)
-
-    private fun mockActionContext(parentDir: File): ActionContext =
-        ActionContext(
-            context = mock {
-                on { filesDir } doReturn parentDir
-            },
-            clipboard = mock {},
-            resources = mock {},
-            androidTools = mock {
-                on { openApp(any(), any(), any()) } doThrow NotImplementedError()
-                on { openAppFile(any(), any(), any()) } doThrow NotImplementedError()
-                on { openAppFile(any(), eq(PackageNames.TEST), any()) } doReturn true
-                on { openChooser(any(), any()) } doThrow NotImplementedError()
-                on { openChooserFile(any(), any()) } doThrow NotImplementedError()
-            },
-        )
+class OpenPointsGpxOutputTest {
+    private val coordinateConverter = CoordinateConverter(mockGeometries)
+    private val log = FakeLog
 
     @Test
-    fun execute_pointsHasThreePoints_writesGpxPoints() = runTest {
+    fun write_whenPointsContainThreePoints_writesGpxWaypoints() = runTest {
+        val stringBuilder = StringBuilder()
         val points = persistentListOf(
             WGS84Point(3.0, 4.0, source = Source.GENERATED),
             WGS84Point(5.0, 6.0, name = "My waypoint", source = Source.GENERATED),
             WGS84Point(1.0, 2.0, name = "My destination", source = Source.GENERATED),
         )
-        val parentDir = createTempDirectory().toFile()
-        val childDir = File(parentDir, "points")
-        childDir.mkdirs()
-        val oldFile = File(childDir, "000.xml")
-        oldFile.writeText("<gpx></gpx>")
-        assertEquals(
-            setOf(oldFile.path),
-            childDir.listFiles()?.map { it.path }?.toSet(),
-        )
-        val actionResult = OpenPointsGpxOutput(PackageNames.TEST, coordinateConverter).execute(
-            value = points,
-            actionContext = mockActionContext(parentDir),
-        )
-        assertEquals(ActionResult.SUCCEEDED_AND_OPENED_APP, actionResult)
-        val resFiles = childDir.listFiles()
-        assertEquals(1, resFiles?.size)
-        val resFile = resFiles?.first()
-        assertFalse(resFile?.path == oldFile.path)
+        val output = OpenPointsGpxOutput(PackageNames.TEST, coordinateConverter, log)
+        output.write(points, stringBuilder)
         assertEquals(
             """<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1"
@@ -77,7 +39,7 @@ class OpenPointsGpxOutputTest : GeoTest {
 </wpt>
 </gpx>
 """,
-            resFile?.readText(),
+            stringBuilder.toString(),
         )
     }
 

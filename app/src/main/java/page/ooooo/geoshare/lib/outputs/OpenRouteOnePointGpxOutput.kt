@@ -5,7 +5,9 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.openFileInApp
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
@@ -22,23 +24,24 @@ import javax.inject.Inject
 class OpenRouteOnePointGpxOutput @Inject constructor(
     val packageName: String,
     private val coordinateConverter: CoordinateConverter,
+    private val log: Log,
 ) :
     PointOutput.WithLocation,
     Output.HasErrorText,
     Output.HasAutomationDelay,
     Output.HasAutomationErrorText {
 
-    override suspend fun execute(
-        location: Point?,
-        value: Point,
-        actionContext: ActionContext,
-    ) =
+    fun write(location: Point, value: Point, writer: Appendable) {
+        GpxFormatter.writeGpxRoute(coordinateConverter.toWGS84(persistentListOf(location, value)), writer)
+    }
+
+    override suspend fun execute(location: Point?, value: Point, actionContext: ActionContext) =
         location?.let { location ->
             // Don't use a .gpx extension but use .xml instead, because that's what TomTom requires
             writeFile(actionContext.context.filesDir, "routes", "${System.currentTimeMillis()}.xml") {
-                GpxFormatter.writeGpxRoute(coordinateConverter.toWGS84(persistentListOf(location, value)), this)
+                write(location, value, this)
             }?.let { file ->
-                actionContext.androidTools.openAppFile(actionContext.context, packageName, file)
+                actionContext.context.openFileInApp(file, packageName, log)
             }
         }.let { success -> if (success == true) ActionResult.SUCCEEDED_AND_OPENED_APP else ActionResult.FAILED }
 
