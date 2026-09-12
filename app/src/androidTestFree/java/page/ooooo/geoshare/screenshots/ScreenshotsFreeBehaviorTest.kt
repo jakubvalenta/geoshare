@@ -157,10 +157,10 @@ class ScreenshotsFreeBehaviorTest {
 
         // Help - Message - Open by default
         shareUri()
-        onMainScrollablePane()
-            // Scroll by percents not to element, because it's more reliable due to the lazy list loading
-            .scroll(Direction.DOWN, 3f)
-        onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.OPEN_BY_DEFAULT}" }
+        quickWaitForStableInActiveWindow() // Wait for the result to render, to prevent stale element error
+        onMainScrollablePane().scrollToElement(Direction.DOWN) {
+            viewIdResourceName == "geoShareHelpMessage_${HelpMessage.OPEN_BY_DEFAULT}"
+        }
         saveScreenshot("main_strings/help_message_open_by_default")
         onElement { viewIdResourceName == "geoShareHelpMessageDismiss_${HelpMessage.OPEN_BY_DEFAULT}" }.click()
 
