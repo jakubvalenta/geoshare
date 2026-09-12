@@ -99,45 +99,50 @@ suspend fun PackageManager.queryAppDetails(packageNames: Iterable<String>): AppD
     }
 
 /**
- * Query package manager for labels and icons of apps that can open [uriString].
+ * Query package manager for package names of apps that can open [uriString].
  */
-suspend fun PackageManager.queryAppDetailsForUri(uriString: String): AppDetails =
-    queryAppDetails(
-        uriString.toUri().let { uri ->
+fun PackageManager.queryAppsForUri(uriString: String): Apps =
+    uriString.toUri().let { uri ->
+        // Use flag MATCH_ALL, so that all apps are returned, even if GeoShare is set to open the URI by default
+        if (uri.scheme != null) {
             queryPackageNames(
-                if (uri.scheme != null) {
-                    Intent(Intent.ACTION_VIEW, uri)
-                } else {
-                    Intent(Intent.ACTION_SEND).apply {
-                        putExtra(Intent.EXTRA_TEXT, uriString)
-                    }
-                },
-                // Pass MATCH_ALL, so that all apps are returned, even if GeoShare is set to open the URI by default
+                Intent(Intent.ACTION_VIEW, uri),
                 flags = PackageManager.MATCH_ALL,
             )
+                .associateWith { packageName -> App(packageName, setOf(DataType.VIEW_URI)) }
+        } else {
+            queryPackageNames(
+                Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                },
+                flags = PackageManager.MATCH_ALL,
+            )
+                .associateWith { packageName -> App(packageName, setOf(DataType.SEND_PLAIN_TEXT)) }
         }
-    )
+    }
 
 private fun PackageManager.queryPackageNames(
     intent: Intent,
     flags: Int = PackageManager.MATCH_DEFAULT_ONLY,
-): List<String> {
+): Set<String> {
     val resolveInfos = try {
         queryIntentActivities(intent, flags)
     } catch (e: Exception) {
         Log.e(TAG, "Error when querying installed apps", e)
-        return emptyList()
+        return emptySet()
     }
-    return resolveInfos.mapNotNull { resolveInfo ->
-        val packageName = try {
-            resolveInfo.activityInfo.packageName
-        } catch (e: Exception) {
-            Log.e(TAG, "Error when loading info about an installed app", e)
-            null
+    return resolveInfos
+        .mapNotNull { resolveInfo ->
+            val packageName = try {
+                resolveInfo.activityInfo.packageName
+            } catch (e: Exception) {
+                Log.e(TAG, "Error when loading info about an installed app", e)
+                null
+            }
+            // Exclude GeoShare itself and all its build flavors
+            packageName?.takeUnless { it == PackageNames.GEOSHARE || it.startsWith(PackageNames.GEOSHARE_PREFIX) }
         }
-        // Exclude GeoShare itself and all its build flavors
-        packageName?.takeUnless { it == PackageNames.GEOSHARE || it.startsWith(PackageNames.GEOSHARE_PREFIX) }
-    }
+        .toSet()
 }
 
 fun PackageManager.isDefaultHandlerEnabled(uriString: String): Boolean {

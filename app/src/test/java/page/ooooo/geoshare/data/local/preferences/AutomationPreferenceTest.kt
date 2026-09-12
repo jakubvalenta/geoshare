@@ -97,15 +97,23 @@ class AutomationPreferenceTest {
                         PackageNames.MAGIC_EARTH to AppDetail(
                             packageName = PackageNames.MAGIC_EARTH,
                             label = "Magic Earth",
-                            mock()
+                            icon = mock(),
                         ),
-                        PackageNames.SIGNAL to AppDetail(packageName = PackageNames.SIGNAL, label = "Signal", mock()),
+                        PackageNames.SIGNAL to AppDetail(
+                            packageName = PackageNames.SIGNAL,
+                            label = "Signal",
+                            icon = mock(),
+                        ),
                         PackageNames.TEST to AppDetail(
                             packageName = PackageNames.TEST,
                             label = "ZZZ sort last",
-                            mock()
+                            icon = mock(),
                         ),
-                        PackageNames.TOMTOM to AppDetail(packageName = PackageNames.TOMTOM, label = "TomTom", mock()),
+                        PackageNames.TOMTOM to AppDetail(
+                            packageName = PackageNames.TOMTOM,
+                            label = "TomTom",
+                            icon = mock(),
+                        ),
                     ),
                     hiddenApps = emptySet(),
                     links = defaultFakeLinks,
@@ -159,14 +167,18 @@ class AutomationPreferenceTest {
                         PackageNames.MAGIC_EARTH to AppDetail(
                             packageName = PackageNames.MAGIC_EARTH,
                             label = "Magic Earth",
-                            mock()
+                            icon = mock(),
                         ),
                         PackageNames.TEST to AppDetail(
                             packageName = PackageNames.TEST,
                             label = "ZZZ sort last",
-                            mock()
+                            icon = mock(),
                         ),
-                        PackageNames.TOMTOM to AppDetail(packageName = PackageNames.TOMTOM, label = "TomTom", mock()),
+                        PackageNames.TOMTOM to AppDetail(
+                            packageName = PackageNames.TOMTOM,
+                            label = "TomTom",
+                            icon = mock(),
+                        ),
                     ),
                     hiddenApps = setOf(PackageNames.MAGIC_EARTH),
                     links = emptyList(),
@@ -206,10 +218,18 @@ class AutomationPreferenceTest {
                 PackageNames.MAGIC_EARTH to AppDetail(
                     packageName = PackageNames.MAGIC_EARTH,
                     label = "Magic Earth",
-                    mock()
+                    icon = mock(),
                 ),
-                PackageNames.TEST to AppDetail(packageName = PackageNames.TEST, label = "ZZZ sort last", mock()),
-                PackageNames.TOMTOM to AppDetail(packageName = PackageNames.TOMTOM, label = "TomTom", mock()),
+                PackageNames.TEST to AppDetail(
+                    packageName = PackageNames.TEST,
+                    label = "ZZZ sort last",
+                    icon = mock(),
+                ),
+                PackageNames.TOMTOM to AppDetail(
+                    packageName = PackageNames.TOMTOM,
+                    label = "TomTom",
+                    icon = mock(),
+                ),
             ),
             hiddenApps = emptySet(),
             links = defaultFakeLinks,

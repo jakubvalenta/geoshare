@@ -9,4 +9,5 @@ enum class DataType {
     GPX_ONE_POINT_DATA,
     MAGIC_EARTH_URI,
     SEND_PLAIN_TEXT,
+    VIEW_URI, // TODO We use this value to mark apps that can open any a source link that is a URI; it feels wrong
 }

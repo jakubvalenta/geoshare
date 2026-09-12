@@ -303,52 +303,52 @@ fun fakeAppDetails(
     PackageNames.COMAPS_FDROID to AppDetail(
         packageName = PackageNames.COMAPS_FDROID,
         label = "CoMaps",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
     ),
     PackageNames.CONVERSATIONS to AppDetail(
         packageName = PackageNames.CONVERSATIONS,
         label = "Conversations",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
     ),
     PackageNames.ORGANIC_MAPS to AppDetail(
         packageName = PackageNames.ORGANIC_MAPS,
         label = "Organic Maps",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
     ),
     PackageNames.HERE_WEGO to AppDetail(
         packageName = PackageNames.HERE_WEGO,
         label = "HERE WeGo",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
     ),
     PackageNames.MAPY_COM to AppDetail(
         packageName = PackageNames.MAPY_COM,
         label = "Mapy.com",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
     ),
     PackageNames.OSMAND_PLUS to AppDetail(
         packageName = PackageNames.OSMAND_PLUS,
         label = "OsmAnd",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
     ),
     PackageNames.MAGIC_EARTH to AppDetail(
         packageName = PackageNames.MAGIC_EARTH,
         label = "Magic Earth",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
     ),
     PackageNames.GOOGLE_MAPS to AppDetail(
         packageName = PackageNames.GOOGLE_MAPS,
         label = "Google Maps",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
     ),
     PackageNames.GMAPS_WV to AppDetail(
         packageName = PackageNames.GMAPS_WV,
         label = @Suppress("SpellCheckingInspection", "GrazieInspectionRunner") "GMaps WV",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
     ),
     PackageNames.TOMTOM to AppDetail(
         packageName = PackageNames.TOMTOM,
         label = "TomTom",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!
+        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
     ),
 )
 
