@@ -102,14 +102,28 @@ suspend fun PackageManager.queryAppDetails(packageNames: Iterable<String>): AppD
  * Query package manager for labels and icons of apps that can open [uriString].
  */
 suspend fun PackageManager.queryAppDetailsForUri(uriString: String): AppDetails =
-    // TODO Add support for plain text input
     queryAppDetails(
-        queryPackageNames(Intent(Intent.ACTION_VIEW, uriString.toUri()))
+        uriString.toUri().let { uri ->
+            queryPackageNames(
+                if (uri.scheme != null) {
+                    Intent(Intent.ACTION_VIEW, uri)
+                } else {
+                    Intent(Intent.ACTION_SEND).apply {
+                        putExtra(Intent.EXTRA_TEXT, uriString)
+                    }
+                },
+                // Pass MATCH_ALL, so that all apps are returned, even if GeoShare is set to open the URI by default
+                flags = PackageManager.MATCH_ALL,
+            )
+        }
     )
 
-private fun PackageManager.queryPackageNames(intent: Intent): List<String> {
+private fun PackageManager.queryPackageNames(
+    intent: Intent,
+    flags: Int = PackageManager.MATCH_DEFAULT_ONLY,
+): List<String> {
     val resolveInfos = try {
-        queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
+        queryIntentActivities(intent, flags)
     } catch (e: Exception) {
         Log.e(TAG, "Error when querying installed apps", e)
         return emptyList()

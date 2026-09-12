@@ -2,7 +2,9 @@ package page.ooooo.geoshare.ui.components
 
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -23,6 +25,8 @@ data class ResourceIconDescriptor(val id: Int) : IconDescriptor
 data class ImageVectorIconDescriptor(val imageVector: ImageVector) : IconDescriptor
 
 data class CharacterIconDescriptor(val text: String?) : IconDescriptor
+
+object SpacerIconDescriptor : IconDescriptor
 
 @Composable
 fun IconFromDescriptor(
@@ -57,5 +61,7 @@ fun IconFromDescriptor(
             contentDescription,
             modifier.requiredSize(size),
         )
+
+        is SpacerIconDescriptor -> Spacer(Modifier.size(size))
     }
 }

@@ -122,9 +122,10 @@ import page.ooooo.geoshare.ui.components.HelpWelcomeMessage
 import page.ooooo.geoshare.ui.components.MainHeadline
 import page.ooooo.geoshare.ui.components.MainHelp
 import page.ooooo.geoshare.ui.components.MainLoadingIndicator
-import page.ooooo.geoshare.ui.components.MainLog
+import page.ooooo.geoshare.ui.components.ConversionStateLogList
 import page.ooooo.geoshare.ui.components.MainMenu
-import page.ooooo.geoshare.ui.components.MainSource
+import page.ooooo.geoshare.ui.components.MainSourceBar
+import page.ooooo.geoshare.ui.components.ConversionUriSheet
 import page.ooooo.geoshare.ui.components.MainSubmit
 import page.ooooo.geoshare.ui.components.MainSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
@@ -385,9 +386,10 @@ private fun MainScreen(
     val linkMessage by linkMessage.collectAsStateWithLifecycle()
     val userPreferenceMessage by userPreferenceMessage.collectAsStateWithLifecycle()
 
-    val (errorMessageResId, setErrorMessageResId) = retain { mutableStateOf<Int?>(null) }
-    val (logExpanded, setLogExpanded) = retain { mutableStateOf(false) }
-    val (selectedPointIndex, setSelectedPointIndex) = retain { mutableStateOf<Int?>(null) }
+    var errorMessageResId by retain { mutableStateOf<Int?>(null) }
+    var logExpanded by retain { mutableStateOf(false) }
+    var selectedPointIndex by retain { mutableStateOf<Int?>(null) }
+    var selectedUriString by retain { mutableStateOf<String?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     BackHandler(currentState !is Initial) {
@@ -432,21 +434,23 @@ private fun MainScreen(
             topContent = {
                 item {
                     Column {
-                        MainSource(
-                            state = currentState,
+                        MainSourceBar(
+                            currentState = currentState,
                             errorMessageResId = errorMessageResId,
                             logExpanded = logExpanded,
                             source = source,
                             start = start,
                             stateLog = stateLog,
-                            onSetLogExpanded = setLogExpanded,
-                            onSetErrorMessageResId = setErrorMessageResId,
+                            onSelectUriString = { selectedUriString = it },
+                            onSetLogExpanded = { logExpanded = it },
+                            onSetErrorMessageResId = { errorMessageResId = it },
                             onSetSource = onSetSource,
                             onSubmit = onSubmit,
                         )
-                        MainLog(
+                        ConversionStateLogList(
                             expanded = logExpanded,
                             stateLog = stateLog,
+                            onUriClick = { selectedUriString = it },
                         )
                     }
                 }
@@ -455,7 +459,7 @@ private fun MainScreen(
                     if (currentState is Initial) {
                         MainSubmit(
                             source = source,
-                            onSetErrorMessageResId = setErrorMessageResId,
+                            onSetErrorMessageResId = { errorMessageResId = it },
                             onSubmit = onSubmit,
                         )
                     } else {
@@ -467,7 +471,7 @@ private fun MainScreen(
                             when (currentState) {
                                 is ConversionState.HasError ->
                                     ResultError(
-                                        state = currentState,
+                                        currentState = currentState,
                                         onNavigateToInputsScreen = onNavigateToInputsScreen,
                                         onRetry = onRetry,
                                     )
@@ -484,7 +488,7 @@ private fun MainScreen(
                                         onNavigateToFaqScreen = onNavigateToFaqScreen,
                                         onSelect = { index ->
                                             onCancel()
-                                            setSelectedPointIndex(index)
+                                            selectedPointIndex = index
                                         },
                                     ) { paddingValues ->
                                         HelpShareSourceMessage(
@@ -500,7 +504,7 @@ private fun MainScreen(
                                 is ConversionState.HasDescription ->
                                     currentState.getLoadingIndicatorTitle(resources)?.let { title ->
                                         MainLoadingIndicator(
-                                            state = currentState,
+                                            currentState = currentState,
                                             title = title,
                                             onCancel = onCancel,
                                         )
@@ -527,7 +531,7 @@ private fun MainScreen(
                                 inputRepository = inputRepository,
                                 onNavigateToFaqScreen = onNavigateToFaqScreen,
                                 onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                onSetErrorMessageResId = setErrorMessageResId,
+                                onSetErrorMessageResId = { errorMessageResId = it },
                                 onSetSource = onSetSource,
                             ) { paddingValues ->
                                 HelpWelcomeMessage(
@@ -602,18 +606,26 @@ private fun MainScreen(
             },
         )
     }
-    // }
 
-    if (currentState is ConversionState.HasResult && selectedPointIndex != null) {
-        ResultSheet(
-            points = currentState.points,
-            selectedPointIndex = selectedPointIndex,
-            appDetails = appDetails,
-            outputsForPoint = outputsForPoint,
-            outputsForPoints = outputsForPoints,
-            onExecute = onExecute,
-            onSelectPointIndex = setSelectedPointIndex,
+    selectedUriString?.let { uriString ->
+        ConversionUriSheet(
+            uriString = uriString,
+            onDismissRequest = { selectedUriString = null },
         )
+    }
+
+    if (currentState is ConversionState.HasResult) {
+        selectedPointIndex?.let { index ->
+            ResultSheet(
+                points = currentState.points,
+                selectedPointIndex = index,
+                appDetails = appDetails,
+                outputsForPoint = outputsForPoint,
+                outputsForPoints = outputsForPoints,
+                onExecute = onExecute,
+                onSelectPointIndex = { selectedPointIndex = it },
+            )
+        }
     }
 
     when (currentState) {

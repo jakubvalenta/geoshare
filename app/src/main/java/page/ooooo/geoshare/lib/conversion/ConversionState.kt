@@ -63,7 +63,7 @@ interface ConversionState {
         fun getLoadingIndicatorTitle(resources: Resources): String? = null
 
         @Suppress("SameReturnValue")
-        val uri: String? get() = null
+        val uriString: String? get() = null
     }
 
     interface HasError : HasSource {
@@ -287,7 +287,7 @@ data class PermissionGrantedBasicInput<T>(
             null
         }
 
-    override val uri = matchedInput.match
+    override val uriString = matchedInput.match
 
     override fun toString() =
         "$TAG(source=$source, matchedInput=$matchedInput, permission=$permission, results=$results, lastAttempt=$lastAttempt)"
@@ -377,7 +377,7 @@ data class PermissionGrantedWebViewInput(
     override fun getLoadingIndicatorTitle(resources: Resources) =
         resources.getString(R.string.conversion_connecting, matchedInput.input.group.getName(resources))
 
-    override val uri = matchedInput.match
+    override val uriString = matchedInput.match
 
     override fun toString() =
         "$TAG(source=$source, matchedInput=$matchedInput, permission=$permission, results=$results)"

@@ -360,4 +360,5 @@
     <string name="user_preferences_section_input">Input</string>
     <string name="user_preferences_section_output">Output</string>
     <string name="yes">Yes</string>
+    <string name="main_source_open">Open original link</string>
 </resources>

@@ -35,7 +35,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MainLoadingIndicator(
-    state: ConversionState.HasDescription,
+    currentState: ConversionState.HasDescription,
     title: String,
     initialExpanded: Boolean = false,
     onCancel: () -> Unit,
@@ -72,7 +72,7 @@ fun MainLoadingIndicator(
         ) {
             Text(stringResource(R.string.conversion_loading_indicator_cancel))
         }
-        state.getDetails(resources)?.let { details ->
+        currentState.getDetails(resources)?.let { details ->
             ResultDetails(
                 details,
                 Modifier.testTag("geoShareMainLoadingIndicatorDescription"),
@@ -98,7 +98,7 @@ private fun DefaultPreview() {
         )
         Surface(color = mainContainerColor(state)) {
             MainLoadingIndicator(
-                state = state,
+                currentState = state,
                 title = stringResource(
                     R.string.conversion_connecting,
                     state.matchedInput.input.group.getName(LocalResources.current),
@@ -123,7 +123,7 @@ private fun DarkPreview() {
         )
         Surface(color = mainContainerColor(state)) {
             MainLoadingIndicator(
-                state = state,
+                currentState = state,
                 title = stringResource(
                     R.string.conversion_connecting,
                     state.matchedInput.input.group.getName(LocalResources.current),

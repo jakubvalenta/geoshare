@@ -27,7 +27,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun ResultError(
-    state: ConversionState.HasError,
+    currentState: ConversionState.HasError,
     initialExpanded: Boolean = false,
     onNavigateToInputsScreen: () -> Unit,
     onRetry: () -> Unit,
@@ -48,21 +48,20 @@ fun ResultError(
                 verticalArrangement = Arrangement.spacedBy(spacing.tiny),
             ) {
                 Text(
-                    state.message,
+                    currentState.message,
                     Modifier.testTag("geoShareConversionErrorMessage"),
                     style = MaterialTheme.typography.bodyMedium,
                 )
-                state.stackTrace?.let { details ->
+                currentState.stackTrace?.let { details ->
                     ResultDetails(
                         details,
                         initialExpanded = initialExpanded,
                     )
                 }
-                ResultUri(state.source)
             }
         }
         ScrollableChips {
-            if (!state.warning) {
+            if (!currentState.warning) {
                 item {
                     StyledChip(
                         stringResource(R.string.conversion_error_retry),
@@ -109,7 +108,7 @@ private fun DefaultPreview() {
         )
         Surface(color = mainContainerColor(state)) {
             ResultError(
-                state = state,
+                currentState = state,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -129,7 +128,7 @@ private fun DarkPreview() {
         )
         Surface(color = mainContainerColor(state)) {
             ResultError(
-                state = state,
+                currentState = state,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -149,7 +148,7 @@ private fun ExpandedPreview() {
         )
         Surface(color = mainContainerColor(state)) {
             ResultError(
-                state = state,
+                currentState = state,
                 initialExpanded = true,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
@@ -170,7 +169,7 @@ private fun DarkExpandedPreview() {
         )
         Surface(color = mainContainerColor(state)) {
             ResultError(
-                state = state,
+                currentState = state,
                 initialExpanded = true,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
@@ -190,7 +189,7 @@ private fun NoDetailsPreview() {
         )
         Surface(color = mainContainerColor(state)) {
             ResultError(
-                state = state,
+                currentState = state,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -209,7 +208,7 @@ private fun DarkNoDetailsPreview() {
         )
         Surface(color = mainContainerColor(state)) {
             ResultError(
-                state = state,
+                currentState = state,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -228,7 +227,7 @@ private fun WarningPreview() {
         )
         Surface(color = mainContainerColor(state)) {
             ResultError(
-                state = state,
+                currentState = state,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -247,7 +246,7 @@ private fun DarkWarningPreview() {
         )
         Surface(color = mainContainerColor(state)) {
             ResultError(
-                state = state,
+                currentState = state,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )

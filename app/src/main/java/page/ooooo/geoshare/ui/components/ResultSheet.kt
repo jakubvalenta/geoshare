@@ -2,10 +2,6 @@ package page.ooooo.geoshare.ui.components
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -22,7 +18,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,6 +28,7 @@ import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.extensions.zipWithNextFirstNull
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.NaivePoint
@@ -42,7 +38,6 @@ import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,7 +54,6 @@ fun ResultSheet(
     val selectedPoint = points.getOrNull(selectedPointIndex) ?: return
 
     val coroutineScope = rememberCoroutineScope()
-    val spacing = LocalSpacing.current
     val sheetState = rememberBottomSheetState(initialValue)
 
     val appDetails by appDetails.collectAsStateWithLifecycle()
@@ -67,11 +61,15 @@ fun ResultSheet(
     val outputsForPoints by outputsForPoints.collectAsStateWithLifecycle()
 
     fun hide() {
-        coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
-            if (!sheetState.isVisible) {
-                onSelectPointIndex(null)
+        coroutineScope
+            .launch {
+                sheetState.hide()
             }
-        }
+            .invokeOnCompletion {
+                if (!sheetState.isVisible) {
+                    onSelectPointIndex(null)
+                }
+            }
     }
 
     ModalBottomSheet(
@@ -84,75 +82,56 @@ fun ResultSheet(
                 .testTag("geoShareResultSheet"),
         ) {
             item {
-                ResultSuccessSheetItemGroup(
+                SheetSection(
                     title = if (points.size > 1) {
                         stringResource(R.string.conversion_succeeded_point_number, selectedPointIndex + 1)
                     } else {
                         null
                     },
-                    appDetails = appDetails,
-                    actions = outputsForPoint
+                ) {
+                    outputsForPoint
                         .filter { it.isAvailable(selectedPoint) }
-                        .map { it.toAction(selectedPoint) },
-                    value = selectedPoint,
-                    onClick = { action ->
-                        hide()
-                        onExecute(action)
-                    },
-                )
+                        .map { output -> output.toAction(selectedPoint) to output.getIcon(appDetails) }
+                        .zipWithNextFirstNull { prev, (action, icon) ->
+                            SheetListItem(
+                                headlineText = action.output.label(appDetails),
+                                onClick = {
+                                    hide()
+                                    onExecute(action)
+                                },
+                                supportingText = action.getDescription(selectedPoint),
+                                icon = icon,
+                                prevIcon = prev?.second,
+                            )
+                        }
+                }
             }
             item {
-                Spacer(Modifier.height(spacing.small))
-            }
-            item {
-                ResultSuccessSheetItemGroup(
+                SheetSection(
+                    first = false,
                     title = if (points.size > 1) {
                         stringResource(R.string.conversion_succeeded_point_all, points.size)
                     } else {
                         null
                     },
-                    appDetails = appDetails,
-                    actions = outputsForPoints
+                ) {
+                    outputsForPoints
                         .filter { it.isAvailable(points) }
-                        .map { it.toAction(points) },
-                    value = points,
-                    onClick = { action ->
-                        hide()
-                        onExecute(action)
-                    },
-                )
+                        .map { output -> output.toAction(points) to output.getIcon(appDetails) }
+                        .zipWithNextFirstNull { prev, (action, icon) ->
+                            SheetListItem(
+                                headlineText = action.output.label(appDetails),
+                                onClick = {
+                                    hide()
+                                    onExecute(action)
+                                },
+                                supportingText = action.getDescription(points),
+                                icon = icon,
+                                prevIcon = prev?.second,
+                            )
+                        }
+                }
             }
-        }
-    }
-}
-
-@Composable
-private fun <T> ResultSuccessSheetItemGroup(
-    title: String?,
-    appDetails: AppDetails,
-    actions: List<Action<T>>,
-    value: T,
-    onClick: (action: Action<*>) -> Unit,
-) {
-    val spacing = LocalSpacing.current
-
-    Column {
-        if (title != null) {
-            LabelLarge(
-                title,
-                Modifier.padding(start = 16.dp, end = 16.dp, bottom = spacing.tiny),
-            )
-        }
-        var prevIcon: IconDescriptor? = null
-        actions.forEach { action ->
-            ResultSheetItem(
-                headlineText = action.output.label(appDetails),
-                onClick = { onClick(action) },
-                supportingText = action.getDescription(value),
-                icon = action.output.getIcon(appDetails)
-                    ?.takeIf { it != prevIcon }
-                    ?.also { prevIcon = it },
-            )
         }
     }
 }

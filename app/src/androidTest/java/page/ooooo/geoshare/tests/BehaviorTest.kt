@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.tests
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.location.Location
 import android.location.LocationManager
@@ -372,7 +373,7 @@ fun UiAutomatorTestScope.waitAndAssertTomTomContainsElement(block: Accessibility
 fun UiAutomatorTestScope.shareUri(unsafeUriString: String = "geo:52.47254,13.4345") {
     // Use shell command instead of startActivity() to support Xiaomi
     device.executeShellCommand(
-        "am start -a android.intent.action.VIEW -d $unsafeUriString -n ${BuildConfig.APPLICATION_ID}/page.ooooo.geoshare.ConversionActivity ${BuildConfig.APPLICATION_ID}"
+        "am start -a ${Intent.ACTION_VIEW} -d $unsafeUriString -n ${BuildConfig.APPLICATION_ID}/page.ooooo.geoshare.ConversionActivity ${BuildConfig.APPLICATION_ID}"
     )
 }
 
@@ -436,9 +437,9 @@ fun UiAutomatorTestScope.submitMainForm() {
 }
 
 /**
- * Test the conversion of a text source (e.g. coordinates string or Plus Codes) to coordinates.
+ * Tests the conversion of a text source [unsafeText] (e.g. coordinates string or Plus Codes) to coordinates.
  *
- * Enter the text in the form on the main screen. It would be faster to share the text with the app using
+ * It enters the text in main form and submits it. It would be faster to share the text with the app using
  * `am start ... android.intent.action.SEND`, but unfortunately that command doesn't work when there are spaces in the
  * text.
  */
@@ -455,7 +456,8 @@ fun UiAutomatorTestScope.testText(expectedPoint: Point, unsafeText: String) =
 /**
  * Clicks an app icon on the conversion result screen.
  *
- * Uses custom point of the click, so that we don't accidentally hit the context menu icon, which happens on Nexus 5.
+ * It uses a custom point of the click, instead of the default center, so that we don't accidentally hit the context
+ * menu icon, which can happen on Nexus 5.
  */
 fun UiAutomatorTestScope.clickAppIcon(id: String) {
     onElement { viewIdResourceName == "geoShareApp_$id" }.click(android.graphics.Point(10, 10))
@@ -565,13 +567,13 @@ fun UiObject2.longScrollSheet(direction: Direction = Direction.DOWN) {
 }
 
 fun UiObject2.onSheetItem(block: AccessibilityNodeInfo.() -> Boolean): UiObject2 =
-    onElement { viewIdResourceName == "geoShareResultSheetItemHeadline" && block() }
+    onElement { viewIdResourceName == "geoShareSheetListItemHeadline" && block() }
 
 fun UiObject2.scrollToSheetItem(
     direction: Direction = Direction.DOWN,
     block: AccessibilityNodeInfo.() -> Boolean,
 ): UiObject2 =
-    scrollToElement(direction) { viewIdResourceName == "geoShareResultSheetItemHeadline" && block() }
+    scrollToElement(direction) { viewIdResourceName == "geoShareSheetListItemHeadline" && block() }
 
 fun UiAutomatorTestScope.chooseFile() {
     if (onElementOrNull(3_000) { textAsString() in setOf("Recent", "Récents") } != null) {
