@@ -6,13 +6,12 @@ import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.GCJ02Point
-import page.ooooo.geoshare.lib.geo.GeoTest
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.geo.mockGeometries
 
-class SendPointOutputTest : GeoTest {
-    private val geometries = mockGeometries()
-    private val coordinateConverter = CoordinateConverter(geometries)
+class SendPointOutputTest {
+    private val coordinateConverter = CoordinateConverter(mockGeometries)
     private val uriQuote = FakeUriQuote
 
     @Test

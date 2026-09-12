@@ -28,6 +28,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.fakeApps
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
+import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
@@ -137,8 +138,10 @@ private fun DefaultPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val log = DefaultLog
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
+            log = log,
         )
         HelpShareSourceMessage(
             appDetails = MutableStateFlow(fakeAppDetails()),
@@ -162,8 +165,10 @@ private fun DarkPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val log = DefaultLog
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
+            log = log,
         )
         HelpShareSourceMessage(
             appDetails = MutableStateFlow(fakeAppDetails()),

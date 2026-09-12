@@ -38,6 +38,7 @@ import page.ooooo.geoshare.data.local.preferences.ShareNavigationGoogleUriAutoma
 import page.ooooo.geoshare.data.local.preferences.SharePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareRouteGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareStreetViewGoogleUriAutomation
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.Apps
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
@@ -77,6 +78,7 @@ import javax.inject.Singleton
 @Singleton
 class OutputRepository @Inject constructor(
     private val coordinateConverter: CoordinateConverter,
+    private val log: Log,
 ) {
     fun getOutputsForPoint(links: List<Link>): List<PointOutput> =
         listOf(
@@ -129,11 +131,11 @@ class OutputRepository @Inject constructor(
                         add(OpenStreetViewGoogleUriOutput(packageName, coordinateConverter))
                     }
                     if (DataType.GPX_DATA in app.dataTypes) {
-                        add(OpenRouteGpxOutput(packageName, coordinateConverter))
-                        add(OpenPointsGpxOutput(packageName, coordinateConverter))
+                        add(OpenRouteGpxOutput(packageName, coordinateConverter, log))
+                        add(OpenPointsGpxOutput(packageName, coordinateConverter, log))
                     }
                     if (DataType.GPX_ONE_POINT_DATA in app.dataTypes) {
-                        add(OpenRouteOnePointGpxOutput(packageName, coordinateConverter))
+                        add(OpenRouteOnePointGpxOutput(packageName, coordinateConverter, log))
                     }
                     if (DataType.SEND_PLAIN_TEXT in app.dataTypes) {
                         add(SendPointOutput(packageName, coordinateConverter))
@@ -267,17 +269,17 @@ class OutputRepository @Inject constructor(
 
             is OpenPointsGpxAutomation ->
                 automation.packageName?.let { packageName ->
-                    OpenPointsGpxOutput(packageName, coordinateConverter)
+                    OpenPointsGpxOutput(packageName, coordinateConverter, log)
                 }
 
             is OpenRouteGpxAutomation ->
                 automation.packageName?.let { packageName ->
-                    OpenRouteGpxOutput(packageName, coordinateConverter)
+                    OpenRouteGpxOutput(packageName, coordinateConverter, log)
                 }
 
             is OpenRouteOnePointGpxAutomation ->
                 automation.packageName?.let { packageName ->
-                    OpenRouteOnePointGpxOutput(packageName, coordinateConverter)
+                    OpenRouteOnePointGpxOutput(packageName, coordinateConverter, log)
                 }
 
             is SavePointGpxAutomation ->

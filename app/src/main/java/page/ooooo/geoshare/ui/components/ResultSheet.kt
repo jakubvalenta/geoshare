@@ -31,6 +31,7 @@ import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
+import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
@@ -166,8 +167,10 @@ private fun DefaultPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
+                log = log,
             )
             ResultSheet(
                 points = persistentListOf(WGS84Point(NaivePoint.example), WGS84Point(NaivePoint.genRandomPoint())),
@@ -197,8 +200,10 @@ private fun DarkPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
+                log = log,
             )
             ResultSheet(
                 points = persistentListOf(WGS84Point(NaivePoint.example), WGS84Point(NaivePoint.genRandomPoint())),
@@ -224,8 +229,10 @@ private fun LastPointPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
+                log = log,
             )
             ResultSheet(
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
@@ -255,8 +262,10 @@ private fun DarkLastPointPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
+                log = log,
             )
             ResultSheet(
                 points = persistentListOf(WGS84Point(NaivePoint.example)),

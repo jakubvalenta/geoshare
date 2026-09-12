@@ -47,6 +47,7 @@ import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.fakeApps
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
+import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.PackageNames
@@ -361,8 +362,10 @@ private fun DefaultPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
+                log = log,
             )
             ResultApps(
                 appDetails = MutableStateFlow(fakeAppDetails()),
@@ -392,8 +395,10 @@ private fun DarkPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
+                log = log,
             )
             ResultApps(
                 appDetails = MutableStateFlow(fakeAppDetails()),
@@ -423,8 +428,10 @@ private fun LoadingPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
+                log = log,
             )
             ResultApps(
                 appDetails = MutableStateFlow(emptyMap()),
@@ -474,8 +481,10 @@ private fun DarkLoadingPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
+                log = log,
             )
             ResultApps(
                 appDetails = MutableStateFlow(emptyMap()),
@@ -525,8 +534,10 @@ private fun EmptyPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
+                log = log,
             )
             ResultApps(
                 appDetails = MutableStateFlow(emptyMap()),
@@ -551,8 +562,10 @@ private fun DarkEmptyPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
+                log = log,
             )
             ResultApps(
                 appDetails = MutableStateFlow(emptyMap()),

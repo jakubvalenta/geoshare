@@ -44,6 +44,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.billing.AutomationFeature
@@ -454,12 +455,13 @@ private fun LocationPermissionReceivedPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultTitle(
                 currentState = LocationPermissionReceived(
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter)
+                    action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter, log)
                         .toAction(WGS84Point(NaivePoint.example)),
                     isAutomation = true,
                 ),
@@ -489,12 +491,13 @@ private fun DarkLocationPermissionReceivedPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultTitle(
                 currentState = LocationPermissionReceived(
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter)
+                    action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter, log)
                         .toAction(WGS84Point(NaivePoint.example)),
                     isAutomation = true,
                 ),

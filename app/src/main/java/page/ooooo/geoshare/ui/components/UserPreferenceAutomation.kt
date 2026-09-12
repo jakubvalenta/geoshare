@@ -37,6 +37,7 @@ import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.AutomationPreference
 import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
+import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.Apps
 import page.ooooo.geoshare.lib.android.PackageNames
@@ -200,7 +201,11 @@ private fun ListItemPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val outputRepository = OutputRepository(coordinateConverter)
+                val log = DefaultLog
+                val outputRepository = OutputRepository(
+                    coordinateConverter = coordinateConverter,
+                    log = log,
+                )
                 UserPreferenceAutomationListItem(
                     index = 0,
                     count = 1,
@@ -234,7 +239,11 @@ private fun DarkListItemPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val outputRepository = OutputRepository(coordinateConverter)
+                val log = DefaultLog
+                val outputRepository = OutputRepository(
+                    coordinateConverter = coordinateConverter,
+                    log = log,
+                )
                 UserPreferenceAutomationListItem(
                     index = 0,
                     count = 1,
@@ -268,7 +277,11 @@ private fun NoneListItemPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val outputRepository = OutputRepository(coordinateConverter)
+                val log = DefaultLog
+                val outputRepository = OutputRepository(
+                    coordinateConverter = coordinateConverter,
+                    log = log,
+                )
                 UserPreferenceAutomationListItem(
                     index = 0,
                     count = 1,
@@ -302,7 +315,11 @@ private fun DarkNoneListItemPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val outputRepository = OutputRepository(coordinateConverter)
+                val log = DefaultLog
+                val outputRepository = OutputRepository(
+                    coordinateConverter = coordinateConverter,
+                    log = log,
+                )
                 UserPreferenceAutomationListItem(
                     index = 0,
                     count = 1,
@@ -335,7 +352,11 @@ private fun ControlsPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val outputRepository = OutputRepository(coordinateConverter)
+            val log = DefaultLog
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+                log = log,
+            )
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
                 apps = fakeApps.filterKeys { it == PackageNames.OSMAND_PLUS },
@@ -369,7 +390,11 @@ private fun DarkControlsPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val outputRepository = OutputRepository(coordinateConverter)
+            val log = DefaultLog
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+                log = log,
+            )
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
                 apps = fakeApps.filterKeys { it == PackageNames.OSMAND_PLUS },
@@ -403,7 +428,11 @@ private fun TabletControlsPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val outputRepository = OutputRepository(coordinateConverter)
+            val log = DefaultLog
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+                log = log,
+            )
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
                 apps = fakeApps.filterKeys { it == PackageNames.OSMAND_PLUS },
@@ -437,7 +466,11 @@ private fun NotPurchasedControlsPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val outputRepository = OutputRepository(coordinateConverter)
+            val log = DefaultLog
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+                log = log,
+            )
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
                 apps = fakeApps.filterKeys { it == PackageNames.OSMAND_PLUS },
@@ -466,7 +499,11 @@ private fun DarkNotPurchasedControlsPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val outputRepository = OutputRepository(coordinateConverter)
+            val log = DefaultLog
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+                log = log,
+            )
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
                 apps = fakeApps.filterKeys { it == PackageNames.OSMAND_PLUS },
@@ -495,7 +532,11 @@ private fun TabletNotPurchasedControlsPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val outputRepository = OutputRepository(coordinateConverter)
+            val log = DefaultLog
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+                log = log,
+            )
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
                 apps = fakeApps.filterKeys { it == PackageNames.OSMAND_PLUS },

@@ -72,9 +72,11 @@ import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.data.local.preferences.shouldAppFinish
 import page.ooooo.geoshare.lib.Attempt
+import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.Message
-import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.getLocation
+import page.ooooo.geoshare.lib.android.hasLocationPermission
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
@@ -222,7 +224,7 @@ fun MainScreen(
                 // Location action
 
                 is LocationRationaleRequested -> {
-                    if (AndroidTools.hasLocationPermission(context)) {
+                    if (context.hasLocationPermission()) {
                         conversionViewModel.skipLocationRationale(currentState.action, currentState.isAutomation)
                     } else {
                         conversionViewModel.showLocationRationale(currentState.action, currentState.isAutomation)
@@ -239,7 +241,7 @@ fun MainScreen(
                     locationJob?.cancel()
                     locationJob = coroutineScope.launch(Dispatchers.IO) {
                         val location = try {
-                            AndroidTools.getLocation(context)
+                            context.getLocation()
                         } catch (_: CancellationException) {
                             conversionViewModel.cancelLocationFinding()
                             return@launch
@@ -933,8 +935,10 @@ private fun SucceededPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val log = DefaultLog
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
+            log = log,
         )
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
@@ -1015,8 +1019,10 @@ private fun DarkSucceededPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val log = DefaultLog
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
+            log = log,
         )
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
@@ -1097,8 +1103,10 @@ private fun SmallSucceededPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val log = DefaultLog
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
+            log = log,
         )
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
@@ -1178,8 +1186,10 @@ private fun TabletSucceededPreview() {
         val context = LocalContext.current
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
+        val log = DefaultLog
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
+            log = log,
         )
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()

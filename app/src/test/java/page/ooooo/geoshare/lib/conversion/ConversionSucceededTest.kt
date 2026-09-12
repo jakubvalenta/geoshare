@@ -46,7 +46,10 @@ class ConversionSucceededTest {
     private val coordinateConverter: CoordinateConverter = mock()
     private val linkRepository: LinkRepository = FakeLinkRepository()
     private val log = FakeLog
-    private val outputRepository = OutputRepository(coordinateConverter)
+    private val outputRepository = OutputRepository(
+        coordinateConverter = coordinateConverter,
+        log = log,
+    )
     private val source = "https://maps.google.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
 

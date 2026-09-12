@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.kotlin.mock
+import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
@@ -13,9 +14,11 @@ import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 
 class LocationRationaleRequestedTest {
     private val coordinateConverter: CoordinateConverter = mock()
+    private val log = FakeLog
     private val source = "https://maps.google.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-    private val action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter).toAction(points.last())
+    private val action =
+        OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter, log).toAction(points.last())
     private val stateContext: ConversionStateContext = mock()
 
     @Test

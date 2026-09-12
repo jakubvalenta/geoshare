@@ -1,23 +1,19 @@
 package page.ooooo.geoshare.lib.outputs
 
 import android.content.res.Resources
-import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
-import page.ooooo.geoshare.lib.getTimestamp
 import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.getTimestamp
 import javax.inject.Inject
 
 class SaveRouteGpxOutput @Inject constructor(
     private val coordinateConverter: CoordinateConverter,
-) : PointsOutput.WithFile, SaveFileOutput {
+) : SavePointsOutput {
     override fun getFilename(resources: Resources) =
         resources.getString(
             R.string.conversion_succeeded_save_gpx_filename,
@@ -27,10 +23,8 @@ class SaveRouteGpxOutput @Inject constructor(
 
     override val mimeType = "text/xml"
 
-    override suspend fun execute(uri: Uri, value: Points, actionContext: ActionContext) = withContext(Dispatchers.IO) {
-        AndroidTools.openFileUri(actionContext.context, uri) {
-            GpxFormatter.writeGpxRoute(coordinateConverter.toWGS84(value), this)
-        }.let { success -> if (success) ActionResult.SUCCEEDED else ActionResult.FAILED }
+    override fun write(value: Points, writer: Appendable) {
+        GpxFormatter.writeGpxRoute(coordinateConverter.toWGS84(value), writer)
     }
 
     @Composable

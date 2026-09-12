@@ -53,8 +53,8 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeGoogleMapsStreetViewLink
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.database.LinkType
-import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.openUriInDefaultApp
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
@@ -203,7 +203,7 @@ fun LinkForm(
                                         coordsUriTemplate,
                                         nameUriTemplate,
                                     )?.let {
-                                        AndroidTools.openWebUri(context, it)
+                                        context.openUriInDefaultApp(it)
                                     }
                                 },
                                 label = {

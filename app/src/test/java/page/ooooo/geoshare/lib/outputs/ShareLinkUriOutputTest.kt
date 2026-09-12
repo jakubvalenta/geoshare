@@ -6,14 +6,13 @@ import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.GCJ02Point
-import page.ooooo.geoshare.lib.geo.GeoTest
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.Srs
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.geo.mockGeometries
 
-class ShareLinkUriOutputTest : GeoTest {
-    private val geometries = mockGeometries()
-    private val coordinateConverter = CoordinateConverter(geometries)
+class ShareLinkUriOutputTest {
+    private val coordinateConverter = CoordinateConverter(mockGeometries)
     private val uriQuote = FakeUriQuote
 
     @Test

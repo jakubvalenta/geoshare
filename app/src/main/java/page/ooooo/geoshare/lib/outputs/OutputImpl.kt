@@ -1,12 +1,22 @@
 package page.ooooo.geoshare.lib.outputs
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.DefaultUriQuote
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.copy
+import page.ooooo.geoshare.lib.android.openFileInApp
+import page.ooooo.geoshare.lib.android.openFileUriForWriting
+import page.ooooo.geoshare.lib.android.openFileWithChooser
+import page.ooooo.geoshare.lib.android.openUriInApp
+import page.ooooo.geoshare.lib.android.openUriWithChooser
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.writeFile
@@ -23,7 +33,7 @@ sealed interface CopyPointOutput :
 
     override suspend fun execute(value: Point, actionContext: ActionContext) =
         getText(value, actionContext.uriQuote)?.let { text ->
-            actionContext.androidTools.copyToClipboard(actionContext.clipboard, text)
+            actionContext.clipboard.copy(text)
             true
         }.let { success -> if (success == true) ActionResult.SUCCEEDED else ActionResult.FAILED }
 
@@ -50,7 +60,7 @@ sealed interface OpenPointOutput :
 
     override suspend fun execute(value: Point, actionContext: ActionContext) =
         getText(value, actionContext.uriQuote)?.let { uriString ->
-            actionContext.androidTools.openApp(actionContext.context, packageName, uriString)
+            actionContext.context.openUriInApp(uriString, packageName)
         }.let { success -> if (success == true) ActionResult.SUCCEEDED_AND_OPENED_APP else ActionResult.FAILED }
 
     override fun getIcon(appDetails: AppDetails) =
@@ -87,14 +97,15 @@ sealed interface OpenPointsOutput :
     Output.HasAutomationErrorText {
 
     val packageName: String
+    val log: Log
 
-    fun writePoints(value: Points, writer: Appendable)
+    fun write(value: Points, writer: Appendable)
 
     override suspend fun execute(value: Points, actionContext: ActionContext) =
         writeFile(actionContext.context.filesDir, "points", "${System.currentTimeMillis()}.gpx") {
-            writePoints(value, this)
+            write(value, this)
         }?.let { file ->
-            actionContext.androidTools.openAppFile(actionContext.context, packageName, file)
+            actionContext.context.openFileInApp(file, packageName, log)
         }.let { success -> if (success == true) ActionResult.SUCCEEDED_AND_OPENED_APP else ActionResult.FAILED }
 
     override fun getIcon(appDetails: AppDetails) =
@@ -127,13 +138,61 @@ sealed interface OpenPointsOutput :
         )
 }
 
-sealed interface SaveFileOutput :
-    Output,
+sealed interface SavePointOutput :
+    PointOutput.WithFile,
     Output.HasErrorText,
     Output.HasSuccessText,
     Output.HasAutomationDelay,
     Output.HasAutomationErrorText,
     Output.HasAutomationSuccessText {
+
+    fun write(value: Point, writer: Appendable)
+
+    override suspend fun execute(uri: Uri, value: Point, actionContext: ActionContext) = withContext(Dispatchers.IO) {
+        actionContext.context.openFileUriForWriting(uri) {
+            write(value, this)
+        }.let { success -> if (success) ActionResult.SUCCEEDED else ActionResult.FAILED }
+    }
+
+    override fun getMenuIcon(appDetails: AppDetails) =
+        ResourceIconDescriptor(R.drawable.download_24px)
+
+    @Composable
+    override fun errorText(appDetails: AppDetails) =
+        stringResource(R.string.conversion_succeeded_save_gpx_failed)
+
+    @Composable
+    override fun successText(appDetails: AppDetails) =
+        stringResource(R.string.conversion_succeeded_save_gpx_succeeded)
+
+    @Composable
+    override fun automationErrorText(appDetails: AppDetails) =
+        errorText(appDetails)
+
+    @Composable
+    override fun automationSuccessText(appDetails: AppDetails) =
+        stringResource(R.string.conversion_automation_save_gpx_succeeded)
+
+    @Composable
+    override fun automationWaitingText(counterSec: Int, appDetails: AppDetails) =
+        pluralStringResource(R.plurals.conversion_automation_save_gpx_waiting, counterSec, counterSec)
+}
+
+sealed interface SavePointsOutput :
+    PointsOutput.WithFile,
+    Output.HasErrorText,
+    Output.HasSuccessText,
+    Output.HasAutomationDelay,
+    Output.HasAutomationErrorText,
+    Output.HasAutomationSuccessText {
+
+    fun write(value: Points, writer: Appendable)
+
+    override suspend fun execute(uri: Uri, value: Points, actionContext: ActionContext) = withContext(Dispatchers.IO) {
+        actionContext.context.openFileUriForWriting(uri) {
+            write(value, this)
+        }.let { success -> if (success) ActionResult.SUCCEEDED else ActionResult.FAILED }
+    }
 
     override fun getMenuIcon(appDetails: AppDetails) =
         ResourceIconDescriptor(R.drawable.download_24px)
@@ -169,7 +228,7 @@ sealed interface SharePointOutput :
 
     override suspend fun execute(value: Point, actionContext: ActionContext) =
         getText(value, actionContext.uriQuote)?.let { uriString ->
-            actionContext.androidTools.openChooser(actionContext.context, uriString)
+            actionContext.context.openUriWithChooser(uriString)
         }.let { success -> if (success == true) ActionResult.SUCCEEDED_AND_OPENED_APP else ActionResult.FAILED }
 
     @Composable
@@ -192,13 +251,13 @@ sealed interface SharePointsOutput :
     Output.HasAutomationErrorText,
     Output.HasAutomationSuccessText {
 
-    fun writePoints(value: Points, writer: Appendable)
+    fun write(value: Points, writer: Appendable)
 
     override suspend fun execute(value: Points, actionContext: ActionContext) =
         writeFile(actionContext.context.filesDir, "points", "${System.currentTimeMillis()}.gpx") {
-            writePoints(value, this)
+            write(value, this)
         }?.let { file ->
-            actionContext.androidTools.openChooserFile(actionContext.context, file)
+            actionContext.context.openFileWithChooser(file)
         }.let { success -> if (success == true) ActionResult.SUCCEEDED_AND_OPENED_APP else ActionResult.FAILED }
 
     override fun getMenuIcon(appDetails: AppDetails) =

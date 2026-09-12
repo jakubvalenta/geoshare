@@ -3,6 +3,7 @@ package page.ooooo.geoshare.lib.outputs
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
@@ -12,8 +13,9 @@ import javax.inject.Inject
 class OpenPointsGpxOutput @Inject constructor(
     override val packageName: String,
     private val coordinateConverter: CoordinateConverter,
+    override val log: Log,
 ) : OpenPointsOutput {
-    override fun writePoints(value: Points, writer: Appendable) {
+    override fun write(value: Points, writer: Appendable) {
         GpxFormatter.writeGpxPoints(coordinateConverter.toWGS84(value), writer)
     }
 
