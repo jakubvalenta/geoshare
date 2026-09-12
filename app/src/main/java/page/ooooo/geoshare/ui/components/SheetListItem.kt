@@ -28,11 +28,7 @@ fun SheetListItem(
         },
         supportingContent = supportingText?.let { text ->
             {
-                Text(
-                    text,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                Text(text, overflow = TextOverflow.Ellipsis, maxLines = 1)
             }
         },
         leadingContent = {
@@ -44,5 +40,37 @@ fun SheetListItem(
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
     ) {
         Text(headlineText, Modifier.testTag("geoShareSheetListItemHeadline"))
+    }
+}
+
+@Composable
+fun OneLineSheetListItem(
+    headlineText: String,
+    onClick: (() -> Unit)? = null,
+    icon: IconDescriptor? = null,
+    prevIcon: IconDescriptor? = null,
+) {
+    ListItem(
+        modifier = Modifier.run {
+            if (onClick != null) {
+                clickable(onClick = onClick)
+            } else {
+                this
+            }
+        },
+        leadingContent = {
+            IconFromDescriptor(
+                icon?.takeIf { it != prevIcon } ?: SpacerIconDescriptor,
+                contentDescription = null,
+            )
+        },
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+    ) {
+        Text(
+            headlineText,
+            Modifier.testTag("geoShareSheetListItemHeadline"),
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1,
+        )
     }
 }

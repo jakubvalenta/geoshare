@@ -82,6 +82,7 @@
     <string name="input_waze_html_name" translatable="false">Waze (HTML)</string>
     <string name="input_yandex_html_name" translatable="false">Yandex (HTML)</string>
     <string name="input_yandex_short_link_name" translatable="false">Yandex (short link)</string>
+    <string name="main_source_open">Open original link</string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="nav_back_content_description">Back to main screen</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Dropped pin</string>
@@ -360,5 +361,4 @@
     <string name="user_preferences_section_input">Input</string>
     <string name="user_preferences_section_output">Output</string>
     <string name="yes">Yes</string>
-    <string name="main_source_open">Open original link</string>
 </resources>

@@ -52,22 +52,22 @@ fun ConversionUriSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
     ) {
-        SheetSection {
-            SheetListItem(
-                headlineText = stringResource(R.string.conversion_succeeded_skip),
+        SheetSection(title = stringResource(R.string.conversion_succeeded_skip)) {
+            OneLineSheetListItem(
+                headlineText = uriString,
                 onClick = {
                     coroutineScope.launch {
                         clipboard.copy(uriString)
                         onDismissRequest()
                     }
                 },
-                supportingText = uriString,
                 icon = ResourceIconDescriptor(R.drawable.content_copy_24px),
             )
         }
         appDetailsForUri.values
             .filterNotNull()
             .takeIf { it.isNotEmpty() }
+            ?.sortedBy { it.label }
             ?.let { appDetails ->
                 SheetSection(
                     first = false,
