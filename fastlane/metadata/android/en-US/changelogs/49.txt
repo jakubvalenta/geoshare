@@ -1,5 +1,7 @@
-- Added the option to copy point name to clipboard.
-- Added top bar with original link, elapsed time, and link processing log.
-- Replaced the "Copy original link" button with the original link in top bar.
-- Replaced intro screen with contextual help messages.
+- Added a bar to the top of the screen with original link and elapsed time.
+- Added a menu with options to copy and open the original link, accessible by tapping the original link bar.
+- Added a log of the processing of the current link, accessible by tapping the elapsed time.
+- Added contextual help messages, which teach how to use the app.
 - Improved rendering speed of the result screen.
+- Removed the intro screen.
+- Removed the button to copy original link from the bottom of the result screen.
