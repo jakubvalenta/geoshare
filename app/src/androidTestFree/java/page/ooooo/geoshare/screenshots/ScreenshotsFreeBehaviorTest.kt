@@ -559,6 +559,12 @@ class ScreenshotsFreeBehaviorTest {
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result")
 
+        // Conversion - Source sheet
+        onElement { viewIdResourceName == "geoShareMainSourceButton" }.click()
+        quickWaitForStableInActiveWindow()
+        saveScreenshot("main_strings/conversion_source_sheet")
+        pressBack() // Collapse source sheet
+
         // Conversion - Result - Log
         onElement { viewIdResourceName == "geoShareMainSourceIcon" }.click() // Expand log
         quickWaitForStableInActiveWindow()
