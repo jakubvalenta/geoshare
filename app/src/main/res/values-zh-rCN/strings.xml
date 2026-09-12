@@ -313,4 +313,7 @@
     <string name="help_share_source_title">从地图应用中启动 GeoShare</string>
     <string name="help_welcome_action">或者复制此示例：</string>
     <string name="faq_open_by_default_headline">如何始终在 %1$s 中打开链接</string>
+    <string name="conversion_processing">正在处理 %1$s 类型的链接…</string>
+    <string name="conversion_succeeded_copy_name">复制名称</string>
+    <string name="conversion_automation_copy_name_succeeded">自动复制了名称</string>
 </resources>
