@@ -145,7 +145,9 @@ fun MainSourceBar(
             Row(Modifier.padding(bottom = spacing.tiny)) {
                 ThinButton(
                     { onSelectUriString(source) },
-                    Modifier.weight(1f),
+                    Modifier
+                        .weight(1f)
+                        .testTag("geoShareMainSourceButton"),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                         contentColor = MaterialTheme.colorScheme.onSurface,
