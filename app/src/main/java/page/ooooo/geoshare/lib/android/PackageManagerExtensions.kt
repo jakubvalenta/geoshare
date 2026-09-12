@@ -89,13 +89,23 @@ private fun PackageManager.queryAppDetails(packageName: String): AppDetail? {
 }
 
 /**
- * Query package manager for labels and icons of passed [apps].
+ * Query package manager for labels and icons of [packageNames].
  *
  * It is executed on a non-main thread, because it takes about 50ms and maybe that's too much.
  */
-suspend fun PackageManager.queryAppDetails(apps: Apps): AppDetails = withContext(Dispatchers.Default) {
-    apps.mapValues { (packageName) -> queryAppDetails(packageName) }
-}
+suspend fun PackageManager.queryAppDetails(packageNames: Iterable<String>): AppDetails =
+    withContext(Dispatchers.Default) {
+        packageNames.associateWith { packageName -> queryAppDetails(packageName) }
+    }
+
+/**
+ * Query package manager for labels and icons of apps that can open [uriString].
+ */
+suspend fun PackageManager.queryAppDetailsForUri(uriString: String): AppDetails =
+    // TODO Add support for plain text input
+    queryAppDetails(
+        queryPackageNames(Intent(Intent.ACTION_VIEW, uriString.toUri()))
+    )
 
 private fun PackageManager.queryPackageNames(intent: Intent): List<String> {
     val resolveInfos = try {
