@@ -416,7 +416,7 @@ fun UiAutomatorTestScope.testUriFails(
     assertConversionFails(expectedMessage, timeoutMs)
 }
 
-fun UiAutomatorTestScope.setMainInput(unsafeText: String = "geo:52.47254,13.4345") {
+fun UiAutomatorTestScope.setMainInput(unsafeText: String = "52.47254, 13.4345") {
     onElement { viewIdResourceName == "geoShareMainSourceTextField" }.setText(unsafeText)
     quickWaitForStableInActiveWindow() // Wait for the submit button to get its final position, after setting text
 }
@@ -565,15 +565,6 @@ fun UiObject2.collapseSheet() {
 fun UiObject2.longScrollSheet(direction: Direction = Direction.DOWN) {
     scroll(direction, 10f)
 }
-
-fun UiObject2.onSheetItem(block: AccessibilityNodeInfo.() -> Boolean): UiObject2 =
-    onElement { viewIdResourceName == "geoShareSheetListItemHeadline" && block() }
-
-fun UiObject2.scrollToSheetItem(
-    direction: Direction = Direction.DOWN,
-    block: AccessibilityNodeInfo.() -> Boolean,
-): UiObject2 =
-    scrollToElement(direction) { viewIdResourceName == "geoShareSheetListItemHeadline" && block() }
 
 fun UiAutomatorTestScope.chooseFile() {
     if (onElementOrNull(3_000) { textAsString() in setOf("Recent", "Récents") } != null) {

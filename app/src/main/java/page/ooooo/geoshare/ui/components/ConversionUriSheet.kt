@@ -112,9 +112,9 @@ private fun ConversionUriSheet(
                         appsAndLabels.forEach { (app, label) ->
                             SheetListItem(
                                 headlineText = label.orEmpty(),
+                                modifier = Modifier.testTag("geoShareConversionUriSheetItem_${app.packageName}"),
                                 onClick = {
                                     if (DataType.SEND_PLAIN_TEXT in app.dataTypes) {
-                                        // TODO Add instrumented test
                                         context.sendTextViaApp(uriString, app.packageName)
                                     } else {
                                         context.openUriInApp(uriString, app.packageName)

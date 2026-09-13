@@ -13,13 +13,14 @@ import androidx.compose.ui.text.style.TextOverflow
 @Composable
 fun SheetListItem(
     headlineText: String,
+    modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
     supportingText: String? = null,
     icon: IconDescriptor? = null,
     prevIcon: IconDescriptor? = null,
 ) {
     ListItem(
-        modifier = Modifier.run {
+        modifier = modifier.run {
             if (onClick != null) {
                 clickable(onClick = onClick)
             } else {

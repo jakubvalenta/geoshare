@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.tests
 
 import androidx.test.uiautomator.Direction
+import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.Dispatchers
@@ -106,7 +107,32 @@ class MainBehaviorTest {
     }
 
     @Test
-    fun whenLinkIsShared_allowsOpeningSource() = uiAutomator {
+    fun whenLinkIsShared_allowsOpeningTextSource() = uiAutomator {
+        val messagingAppPackageName = PackageNames.CONVERSATIONS
+        assumeAppInstalled(messagingAppPackageName)
+
+        // Launch app
+        launchApplication()
+        waitForAppToBeVisible()
+
+        // Enter text in the main form and submit it
+        setMainInput()
+        submitMainForm()
+
+        // Open the source sheet and tap an app
+        onElement { viewIdResourceName == "geoShareMainSourceButton" }.click()
+        onElement { viewIdResourceName == "geoShareConversionUriSheet" }
+            .scrollToElement(Direction.DOWN) {
+                viewIdResourceName == "geoShareConversionUriSheetItem_$messagingAppPackageName"
+            }
+            .click()
+
+        // Opens the messaging app
+        onElement { packageName == messagingAppPackageName }
+    }
+
+    @Test
+    fun whenLinkIsShared_allowsOpeningUriSource() = uiAutomator {
         assumeAppInstalled(PackageNames.GOOGLE_MAPS)
 
         // Share a Google Maps place link with the app
@@ -114,9 +140,11 @@ class MainBehaviorTest {
 
         // Open the source sheet and tap an app
         onElement { viewIdResourceName == "geoShareMainSourceButton" }.click()
-        onElement { viewIdResourceName == "geoShareConversionUriSheet" }.apply {
-            onSheetItem { textAsString() == "Maps" }.click()
-        }
+        onElement { viewIdResourceName == "geoShareConversionUriSheet" }
+            .scrollToElement(Direction.DOWN) {
+                viewIdResourceName == "geoShareConversionUriSheetItem_${PackageNames.GOOGLE_MAPS}"
+            }
+            .click()
 
         // Google Maps shows precise location
         waitAndAssertGoogleMapsContainsElement {
@@ -218,8 +246,8 @@ class MainBehaviorTest {
         onElement { viewIdResourceName == "geoShareResultSheet" }.run {
             expandSheet()
             longScrollSheet() // Speed up scrolling to the item, which is at the bottom of the sheet
-            scrollToSheetItem {
-                textAsString() in setOf(
+            scrollToElement(Direction.DOWN) {
+                viewIdResourceName == "geoShareSheetListItemHeadline" && textAsString() in setOf(
                     "Save GPX route",
                     @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Enregistrer l’itinéraire GPX",
                 )
@@ -250,8 +278,8 @@ class MainBehaviorTest {
         onElement { viewIdResourceName == "geoShareResultSheet" }.run {
             expandSheet()
             longScrollSheet() // Speed up scrolling to the item, which is at the bottom of the sheet
-            scrollToSheetItem {
-                textAsString() in setOf(
+            scrollToElement(Direction.DOWN) {
+                viewIdResourceName == "geoShareSheetListItemHeadline" && textAsString() in setOf(
                     "Save to contact",
                     @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Enregistrer dans les contacts",
                 )
