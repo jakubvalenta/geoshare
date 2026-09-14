@@ -5,6 +5,8 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import page.ooooo.geoshare.lib.FakeLog
+import page.ooooo.geoshare.lib.android.FileActivity
+import page.ooooo.geoshare.lib.android.FileType
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
@@ -14,6 +16,8 @@ import page.ooooo.geoshare.lib.geo.mockGeometries
 class OpenPointsGpxOutputTest {
     private val coordinateConverter = CoordinateConverter(mockGeometries)
     private val log = FakeLog
+    private val activity = FileActivity(PackageNames.TEST, FileType.GPX)
+    private val output = OpenPointsGpxOutput(activity, coordinateConverter, log)
 
     @Test
     fun write_whenPointsContainThreePoints_writesGpxWaypoints() = runTest {
@@ -23,7 +27,6 @@ class OpenPointsGpxOutputTest {
             WGS84Point(5.0, 6.0, name = "My waypoint", source = Source.GENERATED),
             WGS84Point(1.0, 2.0, name = "My destination", source = Source.GENERATED),
         )
-        val output = OpenPointsGpxOutput(PackageNames.TEST, coordinateConverter, log)
         output.write(points, stringBuilder)
         assertEquals(
             """<?xml version="1.0" encoding="UTF-8" standalone="no" ?>

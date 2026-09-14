@@ -6,6 +6,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.lib.FakeLog
+import page.ooooo.geoshare.lib.android.FileActivity
+import page.ooooo.geoshare.lib.android.FileType
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
@@ -18,8 +20,12 @@ class LocationRationaleShownTest {
     private val log = FakeLog
     private val source = "https://maps.google.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-    private val action =
-        OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter, log).toAction(points.last())
+    private val output = OpenRouteOnePointGpxOutput(
+        FileActivity(PackageNames.TOMTOM, FileType.GPX_ONE_POINT),
+        coordinateConverter,
+        log,
+    )
+    private val action = output.toAction(points.last())
     private val stateContext: ConversionStateContext = mock()
 
     @Test

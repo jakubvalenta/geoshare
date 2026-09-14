@@ -13,7 +13,7 @@ import javax.inject.Inject
  *
  * Only available when the point actually has a name.
  */
-class CopyNameOutput @Inject constructor() : CopyPointOutput {
+class CopyNameOutput @Inject constructor() : CopyPointTextOutput {
     override fun getText(value: Point, uriQuote: UriQuote) =
         value.cleanName
 

@@ -11,20 +11,21 @@ import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.FileActivity
+import page.ooooo.geoshare.lib.android.UriActivity
 import page.ooooo.geoshare.lib.android.copy
-import page.ooooo.geoshare.lib.android.openFileInApp
-import page.ooooo.geoshare.lib.android.openFileUriForWriting
+import page.ooooo.geoshare.lib.android.writeToContentProvider
 import page.ooooo.geoshare.lib.android.openFileWithChooser
-import page.ooooo.geoshare.lib.android.openUriInApp
 import page.ooooo.geoshare.lib.android.openUriWithChooser
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
-import page.ooooo.geoshare.lib.writeFile
+import page.ooooo.geoshare.lib.deleteAllAndWriteFile
 import page.ooooo.geoshare.ui.components.DrawableIconDescriptor
 import page.ooooo.geoshare.ui.components.IconDescriptor
 import page.ooooo.geoshare.ui.components.ResourceIconDescriptor
+import java.io.File
 
-sealed interface CopyPointOutput :
+sealed interface CopyPointTextOutput :
     PointOutput.WithoutLocation,
     Output.HasSuccessText,
     Output.HasAutomationSuccessText {
@@ -32,10 +33,12 @@ sealed interface CopyPointOutput :
     fun getText(value: Point, uriQuote: UriQuote = DefaultUriQuote): String? = null
 
     override suspend fun execute(value: Point, actionContext: ActionContext) =
-        getText(value, actionContext.uriQuote)?.let { text ->
-            actionContext.clipboard.copy(text)
-            true
-        }.let { success -> if (success == true) ActionResult.SUCCEEDED else ActionResult.FAILED }
+        getText(value, actionContext.uriQuote)
+            ?.let { text ->
+                actionContext.clipboard.copy(text)
+                true
+            }
+            .toActionResult()
 
     override fun getDescription(value: Point, uriQuote: UriQuote) =
         getText(value, uriQuote)
@@ -48,36 +51,36 @@ sealed interface CopyPointOutput :
         stringResource(R.string.copying_finished)
 }
 
-sealed interface OpenPointOutput :
+sealed interface OpenPointUriOutput :
     PointOutput.WithoutLocation,
     Output.HasErrorText,
     Output.HasAutomationDelay,
     Output.HasAutomationErrorText {
 
-    val packageName: String
+    val activity: UriActivity
 
-    fun getText(value: Point, uriQuote: UriQuote = DefaultUriQuote): String? = null
+    fun getUriString(value: Point, uriQuote: UriQuote = DefaultUriQuote): String? = null
 
     override suspend fun execute(value: Point, actionContext: ActionContext) =
-        getText(value, actionContext.uriQuote)?.let { uriString ->
-            actionContext.context.openUriInApp(uriString, packageName)
-        }.let { success -> if (success == true) ActionResult.SUCCEEDED_AND_OPENED_APP else ActionResult.FAILED }
+        getUriString(value, actionContext.uriQuote)
+            ?.let { uriString -> activity.launch(actionContext.context, uriString) }
+            .toActionResult(openedApp = true)
 
     override fun getIcon(appDetails: AppDetails) =
-        appDetails[packageName]?.let { DrawableIconDescriptor(it.icon) }
+        appDetails[activity.packageName]?.let { DrawableIconDescriptor(it.icon) }
 
     @Composable
     override fun errorText(appDetails: AppDetails) =
         stringResource(
             R.string.conversion_succeeded_open_app_failed,
-            appDetails[packageName]?.label ?: packageName,
+            appDetails[activity.packageName]?.label ?: activity.packageName,
         )
 
     @Composable
     override fun automationErrorText(appDetails: AppDetails) =
         stringResource(
             R.string.conversion_automation_open_app_failed,
-            appDetails[packageName]?.label ?: packageName,
+            appDetails[activity.packageName]?.label ?: activity.packageName,
         )
 
     @Composable
@@ -85,31 +88,32 @@ sealed interface OpenPointOutput :
         pluralStringResource(
             R.plurals.conversion_automation_open_app_waiting,
             counterSec,
-            appDetails[packageName]?.label ?: packageName,
+            appDetails[activity.packageName]?.label ?: activity.packageName,
             counterSec,
         )
 }
 
-sealed interface OpenPointsOutput :
+sealed interface OpenPointsFileOutput :
     PointsOutput.WithoutLocation,
     Output.HasErrorText,
     Output.HasAutomationDelay,
     Output.HasAutomationErrorText {
 
-    val packageName: String
+    val activity: FileActivity
     val log: Log
 
     fun write(value: Points, writer: Appendable)
 
     override suspend fun execute(value: Points, actionContext: ActionContext) =
-        writeFile(actionContext.context.filesDir, "points", "${System.currentTimeMillis()}.gpx") {
-            write(value, this)
-        }?.let { file ->
-            actionContext.context.openFileInApp(file, packageName, log)
-        }.let { success -> if (success == true) ActionResult.SUCCEEDED_AND_OPENED_APP else ActionResult.FAILED }
+        File(actionContext.context.filesDir, "points")
+            .deleteAllAndWriteFile("${System.currentTimeMillis()}.gpx") {
+                write(value, this)
+            }
+            ?.let { file -> activity.launch(actionContext.context, file, log) }
+            .toActionResult(openedApp = true)
 
     override fun getIcon(appDetails: AppDetails) =
-        appDetails[packageName]?.let { DrawableIconDescriptor(it.icon) }
+        appDetails[activity.packageName]?.let { DrawableIconDescriptor(it.icon) }
 
     override fun getMenuIcon(appDetails: AppDetails) =
         ResourceIconDescriptor(R.drawable.route_24px)
@@ -118,14 +122,14 @@ sealed interface OpenPointsOutput :
     override fun errorText(appDetails: AppDetails) =
         stringResource(
             R.string.conversion_succeeded_open_app_failed,
-            appDetails[packageName]?.label ?: packageName,
+            appDetails[activity.packageName]?.label ?: activity.packageName,
         )
 
     @Composable
     override fun automationErrorText(appDetails: AppDetails) =
         stringResource(
             R.string.conversion_automation_open_app_failed,
-            appDetails[packageName]?.label ?: packageName,
+            appDetails[activity.packageName]?.label ?: activity.packageName,
         )
 
     @Composable
@@ -133,12 +137,12 @@ sealed interface OpenPointsOutput :
         pluralStringResource(
             R.plurals.conversion_automation_open_app_waiting,
             counterSec,
-            appDetails[packageName]?.label ?: packageName,
+            appDetails[activity.packageName]?.label ?: activity.packageName,
             counterSec,
         )
 }
 
-sealed interface SavePointOutput :
+sealed interface SavePointFileOutput :
     PointOutput.WithFile,
     Output.HasErrorText,
     Output.HasSuccessText,
@@ -149,9 +153,10 @@ sealed interface SavePointOutput :
     fun write(value: Point, writer: Appendable)
 
     override suspend fun execute(uri: Uri, value: Point, actionContext: ActionContext) = withContext(Dispatchers.IO) {
-        actionContext.context.openFileUriForWriting(uri) {
+        actionContext.context.writeToContentProvider(uri) {
             write(value, this)
-        }.let { success -> if (success) ActionResult.SUCCEEDED else ActionResult.FAILED }
+        }
+            .toActionResult()
     }
 
     override fun getMenuIcon(appDetails: AppDetails) =
@@ -178,7 +183,7 @@ sealed interface SavePointOutput :
         pluralStringResource(R.plurals.conversion_automation_save_gpx_waiting, counterSec, counterSec)
 }
 
-sealed interface SavePointsOutput :
+sealed interface SavePointsFileOutput :
     PointsOutput.WithFile,
     Output.HasErrorText,
     Output.HasSuccessText,
@@ -189,9 +194,10 @@ sealed interface SavePointsOutput :
     fun write(value: Points, writer: Appendable)
 
     override suspend fun execute(uri: Uri, value: Points, actionContext: ActionContext) = withContext(Dispatchers.IO) {
-        actionContext.context.openFileUriForWriting(uri) {
+        actionContext.context.writeToContentProvider(uri) {
             write(value, this)
-        }.let { success -> if (success) ActionResult.SUCCEEDED else ActionResult.FAILED }
+        }
+            .toActionResult()
     }
 
     override fun getMenuIcon(appDetails: AppDetails) =
@@ -218,18 +224,18 @@ sealed interface SavePointsOutput :
         pluralStringResource(R.plurals.conversion_automation_save_gpx_waiting, counterSec, counterSec)
 }
 
-sealed interface SharePointOutput :
+sealed interface SharePointUriOutput :
     PointOutput.WithoutLocation,
     Output.HasErrorText,
     Output.HasAutomationDelay,
     Output.HasAutomationErrorText {
 
-    fun getText(value: Point, uriQuote: UriQuote = DefaultUriQuote): String? = null
+    fun getUriString(value: Point, uriQuote: UriQuote = DefaultUriQuote): String? = null
 
     override suspend fun execute(value: Point, actionContext: ActionContext) =
-        getText(value, actionContext.uriQuote)?.let { uriString ->
-            actionContext.context.openUriWithChooser(uriString)
-        }.let { success -> if (success == true) ActionResult.SUCCEEDED_AND_OPENED_APP else ActionResult.FAILED }
+        getUriString(value, actionContext.uriQuote)
+            ?.let { uriString -> actionContext.context.openUriWithChooser(uriString) }
+            .toActionResult(openedApp = true)
 
     @Composable
     override fun errorText(appDetails: AppDetails) =
@@ -244,7 +250,7 @@ sealed interface SharePointOutput :
         pluralStringResource(R.plurals.conversion_automation_share_waiting, counterSec, counterSec)
 }
 
-sealed interface SharePointsOutput :
+sealed interface SharePointsFileOutput :
     PointsOutput.WithoutLocation,
     Output.HasErrorText,
     Output.HasAutomationDelay,
@@ -254,11 +260,12 @@ sealed interface SharePointsOutput :
     fun write(value: Points, writer: Appendable)
 
     override suspend fun execute(value: Points, actionContext: ActionContext) =
-        writeFile(actionContext.context.filesDir, "points", "${System.currentTimeMillis()}.gpx") {
-            write(value, this)
-        }?.let { file ->
-            actionContext.context.openFileWithChooser(file)
-        }.let { success -> if (success == true) ActionResult.SUCCEEDED_AND_OPENED_APP else ActionResult.FAILED }
+        File(actionContext.context.filesDir, "points")
+            .deleteAllAndWriteFile("${System.currentTimeMillis()}.gpx") {
+                write(value, this)
+            }
+            ?.let { file -> actionContext.context.openFileWithChooser(file) }
+            .toActionResult(openedApp = true)
 
     override fun getMenuIcon(appDetails: AppDetails) =
         ResourceIconDescriptor(R.drawable.route_24px)

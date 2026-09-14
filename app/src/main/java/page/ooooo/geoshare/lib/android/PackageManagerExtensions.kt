@@ -69,6 +69,60 @@ fun PackageManager.queryApps(
     }
         .mapValues { (packageName, dataTypes) -> App(packageName = packageName, dataTypes = dataTypes) }
 
+fun PackageManager.queryActivities(
+    allowedMessagingApps: Set<String> = setOf(
+        PackageNames.CONVERSATIONS,
+        PackageNames.SIGNAL,
+        PackageNames.TELEGRAM,
+        PackageNames.TELEGRAM_FORK,
+        PackageNames.WHATSAPP,
+    ),
+): List<AppActivity> = buildList {
+    for (packageName in queryPackageNames(Intent(Intent.ACTION_VIEW, "geo:".toUri()))) {
+        when (packageName) {
+            // Replace geo: URIs with HTTPs URLs for Cartes IGN, because it doesn't support geo: URIs well
+            PackageNames.CARTES_IGN -> add(UriActivity(packageName, UriScheme.CARTES_IGN))
+            // Exclude geo: URIs from Magic Earth, because it doesn't support these URIs well
+            PackageNames.MAGIC_EARTH -> {}
+            else -> add(UriActivity(packageName, UriScheme.GEO))
+        }
+    }
+    for (packageName in queryPackageNames(Intent(Intent.ACTION_VIEW, "google.navigation:".toUri()))) {
+        when (packageName) {
+            // Exclude google.navigation: URIs from Magic Earth, because it doesn't support these URIs well
+            PackageNames.MAGIC_EARTH -> {}
+            else -> add(UriActivity(packageName, UriScheme.GOOGLE_NAVIGATION))
+        }
+    }
+    for (packageName in queryPackageNames(Intent(Intent.ACTION_VIEW, "google.streetview:".toUri()))) {
+        add(UriActivity(packageName, UriScheme.GOOGLE_STREET_VIEW))
+    }
+    for (packageName in queryPackageNames(Intent(Intent.ACTION_VIEW, "magicearth:".toUri()))) {
+        add(UriActivity(packageName, UriScheme.MAGIC_EARTH))
+    }
+    for (packageName in queryPackageNames(
+        Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType("content:".toUri(), "application/gpx+xml")
+        },
+    )) {
+        if (packageName.startsWith(PackageNames.TOMTOM_PREFIX)) {
+            add(FileActivity(packageName, FileType.GPX_ONE_POINT))
+        } else {
+            add(FileActivity(packageName, FileType.GPX))
+        }
+    }
+    for (packageName in queryPackageNames(
+        Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+        },
+    )) {
+        // Allow only selected messaging apps, so that the app list is not flooded with apps no one will use
+        if (packageName in allowedMessagingApps) {
+            add(TextActivity(packageName, mimeType = "text/plain"))
+        }
+    }
+}
+
 private fun PackageManager.queryAppDetails(packageName: String): AppDetail? {
     val applicationInfo = try {
         getApplicationInfo(packageName, 0)

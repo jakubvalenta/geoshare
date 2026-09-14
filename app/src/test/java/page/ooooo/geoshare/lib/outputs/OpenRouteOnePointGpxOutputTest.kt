@@ -5,6 +5,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.lib.FakeLog
+import page.ooooo.geoshare.lib.android.FileActivity
+import page.ooooo.geoshare.lib.android.FileType
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
@@ -14,10 +16,12 @@ import page.ooooo.geoshare.lib.geo.mockGeometries
 class OpenRouteOnePointGpxOutputTest {
     private val coordinateConverter = CoordinateConverter(mockGeometries)
     private val log = FakeLog
+    private val activity = FileActivity(PackageNames.TOMTOM, FileType.GPX_ONE_POINT)
+    private val output = OpenRouteOnePointGpxOutput(activity, coordinateConverter, log)
 
     @Test
     fun execute_whenLocationIsNull_returnsFailed() = runTest {
-        val actionResult = OpenRouteOnePointGpxOutput(PackageNames.TEST, coordinateConverter, log).execute(
+        val actionResult = output.execute(
             location = null,
             value = WGS84Point(1.0, 2.0, name = "My destination", source = Source.GENERATED),
             actionContext = mock(),
@@ -30,7 +34,6 @@ class OpenRouteOnePointGpxOutputTest {
         val stringBuilder = StringBuilder()
         val location = WGS84Point(3.0, 4.0, source = Source.GPS_SENSOR)
         val point = WGS84Point(1.0, 2.0, name = "My destination", source = Source.GENERATED)
-        val output = OpenRouteOnePointGpxOutput(PackageNames.TEST, coordinateConverter, log)
         output.write(location, point, stringBuilder)
         assertEquals(
             @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")

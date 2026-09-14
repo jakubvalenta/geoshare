@@ -46,7 +46,11 @@ import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.FileActivity
+import page.ooooo.geoshare.lib.android.FileType
 import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.android.UriActivity
+import page.ooooo.geoshare.lib.android.UriScheme
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
@@ -381,7 +385,10 @@ private fun ActionWaitingPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val output = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
+            val output = OpenDisplayGeoUriOutput(
+                UriActivity(PackageNames.OSMAND_PLUS, UriScheme.GEO),
+                coordinateConverter,
+            )
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultTitle(
                 currentState = ActionWaiting(
@@ -418,7 +425,10 @@ private fun DarkActionWaitingPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            val output = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
+            val output = OpenDisplayGeoUriOutput(
+                UriActivity(PackageNames.OSMAND_PLUS, UriScheme.GEO),
+                coordinateConverter,
+            )
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultTitle(
                 currentState = ActionWaiting(
@@ -456,13 +466,17 @@ private fun LocationPermissionReceivedPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val log = DefaultLog
+            val output = OpenRouteOnePointGpxOutput(
+                FileActivity(PackageNames.TOMTOM, FileType.GPX_ONE_POINT),
+                coordinateConverter,
+                log,
+            )
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultTitle(
                 currentState = LocationPermissionReceived(
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter, log)
-                        .toAction(WGS84Point(NaivePoint.example)),
+                    action = output.toAction(WGS84Point(NaivePoint.example)),
                     isAutomation = true,
                 ),
                 appDetails = MutableStateFlow(fakeAppDetails()),
@@ -492,13 +506,17 @@ private fun DarkLocationPermissionReceivedPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val log = DefaultLog
+            val output = OpenRouteOnePointGpxOutput(
+                FileActivity(PackageNames.TOMTOM, FileType.GPX_ONE_POINT),
+                coordinateConverter,
+                log,
+            )
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultTitle(
                 currentState = LocationPermissionReceived(
                     source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    action = OpenRouteOnePointGpxOutput(PackageNames.TOMTOM, coordinateConverter, log)
-                        .toAction(WGS84Point(NaivePoint.example)),
+                    action = output.toAction(WGS84Point(NaivePoint.example)),
                     isAutomation = true,
                 ),
                 appDetails = MutableStateFlow(fakeAppDetails()),

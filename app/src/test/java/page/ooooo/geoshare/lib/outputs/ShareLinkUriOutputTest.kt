@@ -16,7 +16,7 @@ class ShareLinkUriOutputTest {
     private val uriQuote = FakeUriQuote
 
     @Test
-    fun getText_whenPointIsWGS84AndWithinMainlandChinaAndLinkSrsIsGCJ02MainlandChina_returnsUriWithConvertedCoordinates() {
+    fun getUriString_whenPointIsWGS84AndWithinMainlandChinaAndLinkSrsIsGCJ02MainlandChina_returnsUriWithConvertedCoordinates() {
         val link = Link(
             coordsUriTemplate = "https://www.google.com/maps/search/?api=1&query={lat}%2C{lon}",
             nameUriTemplate = "https://www.google.com/maps/search/?api=1&query={q}",
@@ -25,7 +25,7 @@ class ShareLinkUriOutputTest {
         assertEquals(
             "https://www.google.com/maps/search/?api=1&query=31.2285067%2C121.475524",
             ShareLinkUriOutput(link, coordinateConverter)
-                .getText(
+                .getUriString(
                     WGS84Point(31.23044166868017, 121.47099209401793, source = Source.GENERATED),
                     uriQuote,
                 ),
@@ -33,7 +33,7 @@ class ShareLinkUriOutputTest {
     }
 
     @Test
-    fun getText_whenPointIsGCJ02AndWithinMainlandChinaAndLinkSrsIsGCJ02MainlandChina_returnsUriWithUnchangedCoordinates() {
+    fun getUriString_whenPointIsGCJ02AndWithinMainlandChinaAndLinkSrsIsGCJ02MainlandChina_returnsUriWithUnchangedCoordinates() {
         val link = Link(
             coordsUriTemplate = "https://www.google.com/maps/search/?api=1&query={lat}%2C{lon}",
             nameUriTemplate = "https://www.google.com/maps/search/?api=1&query={q}",
@@ -42,7 +42,7 @@ class ShareLinkUriOutputTest {
         assertEquals(
             "https://www.google.com/maps/search/?api=1&query=31.2285069%2C121.4755246",
             ShareLinkUriOutput(link, coordinateConverter)
-                .getText(
+                .getUriString(
                     GCJ02Point(31.22850685422705, 121.47552456472106, source = Source.GENERATED),
                     uriQuote,
                 ),

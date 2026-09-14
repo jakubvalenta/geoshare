@@ -8,6 +8,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.android.UriActivity
+import page.ooooo.geoshare.lib.android.UriScheme
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
@@ -21,7 +23,10 @@ class ActionFailedTest {
     private val coordinateConverter: CoordinateConverter = mock()
     private val source = "https://maps.google.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-    private val output = OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
+    private val output = OpenDisplayGeoUriOutput(
+        UriActivity(PackageNames.OSMAND_PLUS, UriScheme.GEO),
+        coordinateConverter,
+    )
     private val actionResult = ActionResult.FAILED
     private val stateContext: ConversionStateContext = mock()
 

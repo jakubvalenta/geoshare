@@ -6,6 +6,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.lib.FakeLog
+import page.ooooo.geoshare.lib.android.FileActivity
+import page.ooooo.geoshare.lib.android.FileType
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
@@ -43,8 +45,12 @@ class ActionReadyTest {
 
     @Test
     fun transition_whenActionIsOpenRouteOnePointGpx_returnsLocationRationaleRequested() = runTest {
-        val action =
-            OpenRouteOnePointGpxOutput(PackageNames.GOOGLE_MAPS, coordinateConverter, log).toAction(points.last())
+        val output = OpenRouteOnePointGpxOutput(
+            FileActivity(PackageNames.TOMTOM, FileType.GPX_ONE_POINT),
+            coordinateConverter,
+            log,
+        )
+        val action = output.toAction(points.last())
         val state = ActionReady(source, points, action, isAutomation = true)
         assertEquals(
             LocationRationaleRequested(source, points, action, isAutomation = true),

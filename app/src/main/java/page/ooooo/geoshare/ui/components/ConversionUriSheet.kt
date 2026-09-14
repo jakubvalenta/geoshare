@@ -115,7 +115,7 @@ private fun ConversionUriSheet(
                                 modifier = Modifier.testTag("geoShareConversionUriSheetItem_${app.packageName}"),
                                 onClick = {
                                     if (DataType.SEND_PLAIN_TEXT in app.dataTypes) {
-                                        context.sendTextViaApp(uriString, app.packageName)
+                                        context.sendTextViaApp(uriString, app.packageName, "text/plain")
                                     } else {
                                         context.openUriInApp(uriString, app.packageName)
                                     }
