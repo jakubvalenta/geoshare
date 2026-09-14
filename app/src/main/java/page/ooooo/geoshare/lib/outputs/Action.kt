@@ -2,8 +2,6 @@ package page.ooooo.geoshare.lib.outputs
 
 import android.content.res.Resources
 import android.net.Uri
-import page.ooooo.geoshare.lib.DefaultUriQuote
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
@@ -21,8 +19,6 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 sealed interface Action<T> {
     val value: T
     val output: Output
-
-    fun getDescription(value: T, uriQuote: UriQuote = DefaultUriQuote): String?
 }
 
 /**
@@ -37,9 +33,6 @@ sealed interface BasicAction<T> : Action<T> {
     ) : BasicAction<Point> {
         override suspend fun execute(actionContext: ActionContext) =
             output.execute(value, actionContext)
-
-        override fun getDescription(value: Point, uriQuote: UriQuote) =
-            output.getDescription(value)
     }
 
     data class WithPoints(
@@ -48,9 +41,6 @@ sealed interface BasicAction<T> : Action<T> {
     ) : BasicAction<Points> {
         override suspend fun execute(actionContext: ActionContext) =
             output.execute(value, actionContext)
-
-        override fun getDescription(value: Points, uriQuote: UriQuote) =
-            output.getDescription(value)
     }
 }
 
@@ -75,9 +65,6 @@ sealed interface FileAction<T> : Action<T> {
 
         override suspend fun execute(uri: Uri, actionContext: ActionContext) =
             output.execute(uri, value, actionContext)
-
-        override fun getDescription(value: Point, uriQuote: UriQuote) =
-            output.getDescription(value)
     }
 
     data class WithPoints(
@@ -90,9 +77,6 @@ sealed interface FileAction<T> : Action<T> {
 
         override suspend fun execute(uri: Uri, actionContext: ActionContext) =
             output.execute(uri, value, actionContext)
-
-        override fun getDescription(value: Points, uriQuote: UriQuote) =
-            output.getDescription(value)
     }
 }
 
@@ -109,9 +93,6 @@ sealed interface LocationAction<T> : Action<T> {
     ) : LocationAction<Point> {
         override suspend fun execute(location: Point, actionContext: ActionContext) =
             output.execute(location, value, actionContext)
-
-        override fun getDescription(value: Point, uriQuote: UriQuote) =
-            output.getDescription(value)
     }
 
     data class WithPoints(
@@ -120,9 +101,6 @@ sealed interface LocationAction<T> : Action<T> {
     ) : LocationAction<Points> {
         override suspend fun execute(location: Point, actionContext: ActionContext) =
             output.execute(location, value, actionContext)
-
-        override fun getDescription(value: Points, uriQuote: UriQuote) =
-            output.getDescription(value)
     }
 }
 
