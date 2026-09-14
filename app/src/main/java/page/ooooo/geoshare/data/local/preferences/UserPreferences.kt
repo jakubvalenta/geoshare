@@ -11,9 +11,15 @@ import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.Log
+import page.ooooo.geoshare.lib.android.AppActivity
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.android.DataType
-import page.ooooo.geoshare.lib.android.Apps
+import page.ooooo.geoshare.lib.android.FileActivity
+import page.ooooo.geoshare.lib.android.FileType
+import page.ooooo.geoshare.lib.android.TextActivity
+import page.ooooo.geoshare.lib.android.UriActivity
+import page.ooooo.geoshare.lib.android.UriScheme
+import page.ooooo.geoshare.lib.android.getPackageNames
+import page.ooooo.geoshare.lib.android.sorted
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -203,7 +209,7 @@ object AutomationPreference : OptionsPreference<Automation> {
     }
 
     fun getOptionGroups(
-        apps: Apps,
+        activities: List<AppActivity>,
         appDetails: AppDetails,
         hiddenApps: Set<String>?,
         links: List<Link>,
@@ -228,35 +234,14 @@ object AutomationPreference : OptionsPreference<Automation> {
             SaveRouteGpxAutomation,
             SavePointsGpxAutomation,
         ),
-        apps
-            .filterKeys { hiddenApps?.contains(it) != true }
+        activities
+            .groupBy { activity -> activity.packageName }
+            .filterKeys { packageName -> hiddenApps?.contains(packageName) != true }
             .toSortedMap(compareBy(nullsLast()) { packageName -> appDetails[packageName]?.label })
-            .flatMap { (packageName, app) ->
-                buildList {
-                    if (DataType.GEO_URI in app.dataTypes) {
-                        add(OpenDisplayGeoUriAutomation(packageName))
-                    }
-                    if (DataType.MAGIC_EARTH_URI in app.dataTypes) {
-                        add(OpenDisplayMagicEarthUriAutomation(packageName))
-                        add(OpenNavigationMagicEarthUriAutomation(packageName))
-                    }
-                    if (DataType.GOOGLE_NAVIGATION_URI in app.dataTypes) {
-                        add(OpenNavigationGoogleUriAutomation(packageName))
-                    }
-                    if (DataType.GOOGLE_STREET_VIEW_URI in app.dataTypes) {
-                        add(OpenStreetViewGoogleUriAutomation(packageName))
-                    }
-                    if (DataType.GPX_DATA in app.dataTypes) {
-                        add(OpenRouteGpxAutomation(packageName))
-                        add(OpenPointsGpxAutomation(packageName))
-                    }
-                    if (DataType.GPX_ONE_POINT_DATA in app.dataTypes) {
-                        add(OpenRouteOnePointGpxAutomation(packageName))
-                    }
-                    if (DataType.SEND_PLAIN_TEXT in app.dataTypes) {
-                        add(SendPointAutomation(packageName))
-                    }
-                }
+            .flatMap { (_, activities) ->
+                activities
+                    .sorted()
+                    .flatMap { activity -> activity.toAutomations() }
             }
             .takeIf { it.isNotEmpty() },
         links
@@ -270,6 +255,52 @@ object AutomationPreference : OptionsPreference<Automation> {
             }
             .takeIf { it.isNotEmpty() },
     )
+
+    private fun AppActivity.toAutomations(): List<Automation> =
+        when (this) {
+            is FileActivity ->
+                when (fileType) {
+                    FileType.GPX -> listOf(
+                        OpenRouteGpxAutomation(packageName),
+                        OpenPointsGpxAutomation(packageName),
+                    )
+
+                    FileType.GPX_ONE_POINT -> listOf(
+                        OpenRouteOnePointGpxAutomation(packageName),
+                    )
+                }
+
+            is TextActivity -> listOf(
+                SendPointAutomation(packageName)
+            )
+
+            is UriActivity ->
+                when (uriScheme) {
+                    UriScheme.CARTES_IGN -> listOf(
+                        // Return empty list, because a Cartes IGN automation is not implemented, because we expect few
+                        // people would use it
+                    )
+
+                    UriScheme.GEO -> listOf(
+                        OpenDisplayGeoUriAutomation(packageName),
+                    )
+
+                    UriScheme.GOOGLE_NAVIGATION -> listOf(
+                        OpenNavigationGoogleUriAutomation(packageName),
+                    )
+
+                    UriScheme.GOOGLE_STREET_VIEW -> listOf(
+                        OpenStreetViewGoogleUriAutomation(packageName),
+                    )
+
+                    UriScheme.MAGIC_EARTH -> listOf(
+                        OpenDisplayMagicEarthUriAutomation(packageName),
+                        OpenNavigationMagicEarthUriAutomation(packageName),
+                    )
+
+                    UriScheme.UNKNOWN -> emptyList()
+                }
+        }
 
     private const val TAG = "AutomationPreference"
 }
@@ -470,7 +501,7 @@ object HiddenAppsPreference : SetPreference {
 
     override fun getValue(values: UserPreferencesValues) = values.hiddenApps
 
-    fun getOptions(apps: Apps): Set<String> = apps.keys
+    fun getOptions(activities: List<AppActivity>): Set<String> = activities.getPackageNames()
 }
 
 object ChangelogShownForVersionCodePreference : NullableIntPreference {

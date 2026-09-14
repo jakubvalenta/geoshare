@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
-import page.ooooo.geoshare.data.di.fakeApps
+import page.ooooo.geoshare.data.di.fakeActivities
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.android.AppDetails
@@ -148,7 +148,7 @@ private fun DefaultPreview() {
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             outputsForApps = MutableStateFlow(
                 outputRepository.getOutputsForApps(
-                    apps = fakeApps,
+                    activities = fakeActivities,
                     hiddenApps = emptySet(),
                 )
             ),
@@ -175,7 +175,7 @@ private fun DarkPreview() {
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             outputsForApps = MutableStateFlow(
                 outputRepository.getOutputsForApps(
-                    apps = fakeApps,
+                    activities = fakeActivities,
                     hiddenApps = emptySet(),
                 )
             ),

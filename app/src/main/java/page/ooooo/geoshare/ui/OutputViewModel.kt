@@ -67,7 +67,7 @@ class OutputViewModel @Inject constructor(
                 emptyList(),
             )
     val outputsForApps: StateFlow<Map<String, List<Output>>> =
-        appsRepository.apps
+        appsRepository.activities
             .combine(
                 userPreferencesRepository.values
                     .map { it.hiddenApps }

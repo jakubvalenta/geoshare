@@ -40,12 +40,12 @@ import page.ooooo.geoshare.data.local.preferences.ShareRouteGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareStreetViewGoogleUriAutomation
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.android.AppActivity
-import page.ooooo.geoshare.lib.android.Apps
 import page.ooooo.geoshare.lib.android.FileActivity
 import page.ooooo.geoshare.lib.android.FileType
 import page.ooooo.geoshare.lib.android.TextActivity
 import page.ooooo.geoshare.lib.android.UriActivity
 import page.ooooo.geoshare.lib.android.UriScheme
+import page.ooooo.geoshare.lib.android.sorted
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.outputs.CopyCoordsDecOutput
 import page.ooooo.geoshare.lib.outputs.CopyCoordsDegMinSecOutput
@@ -113,8 +113,6 @@ class OutputRepository @Inject constructor(
             SaveRouteGpxOutput(coordinateConverter),
             SavePointsGpxOutput(coordinateConverter),
         )
-
-    fun getOutputsForApps(apps: Apps, hiddenApps: Set<String>?): Map<String, List<Output>> = TODO()
 
     fun getOutputsForApps(activities: List<AppActivity>, hiddenApps: Set<String>?): Map<String, List<Output>> =
         activities
@@ -356,35 +354,8 @@ class OutputRepository @Inject constructor(
                         OpenDisplayMagicEarthUriOutput(this, coordinateConverter),
                         OpenNavigationMagicEarthUriOutput(this, coordinateConverter),
                     )
+
+                    UriScheme.UNKNOWN -> emptyList()
                 }
         }
-
-    private fun Iterable<AppActivity>.sorted(): List<AppActivity> =
-        sortedWith(
-            compareBy<AppActivity> { activity ->
-                when (activity) {
-                    is FileActivity -> 2
-                    is TextActivity -> 1
-                    is UriActivity -> 0
-                }
-            }
-                .thenBy { activity ->
-                    when (activity) {
-                        is FileActivity -> when (activity.fileType) {
-                            FileType.GPX -> 0
-                            FileType.GPX_ONE_POINT -> 1
-                        }
-
-                        is TextActivity -> null
-
-                        is UriActivity -> when (activity.uriScheme) {
-                            UriScheme.CARTES_IGN -> 1
-                            UriScheme.GEO -> 0
-                            UriScheme.GOOGLE_NAVIGATION -> 3
-                            UriScheme.GOOGLE_STREET_VIEW -> 4
-                            UriScheme.MAGIC_EARTH -> 2
-                        }
-                    }
-                }
-        )
 }

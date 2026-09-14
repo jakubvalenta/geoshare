@@ -10,65 +10,6 @@ import page.ooooo.geoshare.BuildConfig
 
 private const val TAG = "PackageManagerExtensions"
 
-fun PackageManager.queryApps(
-    allowedMessagingApps: Set<String> = setOf(
-        PackageNames.CONVERSATIONS,
-        PackageNames.SIGNAL,
-        PackageNames.TELEGRAM,
-        PackageNames.TELEGRAM_FORK,
-        PackageNames.WHATSAPP,
-    ),
-): Apps =
-    buildMap {
-        for (packageName in queryPackageNames(Intent(Intent.ACTION_VIEW, "geo:".toUri()))) {
-            if (packageName != PackageNames.CARTES_IGN) {
-                getOrPut(packageName) { mutableSetOf() }.add(DataType.GEO_URI)
-            } else {
-                // Replace geo: URIs with HTTPs URLs for Cartes IGN, because it doesn't support geo: URIs well
-                getOrPut(packageName) { mutableSetOf() }.add(DataType.CARTES_IGN_URL)
-            }
-        }
-        for (packageName in queryPackageNames(Intent(Intent.ACTION_VIEW, "google.navigation:".toUri()))) {
-            getOrPut(packageName) { mutableSetOf() }.add(DataType.GOOGLE_NAVIGATION_URI)
-        }
-        for (packageName in queryPackageNames(Intent(Intent.ACTION_VIEW, "google.streetview:".toUri()))) {
-            getOrPut(packageName) { mutableSetOf() }.add(DataType.GOOGLE_STREET_VIEW_URI)
-        }
-        for (packageName in queryPackageNames(Intent(Intent.ACTION_VIEW, "magicearth:".toUri()))) {
-            getOrPut(packageName) { mutableSetOf() }.apply {
-                add(DataType.MAGIC_EARTH_URI)
-                // Remove support for geo: and google.navigation: URIs from the Magic Earth app, because it doesn't
-                // support these URIs well
-                remove(DataType.GEO_URI)
-                remove(DataType.GOOGLE_NAVIGATION_URI)
-            }
-        }
-        for (packageName in queryPackageNames(
-            Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType("content:".toUri(), "application/gpx+xml")
-            },
-        )) {
-            getOrPut(packageName) { mutableSetOf() }.add(
-                if (packageName.startsWith(PackageNames.TOMTOM_PREFIX)) {
-                    DataType.GPX_ONE_POINT_DATA
-                } else {
-                    DataType.GPX_DATA
-                }
-            )
-        }
-        for (packageName in queryPackageNames(
-            Intent(Intent.ACTION_SEND).apply {
-                type = "text/plain"
-            },
-        )) {
-            // Allow only selected messaging apps, so that the app list is not flooded with apps no one will use
-            if (packageName in allowedMessagingApps) {
-                getOrPut(packageName) { mutableSetOf() }.add(DataType.SEND_PLAIN_TEXT)
-            }
-        }
-    }
-        .mapValues { (packageName, dataTypes) -> App(packageName = packageName, dataTypes = dataTypes) }
-
 fun PackageManager.queryActivities(
     allowedMessagingApps: Set<String> = setOf(
         PackageNames.CONVERSATIONS,
@@ -123,6 +64,29 @@ fun PackageManager.queryActivities(
     }
 }
 
+/**
+ * Query package manager for activities that can open [uriString].
+ */
+fun PackageManager.queryActivitiesForUri(uriString: String): List<AppActivity> =
+    uriString.toUri().let { uri ->
+        // Use flag MATCH_ALL, so that all apps are returned, even if GeoShare is set to open the URI by default
+        if (uri.scheme != null) {
+            queryPackageNames(
+                Intent(Intent.ACTION_VIEW, uri),
+                flags = PackageManager.MATCH_ALL,
+            )
+                .map { packageName -> UriActivity(packageName, UriScheme.UNKNOWN) }
+        } else {
+            queryPackageNames(
+                Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                },
+                flags = PackageManager.MATCH_ALL,
+            )
+                .map { packageName -> TextActivity(packageName, mimeType = "text/plain") }
+        }
+    }
+
 private fun PackageManager.queryAppDetails(packageName: String): AppDetail? {
     val applicationInfo = try {
         getApplicationInfo(packageName, 0)
@@ -150,29 +114,6 @@ private fun PackageManager.queryAppDetails(packageName: String): AppDetail? {
 suspend fun PackageManager.queryAppDetails(packageNames: Iterable<String>): AppDetails =
     withContext(Dispatchers.Default) {
         packageNames.associateWith { packageName -> queryAppDetails(packageName) }
-    }
-
-/**
- * Query package manager for package names of apps that can open [uriString].
- */
-fun PackageManager.queryAppsForUri(uriString: String): Apps =
-    uriString.toUri().let { uri ->
-        // Use flag MATCH_ALL, so that all apps are returned, even if GeoShare is set to open the URI by default
-        if (uri.scheme != null) {
-            queryPackageNames(
-                Intent(Intent.ACTION_VIEW, uri),
-                flags = PackageManager.MATCH_ALL,
-            )
-                .associateWith { packageName -> App(packageName, setOf(DataType.VIEW_URI)) }
-        } else {
-            queryPackageNames(
-                Intent(Intent.ACTION_SEND).apply {
-                    type = "text/plain"
-                },
-                flags = PackageManager.MATCH_ALL,
-            )
-                .associateWith { packageName -> App(packageName, setOf(DataType.SEND_PLAIN_TEXT)) }
-        }
     }
 
 private fun PackageManager.queryPackageNames(

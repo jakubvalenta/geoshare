@@ -38,8 +38,8 @@ import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.DynamicColorPreference
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
+import page.ooooo.geoshare.lib.android.AppActivity
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.android.Apps
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.CustomLinkFeature
@@ -98,7 +98,7 @@ fun UserPreferenceScreen(
     outputViewModel: OutputViewModel = hiltViewModel(),
     viewModel: UserPreferenceViewModel = hiltViewModel(),
 ) {
-    val apps by viewModel.apps.collectAsStateWithLifecycle()
+    val activities by viewModel.activities.collectAsStateWithLifecycle()
     val appDetails by viewModel.appDetails.collectAsStateWithLifecycle()
     val billingAppNameResId = billingViewModel.billingAppNameResId
     val billingFeatures = billingViewModel.billingFeatures
@@ -108,7 +108,7 @@ fun UserPreferenceScreen(
 
     UserPreferenceScreen(
         initialGroupId = initialGroupId,
-        apps = apps,
+        activities = activities,
         appDetails = appDetails,
         billingAppNameResId = billingAppNameResId,
         billingFeatures = billingFeatures,
@@ -132,7 +132,7 @@ fun UserPreferenceScreen(
 @Composable
 private fun UserPreferenceScreen(
     initialGroupId: UserPreferenceGroupId?,
-    apps: Apps,
+    activities: List<AppActivity>,
     appDetails: AppDetails,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
@@ -165,7 +165,7 @@ private fun UserPreferenceScreen(
         listPane = {
             UserPreferenceListPane(
                 currentGroupId = currentGroupId,
-                apps = apps,
+                activities = activities,
                 appDetails = appDetails,
                 billingStatus = billingStatus,
                 billingFeatures = billingFeatures,
@@ -194,7 +194,7 @@ private fun UserPreferenceScreen(
             if (currentGroupId != null) {
                 UserPreferenceDetailPane(
                     currentGroupId = currentGroupId,
-                    apps = apps,
+                    activities = activities,
                     appDetails = appDetails,
                     billingAppNameResId = billingAppNameResId,
                     billingFeatures = billingFeatures,
@@ -228,7 +228,7 @@ private fun UserPreferenceScreen(
 private fun UserPreferenceListPane(
     currentGroupId: UserPreferenceGroupId?,
     values: UserPreferencesValues,
-    apps: Apps,
+    activities: List<AppActivity>,
     appDetails: AppDetails,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
@@ -338,7 +338,7 @@ private fun UserPreferenceListPane(
                 UserPreferenceHiddenAppsListItem(
                     index = 0,
                     count = 4,
-                    apps = apps,
+                    activities = activities,
                     selected = currentGroupId == UserPreferenceGroupId.HIDDEN_APPS,
                     values = values,
                     modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.HIDDEN_APPS}"),
@@ -425,7 +425,7 @@ private fun UserPreferenceListPane(
 @Composable
 private fun UserPreferenceDetailPane(
     currentGroupId: UserPreferenceGroupId,
-    apps: Apps,
+    activities: List<AppActivity>,
     appDetails: AppDetails,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
@@ -450,7 +450,7 @@ private fun UserPreferenceDetailPane(
 
         UserPreferenceGroupId.AUTOMATION -> UserPreferenceAutomationControls(
             appDetails = appDetails,
-            apps = apps,
+            activities = activities,
             billingAppNameResId = billingAppNameResId,
             billingFeatures = billingFeatures,
             billingStatus = billingStatus,
@@ -512,7 +512,7 @@ private fun UserPreferenceDetailPane(
 
         UserPreferenceGroupId.HIDDEN_APPS -> UserPreferenceHiddenAppsControls(
             appDetails = appDetails,
-            apps = apps,
+            activities = activities,
             billingAppNameResId = billingAppNameResId,
             onBack = onBack,
             onNavigateToBillingScreen = onNavigateToBillingScreen,
@@ -537,7 +537,7 @@ private fun DefaultPreview() {
             Column {
                 UserPreferenceScreen(
                     initialGroupId = null,
-                    apps = emptyMap(),
+                    activities = emptyList(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -570,7 +570,7 @@ private fun DarkPreview() {
             Column {
                 UserPreferenceScreen(
                     initialGroupId = null,
-                    apps = emptyMap(),
+                    activities = emptyList(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -599,7 +599,7 @@ private fun TabletPreview() {
             Column {
                 UserPreferenceScreen(
                     initialGroupId = null,
-                    apps = emptyMap(),
+                    activities = emptyList(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
