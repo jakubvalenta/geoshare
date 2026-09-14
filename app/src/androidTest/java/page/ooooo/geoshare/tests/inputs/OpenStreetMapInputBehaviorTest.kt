@@ -42,7 +42,7 @@ class OpenStreetMapInputBehaviorTest : InputBehaviorTest {
     }
 
     @Test
-    fun openStreetMap_online() = uiAutomator { // FIXME
+    fun openStreetMap_online() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("www.openstreetmap.org")
         }
