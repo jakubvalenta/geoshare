@@ -333,4 +333,7 @@
     <string name="help_welcome_text">Máte připravený odkaz na mapu? Zadejte jej do formuláře a stiskněte „%1$s“.</string>
     <string name="help_welcome_title">Vítejte</string>
     <string name="faq_open_by_default_headline">Jak vždy otevírat odkazy v %1$s</string>
+    <string name="conversion_processing">Zpracovává se odkaz typu %1$s…</string>
+    <string name="conversion_succeeded_copy_name">Zkopírovat název</string>
+    <string name="conversion_automation_copy_name_succeeded">Název byl automaticky zkopírován</string>
 </resources>
