@@ -329,4 +329,5 @@
     <string name="faq_open_by_default_headline">Comment ouvrir systématiquement les liens dans %1$s</string>
     <string name="conversion_succeeded_copy_name">Copier le nom</string>
     <string name="conversion_automation_copy_name_succeeded">Nom copié automatiquement</string>
+    <string name="conversion_processing">Traitement du lien de type %1$s…</string>
 </resources>
