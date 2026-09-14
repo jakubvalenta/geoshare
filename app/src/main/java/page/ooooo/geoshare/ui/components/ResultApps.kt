@@ -3,9 +3,7 @@ package page.ooooo.geoshare.ui.components
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -110,24 +108,24 @@ fun ResultApps(
             onClick = { onClick(it) },
             onHideApp = onHideApp,
         ) {
-            // Share item
-            item {
-                AppIcon(
-                    modifier = Modifier
-                        .weight(1f)
-                        .testTag("geoShareApp_share"),
-                    label = null,
-                    appDetails = appDetails,
-                    outputs = outputsForSharing,
-                    onClick = { onClick(it) },
-                ) {
-                    Surface(
-                        Modifier.requiredSize(iconSize),
-                        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                        shape = CircleShape,
-                    ) {
-                        outputsForSharing.firstOrNull()?.let { firstOutput ->
-                            firstOutput.getIcon(appDetails)?.let { icon ->
+            outputsForSharing.firstOrNull()?.let { firstOutput ->
+                firstOutput.getIcon(appDetails)?.let { icon ->
+                    // Share item
+                    item {
+                        AppIcon(
+                            modifier = Modifier
+                                .weight(1f)
+                                .testTag("geoShareApp_share"),
+                            label = null,
+                            appDetails = appDetails,
+                            outputs = outputsForSharing,
+                            onClick = { onClick(it) },
+                        ) {
+                            Surface(
+                                Modifier.requiredSize(iconSize),
+                                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                shape = CircleShape,
+                            ) {
                                 IconFromDescriptor(
                                     icon,
                                     contentDescription = firstOutput.label(appDetails),
@@ -240,13 +238,12 @@ private fun ResultAppsGrid(
                         onClick = onClick,
                         onHide = { onHideApp(packageName) },
                     ) {
-                        outputs.firstOrNull()?.getIcon(appDetails)
-                            ?.let { IconFromDescriptor(it, contentDescription = null, size = iconSize) }
-                            ?: Box(
-                                Modifier
-                                    .background(MaterialTheme.colorScheme.surfaceContainer, CircleShape)
-                                    .requiredSize(iconSize)
-                            )
+                        IconFromDescriptor(
+                            outputs.firstOrNull()?.getIcon(appDetails) ?: PlaceholderIconDescriptor,
+                            contentDescription = null,
+                            size = iconSize,
+                            placeholderContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        )
                     }
                 }
             }
@@ -279,15 +276,14 @@ private fun ResultAppsLinksGrid(
                         onClick = onClick,
                         onHide = { onDisableLinkGroup(group) },
                     ) {
-                        outputs.firstOrNull()?.getIcon(appDetails)?.let {
-                            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
-                                IconFromDescriptor(
-                                    it,
-                                    contentDescription = null,
-                                    size = iconSize,
-                                    inverseContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                                )
-                            }
+                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
+                            IconFromDescriptor(
+                                outputs.firstOrNull()?.getIcon(appDetails) ?: PlaceholderIconDescriptor,
+                                contentDescription = null,
+                                size = iconSize,
+                                inverseContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                                placeholderContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                            )
                         }
                     }
                 }
