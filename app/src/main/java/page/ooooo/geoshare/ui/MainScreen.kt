@@ -557,10 +557,11 @@ private fun MainScreen(
                                 onExecute = onExecute,
                                 onHideApp = onHideApp,
                                 onNavigateToLinkScreen = onNavigateToLinkScreen,
-                            ) {
+                            ) { paddingValues ->
                                 HelpOpenByDefaultMessage(
                                     dismissedHelpMessages = dismissedHelpMessages,
                                     sourceComesFromIntent = sourceComesFromIntent,
+                                    modifier = Modifier.padding(paddingValues),
                                     onDismissHelpMessage = onDismissHelpMessage,
                                     onNavigateToFaqScreen = onNavigateToFaqScreen,
                                 )
