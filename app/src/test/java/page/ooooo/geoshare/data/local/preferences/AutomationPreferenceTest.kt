@@ -18,10 +18,13 @@ import page.ooooo.geoshare.data.di.FakeOpenStreetMapDisplayLink
 import page.ooooo.geoshare.data.di.FakeOpenStreetMapNavigationLink
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.lib.FakeLog
-import page.ooooo.geoshare.lib.android.App
 import page.ooooo.geoshare.lib.android.AppDetail
-import page.ooooo.geoshare.lib.android.DataType
+import page.ooooo.geoshare.lib.android.FileActivity
+import page.ooooo.geoshare.lib.android.FileType
 import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.android.TextActivity
+import page.ooooo.geoshare.lib.android.UriActivity
+import page.ooooo.geoshare.lib.android.UriScheme
 
 class AutomationPreferenceTest {
     @Test
@@ -78,20 +81,11 @@ class AutomationPreferenceTest {
             ),
             AutomationPreference
                 .getOptionGroups(
-                    apps = mapOf(
-                        PackageNames.MAGIC_EARTH to App(
-                            packageName = PackageNames.MAGIC_EARTH,
-                            dataTypes = setOf(DataType.MAGIC_EARTH_URI)
-                        ),
-                        PackageNames.SIGNAL to App(
-                            packageName = PackageNames.SIGNAL,
-                            dataTypes = setOf(DataType.SEND_PLAIN_TEXT)
-                        ),
-                        PackageNames.TEST to App(packageName = PackageNames.TEST, dataTypes = setOf(DataType.GEO_URI)),
-                        PackageNames.TOMTOM to App(
-                            packageName = PackageNames.TOMTOM,
-                            dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
-                        ),
+                    activities = listOf(
+                        UriActivity(PackageNames.MAGIC_EARTH, UriScheme.MAGIC_EARTH),
+                        TextActivity(PackageNames.SIGNAL, mimeType = "text/plain"),
+                        UriActivity(PackageNames.TEST, UriScheme.GEO),
+                        FileActivity(PackageNames.TOMTOM, FileType.GPX_ONE_POINT),
                     ),
                     appDetails = mapOf(
                         PackageNames.MAGIC_EARTH to AppDetail(
@@ -152,16 +146,10 @@ class AutomationPreferenceTest {
             ),
             AutomationPreference
                 .getOptionGroups(
-                    apps = mapOf(
-                        PackageNames.MAGIC_EARTH to App(
-                            packageName = PackageNames.MAGIC_EARTH,
-                            dataTypes = setOf(DataType.MAGIC_EARTH_URI)
-                        ),
-                        PackageNames.TEST to App(packageName = PackageNames.TEST, dataTypes = setOf(DataType.GEO_URI)),
-                        PackageNames.TOMTOM to App(
-                            packageName = PackageNames.TOMTOM,
-                            dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
-                        ),
+                    activities = listOf(
+                        UriActivity(PackageNames.MAGIC_EARTH, UriScheme.MAGIC_EARTH),
+                        UriActivity(PackageNames.TEST, UriScheme.GEO),
+                        FileActivity(PackageNames.TOMTOM, FileType.GPX_ONE_POINT),
                     ),
                     appDetails = mapOf(
                         PackageNames.MAGIC_EARTH to AppDetail(
@@ -203,16 +191,10 @@ class AutomationPreferenceTest {
     @Test
     fun getValue_forEachSerializedString_returnsAutomation() {
         AutomationPreference.getOptionGroups(
-            apps = mapOf(
-                PackageNames.TEST to App(packageName = PackageNames.TEST, dataTypes = setOf(DataType.GEO_URI)),
-                PackageNames.MAGIC_EARTH to App(
-                    packageName = PackageNames.MAGIC_EARTH,
-                    dataTypes = setOf(DataType.MAGIC_EARTH_URI)
-                ),
-                PackageNames.TOMTOM to App(
-                    packageName = PackageNames.TOMTOM,
-                    dataTypes = setOf(DataType.GPX_ONE_POINT_DATA)
-                ),
+            activities = listOf(
+                UriActivity(PackageNames.TEST, UriScheme.GEO),
+                UriActivity(PackageNames.MAGIC_EARTH, UriScheme.MAGIC_EARTH),
+                FileActivity(PackageNames.TOMTOM, FileType.GPX_ONE_POINT),
             ),
             appDetails = mapOf(
                 PackageNames.MAGIC_EARTH to AppDetail(

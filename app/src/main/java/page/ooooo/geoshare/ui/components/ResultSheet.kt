@@ -91,15 +91,15 @@ fun ResultSheet(
                 ) {
                     outputsForPoint
                         .filter { it.isAvailable(selectedPoint) }
-                        .map { output -> output.toAction(selectedPoint) to output.getIcon(appDetails) }
-                        .zipWithNextFirstNull { prev, (action, icon) ->
+                        .map { output -> output to output.getIcon(appDetails) }
+                        .zipWithNextFirstNull { prev, (output, icon) ->
                             SheetListItem(
-                                headlineText = action.output.label(appDetails),
+                                headlineText = output.label(appDetails),
                                 onClick = {
                                     hide()
-                                    onExecute(action)
+                                    onExecute(output.toAction(selectedPoint))
                                 },
-                                supportingText = action.getDescription(selectedPoint),
+                                supportingText = output.getDescription(selectedPoint),
                                 icon = icon,
                                 prevIcon = prev?.second,
                             )
@@ -117,15 +117,15 @@ fun ResultSheet(
                 ) {
                     outputsForPoints
                         .filter { it.isAvailable(points) }
-                        .map { output -> output.toAction(points) to output.getIcon(appDetails) }
-                        .zipWithNextFirstNull { prev, (action, icon) ->
+                        .map { output -> output to output.getIcon(appDetails) }
+                        .zipWithNextFirstNull { prev, (output, icon) ->
                             SheetListItem(
-                                headlineText = action.output.label(appDetails),
+                                headlineText = output.label(appDetails),
                                 onClick = {
                                     hide()
-                                    onExecute(action)
+                                    onExecute(output.toAction(points))
                                 },
-                                supportingText = action.getDescription(points),
+                                supportingText = output.getDescription(points),
                                 icon = icon,
                                 prevIcon = prev?.second,
                             )

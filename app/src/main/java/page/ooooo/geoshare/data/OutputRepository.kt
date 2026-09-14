@@ -39,8 +39,13 @@ import page.ooooo.geoshare.data.local.preferences.SharePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareRouteGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareStreetViewGoogleUriAutomation
 import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.android.DataType
-import page.ooooo.geoshare.lib.android.Apps
+import page.ooooo.geoshare.lib.android.AppActivity
+import page.ooooo.geoshare.lib.android.FileActivity
+import page.ooooo.geoshare.lib.android.FileType
+import page.ooooo.geoshare.lib.android.TextActivity
+import page.ooooo.geoshare.lib.android.UriActivity
+import page.ooooo.geoshare.lib.android.UriScheme
+import page.ooooo.geoshare.lib.android.sorted
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.outputs.CopyCoordsDecOutput
 import page.ooooo.geoshare.lib.outputs.CopyCoordsDegMinSecOutput
@@ -109,38 +114,14 @@ class OutputRepository @Inject constructor(
             SavePointsGpxOutput(coordinateConverter),
         )
 
-    fun getOutputsForApps(apps: Apps, hiddenApps: Set<String>?): Map<String, List<Output>> =
-        apps
-            .filterKeys { hiddenApps?.contains(it) != true }
-            .mapValues { (packageName, app) ->
-                buildList {
-                    if (DataType.GEO_URI in app.dataTypes) {
-                        add(OpenDisplayGeoUriOutput(packageName, coordinateConverter))
-                    }
-                    if (DataType.CARTES_IGN_URL in app.dataTypes) {
-                        add(OpenDisplayCartesIGNUrlOutput(packageName, coordinateConverter))
-                    }
-                    if (DataType.MAGIC_EARTH_URI in app.dataTypes) {
-                        add(OpenDisplayMagicEarthUriOutput(packageName, coordinateConverter))
-                        add(OpenNavigationMagicEarthUriOutput(packageName, coordinateConverter))
-                    }
-                    if (DataType.GOOGLE_NAVIGATION_URI in app.dataTypes) {
-                        add(OpenNavigationGoogleUriOutput(packageName, coordinateConverter))
-                    }
-                    if (DataType.GOOGLE_STREET_VIEW_URI in app.dataTypes) {
-                        add(OpenStreetViewGoogleUriOutput(packageName, coordinateConverter))
-                    }
-                    if (DataType.GPX_DATA in app.dataTypes) {
-                        add(OpenRouteGpxOutput(packageName, coordinateConverter, log))
-                        add(OpenPointsGpxOutput(packageName, coordinateConverter, log))
-                    }
-                    if (DataType.GPX_ONE_POINT_DATA in app.dataTypes) {
-                        add(OpenRouteOnePointGpxOutput(packageName, coordinateConverter, log))
-                    }
-                    if (DataType.SEND_PLAIN_TEXT in app.dataTypes) {
-                        add(SendPointOutput(packageName, coordinateConverter))
-                    }
-                }
+    fun getOutputsForApps(activities: List<AppActivity>, hiddenApps: Set<String>?): Map<String, List<Output>> =
+        activities
+            .groupBy { activity -> activity.packageName }
+            .filterKeys { packageName -> hiddenApps?.contains(packageName) != true }
+            .mapValues { (_, activities) ->
+                activities
+                    .sorted()
+                    .flatMap { activity -> activity.toOutputs() }
             }
 
     fun getOutputsForLinks(links: List<Link>): Map<String?, List<Output>> =
@@ -239,47 +220,60 @@ class OutputRepository @Inject constructor(
 
             is OpenDisplayGeoUriAutomation ->
                 automation.packageName?.let { packageName ->
-                    OpenDisplayGeoUriOutput(packageName, coordinateConverter)
+                    OpenDisplayGeoUriOutput(UriActivity(packageName, UriScheme.GEO), coordinateConverter)
                 }
 
             is OpenDisplayCartesIGNUrlAutomation ->
                 automation.packageName?.let { packageName ->
-                    OpenDisplayCartesIGNUrlOutput(packageName, coordinateConverter)
+                    OpenDisplayCartesIGNUrlOutput(UriActivity(packageName, UriScheme.CARTES_IGN), coordinateConverter)
                 }
 
             is OpenDisplayMagicEarthUriAutomation ->
                 automation.packageName?.let { packageName ->
-                    OpenDisplayMagicEarthUriOutput(packageName, coordinateConverter)
+                    OpenDisplayMagicEarthUriOutput(UriActivity(packageName, UriScheme.MAGIC_EARTH), coordinateConverter)
                 }
 
             is OpenNavigationGoogleUriAutomation ->
                 automation.packageName?.let { packageName ->
-                    OpenNavigationGoogleUriOutput(packageName, coordinateConverter)
+                    OpenNavigationGoogleUriOutput(
+                        UriActivity(packageName, UriScheme.GOOGLE_NAVIGATION),
+                        coordinateConverter
+                    )
                 }
 
             is OpenNavigationMagicEarthUriAutomation ->
                 automation.packageName?.let { packageName ->
-                    OpenNavigationMagicEarthUriOutput(packageName, coordinateConverter)
+                    OpenNavigationMagicEarthUriOutput(
+                        UriActivity(packageName, UriScheme.MAGIC_EARTH),
+                        coordinateConverter
+                    )
                 }
 
             is OpenStreetViewGoogleUriAutomation ->
                 automation.packageName?.let { packageName ->
-                    OpenStreetViewGoogleUriOutput(packageName, coordinateConverter)
+                    OpenStreetViewGoogleUriOutput(
+                        UriActivity(packageName, UriScheme.GOOGLE_STREET_VIEW),
+                        coordinateConverter
+                    )
                 }
 
             is OpenPointsGpxAutomation ->
                 automation.packageName?.let { packageName ->
-                    OpenPointsGpxOutput(packageName, coordinateConverter, log)
+                    OpenPointsGpxOutput(FileActivity(packageName, FileType.GPX), coordinateConverter, log)
                 }
 
             is OpenRouteGpxAutomation ->
                 automation.packageName?.let { packageName ->
-                    OpenRouteGpxOutput(packageName, coordinateConverter, log)
+                    OpenRouteGpxOutput(FileActivity(packageName, FileType.GPX), coordinateConverter, log)
                 }
 
             is OpenRouteOnePointGpxAutomation ->
                 automation.packageName?.let { packageName ->
-                    OpenRouteOnePointGpxOutput(packageName, coordinateConverter, log)
+                    OpenRouteOnePointGpxOutput(
+                        FileActivity(packageName, FileType.GPX_ONE_POINT),
+                        coordinateConverter,
+                        log
+                    )
                 }
 
             is SavePointGpxAutomation ->
@@ -296,7 +290,7 @@ class OutputRepository @Inject constructor(
 
             is SendPointAutomation ->
                 automation.packageName?.let { packageName ->
-                    SendPointOutput(packageName, coordinateConverter)
+                    SendPointOutput(TextActivity(packageName, "text/plain"), coordinateConverter)
                 }
 
             is ShareDisplayGeoUriAutomation ->
@@ -318,5 +312,50 @@ class OutputRepository @Inject constructor(
 
             is ShareStreetViewGoogleUriAutomation ->
                 ShareStreetViewGoogleUriOutput(coordinateConverter)
+        }
+
+    private fun AppActivity.toOutputs(): List<Output> =
+        when (this) {
+            is FileActivity ->
+                when (fileType) {
+                    FileType.GPX -> listOf(
+                        OpenRouteGpxOutput(this, coordinateConverter, log),
+                        OpenPointsGpxOutput(this, coordinateConverter, log),
+                    )
+
+                    FileType.GPX_ONE_POINT -> listOf(
+                        OpenRouteOnePointGpxOutput(this, coordinateConverter, log),
+                    )
+                }
+
+            is TextActivity -> listOf(
+                SendPointOutput(this, coordinateConverter),
+            )
+
+            is UriActivity ->
+                when (uriScheme) {
+                    UriScheme.CARTES_IGN -> listOf(
+                        OpenDisplayCartesIGNUrlOutput(this, coordinateConverter),
+                    )
+
+                    UriScheme.GEO -> listOf(
+                        OpenDisplayGeoUriOutput(this, coordinateConverter),
+                    )
+
+                    UriScheme.GOOGLE_NAVIGATION -> listOf(
+                        OpenNavigationGoogleUriOutput(this, coordinateConverter),
+                    )
+
+                    UriScheme.GOOGLE_STREET_VIEW -> listOf(
+                        OpenStreetViewGoogleUriOutput(this, coordinateConverter),
+                    )
+
+                    UriScheme.MAGIC_EARTH -> listOf(
+                        OpenDisplayMagicEarthUriOutput(this, coordinateConverter),
+                        OpenNavigationMagicEarthUriOutput(this, coordinateConverter),
+                    )
+
+                    UriScheme.UNKNOWN -> emptyList()
+                }
         }
 }

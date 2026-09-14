@@ -4,6 +4,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.android.UriActivity
+import page.ooooo.geoshare.lib.android.UriScheme
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
@@ -15,36 +17,36 @@ class OpenDisplayGeoUriOutputTest {
     private val uriQuote = FakeUriQuote
 
     @Test
-    fun getText_returnsGeoUriWithCoordinatesConvertedToSrsBasedOnPackageName() {
+    fun getUriString_returnsGeoUriWithCoordinatesConvertedToSrsBasedOnPackageName() {
         val point = WGS84Point(31.23044166868017, 121.47099209401793, source = Source.GENERATED)
         // WGS-84
         assertEquals(
             "geo:31.2304417,121.4709921",
-            OpenDisplayGeoUriOutput(PackageNames.TEST, coordinateConverter)
-                .getText(point, uriQuote),
+            OpenDisplayGeoUriOutput(UriActivity(PackageNames.TEST, UriScheme.GEO), coordinateConverter)
+                .getUriString(point, uriQuote),
         )
         // GCJ-02
         assertEquals(
             "geo:31.2285067,121.475524?q=31.2285067,121.475524",
-            OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
-                .getText(point, uriQuote),
+            OpenDisplayGeoUriOutput(UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GEO), coordinateConverter)
+                .getUriString(point, uriQuote),
         )
         // GCJ-02
         assertEquals(
             "geo:31.2285067,121.475524?q=31.2285067,121.475524",
-            OpenDisplayGeoUriOutput(PackageNames.GMAPS_WV, coordinateConverter)
-                .getText(point, uriQuote),
+            OpenDisplayGeoUriOutput(UriActivity(PackageNames.GMAPS_WV, UriScheme.GEO), coordinateConverter)
+                .getUriString(point, uriQuote),
         )
         // GCJ-02
         assertEquals(
             "geo:31.2285067,121.475524?q=31.2285067,121.475524",
-            OpenDisplayGeoUriOutput(PackageNames.AMAP, coordinateConverter)
-                .getText(point, uriQuote),
+            OpenDisplayGeoUriOutput(UriActivity(PackageNames.AMAP, UriScheme.GEO), coordinateConverter)
+                .getUriString(point, uriQuote),
         )
     }
 
     @Test
-    fun getText_returnsGeoUriWithFlavorBasedOnPackageName() {
+    fun getUriString_returnsGeoUriWithFlavorBasedOnPackageName() {
         val point = WGS84Point(
             31.23044166868017, 121.47099209401793,
             z = 3.4, name = "foo bar", source = Source.GENERATED,
@@ -73,18 +75,18 @@ class OpenDisplayGeoUriOutputTest {
         ).forEach { (packageName, expectedGeoUriString) ->
             assertEquals(
                 expectedGeoUriString,
-                OpenDisplayGeoUriOutput(packageName, coordinateConverter)
-                    .getText(point, uriQuote),
+                OpenDisplayGeoUriOutput(UriActivity(packageName, UriScheme.GEO), coordinateConverter)
+                    .getUriString(point, uriQuote),
             )
         }
     }
 
     @Test
-    fun getText_whenPointIsGCJ02AndWithinMainlandChinaAndPackageNameRequiresWGS84_returnsUriWithCoordinatesConvertedToWGS84() {
+    fun getUriString_whenPointIsGCJ02AndWithinMainlandChinaAndPackageNameRequiresWGS84_returnsUriWithCoordinatesConvertedToWGS84() {
         assertEquals(
             "geo:39.9191328,116.3254076?q=39.9191328,116.3254076",
-            OpenDisplayGeoUriOutput(PackageNames.OSMAND_PLUS, coordinateConverter)
-                .getText(
+            OpenDisplayGeoUriOutput(UriActivity(PackageNames.OSMAND_PLUS, UriScheme.GEO), coordinateConverter)
+                .getUriString(
                     GCJ02Point(39.920439, 116.331538, source = Source.GENERATED),
                     uriQuote,
                 )
@@ -92,11 +94,11 @@ class OpenDisplayGeoUriOutputTest {
     }
 
     @Test
-    fun getText_whenPointIsGCJ02AndWithinWesternJapanAndPackageNameRequiresGCJ02MainlandChina_returnsUriWithCoordinatesConvertedToWGS84() {
+    fun getUriString_whenPointIsGCJ02AndWithinWesternJapanAndPackageNameRequiresGCJ02MainlandChina_returnsUriWithCoordinatesConvertedToWGS84() {
         assertEquals(
             "geo:34.5953404,133.7527361?q=34.5953404,133.7527361",
-            OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
-                .getText(
+            OpenDisplayGeoUriOutput(UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GEO), coordinateConverter)
+                .getUriString(
                     GCJ02Point(34.5945482, 133.7583428, source = Source.GENERATED),
                     uriQuote,
                 )

@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
-import page.ooooo.geoshare.data.di.fakeApps
+import page.ooooo.geoshare.data.di.fakeActivities
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.android.AppDetails
@@ -35,7 +35,7 @@ import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.ActionContext
-import page.ooooo.geoshare.lib.outputs.OpenPointOutput
+import page.ooooo.geoshare.lib.outputs.OpenPointUriOutput
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.ui.theme.AppTheme
 
@@ -75,7 +75,7 @@ fun HelpShareSourceMessage(
             PackageNames.MAGIC_EARTH,
             PackageNames.MAPS_ME,
         ).firstNotNullOfOrNull { packageName ->
-            outputsForApps[packageName]?.firstNotNullOfOrNull { it as? OpenPointOutput }
+            outputsForApps[packageName]?.firstNotNullOfOrNull { it as? OpenPointUriOutput }
         }
         HelpMessageCard(
             helpMessage = HelpMessage.SHARE_SOURCE,
@@ -83,7 +83,7 @@ fun HelpShareSourceMessage(
             title = { Text(stringResource(R.string.help_share_source_title)) },
             modifier = modifier,
             actionText = exampleAppOutput?.let { exampleAppOutput ->
-                appDetails[exampleAppOutput.packageName]?.label?.let { exampleAppLabel ->
+                appDetails[exampleAppOutput.activity.packageName]?.label?.let { exampleAppLabel ->
                     {
                         stringResource(R.string.help_share_source_action, exampleAppLabel)
                     }
@@ -148,7 +148,7 @@ private fun DefaultPreview() {
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             outputsForApps = MutableStateFlow(
                 outputRepository.getOutputsForApps(
-                    apps = fakeApps,
+                    activities = fakeActivities,
                     hiddenApps = emptySet(),
                 )
             ),
@@ -175,7 +175,7 @@ private fun DarkPreview() {
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             outputsForApps = MutableStateFlow(
                 outputRepository.getOutputsForApps(
-                    apps = fakeApps,
+                    activities = fakeActivities,
                     hiddenApps = emptySet(),
                 )
             ),

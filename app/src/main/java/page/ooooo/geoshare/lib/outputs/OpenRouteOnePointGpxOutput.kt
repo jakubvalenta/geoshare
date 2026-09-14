@@ -7,22 +7,23 @@ import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.android.openFileInApp
+import page.ooooo.geoshare.lib.android.FileActivity
+import page.ooooo.geoshare.lib.deleteAllAndWriteFile
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
-import page.ooooo.geoshare.lib.writeFile
 import page.ooooo.geoshare.ui.components.DrawableIconDescriptor
 import page.ooooo.geoshare.ui.components.ResourceIconDescriptor
+import java.io.File
 import javax.inject.Inject
 
 /**
- * When executed, this output creates a GPX route starting at current device location and opens it in [packageName].
+ * When executed, this output creates a GPX route starting at current device location and opens it in [activity].
  *
  * It's only useful for TomTom, because TomTom doesn't support geo: URIs.
  */
 class OpenRouteOnePointGpxOutput @Inject constructor(
-    val packageName: String,
+    val activity: FileActivity,
     private val coordinateConverter: CoordinateConverter,
     private val log: Log,
 ) :
@@ -37,20 +38,21 @@ class OpenRouteOnePointGpxOutput @Inject constructor(
 
     override suspend fun execute(location: Point?, value: Point, actionContext: ActionContext) =
         location?.let { location ->
-            // Don't use a .gpx extension but use .xml instead, because that's what TomTom requires
-            writeFile(actionContext.context.filesDir, "routes", "${System.currentTimeMillis()}.xml") {
-                write(location, value, this)
-            }?.let { file ->
-                actionContext.context.openFileInApp(file, packageName, log)
-            }
-        }.let { success -> if (success == true) ActionResult.SUCCEEDED_AND_OPENED_APP else ActionResult.FAILED }
+            File(actionContext.context.filesDir, "routes")
+                // Don't use a .gpx extension but use .xml instead, because that's what TomTom requires
+                .deleteAllAndWriteFile("${System.currentTimeMillis()}.xml") {
+                    write(location, value, this)
+                }
+                ?.let { file -> activity.launch(actionContext.context, file, log) }
+        }
+            .toActionResult(openedApp = true)
 
     @Composable
     override fun label(appDetails: AppDetails) =
         stringResource(R.string.output_open_navigation)
 
     override fun getIcon(appDetails: AppDetails) =
-        appDetails[packageName]?.let { DrawableIconDescriptor(it.icon) }
+        appDetails[activity.packageName]?.let { DrawableIconDescriptor(it.icon) }
 
     override fun getMenuIcon(appDetails: AppDetails) =
         ResourceIconDescriptor(R.drawable.navigation_24px)
@@ -65,21 +67,21 @@ class OpenRouteOnePointGpxOutput @Inject constructor(
     override fun errorText(appDetails: AppDetails) =
         stringResource(
             R.string.conversion_succeeded_open_app_failed,
-            appDetails[packageName]?.label ?: packageName,
+            appDetails[activity.packageName]?.label ?: activity.packageName,
         )
 
     @Composable
     override fun automationLabel(appDetails: AppDetails) =
         stringResource(
             R.string.conversion_succeeded_open_app_navigate_to,
-            appDetails[packageName]?.label ?: packageName,
+            appDetails[activity.packageName]?.label ?: activity.packageName,
         )
 
     @Composable
     override fun automationErrorText(appDetails: AppDetails) =
         stringResource(
             R.string.conversion_automation_open_app_failed,
-            appDetails[packageName]?.label ?: packageName,
+            appDetails[activity.packageName]?.label ?: activity.packageName,
         )
 
     @Composable
@@ -87,7 +89,7 @@ class OpenRouteOnePointGpxOutput @Inject constructor(
         pluralStringResource(
             R.plurals.conversion_automation_open_app_waiting,
             counterSec,
-            appDetails[packageName]?.label ?: packageName,
+            appDetails[activity.packageName]?.label ?: activity.packageName,
             counterSec,
         )
 
@@ -95,8 +97,8 @@ class OpenRouteOnePointGpxOutput @Inject constructor(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
         other as OpenRouteOnePointGpxOutput
-        return packageName == other.packageName
+        return activity == other.activity
     }
 
-    override fun hashCode() = packageName.hashCode()
+    override fun hashCode() = activity.hashCode()
 }

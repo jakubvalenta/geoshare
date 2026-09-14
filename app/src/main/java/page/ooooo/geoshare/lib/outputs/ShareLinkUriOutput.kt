@@ -15,8 +15,8 @@ import javax.inject.Inject
 class ShareLinkUriOutput @Inject constructor(
     val link: Link,
     private val coordinateConverter: CoordinateConverter,
-) : SharePointOutput {
-    override fun getText(value: Point, uriQuote: UriQuote) =
+) : SharePointUriOutput {
+    override fun getUriString(value: Point, uriQuote: UriQuote) =
         UriFormatter.formatUriString(
             coordinateConverter.toSrs(value, link.srs),
             link.coordsUriTemplate,
@@ -25,7 +25,7 @@ class ShareLinkUriOutput @Inject constructor(
         )
 
     override suspend fun execute(value: Point, actionContext: ActionContext) =
-        getText(value, actionContext.uriQuote)?.let { uriString ->
+        getUriString(value, actionContext.uriQuote)?.let { uriString ->
             actionContext.context.openUriInDefaultApp(uriString)
         }.let { success -> if (success == true) ActionResult.SUCCEEDED_AND_OPENED_APP else ActionResult.FAILED }
 

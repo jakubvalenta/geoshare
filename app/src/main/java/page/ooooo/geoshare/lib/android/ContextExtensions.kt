@@ -111,10 +111,10 @@ fun Context.openSettingsOpenByDefault(launcher: ActivityResultLauncher<Intent>) 
     openSettingsOpenByDefaultForPackage(launcher, BuildConfig.APPLICATION_ID)
 }
 
-fun Context.sendTextViaApp(text: String, packageName: String): Boolean =
+fun Context.sendTextViaApp(text: String, packageName: String, mimeType: String): Boolean =
     startActivityOrFalse(
         Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
+            type = mimeType
             setPackage(packageName)
             putExtra(Intent.EXTRA_TEXT, text)
         }
@@ -138,7 +138,7 @@ fun String.toEmailIntent(): Intent =
 fun Context.composeEmail(address: String): Boolean =
     startActivityOrFalse(address.toEmailIntent())
 
-fun Context.openFileUriForWriting(uri: Uri, log: Log = DefaultLog, block: Appendable.() -> Unit): Boolean {
+fun Context.writeToContentProvider(uri: Uri, log: Log = DefaultLog, block: Appendable.() -> Unit): Boolean {
     val outputStream = try {
         contentResolver.openOutputStream(uri)
     } catch (_: FileNotFoundException) {

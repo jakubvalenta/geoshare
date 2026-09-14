@@ -27,16 +27,17 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.di.fakeApps
+import page.ooooo.geoshare.data.di.fakeActivities
+import page.ooooo.geoshare.lib.android.AppActivity
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.android.Apps
-import page.ooooo.geoshare.lib.android.DataType
+import page.ooooo.geoshare.lib.android.FileActivity
 import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.android.TextActivity
+import page.ooooo.geoshare.lib.android.UriActivity
 import page.ooooo.geoshare.lib.android.copy
-import page.ooooo.geoshare.lib.android.openUriInApp
+import page.ooooo.geoshare.lib.android.getPackageNames
+import page.ooooo.geoshare.lib.android.queryActivitiesForUri
 import page.ooooo.geoshare.lib.android.queryAppDetails
-import page.ooooo.geoshare.lib.android.queryAppsForUri
-import page.ooooo.geoshare.lib.android.sendTextViaApp
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,19 +48,19 @@ fun ConversionUriSheet(
 ) {
     val context = LocalContext.current
 
+    val activitiesForUri = remember(uriString) { context.packageManager.queryActivitiesForUri(uriString) }
     var appDetailsForUri by remember { mutableStateOf<AppDetails>(emptyMap()) }
-    val appsForUri = remember(uriString) { context.packageManager.queryAppsForUri(uriString) }
 
-    LaunchedEffect(appsForUri) {
-        if (appsForUri.isNotEmpty()) {
-            appDetailsForUri = context.packageManager.queryAppDetails(appsForUri.keys)
+    LaunchedEffect(activitiesForUri) {
+        if (activitiesForUri.isNotEmpty()) {
+            appDetailsForUri = context.packageManager.queryAppDetails(activitiesForUri.getPackageNames())
         }
     }
 
     ConversionUriSheet(
         uriString = uriString,
+        activitiesForUri = activitiesForUri,
         appDetailsForUri = appDetailsForUri,
-        appsForUri = appsForUri,
         onDismissRequest = onDismissRequest,
     )
 }
@@ -68,8 +69,8 @@ fun ConversionUriSheet(
 @Composable
 private fun ConversionUriSheet(
     uriString: String,
+    activitiesForUri: List<AppActivity>,
     appDetailsForUri: AppDetails,
-    appsForUri: Apps,
     initialValue: SheetValue = SheetValue.Hidden,
     onDismissRequest: () -> Unit,
 ) {
@@ -99,36 +100,55 @@ private fun ConversionUriSheet(
                     icon = ResourceIconDescriptor(R.drawable.content_copy_24px),
                 )
             }
-            appsForUri
+            activitiesForUri
                 .takeIf { it.isNotEmpty() }
-                ?.values
-                ?.map { app -> app to appDetailsForUri[app.packageName]?.label }
+                ?.map { activity -> activity to appDetailsForUri[activity.packageName]?.label }
                 ?.sortedWith(compareBy(nullsLast()) { (_, label) -> label })
-                ?.let { appsAndLabels ->
+                ?.let { activitiesAndLabels ->
                     SheetSection(
                         first = false,
                         title = stringResource(R.string.main_source_open),
                     ) {
-                        appsAndLabels.forEach { (app, label) ->
-                            SheetListItem(
-                                headlineText = label.orEmpty(),
-                                modifier = Modifier.testTag("geoShareConversionUriSheetItem_${app.packageName}"),
-                                onClick = {
-                                    if (DataType.SEND_PLAIN_TEXT in app.dataTypes) {
-                                        context.sendTextViaApp(uriString, app.packageName)
-                                    } else {
-                                        context.openUriInApp(uriString, app.packageName)
+                        activitiesAndLabels.forEach { (activity, label) ->
+                            when (activity) {
+                                is FileActivity -> {
+                                    // Don't show an item for a file activity, because we don't know how to create a
+                                    // file from the source, which is a URI or a text
+                                }
+
+                                is TextActivity ->
+                                    ConversionUriSheetItem(activity, appDetailsForUri, label) {
+                                        activity.launch(context, uriString)
+                                        onDismissRequest()
                                     }
-                                    onDismissRequest()
-                                },
-                                icon = appDetailsForUri[app.packageName]?.icon?.let { DrawableIconDescriptor(it) }
-                                    ?: PlaceholderIconDescriptor,
-                            )
+
+                                is UriActivity ->
+                                    ConversionUriSheetItem(activity, appDetailsForUri, label) {
+                                        activity.launch(context, uriString)
+                                        onDismissRequest()
+                                    }
+                            }
                         }
                     }
                 }
         }
     }
+}
+
+@Composable
+private fun ConversionUriSheetItem(
+    activity: AppActivity,
+    appDetailsForUri: AppDetails,
+    label: String?,
+    onClick: () -> Unit,
+) {
+    SheetListItem(
+        headlineText = label.orEmpty(),
+        modifier = Modifier.testTag("geoShareConversionUriSheetItem_${activity.packageName}"),
+        onClick = onClick,
+        icon = appDetailsForUri[activity.packageName]?.icon?.let { DrawableIconDescriptor(it) }
+            ?: PlaceholderIconDescriptor,
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -140,14 +160,14 @@ private fun DefaultPreview() {
         Scaffold {
             ConversionUriSheet(
                 uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                appDetailsForUri = fakeAppDetails(),
-                appsForUri = fakeApps.filterKeys {
-                    it in setOf(
+                activitiesForUri = fakeActivities.filter {
+                    it.packageName in setOf(
                         PackageNames.COMAPS_FDROID,
                         PackageNames.CONVERSATIONS,
                         PackageNames.OSMAND_PLUS,
                     )
                 },
+                appDetailsForUri = fakeAppDetails(),
                 initialValue = SheetValue.Expanded,
                 onDismissRequest = {},
             )
@@ -164,14 +184,14 @@ private fun DarkPreview() {
         Scaffold {
             ConversionUriSheet(
                 uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                appDetailsForUri = fakeAppDetails(),
-                appsForUri = fakeApps.filterKeys {
-                    it in setOf(
+                activitiesForUri = fakeActivities.filter {
+                    it.packageName in setOf(
                         PackageNames.COMAPS_FDROID,
                         PackageNames.CONVERSATIONS,
                         PackageNames.OSMAND_PLUS,
                     )
                 },
+                appDetailsForUri = fakeAppDetails(),
                 initialValue = SheetValue.Expanded,
                 onDismissRequest = {},
             )

@@ -3,11 +3,12 @@ package page.ooooo.geoshare.lib.outputs
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.android.sendTextViaApp
+import page.ooooo.geoshare.lib.android.TextActivity
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
@@ -17,13 +18,18 @@ import page.ooooo.geoshare.ui.components.ImageVectorIconDescriptor
 import javax.inject.Inject
 
 /**
- * Creates a Google Maps display URI and sends it via [packageName], which is often a messaging app.
+ * Creates a Google Maps display URI and sends it via [activity], which is often a messaging app.
  */
 class SendPointOutput @Inject constructor(
-    override val packageName: String,
+    val activity: TextActivity,
     private val coordinateConverter: CoordinateConverter,
-) : OpenPointOutput {
-    override fun getText(value: Point, uriQuote: UriQuote) =
+) :
+    PointOutput.WithoutLocation,
+    Output.HasErrorText,
+    Output.HasAutomationDelay,
+    Output.HasAutomationErrorText {
+
+    fun getUriString(value: Point, uriQuote: UriQuote): String? =
         UriFormatter.formatUriString(
             point = coordinateConverter.toSrs(value, Srs.GCJ02_MAINLAND_CHINA),
             // Use https://maps.google.com/?q= instead of https://www.google.com/maps/search/?api=1&q=, because
@@ -34,9 +40,9 @@ class SendPointOutput @Inject constructor(
         )
 
     override suspend fun execute(value: Point, actionContext: ActionContext) =
-        getText(value, actionContext.uriQuote)?.let { text ->
-            actionContext.context.sendTextViaApp(text, packageName)
-        }.let { success -> if (success == true) ActionResult.SUCCEEDED_AND_OPENED_APP else ActionResult.FAILED }
+        getUriString(value, actionContext.uriQuote)
+            ?.let { text -> activity.launch(actionContext.context, text) }
+            .toActionResult(openedApp = true)
 
     @Composable
     override fun label(appDetails: AppDetails) =
@@ -46,21 +52,44 @@ class SendPointOutput @Inject constructor(
         ImageVectorIconDescriptor(Icons.AutoMirrored.Default.Send)
 
     override fun getIcon(appDetails: AppDetails) =
-        appDetails[packageName]?.let { DrawableIconDescriptor(it.icon) }
+        appDetails[activity.packageName]?.let { DrawableIconDescriptor(it.icon) }
+
+    @Composable
+    override fun errorText(appDetails: AppDetails) =
+        stringResource(
+            R.string.conversion_succeeded_open_app_failed,
+            appDetails[activity.packageName]?.label ?: activity.packageName,
+        )
 
     @Composable
     override fun automationLabel(appDetails: AppDetails) =
         stringResource(
             R.string.output_send_via,
-            appDetails[packageName]?.label ?: packageName,
+            appDetails[activity.packageName]?.label ?: activity.packageName,
+        )
+
+    @Composable
+    override fun automationErrorText(appDetails: AppDetails) =
+        stringResource(
+            R.string.conversion_automation_open_app_failed,
+            appDetails[activity.packageName]?.label ?: activity.packageName,
+        )
+
+    @Composable
+    override fun automationWaitingText(counterSec: Int, appDetails: AppDetails) =
+        pluralStringResource(
+            R.plurals.conversion_automation_open_app_waiting,
+            counterSec,
+            appDetails[activity.packageName]?.label ?: activity.packageName,
+            counterSec,
         )
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
         other as SendPointOutput
-        return packageName == other.packageName
+        return activity == other.activity
     }
 
-    override fun hashCode() = packageName.hashCode()
+    override fun hashCode() = activity.hashCode()
 }

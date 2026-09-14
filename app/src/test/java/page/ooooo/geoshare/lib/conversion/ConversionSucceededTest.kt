@@ -29,6 +29,8 @@ import page.ooooo.geoshare.data.local.preferences.ShareLinkUriAutomation
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.android.UriActivity
+import page.ooooo.geoshare.lib.android.UriScheme
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
@@ -366,7 +368,10 @@ class ConversionSucceededTest {
     @Test
     fun transition_whenUserPreferenceAutomationIsOpenApp_returnsActionWaiting() = runTest {
         val automation = OpenDisplayGeoUriAutomation(PackageNames.GOOGLE_MAPS)
-        val output = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
+        val output = OpenDisplayGeoUriOutput(
+            UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GEO),
+            coordinateConverter,
+        )
         val action = output.toAction(points.last())
         val delay = 2.seconds
         val billing = FakeBilling(
@@ -489,7 +494,10 @@ class ConversionSucceededTest {
     @Test
     fun transition_whenUserPreferenceAutomationIsShare_returnsActionWaiting() = runTest {
         val automation = OpenDisplayGeoUriAutomation(PackageNames.GOOGLE_MAPS)
-        val output = OpenDisplayGeoUriOutput(PackageNames.GOOGLE_MAPS, coordinateConverter)
+        val output = OpenDisplayGeoUriOutput(
+            UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GEO),
+            coordinateConverter,
+        )
         val action = output.toAction(points.last())
         val delay = 2.seconds
         val billing = FakeBilling(

@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 class CopyGeoUriOutput @Inject constructor(
     private val coordinateConverter: CoordinateConverter,
-) : CopyPointOutput {
+) : CopyPointTextOutput {
     override fun getText(value: Point, uriQuote: UriQuote) =
         GeoUriFormatter.formatGeoUriString(coordinateConverter.toWGS84(value), uriQuote = uriQuote)
 

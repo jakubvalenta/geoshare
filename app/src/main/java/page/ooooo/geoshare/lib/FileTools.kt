@@ -5,15 +5,14 @@ import java.io.FileNotFoundException
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-fun writeFile(parentDir: File, childDir: String, filename: String, block: Appendable.() -> Unit): File? {
-    val dir = File(parentDir, childDir)
-    dir.deleteRecursively()
+fun File.deleteAllAndWriteFile(filename: String, block: Appendable.() -> Unit): File? {
+    deleteRecursively()
     try {
-        dir.mkdirs()
+        mkdirs()
     } catch (_: SecurityException) {
         return null
     }
-    val file = File(dir, filename)
+    val file = File(this, filename)
     try {
         file.printWriter().use { writer ->
             writer.block()

@@ -45,7 +45,7 @@ import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
-import page.ooooo.geoshare.data.di.fakeApps
+import page.ooooo.geoshare.data.di.fakeActivities
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.android.AppDetail
@@ -371,7 +371,7 @@ private fun DefaultPreview() {
                 appDetails = MutableStateFlow(fakeAppDetails()),
                 outputsForApps = MutableStateFlow(
                     outputRepository.getOutputsForApps(
-                        apps = fakeApps,
+                        activities = fakeActivities,
                         hiddenApps = emptySet(),
                     )
                 ),
@@ -404,7 +404,7 @@ private fun DarkPreview() {
                 appDetails = MutableStateFlow(fakeAppDetails()),
                 outputsForApps = MutableStateFlow(
                     outputRepository.getOutputsForApps(
-                        apps = fakeApps,
+                        activities = fakeActivities,
                         hiddenApps = emptySet(),
                     )
                 ),
@@ -437,8 +437,8 @@ private fun LoadingPreview() {
                 appDetails = MutableStateFlow(emptyMap()),
                 outputsForApps = MutableStateFlow(
                     outputRepository.getOutputsForApps(
-                        apps = fakeApps.filterKeys {
-                            it in setOf(
+                        activities = fakeActivities.filter {
+                            it.packageName in setOf(
                                 PackageNames.COMAPS_FDROID,
                                 PackageNames.ORGANIC_MAPS,
                             )
@@ -490,8 +490,8 @@ private fun DarkLoadingPreview() {
                 appDetails = MutableStateFlow(emptyMap()),
                 outputsForApps = MutableStateFlow(
                     outputRepository.getOutputsForApps(
-                        apps = fakeApps.filterKeys {
-                            it in setOf(
+                        activities = fakeActivities.filter {
+                            it.packageName in setOf(
                                 PackageNames.COMAPS_FDROID,
                                 PackageNames.ORGANIC_MAPS,
                             )
@@ -569,7 +569,7 @@ private fun DarkEmptyPreview() {
             )
             ResultApps(
                 appDetails = MutableStateFlow(emptyMap()),
-                outputsForApps = MutableStateFlow(outputRepository.getOutputsForApps(emptyMap(), emptySet())),
+                outputsForApps = MutableStateFlow(outputRepository.getOutputsForApps(emptyList(), emptySet())),
                 outputsForLinks = MutableStateFlow(emptyMap()),
                 outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),

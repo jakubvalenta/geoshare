@@ -66,7 +66,7 @@ import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
-import page.ooooo.geoshare.data.di.fakeApps
+import page.ooooo.geoshare.data.di.fakeActivities
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
@@ -985,7 +985,7 @@ private fun SucceededPreview() {
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(
                 outputRepository.getOutputsForApps(
-                    apps = fakeApps,
+                    activities = fakeActivities,
                     hiddenApps = emptySet(),
                 )
             ),
@@ -1069,7 +1069,7 @@ private fun DarkSucceededPreview() {
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(
                 outputRepository.getOutputsForApps(
-                    apps = fakeApps,
+                    activities = fakeActivities,
                     hiddenApps = emptySet(),
                 )
             ),
@@ -1152,7 +1152,7 @@ private fun SmallSucceededPreview() {
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(
                 outputRepository.getOutputsForApps(
-                    apps = fakeApps,
+                    activities = fakeActivities,
                     hiddenApps = emptySet(),
                 )
             ),
@@ -1236,7 +1236,7 @@ private fun TabletSucceededPreview() {
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(
                 outputRepository.getOutputsForApps(
-                    apps = fakeApps,
+                    activities = fakeActivities,
                     hiddenApps = emptySet(),
                 )
             ),

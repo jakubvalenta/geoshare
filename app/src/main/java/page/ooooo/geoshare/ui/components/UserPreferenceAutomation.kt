@@ -30,7 +30,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
-import page.ooooo.geoshare.data.di.fakeApps
+import page.ooooo.geoshare.data.di.fakeActivities
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.database.findByUUID
 import page.ooooo.geoshare.data.local.preferences.Automation
@@ -38,8 +38,8 @@ import page.ooooo.geoshare.data.local.preferences.AutomationPreference
 import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.DefaultLog
+import page.ooooo.geoshare.lib.android.AppActivity
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.android.Apps
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingProduct
@@ -99,8 +99,8 @@ fun UserPreferenceAutomationListItem(
 
 @Composable
 fun UserPreferenceAutomationControls(
+    activities: List<AppActivity>,
     appDetails: AppDetails,
-    apps: Apps,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
@@ -125,7 +125,7 @@ fun UserPreferenceAutomationControls(
     ) {
         userPreferenceOptionsControl(
             userPreference = AutomationPreference,
-            optionGroups = AutomationPreference.getOptionGroups(apps, appDetails, values.hiddenApps, links),
+            optionGroups = AutomationPreference.getOptionGroups(activities, appDetails, values.hiddenApps, links),
             values = values,
             enabled = AutomationFeature in billingFeatures && billingStatus is BillingStatus.Purchased,
             itemTestTag = { option ->
@@ -359,7 +359,7 @@ private fun ControlsPreview() {
             )
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
-                apps = fakeApps.filterKeys { it == PackageNames.OSMAND_PLUS },
+                activities = fakeActivities.filter { it.packageName == PackageNames.OSMAND_PLUS },
                 appDetails = fakeAppDetails(),
                 links = defaultFakeLinks,
                 values = UserPreferencesValues(automation = SavePointsGpxAutomation),
@@ -397,7 +397,7 @@ private fun DarkControlsPreview() {
             )
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
-                apps = fakeApps.filterKeys { it == PackageNames.OSMAND_PLUS },
+                activities = fakeActivities.filter { it.packageName == PackageNames.OSMAND_PLUS },
                 appDetails = fakeAppDetails(),
                 links = defaultFakeLinks,
                 values = UserPreferencesValues(automation = SavePointsGpxAutomation),
@@ -435,7 +435,7 @@ private fun TabletControlsPreview() {
             )
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
-                apps = fakeApps.filterKeys { it == PackageNames.OSMAND_PLUS },
+                activities = fakeActivities.filter { it.packageName == PackageNames.OSMAND_PLUS },
                 appDetails = fakeAppDetails(),
                 links = defaultFakeLinks,
                 values = UserPreferencesValues(automation = SavePointsGpxAutomation),
@@ -473,7 +473,7 @@ private fun NotPurchasedControlsPreview() {
             )
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
-                apps = fakeApps.filterKeys { it == PackageNames.OSMAND_PLUS },
+                activities = fakeActivities.filter { it.packageName == PackageNames.OSMAND_PLUS },
                 appDetails = fakeAppDetails(),
                 links = defaultFakeLinks,
                 values = UserPreferencesValues(automation = SavePointsGpxAutomation),
@@ -506,7 +506,7 @@ private fun DarkNotPurchasedControlsPreview() {
             )
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
-                apps = fakeApps.filterKeys { it == PackageNames.OSMAND_PLUS },
+                activities = fakeActivities.filter { it.packageName == PackageNames.OSMAND_PLUS },
                 appDetails = fakeAppDetails(),
                 links = defaultFakeLinks,
                 values = UserPreferencesValues(automation = SavePointsGpxAutomation),
@@ -539,7 +539,7 @@ private fun TabletNotPurchasedControlsPreview() {
             )
             UserPreferenceAutomationControls(
                 billingAppNameResId = R.string.app_name_pro,
-                apps = fakeApps.filterKeys { it == PackageNames.OSMAND_PLUS },
+                activities = fakeActivities.filter { it.packageName == PackageNames.OSMAND_PLUS },
                 appDetails = fakeAppDetails(),
                 links = defaultFakeLinks,
                 values = UserPreferencesValues(automation = SavePointsGpxAutomation),

@@ -9,19 +9,19 @@ import kotlin.io.path.createTempDirectory
 
 class FileToolsTest {
     @Test
-    fun writeFile_whenParentDirIsNotWritable_returnsNull() {
+    fun deleteAllAndWriteFile_whenParentDirIsNotWritable_returnsNull() {
         val parentDir = createTempDirectory(
             null,
             PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("r--------")),
         ).toFile()
-        val res = writeFile(parentDir, "my_dir", "new_file.txt") {
+        val res = File(parentDir, "my_dir").deleteAllAndWriteFile("new_file.txt") {
             append("new_content")
         }
         assertNull(res)
     }
 
     @Test
-    fun writeFile_whenParentDirIsWritable_deletesExistingFilesAndWritesNewFile() {
+    fun deleteAllAndWriteFile_whenParentDirIsWritable_deletesExistingFilesAndWritesNewFile() {
         val parentDir = createTempDirectory().toFile()
 
         // Write old files
@@ -36,7 +36,7 @@ class FileToolsTest {
             childDir.listFiles()?.map { it.relativeTo(parentDir).path },
         )
 
-        val res = writeFile(parentDir, "my_dir", "new_file.txt") {
+        val res = File(parentDir, "my_dir").deleteAllAndWriteFile("new_file.txt") {
             append("new_content")
         }
 
