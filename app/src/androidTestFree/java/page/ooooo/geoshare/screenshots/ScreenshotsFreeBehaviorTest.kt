@@ -53,14 +53,12 @@ import page.ooooo.geoshare.tests.launchNavigationInApp
 import page.ooooo.geoshare.tests.longScrollSheet
 import page.ooooo.geoshare.tests.mockLocation
 import page.ooooo.geoshare.tests.onMainScrollablePane
-import page.ooooo.geoshare.tests.onSheetItem
 import page.ooooo.geoshare.tests.quickWaitForStableInActiveWindow
 import page.ooooo.geoshare.tests.saveLinkForm
 import page.ooooo.geoshare.tests.saveScreenshot
 import page.ooooo.geoshare.tests.saveServerForm
 import page.ooooo.geoshare.tests.scrollToAppIcons
 import page.ooooo.geoshare.tests.scrollToAutomationItem
-import page.ooooo.geoshare.tests.scrollToSheetItem
 import page.ooooo.geoshare.tests.setAppLocales
 import page.ooooo.geoshare.tests.setMainInput
 import page.ooooo.geoshare.tests.shareUri
@@ -157,10 +155,10 @@ class ScreenshotsFreeBehaviorTest {
 
         // Help - Message - Open by default
         shareUri()
-        onMainScrollablePane()
-            // Scroll by percents not to element, because it's more reliable due to the lazy list loading
-            .scroll(Direction.DOWN, 3f)
-        onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.OPEN_BY_DEFAULT}" }
+        quickWaitForStableInActiveWindow() // Wait for the result to render, to prevent stale object error
+        onMainScrollablePane().scrollToElement(Direction.DOWN) {
+            viewIdResourceName == "geoShareHelpMessage_${HelpMessage.OPEN_BY_DEFAULT}"
+        }
         saveScreenshot("main_strings/help_message_open_by_default")
         onElement { viewIdResourceName == "geoShareHelpMessageDismiss_${HelpMessage.OPEN_BY_DEFAULT}" }.click()
 
@@ -559,6 +557,12 @@ class ScreenshotsFreeBehaviorTest {
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result")
 
+        // Conversion - Source sheet
+        onElement { viewIdResourceName == "geoShareMainSourceButton" }.click()
+        quickWaitForStableInActiveWindow()
+        saveScreenshot("main_strings/conversion_source_sheet")
+        pressBack() // Collapse source sheet
+
         // Conversion - Result - Log
         onElement { viewIdResourceName == "geoShareMainSourceIcon" }.click() // Expand log
         quickWaitForStableInActiveWindow()
@@ -569,7 +573,10 @@ class ScreenshotsFreeBehaviorTest {
         onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
         onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
             expandSheet()
-            scrollToSheetItem(Direction.DOWN) { textAsString() == "Copy coordinates" }.click()
+            scrollToElement(Direction.DOWN) {
+                viewIdResourceName == "geoShareSheetListItemHeadline" && textAsString() == "Copy coordinates"
+            }
+                .click()
         }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_message_copy_success")
@@ -583,12 +590,19 @@ class ScreenshotsFreeBehaviorTest {
 
         // Conversion - Result - Sheet - Page 2
         sheet.longScrollSheet() // Speed up scrolling to the item, which is at the bottom of the sheet
-        sheet.scrollToSheetItem { textAsString() == "Save to contact" }
+        sheet
+            .scrollToElement(Direction.DOWN) {
+                viewIdResourceName == "geoShareSheetListItemHeadline" && textAsString() == "Save to contact"
+            }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_sheet_page_2")
 
         // Conversion - Result - Save GPX - File chooser
-        sheet.onSheetItem { textAsString() == "Save GPX route" }.click()
+        sheet
+            .scrollToElement(Direction.DOWN) {
+                viewIdResourceName == "geoShareSheetListItemHeadline" && textAsString() == "Save GPX route"
+            }
+            .click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_save_gpx_file_chooser")
 

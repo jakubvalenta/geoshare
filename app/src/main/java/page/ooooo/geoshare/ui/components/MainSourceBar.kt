@@ -31,7 +31,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -44,7 +43,6 @@ import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.local.preferences.Permission
-import page.ooooo.geoshare.lib.android.copy
 import page.ooooo.geoshare.lib.android.paste
 import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.ConversionSucceeded
@@ -59,13 +57,14 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TestTimeSource
 
 @Composable
-fun MainSource(
-    state: ConversionState,
+fun MainSourceBar(
+    currentState: ConversionState,
     errorMessageResId: Int?,
     logExpanded: Boolean,
     source: StateFlow<String>,
     start: StateFlow<ComparableTimeMark?>,
     stateLog: StateFlow<List<ExtendedConversionStateLogItem>>,
+    onSelectUriString: (uriString: String) -> Unit,
     onSetLogExpanded: (logExpanded: Boolean) -> Unit,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
     onSetSource: (newSource: String) -> Unit,
@@ -78,7 +77,7 @@ fun MainSource(
     val source by source.collectAsStateWithLifecycle()
     val stateLog by stateLog.collectAsStateWithLifecycle()
 
-    when (state) {
+    when (currentState) {
         is Initial -> {
             OutlinedTextField(
                 value = source,
@@ -145,23 +144,16 @@ fun MainSource(
         is ConversionState.HasSource -> {
             Row(Modifier.padding(bottom = spacing.tiny)) {
                 ThinButton(
-                    {
-                        coroutineScope.launch {
-                            clipboard.copy(source)
-                        }
-                    },
-                    Modifier.weight(1f),
+                    { onSelectUriString(source) },
+                    Modifier
+                        .weight(1f)
+                        .testTag("geoShareMainSourceButton"),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                         contentColor = MaterialTheme.colorScheme.onSurface,
                     ),
                 ) {
-                    Text(
-                        source,
-                        textDecoration = TextDecoration.Underline,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1,
-                    )
+                    Text(source, overflow = TextOverflow.Ellipsis, maxLines = 1)
                 }
                 MainSourceTimeButton(
                     start = start,
@@ -252,13 +244,14 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             val timeSource = TestTimeSource()
-            MainSource(
-                state = Initial,
+            MainSourceBar(
+                currentState = Initial,
                 errorMessageResId = null,
                 logExpanded = false,
                 source = MutableStateFlow(""),
                 start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(emptyList()),
+                onSelectUriString = {},
                 onSetLogExpanded = {},
                 onSetErrorMessageResId = {},
                 onSetSource = {},
@@ -274,13 +267,14 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             val timeSource = TestTimeSource()
-            MainSource(
-                state = Initial,
+            MainSourceBar(
+                currentState = Initial,
                 errorMessageResId = null,
                 logExpanded = false,
                 source = MutableStateFlow(""),
                 start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(emptyList()),
+                onSelectUriString = {},
                 onSetLogExpanded = {},
                 onSetErrorMessageResId = {},
                 onSetSource = {},
@@ -296,13 +290,14 @@ private fun FilledPreview() {
     AppTheme {
         Surface {
             val timeSource = TestTimeSource()
-            MainSource(
-                state = Initial,
+            MainSourceBar(
+                currentState = Initial,
                 errorMessageResId = null,
                 logExpanded = false,
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(emptyList()),
+                onSelectUriString = {},
                 onSetLogExpanded = {},
                 onSetErrorMessageResId = {},
                 onSetSource = {},
@@ -318,13 +313,14 @@ private fun DarkFilledPreview() {
     AppTheme {
         Surface {
             val timeSource = TestTimeSource()
-            MainSource(
-                state = Initial,
+            MainSourceBar(
+                currentState = Initial,
                 errorMessageResId = null,
                 logExpanded = false,
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(emptyList()),
+                onSelectUriString = {},
                 onSetLogExpanded = {},
                 onSetErrorMessageResId = {},
                 onSetSource = {},
@@ -340,13 +336,14 @@ private fun ErrorPreview() {
     AppTheme {
         Surface {
             val timeSource = TestTimeSource()
-            MainSource(
-                state = Initial,
+            MainSourceBar(
+                currentState = Initial,
                 errorMessageResId = R.string.conversion_failed_missing_url,
                 logExpanded = false,
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(emptyList()),
+                onSelectUriString = {},
                 onSetLogExpanded = {},
                 onSetErrorMessageResId = {},
                 onSetSource = {},
@@ -362,13 +359,14 @@ private fun DarkErrorPreview() {
     AppTheme {
         Surface {
             val timeSource = TestTimeSource()
-            MainSource(
-                state = Initial,
+            MainSourceBar(
+                currentState = Initial,
                 errorMessageResId = R.string.conversion_failed_missing_url,
                 logExpanded = false,
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(emptyList()),
+                onSelectUriString = {},
                 onSetLogExpanded = {},
                 onSetErrorMessageResId = {},
                 onSetSource = {},
@@ -384,8 +382,8 @@ private fun SubmittedPreview() {
     AppTheme {
         val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
         val timeSource = TestTimeSource()
-        MainSource(
-            state = PermissionGrantedBasicInput(
+        MainSourceBar(
+            currentState = PermissionGrantedBasicInput(
                 source = source,
                 matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
                 permission = Permission.ALWAYS,
@@ -396,6 +394,7 @@ private fun SubmittedPreview() {
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
+            onSelectUriString = {},
             onSetLogExpanded = {},
             onSetErrorMessageResId = {},
             onSetSource = {},
@@ -410,8 +409,8 @@ private fun DarkSubmittedPreview() {
     AppTheme {
         val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
         val timeSource = TestTimeSource()
-        MainSource(
-            state = PermissionGrantedBasicInput(
+        MainSourceBar(
+            currentState = PermissionGrantedBasicInput(
                 source = source,
                 matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
                 permission = Permission.ALWAYS,
@@ -422,6 +421,7 @@ private fun DarkSubmittedPreview() {
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
+            onSelectUriString = {},
             onSetLogExpanded = {},
             onSetErrorMessageResId = {},
             onSetSource = {},
@@ -436,8 +436,8 @@ private fun SubmittedExpandedLogPreview() {
     AppTheme {
         val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
         val timeSource = TestTimeSource()
-        MainSource(
-            state = PermissionGrantedBasicInput(
+        MainSourceBar(
+            currentState = PermissionGrantedBasicInput(
                 source = source,
                 matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
                 permission = Permission.ALWAYS,
@@ -448,6 +448,7 @@ private fun SubmittedExpandedLogPreview() {
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
+            onSelectUriString = {},
             onSetLogExpanded = {},
             onSetErrorMessageResId = {},
             onSetSource = {},
@@ -462,8 +463,8 @@ private fun DarkSubmittedExpandedLogPreview() {
     AppTheme {
         val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
         val timeSource = TestTimeSource()
-        MainSource(
-            state = PermissionGrantedBasicInput(
+        MainSourceBar(
+            currentState = PermissionGrantedBasicInput(
                 source = source,
                 matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
                 permission = Permission.ALWAYS,
@@ -474,6 +475,7 @@ private fun DarkSubmittedExpandedLogPreview() {
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
+            onSelectUriString = {},
             onSetLogExpanded = {},
             onSetErrorMessageResId = {},
             onSetSource = {},
@@ -488,8 +490,8 @@ private fun SubmittedShortTimePreview() {
     AppTheme {
         val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
         val timeSource = TestTimeSource()
-        MainSource(
-            state = ConversionSucceeded(
+        MainSourceBar(
+            currentState = ConversionSucceeded(
                 source = source,
                 points = persistentListOf(),
             ),
@@ -498,6 +500,7 @@ private fun SubmittedShortTimePreview() {
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource).take(1)),
+            onSelectUriString = {},
             onSetLogExpanded = {},
             onSetErrorMessageResId = {},
             onSetSource = {},
@@ -512,8 +515,8 @@ private fun DarkSubmittedShortTimePreview() {
     AppTheme {
         val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
         val timeSource = TestTimeSource()
-        MainSource(
-            state = ConversionSucceeded(
+        MainSourceBar(
+            currentState = ConversionSucceeded(
                 source = source,
                 points = persistentListOf(),
             ),
@@ -522,6 +525,7 @@ private fun DarkSubmittedShortTimePreview() {
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource).take(1)),
+            onSelectUriString = {},
             onSetLogExpanded = {},
             onSetErrorMessageResId = {},
             onSetSource = {},
@@ -532,14 +536,14 @@ private fun DarkSubmittedShortTimePreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun SubmittedEmptyLogPreview() {
+private fun SubmittedTextAndEmptyLogPreview() {
     AppTheme {
-        val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
+        val source = "41°24′12.2″N 2°10′26.5″E"
         val timeSource = TestTimeSource()
-        MainSource(
-            state = PermissionGrantedBasicInput(
+        MainSourceBar(
+            currentState = PermissionGrantedBasicInput(
                 source = source,
-                matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
+                matchedInput = MatchedInput(FakeInputRepository.coordinateInput, source),
                 permission = Permission.ALWAYS,
                 results = emptyMap(),
             ),
@@ -548,6 +552,7 @@ private fun SubmittedEmptyLogPreview() {
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(emptyList()),
+            onSelectUriString = {},
             onSetLogExpanded = {},
             onSetErrorMessageResId = {},
             onSetSource = {},
@@ -558,14 +563,14 @@ private fun SubmittedEmptyLogPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkSubmittedEmptyLogPreview() {
+private fun DarkSubmittedTextAndEmptyLogPreview() {
     AppTheme {
-        val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
+        val source = "41°24′12.2″N 2°10′26.5″E"
         val timeSource = TestTimeSource()
-        MainSource(
-            state = PermissionGrantedBasicInput(
+        MainSourceBar(
+            currentState = PermissionGrantedBasicInput(
                 source = source,
-                matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
+                matchedInput = MatchedInput(FakeInputRepository.coordinateInput, source),
                 permission = Permission.ALWAYS,
                 results = emptyMap(),
             ),
@@ -574,6 +579,7 @@ private fun DarkSubmittedEmptyLogPreview() {
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(emptyList()),
+            onSelectUriString = {},
             onSetLogExpanded = {},
             onSetErrorMessageResId = {},
             onSetSource = {},

@@ -84,8 +84,8 @@ class UserPreferencesBehaviorTest {
         onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
         onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
             expandSheet()
-            scrollToSheetItem(Direction.UP) {
-                textAsString() in setOf(
+            scrollToElement(Direction.UP) {
+                viewIdResourceName == "geoShareSheetListItemHeadline" && textAsString() in setOf(
                     "Copy coordinates",
                     @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Copier les coordonnées",
                 )
@@ -111,8 +111,8 @@ class UserPreferencesBehaviorTest {
         onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
         onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
             expandSheet()
-            scrollToSheetItem(Direction.UP) {
-                textAsString() in setOf(
+            scrollToElement(Direction.UP) {
+                viewIdResourceName == "geoShareSheetListItemHeadline" && textAsString() in setOf(
                     "Copy coordinates",
                     @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Copier les coordonnées",
                 )
@@ -203,7 +203,7 @@ class UserPreferencesBehaviorTest {
         shareUri()
 
         // Hide an app
-        quickWaitForStableInActiveWindow() // Wait for the result to render, to prevent stale element on Redmi 8
+        quickWaitForStableInActiveWindow() // Wait for the result to render, to prevent stale object error
         onMainScrollablePane()
             .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareApp_${PackageNames.OSMAND_PLUS}" }
             .longClick()

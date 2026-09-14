@@ -5,6 +5,7 @@ import android.content.res.Resources
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,8 +34,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -54,11 +59,12 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TestTimeSource
 
 @Composable
-fun MainLog(
+fun ConversionStateLogList(
     expanded: Boolean,
     stateLog: StateFlow<List<ExtendedConversionStateLogItem>>,
     animationsEnabled: Boolean = true,
     initialItemsExpanded: Boolean = false,
+    onUriClick: (uriString: String) -> Unit,
 ) {
     val colors = ListItemDefaults.segmentedColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
     val spacing = LocalSpacing.current
@@ -82,10 +88,11 @@ fun MainLog(
                             colors = colors,
                         ) {
                             key(item.id) {
-                                ResultLogItem(
+                                ConversionStateLogListItem(
                                     item = item,
                                     animationsEnabled = animationsEnabled,
                                     initialExpanded = initialItemsExpanded,
+                                    onUriClick = onUriClick,
                                 )
                             }
                         }
@@ -98,10 +105,12 @@ fun MainLog(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun ResultLogItem(
+private fun ConversionStateLogListItem(
     item: ExtendedConversionStateLogItem,
     animationsEnabled: Boolean = true,
+    iconSize: Dp = 24.dp,
     initialExpanded: Boolean = false,
+    onUriClick: (uriString: String) -> Unit,
 ) {
     val resources = LocalResources.current
     val spacing = LocalSpacing.current
@@ -127,10 +136,14 @@ fun ResultLogItem(
             ) {
                 when (item) {
                     is ExtendedConversionStateLogItem.Finished ->
-                        Icon(if (item.succeeded) Icons.Default.Check else Icons.Default.Close, null)
+                        Icon(
+                            if (item.succeeded) Icons.Default.Check else Icons.Default.Close,
+                            contentDescription = null,
+                            modifier = Modifier.size(iconSize),
+                        )
 
                     is ExtendedConversionStateLogItem.Pending ->
-                        LoadingIndicator(Modifier.size(24.dp), color = LocalContentColor.current)
+                        LoadingIndicator(Modifier.size(iconSize), color = LocalContentColor.current)
                 }
                 Text(
                     item.state.getDescription(resources),
@@ -147,14 +160,22 @@ fun ResultLogItem(
             item.state.getDetails(resources)?.let { details ->
                 ResultDetails(
                     details,
-                    Modifier.padding(start = 24.dp + spacing.tiny),
+                    Modifier.padding(start = iconSize + spacing.tiny),
                     initialExpanded = initialExpanded
                 )
             }
-            item.state.uri?.let { uri ->
-                ResultUri(
-                    uri,
-                    Modifier.padding(start = 24.dp + spacing.tiny),
+            item.state.uriString?.let { uriString ->
+                Text(
+                    uriString,
+                    modifier = Modifier
+                        .padding(start = iconSize + spacing.tiny)
+                        .graphicsLayer { alpha = 0.9f }
+                        .clickable { onUriClick(uriString) },
+                    color = LocalContentColor.current.copy(alpha = 0.9f),
+                    textDecoration = TextDecoration.Underline,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    style = MaterialTheme.typography.bodySmall,
                 )
             }
         }
@@ -172,7 +193,7 @@ fun fakeStateLog(source: String, timeSource: TestTimeSource) = listOf(
             override fun getDetails(resources: Resources) =
                 NotImplementedError().stackTraceToString()
 
-            override val uri = source
+            override val uriString = "41°24′12.2″N 2°10′26.5″E"
         },
         succeeded = false,
         start = timeSource.markNow(),
@@ -235,11 +256,12 @@ private fun DefaultPreview() {
     AppTheme {
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
-        MainLog(
+        ConversionStateLogList(
             expanded = true,
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             animationsEnabled = false,
             initialItemsExpanded = true,
+            onUriClick = {},
         )
     }
 }
@@ -250,11 +272,12 @@ private fun DarkPreview() {
     AppTheme {
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
-        MainLog(
+        ConversionStateLogList(
             expanded = true,
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
             animationsEnabled = false,
             initialItemsExpanded = true,
+            onUriClick = {},
         )
     }
 }

@@ -2,7 +2,12 @@ package page.ooooo.geoshare.ui.components
 
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -16,13 +21,17 @@ import com.google.accompanist.drawablepainter.rememberDrawablePainter
 
 sealed interface IconDescriptor
 
-data class DrawableIconDescriptor(val drawable: Drawable) : IconDescriptor
+data class CharacterIconDescriptor(val text: String?) : IconDescriptor
 
-data class ResourceIconDescriptor(val id: Int) : IconDescriptor
+data class DrawableIconDescriptor(val drawable: Drawable) : IconDescriptor
 
 data class ImageVectorIconDescriptor(val imageVector: ImageVector) : IconDescriptor
 
-data class CharacterIconDescriptor(val text: String?) : IconDescriptor
+object PlaceholderIconDescriptor : IconDescriptor
+
+data class ResourceIconDescriptor(val id: Int) : IconDescriptor
+
+object SpacerIconDescriptor : IconDescriptor
 
 @Composable
 fun IconFromDescriptor(
@@ -31,6 +40,7 @@ fun IconFromDescriptor(
     modifier: Modifier = Modifier,
     size: Dp = 24.dp,
     inverseContentColor: Color = MaterialTheme.colorScheme.surface,
+    placeholderContainerColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
 ) {
     when (descriptor) {
         is DrawableIconDescriptor -> Image(
@@ -52,10 +62,18 @@ fun IconFromDescriptor(
             modifier.requiredSize(size),
         )
 
+        is PlaceholderIconDescriptor -> Box(
+            Modifier
+                .requiredSize(size)
+                .background(placeholderContainerColor, CircleShape),
+        )
+
         is ResourceIconDescriptor -> Icon(
             painterResource(descriptor.id),
             contentDescription,
             modifier.requiredSize(size),
         )
+
+        is SpacerIconDescriptor -> Spacer(Modifier.size(size))
     }
 }

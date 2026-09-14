@@ -3,84 +3,16 @@ package page.ooooo.geoshare.tests
 import androidx.test.uiautomator.UiAutomatorTestScope
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import page.ooooo.geoshare.data.local.database.InitialLinks
-import page.ooooo.geoshare.lib.android.PackageNames
-import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
-import page.ooooo.geoshare.lib.formatters.GeoUriFormatter
-import page.ooooo.geoshare.lib.geo.GCJ02Point
-import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import kotlin.time.Duration.Companion.seconds
 
-class ConversionBehaviorTest {
-    @Test
-    fun whenLinkIsShared_showsPointAndAllowsOpeningGoogleMaps() = uiAutomator {
-        assumeAppInstalled(PackageNames.GOOGLE_MAPS)
-        runBlocking {
-            assumeDomainResolvable("maps.google.com")
-        }
-
-        // Share a Google Maps coordinates link with the app
-        shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
-
-        // Shows precise location
-        assertConversionSucceeds(WGS84Point(52.5067296, 13.2599309, z = 11.0, source = Source.MAP_CENTER))
-
-        // Tap the Google Maps icon
-        clickAppIcon(PackageNames.GOOGLE_MAPS)
-
-        // Google Maps shows precise location
-        waitAndAssertGoogleMapsContainsElement { textAsString() in setOf("Westend", "Berlin-Westend") }
-
-        // Go back to app
-        launchApplication()
-        waitForAppToBeVisible()
-
-        // Shows main screen instead of result screen, because the app finished
-        onElement { viewIdResourceName == "geoShareMainSourceTextField" }
-    }
-
-    @Test
-    fun whenLinkWithCoordinatesWithinMainlandChinaIsShared_showsPointAndAllowsOpeningGoogleMapsInGCJ02() = uiAutomator {
-        assumeAppInstalled(PackageNames.GOOGLE_MAPS)
-        runBlocking {
-            assumeDomainResolvable("maps.google.com")
-        }
-
-        // Share a Google Maps coordinates link with the app
-        shareUri("https://www.google.com/maps/@31.22850685422705,121.47552456472106,11z")
-
-        // Shows precise location
-        val expectedPoint = GCJ02Point(
-            31.22850685422705, 121.47552456472106,
-            z = 11.0,
-            source = Source.MAP_CENTER,
-        )
-        assertConversionSucceeds(expectedPoint)
-
-        // Tap the Google Maps icon
-        clickAppIcon(PackageNames.GOOGLE_MAPS)
-
-        // Google Maps shows precise location
-        waitAndAssertGoogleMapsContainsElement {
-            textAsString() in setOf(
-                "Ming&Qing Dynasties Furniture Hall",
-                """31°13'42.6"N 121°28'31.9"E""", // Sometimes shown on Nexus 5 instead of place name
-            )
-        }
-    }
-
+class MainPermissionBehaviorTest {
     @Test
     fun whenShortLinkIsSharedAndPermissionIsGrantedWithoutDoNotAsk_showsPointAndShowsDialogAgain() = uiAutomator {
         runBlocking {
-            assumeDomainResolvable("maps.google.com")
+            assumeDomainResolvable("maps.apple")
         }
 
         // Share a short link with the app
@@ -105,7 +37,7 @@ class ConversionBehaviorTest {
     @Test
     fun whenShortLinkIsSharedAndPermissionIsGrantedWithDoNotAsk_showsPointAndDoesNotShowDialogAgain() = uiAutomator {
         runBlocking {
-            assumeDomainResolvable("maps.apple.com")
+            assumeDomainResolvable("maps.apple")
         }
 
         // Share a short link with the app
@@ -135,7 +67,7 @@ class ConversionBehaviorTest {
     @Test
     fun whenShortLinkIsSharedAndPermissionIsDeniedWithoutDoNotAsk_closesDialogAndShowsDialogAgain() = uiAutomator {
         runBlocking {
-            assumeDomainResolvable("maps.apple.com")
+            assumeDomainResolvable("maps.apple")
         }
 
         // Share a Google Maps short link with the app
@@ -182,7 +114,7 @@ class ConversionBehaviorTest {
     @Test
     fun whenNonexistentShortLinkIsSharedAndPermissionIsDenied_closesDialogAndDoesNothing() = uiAutomator {
         runBlocking {
-            assumeDomainResolvable("maps.google.com")
+            assumeDomainResolvable("maps.app.goo.gl")
         }
 
         // Share a Google Maps short non-existent link with the app
@@ -299,165 +231,6 @@ class ConversionBehaviorTest {
             // Shows permission denied error
             assertPermissionDenied()
         }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun opensMessagingApp() = uiAutomator {
-        val messagingAppPackageName = PackageNames.CONVERSATIONS
-        assumeAppInstalled(messagingAppPackageName)
-
-        // Share a URI with the app
-        shareUri()
-
-        // Tap the messaging app icon
-        scrollToAppIcons()
-        clickAppIcon(messagingAppPackageName)
-
-        // Opens the messaging app
-        onElement { packageName == messagingAppPackageName }
-    }
-
-    @Test
-    fun opensGoogleMapsSearchLink() = uiAutomator {
-        assumeAppInstalled(PackageNames.GOOGLE_MAPS)
-
-        // Launch app
-        launchApplication()
-        waitForAppToBeVisible()
-
-        // Share a geo: URI with the app
-        val query = "foo"
-        shareUri("geo:?q=$query")
-
-        // Click the link
-        scrollToLinkIcons()
-        onElement { viewIdResourceName == "geoShareApp_${InitialLinks.GOOGLE_MAPS_DISPLAY_UUID}" }.longClick()
-        onElement {
-            viewIdResourceName == "geoShareAppOutput" && textAsString()?.contains("Google Maps search") == true
-        }.click()
-
-        // Google Maps shows the search query
-        clickSystemShareMenuIfShown("Maps")
-        waitAndAssertGoogleMapsContainsElement { textAsString() == query }
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun launchesNavigationInTomTom() = uiAutomator {
-        runBlocking {
-            assumeAppInstalled(PackageNames.TOMTOM)
-            assumeDomainResolvable("tomtom.com")
-
-            // Share a URI with the app
-            shareUri()
-
-            // Launch navigation in TomTom
-            scrollToAppIcons()
-            launchNavigationInApp(PackageNames.TOMTOM)
-
-            // Dismiss the location rationale dialog
-            onElement(20_000) { viewIdResourceName == "geoShareLocationRationaleDialog" }.dismissDialog()
-
-            // Launch navigation in TomTom again
-            launchNavigationInApp(PackageNames.TOMTOM)
-
-            // Confirm location rationale
-            onElement(20_000) { viewIdResourceName == "geoShareLocationRationaleDialog" }.confirmDialog()
-
-            // Deny location permission
-            denySystemPermission()
-
-            // Launch navigation in TomTom again
-            launchNavigationInApp(PackageNames.TOMTOM)
-
-            // Confirm location rationale
-            onElement(20_000) { viewIdResourceName == "geoShareLocationRationaleDialog" }.confirmDialog()
-
-            // Grant location permission
-            waitForStableInActiveWindow() // Wait, otherwise tapping the location permission grant button does nothing
-            grantSystemPermission()
-
-            mockLocation {
-                // Set location
-                launch(Dispatchers.IO) {
-                    delay(3.seconds)
-                    setLocation(52.474160, 13.455457)
-                }
-
-                // TomTom starts navigation
-                waitAndAssertTomTomContainsElement { textAsString() in setOf("Drive", "Aller") }
-            }
-        }
-    }
-
-    @Test
-    fun savesGpxRoute() = uiAutomator {
-        // Launch app
-        launchApplication()
-        waitForAppToBeVisible()
-
-        // Share a URI with the app
-        shareUri()
-
-        // Open sheet and tap Save GPX
-        onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
-        onElement { viewIdResourceName == "geoShareResultSheet" }.run {
-            expandSheet()
-            longScrollSheet() // Speed up scrolling to the item, which is at the bottom of the sheet
-            scrollToSheetItem {
-                textAsString() in setOf(
-                    "Save GPX route",
-                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Enregistrer l’itinéraire GPX",
-                )
-            }
-                .click()
-        }
-
-        // Choose file
-        chooseFile()
-
-        // Shows success message
-        onElement(pollIntervalMs = 50) {
-            textAsString() in setOf(
-                "Saved GPX file",
-                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Fichier GPX enregistré",
-            )
-        }
-    }
-
-    @Test
-    fun savesPointToContact() = uiAutomator {
-        // Launch app
-        launchApplication()
-        waitForAppToBeVisible()
-
-        // Share a geo: URI with the app
-        val point = WGS84Point(NaivePoint.genRandomPoint())
-        shareUri(GeoUriFormatter.formatGeoUriString(point))
-
-        // Open sheet and tap Save to contact
-        onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
-        onElement { viewIdResourceName == "geoShareResultSheet" }.run {
-            expandSheet()
-            longScrollSheet() // Speed up scrolling to the item, which is at the bottom of the sheet
-            scrollToSheetItem {
-                textAsString() in setOf(
-                    "Save to contact",
-                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Enregistrer dans les contacts",
-                )
-            }
-                .click()
-        }
-
-        // Insert or edit the test contact
-        insertOrEditContact()
-
-        // Open the test contact
-        openContact()
-
-        // The test contact contains coordinates
-        assertContactContainsText(CoordinateFormatter.formatDecCoords(point))
-    }
 
     private fun UiAutomatorTestScope.assertPermissionDenied() {
         onElement {

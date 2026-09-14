@@ -271,7 +271,7 @@ fun LinkForm(
                         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                             BottomSheetDefaults.DragHandle()
                         }
-                        ResultSheetItem(
+                        SheetListItem(
                             headlineText = copyOutput.label(appDetails),
                             supportingText = copyOutput.getDescription(WGS84Point(NaivePoint.example)),
                             icon = copyOutput.getIcon(appDetails),
