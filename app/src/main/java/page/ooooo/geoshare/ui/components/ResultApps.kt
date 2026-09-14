@@ -176,13 +176,7 @@ fun ResultApps(
         }
 
         // Message
-        message?.invoke(
-            PaddingValues(
-                start = spacing.windowPadding,
-                top = spacing.tiny,
-                end = spacing.windowPadding,
-            )
-        )
+        message?.invoke(PaddingValues(top = spacing.small))
     }
 }
 
@@ -192,13 +186,9 @@ private fun ResultAppsHeadline(text: String, extra: (@Composable RowScope.() -> 
 
     Row(
         Modifier
+            .padding(top = spacing.tiny)
             .fillMaxWidth()
-            .height(50.dp)
-            .padding(
-                start = spacing.windowPadding,
-                top = spacing.tiny,
-                end = spacing.windowPadding - 8.dp, // Align with last point menu
-            ),
+            .height(50.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -220,9 +210,7 @@ private fun ResultAppsGrid(
     onHideApp: (packageName: String) -> Unit,
     extra: (GridScope.() -> Unit)? = null,
 ) {
-    val spacing = LocalSpacing.current
-
-    Grid(Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.tiny)) {
+    Grid {
         outputsForApps
             .map { (packageName, outputs) -> Triple(packageName, appDetails[packageName]?.label, outputs) }
             .sortedWith(compareBy(nullsLast()) { (_, label) -> label })
@@ -259,9 +247,7 @@ private fun ResultAppsLinksGrid(
     onClick: (output: Output) -> Unit,
     onDisableLinkGroup: (group: String?) -> Unit,
 ) {
-    val spacing = LocalSpacing.current
-
-    Grid(Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.tiny)) {
+    Grid {
         outputsForLinks
             .forEach { (group, outputs) ->
                 item {

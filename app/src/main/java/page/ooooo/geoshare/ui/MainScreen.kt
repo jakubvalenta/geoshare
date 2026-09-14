@@ -127,7 +127,7 @@ import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.components.MainSourceBar
 import page.ooooo.geoshare.ui.components.ConversionUriSheet
 import page.ooooo.geoshare.ui.components.MainSubmit
-import page.ooooo.geoshare.ui.components.MainSupportingPaneScaffold
+import page.ooooo.geoshare.ui.components.MainScaffold
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
 import page.ooooo.geoshare.ui.components.PermissionDialog
@@ -417,7 +417,7 @@ private fun MainScreen(
             MessageSnackbarHost(snackbarHostState)
         },
     ) {
-        MainSupportingPaneScaffold(
+        MainScaffold(
             actions = {
                 MainMenu(
                     currentState = currentState,
@@ -550,6 +550,9 @@ private fun MainScreen(
                                 outputsForLinks = outputsForLinks,
                                 outputsForSharing = outputsForSharing,
                                 points = currentState.points,
+                                modifier = Modifier
+                                    .padding(horizontal = spacing.windowPadding)
+                                    .padding(top = spacing.tiny),
                                 onDisableLinkGroup = onDisableLinkGroup,
                                 onExecute = onExecute,
                                 onHideApp = onHideApp,
