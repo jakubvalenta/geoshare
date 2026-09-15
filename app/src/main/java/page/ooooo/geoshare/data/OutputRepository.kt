@@ -124,7 +124,7 @@ class OutputRepository @Inject constructor(
                     .flatMap { activity -> activity.toOutputs() }
             }
 
-    fun getOutputsForLinks(links: List<Link>): Map<String?, List<Output>> =
+    fun getOutputsForLinks(links: List<Link>): Map<String, List<Output>> =
         links
             .filter { it.appEnabled }
             .groupBy { it.groupOrName }

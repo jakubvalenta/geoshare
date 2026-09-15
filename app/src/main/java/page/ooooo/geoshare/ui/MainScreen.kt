@@ -355,7 +355,7 @@ private fun MainScreen(
     inputRepository: InputRepository,
     linkMessage: StateFlow<Message?>,
     outputsForApps: StateFlow<Map<String, List<Output>>>,
-    outputsForLinks: StateFlow<Map<String?, List<Output>>>,
+    outputsForLinks: StateFlow<Map<String, List<Output>>>,
     outputsForPoint: StateFlow<List<PointOutput>>,
     outputsForPointChips: StateFlow<List<PointOutput>>,
     outputsForPoints: StateFlow<List<PointsOutput>>,

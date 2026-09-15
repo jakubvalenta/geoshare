@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridScope
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -26,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -68,7 +72,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun ResultApps(
     appDetails: StateFlow<AppDetails>,
     outputsForApps: StateFlow<Map<String, List<Output>>>,
-    outputsForLinks: StateFlow<Map<String?, List<Output>>>,
+    outputsForLinks: StateFlow<Map<String, List<Output>>>,
     outputsForSharing: StateFlow<List<Output>>,
     points: Points,
     modifier: Modifier = Modifier,
@@ -86,11 +90,12 @@ fun ResultApps(
     val outputsForApps by outputsForApps.collectAsStateWithLifecycle()
     val outputsForLinks by outputsForLinks.collectAsStateWithLifecycle()
     val outputsForSharing by outputsForSharing.collectAsStateWithLifecycle()
-    val (outputsForMapApps, outputsForMessagingApps) = outputsForApps.entries.partition { (_, outputs) ->
-        outputs.size != 1 || outputs[0] !is SendPointOutput
+    val (outputsForMapApps, outputsForMessagingApps) = remember(outputsForApps, outputsForLinks) {
+        outputsForApps.entries.partition { (_, outputs) ->
+            outputs.size != 1 || outputs[0] !is SendPointOutput
+        }
     }
-
-    fun onClick(output: Output) {
+    val onClick = fun(output: Output) {
         onExecute(
             when (output) {
                 is PointOutput -> output.toAction(lastPoint)
@@ -105,33 +110,39 @@ fun ResultApps(
             outputsForApps = outputsForMapApps,
             appDetails = appDetails,
             iconSize = iconSize,
-            onClick = { onClick(it) },
+            onClick = onClick,
             onHideApp = onHideApp,
         ) {
             outputsForSharing.firstOrNull()?.let { firstOutput ->
-                firstOutput.getIcon(appDetails)?.let { icon ->
-                    // Share item
-                    item {
-                        AppIcon(
-                            modifier = Modifier
-                                .weight(1f)
-                                .testTag("geoShareApp_share"),
-                            label = null,
-                            appDetails = appDetails,
-                            outputs = outputsForSharing,
-                            onClick = { onClick(it) },
+                // Share item
+                item(firstOutput.id) {
+                    AppIcon(
+                        label = null,
+                        menu = { expanded, onDismissRequest ->
+                            AppMenu(
+                                appDetails = appDetails,
+                                expanded = expanded,
+                                outputs = outputsForSharing,
+                                onClick = onClick,
+                                onDismissRequest = onDismissRequest,
+                                onHide = null,
+                            )
+                        },
+                        onClick = { onClick(firstOutput) },
+                        modifier = Modifier
+                            .weight(1f)
+                            .testTag("geoShareApp_share"),
+                    ) {
+                        Surface(
+                            Modifier.requiredSize(iconSize),
+                            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                            shape = CircleShape,
                         ) {
-                            Surface(
-                                Modifier.requiredSize(iconSize),
-                                color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                                shape = CircleShape,
-                            ) {
-                                IconFromDescriptor(
-                                    icon,
-                                    contentDescription = firstOutput.label(appDetails),
-                                    size = 24.dp,
-                                )
-                            }
+                            IconFromDescriptor(
+                                firstOutput.getIcon(appDetails) ?: PlaceholderIconDescriptor,
+                                contentDescription = firstOutput.label(appDetails),
+                                size = 24.dp,
+                            )
                         }
                     }
                 }
@@ -145,7 +156,7 @@ fun ResultApps(
                 outputsForApps = outputsForMessagingApps,
                 appDetails = appDetails,
                 iconSize = iconSize,
-                onClick = { onClick(it) },
+                onClick = onClick,
                 onHideApp = onHideApp,
             )
         }
@@ -208,30 +219,41 @@ private fun ResultAppsGrid(
     iconSize: Dp,
     onClick: (output: Output) -> Unit,
     onHideApp: (packageName: String) -> Unit,
-    extra: (GridScope.() -> Unit)? = null,
+    extra: (LazyGridScope.() -> Unit)? = null,
 ) {
-    Grid {
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(80.dp),
+        modifier = Modifier.fillMaxWidth(),
+        userScrollEnabled = false,
+    ) {
         outputsForApps
             .map { (packageName, outputs) -> Triple(packageName, appDetails[packageName]?.label, outputs) }
             .sortedWith(compareBy(nullsLast()) { (_, label) -> label })
             .forEach { (packageName, label, outputs) ->
-                item {
-                    AppIcon(
-                        modifier = Modifier
-                            .weight(1f)
-                            .testTag("geoShareApp_$packageName"),
-                        label = label,
-                        appDetails = appDetails,
-                        outputs = outputs,
-                        onClick = onClick,
-                        onHide = { onHideApp(packageName) },
-                    ) {
-                        IconFromDescriptor(
-                            outputs.firstOrNull()?.getIcon(appDetails) ?: PlaceholderIconDescriptor,
-                            contentDescription = null,
-                            size = iconSize,
-                            placeholderContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                        )
+                outputs.firstOrNull()?.let { firstOutput ->
+                    item(firstOutput.id) {
+                        AppIcon(
+                            label = label.orEmpty(),
+                            menu = { expanded, onDismissRequest ->
+                                AppMenu(
+                                    appDetails = appDetails,
+                                    expanded = expanded,
+                                    outputs = outputs,
+                                    onClick = onClick,
+                                    onDismissRequest = onDismissRequest,
+                                    onHide = { onHideApp(packageName) },
+                                )
+                            },
+                            onClick = { onClick(firstOutput) },
+                            modifier = Modifier.testTag("geoShareApp_$packageName"),
+                        ) {
+                            IconFromDescriptor(
+                                firstOutput.getIcon(appDetails) ?: PlaceholderIconDescriptor,
+                                contentDescription = null,
+                                size = iconSize,
+                                placeholderContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                            )
+                        }
                     }
                 }
             }
@@ -241,35 +263,45 @@ private fun ResultAppsGrid(
 
 @Composable
 private fun ResultAppsLinksGrid(
-    outputsForLinks: Map<String?, List<Output>>,
+    outputsForLinks: Map<String, List<Output>>,
     appDetails: AppDetails,
     iconSize: Dp,
     onClick: (output: Output) -> Unit,
     onDisableLinkGroup: (group: String?) -> Unit,
 ) {
-    Grid {
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(80.dp),
+        modifier = Modifier.fillMaxWidth(),
+        userScrollEnabled = false,
+    ) {
         outputsForLinks
             .forEach { (group, outputs) ->
-                item {
-                    val uuid = (outputs.firstOrNull() as? ShareLinkUriOutput)?.link?.uuid
-                    AppIcon(
-                        modifier = Modifier
-                            .weight(1f)
-                            .testTag("geoShareApp_$uuid"),
-                        label = group,
-                        appDetails = appDetails,
-                        outputs = outputs,
-                        onClick = onClick,
-                        onHide = { onDisableLinkGroup(group) },
-                    ) {
-                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
-                            IconFromDescriptor(
-                                outputs.firstOrNull()?.getIcon(appDetails) ?: PlaceholderIconDescriptor,
-                                contentDescription = null,
-                                size = iconSize,
-                                inverseContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                                placeholderContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                            )
+                outputs.firstOrNull()?.let { firstOutput ->
+                    item(firstOutput.id) {
+                        AppIcon(
+                            label = group,
+                            menu = { expanded, onDismissRequest ->
+                                AppMenu(
+                                    appDetails = appDetails,
+                                    expanded = expanded,
+                                    outputs = outputs,
+                                    onClick = onClick,
+                                    onDismissRequest = onDismissRequest,
+                                    onHide = { onDisableLinkGroup(group) },
+                                )
+                            },
+                            onClick = { onClick(firstOutput) },
+                            modifier = Modifier.testTag("geoShareApp_${(firstOutput as? ShareLinkUriOutput)?.link?.uuid}"),
+                        ) {
+                            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
+                                IconFromDescriptor(
+                                    firstOutput.getIcon(appDetails) ?: PlaceholderIconDescriptor,
+                                    contentDescription = null,
+                                    size = iconSize,
+                                    inverseContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                                    placeholderContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                )
+                            }
                         }
                     }
                 }

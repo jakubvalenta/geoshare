@@ -246,7 +246,13 @@ fun LinkForm(
                         .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.extraSmall)
                         .padding(vertical = spacing.tiny)
                 ) {
-                    AppIcon(Modifier.width(100.dp), link.groupOrName, enabled = false) {
+                    AppIcon(
+                        label = link.groupOrName,
+                        menu = { _, _ -> },
+                        onClick = {},
+                        modifier = Modifier.width(100.dp),
+                        enabled = false,
+                    ) {
                         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
                             IconFromDescriptor(
                                 shareOutput.getIcon(appDetails),

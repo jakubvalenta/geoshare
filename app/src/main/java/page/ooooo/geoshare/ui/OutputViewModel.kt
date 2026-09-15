@@ -122,7 +122,7 @@ class OutputViewModel @Inject constructor(
                 SharingStarted.WhileSubscribed(5000),
                 emptyMap(),
             )
-    val outputsForLinks: StateFlow<Map<String?, List<Output>>> =
+    val outputsForLinks: StateFlow<Map<String, List<Output>>> =
         linkRepository.all.map { links -> outputRepository.getOutputsForLinks(links) }
             .stateIn(
                 viewModelScope,
