@@ -11,12 +11,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
@@ -25,6 +21,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.fakeActivities
@@ -35,32 +33,23 @@ import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.android.TextActivity
 import page.ooooo.geoshare.lib.android.UriActivity
 import page.ooooo.geoshare.lib.android.copy
-import page.ooooo.geoshare.lib.android.getPackageNames
-import page.ooooo.geoshare.lib.android.queryActivitiesForUri
-import page.ooooo.geoshare.lib.android.queryAppDetails
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConversionUriSheet(
+    activities: StateFlow<List<AppActivity>>,
+    appDetails: StateFlow<AppDetails>,
     uriString: String,
     onDismissRequest: () -> Unit,
 ) {
-    val context = LocalContext.current
-
-    val activitiesForUri = remember(uriString) { context.packageManager.queryActivitiesForUri(uriString) }
-    var appDetailsForUri by remember { mutableStateOf<AppDetails>(emptyMap()) }
-
-    LaunchedEffect(activitiesForUri) {
-        if (activitiesForUri.isNotEmpty()) {
-            appDetailsForUri = context.packageManager.queryAppDetails(activitiesForUri.getPackageNames())
-        }
-    }
+    val activities by activities.collectAsStateWithLifecycle()
+    val appDetails by appDetails.collectAsStateWithLifecycle()
 
     ConversionUriSheet(
+        activities = activities,
+        appDetails = appDetails,
         uriString = uriString,
-        activitiesForUri = activitiesForUri,
-        appDetailsForUri = appDetailsForUri,
         onDismissRequest = onDismissRequest,
     )
 }
@@ -68,9 +57,9 @@ fun ConversionUriSheet(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ConversionUriSheet(
+    activities: List<AppActivity>,
+    appDetails: AppDetails,
     uriString: String,
-    activitiesForUri: List<AppActivity>,
-    appDetailsForUri: AppDetails,
     initialValue: SheetValue = SheetValue.Hidden,
     onDismissRequest: () -> Unit,
 ) {
@@ -100,9 +89,9 @@ private fun ConversionUriSheet(
                     icon = ResourceIconDescriptor(R.drawable.content_copy_24px),
                 )
             }
-            activitiesForUri
+            activities
                 .takeIf { it.isNotEmpty() }
-                ?.map { activity -> activity to appDetailsForUri[activity.packageName]?.label }
+                ?.map { activity -> activity to appDetails[activity.packageName]?.label }
                 ?.sortedWith(compareBy(nullsLast()) { (_, label) -> label })
                 ?.let { activitiesAndLabels ->
                     SheetSection(
@@ -117,13 +106,13 @@ private fun ConversionUriSheet(
                                 }
 
                                 is TextActivity ->
-                                    ConversionUriSheetItem(activity, appDetailsForUri, label) {
+                                    ConversionUriSheetItem(activity, appDetails, label) {
                                         activity.launch(context, uriString)
                                         onDismissRequest()
                                     }
 
                                 is UriActivity ->
-                                    ConversionUriSheetItem(activity, appDetailsForUri, label) {
+                                    ConversionUriSheetItem(activity, appDetails, label) {
                                         activity.launch(context, uriString)
                                         onDismissRequest()
                                     }
@@ -138,7 +127,7 @@ private fun ConversionUriSheet(
 @Composable
 private fun ConversionUriSheetItem(
     activity: AppActivity,
-    appDetailsForUri: AppDetails,
+    appDetails: AppDetails,
     label: String?,
     onClick: () -> Unit,
 ) {
@@ -146,7 +135,7 @@ private fun ConversionUriSheetItem(
         headlineText = label.orEmpty(),
         modifier = Modifier.testTag("geoShareConversionUriSheetItem_${activity.packageName}"),
         onClick = onClick,
-        icon = appDetailsForUri[activity.packageName]?.icon?.let { DrawableIconDescriptor(it) }
+        icon = appDetails[activity.packageName]?.icon?.let { DrawableIconDescriptor(it) }
             ?: PlaceholderIconDescriptor,
     )
 }
@@ -159,15 +148,15 @@ private fun DefaultPreview() {
         @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
         Scaffold {
             ConversionUriSheet(
-                uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                activitiesForUri = fakeActivities.filter {
+                activities = fakeActivities.filter {
                     it.packageName in setOf(
                         PackageNames.COMAPS_FDROID,
                         PackageNames.CONVERSATIONS,
                         PackageNames.OSMAND_PLUS,
                     )
                 },
-                appDetailsForUri = fakeAppDetails(),
+                appDetails = fakeAppDetails(),
+                uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 initialValue = SheetValue.Expanded,
                 onDismissRequest = {},
             )
@@ -183,15 +172,15 @@ private fun DarkPreview() {
         @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
         Scaffold {
             ConversionUriSheet(
-                uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                activitiesForUri = fakeActivities.filter {
+                activities = fakeActivities.filter {
                     it.packageName in setOf(
                         PackageNames.COMAPS_FDROID,
                         PackageNames.CONVERSATIONS,
                         PackageNames.OSMAND_PLUS,
                     )
                 },
-                appDetailsForUri = fakeAppDetails(),
+                appDetails = fakeAppDetails(),
+                uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 initialValue = SheetValue.Expanded,
                 onDismissRequest = {},
             )

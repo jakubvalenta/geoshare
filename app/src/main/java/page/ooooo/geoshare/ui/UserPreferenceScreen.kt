@@ -100,8 +100,8 @@ fun UserPreferenceScreen(
     outputViewModel: OutputViewModel = hiltViewModel(),
     viewModel: UserPreferenceViewModel = hiltViewModel(),
 ) {
-    val activities by viewModel.activities.collectAsStateWithLifecycle()
-    val appDetails by viewModel.appDetails.collectAsStateWithLifecycle()
+    val activities by outputViewModel.activities.collectAsStateWithLifecycle()
+    val appDetails by outputViewModel.appDetails.collectAsStateWithLifecycle()
     val billingAppNameResId = billingViewModel.billingAppNameResId
     val billingFeatures = billingViewModel.billingFeatures
     val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
