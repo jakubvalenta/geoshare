@@ -337,4 +337,5 @@
     <string name="conversion_automation_copy_name_succeeded">Название автоматически скопировано</string>
     <string name="conversion_succeeded_copy_name">Копировать название</string>
     <string name="conversion_processing">Обработка ссылки формата %1$s…</string>
+    <string name="main_source_open">Открыть исходную ссылку</string>
 </resources>
