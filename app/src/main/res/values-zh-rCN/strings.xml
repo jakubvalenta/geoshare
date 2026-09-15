@@ -316,4 +316,5 @@
     <string name="conversion_processing">正在处理 %1$s 类型的链接…</string>
     <string name="conversion_succeeded_copy_name">复制名称</string>
     <string name="conversion_automation_copy_name_succeeded">自动复制了名称</string>
+    <string name="main_source_open">打开原始链接</string>
 </resources>
