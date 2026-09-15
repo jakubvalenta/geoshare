@@ -320,4 +320,8 @@
     <string name="help_welcome_text">Имате ли готова връзка към картата? Въведете я във формуляра и натиснете %1$s.</string>
     <string name="help_welcome_title">Добре дошли</string>
     <string name="faq_open_by_default_headline">Как винаги да отварям връзки в %1$s</string>
+    <string name="conversion_processing">Обработва се връзка от тип %1$s…</string>
+    <string name="conversion_succeeded_copy_name">Копиране на име</string>
+    <string name="main_source_open">Отваряне на оригиналната връзка</string>
+    <string name="conversion_automation_copy_name_succeeded">Автоматично копирано име</string>
 </resources>
