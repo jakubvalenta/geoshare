@@ -74,6 +74,7 @@ import page.ooooo.geoshare.data.local.preferences.shouldAppFinish
 import page.ooooo.geoshare.lib.Attempt
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.Message
+import page.ooooo.geoshare.lib.android.AppActivity
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.getLocation
 import page.ooooo.geoshare.lib.android.hasLocationPermission
@@ -127,7 +128,7 @@ import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.components.MainSourceBar
 import page.ooooo.geoshare.ui.components.ConversionUriSheet
 import page.ooooo.geoshare.ui.components.MainSubmit
-import page.ooooo.geoshare.ui.components.MainSupportingPaneScaffold
+import page.ooooo.geoshare.ui.components.MainScaffold
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
 import page.ooooo.geoshare.ui.components.PermissionDialog
@@ -265,7 +266,9 @@ fun MainScreen(
 
     MainScreen(
         currentState = currentState,
-        appDetails = userPreferenceViewModel.appDetails,
+        activitiesForSelectedUriString = outputViewModel.activitiesForSelectedUriString,
+        appDetails = outputViewModel.appDetails,
+        appDetailsForSelectedUriString = outputViewModel.appDetailsForSelectedUriString,
         billingAppNameResId = billingViewModel.billingAppNameResId,
         billingFeatures = billingViewModel.billingFeatures,
         billingStatus = billingViewModel.billingStatus,
@@ -281,6 +284,7 @@ fun MainScreen(
         outputsForPoints = outputViewModel.outputsForPoints,
         outputsForPointsChips = outputViewModel.outputsForPointsChips,
         outputsForSharing = outputViewModel.outputsForSharing,
+        selectedUriString = outputViewModel.selectedUriString,
         start = conversionViewModel.start,
         stateLog = conversionViewModel.extendedStateLog,
         source = conversionViewModel.source,
@@ -328,6 +332,7 @@ fun MainScreen(
         },
         onReset = { conversionViewModel.reset() },
         onRetry = { conversionViewModel.retry() },
+        onSelectUriString = { outputViewModel.setSelectedUriString(it) },
         onSetSource = { conversionViewModel.setSource(it) },
         onSubmit = { conversionViewModel.start(false) },
     )
@@ -338,7 +343,9 @@ fun MainScreen(
 @Composable
 private fun MainScreen(
     currentState: ConversionState,
+    activitiesForSelectedUriString: StateFlow<List<AppActivity>>,
     appDetails: StateFlow<AppDetails>,
+    appDetailsForSelectedUriString: StateFlow<AppDetails>,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
     billingStatus: StateFlow<BillingStatus>,
@@ -354,6 +361,7 @@ private fun MainScreen(
     outputsForPoints: StateFlow<List<PointsOutput>>,
     outputsForPointsChips: StateFlow<List<PointsOutput>>,
     outputsForSharing: StateFlow<List<Output>>,
+    selectedUriString: StateFlow<String?>,
     source: StateFlow<String>,
     sourceComesFromIntent: StateFlow<Boolean>,
     start: StateFlow<ComparableTimeMark?>,
@@ -377,6 +385,7 @@ private fun MainScreen(
     onNavigateToUserPreferencesScreen: (groupId: UserPreferenceGroupId?) -> Unit,
     onReset: () -> Unit,
     onRetry: () -> Unit,
+    onSelectUriString: (String?) -> Unit,
     onSetSource: (String) -> Unit,
     onSubmit: () -> Unit,
 ) {
@@ -389,7 +398,7 @@ private fun MainScreen(
     var errorMessageResId by retain { mutableStateOf<Int?>(null) }
     var logExpanded by retain { mutableStateOf(false) }
     var selectedPointIndex by retain { mutableStateOf<Int?>(null) }
-    var selectedUriString by retain { mutableStateOf<String?>(null) }
+    val selectedUriString by selectedUriString.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
     BackHandler(currentState !is Initial) {
@@ -417,7 +426,7 @@ private fun MainScreen(
             MessageSnackbarHost(snackbarHostState)
         },
     ) {
-        MainSupportingPaneScaffold(
+        MainScaffold(
             actions = {
                 MainMenu(
                     currentState = currentState,
@@ -441,7 +450,7 @@ private fun MainScreen(
                             source = source,
                             start = start,
                             stateLog = stateLog,
-                            onSelectUriString = { selectedUriString = it },
+                            onSelectUriString = onSelectUriString,
                             onSetLogExpanded = { logExpanded = it },
                             onSetErrorMessageResId = { errorMessageResId = it },
                             onSetSource = onSetSource,
@@ -450,7 +459,7 @@ private fun MainScreen(
                         ConversionStateLogList(
                             expanded = logExpanded,
                             stateLog = stateLog,
-                            onUriClick = { selectedUriString = it },
+                            onUriClick = onSelectUriString,
                         )
                     }
                 }
@@ -550,14 +559,18 @@ private fun MainScreen(
                                 outputsForLinks = outputsForLinks,
                                 outputsForSharing = outputsForSharing,
                                 points = currentState.points,
+                                modifier = Modifier
+                                    .padding(horizontal = spacing.windowPadding)
+                                    .padding(top = spacing.tiny),
                                 onDisableLinkGroup = onDisableLinkGroup,
                                 onExecute = onExecute,
                                 onHideApp = onHideApp,
                                 onNavigateToLinkScreen = onNavigateToLinkScreen,
-                            ) {
+                            ) { paddingValues ->
                                 HelpOpenByDefaultMessage(
                                     dismissedHelpMessages = dismissedHelpMessages,
                                     sourceComesFromIntent = sourceComesFromIntent,
+                                    modifier = Modifier.padding(paddingValues),
                                     onDismissHelpMessage = onDismissHelpMessage,
                                     onNavigateToFaqScreen = onNavigateToFaqScreen,
                                 )
@@ -609,8 +622,10 @@ private fun MainScreen(
 
     selectedUriString?.let { uriString ->
         ConversionUriSheet(
+            activities = activitiesForSelectedUriString,
+            appDetails = appDetailsForSelectedUriString,
             uriString = uriString,
-            onDismissRequest = { selectedUriString = null },
+            onDismissRequest = { onSelectUriString(null) },
         )
     }
 
@@ -730,7 +745,9 @@ private fun DefaultPreview() {
         val timeSource = TestTimeSource()
         MainScreen(
             currentState = Initial,
+            activitiesForSelectedUriString = MutableStateFlow(emptyList()),
             appDetails = MutableStateFlow(emptyMap()),
+            appDetailsForSelectedUriString = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(BillingStatus.NotPurchased()),
@@ -746,6 +763,7 @@ private fun DefaultPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
+            selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(""),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(emptyList()),
@@ -769,6 +787,7 @@ private fun DefaultPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onSelectUriString = {},
             onSetSource = {},
             onSubmit = {},
         )
@@ -785,7 +804,9 @@ private fun DarkPreview() {
         val timeSource = TestTimeSource()
         MainScreen(
             currentState = Initial,
+            activitiesForSelectedUriString = MutableStateFlow(emptyList()),
             appDetails = MutableStateFlow(emptyMap()),
+            appDetailsForSelectedUriString = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(BillingStatus.NotPurchased()),
@@ -801,6 +822,7 @@ private fun DarkPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
+            selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(""),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(emptyList()),
@@ -824,6 +846,7 @@ private fun DarkPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onSelectUriString = {},
             onSetSource = {},
             onSubmit = {},
         )
@@ -840,7 +863,9 @@ private fun SmallPreview() {
         val timeSource = TestTimeSource()
         MainScreen(
             currentState = Initial,
+            activitiesForSelectedUriString = MutableStateFlow(emptyList()),
             appDetails = MutableStateFlow(emptyMap()),
+            appDetailsForSelectedUriString = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(BillingStatus.NotPurchased()),
@@ -856,6 +881,7 @@ private fun SmallPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
+            selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(""),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(emptyList()),
@@ -879,6 +905,7 @@ private fun SmallPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onSelectUriString = {},
             onSetSource = {},
             onSubmit = {},
         )
@@ -895,7 +922,9 @@ private fun TabletPreview() {
         val timeSource = TestTimeSource()
         MainScreen(
             currentState = Initial,
+            activitiesForSelectedUriString = MutableStateFlow(emptyList()),
             appDetails = MutableStateFlow(emptyMap()),
+            appDetailsForSelectedUriString = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(BillingStatus.NotPurchased()),
@@ -911,6 +940,7 @@ private fun TabletPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
+            selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(""),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(emptyList()),
@@ -934,6 +964,7 @@ private fun TabletPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onSelectUriString = {},
             onSetSource = {},
             onSubmit = {},
         )
@@ -967,7 +998,9 @@ private fun SucceededPreview() {
                 ),
                 actionResult = ActionResult.SUCCEEDED,
             ),
+            activitiesForSelectedUriString = MutableStateFlow(emptyList()),
             appDetails = MutableStateFlow(emptyMap()),
+            appDetailsForSelectedUriString = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -995,6 +1028,7 @@ private fun SucceededPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
             outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
+            selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
@@ -1018,6 +1052,7 @@ private fun SucceededPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onSelectUriString = {},
             onSetSource = {},
             onSubmit = {},
         )
@@ -1051,7 +1086,9 @@ private fun DarkSucceededPreview() {
                 ),
                 actionResult = ActionResult.SUCCEEDED,
             ),
+            activitiesForSelectedUriString = MutableStateFlow(emptyList()),
             appDetails = MutableStateFlow(emptyMap()),
+            appDetailsForSelectedUriString = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1079,6 +1116,7 @@ private fun DarkSucceededPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
             outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
+            selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
@@ -1102,6 +1140,7 @@ private fun DarkSucceededPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onSelectUriString = {},
             onSetSource = {},
             onSubmit = {},
         )
@@ -1134,7 +1173,9 @@ private fun SmallSucceededPreview() {
                 ),
                 actionResult = ActionResult.SUCCEEDED,
             ),
+            activitiesForSelectedUriString = MutableStateFlow(emptyList()),
             appDetails = MutableStateFlow(emptyMap()),
+            appDetailsForSelectedUriString = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1162,6 +1203,7 @@ private fun SmallSucceededPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
             outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
+            selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
@@ -1185,6 +1227,7 @@ private fun SmallSucceededPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onSelectUriString = {},
             onSetSource = {},
             onSubmit = {},
         )
@@ -1218,7 +1261,9 @@ private fun TabletSucceededPreview() {
                 ),
                 actionResult = ActionResult.SUCCEEDED,
             ),
+            activitiesForSelectedUriString = MutableStateFlow(emptyList()),
             appDetails = MutableStateFlow(emptyMap()),
+            appDetailsForSelectedUriString = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1246,6 +1291,7 @@ private fun TabletSucceededPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
             outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
+            selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
@@ -1269,6 +1315,7 @@ private fun TabletSucceededPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onSelectUriString = {},
             onSetSource = {},
             onSubmit = {},
         )
@@ -1289,7 +1336,9 @@ private fun ErrorPreview() {
                 source = source,
                 message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
+            activitiesForSelectedUriString = MutableStateFlow(emptyList()),
             appDetails = MutableStateFlow(emptyMap()),
+            appDetailsForSelectedUriString = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1312,6 +1361,7 @@ private fun ErrorPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
+            selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
@@ -1335,6 +1385,7 @@ private fun ErrorPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onSelectUriString = {},
             onSetSource = {},
             onSubmit = {},
         )
@@ -1355,7 +1406,9 @@ private fun DarkErrorPreview() {
                 source = source,
                 message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
+            activitiesForSelectedUriString = MutableStateFlow(emptyList()),
             appDetails = MutableStateFlow(emptyMap()),
+            appDetailsForSelectedUriString = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1378,6 +1431,7 @@ private fun DarkErrorPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
+            selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
@@ -1401,6 +1455,7 @@ private fun DarkErrorPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onSelectUriString = {},
             onSetSource = {},
             onSubmit = {},
         )
@@ -1421,7 +1476,9 @@ private fun TabletErrorPreview() {
                 source = source,
                 message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
+            activitiesForSelectedUriString = MutableStateFlow(emptyList()),
             appDetails = MutableStateFlow(emptyMap()),
+            appDetailsForSelectedUriString = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1444,6 +1501,7 @@ private fun TabletErrorPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
+            selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
@@ -1467,6 +1525,7 @@ private fun TabletErrorPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onSelectUriString = {},
             onSetSource = {},
             onSubmit = {},
         )
@@ -1488,7 +1547,9 @@ private fun WarningPreview() {
                 message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
                 warning = true,
             ),
+            activitiesForSelectedUriString = MutableStateFlow(emptyList()),
             appDetails = MutableStateFlow(emptyMap()),
+            appDetailsForSelectedUriString = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1511,6 +1572,7 @@ private fun WarningPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
+            selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
@@ -1534,6 +1596,7 @@ private fun WarningPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onSelectUriString = {},
             onSetSource = {},
             onSubmit = {},
         )
@@ -1555,7 +1618,9 @@ private fun DarkWarningPreview() {
                 message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
                 warning = true,
             ),
+            activitiesForSelectedUriString = MutableStateFlow(emptyList()),
             appDetails = MutableStateFlow(emptyMap()),
+            appDetailsForSelectedUriString = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1578,6 +1643,7 @@ private fun DarkWarningPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
+            selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
@@ -1601,6 +1667,7 @@ private fun DarkWarningPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onSelectUriString = {},
             onSetSource = {},
             onSubmit = {},
         )
@@ -1626,7 +1693,9 @@ private fun LoadingIndicatorPreview() {
                 results = emptyMap(),
                 lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
             ),
+            activitiesForSelectedUriString = MutableStateFlow(emptyList()),
             appDetails = MutableStateFlow(emptyMap()),
+            appDetailsForSelectedUriString = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1649,6 +1718,7 @@ private fun LoadingIndicatorPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
+            selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
@@ -1672,6 +1742,7 @@ private fun LoadingIndicatorPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onSelectUriString = {},
             onSetSource = {},
             onSubmit = {},
         )
@@ -1697,7 +1768,9 @@ private fun DarkLoadingIndicatorPreview() {
                 results = emptyMap(),
                 lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
             ),
+            activitiesForSelectedUriString = MutableStateFlow(emptyList()),
             appDetails = MutableStateFlow(emptyMap()),
+            appDetailsForSelectedUriString = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1720,6 +1793,7 @@ private fun DarkLoadingIndicatorPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
+            selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
@@ -1743,6 +1817,7 @@ private fun DarkLoadingIndicatorPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onSelectUriString = {},
             onSetSource = {},
             onSubmit = {},
         )
@@ -1768,7 +1843,9 @@ private fun TabletLoadingIndicatorPreview() {
                 results = emptyMap(),
                 lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
             ),
+            activitiesForSelectedUriString = MutableStateFlow(emptyList()),
             appDetails = MutableStateFlow(emptyMap()),
+            appDetailsForSelectedUriString = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1791,6 +1868,7 @@ private fun TabletLoadingIndicatorPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
+            selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
@@ -1814,6 +1892,7 @@ private fun TabletLoadingIndicatorPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onSelectUriString = {},
             onSetSource = {},
             onSubmit = {},
         )
@@ -1836,7 +1915,9 @@ private fun WebViewPreview() {
                 permission = Permission.ALWAYS,
                 results = emptyMap(),
             ),
+            activitiesForSelectedUriString = MutableStateFlow(emptyList()),
             appDetails = MutableStateFlow(emptyMap()),
+            appDetailsForSelectedUriString = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1859,6 +1940,7 @@ private fun WebViewPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
+            selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
@@ -1882,6 +1964,7 @@ private fun WebViewPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onSelectUriString = {},
             onSetSource = {},
             onSubmit = {},
         )
@@ -1904,7 +1987,9 @@ private fun DarkWebViewPreview() {
                 permission = Permission.ALWAYS,
                 results = emptyMap(),
             ),
+            activitiesForSelectedUriString = MutableStateFlow(emptyList()),
             appDetails = MutableStateFlow(emptyMap()),
+            appDetailsForSelectedUriString = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1927,6 +2012,7 @@ private fun DarkWebViewPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
+            selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
@@ -1950,6 +2036,7 @@ private fun DarkWebViewPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onSelectUriString = {},
             onSetSource = {},
             onSubmit = {},
         )
@@ -1973,7 +2060,9 @@ private fun TabletWebViewPreview() {
         )
         MainScreen(
             currentState = currentState,
+            activitiesForSelectedUriString = MutableStateFlow(emptyList()),
             appDetails = MutableStateFlow(emptyMap()),
+            appDetailsForSelectedUriString = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1996,6 +2085,7 @@ private fun TabletWebViewPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
+            selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
@@ -2019,6 +2109,7 @@ private fun TabletWebViewPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onSelectUriString = {},
             onSetSource = {},
             onSubmit = {},
         )
@@ -2040,7 +2131,9 @@ private fun EmptyPreview() {
         )
         MainScreen(
             currentState = currentState,
+            activitiesForSelectedUriString = MutableStateFlow(emptyList()),
             appDetails = MutableStateFlow(emptyMap()),
+            appDetailsForSelectedUriString = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -2063,6 +2156,7 @@ private fun EmptyPreview() {
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(emptyList()),
+            selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
@@ -2086,6 +2180,7 @@ private fun EmptyPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
+            onSelectUriString = {},
             onSetSource = {},
             onSubmit = {},
         )

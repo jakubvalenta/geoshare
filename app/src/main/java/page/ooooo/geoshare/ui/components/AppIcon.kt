@@ -31,8 +31,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.retain.retain
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -70,14 +72,15 @@ fun AppIcon(
     content: @Composable () -> Unit,
 ) {
     val spacing = LocalSpacing.current
-    val (expanded, setExpanded) = retain { mutableStateOf(false) }
+
+    var expanded by retain { mutableStateOf(false) }
 
     Box(
         modifier.run {
             if (enabled) {
                 combinedClickable(
                     role = Role.Button,
-                    onLongClick = { setExpanded(true) },
+                    onLongClick = { expanded = true },
                     onClick = { outputs.firstOrNull()?.let { onClick(it) } },
                 )
             } else {
@@ -108,7 +111,7 @@ fun AppIcon(
             }
         }
         FilledIconButton(
-            { setExpanded(true) },
+            { expanded = true },
             Modifier.size(30.dp),
             shape = MaterialShapes.ClamShell.toShape(),
             colors = IconButtonDefaults.filledIconButtonColors(
@@ -124,7 +127,7 @@ fun AppIcon(
         }
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { setExpanded(false) },
+            onDismissRequest = { expanded = false },
             modifier = Modifier.semantics { testTagsAsResourceId = true },
             shape = ShapeDefaults.Large,
             containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
@@ -139,7 +142,7 @@ fun AppIcon(
                         )
                     },
                     onClick = {
-                        setExpanded(false)
+                        expanded = false
                         onClick(output)
                     },
                     leadingIcon = output.getMenuIcon(appDetails)
@@ -159,7 +162,7 @@ fun AppIcon(
                         )
                     },
                     onClick = {
-                        setExpanded(false)
+                        expanded = false
                         onHide()
                     },
                     leadingIcon = {

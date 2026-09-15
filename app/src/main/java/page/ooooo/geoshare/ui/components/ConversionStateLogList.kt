@@ -30,7 +30,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -115,7 +115,7 @@ private fun ConversionStateLogListItem(
     val resources = LocalResources.current
     val spacing = LocalSpacing.current
 
-    var visible by remember { mutableStateOf(!animationsEnabled) }
+    var visible by retain { mutableStateOf(!animationsEnabled) }
 
     // Trigger the enter animation on first composition
     LaunchedEffect(Unit) {

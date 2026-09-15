@@ -21,6 +21,7 @@ import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
 import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
 import androidx.compose.material3.adaptive.layout.PaneScaffoldDirective
 import androidx.compose.material3.adaptive.layout.SupportingPaneScaffold
+import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldScope
 import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldState
 import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
 import androidx.compose.material3.adaptive.navigation.BackNavigationBehavior
@@ -169,6 +170,7 @@ fun StyledListDetailPaneScaffold(
 fun StyledSupportingPaneScaffold(
     mainPane: @Composable ColumnScope.(innerPadding: PaddingValues, wide: Boolean) -> Unit,
     supportingPane: @Composable ColumnScope.(wide: Boolean) -> Unit,
+    supportingPaneModifier: ThreePaneScaffoldScope.() -> Modifier = { Modifier.preferredWidth(450.dp) },
     colors: StyledPaneScaffoldColors = StyledPaneScaffoldDefaults.colors(),
     shouldAutoFocusCurrentDestination: Boolean = true,
 ) {
@@ -229,7 +231,7 @@ fun StyledSupportingPaneScaffold(
             }
         },
         supportingPane = {
-            AnimatedPane(Modifier.preferredWidth(450.dp)) {
+            AnimatedPane(supportingPaneModifier()) {
                 val containerPadding = if (wide) {
                     PaddingValues(
                         top = insetPadding.calculateTopPadding(),

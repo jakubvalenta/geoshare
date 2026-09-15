@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -18,6 +19,7 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 fun HelpOpenByDefaultMessage(
     dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
     sourceComesFromIntent: StateFlow<Boolean>,
+    modifier: Modifier = Modifier,
     onDismissHelpMessage: (helpMessage: HelpMessage) -> Unit,
     onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
 ) {
@@ -29,6 +31,7 @@ fun HelpOpenByDefaultMessage(
             helpMessage = HelpMessage.OPEN_BY_DEFAULT,
             dismissedHelpMessages = dismissedHelpMessages,
             title = { Text(stringResource(R.string.help_open_by_default_title, appName)) },
+            modifier = modifier,
             actionText = {
                 stringResource(R.string.help_open_by_default_action)
             },

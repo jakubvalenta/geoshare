@@ -34,7 +34,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
@@ -59,7 +58,7 @@ import kotlin.time.Duration.Companion.seconds
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AnimatedPlaceholderTextField(
-    value: String,
+    @Suppress("SameParameterValue") value: String,
     onValueChange: (String) -> Unit,
     placeholders: List<String>,
     modifier: Modifier = Modifier,
@@ -183,10 +182,9 @@ fun AnimatedPlaceholderTextField(
 private fun DefaultPreview() {
     AppTheme {
         Surface {
-            var text by remember { mutableStateOf("") }
             AnimatedPlaceholderTextField(
-                value = text,
-                onValueChange = { text = it },
+                value = "",
+                onValueChange = {},
                 placeholders = listOf(
                     "flights to Tokyo",
                     "hotels in Paris",

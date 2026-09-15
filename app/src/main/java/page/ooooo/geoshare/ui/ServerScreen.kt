@@ -28,8 +28,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldDestinationItem
+import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -173,7 +175,11 @@ private fun ServerScreen(
 
     // Drive the scaffold navigator from view model, so that the UI state survives process death.
 
+    val defaultDirective = calculatePaneScaffoldDirective(currentWindowAdaptiveInfoV2())
     val navigator = rememberListDetailPaneScaffoldNavigator(
+        scaffoldDirective = defaultDirective.copy(
+            horizontalPartitionSpacerSize = LocalSpacing.current.windowPadding,
+        ),
         initialDestinationHistory = listOf(
             if (destination == null) {
                 ThreePaneScaffoldDestinationItem(ListDetailPaneScaffoldRole.List)
@@ -546,7 +552,7 @@ fun LazyListScope.serverListSection(
             itemTrailingContent = { item ->
                 if (item != null) {
                     {
-                        var expanded by remember { mutableStateOf(false) }
+                        var expanded by retain { mutableStateOf(false) }
 
                         Box {
                             IconButton(

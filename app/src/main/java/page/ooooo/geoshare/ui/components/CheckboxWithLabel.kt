@@ -10,10 +10,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
@@ -58,14 +54,13 @@ fun CheckboxWithLabel(
 @Preview(showBackground = true)
 @Composable
 private fun DefaultPreview() {
-    var checked by remember { mutableStateOf(false) }
     AppTheme {
         Surface {
             Column(verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.small)) {
                 CheckboxWithLabel(
                     label = "Accept terms and conditions",
-                    checked = checked,
-                    onCheckedChange = { checked = it },
+                    checked = false,
+                    onCheckedChange = {},
                 )
                 CheckboxWithLabel(
                     label = "Disabled option",
@@ -81,14 +76,13 @@ private fun DefaultPreview() {
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DarkPreview() {
-    var checked by remember { mutableStateOf(false) }
     AppTheme {
         Surface {
             Column(verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.small)) {
                 CheckboxWithLabel(
                     label = "Accept terms and conditions",
-                    checked = checked,
-                    onCheckedChange = { checked = it },
+                    checked = false,
+                    onCheckedChange = {},
                 )
                 CheckboxWithLabel(
                     label = "Disabled option",

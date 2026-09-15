@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
@@ -24,7 +24,7 @@ fun ResultDetails(details: String, modifier: Modifier = Modifier, initialExpande
         val newLineIndex = details.indexOf('\n')
         if (newLineIndex > -1) {
             val firstLine = details.substring(0, newLineIndex)
-            var expanded by remember { mutableStateOf(initialExpanded) }
+            var expanded by retain { mutableStateOf(initialExpanded) }
             ExpandablePane(
                 expanded = expanded,
                 onSetExpanded = { expanded = it },

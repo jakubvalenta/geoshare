@@ -13,8 +13,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldDestinationItem
+import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -98,8 +100,8 @@ fun UserPreferenceScreen(
     outputViewModel: OutputViewModel = hiltViewModel(),
     viewModel: UserPreferenceViewModel = hiltViewModel(),
 ) {
-    val activities by viewModel.activities.collectAsStateWithLifecycle()
-    val appDetails by viewModel.appDetails.collectAsStateWithLifecycle()
+    val activities by outputViewModel.activities.collectAsStateWithLifecycle()
+    val appDetails by outputViewModel.appDetails.collectAsStateWithLifecycle()
     val billingAppNameResId = billingViewModel.billingAppNameResId
     val billingFeatures = billingViewModel.billingFeatures
     val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
@@ -147,7 +149,11 @@ private fun UserPreferenceScreen(
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val defaultDirective = calculatePaneScaffoldDirective(currentWindowAdaptiveInfoV2())
     val navigator = rememberListDetailPaneScaffoldNavigator(
+        scaffoldDirective = defaultDirective.copy(
+            horizontalPartitionSpacerSize = LocalSpacing.current.windowPadding,
+        ),
         initialDestinationHistory = listOf(
             if (initialGroupId == null) {
                 ThreePaneScaffoldDestinationItem(ListDetailPaneScaffoldRole.List)
@@ -598,7 +604,7 @@ private fun TabletPreview() {
         Surface {
             Column {
                 UserPreferenceScreen(
-                    initialGroupId = null,
+                    initialGroupId = UserPreferenceGroupId.CONNECTION_PERMISSION,
                     activities = emptyList(),
                     appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,

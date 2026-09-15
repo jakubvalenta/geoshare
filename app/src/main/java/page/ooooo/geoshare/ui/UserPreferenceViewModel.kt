@@ -13,36 +13,20 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.AppsRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.HiddenAppsPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.Message
-import page.ooooo.geoshare.lib.android.AppActivity
-import page.ooooo.geoshare.lib.android.AppDetails
 import javax.inject.Inject
 
 @HiltViewModel
 class UserPreferenceViewModel @Inject constructor(
-    appsRepository: AppsRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
 ) : ViewModel() {
 
     private val _message = MutableStateFlow<Message?>(null)
     val message: StateFlow<Message?> = _message.asStateFlow()
 
-    val activities: StateFlow<List<AppActivity>> = appsRepository.activities
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            emptyList(),
-        )
-    val appDetails: StateFlow<AppDetails> = appsRepository.appDetails
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            emptyMap(),
-        )
     val values: StateFlow<UserPreferencesValues> = userPreferencesRepository.values
         .stateIn(
             viewModelScope,

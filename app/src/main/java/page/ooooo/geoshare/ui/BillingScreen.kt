@@ -34,6 +34,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -41,6 +42,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -122,7 +124,7 @@ fun BillingScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 private fun BillingScreen(
@@ -460,7 +462,7 @@ private fun BillingSupportingPane(
             }
         }.orEmpty()
     }
-    var selectedOffer by remember(sortedBillingOffers) { mutableStateOf(sortedBillingOffers.firstOrNull()) }
+    var selectedOffer by retain(sortedBillingOffers) { mutableStateOf(sortedBillingOffers.firstOrNull()) }
 
     when (billingStatus) {
         is BillingStatus.Pending, is BillingStatus.NotPurchased -> if (sortedBillingOffers.isNotEmpty()) {
