@@ -16,6 +16,8 @@ class ShareLinkUriOutput @Inject constructor(
     val link: Link,
     private val coordinateConverter: CoordinateConverter,
 ) : SharePointUriOutput {
+    override val id = "ShareLinkUriOutput(link.uuid=${link.uuid})"
+
     override fun getUriString(value: Point, uriQuote: UriQuote) =
         UriFormatter.formatUriString(
             coordinateConverter.toSrs(value, link.srs),

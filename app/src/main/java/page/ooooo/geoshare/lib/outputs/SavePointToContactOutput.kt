@@ -23,6 +23,8 @@ class SavePointToContactOutput @Inject constructor(
     Output.HasErrorText,
     Output.HasAutomationErrorText {
 
+    override val id = "SavePointToContactOutput"
+
     override suspend fun execute(value: Point, actionContext: ActionContext) =
         actionContext.context.insertOrEditContactAddress(
             CoordinateFormatter.formatDecCoords(

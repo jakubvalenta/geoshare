@@ -12,6 +12,8 @@ import javax.inject.Inject
 class ShareRouteGpxOutput @Inject constructor(
     private val coordinateConverter: CoordinateConverter,
 ) : SharePointsFileOutput {
+    override val id = "ShareRouteGpxOutput"
+
     override fun write(value: Points, writer: Appendable) {
         GpxFormatter.writeGpxRoute(coordinateConverter.toWGS84(value), writer)
     }

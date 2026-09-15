@@ -16,6 +16,8 @@ class OpenRouteGpxOutput @Inject constructor(
     private val coordinateConverter: CoordinateConverter,
     override val log: Log,
 ) : OpenPointsFileOutput {
+    override val id = "OpenRouteGpxOutput(activity=$activity)"
+
     override fun write(value: Points, writer: Appendable) {
         GpxFormatter.writeGpxRoute(coordinateConverter.toWGS84(value), writer)
     }

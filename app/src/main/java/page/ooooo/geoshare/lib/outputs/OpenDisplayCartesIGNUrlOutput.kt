@@ -22,6 +22,8 @@ class OpenDisplayCartesIGNUrlOutput @Inject constructor(
     override val activity: UriActivity,
     private val coordinateConverter: CoordinateConverter,
 ) : OpenPointUriOutput {
+    override val id = "OpenDisplayCartesIGNUrlOutput(activity=$activity)"
+
     override fun getUriString(value: Point, uriQuote: UriQuote) =
         UriFormatter.formatUriString(
             coordinateConverter.toWGS84(value),

@@ -17,6 +17,8 @@ import javax.inject.Inject
 class ShareDisplayGeoUriOutput @Inject constructor(
     private val coordinateConverter: CoordinateConverter,
 ) : SharePointUriOutput {
+    override val id = "ShareDisplayGeoUriOutput"
+
     override fun getUriString(value: Point, uriQuote: UriQuote) =
         GeoUriFormatter.formatGeoUriString(coordinateConverter.toWGS84(value), uriQuote = uriQuote)
 

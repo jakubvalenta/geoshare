@@ -32,6 +32,8 @@ class OpenRouteOnePointGpxOutput @Inject constructor(
     Output.HasAutomationDelay,
     Output.HasAutomationErrorText {
 
+    override val id = "OpenRouteOnePointGpxOutput(activity=$activity)"
+
     fun write(location: Point, value: Point, writer: Appendable) {
         GpxFormatter.writeGpxRoute(coordinateConverter.toWGS84(persistentListOf(location, value)), writer)
     }

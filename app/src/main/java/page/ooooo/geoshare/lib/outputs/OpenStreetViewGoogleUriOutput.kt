@@ -22,6 +22,8 @@ class OpenStreetViewGoogleUriOutput @Inject constructor(
     override val activity: UriActivity,
     private val coordinateConverter: CoordinateConverter,
 ) : OpenPointUriOutput {
+    override val id = "OpenStreetViewGoogleUriOutput(activity=$activity)"
+
     override fun getUriString(value: Point, uriQuote: UriQuote) =
         GoogleMapsUriFormatter.formatStreetViewUriString(
             coordinateConverter.toSrs(value, PackageNames.getSrs(activity.packageName)),

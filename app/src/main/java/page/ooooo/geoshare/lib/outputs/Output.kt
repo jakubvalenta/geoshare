@@ -11,6 +11,11 @@ import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.ui.components.IconDescriptor
 
 sealed interface Output {
+    /**
+     * A unique id of the output and its parameters. Used as a LazyList key, testTag, etc.
+     */
+    val id: String
+
     @Composable
     fun label(appDetails: AppDetails): String
 

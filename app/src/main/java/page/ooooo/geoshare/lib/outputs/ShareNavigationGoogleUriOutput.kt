@@ -14,6 +14,8 @@ import javax.inject.Inject
 class ShareNavigationGoogleUriOutput @Inject constructor(
     private val coordinateConverter: CoordinateConverter,
 ) : SharePointUriOutput {
+    override val id = "ShareNavigationGoogleUriOutput"
+
     override fun getUriString(value: Point, uriQuote: UriQuote) =
         GoogleMapsUriFormatter.formatNavigationUriString(coordinateConverter.toWGS84(value), uriQuote)
 

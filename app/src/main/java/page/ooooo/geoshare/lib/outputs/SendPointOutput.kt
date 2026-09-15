@@ -29,6 +29,8 @@ class SendPointOutput @Inject constructor(
     Output.HasAutomationDelay,
     Output.HasAutomationErrorText {
 
+    override val id = "SendPointOutput(activity=$activity)"
+
     fun getUriString(value: Point, uriQuote: UriQuote): String? =
         UriFormatter.formatUriString(
             point = coordinateConverter.toSrs(value, Srs.GCJ02_MAINLAND_CHINA),

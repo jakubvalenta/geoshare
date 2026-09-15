@@ -14,6 +14,8 @@ import javax.inject.Inject
 class SavePointsGpxOutput @Inject constructor(
     private val coordinateConverter: CoordinateConverter,
 ) : SavePointsFileOutput {
+    override val id = "SavePointsGpxOutput"
+
     override fun getFilename(resources: Resources) =
         resources.getString(
             R.string.conversion_succeeded_save_gpx_filename,

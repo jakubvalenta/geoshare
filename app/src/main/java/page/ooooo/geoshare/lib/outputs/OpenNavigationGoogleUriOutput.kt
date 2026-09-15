@@ -21,6 +21,8 @@ class OpenNavigationGoogleUriOutput @Inject constructor(
     override val activity: UriActivity,
     private val coordinateConverter: CoordinateConverter,
 ) : OpenPointUriOutput {
+    override val id = "OpenNavigationGoogleUriOutput(activity=$activity)"
+
     override fun getUriString(value: Point, uriQuote: UriQuote) =
         GoogleMapsUriFormatter.formatNavigationUriString(
             coordinateConverter.toSrs(value, PackageNames.getSrs(activity.packageName)),

@@ -7,6 +7,8 @@ import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.geo.Point
 
 class NoopOutput : PointOutput.WithoutLocation {
+    override val id = "NoopOutput"
+
     override suspend fun execute(value: Point, actionContext: ActionContext) = ActionResult.SUCCEEDED
 
     @Composable
