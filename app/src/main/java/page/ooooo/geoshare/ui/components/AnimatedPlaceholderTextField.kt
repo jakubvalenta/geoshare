@@ -58,7 +58,7 @@ import kotlin.time.Duration.Companion.seconds
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AnimatedPlaceholderTextField(
-    value: String,
+    @Suppress("SameParameterValue") value: String,
     onValueChange: (String) -> Unit,
     placeholders: List<String>,
     modifier: Modifier = Modifier,
