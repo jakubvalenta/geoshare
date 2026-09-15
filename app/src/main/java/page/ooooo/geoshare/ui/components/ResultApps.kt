@@ -129,7 +129,7 @@ fun ResultApps(
                                 IconFromDescriptor(
                                     icon,
                                     contentDescription = firstOutput.label(appDetails),
-                                    size = 24.dp
+                                    size = 24.dp,
                                 )
                             }
                         }

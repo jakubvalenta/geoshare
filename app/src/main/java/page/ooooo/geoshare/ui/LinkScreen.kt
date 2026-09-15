@@ -389,7 +389,7 @@ private fun LinkListPane(
                         },
                         itemTrailingContent = {
                             {
-                                var expanded by remember { mutableStateOf(false) }
+                                var expanded by retain { mutableStateOf(false) }
 
                                 Box {
                                     IconButton(

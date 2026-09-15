@@ -20,7 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -42,7 +42,7 @@ fun <T> DropdownField(
     supportingText: (@Composable () -> Unit)? = null,
     testTagPrefix: String? = null,
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by retain { mutableStateOf(false) }
 
     Column(modifier) {
         ExposedDropdownMenuBox(

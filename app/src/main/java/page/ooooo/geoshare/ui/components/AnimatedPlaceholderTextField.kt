@@ -34,7 +34,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
@@ -183,10 +182,9 @@ fun AnimatedPlaceholderTextField(
 private fun DefaultPreview() {
     AppTheme {
         Surface {
-            var text by remember { mutableStateOf("") }
             AnimatedPlaceholderTextField(
-                value = text,
-                onValueChange = { text = it },
+                value = "",
+                onValueChange = {},
                 placeholders = listOf(
                     "flights to Tokyo",
                     "hotels in Paris",
