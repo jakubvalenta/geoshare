@@ -31,7 +31,7 @@ class OpenDisplayGeoUriOutput @Inject constructor(
         )
 
     @Composable
-    override fun label(appDetails: AppDetails) =
+    override fun label() =
         stringResource(R.string.output_open_display)
 
     override fun getMenuIcon(appDetails: AppDetails) =

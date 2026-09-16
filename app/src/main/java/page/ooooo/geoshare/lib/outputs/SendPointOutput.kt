@@ -47,7 +47,7 @@ class SendPointOutput @Inject constructor(
             .toActionResult(openedApp = true)
 
     @Composable
-    override fun label(appDetails: AppDetails) =
+    override fun label() =
         stringResource(R.string.output_send)
 
     override fun getMenuIcon(appDetails: AppDetails) =

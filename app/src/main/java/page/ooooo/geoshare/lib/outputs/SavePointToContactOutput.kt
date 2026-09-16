@@ -33,7 +33,7 @@ class SavePointToContactOutput @Inject constructor(
         ).let { success -> if (success) ActionResult.SUCCEEDED else ActionResult.FAILED }
 
     @Composable
-    override fun label(appDetails: AppDetails) =
+    override fun label() =
         stringResource(R.string.output_save_to_contact)
 
     override fun getMenuIcon(appDetails: AppDetails) =

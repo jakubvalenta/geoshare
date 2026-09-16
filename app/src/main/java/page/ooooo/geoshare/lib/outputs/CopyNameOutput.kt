@@ -23,7 +23,7 @@ class CopyNameOutput @Inject constructor() : CopyPointTextOutput {
         value.hasName()
 
     @Composable
-    override fun label(appDetails: AppDetails) =
+    override fun label() =
         stringResource(R.string.conversion_succeeded_copy_name)
 
     @Composable

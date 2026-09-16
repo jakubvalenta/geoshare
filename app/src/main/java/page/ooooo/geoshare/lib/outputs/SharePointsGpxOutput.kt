@@ -3,7 +3,6 @@ package page.ooooo.geoshare.lib.outputs
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Points
@@ -19,7 +18,7 @@ class SharePointsGpxOutput @Inject constructor(
     }
 
     @Composable
-    override fun label(appDetails: AppDetails) =
+    override fun label() =
         stringResource(R.string.output_gpx_points_share)
 
     override fun equals(other: Any?): Boolean {

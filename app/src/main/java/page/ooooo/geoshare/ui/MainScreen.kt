@@ -78,6 +78,7 @@ import page.ooooo.geoshare.lib.android.AppActivity
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.getLocation
 import page.ooooo.geoshare.lib.android.hasLocationPermission
+import page.ooooo.geoshare.lib.android.isMessagingApp
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
@@ -112,7 +113,6 @@ import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.ActionContext
 import page.ooooo.geoshare.lib.outputs.ActionResult
 import page.ooooo.geoshare.lib.outputs.LocationAction
-import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
@@ -138,6 +138,7 @@ import page.ooooo.geoshare.ui.components.ResultError
 import page.ooooo.geoshare.ui.components.ResultSheet
 import page.ooooo.geoshare.ui.components.ResultTitle
 import page.ooooo.geoshare.ui.components.checkeredBackground
+import page.ooooo.geoshare.ui.components.fakeAppDetails
 import page.ooooo.geoshare.ui.components.fakeStateLog
 import page.ooooo.geoshare.ui.components.mainContainerColor
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -277,7 +278,7 @@ fun MainScreen(
         dismissedHelpMessages = helpViewModel.dismissedHelpMessages,
         inputRepository = inputViewModel.inputRepository,
         linkMessage = linkViewModel.message,
-        outputsForApps = outputViewModel.outputsForApps,
+        outputsForAppsByCategory = outputViewModel.outputsForAppsByCategory,
         outputsForLinks = outputViewModel.outputsForLinks,
         outputsForPoint = outputViewModel.outputsForPoint,
         outputsForPointChips = outputViewModel.outputsForPointChips,
@@ -344,8 +345,8 @@ fun MainScreen(
 private fun MainScreen(
     currentState: ConversionState,
     activitiesForSelectedUriString: StateFlow<List<AppActivity>>,
-    appDetails: StateFlow<AppDetails>,
-    appDetailsForSelectedUriString: StateFlow<AppDetails>,
+    appDetails: StateFlow<AppDetails>, // TODO Remove
+    appDetailsForSelectedUriString: StateFlow<AppDetails>, // TODO Remove
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
     billingStatus: StateFlow<BillingStatus>,
@@ -354,13 +355,13 @@ private fun MainScreen(
     dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
     inputRepository: InputRepository,
     linkMessage: StateFlow<Message?>,
-    outputsForApps: StateFlow<Map<String, List<Output>>>,
-    outputsForLinks: StateFlow<Map<String, List<Output>>>,
-    outputsForPoint: StateFlow<List<PointOutput>>,
-    outputsForPointChips: StateFlow<List<PointOutput>>,
-    outputsForPoints: StateFlow<List<PointsOutput>>,
-    outputsForPointsChips: StateFlow<List<PointsOutput>>,
-    outputsForSharing: StateFlow<List<Output>>,
+    outputsForAppsByCategory: StateFlow<OutputStatesForAppsByCategory>,
+    outputsForLinks: StateFlow<List<OutputStatesForLink>>,
+    outputsForPoint: StateFlow<List<OutputState<PointOutput>>>,
+    outputsForPointChips: StateFlow<List<OutputState<PointOutput>>>,
+    outputsForPoints: StateFlow<List<OutputState<PointsOutput>>>,
+    outputsForPointsChips: StateFlow<List<OutputState<PointsOutput>>>,
+    outputsForSharing: StateFlow<OutputStatesForSharing?>,
     selectedUriString: StateFlow<String?>,
     source: StateFlow<String>,
     sourceComesFromIntent: StateFlow<Boolean>,
@@ -488,7 +489,6 @@ private fun MainScreen(
                                 is ConversionState.HasResult ->
                                     ResultCoordinates(
                                         points = currentState.points,
-                                        appDetails = appDetails,
                                         coordinateConverter = coordinateConverter,
                                         outputsForPointChips = outputsForPointChips,
                                         outputsForPointsChips = outputsForPointsChips,
@@ -501,12 +501,12 @@ private fun MainScreen(
                                         },
                                     ) { paddingValues ->
                                         HelpShareSourceMessage(
-                                            appDetails = appDetails,
                                             dismissedHelpMessages = dismissedHelpMessages,
-                                            outputsForApps = outputsForApps,
+                                            outputsForAppsByCategory = outputsForAppsByCategory,
                                             sourceComesFromIntent = sourceComesFromIntent,
                                             modifier = Modifier.padding(paddingValues),
                                             onDismissHelpMessage = onDismissHelpMessage,
+                                            onExecute = onExecute,
                                         )
                                     }
 
@@ -554,8 +554,7 @@ private fun MainScreen(
                     is ConversionState.HasResult ->
                         item {
                             ResultApps(
-                                appDetails = appDetails,
-                                outputsForApps = outputsForApps,
+                                outputsForAppsByCategory = outputsForAppsByCategory,
                                 outputsForLinks = outputsForLinks,
                                 outputsForSharing = outputsForSharing,
                                 points = currentState.points,
@@ -634,7 +633,6 @@ private fun MainScreen(
             ResultSheet(
                 points = currentState.points,
                 selectedPointIndex = index,
-                appDetails = appDetails,
                 outputsForPoint = outputsForPoint,
                 outputsForPoints = outputsForPoints,
                 onExecute = onExecute,
@@ -756,13 +754,15 @@ private fun DefaultPreview() {
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(emptyMap()),
-            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForAppsByCategory = MutableStateFlow(
+                OutputStatesForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
+            ),
+            outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(null),
             selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(""),
             start = MutableStateFlow(timeSource.markNow()),
@@ -815,13 +815,15 @@ private fun DarkPreview() {
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(emptyMap()),
-            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForAppsByCategory = MutableStateFlow(
+                OutputStatesForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
+            ),
+            outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(null),
             selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(""),
             start = MutableStateFlow(timeSource.markNow()),
@@ -874,13 +876,15 @@ private fun SmallPreview() {
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(emptyMap()),
-            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForAppsByCategory = MutableStateFlow(
+                OutputStatesForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
+            ),
+            outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(null),
             selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(""),
             start = MutableStateFlow(timeSource.markNow()),
@@ -933,13 +937,15 @@ private fun TabletPreview() {
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(emptyMap()),
-            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForAppsByCategory = MutableStateFlow(
+                OutputStatesForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
+            ),
+            outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(null),
             selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(""),
             start = MutableStateFlow(timeSource.markNow()),
@@ -985,6 +991,7 @@ private fun SucceededPreview() {
         )
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
+        val appDetails = fakeAppDetails()
         MainScreen(
             currentState = ActionCompleted(
                 source = source,
@@ -1016,18 +1023,31 @@ private fun SucceededPreview() {
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(
-                outputRepository.getOutputsForApps(
-                    activities = fakeActivities,
-                    hiddenApps = emptySet(),
-                )
+            outputsForAppsByCategory = MutableStateFlow(
+                fakeActivities
+                    .partition { !it.isMessagingApp() }
+                    .let { (mapAppActivities, messagingAppActivities) ->
+                        Pair(
+                            outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
+                            outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
+                        )
+                    }
+                    .toOutputStatesForAppsByCategory(appDetails)
             ),
-            outputsForLinks = MutableStateFlow(outputRepository.getOutputsForLinks(defaultFakeLinks)),
+            outputsForLinks = MutableStateFlow(
+                outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputStatesForLinks(appDetails)
+            ),
             outputsForPoint = MutableStateFlow(emptyList()),
-            outputsForPointChips = MutableStateFlow(outputRepository.getOutputsForPointChips(defaultFakeLinks)),
+            outputsForPointChips = MutableStateFlow(
+                outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputState(appDetails) }
+            ),
             outputsForPoints = MutableStateFlow(emptyList()),
-            outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
-            outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
+            outputsForPointsChips = MutableStateFlow(
+                outputRepository.getOutputsForPointsChips().map { it.toOutputState(appDetails) }
+            ),
+            outputsForSharing = MutableStateFlow(
+                outputRepository.getOutputsForSharing().toOutputStatesForSharing(appDetails)
+            ),
             selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
@@ -1073,6 +1093,7 @@ private fun DarkSucceededPreview() {
         )
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
+        val appDetails = fakeAppDetails()
         MainScreen(
             currentState = ActionCompleted(
                 source = source,
@@ -1104,18 +1125,31 @@ private fun DarkSucceededPreview() {
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(
-                outputRepository.getOutputsForApps(
-                    activities = fakeActivities,
-                    hiddenApps = emptySet(),
-                )
+            outputsForAppsByCategory = MutableStateFlow(
+                fakeActivities
+                    .partition { !it.isMessagingApp() }
+                    .let { (mapAppActivities, messagingAppActivities) ->
+                        Pair(
+                            outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
+                            outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
+                        )
+                    }
+                    .toOutputStatesForAppsByCategory(appDetails)
             ),
-            outputsForLinks = MutableStateFlow(outputRepository.getOutputsForLinks(defaultFakeLinks)),
+            outputsForLinks = MutableStateFlow(
+                outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputStatesForLinks(appDetails)
+            ),
             outputsForPoint = MutableStateFlow(emptyList()),
-            outputsForPointChips = MutableStateFlow(outputRepository.getOutputsForPointChips(defaultFakeLinks)),
+            outputsForPointChips = MutableStateFlow(
+                outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputState(appDetails) }
+            ),
             outputsForPoints = MutableStateFlow(emptyList()),
-            outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
-            outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
+            outputsForPointsChips = MutableStateFlow(
+                outputRepository.getOutputsForPointsChips().map { it.toOutputState(appDetails) }
+            ),
+            outputsForSharing = MutableStateFlow(
+                outputRepository.getOutputsForSharing().toOutputStatesForSharing(appDetails)
+            ),
             selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
@@ -1161,6 +1195,7 @@ private fun SmallSucceededPreview() {
         )
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
+        val appDetails = fakeAppDetails()
         MainScreen(
             currentState = ActionCompleted(
                 source = source,
@@ -1191,18 +1226,31 @@ private fun SmallSucceededPreview() {
             dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(
-                outputRepository.getOutputsForApps(
-                    activities = fakeActivities,
-                    hiddenApps = emptySet(),
-                )
+            outputsForAppsByCategory = MutableStateFlow(
+                fakeActivities
+                    .partition { !it.isMessagingApp() }
+                    .let { (mapAppActivities, messagingAppActivities) ->
+                        Pair(
+                            outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
+                            outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
+                        )
+                    }
+                    .toOutputStatesForAppsByCategory(appDetails)
             ),
-            outputsForLinks = MutableStateFlow(outputRepository.getOutputsForLinks(defaultFakeLinks)),
+            outputsForLinks = MutableStateFlow(
+                outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputStatesForLinks(appDetails)
+            ),
             outputsForPoint = MutableStateFlow(emptyList()),
-            outputsForPointChips = MutableStateFlow(outputRepository.getOutputsForPointChips(defaultFakeLinks)),
+            outputsForPointChips = MutableStateFlow(
+                outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputState(appDetails) }
+            ),
             outputsForPoints = MutableStateFlow(emptyList()),
-            outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
-            outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
+            outputsForPointsChips = MutableStateFlow(
+                outputRepository.getOutputsForPointsChips().map { it.toOutputState(appDetails) }
+            ),
+            outputsForSharing = MutableStateFlow(
+                outputRepository.getOutputsForSharing().toOutputStatesForSharing(appDetails)
+            ),
             selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
@@ -1248,6 +1296,7 @@ private fun TabletSucceededPreview() {
         )
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
+        val appDetails = fakeAppDetails()
         MainScreen(
             currentState = ActionCompleted(
                 source = source,
@@ -1279,18 +1328,31 @@ private fun TabletSucceededPreview() {
             dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(
-                outputRepository.getOutputsForApps(
-                    activities = fakeActivities,
-                    hiddenApps = emptySet(),
-                )
+            outputsForAppsByCategory = MutableStateFlow(
+                fakeActivities
+                    .partition { !it.isMessagingApp() }
+                    .let { (mapAppActivities, messagingAppActivities) ->
+                        Pair(
+                            outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
+                            outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
+                        )
+                    }
+                    .toOutputStatesForAppsByCategory(appDetails)
             ),
-            outputsForLinks = MutableStateFlow(outputRepository.getOutputsForLinks(defaultFakeLinks)),
+            outputsForLinks = MutableStateFlow(
+                outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputStatesForLinks(appDetails)
+            ),
             outputsForPoint = MutableStateFlow(emptyList()),
-            outputsForPointChips = MutableStateFlow(outputRepository.getOutputsForPointChips(defaultFakeLinks)),
+            outputsForPointChips = MutableStateFlow(
+                outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputState(appDetails) }
+            ),
             outputsForPoints = MutableStateFlow(emptyList()),
-            outputsForPointsChips = MutableStateFlow(outputRepository.getOutputsForPointsChips()),
-            outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
+            outputsForPointsChips = MutableStateFlow(
+                outputRepository.getOutputsForPointsChips().map { it.toOutputState(appDetails) }
+            ),
+            outputsForSharing = MutableStateFlow(
+                outputRepository.getOutputsForSharing().toOutputStatesForSharing(appDetails)
+            ),
             selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
@@ -1354,13 +1416,15 @@ private fun ErrorPreview() {
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(emptyMap()),
-            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForAppsByCategory = MutableStateFlow(
+                OutputStatesForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
+            ),
+            outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(null),
             selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
@@ -1424,13 +1488,15 @@ private fun DarkErrorPreview() {
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(emptyMap()),
-            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForAppsByCategory = MutableStateFlow(
+                OutputStatesForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
+            ),
+            outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(null),
             selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
@@ -1494,13 +1560,15 @@ private fun TabletErrorPreview() {
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(emptyMap()),
-            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForAppsByCategory = MutableStateFlow(
+                OutputStatesForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
+            ),
+            outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(null),
             selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
@@ -1565,13 +1633,15 @@ private fun WarningPreview() {
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(emptyMap()),
-            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForAppsByCategory = MutableStateFlow(
+                OutputStatesForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
+            ),
+            outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(null),
             selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
@@ -1636,13 +1706,15 @@ private fun DarkWarningPreview() {
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(emptyMap()),
-            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForAppsByCategory = MutableStateFlow(
+                OutputStatesForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
+            ),
+            outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(null),
             selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
@@ -1711,13 +1783,15 @@ private fun LoadingIndicatorPreview() {
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(emptyMap()),
-            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForAppsByCategory = MutableStateFlow(
+                OutputStatesForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
+            ),
+            outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(null),
             selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
@@ -1786,13 +1860,15 @@ private fun DarkLoadingIndicatorPreview() {
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(emptyMap()),
-            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForAppsByCategory = MutableStateFlow(
+                OutputStatesForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
+            ),
+            outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(null),
             selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
@@ -1861,13 +1937,15 @@ private fun TabletLoadingIndicatorPreview() {
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(emptyMap()),
-            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForAppsByCategory = MutableStateFlow(
+                OutputStatesForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
+            ),
+            outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(null),
             selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
@@ -1933,13 +2011,15 @@ private fun WebViewPreview() {
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(emptyMap()),
-            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForAppsByCategory = MutableStateFlow(
+                OutputStatesForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
+            ),
+            outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(null),
             selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
@@ -2005,13 +2085,15 @@ private fun DarkWebViewPreview() {
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(emptyMap()),
-            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForAppsByCategory = MutableStateFlow(
+                OutputStatesForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
+            ),
+            outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(null),
             selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
@@ -2078,13 +2160,15 @@ private fun TabletWebViewPreview() {
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(emptyMap()),
-            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForAppsByCategory = MutableStateFlow(
+                OutputStatesForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
+            ),
+            outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(null),
             selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),
@@ -2149,13 +2233,15 @@ private fun EmptyPreview() {
             dismissedHelpMessages = MutableStateFlow(null),
             inputRepository = FakeInputRepository,
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(emptyMap()),
-            outputsForLinks = MutableStateFlow(emptyMap()),
+            outputsForAppsByCategory = MutableStateFlow(
+                OutputStatesForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
+            ),
+            outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(emptyList()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(emptyList()),
+            outputsForSharing = MutableStateFlow(null),
             selectedUriString = MutableStateFlow(null),
             source = MutableStateFlow(source),
             start = MutableStateFlow(timeSource.markNow()),

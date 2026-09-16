@@ -37,17 +37,18 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
+import page.ooooo.geoshare.ui.OutputState
 import page.ooooo.geoshare.ui.theme.AppTheme
+import page.ooooo.geoshare.ui.toOutputState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResultSheet(
     points: Points,
     selectedPointIndex: Int,
-    appDetails: StateFlow<AppDetails>,
     initialValue: SheetValue = SheetValue.Hidden,
-    outputsForPoint: StateFlow<List<PointOutput>>,
-    outputsForPoints: StateFlow<List<PointsOutput>>,
+    outputsForPoint: StateFlow<List<OutputState<PointOutput>>>,
+    outputsForPoints: StateFlow<List<OutputState<PointsOutput>>>,
     onExecute: (action: Action<*>) -> Unit,
     onSelectPointIndex: (index: Int?) -> Unit,
 ) {
@@ -56,7 +57,6 @@ fun ResultSheet(
     val coroutineScope = rememberCoroutineScope()
     val sheetState = rememberBottomSheetState(initialValue)
 
-    val appDetails by appDetails.collectAsStateWithLifecycle()
     val outputsForPoint by outputsForPoint.collectAsStateWithLifecycle()
     val outputsForPoints by outputsForPoints.collectAsStateWithLifecycle()
 
@@ -90,18 +90,17 @@ fun ResultSheet(
                     },
                 ) {
                     outputsForPoint
-                        .filter { it.isAvailable(selectedPoint) }
-                        .map { output -> output to output.getIcon(appDetails) }
-                        .zipWithNextFirstNull { prev, (output, icon) ->
+                        .filter { it.output.isAvailable(selectedPoint) }
+                        .zipWithNextFirstNull { prevOutputState, outputState ->
                             SheetListItem(
-                                headlineText = output.label(appDetails),
+                                headlineText = outputState.output.label(),
                                 onClick = {
                                     hide()
-                                    onExecute(output.toAction(selectedPoint))
+                                    onExecute(outputState.output.toAction(selectedPoint))
                                 },
-                                supportingText = output.getDescription(selectedPoint),
-                                icon = icon,
-                                prevIcon = prev?.second,
+                                supportingText = outputState.output.getDescription(selectedPoint),
+                                icon = outputState.icon,
+                                prevIcon = prevOutputState?.icon,
                             )
                         }
                 }
@@ -116,18 +115,17 @@ fun ResultSheet(
                     },
                 ) {
                     outputsForPoints
-                        .filter { it.isAvailable(points) }
-                        .map { output -> output to output.getIcon(appDetails) }
-                        .zipWithNextFirstNull { prev, (output, icon) ->
+                        .filter { it.output.isAvailable(points) }
+                        .zipWithNextFirstNull { prevOutputState, outputState ->
                             SheetListItem(
-                                headlineText = output.label(appDetails),
+                                headlineText = outputState.output.label(),
                                 onClick = {
                                     hide()
-                                    onExecute(output.toAction(points))
+                                    onExecute(outputState.output.toAction(points))
                                 },
-                                supportingText = output.getDescription(points),
-                                icon = icon,
-                                prevIcon = prev?.second,
+                                supportingText = outputState.output.getDescription(points),
+                                icon = outputState.icon,
+                                prevIcon = prevOutputState?.icon,
                             )
                         }
                 }
@@ -151,13 +149,17 @@ private fun DefaultPreview() {
                 coordinateConverter = coordinateConverter,
                 log = log,
             )
+            val appDetails: AppDetails = emptyMap()
             ResultSheet(
                 points = persistentListOf(WGS84Point(NaivePoint.example), WGS84Point(NaivePoint.genRandomPoint())),
                 selectedPointIndex = 1,
-                appDetails = MutableStateFlow(emptyMap()),
                 initialValue = SheetValue.Expanded,
-                outputsForPoint = MutableStateFlow(outputRepository.getOutputsForPoint(defaultFakeLinks)),
-                outputsForPoints = MutableStateFlow(outputRepository.getOutputsForPoints()),
+                outputsForPoint = MutableStateFlow(
+                    outputRepository.getOutputsForPoint(defaultFakeLinks).map { it.toOutputState(appDetails) }
+                ),
+                outputsForPoints = MutableStateFlow(
+                    outputRepository.getOutputsForPoints().map { it.toOutputState(appDetails) }
+                ),
                 onExecute = {},
                 onSelectPointIndex = {},
             )
@@ -184,13 +186,17 @@ private fun DarkPreview() {
                 coordinateConverter = coordinateConverter,
                 log = log,
             )
+            val appDetails: AppDetails = emptyMap()
             ResultSheet(
                 points = persistentListOf(WGS84Point(NaivePoint.example), WGS84Point(NaivePoint.genRandomPoint())),
                 selectedPointIndex = 1,
-                appDetails = MutableStateFlow(emptyMap()),
                 initialValue = SheetValue.Expanded,
-                outputsForPoint = MutableStateFlow(outputRepository.getOutputsForPoint(defaultFakeLinks)),
-                outputsForPoints = MutableStateFlow(outputRepository.getOutputsForPoints()),
+                outputsForPoint = MutableStateFlow(
+                    outputRepository.getOutputsForPoint(defaultFakeLinks).map { it.toOutputState(appDetails) }
+                ),
+                outputsForPoints = MutableStateFlow(
+                    outputRepository.getOutputsForPoints().map { it.toOutputState(appDetails) }
+                ),
                 onExecute = {},
                 onSelectPointIndex = {},
             )
@@ -213,13 +219,17 @@ private fun LastPointPreview() {
                 coordinateConverter = coordinateConverter,
                 log = log,
             )
+            val appDetails: AppDetails = emptyMap()
             ResultSheet(
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 selectedPointIndex = 0,
-                appDetails = MutableStateFlow(emptyMap()),
                 initialValue = SheetValue.Expanded,
-                outputsForPoint = MutableStateFlow(outputRepository.getOutputsForPoint(defaultFakeLinks)),
-                outputsForPoints = MutableStateFlow(outputRepository.getOutputsForPoints()),
+                outputsForPoint = MutableStateFlow(
+                    outputRepository.getOutputsForPoint(defaultFakeLinks).map { it.toOutputState(appDetails) }
+                ),
+                outputsForPoints = MutableStateFlow(
+                    outputRepository.getOutputsForPoints().map { it.toOutputState(appDetails) }
+                ),
                 onExecute = {},
                 onSelectPointIndex = {},
             )
@@ -246,13 +256,17 @@ private fun DarkLastPointPreview() {
                 coordinateConverter = coordinateConverter,
                 log = log,
             )
+            val appDetails: AppDetails = emptyMap()
             ResultSheet(
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 selectedPointIndex = 0,
-                appDetails = MutableStateFlow(emptyMap()),
                 initialValue = SheetValue.Expanded,
-                outputsForPoint = MutableStateFlow(outputRepository.getOutputsForPoint(defaultFakeLinks)),
-                outputsForPoints = MutableStateFlow(outputRepository.getOutputsForPoints()),
+                outputsForPoint = MutableStateFlow(
+                    outputRepository.getOutputsForPoint(defaultFakeLinks).map { it.toOutputState(appDetails) }
+                ),
+                outputsForPoints = MutableStateFlow(
+                    outputRepository.getOutputsForPoints().map { it.toOutputState(appDetails) }
+                ),
                 onExecute = {},
                 onSelectPointIndex = {},
             )

@@ -24,6 +24,6 @@ class AppsRepository @Inject constructor(
         flow { emit(context.packageManager.queryActivities()) }
             .shareIn(applicationScope, SharingStarted.WhileSubscribed(5000), replay = 1)
     val appDetails: SharedFlow<AppDetails> =
-        activities.map { apps -> context.packageManager.queryAppDetails(apps.getPackageNames()) }
+        activities.map { activities -> context.packageManager.queryAppDetails(activities.getPackageNames()) }
             .shareIn(applicationScope, SharingStarted.WhileSubscribed(5000), replay = 1)
 }

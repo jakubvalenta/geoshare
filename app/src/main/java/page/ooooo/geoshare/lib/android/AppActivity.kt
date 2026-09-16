@@ -37,6 +37,9 @@ data class UriActivity(override val packageName: String, val uriScheme: UriSchem
         context.openUriInApp(uriString, packageName)
 }
 
+fun AppActivity.isMessagingApp(): Boolean =
+    this is TextActivity
+
 fun Iterable<AppActivity>.getPackageNames(): Set<String> =
     map { it.packageName }.toSet()
 

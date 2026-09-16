@@ -17,14 +17,14 @@ sealed interface Output {
     val id: String
 
     @Composable
-    fun label(appDetails: AppDetails): String
+    fun label(): String
 
     fun getMenuIcon(appDetails: AppDetails): IconDescriptor?
 
     fun getIcon(appDetails: AppDetails): IconDescriptor? = getMenuIcon(appDetails)
 
     @Composable
-    fun automationLabel(appDetails: AppDetails): String = label(appDetails)
+    fun automationLabel(appDetails: AppDetails): String = label()
 
     fun getAutomationDescription(): (@Composable () -> String)? = null
 

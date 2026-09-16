@@ -23,7 +23,7 @@ class OpenPointsGpxOutput @Inject constructor(
     }
 
     @Composable
-    override fun label(appDetails: AppDetails) =
+    override fun label() =
         stringResource(R.string.output_gpx_points_open)
 
     @Composable

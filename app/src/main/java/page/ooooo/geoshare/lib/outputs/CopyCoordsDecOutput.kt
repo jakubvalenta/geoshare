@@ -21,7 +21,7 @@ class CopyCoordsDecOutput @Inject constructor(
         CoordinateFormatter.formatDecCoords(coordinateConverter.toWGS84(value))
 
     @Composable
-    override fun label(appDetails: AppDetails) =
+    override fun label() =
         stringResource(R.string.conversion_succeeded_copy_coordinates)
 
     override fun getAutomationDescription() = @Composable {

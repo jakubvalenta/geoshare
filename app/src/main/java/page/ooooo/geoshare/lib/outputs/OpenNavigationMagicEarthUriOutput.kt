@@ -27,7 +27,7 @@ class OpenNavigationMagicEarthUriOutput @Inject constructor(
         MagicEarthUriFormatter.formatNavigationUriString(coordinateConverter.toWGS84(value), uriQuote)
 
     @Composable
-    override fun label(appDetails: AppDetails) =
+    override fun label() =
         stringResource(R.string.output_open_navigation)
 
     override fun getMenuIcon(appDetails: AppDetails) =

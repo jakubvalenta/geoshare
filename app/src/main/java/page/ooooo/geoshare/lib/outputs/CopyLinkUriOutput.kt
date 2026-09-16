@@ -5,6 +5,7 @@ import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
@@ -25,12 +26,12 @@ class CopyLinkUriOutput @Inject constructor(
             uriQuote = uriQuote,
         )
 
+    @Composable
+    override fun label() =
+        stringResource(R.string.conversion_succeeded_copy_link, link.name)
+
     override fun getIcon(appDetails: AppDetails) =
         link.icon
-
-    @Composable
-    override fun label(appDetails: AppDetails) =
-        stringResource(R.string.conversion_succeeded_copy_link, link.name)
 
     @Composable
     override fun automationSuccessText(appDetails: AppDetails) =

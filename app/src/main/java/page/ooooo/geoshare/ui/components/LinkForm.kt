@@ -278,7 +278,7 @@ fun LinkForm(
                             BottomSheetDefaults.DragHandle()
                         }
                         SheetListItem(
-                            headlineText = copyOutput.label(appDetails),
+                            headlineText = copyOutput.label(),
                             supportingText = copyOutput.getDescription(WGS84Point(NaivePoint.example)),
                             icon = copyOutput.getIcon(appDetails),
                         )
@@ -301,7 +301,7 @@ fun LinkForm(
                     // Row prevents the chip from filling the whole container width
                     Row(Modifier.padding(horizontal = spacing.small)) {
                         StyledChip(
-                            label = copyOutput.label(appDetails),
+                            label = copyOutput.label(),
                             modifier = Modifier.widthIn(min = 150.dp),
                             icon = {
                                 IconFromDescriptor(
@@ -421,7 +421,7 @@ fun LinkForm(
                             color = MaterialTheme.colorScheme.surfaceContainerHighest,
                         ) {
                             DropdownMenuItem(
-                                text = { Text(shareOutput.label(appDetails)) },
+                                text = { Text(shareOutput.label()) },
                                 onClick = { onSetType(value) },
                                 leadingIcon = {
                                     IconFromDescriptor(

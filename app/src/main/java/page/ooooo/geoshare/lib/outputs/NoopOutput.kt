@@ -12,7 +12,7 @@ class NoopOutput : PointOutput.WithoutLocation {
     override suspend fun execute(value: Point, actionContext: ActionContext) = ActionResult.SUCCEEDED
 
     @Composable
-    override fun label(appDetails: AppDetails) =
+    override fun label() =
         stringResource(R.string.user_preferences_automation_nothing)
 
     override fun getMenuIcon(appDetails: AppDetails) = null

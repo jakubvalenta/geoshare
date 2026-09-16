@@ -6,7 +6,6 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
@@ -50,11 +49,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeOpenStreetMapDisplayLink
-import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.extensions.zipWithNextFirstNull
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.ShareDisplayGeoUriOutput
+import page.ooooo.geoshare.ui.OutputState
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -73,17 +73,19 @@ fun AppIcon(
     var expanded by retain { mutableStateOf(false) }
 
     Box(
-        modifier.run {
-            if (enabled) {
-                combinedClickable(
-                    role = Role.Button,
-                    onLongClick = { expanded = true },
-                    onClick = onClick,
-                )
-            } else {
-                this
-            }
-        },
+        modifier
+            .width(78.dp)
+            .run {
+                if (enabled) {
+                    combinedClickable(
+                        role = Role.Button,
+                        onLongClick = { expanded = true },
+                        onClick = onClick,
+                    )
+                } else {
+                    this
+                }
+            },
         contentAlignment = Alignment.TopEnd,
     ) {
         Column(
@@ -128,9 +130,8 @@ fun AppIcon(
 
 @Composable
 fun AppMenu(
-    appDetails: AppDetails,
     expanded: Boolean,
-    outputs: List<Output>,
+    outputStates: List<OutputState<Output>>,
     onClick: (Output) -> Unit,
     onDismissRequest: () -> Unit,
     onHide: (() -> Unit)?,
@@ -142,26 +143,27 @@ fun AppMenu(
         shape = ShapeDefaults.Large,
         containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
     ) {
-        var prevIconDescriptor: IconDescriptor? = null
-        outputs.forEach { output ->
-            DropdownMenuItem(
-                text = {
-                    Text(
-                        output.label(appDetails),
-                        Modifier.testTag("geoShareAppOutput"),
-                    )
-                },
-                onClick = {
-                    onDismissRequest()
-                    onClick(output)
-                },
-                leadingIcon = output.getMenuIcon(appDetails)
-                    ?.takeIf { it != prevIconDescriptor }
-                    ?.also { prevIconDescriptor = it }
-                    ?.let { { IconFromDescriptor(it, contentDescription = null) } }
-                    ?: { Spacer(Modifier.size(24.dp)) },
-            )
-        }
+        outputStates
+            .zipWithNextFirstNull { prevOutputState, outputState ->
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            outputState.output.label(),
+                            Modifier.testTag("geoShareAppOutput"),
+                        )
+                    },
+                    onClick = {
+                        onDismissRequest()
+                        onClick(outputState.output)
+                    },
+                    leadingIcon = {
+                        IconFromDescriptor(
+                            outputState.menuIcon?.takeIf { it != prevOutputState?.menuIcon } ?: SpacerIconDescriptor,
+                            contentDescription = null,
+                        )
+                    },
+                )
+            }
         if (onHide != null) {
             HorizontalDivider()
             DropdownMenuItem(
@@ -194,7 +196,6 @@ private fun DefaultPreview() {
                 label = FakeOpenStreetMapDisplayLink.group,
                 menu = { _, _ -> },
                 onClick = {},
-                modifier = Modifier.width(85.dp),
             ) {
                 CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
                     IconFromDescriptor(
@@ -218,7 +219,6 @@ private fun DarkPreview() {
                 label = FakeOpenStreetMapDisplayLink.group,
                 menu = { _, _ -> },
                 onClick = {},
-                modifier = Modifier.width(85.dp),
             ) {
                 CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
                     IconFromDescriptor(
@@ -246,7 +246,6 @@ private fun ShareItemPreview() {
                 label = null,
                 menu = { _, _ -> },
                 onClick = {},
-                modifier = Modifier.width(85.dp),
             ) {
                 Surface(
                     Modifier.requiredSize(46.dp),
@@ -255,7 +254,7 @@ private fun ShareItemPreview() {
                 ) {
                     IconFromDescriptor(
                         output.getIcon(emptyMap()),
-                        contentDescription = output.label(emptyMap()),
+                        contentDescription = output.label(),
                         size = 24.dp,
                     )
                 }
@@ -277,7 +276,6 @@ private fun DarkShareItemPreview() {
                 label = null,
                 menu = { _, _ -> },
                 onClick = {},
-                modifier = Modifier.width(85.dp),
             ) {
                 Surface(
                     Modifier.requiredSize(46.dp),
@@ -286,7 +284,7 @@ private fun DarkShareItemPreview() {
                 ) {
                     IconFromDescriptor(
                         output.getIcon(emptyMap()),
-                        contentDescription = output.label(emptyMap()),
+                        contentDescription = output.label(),
                         size = 24.dp,
                     )
                 }
@@ -304,7 +302,6 @@ private fun LinkPreview() {
                 label = FakeOpenStreetMapDisplayLink.group,
                 menu = { _, _ -> },
                 onClick = {},
-                modifier = Modifier.width(85.dp),
             ) {
                 CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
                     IconFromDescriptor(
@@ -328,7 +325,6 @@ private fun DarkLinkPreview() {
                 label = FakeOpenStreetMapDisplayLink.group,
                 menu = { _, _ -> },
                 onClick = {},
-                modifier = Modifier.width(85.dp),
             ) {
                 CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
                     IconFromDescriptor(
@@ -352,7 +348,6 @@ private fun PlaceholderPreview() {
                 label = null,
                 menu = { _, _ -> },
                 onClick = {},
-                modifier = Modifier.width(85.dp),
             ) {
                 Box(
                     Modifier
@@ -373,7 +368,6 @@ private fun DarkPlaceholderPreview() {
                 label = null,
                 menu = { _, _ -> },
                 onClick = {},
-                modifier = Modifier.width(85.dp),
             ) {
                 Box(
                     Modifier

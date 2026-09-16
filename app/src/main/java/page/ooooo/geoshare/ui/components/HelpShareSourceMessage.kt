@@ -9,12 +9,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
@@ -23,38 +20,32 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.fakeActivities
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.lib.DefaultLog
-import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.android.isMessagingApp
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import page.ooooo.geoshare.lib.outputs.ActionContext
-import page.ooooo.geoshare.lib.outputs.OpenPointUriOutput
-import page.ooooo.geoshare.lib.outputs.Output
+import page.ooooo.geoshare.lib.outputs.Action
+import page.ooooo.geoshare.lib.outputs.PointOutput
+import page.ooooo.geoshare.ui.OutputStatesForAppsByCategory
 import page.ooooo.geoshare.ui.theme.AppTheme
+import page.ooooo.geoshare.ui.toOutputStatesForAppsByCategory
 
 @Composable
 fun HelpShareSourceMessage(
-    appDetails: StateFlow<AppDetails>,
     dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
-    outputsForApps: StateFlow<Map<String, List<Output>>>,
+    outputsForAppsByCategory: StateFlow<OutputStatesForAppsByCategory>,
     sourceComesFromIntent: StateFlow<Boolean>,
     modifier: Modifier = Modifier,
     onDismissHelpMessage: (helpMessage: HelpMessage) -> Unit,
+    onExecute: (action: Action<*>) -> Unit,
 ) {
-    val clipboard = LocalClipboard.current
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-    val resources = LocalResources.current
-
-    val appDetails by appDetails.collectAsStateWithLifecycle()
-    val outputsForApps by outputsForApps.collectAsStateWithLifecycle()
+    val outputsForAppsByCategory by outputsForAppsByCategory.collectAsStateWithLifecycle()
     val sourceComesFromIntent by sourceComesFromIntent.collectAsStateWithLifecycle()
 
     if (!sourceComesFromIntent) {
@@ -65,7 +56,7 @@ fun HelpShareSourceMessage(
          *
          * The map app is the first installed app from a list of common map apps.
          */
-        val exampleAppOutput = setOf(
+        val (exampleAppLabel, exampleAppOutput) = setOf(
             PackageNames.GOOGLE_MAPS,
             PackageNames.OSMAND_PLUS,
             PackageNames.COMAPS_FDROID,
@@ -75,28 +66,28 @@ fun HelpShareSourceMessage(
             PackageNames.MAGIC_EARTH,
             PackageNames.MAPS_ME,
         ).firstNotNullOfOrNull { packageName ->
-            outputsForApps[packageName]?.firstNotNullOfOrNull { it as? OpenPointUriOutput }
-        }
+            outputsForAppsByCategory.mapApps.firstNotNullOfOrNull { outputState ->
+                if (outputState.packageName == packageName) {
+                    Pair(
+                        outputState.label,
+                        outputState.defaultOutputState.output as? PointOutput,
+                    )
+                } else {
+                    null
+                }
+            }
+        } ?: Pair(null, null)
         HelpMessageCard(
             helpMessage = HelpMessage.SHARE_SOURCE,
             dismissedHelpMessages = dismissedHelpMessages,
             title = { Text(stringResource(R.string.help_share_source_title)) },
             modifier = modifier,
-            actionText = exampleAppOutput?.let { exampleAppOutput ->
-                appDetails[exampleAppOutput.activity.packageName]?.label?.let { exampleAppLabel ->
-                    {
-                        stringResource(R.string.help_share_source_action, exampleAppLabel)
-                    }
-                }
+            actionText = exampleAppLabel?.let { exampleAppLabel ->
+                { stringResource(R.string.help_share_source_action, exampleAppLabel) }
             },
             onAction = {
                 exampleAppOutput?.let { exampleAppOutput ->
-                    val actionContext = ActionContext(
-                        context = context, clipboard = clipboard, resources = resources
-                    )
-                    coroutineScope.launch {
-                        exampleAppOutput.toAction(examplePoint).execute(actionContext)
-                    }
+                    onExecute(exampleAppOutput.toAction(examplePoint))
                 }
             },
             onDismiss = onDismissHelpMessage,
@@ -143,17 +134,23 @@ private fun DefaultPreview() {
             coordinateConverter = coordinateConverter,
             log = log,
         )
+        val appDetails = fakeAppDetails()
         HelpShareSourceMessage(
-            appDetails = MutableStateFlow(fakeAppDetails()),
             dismissedHelpMessages = MutableStateFlow(emptySet()),
-            outputsForApps = MutableStateFlow(
-                outputRepository.getOutputsForApps(
-                    activities = fakeActivities,
-                    hiddenApps = emptySet(),
-                )
+            outputsForAppsByCategory = MutableStateFlow(
+                fakeActivities
+                    .partition { !it.isMessagingApp() }
+                    .let { (mapAppActivities, messagingAppActivities) ->
+                        Pair(
+                            outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
+                            outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
+                        )
+                    }
+                    .toOutputStatesForAppsByCategory(appDetails)
             ),
             sourceComesFromIntent = MutableStateFlow(false),
             onDismissHelpMessage = {},
+            onExecute = {},
         )
     }
 }
@@ -170,17 +167,23 @@ private fun DarkPreview() {
             coordinateConverter = coordinateConverter,
             log = log,
         )
+        val appDetails = fakeAppDetails()
         HelpShareSourceMessage(
-            appDetails = MutableStateFlow(fakeAppDetails()),
             dismissedHelpMessages = MutableStateFlow(emptySet()),
-            outputsForApps = MutableStateFlow(
-                outputRepository.getOutputsForApps(
-                    activities = fakeActivities,
-                    hiddenApps = emptySet(),
-                )
+            outputsForAppsByCategory = MutableStateFlow(
+                fakeActivities
+                    .partition { !it.isMessagingApp() }
+                    .let { (mapAppActivities, messagingAppActivities) ->
+                        Pair(
+                            outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
+                            outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
+                        )
+                    }
+                    .toOutputStatesForAppsByCategory(appDetails)
             ),
             sourceComesFromIntent = MutableStateFlow(false),
             onDismissHelpMessage = {},
+            onExecute = {},
         )
     }
 }

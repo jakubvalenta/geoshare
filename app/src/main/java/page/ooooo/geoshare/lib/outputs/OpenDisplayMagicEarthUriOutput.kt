@@ -9,7 +9,6 @@ import page.ooooo.geoshare.lib.android.UriActivity
 import page.ooooo.geoshare.lib.formatters.MagicEarthUriFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
-import page.ooooo.geoshare.ui.components.DrawableIconDescriptor
 import page.ooooo.geoshare.ui.components.ResourceIconDescriptor
 import javax.inject.Inject
 
@@ -28,14 +27,11 @@ class OpenDisplayMagicEarthUriOutput @Inject constructor(
         MagicEarthUriFormatter.formatDisplayUriString(coordinateConverter.toWGS84(value), uriQuote)
 
     @Composable
-    override fun label(appDetails: AppDetails) =
+    override fun label() =
         stringResource(R.string.output_open_display)
 
     override fun getMenuIcon(appDetails: AppDetails) =
         ResourceIconDescriptor(R.drawable.location_on_24px)
-
-    override fun getIcon(appDetails: AppDetails) =
-        appDetails[activity.packageName]?.let { DrawableIconDescriptor(it.icon) }
 
     @Composable
     override fun automationLabel(appDetails: AppDetails) =

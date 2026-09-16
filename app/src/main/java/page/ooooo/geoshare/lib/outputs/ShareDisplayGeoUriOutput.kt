@@ -23,7 +23,7 @@ class ShareDisplayGeoUriOutput @Inject constructor(
         GeoUriFormatter.formatGeoUriString(coordinateConverter.toWGS84(value), uriQuote = uriQuote)
 
     @Composable
-    override fun label(appDetails: AppDetails) =
+    override fun label() =
         stringResource(R.string.conversion_succeeded_share)
 
     override fun getMenuIcon(appDetails: AppDetails) =

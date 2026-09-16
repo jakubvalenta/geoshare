@@ -31,7 +31,7 @@ class OpenStreetViewGoogleUriOutput @Inject constructor(
         )
 
     @Composable
-    override fun label(appDetails: AppDetails) =
+    override fun label() =
         stringResource(R.string.output_open_street_view)
 
     override fun getMenuIcon(appDetails: AppDetails) =

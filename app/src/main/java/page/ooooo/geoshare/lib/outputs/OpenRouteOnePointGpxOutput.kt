@@ -50,7 +50,7 @@ class OpenRouteOnePointGpxOutput @Inject constructor(
             .toActionResult(openedApp = true)
 
     @Composable
-    override fun label(appDetails: AppDetails) =
+    override fun label() =
         stringResource(R.string.output_open_navigation)
 
     override fun getIcon(appDetails: AppDetails) =
