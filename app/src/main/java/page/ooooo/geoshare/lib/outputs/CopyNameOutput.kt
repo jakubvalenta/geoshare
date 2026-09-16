@@ -23,11 +23,11 @@ class CopyNameOutput @Inject constructor() : CopyPointTextOutput {
         value.hasName()
 
     @Composable
-    override fun label() =
+    override fun label(appLabel: String?) =
         stringResource(R.string.conversion_succeeded_copy_name)
 
     @Composable
-    override fun automationSuccessText(appDetails: AppDetails) =
+    override fun automationSuccessText(appLabel: String?) =
         stringResource(R.string.conversion_automation_copy_name_succeeded)
 
     override fun equals(other: Any?): Boolean {

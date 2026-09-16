@@ -50,7 +50,7 @@ class OpenRouteOnePointGpxOutput @Inject constructor(
             .toActionResult(openedApp = true)
 
     @Composable
-    override fun label() =
+    override fun label(appLabel: String?) =
         stringResource(R.string.output_open_navigation)
 
     override fun getIcon(appDetails: AppDetails) =
@@ -66,32 +66,26 @@ class OpenRouteOnePointGpxOutput @Inject constructor(
     )
 
     @Composable
-    override fun errorText(appDetails: AppDetails) =
+    override fun errorText(appLabel: String?) =
         stringResource(
             R.string.conversion_succeeded_open_app_failed,
-            appDetails[activity.packageName]?.label ?: activity.packageName,
+            appLabel.orEmpty(),
         )
 
     @Composable
-    override fun automationLabel(appDetails: AppDetails) =
-        stringResource(
-            R.string.conversion_succeeded_open_app_navigate_to,
-            appDetails[activity.packageName]?.label ?: activity.packageName,
-        )
+    override fun automationLabel(appLabel: String?) =
+        stringResource(R.string.conversion_succeeded_open_app_navigate_to, appLabel.orEmpty())
 
     @Composable
-    override fun automationErrorText(appDetails: AppDetails) =
-        stringResource(
-            R.string.conversion_automation_open_app_failed,
-            appDetails[activity.packageName]?.label ?: activity.packageName,
-        )
+    override fun automationErrorText(appLabel: String?) =
+        stringResource(R.string.conversion_automation_open_app_failed, appLabel.orEmpty())
 
     @Composable
-    override fun automationWaitingText(counterSec: Int, appDetails: AppDetails) =
+    override fun automationWaitingText(counterSec: Int, appLabel: String?) =
         pluralStringResource(
             R.plurals.conversion_automation_open_app_waiting,
             counterSec,
-            appDetails[activity.packageName]?.label ?: activity.packageName,
+            appLabel.orEmpty(),
             counterSec,
         )
 

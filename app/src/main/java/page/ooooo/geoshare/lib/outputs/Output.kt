@@ -17,40 +17,42 @@ sealed interface Output {
     val id: String
 
     @Composable
-    fun label(): String
+    fun label(appLabel: String?): String
+
+    fun getAppLabel(appDetails: AppDetails): String? = null
 
     fun getMenuIcon(appDetails: AppDetails): IconDescriptor?
 
     fun getIcon(appDetails: AppDetails): IconDescriptor? = getMenuIcon(appDetails)
 
     @Composable
-    fun automationLabel(appDetails: AppDetails): String = label()
+    fun automationLabel(appLabel: String?): String = label(appLabel)
 
     fun getAutomationDescription(): (@Composable () -> String)? = null
 
     interface HasErrorText {
         @Composable
-        fun errorText(appDetails: AppDetails): String
+        fun errorText(appLabel: String?): String
     }
 
     interface HasSuccessText {
         @Composable
-        fun successText(appDetails: AppDetails): String
+        fun successText(appLabel: String?): String
     }
 
     interface HasAutomationErrorText {
         @Composable
-        fun automationErrorText(appDetails: AppDetails): String
+        fun automationErrorText(appLabel: String?): String
     }
 
     interface HasAutomationSuccessText {
         @Composable
-        fun automationSuccessText(appDetails: AppDetails): String
+        fun automationSuccessText(appLabel: String?): String
     }
 
     interface HasAutomationDelay {
         @Composable
-        fun automationWaitingText(counterSec: Int, appDetails: AppDetails): String
+        fun automationWaitingText(counterSec: Int, appLabel: String?): String
     }
 }
 
@@ -158,4 +160,12 @@ sealed interface PointsOutput : Output {
         @Composable
         fun permissionText(): String
     }
+}
+
+sealed interface StringOutput : Output {
+    fun getDescription(value: String, uriQuote: UriQuote = DefaultUriQuote): String? = null
+
+    suspend fun execute(value: String, actionContext: ActionContext): ActionResult
+
+    fun toAction(value: String) = StringAction(value, this)
 }

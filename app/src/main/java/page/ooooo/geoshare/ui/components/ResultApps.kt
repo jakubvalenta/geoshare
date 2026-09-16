@@ -61,6 +61,7 @@ import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
+import page.ooooo.geoshare.lib.outputs.StringOutput
 import page.ooooo.geoshare.ui.OutputStatesForApp
 import page.ooooo.geoshare.ui.OutputStatesForAppsByCategory
 import page.ooooo.geoshare.ui.OutputStatesForLink
@@ -96,23 +97,25 @@ fun ResultApps(
     Column(modifier) {
         // Map apps
         FlowRow(horizontalArrangement = Arrangement.spacedBy(spacing.extraTiny)) {
-            outputsForAppsByCategory.mapApps.forEach { outputsForApp ->
-                key(outputsForApp.packageName) {
-                    ResultAppsAppIcon(
-                        outputsForApp = outputsForApp,
-                        iconSize = iconSize,
-                        onClick = { output ->
-                            onExecute(
-                                when (output) {
-                                    is PointOutput -> output.toAction(lastPoint)
-                                    is PointsOutput -> output.toAction(points)
-                                }
-                            )
-                        },
-                        onHideApp = { onHideApp(outputsForApp.packageName) },
-                    )
+            outputsForAppsByCategory.mapApps
+                // TODO Sort by label
+                .forEach { outputsForApp ->
+                    key(outputsForApp.packageName) {
+                        ResultAppsAppIcon(
+                            outputsForApp = outputsForApp,
+                            iconSize = iconSize,
+                            onClick = { output ->
+                                onExecute(
+                                    when (output) {
+                                        is PointOutput -> output.toAction(lastPoint)
+                                        is PointsOutput -> output.toAction(points)
+                                    }
+                                )
+                            },
+                            onHideApp = { onHideApp(outputsForApp.packageName) },
+                        )
+                    }
                 }
-            }
             // Share item
             outputsForSharing?.let { outputsForSharing ->
                 key(outputsForSharing.defaultOutputState.output.id) {
@@ -136,23 +139,25 @@ fun ResultApps(
         if (outputsForAppsByCategory.messagingApps.isNotEmpty()) {
             ResultAppsHeadline(stringResource(R.string.output_send))
             FlowRow(horizontalArrangement = Arrangement.spacedBy(spacing.extraTiny)) {
-                outputsForAppsByCategory.messagingApps.forEach { outputsForApp ->
-                    key(outputsForApp.packageName) {
-                        ResultAppsAppIcon(
-                            outputsForApp = outputsForApp,
-                            iconSize = iconSize,
-                            onClick = { output ->
-                                onExecute(
-                                    when (output) {
-                                        is PointOutput -> output.toAction(lastPoint)
-                                        is PointsOutput -> output.toAction(points)
-                                    }
-                                )
-                            },
-                            onHideApp = { onHideApp(outputsForApp.packageName) },
-                        )
+                outputsForAppsByCategory.messagingApps
+                    // TODO Sort by label
+                    .forEach { outputsForApp ->
+                        key(outputsForApp.packageName) {
+                            ResultAppsAppIcon(
+                                outputsForApp = outputsForApp,
+                                iconSize = iconSize,
+                                onClick = { output ->
+                                    onExecute(
+                                        when (output) {
+                                            is PointOutput -> output.toAction(lastPoint)
+                                            is PointsOutput -> output.toAction(points)
+                                        }
+                                    )
+                                },
+                                onHideApp = { onHideApp(outputsForApp.packageName) },
+                            )
+                        }
                     }
-                }
             }
         }
 
@@ -267,7 +272,7 @@ private fun ResultAppsShareIcon(
             )
         },
         onClick = { onClick(outputsForSharing.defaultOutputState.output) },
-        modifier = Modifier.testTag("geoShareApp_share"),
+        modifier = Modifier.testTag("geoShareAppShare"),
     ) {
         Surface(
             Modifier.requiredSize(iconSize),
@@ -276,7 +281,9 @@ private fun ResultAppsShareIcon(
         ) {
             IconFromDescriptor(
                 outputsForSharing.defaultOutputState.icon ?: PlaceholderIconDescriptor,
-                contentDescription = outputsForSharing.defaultOutputState.output.label(),
+                contentDescription = outputsForSharing.defaultOutputState.output.label(
+                    outputsForSharing.defaultOutputState.appLabel
+                ),
                 size = 24.dp,
             )
         }
@@ -302,7 +309,7 @@ private fun ResultAppsLinkIcon(
             )
         },
         onClick = { onClick(outputsForLink.defaultOutputState.output) },
-        modifier = Modifier.testTag("geoShareApp_${outputsForLink.group}"),
+        modifier = Modifier.testTag("geoShareLink_${outputsForLink.group}"),
     ) {
         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
             IconFromDescriptor(

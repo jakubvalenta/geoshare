@@ -411,7 +411,7 @@ class ScreenshotsFreeBehaviorTest {
         // Conversion - Result - Share
         onMainScrollablePane()
             .scrollToElement(Direction.DOWN, 3_000) {
-                viewIdResourceName == "geoShareApp_share"
+                viewIdResourceName == "geoShareAppShare"
             }
             .longClick()
         quickWaitForStableInActiveWindow()
@@ -421,7 +421,7 @@ class ScreenshotsFreeBehaviorTest {
         // Conversion - Result - Web map
         onMainScrollablePane()
             .scrollToElement(Direction.DOWN, 3_000) {
-                viewIdResourceName == "geoShareApp_${InitialLinks.GOOGLE_MAPS_DISPLAY_UUID}"
+                viewIdResourceName == "geoShareLink_Google Maps"
             }
             .longClick()
         quickWaitForStableInActiveWindow()
@@ -711,7 +711,7 @@ class ScreenshotsFreeBehaviorTest {
         quickWaitForStableInActiveWindow() // Wait for the result to render
         onMainScrollablePane()
             .scrollToElement(Direction.DOWN, 3_000) {
-                viewIdResourceName == "geoShareApp_${InitialLinks.APPLE_MAPS_DISPLAY_UUID}"
+                viewIdResourceName == "geoShareLink_Apple Maps"
             }
             .longClick()
         onElement { viewIdResourceName == "geoShareAppHide" }.click()

@@ -21,7 +21,7 @@ class CopyCoordsDegMinSecOutput @Inject constructor(
         CoordinateFormatter.formatDegMinSecCoords(coordinateConverter.toWGS84(value))
 
     @Composable
-    override fun label() =
+    override fun label(appLabel: String?) =
         stringResource(R.string.conversion_succeeded_copy_coordinates)
 
     override fun getAutomationDescription() = @Composable {
@@ -29,7 +29,7 @@ class CopyCoordsDegMinSecOutput @Inject constructor(
     }
 
     @Composable
-    override fun automationSuccessText(appDetails: AppDetails) =
+    override fun automationSuccessText(appLabel: String?) =
         stringResource(R.string.conversion_automation_copy_succeeded)
 
     override fun equals(other: Any?): Boolean {

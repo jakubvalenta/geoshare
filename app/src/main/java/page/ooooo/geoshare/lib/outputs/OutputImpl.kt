@@ -43,11 +43,11 @@ sealed interface CopyPointTextOutput :
     override fun getDescription(value: Point, uriQuote: UriQuote) =
         getText(value, uriQuote)
 
-    override fun getMenuIcon(appDetails: AppDetails): IconDescriptor? =
+    override fun getMenuIcon(appDetails: AppDetails) =
         ResourceIconDescriptor(R.drawable.content_copy_24px)
 
     @Composable
-    override fun successText(appDetails: AppDetails) =
+    override fun successText(appLabel: String?) =
         stringResource(R.string.copying_finished)
 }
 
@@ -70,25 +70,25 @@ sealed interface OpenPointUriOutput :
         appDetails[activity.packageName]?.let { DrawableIconDescriptor(it.icon) }
 
     @Composable
-    override fun errorText(appDetails: AppDetails) =
+    override fun errorText(appLabel: String?) =
         stringResource(
             R.string.conversion_succeeded_open_app_failed,
-            appDetails[activity.packageName]?.label ?: activity.packageName,
+            appLabel.orEmpty(),
         )
 
     @Composable
-    override fun automationErrorText(appDetails: AppDetails) =
+    override fun automationErrorText(appLabel: String?) =
         stringResource(
             R.string.conversion_automation_open_app_failed,
-            appDetails[activity.packageName]?.label ?: activity.packageName,
+            appLabel.orEmpty(),
         )
 
     @Composable
-    override fun automationWaitingText(counterSec: Int, appDetails: AppDetails) =
+    override fun automationWaitingText(counterSec: Int, appLabel: String?) =
         pluralStringResource(
             R.plurals.conversion_automation_open_app_waiting,
             counterSec,
-            appDetails[activity.packageName]?.label ?: activity.packageName,
+            appLabel.orEmpty(),
             counterSec,
         )
 }
@@ -119,25 +119,25 @@ sealed interface OpenPointsFileOutput :
         ResourceIconDescriptor(R.drawable.route_24px)
 
     @Composable
-    override fun errorText(appDetails: AppDetails) =
+    override fun errorText(appLabel: String?) =
         stringResource(
             R.string.conversion_succeeded_open_app_failed,
-            appDetails[activity.packageName]?.label ?: activity.packageName,
+            appLabel.orEmpty(),
         )
 
     @Composable
-    override fun automationErrorText(appDetails: AppDetails) =
+    override fun automationErrorText(appLabel: String?) =
         stringResource(
             R.string.conversion_automation_open_app_failed,
-            appDetails[activity.packageName]?.label ?: activity.packageName,
+            appLabel.orEmpty(),
         )
 
     @Composable
-    override fun automationWaitingText(counterSec: Int, appDetails: AppDetails) =
+    override fun automationWaitingText(counterSec: Int, appLabel: String?) =
         pluralStringResource(
             R.plurals.conversion_automation_open_app_waiting,
             counterSec,
-            appDetails[activity.packageName]?.label ?: activity.packageName,
+            appLabel.orEmpty(),
             counterSec,
         )
 }
@@ -163,23 +163,23 @@ sealed interface SavePointFileOutput :
         ResourceIconDescriptor(R.drawable.download_24px)
 
     @Composable
-    override fun errorText(appDetails: AppDetails) =
+    override fun errorText(appLabel: String?) =
         stringResource(R.string.conversion_succeeded_save_gpx_failed)
 
     @Composable
-    override fun successText(appDetails: AppDetails) =
+    override fun successText(appLabel: String?) =
         stringResource(R.string.conversion_succeeded_save_gpx_succeeded)
 
     @Composable
-    override fun automationErrorText(appDetails: AppDetails) =
-        errorText(appDetails)
+    override fun automationErrorText(appLabel: String?) =
+        errorText(appLabel)
 
     @Composable
-    override fun automationSuccessText(appDetails: AppDetails) =
+    override fun automationSuccessText(appLabel: String?) =
         stringResource(R.string.conversion_automation_save_gpx_succeeded)
 
     @Composable
-    override fun automationWaitingText(counterSec: Int, appDetails: AppDetails) =
+    override fun automationWaitingText(counterSec: Int, appLabel: String?) =
         pluralStringResource(R.plurals.conversion_automation_save_gpx_waiting, counterSec, counterSec)
 }
 
@@ -204,23 +204,23 @@ sealed interface SavePointsFileOutput :
         ResourceIconDescriptor(R.drawable.download_24px)
 
     @Composable
-    override fun errorText(appDetails: AppDetails) =
+    override fun errorText(appLabel: String?) =
         stringResource(R.string.conversion_succeeded_save_gpx_failed)
 
     @Composable
-    override fun successText(appDetails: AppDetails) =
+    override fun successText(appLabel: String?) =
         stringResource(R.string.conversion_succeeded_save_gpx_succeeded)
 
     @Composable
-    override fun automationErrorText(appDetails: AppDetails) =
-        errorText(appDetails)
+    override fun automationErrorText(appLabel: String?) =
+        errorText(appLabel)
 
     @Composable
-    override fun automationSuccessText(appDetails: AppDetails) =
+    override fun automationSuccessText(appLabel: String?) =
         stringResource(R.string.conversion_automation_save_gpx_succeeded)
 
     @Composable
-    override fun automationWaitingText(counterSec: Int, appDetails: AppDetails) =
+    override fun automationWaitingText(counterSec: Int, appLabel: String?) =
         pluralStringResource(R.plurals.conversion_automation_save_gpx_waiting, counterSec, counterSec)
 }
 
@@ -238,15 +238,15 @@ sealed interface SharePointUriOutput :
             .toActionResult(openedApp = true)
 
     @Composable
-    override fun errorText(appDetails: AppDetails) =
+    override fun errorText(appLabel: String?) =
         stringResource(R.string.conversion_succeeded_apps_not_found)
 
     @Composable
-    override fun automationErrorText(appDetails: AppDetails) =
+    override fun automationErrorText(appLabel: String?) =
         stringResource(R.string.conversion_automation_share_failed)
 
     @Composable
-    override fun automationWaitingText(counterSec: Int, appDetails: AppDetails) =
+    override fun automationWaitingText(counterSec: Int, appLabel: String?) =
         pluralStringResource(R.plurals.conversion_automation_share_waiting, counterSec, counterSec)
 }
 
@@ -271,18 +271,18 @@ sealed interface SharePointsFileOutput :
         ResourceIconDescriptor(R.drawable.route_24px)
 
     @Composable
-    override fun errorText(appDetails: AppDetails) =
+    override fun errorText(appLabel: String?) =
         stringResource(R.string.output_gpx_route_share_failed)
 
     @Composable
-    override fun automationErrorText(appDetails: AppDetails) =
+    override fun automationErrorText(appLabel: String?) =
         stringResource(R.string.output_gpx_route_share_automation_failed)
 
     @Composable
-    override fun automationSuccessText(appDetails: AppDetails) =
+    override fun automationSuccessText(appLabel: String?) =
         stringResource(R.string.output_gpx_route_share_automation_succeeded)
 
     @Composable
-    override fun automationWaitingText(counterSec: Int, appDetails: AppDetails) =
+    override fun automationWaitingText(counterSec: Int, appLabel: String?) =
         pluralStringResource(R.plurals.output_gpx_route_share_automation_waiting, counterSec, counterSec)
 }

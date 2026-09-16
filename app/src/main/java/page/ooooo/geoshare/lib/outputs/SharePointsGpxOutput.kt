@@ -18,7 +18,7 @@ class SharePointsGpxOutput @Inject constructor(
     }
 
     @Composable
-    override fun label() =
+    override fun label(appLabel: String?) =
         stringResource(R.string.output_gpx_points_share)
 
     override fun equals(other: Any?): Boolean {

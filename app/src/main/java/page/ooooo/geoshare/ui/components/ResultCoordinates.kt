@@ -186,7 +186,7 @@ fun ResultCoordinates(
                 outputsForPointChips.forEach { outputState ->
                     item {
                         StyledChip(
-                            label = outputState.output.label(),
+                            label = outputState.output.label(outputState.appLabel),
                             icon = outputState.icon?.let {
                                 { IconFromDescriptor(it, contentDescription = null) }
                             },
@@ -257,7 +257,7 @@ fun ResultCoordinates(
                             outputsForPointsChips.forEach { outputState ->
                                 item {
                                     StyledChip(
-                                        label = outputState.output.label(),
+                                        label = outputState.output.label(outputState.appLabel),
                                         icon = outputState.icon?.let {
                                             { IconFromDescriptor(it, contentDescription = null) }
                                         },

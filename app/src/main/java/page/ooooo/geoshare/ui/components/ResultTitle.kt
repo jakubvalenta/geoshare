@@ -82,7 +82,6 @@ import kotlin.time.DurationUnit
 @Composable
 fun ResultTitle(
     currentState: ConversionState.HasResult,
-    appDetails: StateFlow<AppDetails>,
     billingFeatures: List<Feature>,
     billingStatus: StateFlow<BillingStatus>,
     modifier: Modifier = Modifier,
@@ -92,7 +91,6 @@ fun ResultTitle(
 ) {
     var counterSec by remember { mutableIntStateOf(0) }
 
-    val appDetails by appDetails.collectAsStateWithLifecycle()
     val billingStatus by billingStatus.collectAsStateWithLifecycle()
 
     AnimatedMessage(

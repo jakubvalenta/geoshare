@@ -93,7 +93,7 @@ fun ResultSheet(
                         .filter { it.output.isAvailable(selectedPoint) }
                         .zipWithNextFirstNull { prevOutputState, outputState ->
                             SheetListItem(
-                                headlineText = outputState.output.label(),
+                                headlineText = outputState.output.label(outputState.appLabel),
                                 onClick = {
                                     hide()
                                     onExecute(outputState.output.toAction(selectedPoint))
@@ -118,7 +118,7 @@ fun ResultSheet(
                         .filter { it.output.isAvailable(points) }
                         .zipWithNextFirstNull { prevOutputState, outputState ->
                             SheetListItem(
-                                headlineText = outputState.output.label(),
+                                headlineText = outputState.output.label(outputState.appLabel),
                                 onClick = {
                                     hide()
                                     onExecute(outputState.output.toAction(points))

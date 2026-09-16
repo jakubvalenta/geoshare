@@ -148,7 +148,7 @@ fun AppMenu(
                 DropdownMenuItem(
                     text = {
                         Text(
-                            outputState.output.label(),
+                            outputState.output.label(outputState.appLabel),
                             Modifier.testTag("geoShareAppOutput"),
                         )
                     },
@@ -254,7 +254,7 @@ private fun ShareItemPreview() {
                 ) {
                     IconFromDescriptor(
                         output.getIcon(emptyMap()),
-                        contentDescription = output.label(),
+                        contentDescription = output.label(null),
                         size = 24.dp,
                     )
                 }
@@ -284,7 +284,7 @@ private fun DarkShareItemPreview() {
                 ) {
                     IconFromDescriptor(
                         output.getIcon(emptyMap()),
-                        contentDescription = output.label(),
+                        contentDescription = output.label(null),
                         size = 24.dp,
                     )
                 }

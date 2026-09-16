@@ -32,7 +32,7 @@ class ShareLinkUriOutput @Inject constructor(
         }.let { success -> if (success == true) ActionResult.SUCCEEDED_AND_OPENED_APP else ActionResult.FAILED }
 
     @Composable
-    override fun label() =
+    override fun label(appLabel: String?) =
         stringResource(R.string.output_open_link, link.name)
 
     override fun getMenuIcon(appDetails: AppDetails) =

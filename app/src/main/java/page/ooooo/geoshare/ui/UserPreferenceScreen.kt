@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
@@ -100,22 +101,20 @@ fun UserPreferenceScreen(
     outputViewModel: OutputViewModel = hiltViewModel(),
     viewModel: UserPreferenceViewModel = hiltViewModel(),
 ) {
-    val activities by outputViewModel.activities.collectAsStateWithLifecycle()
-    val appDetails by outputViewModel.appDetails.collectAsStateWithLifecycle()
     val billingAppNameResId = billingViewModel.billingAppNameResId
     val billingFeatures = billingViewModel.billingFeatures
     val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
     val links by linkViewModel.all.collectAsStateWithLifecycle()
+    val outputsForAutomation = viewModel.outputsForAutomation
     val userPreferencesValues by viewModel.values.collectAsStateWithLifecycle()
 
     UserPreferenceScreen(
         initialGroupId = initialGroupId,
-        activities = activities,
-        appDetails = appDetails,
         billingAppNameResId = billingAppNameResId,
         billingFeatures = billingFeatures,
         billingStatus = billingStatus,
         links = links,
+        outputsForAutomation = outputsForAutomation,
         userPreferencesValues = userPreferencesValues,
         onBack = onBack,
         onGetAutomationOutput = { automation, getLinkByUUID ->
@@ -134,13 +133,12 @@ fun UserPreferenceScreen(
 @Composable
 private fun UserPreferenceScreen(
     initialGroupId: UserPreferenceGroupId?,
-    activities: List<AppActivity>,
-    appDetails: AppDetails,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
     links: List<Link>,
     userPreferencesValues: UserPreferencesValues,
+    outputsForAutomation: StateFlow<List<OutputState<Output>>>,
     onBack: () -> Unit,
     onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
     onNavigateToBillingScreen: () -> Unit,
@@ -171,11 +169,10 @@ private fun UserPreferenceScreen(
         listPane = {
             UserPreferenceListPane(
                 currentGroupId = currentGroupId,
-                activities = activities,
-                appDetails = appDetails,
                 billingStatus = billingStatus,
                 billingFeatures = billingFeatures,
                 links = links,
+                outputsForAutomation = outputsForAutomation,
                 values = userPreferencesValues,
                 onBack = {
                     coroutineScope.launch {
@@ -200,12 +197,11 @@ private fun UserPreferenceScreen(
             if (currentGroupId != null) {
                 UserPreferenceDetailPane(
                     currentGroupId = currentGroupId,
-                    activities = activities,
-                    appDetails = appDetails,
                     billingAppNameResId = billingAppNameResId,
                     billingFeatures = billingFeatures,
                     billingStatus = billingStatus,
                     links = links,
+                    outputsForAutomation = outputsForAutomation,
                     values = userPreferencesValues,
                     wide = wide,
                     onBack = {
@@ -234,11 +230,10 @@ private fun UserPreferenceScreen(
 private fun UserPreferenceListPane(
     currentGroupId: UserPreferenceGroupId?,
     values: UserPreferencesValues,
-    activities: List<AppActivity>,
-    appDetails: AppDetails,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
     links: List<Link>,
+    outputsForAutomation: StateFlow<List<OutputState<Output>>>,
     onBack: () -> Unit,
     onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
     onNavigateToGroup: (id: UserPreferenceGroupId) -> Unit,
@@ -304,10 +299,10 @@ private fun UserPreferenceListPane(
                 UserPreferenceAutomationListItem(
                     index = 0,
                     count = 2,
-                    appDetails = appDetails,
                     billingFeatures = billingFeatures,
                     billingStatus = billingStatus,
                     links = links,
+                    outputsForAutomation = outputsForAutomation,
                     selected = currentGroupId == UserPreferenceGroupId.AUTOMATION,
                     values = values,
                     modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.AUTOMATION}"),
@@ -430,13 +425,13 @@ private fun UserPreferenceListPane(
 
 @Composable
 private fun UserPreferenceDetailPane(
+    apps: StateFlow<List<OutputState<Output>>>,
     currentGroupId: UserPreferenceGroupId,
-    activities: List<AppActivity>,
-    appDetails: AppDetails,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
     links: List<Link>,
+    outputsForAutomation: StateFlow<List<OutputState<Output>>>,
     values: UserPreferencesValues,
     wide: Boolean,
     onBack: () -> Unit,
@@ -455,12 +450,11 @@ private fun UserPreferenceDetailPane(
         )
 
         UserPreferenceGroupId.AUTOMATION -> UserPreferenceAutomationControls(
-            appDetails = appDetails,
-            activities = activities,
             billingAppNameResId = billingAppNameResId,
             billingFeatures = billingFeatures,
             billingStatus = billingStatus,
             links = links,
+            outputsForAutomation = outputsForAutomation,
             onBack = onBack,
             onGetAutomationOutput = onGetAutomationOutput,
             onNavigateToBillingScreen = onNavigateToBillingScreen,
@@ -517,8 +511,7 @@ private fun UserPreferenceDetailPane(
         )
 
         UserPreferenceGroupId.HIDDEN_APPS -> UserPreferenceHiddenAppsControls(
-            appDetails = appDetails,
-            activities = activities,
+            apps = apps,
             billingAppNameResId = billingAppNameResId,
             onBack = onBack,
             onNavigateToBillingScreen = onNavigateToBillingScreen,
@@ -544,7 +537,6 @@ private fun DefaultPreview() {
                 UserPreferenceScreen(
                     initialGroupId = null,
                     activities = emptyList(),
-                    appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
@@ -577,7 +569,6 @@ private fun DarkPreview() {
                 UserPreferenceScreen(
                     initialGroupId = null,
                     activities = emptyList(),
-                    appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
@@ -606,7 +597,6 @@ private fun TabletPreview() {
                 UserPreferenceScreen(
                     initialGroupId = UserPreferenceGroupId.CONNECTION_PERMISSION,
                     activities = emptyList(),
-                    appDetails = emptyMap(),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),

@@ -30,9 +30,11 @@ import page.ooooo.geoshare.lib.android.isMessagingApp
 import page.ooooo.geoshare.lib.android.queryActivitiesForUri
 import page.ooooo.geoshare.lib.android.queryAppDetails
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.outputs.CopyStringOutput
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
+import page.ooooo.geoshare.lib.outputs.StringOutput
 import page.ooooo.geoshare.ui.components.IconDescriptor
 import java.util.UUID
 import javax.inject.Inject
@@ -43,6 +45,7 @@ import javax.inject.Inject
  * Example: "Copy coordinates" output
  */
 data class OutputState<T : Output>(
+    val appLabel: String?,
     val icon: IconDescriptor?,
     val menuIcon: IconDescriptor?,
     val output: T,
@@ -69,7 +72,7 @@ data class OutputStatesForAppsByCategory(
 )
 
 /**
- * All [outputStates] that can be executed for a link specified by its [group].
+ * All output states that can be executed for a link specified by its [group].
  *
  * - [defaultOutputState] is the output that will be executed when clicking the icon in the UI.
  * - [outputStates] are the outputs that will be shown in a context menu in the UI.
@@ -80,6 +83,11 @@ data class OutputStatesForLink(
     val group: String,
     val defaultOutputState: OutputState<Output>,
     val outputStates: List<OutputState<Output>>,
+)
+
+data class OutputStatesForUriByCategory(
+    val copy: List<OutputState<StringOutput>>,
+    val open: List<OutputState<StringOutput>>,
 )
 
 /**
@@ -106,17 +114,11 @@ class OutputViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val _selectedUriString: MutableStateFlow<String?> =
+    private val _selectedUri: MutableStateFlow<String?> =
         savedStateHandle.getMutableStateFlow("selectedUri", null)
-    val selectedUriString: StateFlow<String?> = _selectedUriString.asStateFlow()
+    val selectedUri: StateFlow<String?> = _selectedUri.asStateFlow()
 
-    val activities: StateFlow<List<AppActivity>> = appsRepository.activities
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            emptyList(),
-        )
-    val activitiesForSelectedUriString: StateFlow<List<AppActivity>> = selectedUriString
+    private val activitiesForUri: StateFlow<List<AppActivity>> = selectedUri
         .filterNotNull()
         .map { context.packageManager.queryActivitiesForUri(it) }
         .stateIn(
@@ -131,7 +133,7 @@ class OutputViewModel @Inject constructor(
             SharingStarted.WhileSubscribed(5000),
             emptyMap(),
         )
-    val appDetailsForSelectedUriString: StateFlow<AppDetails> = activitiesForSelectedUriString
+    val appDetailsForUri: StateFlow<AppDetails> = activitiesForUri
         .filter { it.isNotEmpty() }
         .map { context.packageManager.queryAppDetails(it.getPackageNames()) }
         .stateIn(
@@ -222,17 +224,30 @@ class OutputViewModel @Inject constructor(
                 SharingStarted.WhileSubscribed(5000),
                 null,
             )
+    val outputsForUriByCategory: StateFlow<OutputStatesForUriByCategory> = activitiesForUri
+        .combine(appDetailsForUri) { activities, appDetails ->
+            outputRepository
+                .getOutputsForUri(activities)
+                .partition { it is CopyStringOutput }
+                .toOutputStatesForUriByCategory(appDetails)
+        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            OutputStatesForUriByCategory(copy = emptyList(), open = emptyList()),
+        )
 
     suspend fun getAutomationOutput(automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?): Output? =
         outputRepository.getAutomationOutput(automation, getLinkByUUID)
 
-    fun setSelectedUriString(newSelectedUriString: String?) {
-        _selectedUriString.value = newSelectedUriString
+    fun setSelectedUri(newSelectedUri: String?) {
+        _selectedUri.value = newSelectedUri
     }
 }
 
 fun Output.toOutputState(appDetails: AppDetails): OutputState<Output> =
     OutputState(
+        appLabel = getAppLabel(appDetails),
         icon = getIcon(appDetails),
         menuIcon = getMenuIcon(appDetails),
         output = this,
@@ -240,6 +255,7 @@ fun Output.toOutputState(appDetails: AppDetails): OutputState<Output> =
 
 fun PointOutput.toOutputState(appDetails: AppDetails): OutputState<PointOutput> =
     OutputState(
+        appLabel = getAppLabel(appDetails),
         icon = getIcon(appDetails),
         menuIcon = getMenuIcon(appDetails),
         output = this,
@@ -247,6 +263,15 @@ fun PointOutput.toOutputState(appDetails: AppDetails): OutputState<PointOutput> 
 
 fun PointsOutput.toOutputState(appDetails: AppDetails): OutputState<PointsOutput> =
     OutputState(
+        appLabel = getAppLabel(appDetails),
+        icon = getIcon(appDetails),
+        menuIcon = getMenuIcon(appDetails),
+        output = this,
+    )
+
+fun StringOutput.toOutputState(appDetails: AppDetails): OutputState<StringOutput> =
+    OutputState(
+        appLabel = getAppLabel(appDetails),
         icon = getIcon(appDetails),
         menuIcon = getMenuIcon(appDetails),
         output = this,
@@ -295,4 +320,12 @@ fun List<Output>.toOutputStatesForSharing(appDetails: AppDetails): OutputStatesF
                 outputStates = outputStates,
             )
         }
+    }
+
+fun Pair<List<StringOutput>, List<StringOutput>>.toOutputStatesForUriByCategory(appDetails: AppDetails): OutputStatesForUriByCategory =
+    let { (outputsForCopying, outputsForOpening) ->
+        OutputStatesForUriByCategory(
+            copy = outputsForCopying.map { it.toOutputState(appDetails) },
+            open = outputsForOpening.map { it.toOutputState(appDetails) },
+        )
     }

@@ -23,7 +23,7 @@ class ShareDisplayGeoUriOutput @Inject constructor(
         GeoUriFormatter.formatGeoUriString(coordinateConverter.toWGS84(value), uriQuote = uriQuote)
 
     @Composable
-    override fun label() =
+    override fun label(appLabel: String?) =
         stringResource(R.string.conversion_succeeded_share)
 
     override fun getMenuIcon(appDetails: AppDetails) =
@@ -33,7 +33,7 @@ class ShareDisplayGeoUriOutput @Inject constructor(
         ImageVectorIconDescriptor(Icons.Default.Share)
 
     @Composable
-    override fun automationLabel(appDetails: AppDetails) =
+    override fun automationLabel(appLabel: String?) =
         stringResource(R.string.conversion_succeeded_share)
 
     override fun equals(other: Any?): Boolean {

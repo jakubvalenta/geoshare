@@ -52,6 +52,7 @@ import page.ooooo.geoshare.lib.outputs.CopyCoordsDegMinSecOutput
 import page.ooooo.geoshare.lib.outputs.CopyGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.CopyLinkUriOutput
 import page.ooooo.geoshare.lib.outputs.CopyNameOutput
+import page.ooooo.geoshare.lib.outputs.CopyStringOutput
 import page.ooooo.geoshare.lib.outputs.NoopOutput
 import page.ooooo.geoshare.lib.outputs.OpenDisplayCartesIGNUrlOutput
 import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
@@ -62,6 +63,7 @@ import page.ooooo.geoshare.lib.outputs.OpenPointsGpxOutput
 import page.ooooo.geoshare.lib.outputs.OpenRouteGpxOutput
 import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 import page.ooooo.geoshare.lib.outputs.OpenStreetViewGoogleUriOutput
+import page.ooooo.geoshare.lib.outputs.OpenUnknownUriOutput
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
@@ -70,12 +72,14 @@ import page.ooooo.geoshare.lib.outputs.SavePointToContactOutput
 import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
 import page.ooooo.geoshare.lib.outputs.SaveRouteGpxOutput
 import page.ooooo.geoshare.lib.outputs.SendPointOutput
+import page.ooooo.geoshare.lib.outputs.SendStringOutput
 import page.ooooo.geoshare.lib.outputs.ShareDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.ShareLinkUriOutput
 import page.ooooo.geoshare.lib.outputs.ShareNavigationGoogleUriOutput
 import page.ooooo.geoshare.lib.outputs.SharePointsGpxOutput
 import page.ooooo.geoshare.lib.outputs.ShareRouteGpxOutput
 import page.ooooo.geoshare.lib.outputs.ShareStreetViewGoogleUriOutput
+import page.ooooo.geoshare.lib.outputs.StringOutput
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -149,7 +153,9 @@ class OutputRepository @Inject constructor(
     fun getOutputsForPointChips(links: List<Link>): List<PointOutput> =
         listOf(
             CopyGeoUriOutput(coordinateConverter),
-            *links.filter { it.chipEnabled }.sortedBy { it.name }
+            *links
+                .filter { it.chipEnabled }
+                .sortedBy { it.name }
                 .map { CopyLinkUriOutput(it, coordinateConverter) }
                 .toTypedArray(),
         )
@@ -159,6 +165,23 @@ class OutputRepository @Inject constructor(
             ShareRouteGpxOutput(coordinateConverter),
             SaveRouteGpxOutput(coordinateConverter),
             SavePointsGpxOutput(coordinateConverter),
+        )
+
+    // TODO Test
+    fun getOutputsForUri(activities: List<AppActivity>): List<StringOutput> =
+        listOf(
+            CopyStringOutput,
+            *activities
+                .mapNotNull { activity ->
+                    when (activity) {
+                        // Don't show an item for a file activity, because we don't know how to create a file from the
+                        // source, which is a URI or a text
+                        is FileActivity -> null
+                        is TextActivity -> SendStringOutput(activity)
+                        is UriActivity -> OpenUnknownUriOutput(activity)
+                    }
+                }
+                .toTypedArray(),
         )
 
     suspend fun getAutomationOutput(automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?): Output? =
@@ -355,7 +378,9 @@ class OutputRepository @Inject constructor(
                         OpenNavigationMagicEarthUriOutput(this, coordinateConverter),
                     )
 
-                    UriScheme.UNKNOWN -> emptyList()
+                    UriScheme.UNKNOWN -> listOf(
+                        OpenUnknownUriOutput(this),
+                    )
                 }
         }
 }

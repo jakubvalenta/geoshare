@@ -4,8 +4,6 @@ import android.content.res.Resources
 import android.net.Uri
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
-import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.geo.WGS84Point
 
 /**
  * Action is an [output] with the [value] ([Point] or [Points]) that's needed to execute it.
@@ -22,7 +20,7 @@ sealed interface Action<T> {
 }
 
 /**
- * Basic action is an [Action] that doesn't require anything other than a [value] ([Point] or [Points]) to be executed.
+ * An [Action] that doesn't require anything other than a [value] ([Point] or [Points]) to be executed.
  */
 sealed interface BasicAction<T> : Action<T> {
     suspend fun execute(actionContext: ActionContext): ActionResult
@@ -45,8 +43,7 @@ sealed interface BasicAction<T> : Action<T> {
 }
 
 /**
- * File action is an [Action] that requires a [value] ([Point] or [Points]) and a content: [Uri] of a file to be
- * executed.
+ * An [Action] that requires a [value] ([Point] or [Points]) and a content: [Uri] of a file to be executed.
  */
 sealed interface FileAction<T> : Action<T> {
     fun getFilename(resources: Resources): String
@@ -81,8 +78,7 @@ sealed interface FileAction<T> : Action<T> {
 }
 
 /**
- * Location action is an [Action] that requires a [value] ([Point] or [Points]) and current device location [Point] to
- * be executed.
+ * An [Action] that requires a [value] ([Point] or [Points]) and current device location [Point] to be executed.
  */
 sealed interface LocationAction<T> : Action<T> {
     suspend fun execute(location: Point, actionContext: ActionContext): ActionResult
@@ -104,4 +100,14 @@ sealed interface LocationAction<T> : Action<T> {
     }
 }
 
-val NoopAction = BasicAction.WithPoint(WGS84Point(source = Source.GENERATED), NoopOutput())
+/**
+ * An [Action] that require a string [value] to be executed.
+ */
+data class StringAction(
+    override val value: String,
+    override val output: StringOutput,
+) : Action<String> {
+    suspend fun execute(actionContext: ActionContext): ActionResult = output.execute(value, actionContext)
+}
+
+val NoopAction = StringAction("", NoopOutput())

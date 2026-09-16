@@ -33,18 +33,18 @@ class SavePointToContactOutput @Inject constructor(
         ).let { success -> if (success) ActionResult.SUCCEEDED else ActionResult.FAILED }
 
     @Composable
-    override fun label() =
+    override fun label(appLabel: String?) =
         stringResource(R.string.output_save_to_contact)
 
     override fun getMenuIcon(appDetails: AppDetails) =
         ImageVectorIconDescriptor(Icons.Default.AccountBox)
 
     @Composable
-    override fun errorText(appDetails: AppDetails) =
+    override fun errorText(appLabel: String?) =
         stringResource(R.string.output_save_to_contact_failed)
 
     @Composable
-    override fun automationErrorText(appDetails: AppDetails) =
+    override fun automationErrorText(appLabel: String?) =
         stringResource(R.string.output_save_to_contact_automation_failed)
 
     override fun equals(other: Any?): Boolean {

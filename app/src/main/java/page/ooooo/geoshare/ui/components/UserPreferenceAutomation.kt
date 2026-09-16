@@ -57,7 +57,6 @@ import java.util.UUID
 fun UserPreferenceAutomationListItem(
     index: Int,
     count: Int,
-    appDetails: AppDetails,
     links: List<Link>,
     values: UserPreferencesValues,
     billingFeatures: List<Feature>,
@@ -82,7 +81,6 @@ fun UserPreferenceAutomationListItem(
         supportingContent = {
             AutomationPreferenceValue(
                 value = AutomationPreference.getValue(values),
-                appDetails = appDetails,
                 links = links,
                 descriptionEnabled = false,
                 onGetAutomationOutput = onGetAutomationOutput,
@@ -100,7 +98,6 @@ fun UserPreferenceAutomationListItem(
 @Composable
 fun UserPreferenceAutomationControls(
     activities: List<AppActivity>,
-    appDetails: AppDetails,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
@@ -125,7 +122,7 @@ fun UserPreferenceAutomationControls(
     ) {
         userPreferenceOptionsControl(
             userPreference = AutomationPreference,
-            optionGroups = AutomationPreference.getOptionGroups(activities, appDetails, values.hiddenApps, links),
+            optionGroups = AutomationPreference.getOptionGroups(activities, values.hiddenApps, links),
             values = values,
             enabled = AutomationFeature in billingFeatures && billingStatus is BillingStatus.Purchased,
             itemTestTag = { option ->
@@ -140,7 +137,6 @@ fun UserPreferenceAutomationControls(
         ) { value, modifier ->
             AutomationPreferenceValue(
                 value = value,
-                appDetails = appDetails,
                 links = links,
                 modifier = modifier,
                 onGetAutomationOutput = onGetAutomationOutput,
@@ -152,7 +148,6 @@ fun UserPreferenceAutomationControls(
 @Composable
 private fun AutomationPreferenceValue(
     value: Automation,
-    appDetails: AppDetails,
     links: List<Link>,
     modifier: Modifier = Modifier,
     descriptionEnabled: Boolean = true,

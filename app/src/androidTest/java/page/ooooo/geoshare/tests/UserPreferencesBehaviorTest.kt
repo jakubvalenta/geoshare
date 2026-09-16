@@ -253,7 +253,7 @@ class UserPreferencesBehaviorTest {
 
         // Hide a link
         scrollToLinkIcons()
-        onElement { viewIdResourceName == "geoShareApp_${InitialLinks.APPLE_MAPS_DISPLAY_UUID}" }.longClick()
+        onElement { viewIdResourceName == "geoShareLink_Apple Maps" }.longClick()
         onElement { viewIdResourceName == "geoShareAppHide" }.click()
 
         // Shows a message
@@ -269,7 +269,7 @@ class UserPreferencesBehaviorTest {
         waitForStableInActiveWindow(stableIntervalMs = 3_000) // Wait for the app to get hidden
         assertNull(
             onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) {
-                viewIdResourceName == "geoShareApp_${InitialLinks.APPLE_MAPS_DISPLAY_UUID}"
+                viewIdResourceName == "geoShareLink_Apple Maps"
             }
         )
 
@@ -283,7 +283,7 @@ class UserPreferencesBehaviorTest {
         goBackToElement { viewIdResourceName == "geoShareMainPane" }
         onMainScrollablePane()
             .scrollToElement(Direction.DOWN, timeoutMs = 3_000) {
-                viewIdResourceName == "geoShareApp_${InitialLinks.APPLE_MAPS_DISPLAY_UUID}"
+                viewIdResourceName == "geoShareLink_Apple Maps"
             }
     }
 }

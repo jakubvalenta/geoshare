@@ -30,7 +30,7 @@ class SavePointGpxOutput @Inject constructor(
     }
 
     @Composable
-    override fun label() =
+    override fun label(appLabel: String?) =
         stringResource(R.string.output_gpx_point_save)
 
     override fun equals(other: Any?): Boolean {

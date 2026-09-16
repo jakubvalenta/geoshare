@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.MutablePreferences
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
+import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.di.fakeActivities
@@ -31,6 +32,8 @@ import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.android.AppActivity
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.outputs.Output
+import page.ooooo.geoshare.ui.OutputState
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -74,8 +77,7 @@ fun UserPreferenceHiddenAppsListItem(
 
 @Composable
 fun UserPreferenceHiddenAppsControls(
-    appDetails: AppDetails,
-    activities: List<AppActivity>,
+    apps: StateFlow<List<OutputState<Output>>>,
     billingAppNameResId: Int,
     modifier: Modifier = Modifier,
     onBack: () -> Unit,

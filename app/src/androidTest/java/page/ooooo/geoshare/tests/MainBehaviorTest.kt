@@ -10,7 +10,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertNull
 import org.junit.Test
-import page.ooooo.geoshare.data.local.database.InitialLinks
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
@@ -123,7 +122,7 @@ class MainBehaviorTest {
         onElement { viewIdResourceName == "geoShareMainSourceButton" }.click()
         onElement { viewIdResourceName == "geoShareConversionUriSheet" }
             .scrollToElement(Direction.DOWN) {
-                viewIdResourceName == "geoShareConversionUriSheetItem_$messagingAppPackageName"
+                viewIdResourceName == "geoShareConversionUriSheetItem_$messagingAppPackageName" // FIXME
             }
             .click()
 
@@ -142,7 +141,7 @@ class MainBehaviorTest {
         onElement { viewIdResourceName == "geoShareMainSourceButton" }.click()
         onElement { viewIdResourceName == "geoShareConversionUriSheet" }
             .scrollToElement(Direction.DOWN) {
-                viewIdResourceName == "geoShareConversionUriSheetItem_${PackageNames.GOOGLE_MAPS}"
+                viewIdResourceName == "geoShareConversionUriSheetItem_${PackageNames.GOOGLE_MAPS}" // FIXME
             }
             .click()
 
@@ -178,7 +177,7 @@ class MainBehaviorTest {
 
         // Click the link
         scrollToLinkIcons()
-        onElement { viewIdResourceName == "geoShareApp_${InitialLinks.GOOGLE_MAPS_DISPLAY_UUID}" }.longClick()
+        onElement { viewIdResourceName == "geoShareLink_Google Maps" }.longClick()
         onElement {
             viewIdResourceName == "geoShareAppOutput" && textAsString()?.contains("Google Maps search") == true
         }.click()

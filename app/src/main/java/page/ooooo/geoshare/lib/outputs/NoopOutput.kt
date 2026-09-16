@@ -4,15 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.geo.Point
 
-class NoopOutput : PointOutput.WithoutLocation {
+class NoopOutput : StringOutput {
     override val id = "NoopOutput"
 
-    override suspend fun execute(value: Point, actionContext: ActionContext) = ActionResult.SUCCEEDED
+    override suspend fun execute(value: String, actionContext: ActionContext) = ActionResult.SUCCEEDED
 
     @Composable
-    override fun label() =
+    override fun label(appLabel: String?) =
         stringResource(R.string.user_preferences_automation_nothing)
 
     override fun getMenuIcon(appDetails: AppDetails) = null

@@ -31,18 +31,15 @@ class OpenStreetViewGoogleUriOutput @Inject constructor(
         )
 
     @Composable
-    override fun label() =
+    override fun label(appLabel: String?) =
         stringResource(R.string.output_open_street_view)
 
     override fun getMenuIcon(appDetails: AppDetails) =
         ResourceIconDescriptor(R.drawable.streetview_24px)
 
     @Composable
-    override fun automationLabel(appDetails: AppDetails) =
-        stringResource(
-            R.string.conversion_succeeded_open_app_street_view,
-            appDetails[activity.packageName]?.label ?: activity.packageName,
-        )
+    override fun automationLabel(appLabel: String?) =
+        stringResource(R.string.conversion_succeeded_open_app_street_view, appLabel.orEmpty())
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

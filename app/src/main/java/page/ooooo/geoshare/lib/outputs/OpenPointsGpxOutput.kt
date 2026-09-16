@@ -23,15 +23,12 @@ class OpenPointsGpxOutput @Inject constructor(
     }
 
     @Composable
-    override fun label() =
+    override fun label(appLabel: String?) =
         stringResource(R.string.output_gpx_points_open)
 
     @Composable
-    override fun automationLabel(appDetails: AppDetails) =
-        stringResource(
-            R.string.output_gpx_points_open_in,
-            appDetails[activity.packageName]?.label ?: activity.packageName,
-        )
+    override fun automationLabel(appLabel: String?) =
+        stringResource(R.string.output_gpx_points_open_in, appLabel.orEmpty())
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

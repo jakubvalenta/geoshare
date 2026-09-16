@@ -20,14 +20,14 @@ class ShareNavigationGoogleUriOutput @Inject constructor(
         GoogleMapsUriFormatter.formatNavigationUriString(coordinateConverter.toWGS84(value), uriQuote)
 
     @Composable
-    override fun label() =
+    override fun label(appLabel: String?) =
         stringResource(R.string.output_open_navigation)
 
     override fun getMenuIcon(appDetails: AppDetails) =
         ResourceIconDescriptor(R.drawable.navigation_24px)
 
     @Composable
-    override fun automationLabel(appDetails: AppDetails) =
+    override fun automationLabel(appLabel: String?) =
         stringResource(R.string.output_open_navigation)
 
     override fun equals(other: Any?): Boolean {
