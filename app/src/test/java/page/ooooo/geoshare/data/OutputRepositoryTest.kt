@@ -18,11 +18,13 @@ import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.local.database.InitialLinks
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.database.findByUUID
+import page.ooooo.geoshare.data.local.preferences.BasicAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDegMinSecAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyLinkUriAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyNameAutomation
+import page.ooooo.geoshare.data.local.preferences.LinkAutomation
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayCartesIGNUrlAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation
@@ -359,7 +361,7 @@ class OutputRepositoryTest {
         assertEquals(
             listOf(
                 listOf(
-                    NoopOutput(),
+                    NoopOutput,
                 ),
                 listOf(
                     CopyCoordsDecOutput(coordinateConverter),
@@ -474,17 +476,19 @@ class OutputRepositoryTest {
                 ),
             ).map { group ->
                 group.map { automation ->
-                    outputRepository.getAutomationOutput(
-                        automation = automation,
-                        getLinkByUUID = { defaultFakeLinks.findByUUID(it) },
-                    )
+                    when (automation) {
+                        is BasicAutomation -> automation.toOutput(coordinateConverter, log)
+                        is LinkAutomation -> defaultFakeLinks.findByUUID(automation.linkUUID)?.let { link ->
+                            automation.toOutput(coordinateConverter, link)
+                        }
+                    }
                 }
             },
         )
     }
 
     @Test
-    fun getAutomationOutput_convertsAllOldAutomationsToOutputs() = runTest {
+    fun toOutput_convertsAllOldAutomationsToOutputs() = runTest {
         assertEquals(
             listOf(
                 CopyLinkUriOutput(FakeAppleMapsNavigationLink, coordinateConverter),
@@ -497,7 +501,7 @@ class OutputRepositoryTest {
                 CopyLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter),
                 CopyLinkUriOutput(FakeMagicEarthNavigationLink, coordinateConverter),
                 CopyLinkUriOutput(FakeMagicEarthDisplayLink, coordinateConverter),
-                NoopOutput(),
+                NoopOutput,
                 OpenDisplayGeoUriOutput(UriActivity(PackageNames.TEST, UriScheme.GEO), coordinateConverter),
                 OpenNavigationGoogleUriOutput(
                     UriActivity(PackageNames.TEST, UriScheme.GOOGLE_NAVIGATION),
@@ -541,10 +545,10 @@ class OutputRepositoryTest {
                 ShareDisplayGeoUriAutomation,
                 ShareRouteGpxAutomation,
             ).map { automation ->
-                outputRepository.getAutomationOutput(
-                    automation = automation,
-                    getLinkByUUID = {
-                        when (it) {
+                when (automation) {
+                    is BasicAutomation -> automation.toOutput(coordinateConverter, log)
+                    is LinkAutomation ->
+                        when (automation.linkUUID) {
                             UUID.fromString(InitialLinks.APPLE_MAPS_DISPLAY_UUID) -> FakeAppleMapsDisplayLink
                             UUID.fromString(InitialLinks.APPLE_MAPS_NAVIGATION_UUID) -> FakeAppleMapsNavigationLink
                             UUID.fromString(InitialLinks.GOOGLE_MAPS_DISPLAY_UUID) -> FakeGoogleMapsDisplayLink
@@ -553,9 +557,10 @@ class OutputRepositoryTest {
                             UUID.fromString("b109970a-aef8-4482-9879-52e128fd0e07") -> FakeMagicEarthDisplayLink
                             UUID.fromString("ee4f961c-44b0-4cb6-baad-1ed28edb8ec7") -> FakeMagicEarthNavigationLink
                             else -> null
+                        }?.let { link ->
+                            automation.toOutput(coordinateConverter, link)
                         }
-                    },
-                )
+                }
             },
         )
     }

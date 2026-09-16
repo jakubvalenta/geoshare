@@ -40,6 +40,14 @@ sealed interface BasicAction<T> : Action<T> {
         override suspend fun execute(actionContext: ActionContext) =
             output.execute(value, actionContext)
     }
+
+    data class WithString(
+        override val value: String,
+        override val output: StringOutput,
+    ) : BasicAction<String> {
+        override suspend fun execute(actionContext: ActionContext) =
+            output.execute(value, actionContext)
+    }
 }
 
 /**
@@ -100,14 +108,4 @@ sealed interface LocationAction<T> : Action<T> {
     }
 }
 
-/**
- * An [Action] that require a string [value] to be executed.
- */
-data class StringAction(
-    override val value: String,
-    override val output: StringOutput,
-) : Action<String> {
-    suspend fun execute(actionContext: ActionContext): ActionResult = output.execute(value, actionContext)
-}
-
-val NoopAction = StringAction("", NoopOutput())
+val NoopAction = NoopOutput.toAction("")

@@ -1,12 +1,9 @@
 package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
-import android.graphics.drawable.Drawable
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -22,14 +19,12 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.accompanist.drawablepainter.rememberDrawablePainter
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
-import page.ooooo.geoshare.data.di.fakeActivities
 import page.ooooo.geoshare.data.local.preferences.HiddenAppsPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.android.PackageNames
@@ -37,6 +32,7 @@ import page.ooooo.geoshare.ui.HiddenAppDetail
 import page.ooooo.geoshare.ui.HiddenAppsSize
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
+import page.ooooo.geoshare.ui.toHiddenAppsDetails
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -107,8 +103,7 @@ fun UserPreferenceHiddenAppsControls(
         val value = HiddenAppsPreference.getValue(values)
         val enabled = value != null
 
-        fun isChecked(packageName: String): Boolean =
-            value?.contains(packageName) == false
+        fun isChecked(packageName: String): Boolean = value?.contains(packageName) == false
 
         fun setValue(packageName: String, checked: Boolean) {
             val newValue = if (!checked) {
@@ -165,13 +160,7 @@ private fun ListItemPreview() {
                 UserPreferenceHiddenAppsListItem(
                     index = 0,
                     count = 1,
-                    activities = fakeActivities.filter {
-                        it.packageName in setOf(
-                            PackageNames.COMAPS_FDROID,
-                            PackageNames.ORGANIC_MAPS,
-                            PackageNames.OSMAND_PLUS,
-                        )
-                    },
+                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 3, visible = 2)),
                     selected = false,
                     values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
                     onClick = {},
@@ -190,13 +179,7 @@ private fun DarkListItemPreview() {
                 UserPreferenceHiddenAppsListItem(
                     index = 0,
                     count = 1,
-                    activities = fakeActivities.filter {
-                        it.packageName in setOf(
-                            PackageNames.COMAPS_FDROID,
-                            PackageNames.ORGANIC_MAPS,
-                            PackageNames.OSMAND_PLUS,
-                        )
-                    },
+                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 3, visible = 2)),
                     selected = false,
                     values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
                     onClick = {},
@@ -215,13 +198,7 @@ private fun AllListItemPreview() {
                 UserPreferenceHiddenAppsListItem(
                     index = 0,
                     count = 1,
-                    activities = fakeActivities.filter {
-                        it.packageName in setOf(
-                            PackageNames.COMAPS_FDROID,
-                            PackageNames.ORGANIC_MAPS,
-                            PackageNames.OSMAND_PLUS,
-                        )
-                    },
+                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 3, visible = 0)),
                     selected = false,
                     values = UserPreferencesValues(
                         hiddenApps = setOf(
@@ -246,13 +223,7 @@ private fun DarkAllListItemPreview() {
                 UserPreferenceHiddenAppsListItem(
                     index = 0,
                     count = 1,
-                    activities = fakeActivities.filter {
-                        it.packageName in setOf(
-                            PackageNames.COMAPS_FDROID,
-                            PackageNames.ORGANIC_MAPS,
-                            PackageNames.OSMAND_PLUS,
-                        )
-                    },
+                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 3, visible = 0)),
                     selected = false,
                     values = UserPreferencesValues(
                         hiddenApps = setOf(
@@ -277,13 +248,7 @@ private fun NoneListItemPreview() {
                 UserPreferenceHiddenAppsListItem(
                     index = 0,
                     count = 1,
-                    activities = fakeActivities.filter {
-                        it.packageName in setOf(
-                            PackageNames.COMAPS_FDROID,
-                            PackageNames.ORGANIC_MAPS,
-                            PackageNames.OSMAND_PLUS,
-                        )
-                    },
+                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 3, visible = 3)),
                     selected = false,
                     values = defaultFakeUserPreferences,
                     onClick = {},
@@ -302,13 +267,7 @@ private fun DarkNoneListItemPreview() {
                 UserPreferenceHiddenAppsListItem(
                     index = 0,
                     count = 1,
-                    activities = fakeActivities.filter {
-                        it.packageName in setOf(
-                            PackageNames.COMAPS_FDROID,
-                            PackageNames.ORGANIC_MAPS,
-                            PackageNames.OSMAND_PLUS,
-                        )
-                    },
+                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 3, visible = 3)),
                     selected = false,
                     values = defaultFakeUserPreferences,
                     onClick = {},
@@ -323,16 +282,16 @@ private fun DarkNoneListItemPreview() {
 private fun ControlsPreview() {
     AppTheme {
         Surface {
+            val appDetails = fakeAppDetails()
             UserPreferenceHiddenAppsControls(
                 billingAppNameResId = R.string.app_name_pro,
-                activities = fakeActivities.filter {
-                    it.packageName in setOf(
+                hiddenAppsDetails = MutableStateFlow(
+                    setOf(
                         PackageNames.COMAPS_FDROID,
                         PackageNames.ORGANIC_MAPS,
                         PackageNames.OSMAND_PLUS,
-                    )
-                },
-                appDetails = fakeAppDetails(),
+                    ).toHiddenAppsDetails(appDetails)
+                ),
                 values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
                 wide = true,
                 onBack = {},
@@ -348,16 +307,16 @@ private fun ControlsPreview() {
 private fun DarkControlsPreview() {
     AppTheme {
         Surface {
+            val appDetails = fakeAppDetails()
             UserPreferenceHiddenAppsControls(
                 billingAppNameResId = R.string.app_name_pro,
-                activities = fakeActivities.filter {
-                    it.packageName in setOf(
+                hiddenAppsDetails = MutableStateFlow(
+                    setOf(
                         PackageNames.COMAPS_FDROID,
                         PackageNames.ORGANIC_MAPS,
                         PackageNames.OSMAND_PLUS,
-                    )
-                },
-                appDetails = fakeAppDetails(),
+                    ).toHiddenAppsDetails(appDetails)
+                ),
                 values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
                 wide = true,
                 onBack = {},
@@ -373,16 +332,16 @@ private fun DarkControlsPreview() {
 private fun TabletControlsPreview() {
     AppTheme {
         Surface {
+            val appDetails = fakeAppDetails()
             UserPreferenceHiddenAppsControls(
                 billingAppNameResId = R.string.app_name_pro,
-                activities = fakeActivities.filter {
-                    it.packageName in setOf(
+                hiddenAppsDetails = MutableStateFlow(
+                    setOf(
                         PackageNames.COMAPS_FDROID,
                         PackageNames.ORGANIC_MAPS,
                         PackageNames.OSMAND_PLUS,
-                    )
-                },
-                appDetails = fakeAppDetails(),
+                    ).toHiddenAppsDetails(appDetails)
+                ),
                 values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
                 wide = false,
                 onBack = {},
@@ -400,14 +359,13 @@ private fun LoadingPreview() {
         Surface {
             UserPreferenceHiddenAppsControls(
                 billingAppNameResId = R.string.app_name_pro,
-                activities = fakeActivities.filter {
-                    it.packageName in setOf(
+                hiddenAppsDetails = MutableStateFlow(
+                    setOf(
                         PackageNames.COMAPS_FDROID,
                         PackageNames.ORGANIC_MAPS,
                         PackageNames.OSMAND_PLUS,
-                    )
-                },
-                appDetails = fakeAppDetails(),
+                    ).toHiddenAppsDetails(emptyMap())
+                ),
                 values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
                 wide = false,
                 onBack = {},
@@ -425,14 +383,13 @@ private fun DarkLoadingPreview() {
         Surface {
             UserPreferenceHiddenAppsControls(
                 billingAppNameResId = R.string.app_name_pro,
-                activities = fakeActivities.filter {
-                    it.packageName in setOf(
+                hiddenAppsDetails = MutableStateFlow(
+                    setOf(
                         PackageNames.COMAPS_FDROID,
                         PackageNames.ORGANIC_MAPS,
                         PackageNames.OSMAND_PLUS,
-                    )
-                },
-                appDetails = fakeAppDetails(),
+                    ).toHiddenAppsDetails(emptyMap())
+                ),
                 values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
                 wide = false,
                 onBack = {},
@@ -445,19 +402,18 @@ private fun DarkLoadingPreview() {
 
 @Preview(showBackground = true, device = Devices.TABLET)
 @Composable
-private fun TabletHiddenAppsLoadingPreview() {
+private fun TabletLoadingPreview() {
     AppTheme {
         Surface {
             UserPreferenceHiddenAppsControls(
                 billingAppNameResId = R.string.app_name_pro,
-                activities = fakeActivities.filter {
-                    it.packageName in setOf(
+                hiddenAppsDetails = MutableStateFlow(
+                    setOf(
                         PackageNames.COMAPS_FDROID,
                         PackageNames.ORGANIC_MAPS,
                         PackageNames.OSMAND_PLUS,
-                    )
-                },
-                appDetails = fakeAppDetails(),
+                    ).toHiddenAppsDetails(emptyMap())
+                ),
                 values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
                 wide = false,
                 onBack = {},

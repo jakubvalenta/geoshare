@@ -5,7 +5,7 @@ import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.android.AppDetails
 
-class NoopOutput : StringOutput {
+object NoopOutput : StringOutput {
     override val id = "NoopOutput"
 
     override suspend fun execute(value: String, actionContext: ActionContext) = ActionResult.SUCCEEDED

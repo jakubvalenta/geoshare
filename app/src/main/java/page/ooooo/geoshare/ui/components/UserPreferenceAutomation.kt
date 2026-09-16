@@ -30,8 +30,12 @@ import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.fakeActivities
 import page.ooooo.geoshare.data.local.database.findByUUID
 import page.ooooo.geoshare.data.local.preferences.AutomationPreference
+import page.ooooo.geoshare.data.local.preferences.BasicAutomation
+import page.ooooo.geoshare.data.local.preferences.LinkAutomation
+import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.toOutput
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.billing.AutomationFeature
@@ -40,14 +44,11 @@ import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.outputs.NoopOutput
 import page.ooooo.geoshare.ui.AutomationDetail
-import page.ooooo.geoshare.ui.AutomationOutput
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import page.ooooo.geoshare.ui.toAutomationDetail
-import page.ooooo.geoshare.ui.toAutomationDetails
-import page.ooooo.geoshare.ui.toAutomationOutput
-import page.ooooo.geoshare.ui.toAutomationOutputs
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -198,9 +199,11 @@ private fun ListItemPreview() {
                     index = 0,
                     count = 1,
                     automationDetail = MutableStateFlow(
-                        SavePointsGpxAutomation
-                            .toAutomationOutput(coordinateConverter, log) { null }
-                            .toAutomationDetail(appDetails)
+                        SavePointsGpxAutomation.let { automation ->
+                            automation
+                                .toOutput(coordinateConverter, log)
+                                .toAutomationDetail(automation, appDetails)
+                        }
                     ),
                     billingFeatures = listOf(AutomationFeature),
                     billingStatus = BillingStatus.Purchased(
@@ -232,9 +235,11 @@ private fun DarkListItemPreview() {
                     index = 0,
                     count = 1,
                     automationDetail = MutableStateFlow(
-                        SavePointsGpxAutomation
-                            .toAutomationOutput(coordinateConverter, log) { null }
-                            .toAutomationDetail(appDetails)
+                        SavePointsGpxAutomation.let { automation ->
+                            automation
+                                .toOutput(coordinateConverter, log)
+                                .toAutomationDetail(automation, appDetails)
+                        }
                     ),
                     billingFeatures = listOf(AutomationFeature),
                     billingStatus = BillingStatus.Purchased(
@@ -257,11 +262,10 @@ private fun NoneListItemPreview() {
     AppTheme {
         Surface {
             Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
-                val appDetails = fakeAppDetails()
                 UserPreferenceAutomationListItem(
                     index = 0,
                     count = 1,
-                    automationDetail = MutableStateFlow(AutomationOutput.Noop.toAutomationDetail(appDetails)),
+                    automationDetail = MutableStateFlow(NoopOutput.toAutomationDetail(NoopAutomation, emptyMap())),
                     billingFeatures = listOf(AutomationFeature),
                     billingStatus = BillingStatus.Purchased(
                         product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
@@ -283,11 +287,10 @@ private fun DarkNoneListItemPreview() {
     AppTheme {
         Surface {
             Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
-                val appDetails = fakeAppDetails()
                 UserPreferenceAutomationListItem(
                     index = 0,
                     count = 1,
-                    automationDetail = MutableStateFlow(AutomationOutput.Noop.toAutomationDetail(appDetails)),
+                    automationDetail = MutableStateFlow(NoopOutput.toAutomationDetail(NoopAutomation, emptyMap())),
                     billingFeatures = listOf(AutomationFeature),
                     billingStatus = BillingStatus.Purchased(
                         product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
@@ -321,8 +324,17 @@ private fun ControlsPreview() {
                         hiddenApps = emptySet(),
                         links = defaultFakeLinks,
                     )
-                        .toAutomationOutputs(coordinateConverter, log) { defaultFakeLinks.findByUUID(it) }
-                        .toAutomationDetails(appDetails)
+                        .map { group ->
+                            group.map { automation ->
+                                when (automation) {
+                                    is BasicAutomation -> automation.toOutput(coordinateConverter, log)
+                                    is LinkAutomation -> defaultFakeLinks.findByUUID(automation.linkUUID)?.let { link ->
+                                        automation.toOutput(coordinateConverter, link)
+                                    }
+                                }
+                                    .toAutomationDetail(automation, appDetails)
+                            }
+                        }
                 ),
                 billingAppNameResId = R.string.app_name_pro,
                 values = UserPreferencesValues(automation = SavePointsGpxAutomation),
@@ -360,8 +372,17 @@ private fun DarkControlsPreview() {
                         hiddenApps = emptySet(),
                         links = defaultFakeLinks,
                     )
-                        .toAutomationOutputs(coordinateConverter, log) { defaultFakeLinks.findByUUID(it) }
-                        .toAutomationDetails(appDetails)
+                        .map { group ->
+                            group.map { automation ->
+                                when (automation) {
+                                    is BasicAutomation -> automation.toOutput(coordinateConverter, log)
+                                    is LinkAutomation -> defaultFakeLinks.findByUUID(automation.linkUUID)?.let { link ->
+                                        automation.toOutput(coordinateConverter, link)
+                                    }
+                                }
+                                    .toAutomationDetail(automation, appDetails)
+                            }
+                        }
                 ),
                 billingAppNameResId = R.string.app_name_pro,
                 values = UserPreferencesValues(automation = SavePointsGpxAutomation),
@@ -399,8 +420,17 @@ private fun TabletControlsPreview() {
                         hiddenApps = emptySet(),
                         links = defaultFakeLinks,
                     )
-                        .toAutomationOutputs(coordinateConverter, log) { defaultFakeLinks.findByUUID(it) }
-                        .toAutomationDetails(appDetails)
+                        .map { group ->
+                            group.map { automation ->
+                                when (automation) {
+                                    is BasicAutomation -> automation.toOutput(coordinateConverter, log)
+                                    is LinkAutomation -> defaultFakeLinks.findByUUID(automation.linkUUID)?.let { link ->
+                                        automation.toOutput(coordinateConverter, link)
+                                    }
+                                }
+                                    .toAutomationDetail(automation, appDetails)
+                            }
+                        }
                 ),
                 billingAppNameResId = R.string.app_name_pro,
                 values = UserPreferencesValues(automation = SavePointsGpxAutomation),
@@ -438,8 +468,17 @@ private fun NotPurchasedControlsPreview() {
                         hiddenApps = emptySet(),
                         links = defaultFakeLinks,
                     )
-                        .toAutomationOutputs(coordinateConverter, log) { defaultFakeLinks.findByUUID(it) }
-                        .toAutomationDetails(appDetails)
+                        .map { group ->
+                            group.map { automation ->
+                                when (automation) {
+                                    is BasicAutomation -> automation.toOutput(coordinateConverter, log)
+                                    is LinkAutomation -> defaultFakeLinks.findByUUID(automation.linkUUID)?.let { link ->
+                                        automation.toOutput(coordinateConverter, link)
+                                    }
+                                }
+                                    .toAutomationDetail(automation, appDetails)
+                            }
+                        }
                 ),
                 billingAppNameResId = R.string.app_name_pro,
                 values = UserPreferencesValues(automation = SavePointsGpxAutomation),
@@ -472,8 +511,17 @@ private fun DarkNotPurchasedControlsPreview() {
                         hiddenApps = emptySet(),
                         links = defaultFakeLinks,
                     )
-                        .toAutomationOutputs(coordinateConverter, log) { defaultFakeLinks.findByUUID(it) }
-                        .toAutomationDetails(appDetails)
+                        .map { group ->
+                            group.map { automation ->
+                                when (automation) {
+                                    is BasicAutomation -> automation.toOutput(coordinateConverter, log)
+                                    is LinkAutomation -> defaultFakeLinks.findByUUID(automation.linkUUID)?.let { link ->
+                                        automation.toOutput(coordinateConverter, link)
+                                    }
+                                }
+                                    .toAutomationDetail(automation, appDetails)
+                            }
+                        }
                 ),
                 billingAppNameResId = R.string.app_name_pro,
                 values = UserPreferencesValues(automation = SavePointsGpxAutomation),
@@ -506,8 +554,17 @@ private fun TabletNotPurchasedControlsPreview() {
                         hiddenApps = emptySet(),
                         links = defaultFakeLinks,
                     )
-                        .toAutomationOutputs(coordinateConverter, log) { defaultFakeLinks.findByUUID(it) }
-                        .toAutomationDetails(appDetails)
+                        .map { group ->
+                            group.map { automation ->
+                                when (automation) {
+                                    is BasicAutomation -> automation.toOutput(coordinateConverter, log)
+                                    is LinkAutomation -> defaultFakeLinks.findByUUID(automation.linkUUID)?.let { link ->
+                                        automation.toOutput(coordinateConverter, link)
+                                    }
+                                }
+                                    .toAutomationDetail(automation, appDetails)
+                            }
+                        }
                 ),
                 billingAppNameResId = R.string.app_name_pro,
                 values = UserPreferencesValues(automation = SavePointsGpxAutomation),

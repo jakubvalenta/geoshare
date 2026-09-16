@@ -66,10 +66,14 @@ fun UserPreferenceDynamicColorControls(
         onBack = onBack,
         onNavigateToBillingScreen = onNavigateToBillingScreen,
     ) {
+        val selectedValue = DynamicColorPreference.getValue(values)
         userPreferenceOptionsControl(
-            userPreference = DynamicColorPreference,
-            values = values,
-            onValueChange = onValueChange,
+            isSelected = { it == selectedValue },
+            onSelect = {
+                onValueChange { preferences ->
+                    DynamicColorPreference.setValue(preferences, it)
+                }
+            },
             optionGroups = DynamicColorPreference.getOptionGroups(),
         ) { option, modifier ->
             Column(modifier) {

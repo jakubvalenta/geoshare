@@ -410,7 +410,7 @@ fun LinkForm(
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     RadioButtonGroup(
-                        selectedValue = type,
+                        isSelected = { it == type },
                         onSelect = onSetType,
                         values = listOf(LinkType.DISPLAY, LinkType.NAVIGATION, LinkType.STREET_VIEW),
                         enabled = enabled,

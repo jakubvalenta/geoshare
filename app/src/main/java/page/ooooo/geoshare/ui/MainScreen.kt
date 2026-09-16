@@ -552,6 +552,7 @@ private fun MainScreen(
                                 outputsForLinks = outputsForLinks,
                                 outputsForSharing = outputsForSharing,
                                 points = currentState.points,
+                                source = source,
                                 modifier = Modifier
                                     .padding(horizontal = spacing.windowPadding)
                                     .padding(top = spacing.tiny),

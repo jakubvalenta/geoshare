@@ -59,8 +59,7 @@ import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Output
-import page.ooooo.geoshare.lib.outputs.PointOutput
-import page.ooooo.geoshare.lib.outputs.PointsOutput
+import page.ooooo.geoshare.lib.outputs.toAction
 import page.ooooo.geoshare.ui.OutputDetailsForApp
 import page.ooooo.geoshare.ui.OutputDetailsForAppsByCategory
 import page.ooooo.geoshare.ui.OutputDetailsForLink
@@ -78,6 +77,7 @@ fun ResultApps(
     outputsForLinks: StateFlow<List<OutputDetailsForLink>>,
     outputsForSharing: StateFlow<OutputDetailsForSharing?>,
     points: Points,
+    source: StateFlow<String>,
     modifier: Modifier = Modifier,
     iconSize: Dp = 46.dp,
     onDisableLinkGroup: (group: String?) -> Unit,
@@ -92,6 +92,7 @@ fun ResultApps(
     val outputsForAppsByCategory by outputsForAppsByCategory.collectAsStateWithLifecycle()
     val outputsForLinks by outputsForLinks.collectAsStateWithLifecycle()
     val outputsForSharing by outputsForSharing.collectAsStateWithLifecycle()
+    val source by source.collectAsStateWithLifecycle()
 
     Column(modifier) {
         // Map apps
@@ -103,14 +104,7 @@ fun ResultApps(
                         ResultAppsAppIcon(
                             outputsForApp = outputsForApp,
                             iconSize = iconSize,
-                            onClick = { output ->
-                                onExecute(
-                                    when (output) {
-                                        is PointOutput -> output.toAction(lastPoint)
-                                        is PointsOutput -> output.toAction(points)
-                                    }
-                                )
-                            },
+                            onClick = { output -> onExecute(output.toAction(lastPoint, points, source)) },
                             onHideApp = { onHideApp(outputsForApp.packageName) },
                         )
                     }
@@ -121,14 +115,7 @@ fun ResultApps(
                     ResultAppsShareIcon(
                         outputsForSharing = outputsForSharing,
                         iconSize = iconSize,
-                        onClick = { output ->
-                            onExecute(
-                                when (output) {
-                                    is PointOutput -> output.toAction(lastPoint)
-                                    is PointsOutput -> output.toAction(points)
-                                }
-                            )
-                        },
+                        onClick = { output -> onExecute(output.toAction(lastPoint, points, source)) },
                     )
                 }
             }
@@ -145,14 +132,7 @@ fun ResultApps(
                             ResultAppsAppIcon(
                                 outputsForApp = outputsForApp,
                                 iconSize = iconSize,
-                                onClick = { output ->
-                                    onExecute(
-                                        when (output) {
-                                            is PointOutput -> output.toAction(lastPoint)
-                                            is PointsOutput -> output.toAction(points)
-                                        }
-                                    )
-                                },
+                                onClick = { output -> onExecute(output.toAction(lastPoint, points, source)) },
                                 onHideApp = { onHideApp(outputsForApp.packageName) },
                             )
                         }
@@ -182,14 +162,7 @@ fun ResultApps(
                         ResultAppsLinkIcon(
                             outputsForLink = outputsForLink,
                             iconSize = iconSize,
-                            onClick = { output ->
-                                onExecute(
-                                    when (output) {
-                                        is PointOutput -> output.toAction(lastPoint)
-                                        is PointsOutput -> output.toAction(points)
-                                    }
-                                )
-                            },
+                            onClick = { output -> onExecute(output.toAction(lastPoint, points, source)) },
                             onDisableLinkGroup = { onDisableLinkGroup(outputsForLink.group) },
                         )
                     }
@@ -412,6 +385,7 @@ private fun DefaultPreview() {
                     outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
                 ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
+                source = MutableStateFlow(""),
                 onDisableLinkGroup = {},
                 onExecute = {},
                 onHideApp = {},
@@ -454,6 +428,7 @@ private fun DarkPreview() {
                     outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
                 ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
+                source = MutableStateFlow(""),
                 onDisableLinkGroup = {},
                 onExecute = {},
                 onHideApp = {},
@@ -502,6 +477,7 @@ private fun LoadingPreview() {
                     outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
                 ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
+                source = MutableStateFlow(""),
                 onDisableLinkGroup = {},
                 onExecute = {},
                 onHideApp = {},
@@ -565,6 +541,7 @@ private fun DarkLoadingPreview() {
                     outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
                 ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
+                source = MutableStateFlow(""),
                 onDisableLinkGroup = {},
                 onExecute = {},
                 onHideApp = {},
@@ -601,6 +578,7 @@ private fun EmptyPreview() {
                 outputsForLinks = MutableStateFlow(emptyList()),
                 outputsForSharing = MutableStateFlow(null),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
+                source = MutableStateFlow(""),
                 onDisableLinkGroup = {},
                 onExecute = {},
                 onHideApp = {},
@@ -622,6 +600,7 @@ private fun DarkEmptyPreview() {
                 outputsForLinks = MutableStateFlow(emptyList()),
                 outputsForSharing = MutableStateFlow(null),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
+                source = MutableStateFlow(""),
                 onDisableLinkGroup = {},
                 onExecute = {},
                 onHideApp = {},

@@ -2,9 +2,8 @@
 
 package page.ooooo.geoshare.data
 
-import page.ooooo.geoshare.data.local.database.InitialLinks
 import page.ooooo.geoshare.data.local.database.Link
-import page.ooooo.geoshare.data.local.preferences.Automation
+import page.ooooo.geoshare.data.local.preferences.BasicAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDegMinSecAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyGeoUriAutomation
@@ -17,6 +16,7 @@ import page.ooooo.geoshare.data.local.preferences.CopyLinkNavigationMagicEarthUr
 import page.ooooo.geoshare.data.local.preferences.CopyLinkStreetViewGoogleUriAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyLinkUriAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyNameAutomation
+import page.ooooo.geoshare.data.local.preferences.LinkAutomation
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayCartesIGNUrlAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation
@@ -81,7 +81,6 @@ import page.ooooo.geoshare.lib.outputs.SharePointsGpxOutput
 import page.ooooo.geoshare.lib.outputs.ShareRouteGpxOutput
 import page.ooooo.geoshare.lib.outputs.ShareStreetViewGoogleUriOutput
 import page.ooooo.geoshare.lib.outputs.StringOutput
-import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -185,9 +184,6 @@ class OutputRepository @Inject constructor(
                 .toTypedArray(),
         )
 
-    fun getAutomationOutput(automation: Automation, getLinkByUUID: (linkUUID: UUID) -> Link?): Output? =
-        automation.toOutput(coordinateConverter, log, getLinkByUUID)
-
     private fun AppActivity.toOutputs(): List<Output> =
         when (this) {
             is FileActivity ->
@@ -236,11 +232,7 @@ class OutputRepository @Inject constructor(
         }
 }
 
-fun Automation.toOutput(
-    coordinateConverter: CoordinateConverter,
-    log: Log = DefaultLog,
-    getLinkByUUID: (linkUUID: UUID) -> Link?,
-): Output? =
+fun BasicAutomation.toOutput(coordinateConverter: CoordinateConverter, log: Log = DefaultLog): Output? =
     when (this) {
         is CopyCoordsDecAutomation ->
             CopyCoordsDecOutput(coordinateConverter)
@@ -251,51 +243,11 @@ fun Automation.toOutput(
         is CopyGeoUriAutomation ->
             CopyGeoUriOutput(coordinateConverter)
 
-        is CopyLinkUriAutomation ->
-            getLinkByUUID(linkUUID)?.let { link ->
-                CopyLinkUriOutput(link, coordinateConverter)
-            }
-
-        is CopyLinkDisplayAppleMapsUriAutomation ->
-            getLinkByUUID(UUID.fromString(InitialLinks.APPLE_MAPS_DISPLAY_UUID))?.let { link ->
-                CopyLinkUriOutput(link, coordinateConverter)
-            }
-
-        is CopyLinkDisplayGoogleMapsUriAutomation ->
-            getLinkByUUID(UUID.fromString(InitialLinks.GOOGLE_MAPS_DISPLAY_UUID))?.let { link ->
-                CopyLinkUriOutput(link, coordinateConverter)
-            }
-
-        is CopyLinkDisplayMagicEarthUriAutomation ->
-            getLinkByUUID(UUID.fromString("b109970a-aef8-4482-9879-52e128fd0e07"))?.let { link ->
-                CopyLinkUriOutput(link, coordinateConverter)
-            }
-
-        is CopyLinkNavigationAppleMapsUriAutomation ->
-            getLinkByUUID(UUID.fromString(InitialLinks.APPLE_MAPS_NAVIGATION_UUID))?.let { link ->
-                CopyLinkUriOutput(link, coordinateConverter)
-            }
-
-        is CopyLinkNavigationGoogleUriAutomation ->
-            getLinkByUUID(UUID.fromString("64b0b360-24ec-4113-9056-314223c6e19a"))?.let { link ->
-                CopyLinkUriOutput(link, coordinateConverter)
-            }
-
-        is CopyLinkNavigationMagicEarthUriAutomation ->
-            getLinkByUUID(UUID.fromString("ee4f961c-44b0-4cb6-baad-1ed28edb8ec7"))?.let { link ->
-                CopyLinkUriOutput(link, coordinateConverter)
-            }
-
-        is CopyLinkStreetViewGoogleUriAutomation ->
-            getLinkByUUID(UUID.fromString("9d7cd113-ce01-4b8b-82fe-856956b8b20a"))?.let { link ->
-                CopyLinkUriOutput(link, coordinateConverter)
-            }
-
         is CopyNameAutomation ->
             CopyNameOutput()
 
         is NoopAutomation ->
-            NoopOutput()
+            NoopOutput
 
         is OpenDisplayGeoUriAutomation ->
             packageName?.let { packageName ->
@@ -375,11 +327,6 @@ fun Automation.toOutput(
         is ShareDisplayGeoUriAutomation ->
             ShareDisplayGeoUriOutput(coordinateConverter)
 
-        is ShareLinkUriAutomation ->
-            getLinkByUUID(linkUUID)?.let { link ->
-                ShareLinkUriOutput(link, coordinateConverter)
-            }
-
         is ShareRouteGpxAutomation ->
             ShareRouteGpxOutput(coordinateConverter)
 
@@ -391,4 +338,17 @@ fun Automation.toOutput(
 
         is ShareStreetViewGoogleUriAutomation ->
             ShareStreetViewGoogleUriOutput(coordinateConverter)
+    }
+
+fun LinkAutomation.toOutput(coordinateConverter: CoordinateConverter, link: Link): Output? =
+    when (this) {
+        is CopyLinkUriAutomation -> CopyLinkUriOutput(link, coordinateConverter)
+        is CopyLinkDisplayAppleMapsUriAutomation -> CopyLinkUriOutput(link, coordinateConverter)
+        is CopyLinkDisplayGoogleMapsUriAutomation -> CopyLinkUriOutput(link, coordinateConverter)
+        is CopyLinkDisplayMagicEarthUriAutomation -> CopyLinkUriOutput(link, coordinateConverter)
+        is CopyLinkNavigationAppleMapsUriAutomation -> CopyLinkUriOutput(link, coordinateConverter)
+        is CopyLinkNavigationGoogleUriAutomation -> CopyLinkUriOutput(link, coordinateConverter)
+        is CopyLinkNavigationMagicEarthUriAutomation -> CopyLinkUriOutput(link, coordinateConverter)
+        is CopyLinkStreetViewGoogleUriAutomation -> CopyLinkUriOutput(link, coordinateConverter)
+        is ShareLinkUriAutomation -> ShareLinkUriOutput(link, coordinateConverter)
     }

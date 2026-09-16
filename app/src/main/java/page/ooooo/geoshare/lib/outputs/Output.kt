@@ -19,6 +19,7 @@ sealed interface Output {
     @Composable
     fun label(appLabel: String?): String
 
+    @Suppress("SameReturnValue")
     fun getAppLabel(appDetails: AppDetails): String? = null
 
     fun getMenuIcon(appDetails: AppDetails): IconDescriptor?
@@ -167,5 +168,12 @@ sealed interface StringOutput : Output {
 
     suspend fun execute(value: String, actionContext: ActionContext): ActionResult
 
-    fun toAction(value: String) = StringAction(value, this)
+    fun toAction(value: String) = BasicAction.WithString(value, this)
 }
+
+fun Output.toAction(point: Point, points: Points, source: String): Action<*> =
+    when (this) {
+        is PointOutput -> toAction(point)
+        is PointsOutput -> toAction(points)
+        is StringOutput -> toAction(source)
+    }

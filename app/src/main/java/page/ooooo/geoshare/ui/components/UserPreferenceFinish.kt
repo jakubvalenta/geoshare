@@ -70,10 +70,14 @@ fun UserPreferenceFinishControls(
         onBack = onBack,
         onNavigateToBillingScreen = onNavigateToBillingScreen,
     ) {
+        val selectedValue = FinishPreference.getValue(values)
         userPreferenceOptionsControl(
-            userPreference = FinishPreference,
-            values = values,
-            onValueChange = onValueChange,
+            isSelected = { it == selectedValue },
+            onSelect = {
+                onValueChange { preferences ->
+                    FinishPreference.setValue(preferences, it)
+                }
+            },
             optionGroups = FinishPreference.getOptionGroups(),
             itemTestTag = { option -> "geoShareUserPreferenceFinish_${option}" },
         ) { option, _ ->

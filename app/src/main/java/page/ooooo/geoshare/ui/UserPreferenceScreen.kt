@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.BuildConfig
@@ -37,17 +38,15 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.database.Link
-import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.DynamicColorPreference
+import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
-import page.ooooo.geoshare.lib.android.AppActivity
-import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.CustomLinkFeature
 import page.ooooo.geoshare.lib.billing.Feature
-import page.ooooo.geoshare.lib.outputs.Output
+import page.ooooo.geoshare.lib.outputs.NoopOutput
 import page.ooooo.geoshare.ui.components.LabelLarge
 import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
 import page.ooooo.geoshare.ui.components.NavigableStyledListDetailPaneScaffold
@@ -73,7 +72,6 @@ import page.ooooo.geoshare.ui.components.UserPreferenceLinksListItem
 import page.ooooo.geoshare.ui.components.UserPreferenceServersListItem
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
-import java.util.UUID
 
 @Keep
 enum class UserPreferenceGroupId {
@@ -526,16 +524,18 @@ private fun DefaultPreview() {
             Column {
                 UserPreferenceScreen(
                     initialGroupId = null,
-                    activities = emptyList(),
+                    automationDetail = MutableStateFlow(NoopOutput.toAutomationDetail(NoopAutomation, emptyMap())),
+                    automationDetails = MutableStateFlow(emptyList()),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
-                    links = defaultFakeLinks,
+                    hiddenAppsDetails = MutableStateFlow(emptyList()),
+                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 0, visible = 0)),
+                    links = MutableStateFlow(defaultFakeLinks),
                     userPreferencesValues = defaultFakeUserPreferences.copy(
                         connectionPermission = Permission.NEVER,
                     ),
                     onBack = {},
-                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinkScreen = {},
                     onNavigateToServerScreen = {},
@@ -558,16 +558,18 @@ private fun DarkPreview() {
             Column {
                 UserPreferenceScreen(
                     initialGroupId = null,
-                    activities = emptyList(),
+                    automationDetail = MutableStateFlow(NoopOutput.toAutomationDetail(NoopAutomation, emptyMap())),
+                    automationDetails = MutableStateFlow(emptyList()),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
-                    links = defaultFakeLinks,
+                    hiddenAppsDetails = MutableStateFlow(emptyList()),
+                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 0, visible = 0)),
+                    links = MutableStateFlow(defaultFakeLinks),
                     userPreferencesValues = defaultFakeUserPreferences.copy(
                         connectionPermission = Permission.NEVER,
                     ),
                     onBack = {},
-                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinkScreen = {},
                     onNavigateToServerScreen = {},
@@ -585,17 +587,19 @@ private fun TabletPreview() {
         Surface {
             Column {
                 UserPreferenceScreen(
-                    initialGroupId = UserPreferenceGroupId.CONNECTION_PERMISSION,
-                    activities = emptyList(),
+                    initialGroupId = null,
+                    automationDetail = MutableStateFlow(NoopOutput.toAutomationDetail(NoopAutomation, emptyMap())),
+                    automationDetails = MutableStateFlow(emptyList()),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
-                    links = defaultFakeLinks,
+                    hiddenAppsDetails = MutableStateFlow(emptyList()),
+                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 0, visible = 0)),
+                    links = MutableStateFlow(defaultFakeLinks),
                     userPreferencesValues = defaultFakeUserPreferences.copy(
                         connectionPermission = Permission.NEVER,
                     ),
                     onBack = {},
-                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinkScreen = {},
                     onNavigateToServerScreen = {},

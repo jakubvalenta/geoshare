@@ -31,7 +31,6 @@ import androidx.datastore.preferences.core.MutablePreferences
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.TextPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
-import page.ooooo.geoshare.ui.AutomationDetail
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
