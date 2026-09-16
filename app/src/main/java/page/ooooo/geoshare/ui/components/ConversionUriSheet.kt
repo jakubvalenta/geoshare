@@ -32,14 +32,14 @@ import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.CopyStringOutput
-import page.ooooo.geoshare.ui.OutputStatesForUriByCategory
+import page.ooooo.geoshare.ui.OutputDetailsForUriByCategory
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.toOutputStatesForUriByCategory
+import page.ooooo.geoshare.ui.toOutputDetailsForUriByCategory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConversionUriSheet(
-    outputsForUriByCategory: StateFlow<OutputStatesForUriByCategory>,
+    outputsForUriByCategory: StateFlow<OutputDetailsForUriByCategory>,
     uriString: String,
     initialValue: SheetValue = SheetValue.Hidden,
     onDismissRequest: () -> Unit,
@@ -57,31 +57,31 @@ fun ConversionUriSheet(
     ) {
         Column(Modifier.verticalScroll(rememberScrollState())) {
             SheetSection(title = stringResource(R.string.conversion_succeeded_skip)) {
-                outputsForUriByCategory.copy.forEach { outputState ->
+                outputsForUriByCategory.copy.forEach { outputDetail ->
                     OneLineSheetListItem(
-                        headlineText = outputState.output.getDescription(uriString).orEmpty(),
+                        headlineText = outputDetail.output.getDescription(uriString).orEmpty(),
                         onClick = {
                             onDismissRequest()
-                            onExecute(outputState.output.toAction(uriString))
+                            onExecute(outputDetail.output.toAction(uriString))
                         },
                         icon = ResourceIconDescriptor(R.drawable.content_copy_24px),
                     )
                 }
             }
             // TODO Sort by label
-            outputsForUriByCategory.open.forEach { outputState ->
+            outputsForUriByCategory.open.forEach { outputDetail ->
                 SheetSection(
                     first = false,
                     title = stringResource(R.string.main_source_open),
                 ) {
                     SheetListItem(
-                        headlineText = outputState.output.label(outputState.appLabel),
-                        modifier = Modifier.testTag("geoShareConversionUriSheetItem_${outputState.output.id}"),
+                        headlineText = outputDetail.label(),
+                        modifier = Modifier.testTag("geoShareConversionUriSheetItem_${outputDetail.output.id}"),
                         onClick = {
                             onDismissRequest()
-                            onExecute(outputState.output.toAction(uriString))
+                            onExecute(outputDetail.output.toAction(uriString))
                         },
-                        icon = outputState.icon,
+                        icon = outputDetail.icon,
                     )
                 }
             }
@@ -117,7 +117,7 @@ private fun DefaultPreview() {
                         }
                     )
                         .partition { it is CopyStringOutput }
-                        .toOutputStatesForUriByCategory(appDetails)
+                        .toOutputDetailsForUriByCategory(appDetails)
                 ),
                 uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 initialValue = SheetValue.Expanded,
@@ -156,7 +156,7 @@ private fun DarkPreview() {
                         }
                     )
                         .partition { it is CopyStringOutput }
-                        .toOutputStatesForUriByCategory(appDetails)
+                        .toOutputDetailsForUriByCategory(appDetails)
                 ),
                 uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 initialValue = SheetValue.Expanded,

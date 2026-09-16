@@ -32,14 +32,14 @@ import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.PointOutput
-import page.ooooo.geoshare.ui.OutputStatesForAppsByCategory
+import page.ooooo.geoshare.ui.OutputDetailsForAppsByCategory
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.toOutputStatesForAppsByCategory
+import page.ooooo.geoshare.ui.toOutputDetailsForAppsByCategory
 
 @Composable
 fun HelpShareSourceMessage(
     dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
-    outputsForAppsByCategory: StateFlow<OutputStatesForAppsByCategory>,
+    outputsForAppsByCategory: StateFlow<OutputDetailsForAppsByCategory>,
     sourceComesFromIntent: StateFlow<Boolean>,
     modifier: Modifier = Modifier,
     onDismissHelpMessage: (helpMessage: HelpMessage) -> Unit,
@@ -66,11 +66,11 @@ fun HelpShareSourceMessage(
             PackageNames.MAGIC_EARTH,
             PackageNames.MAPS_ME,
         ).firstNotNullOfOrNull { packageName ->
-            outputsForAppsByCategory.mapApps.firstNotNullOfOrNull { outputState ->
-                if (outputState.packageName == packageName) {
+            outputsForAppsByCategory.mapApps.firstNotNullOfOrNull { outputDetail ->
+                if (outputDetail.packageName == packageName) {
                     Pair(
-                        outputState.label,
-                        outputState.defaultOutputState.output as? PointOutput,
+                        outputDetail.label,
+                        outputDetail.default.output as? PointOutput,
                     )
                 } else {
                     null
@@ -146,7 +146,7 @@ private fun DefaultPreview() {
                             outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
                         )
                     }
-                    .toOutputStatesForAppsByCategory(appDetails)
+                    .toOutputDetailsForAppsByCategory(appDetails)
             ),
             sourceComesFromIntent = MutableStateFlow(false),
             onDismissHelpMessage = {},
@@ -179,7 +179,7 @@ private fun DarkPreview() {
                             outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
                         )
                     }
-                    .toOutputStatesForAppsByCategory(appDetails)
+                    .toOutputDetailsForAppsByCategory(appDetails)
             ),
             sourceComesFromIntent = MutableStateFlow(false),
             onDismissHelpMessage = {},

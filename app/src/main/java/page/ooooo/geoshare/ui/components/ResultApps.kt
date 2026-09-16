@@ -61,23 +61,22 @@ import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
-import page.ooooo.geoshare.lib.outputs.StringOutput
-import page.ooooo.geoshare.ui.OutputStatesForApp
-import page.ooooo.geoshare.ui.OutputStatesForAppsByCategory
-import page.ooooo.geoshare.ui.OutputStatesForLink
-import page.ooooo.geoshare.ui.OutputStatesForSharing
+import page.ooooo.geoshare.ui.OutputDetailsForApp
+import page.ooooo.geoshare.ui.OutputDetailsForAppsByCategory
+import page.ooooo.geoshare.ui.OutputDetailsForLink
+import page.ooooo.geoshare.ui.OutputDetailsForSharing
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
-import page.ooooo.geoshare.ui.toOutputStatesForAppsByCategory
-import page.ooooo.geoshare.ui.toOutputStatesForLinks
-import page.ooooo.geoshare.ui.toOutputStatesForSharing
+import page.ooooo.geoshare.ui.toOutputDetailsForAppsByCategory
+import page.ooooo.geoshare.ui.toOutputDetailsForLinks
+import page.ooooo.geoshare.ui.toOutputDetailsForSharing
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ResultApps(
-    outputsForAppsByCategory: StateFlow<OutputStatesForAppsByCategory>,
-    outputsForLinks: StateFlow<List<OutputStatesForLink>>,
-    outputsForSharing: StateFlow<OutputStatesForSharing?>,
+    outputsForAppsByCategory: StateFlow<OutputDetailsForAppsByCategory>,
+    outputsForLinks: StateFlow<List<OutputDetailsForLink>>,
+    outputsForSharing: StateFlow<OutputDetailsForSharing?>,
     points: Points,
     modifier: Modifier = Modifier,
     iconSize: Dp = 46.dp,
@@ -118,7 +117,7 @@ fun ResultApps(
                 }
             // Share item
             outputsForSharing?.let { outputsForSharing ->
-                key(outputsForSharing.defaultOutputState.output.id) {
+                key(outputsForSharing.defaultOutputDetail.output.id) {
                     ResultAppsShareIcon(
                         outputsForSharing = outputsForSharing,
                         iconSize = iconSize,
@@ -226,7 +225,7 @@ private fun ResultAppsHeadline(text: String, extra: (@Composable RowScope.() -> 
 
 @Composable
 private fun ResultAppsAppIcon(
-    outputsForApp: OutputStatesForApp,
+    outputsForApp: OutputDetailsForApp,
     iconSize: Dp,
     onClick: (output: Output) -> Unit,
     onHideApp: () -> Unit,
@@ -236,17 +235,17 @@ private fun ResultAppsAppIcon(
         menu = { expanded, onDismissRequest ->
             AppMenu(
                 expanded = expanded,
-                outputStates = outputsForApp.outputStates,
+                outputDetails = outputsForApp.all,
                 onClick = onClick,
                 onDismissRequest = onDismissRequest,
                 onHide = onHideApp,
             )
         },
-        onClick = { onClick(outputsForApp.defaultOutputState.output) },
+        onClick = { onClick(outputsForApp.default.output) },
         modifier = Modifier.testTag("geoShareApp_${outputsForApp.packageName}"),
     ) {
         IconFromDescriptor(
-            outputsForApp.defaultOutputState.icon ?: PlaceholderIconDescriptor,
+            outputsForApp.default.icon ?: PlaceholderIconDescriptor,
             contentDescription = null,
             size = iconSize,
             placeholderContainerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -256,7 +255,7 @@ private fun ResultAppsAppIcon(
 
 @Composable
 private fun ResultAppsShareIcon(
-    outputsForSharing: OutputStatesForSharing,
+    outputsForSharing: OutputDetailsForSharing,
     iconSize: Dp,
     onClick: (output: Output) -> Unit,
 ) {
@@ -265,13 +264,13 @@ private fun ResultAppsShareIcon(
         menu = { expanded, onDismissRequest ->
             AppMenu(
                 expanded = expanded,
-                outputStates = outputsForSharing.outputStates,
+                outputDetails = outputsForSharing.outputDetails,
                 onClick = onClick,
                 onDismissRequest = onDismissRequest,
                 onHide = null,
             )
         },
-        onClick = { onClick(outputsForSharing.defaultOutputState.output) },
+        onClick = { onClick(outputsForSharing.defaultOutputDetail.output) },
         modifier = Modifier.testTag("geoShareAppShare"),
     ) {
         Surface(
@@ -280,10 +279,8 @@ private fun ResultAppsShareIcon(
             shape = CircleShape,
         ) {
             IconFromDescriptor(
-                outputsForSharing.defaultOutputState.icon ?: PlaceholderIconDescriptor,
-                contentDescription = outputsForSharing.defaultOutputState.output.label(
-                    outputsForSharing.defaultOutputState.appLabel
-                ),
+                outputsForSharing.defaultOutputDetail.icon ?: PlaceholderIconDescriptor,
+                contentDescription = outputsForSharing.defaultOutputDetail.label(),
                 size = 24.dp,
             )
         }
@@ -292,7 +289,7 @@ private fun ResultAppsShareIcon(
 
 @Composable
 private fun ResultAppsLinkIcon(
-    outputsForLink: OutputStatesForLink,
+    outputsForLink: OutputDetailsForLink,
     iconSize: Dp,
     onClick: (output: Output) -> Unit,
     onDisableLinkGroup: () -> Unit,
@@ -302,18 +299,18 @@ private fun ResultAppsLinkIcon(
         menu = { expanded, onDismissRequest ->
             AppMenu(
                 expanded = expanded,
-                outputStates = outputsForLink.outputStates,
+                outputDetails = outputsForLink.all,
                 onClick = onClick,
                 onDismissRequest = onDismissRequest,
                 onHide = onDisableLinkGroup,
             )
         },
-        onClick = { onClick(outputsForLink.defaultOutputState.output) },
+        onClick = { onClick(outputsForLink.default.output) },
         modifier = Modifier.testTag("geoShareLink_${outputsForLink.group}"),
     ) {
         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
             IconFromDescriptor(
-                outputsForLink.defaultOutputState.icon ?: PlaceholderIconDescriptor,
+                outputsForLink.default.icon ?: PlaceholderIconDescriptor,
                 contentDescription = null,
                 size = iconSize,
                 inverseContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
@@ -406,13 +403,13 @@ private fun DefaultPreview() {
                                 outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
                             )
                         }
-                        .toOutputStatesForAppsByCategory(appDetails)
+                        .toOutputDetailsForAppsByCategory(appDetails)
                 ),
                 outputsForLinks = MutableStateFlow(
-                    outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputStatesForLinks(appDetails)
+                    outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
                 ),
                 outputsForSharing = MutableStateFlow(
-                    outputRepository.getOutputsForSharing().toOutputStatesForSharing(appDetails)
+                    outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
                 ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 onDisableLinkGroup = {},
@@ -448,13 +445,13 @@ private fun DarkPreview() {
                                 outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
                             )
                         }
-                        .toOutputStatesForAppsByCategory(appDetails)
+                        .toOutputDetailsForAppsByCategory(appDetails)
                 ),
                 outputsForLinks = MutableStateFlow(
-                    outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputStatesForLinks(appDetails)
+                    outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
                 ),
                 outputsForSharing = MutableStateFlow(
-                    outputRepository.getOutputsForSharing().toOutputStatesForSharing(appDetails)
+                    outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
                 ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 onDisableLinkGroup = {},
@@ -496,13 +493,13 @@ private fun LoadingPreview() {
                                 outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
                             )
                         }
-                        .toOutputStatesForAppsByCategory(appDetails)
+                        .toOutputDetailsForAppsByCategory(appDetails)
                 ),
                 outputsForLinks = MutableStateFlow(
-                    outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputStatesForLinks(appDetails)
+                    outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
                 ),
                 outputsForSharing = MutableStateFlow(
-                    outputRepository.getOutputsForSharing().toOutputStatesForSharing(appDetails)
+                    outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
                 ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 onDisableLinkGroup = {},
@@ -559,13 +556,13 @@ private fun DarkLoadingPreview() {
                                 outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
                             )
                         }
-                        .toOutputStatesForAppsByCategory(appDetails)
+                        .toOutputDetailsForAppsByCategory(appDetails)
                 ),
                 outputsForLinks = MutableStateFlow(
-                    outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputStatesForLinks(appDetails)
+                    outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
                 ),
                 outputsForSharing = MutableStateFlow(
-                    outputRepository.getOutputsForSharing().toOutputStatesForSharing(appDetails)
+                    outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
                 ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 onDisableLinkGroup = {},
@@ -599,7 +596,7 @@ private fun EmptyPreview() {
         Surface {
             ResultApps(
                 outputsForAppsByCategory = MutableStateFlow(
-                    OutputStatesForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
+                    OutputDetailsForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
                 ),
                 outputsForLinks = MutableStateFlow(emptyList()),
                 outputsForSharing = MutableStateFlow(null),
@@ -620,7 +617,7 @@ private fun DarkEmptyPreview() {
         Surface {
             ResultApps(
                 outputsForAppsByCategory = MutableStateFlow(
-                    OutputStatesForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
+                    OutputDetailsForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
                 ),
                 outputsForLinks = MutableStateFlow(emptyList()),
                 outputsForSharing = MutableStateFlow(null),

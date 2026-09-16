@@ -12,6 +12,7 @@ import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.android.AppActivity
+import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.FileActivity
 import page.ooooo.geoshare.lib.android.FileType
 import page.ooooo.geoshare.lib.android.TextActivity
@@ -209,6 +210,7 @@ object AutomationPreference : OptionsPreference<Automation> {
 
     fun getOptionGroups(
         activities: List<AppActivity>,
+        appDetails: AppDetails,
         hiddenApps: Set<String>?,
         links: List<Link>,
     ): List<List<Automation>> = listOfNotNull(
@@ -235,6 +237,7 @@ object AutomationPreference : OptionsPreference<Automation> {
         activities
             .groupBy { activity -> activity.packageName }
             .filterKeys { packageName -> hiddenApps?.contains(packageName) != true }
+            .toSortedMap(compareBy(nullsLast()) { packageName -> appDetails[packageName]?.label })
             .flatMap { (_, activities) ->
                 activities
                     .sorted()

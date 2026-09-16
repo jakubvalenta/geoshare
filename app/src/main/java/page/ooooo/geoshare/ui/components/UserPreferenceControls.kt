@@ -29,9 +29,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.MutablePreferences
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.local.preferences.OptionsPreference
 import page.ooooo.geoshare.data.local.preferences.TextPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
+import page.ooooo.geoshare.ui.AutomationDetail
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
@@ -89,30 +89,20 @@ fun UserPreferenceControls(
 }
 
 fun <T> LazyListScope.userPreferenceOptionsControl(
-    userPreference: OptionsPreference<T>,
-    values: UserPreferencesValues,
+    isSelected: (value: T) -> Boolean,
+    onSelect: (value: T) -> Unit,
     optionGroups: List<List<T>>,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    itemTestTag: ((option: T) -> String)? = null,
-    onValueChange: ((MutablePreferences) -> Unit) -> Unit,
-    option: @Composable RowScope.(option: T, modifier: Modifier) -> Unit,
+    itemTestTag: ((value: T) -> String)? = null,
+    option: @Composable RowScope.(value: T, modifier: Modifier) -> Unit,
 ) {
-    val value = if (enabled) {
-        userPreference.getValue(values)
-    } else {
-        userPreference.default
-    }
     optionGroups.forEachIndexed { i, values ->
         item {
             val spacing = LocalSpacing.current
             RadioButtonGroup(
-                selectedValue = value,
-                onSelect = {
-                    onValueChange { preferences ->
-                        userPreference.setValue(preferences, it)
-                    }
-                },
+                isSelected = isSelected,
+                onSelect = onSelect,
                 values = values,
                 enabled = enabled,
                 modifier = modifier

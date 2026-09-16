@@ -14,14 +14,13 @@ import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.FileActivity
 import page.ooooo.geoshare.lib.android.UriActivity
 import page.ooooo.geoshare.lib.android.copy
-import page.ooooo.geoshare.lib.android.writeToContentProvider
 import page.ooooo.geoshare.lib.android.openFileWithChooser
 import page.ooooo.geoshare.lib.android.openUriWithChooser
+import page.ooooo.geoshare.lib.android.writeToContentProvider
+import page.ooooo.geoshare.lib.deleteAllAndWriteFile
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
-import page.ooooo.geoshare.lib.deleteAllAndWriteFile
 import page.ooooo.geoshare.ui.components.DrawableIconDescriptor
-import page.ooooo.geoshare.ui.components.IconDescriptor
 import page.ooooo.geoshare.ui.components.ResourceIconDescriptor
 import java.io.File
 

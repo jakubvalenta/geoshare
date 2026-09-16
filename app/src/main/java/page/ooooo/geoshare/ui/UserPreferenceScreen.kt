@@ -98,28 +98,25 @@ fun UserPreferenceScreen(
     onNavigateToServerScreen: () -> Unit,
     billingViewModel: BillingViewModel,
     linkViewModel: LinkViewModel = hiltViewModel(),
-    outputViewModel: OutputViewModel = hiltViewModel(),
     viewModel: UserPreferenceViewModel = hiltViewModel(),
 ) {
     val billingAppNameResId = billingViewModel.billingAppNameResId
     val billingFeatures = billingViewModel.billingFeatures
     val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
-    val links by linkViewModel.all.collectAsStateWithLifecycle()
-    val outputsForAutomation = viewModel.outputsForAutomation
     val userPreferencesValues by viewModel.values.collectAsStateWithLifecycle()
 
     UserPreferenceScreen(
         initialGroupId = initialGroupId,
+        automationDetail = viewModel.automationDetail,
+        automationDetails = viewModel.automationDetails,
         billingAppNameResId = billingAppNameResId,
         billingFeatures = billingFeatures,
         billingStatus = billingStatus,
-        links = links,
-        outputsForAutomation = outputsForAutomation,
+        hiddenAppsDetails = viewModel.hiddenAppsDetails,
+        hiddenAppsSize = viewModel.hiddenAppsSize,
+        links = linkViewModel.all,
         userPreferencesValues = userPreferencesValues,
         onBack = onBack,
-        onGetAutomationOutput = { automation, getLinkByUUID ->
-            outputViewModel.getAutomationOutput(automation, getLinkByUUID)
-        },
         onNavigateToBillingScreen = onNavigateToBillingScreen,
         onNavigateToLinkScreen = onNavigateToLinkScreen,
         onNavigateToServerScreen = onNavigateToServerScreen,
@@ -133,14 +130,16 @@ fun UserPreferenceScreen(
 @Composable
 private fun UserPreferenceScreen(
     initialGroupId: UserPreferenceGroupId?,
+    automationDetail: StateFlow<AutomationDetail>,
+    automationDetails: StateFlow<List<List<AutomationDetail>>>,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
-    links: List<Link>,
+    hiddenAppsDetails: StateFlow<List<HiddenAppDetail>>,
+    hiddenAppsSize: StateFlow<HiddenAppsSize>,
+    links: StateFlow<List<Link>>,
     userPreferencesValues: UserPreferencesValues,
-    outputsForAutomation: StateFlow<List<OutputState<Output>>>,
     onBack: () -> Unit,
-    onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
     onNavigateToBillingScreen: () -> Unit,
     onNavigateToLinkScreen: () -> Unit,
     onNavigateToServerScreen: () -> Unit,
@@ -169,10 +168,11 @@ private fun UserPreferenceScreen(
         listPane = {
             UserPreferenceListPane(
                 currentGroupId = currentGroupId,
+                automationDetail = automationDetail,
                 billingStatus = billingStatus,
                 billingFeatures = billingFeatures,
+                hiddenAppsSize = hiddenAppsSize,
                 links = links,
-                outputsForAutomation = outputsForAutomation,
                 values = userPreferencesValues,
                 onBack = {
                     coroutineScope.launch {
@@ -183,7 +183,6 @@ private fun UserPreferenceScreen(
                         }
                     }
                 },
-                onGetAutomationOutput = onGetAutomationOutput,
                 onNavigateToGroup = { id ->
                     coroutineScope.launch {
                         navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, id)
@@ -197,11 +196,11 @@ private fun UserPreferenceScreen(
             if (currentGroupId != null) {
                 UserPreferenceDetailPane(
                     currentGroupId = currentGroupId,
+                    automationDetails = automationDetails,
                     billingAppNameResId = billingAppNameResId,
                     billingFeatures = billingFeatures,
                     billingStatus = billingStatus,
-                    links = links,
-                    outputsForAutomation = outputsForAutomation,
+                    hiddenAppsDetails = hiddenAppsDetails,
                     values = userPreferencesValues,
                     wide = wide,
                     onBack = {
@@ -213,7 +212,6 @@ private fun UserPreferenceScreen(
                             }
                         }
                     },
-                    onGetAutomationOutput = onGetAutomationOutput,
                     onNavigateToBillingScreen = onNavigateToBillingScreen,
                     onValueChange = onValueChange,
                 )
@@ -229,13 +227,13 @@ private fun UserPreferenceScreen(
 @Composable
 private fun UserPreferenceListPane(
     currentGroupId: UserPreferenceGroupId?,
-    values: UserPreferencesValues,
+    automationDetail: StateFlow<AutomationDetail>,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
-    links: List<Link>,
-    outputsForAutomation: StateFlow<List<OutputState<Output>>>,
+    hiddenAppsSize: StateFlow<HiddenAppsSize>,
+    links: StateFlow<List<Link>>,
+    values: UserPreferencesValues,
     onBack: () -> Unit,
-    onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
     onNavigateToGroup: (id: UserPreferenceGroupId) -> Unit,
     onNavigateToLinkScreen: () -> Unit,
     onNavigateToServerScreen: () -> Unit,
@@ -299,27 +297,23 @@ private fun UserPreferenceListPane(
                 UserPreferenceAutomationListItem(
                     index = 0,
                     count = 2,
+                    automationDetail = automationDetail,
                     billingFeatures = billingFeatures,
                     billingStatus = billingStatus,
-                    links = links,
-                    outputsForAutomation = outputsForAutomation,
                     selected = currentGroupId == UserPreferenceGroupId.AUTOMATION,
-                    values = values,
                     modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.AUTOMATION}"),
                     onClick = { onNavigateToGroup(UserPreferenceGroupId.AUTOMATION) },
-                    onGetAutomationOutput = onGetAutomationOutput,
                 )
                 UserPreferenceAutomationDelayListItem(
                     index = 1,
                     count = 2,
+                    automationDetail = automationDetail,
                     billingFeatures = billingFeatures,
                     billingStatus = billingStatus,
-                    links = links,
                     selected = currentGroupId == UserPreferenceGroupId.AUTOMATION_DELAY,
                     values = values,
                     modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.AUTOMATION_DELAY}"),
                     onClick = { onNavigateToGroup(UserPreferenceGroupId.AUTOMATION_DELAY) },
-                    onGetAutomationOutput = onGetAutomationOutput,
                 )
             }
         }
@@ -339,7 +333,7 @@ private fun UserPreferenceListPane(
                 UserPreferenceHiddenAppsListItem(
                     index = 0,
                     count = 4,
-                    activities = activities,
+                    hiddenAppsSize = hiddenAppsSize,
                     selected = currentGroupId == UserPreferenceGroupId.HIDDEN_APPS,
                     values = values,
                     modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.HIDDEN_APPS}"),
@@ -425,17 +419,15 @@ private fun UserPreferenceListPane(
 
 @Composable
 private fun UserPreferenceDetailPane(
-    apps: StateFlow<List<OutputState<Output>>>,
     currentGroupId: UserPreferenceGroupId,
+    automationDetails: StateFlow<List<List<AutomationDetail>>>,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
-    links: List<Link>,
-    outputsForAutomation: StateFlow<List<OutputState<Output>>>,
+    hiddenAppsDetails: StateFlow<List<HiddenAppDetail>>,
     values: UserPreferencesValues,
     wide: Boolean,
     onBack: () -> Unit,
-    onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
     onNavigateToBillingScreen: () -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
@@ -450,13 +442,11 @@ private fun UserPreferenceDetailPane(
         )
 
         UserPreferenceGroupId.AUTOMATION -> UserPreferenceAutomationControls(
+            automationDetails = automationDetails,
             billingAppNameResId = billingAppNameResId,
             billingFeatures = billingFeatures,
             billingStatus = billingStatus,
-            links = links,
-            outputsForAutomation = outputsForAutomation,
             onBack = onBack,
-            onGetAutomationOutput = onGetAutomationOutput,
             onNavigateToBillingScreen = onNavigateToBillingScreen,
             onValueChange = onValueChange,
             values = values,
@@ -511,8 +501,8 @@ private fun UserPreferenceDetailPane(
         )
 
         UserPreferenceGroupId.HIDDEN_APPS -> UserPreferenceHiddenAppsControls(
-            apps = apps,
             billingAppNameResId = billingAppNameResId,
+            hiddenAppsDetails = hiddenAppsDetails,
             onBack = onBack,
             onNavigateToBillingScreen = onNavigateToBillingScreen,
             onValueChange = onValueChange,

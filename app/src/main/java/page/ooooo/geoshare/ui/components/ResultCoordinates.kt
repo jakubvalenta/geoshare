@@ -57,18 +57,18 @@ import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
 import page.ooooo.geoshare.ui.FaqItemId
-import page.ooooo.geoshare.ui.OutputState
+import page.ooooo.geoshare.ui.OutputDetail
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
-import page.ooooo.geoshare.ui.toOutputState
+import page.ooooo.geoshare.ui.toOutputDetail
 
 @Composable
 fun ResultCoordinates(
     points: Points,
     coordinateConverter: CoordinateConverter,
     userPreferencesValues: StateFlow<UserPreferencesValues>,
-    outputsForPointChips: StateFlow<List<OutputState<PointOutput>>>,
-    outputsForPointsChips: StateFlow<List<OutputState<PointsOutput>>>,
+    outputsForPointChips: StateFlow<List<OutputDetail<PointOutput>>>,
+    outputsForPointsChips: StateFlow<List<OutputDetail<PointsOutput>>>,
     onExecute: (action: Action<*>) -> Unit,
     onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
     onSelect: (index: Int?) -> Unit,
@@ -183,15 +183,15 @@ fun ResultCoordinates(
                     bottom = spacing.extraTiny,
                 ),
             ) {
-                outputsForPointChips.forEach { outputState ->
+                outputsForPointChips.forEach { outputDetail ->
                     item {
                         StyledChip(
-                            label = outputState.output.label(outputState.appLabel),
-                            icon = outputState.icon?.let {
+                            label = outputDetail.label(),
+                            icon = outputDetail.icon?.let {
                                 { IconFromDescriptor(it, contentDescription = null) }
                             },
                         ) {
-                            onExecute(outputState.output.toAction(lastPoint))
+                            onExecute(outputDetail.output.toAction(lastPoint))
                         }
                     }
                 }
@@ -254,15 +254,15 @@ fun ResultCoordinates(
                     }
                     if (outputsForPointsChips.isNotEmpty()) {
                         ScrollableChips(Modifier.testTag("geoShareResultPointsChips")) {
-                            outputsForPointsChips.forEach { outputState ->
+                            outputsForPointsChips.forEach { outputDetail ->
                                 item {
                                     StyledChip(
-                                        label = outputState.output.label(outputState.appLabel),
-                                        icon = outputState.icon?.let {
+                                        label = outputDetail.label(),
+                                        icon = outputDetail.icon?.let {
                                             { IconFromDescriptor(it, contentDescription = null) }
                                         },
                                     ) {
-                                        onExecute(outputState.output.toAction(points))
+                                        onExecute(outputDetail.output.toAction(points))
                                     }
                                 }
                             }
@@ -324,10 +324,10 @@ private fun DefaultPreview() {
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 coordinateConverter = coordinateConverter,
                 outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
                 ),
                 outputsForPointsChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointsChips().map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
                 ),
                 userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onExecute = {},
@@ -356,10 +356,10 @@ private fun DarkPreview() {
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 coordinateConverter = coordinateConverter,
                 outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
                 ),
                 outputsForPointsChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointsChips().map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
                 ),
                 userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onExecute = {},
@@ -388,10 +388,10 @@ private fun DescriptionPreview() {
                 points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI)),
                 coordinateConverter = coordinateConverter,
                 outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
                 ),
                 outputsForPointsChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointsChips().map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
                 ),
                 userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onExecute = {},
@@ -435,10 +435,10 @@ private fun DarkDescriptionPreview() {
                 points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI)),
                 coordinateConverter = coordinateConverter,
                 outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
                 ),
                 outputsForPointsChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointsChips().map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
                 ),
                 userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onExecute = {},
@@ -485,10 +485,10 @@ private fun NamePreview() {
                 ),
                 coordinateConverter = coordinateConverter,
                 outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
                 ),
                 outputsForPointsChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointsChips().map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
                 ),
                 userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onExecute = {},
@@ -520,10 +520,10 @@ private fun DarkNamePreview() {
                 ),
                 coordinateConverter = coordinateConverter,
                 outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
                 ),
                 outputsForPointsChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointsChips().map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
                 ),
                 userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onExecute = {},
@@ -560,10 +560,10 @@ private fun PointsPreview() {
                 ),
                 coordinateConverter = coordinateConverter,
                 outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
                 ),
                 outputsForPointsChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointsChips().map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
                 ),
                 initialExpanded = true,
                 userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -601,10 +601,10 @@ private fun DarkPointsPreview() {
                 ),
                 coordinateConverter = coordinateConverter,
                 outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
                 ),
                 outputsForPointsChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointsChips().map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
                 ),
                 initialExpanded = true,
                 userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
@@ -638,10 +638,10 @@ private fun PointsWithNamePreview() {
                 ),
                 coordinateConverter = coordinateConverter,
                 outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
                 ),
                 outputsForPointsChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointsChips().map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
                 ),
                 initialExpanded = true,
                 userPreferencesValues = MutableStateFlow(
@@ -679,10 +679,10 @@ private fun DarkPointsWithNamePreview() {
                 ),
                 coordinateConverter = coordinateConverter,
                 outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
                 ),
                 outputsForPointsChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointsChips().map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
                 ),
                 initialExpanded = true,
                 userPreferencesValues = MutableStateFlow(

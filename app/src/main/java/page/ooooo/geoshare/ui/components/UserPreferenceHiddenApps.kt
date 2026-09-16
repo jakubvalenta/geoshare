@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
+import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
@@ -22,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.MutablePreferences
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
@@ -29,11 +32,9 @@ import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.di.fakeActivities
 import page.ooooo.geoshare.data.local.preferences.HiddenAppsPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
-import page.ooooo.geoshare.lib.android.AppActivity
-import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.PackageNames
-import page.ooooo.geoshare.lib.outputs.Output
-import page.ooooo.geoshare.ui.OutputState
+import page.ooooo.geoshare.ui.HiddenAppDetail
+import page.ooooo.geoshare.ui.HiddenAppsSize
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -42,28 +43,33 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun UserPreferenceHiddenAppsListItem(
     index: Int,
     count: Int,
-    activities: List<AppActivity>,
+    hiddenAppsSize: StateFlow<HiddenAppsSize>,
     selected: Boolean,
     values: UserPreferencesValues,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
+    val hiddenAppsSize by hiddenAppsSize.collectAsStateWithLifecycle()
+
     SegmentedListItem(
         selected = selected,
         onClick = onClick,
         shapes = ListItemDefaults.segmentedShapes(index, count),
         modifier = modifier,
         supportingContent = HiddenAppsPreference.getValue(values)?.let { value ->
-            @Composable {
-                val options = HiddenAppsPreference.getOptions(activities)
-                Text((options - value).size.takeIf { it != options.size }?.let { visibleCount ->
-                    pluralStringResource(
-                        R.plurals.user_preferences_apps_visible_count,
-                        visibleCount,
-                        visibleCount,
-                        options.size,
-                    )
-                } ?: stringResource(R.string.user_preferences_apps_visible_all))
+            {
+                Text(
+                    if (hiddenAppsSize.visible == 0) {
+                        stringResource(R.string.user_preferences_apps_visible_all)
+                    } else {
+                        pluralStringResource(
+                            R.plurals.user_preferences_apps_visible_count,
+                            hiddenAppsSize.visible,
+                            hiddenAppsSize.visible,
+                            hiddenAppsSize.total,
+                        )
+                    }
+                )
             }
         },
         colors = segmentedListColors(),
@@ -77,8 +83,8 @@ fun UserPreferenceHiddenAppsListItem(
 
 @Composable
 fun UserPreferenceHiddenAppsControls(
-    apps: StateFlow<List<OutputState<Output>>>,
     billingAppNameResId: Int,
+    hiddenAppsDetails: StateFlow<List<HiddenAppDetail>>,
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
@@ -86,6 +92,8 @@ fun UserPreferenceHiddenAppsControls(
     values: UserPreferencesValues,
     wide: Boolean,
 ) {
+    val hiddenAppsDetails by hiddenAppsDetails.collectAsStateWithLifecycle()
+
     UserPreferenceControls(
         titleResId = R.string.user_preferences_apps_title,
         description = {
@@ -99,13 +107,14 @@ fun UserPreferenceHiddenAppsControls(
         val value = HiddenAppsPreference.getValue(values)
         val enabled = value != null
 
-        fun isChecked(option: String): Boolean = value?.contains(option) == false
+        fun isChecked(packageName: String): Boolean =
+            value?.contains(packageName) == false
 
-        fun setValue(option: String, checked: Boolean) {
+        fun setValue(packageName: String, checked: Boolean) {
             val newValue = if (!checked) {
-                value.orEmpty() + option
+                value.orEmpty() + packageName
             } else {
-                value.orEmpty() - option
+                value.orEmpty() - packageName
             }
             onValueChange { preferences ->
                 HiddenAppsPreference.setValue(preferences, newValue)
@@ -116,30 +125,27 @@ fun UserPreferenceHiddenAppsControls(
             val spacing = LocalSpacing.current
 
             SegmentedList(
-                values = HiddenAppsPreference.getOptions(activities).toList(),
+                values = hiddenAppsDetails,
                 modifier = modifier.padding(horizontal = spacing.windowPadding),
-                itemHeadline = { option -> appDetails[option]?.label ?: option },
-                itemOnClick = { option -> setValue(option, !isChecked(option)) },
+                itemHeadline = { detail -> detail.appLabel.orEmpty() },
+                itemOnClick = { detail -> setValue(detail.packageName, !isChecked(detail.packageName)) },
                 itemEnabled = { enabled },
-                itemLeadingContent = { option ->
-                    appDetails[option]?.icon?.let { drawable ->
-                        {
-                            Image(
-                                rememberDrawablePainter(drawable),
-                                null,
-                                Modifier.widthIn(max = 24.dp),
-                            )
-                        }
+                itemLeadingContent = { detail ->
+                    {
+                        IconFromDescriptor(
+                            detail.icon?.let { DrawableIconDescriptor(it) } ?: PlaceholderIconDescriptor,
+                            contentDescription = null,
+                        )
                     }
                 },
-                itemTrailingContent = { option ->
+                itemTrailingContent = { detail ->
                     {
                         Switch(
-                            checked = isChecked(option),
+                            checked = isChecked(detail.packageName),
                             onCheckedChange = {
-                                setValue(option, it)
+                                setValue(detail.packageName, it)
                             },
-                            modifier = Modifier.testTag("geoShareVisibleAppToggle_${option}"),
+                            modifier = Modifier.testTag("geoShareVisibleAppToggle_${detail}"),
                             enabled = enabled,
                         )
                     }

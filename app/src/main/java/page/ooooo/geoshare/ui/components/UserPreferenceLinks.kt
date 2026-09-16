@@ -10,10 +10,14 @@ import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.local.database.Link
@@ -24,11 +28,13 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 fun UserPreferenceLinksListItem(
     index: Int,
     count: Int,
-    links: List<Link>,
+    links: StateFlow<List<Link>>,
     selected: Boolean,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
+    val links by links.collectAsStateWithLifecycle()
+
     SegmentedListItem(
         selected = selected,
         onClick = onClick,
@@ -61,7 +67,7 @@ private fun ListItemPreview() {
                 UserPreferenceLinksListItem(
                     index = 0,
                     count = 1,
-                    links = defaultFakeLinks,
+                    links = MutableStateFlow(defaultFakeLinks),
                     selected = false,
                     onClick = {},
                 )
@@ -79,7 +85,7 @@ private fun DarkListItemPreview() {
                 UserPreferenceLinksListItem(
                     index = 0,
                     count = 1,
-                    links = defaultFakeLinks,
+                    links = MutableStateFlow(defaultFakeLinks),
                     selected = false,
                     onClick = {},
                 )
@@ -97,7 +103,7 @@ private fun EmptyListItemPreview() {
                 UserPreferenceLinksListItem(
                     index = 0,
                     count = 1,
-                    links = emptyList(),
+                    links = MutableStateFlow(emptyList()),
                     selected = false,
                     onClick = {},
                 )
@@ -115,7 +121,7 @@ private fun DarkEmptyListItemPreview() {
                 UserPreferenceLinksListItem(
                     index = 0,
                     count = 1,
-                    links = emptyList(),
+                    links = MutableStateFlow(emptyList()),
                     selected = false,
                     onClick = {},
                 )

@@ -37,9 +37,9 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
-import page.ooooo.geoshare.ui.OutputState
+import page.ooooo.geoshare.ui.OutputDetail
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.toOutputState
+import page.ooooo.geoshare.ui.toOutputDetail
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,8 +47,8 @@ fun ResultSheet(
     points: Points,
     selectedPointIndex: Int,
     initialValue: SheetValue = SheetValue.Hidden,
-    outputsForPoint: StateFlow<List<OutputState<PointOutput>>>,
-    outputsForPoints: StateFlow<List<OutputState<PointsOutput>>>,
+    outputsForPoint: StateFlow<List<OutputDetail<PointOutput>>>,
+    outputsForPoints: StateFlow<List<OutputDetail<PointsOutput>>>,
     onExecute: (action: Action<*>) -> Unit,
     onSelectPointIndex: (index: Int?) -> Unit,
 ) {
@@ -91,16 +91,16 @@ fun ResultSheet(
                 ) {
                     outputsForPoint
                         .filter { it.output.isAvailable(selectedPoint) }
-                        .zipWithNextFirstNull { prevOutputState, outputState ->
+                        .zipWithNextFirstNull { prevOutputDetail, outputDetail ->
                             SheetListItem(
-                                headlineText = outputState.output.label(outputState.appLabel),
+                                headlineText = outputDetail.label(),
                                 onClick = {
                                     hide()
-                                    onExecute(outputState.output.toAction(selectedPoint))
+                                    onExecute(outputDetail.output.toAction(selectedPoint))
                                 },
-                                supportingText = outputState.output.getDescription(selectedPoint),
-                                icon = outputState.icon,
-                                prevIcon = prevOutputState?.icon,
+                                supportingText = outputDetail.output.getDescription(selectedPoint),
+                                icon = outputDetail.icon,
+                                prevIcon = prevOutputDetail?.icon,
                             )
                         }
                 }
@@ -116,16 +116,16 @@ fun ResultSheet(
                 ) {
                     outputsForPoints
                         .filter { it.output.isAvailable(points) }
-                        .zipWithNextFirstNull { prevOutputState, outputState ->
+                        .zipWithNextFirstNull { prevOutputDetail, outputDetail ->
                             SheetListItem(
-                                headlineText = outputState.output.label(outputState.appLabel),
+                                headlineText = outputDetail.label(),
                                 onClick = {
                                     hide()
-                                    onExecute(outputState.output.toAction(points))
+                                    onExecute(outputDetail.output.toAction(points))
                                 },
-                                supportingText = outputState.output.getDescription(points),
-                                icon = outputState.icon,
-                                prevIcon = prevOutputState?.icon,
+                                supportingText = outputDetail.output.getDescription(points),
+                                icon = outputDetail.icon,
+                                prevIcon = prevOutputDetail?.icon,
                             )
                         }
                 }
@@ -155,10 +155,10 @@ private fun DefaultPreview() {
                 selectedPointIndex = 1,
                 initialValue = SheetValue.Expanded,
                 outputsForPoint = MutableStateFlow(
-                    outputRepository.getOutputsForPoint(defaultFakeLinks).map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPoint(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
                 ),
                 outputsForPoints = MutableStateFlow(
-                    outputRepository.getOutputsForPoints().map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPoints().map { it.toOutputDetail(appDetails) }
                 ),
                 onExecute = {},
                 onSelectPointIndex = {},
@@ -192,10 +192,10 @@ private fun DarkPreview() {
                 selectedPointIndex = 1,
                 initialValue = SheetValue.Expanded,
                 outputsForPoint = MutableStateFlow(
-                    outputRepository.getOutputsForPoint(defaultFakeLinks).map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPoint(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
                 ),
                 outputsForPoints = MutableStateFlow(
-                    outputRepository.getOutputsForPoints().map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPoints().map { it.toOutputDetail(appDetails) }
                 ),
                 onExecute = {},
                 onSelectPointIndex = {},
@@ -225,10 +225,10 @@ private fun LastPointPreview() {
                 selectedPointIndex = 0,
                 initialValue = SheetValue.Expanded,
                 outputsForPoint = MutableStateFlow(
-                    outputRepository.getOutputsForPoint(defaultFakeLinks).map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPoint(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
                 ),
                 outputsForPoints = MutableStateFlow(
-                    outputRepository.getOutputsForPoints().map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPoints().map { it.toOutputDetail(appDetails) }
                 ),
                 onExecute = {},
                 onSelectPointIndex = {},
@@ -262,10 +262,10 @@ private fun DarkLastPointPreview() {
                 selectedPointIndex = 0,
                 initialValue = SheetValue.Expanded,
                 outputsForPoint = MutableStateFlow(
-                    outputRepository.getOutputsForPoint(defaultFakeLinks).map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPoint(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
                 ),
                 outputsForPoints = MutableStateFlow(
-                    outputRepository.getOutputsForPoints().map { it.toOutputState(appDetails) }
+                    outputRepository.getOutputsForPoints().map { it.toOutputDetail(appDetails) }
                 ),
                 onExecute = {},
                 onSelectPointIndex = {},

@@ -54,7 +54,7 @@ import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.ShareDisplayGeoUriOutput
-import page.ooooo.geoshare.ui.OutputState
+import page.ooooo.geoshare.ui.OutputDetail
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -131,7 +131,7 @@ fun AppIcon(
 @Composable
 fun AppMenu(
     expanded: Boolean,
-    outputStates: List<OutputState<Output>>,
+    outputDetails: List<OutputDetail<Output>>,
     onClick: (Output) -> Unit,
     onDismissRequest: () -> Unit,
     onHide: (() -> Unit)?,
@@ -143,22 +143,22 @@ fun AppMenu(
         shape = ShapeDefaults.Large,
         containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
     ) {
-        outputStates
-            .zipWithNextFirstNull { prevOutputState, outputState ->
+        outputDetails
+            .zipWithNextFirstNull { prevOutputDetail, outputDetail ->
                 DropdownMenuItem(
                     text = {
                         Text(
-                            outputState.output.label(outputState.appLabel),
+                            outputDetail.label(),
                             Modifier.testTag("geoShareAppOutput"),
                         )
                     },
                     onClick = {
                         onDismissRequest()
-                        onClick(outputState.output)
+                        onClick(outputDetail.output)
                     },
                     leadingIcon = {
                         IconFromDescriptor(
-                            outputState.menuIcon?.takeIf { it != prevOutputState?.menuIcon } ?: SpacerIconDescriptor,
+                            outputDetail.menuIcon?.takeIf { it != prevOutputDetail?.menuIcon } ?: SpacerIconDescriptor,
                             contentDescription = null,
                         )
                     },

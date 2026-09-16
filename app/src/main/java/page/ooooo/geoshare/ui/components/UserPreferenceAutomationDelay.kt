@@ -22,6 +22,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.datastore.preferences.core.MutablePreferences
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.database.findByUUID
@@ -37,6 +39,7 @@ import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
+import page.ooooo.geoshare.ui.AutomationDetail
 import page.ooooo.geoshare.ui.theme.AppTheme
 import java.util.UUID
 import kotlin.time.Duration
@@ -47,22 +50,18 @@ import kotlin.time.DurationUnit
 fun UserPreferenceAutomationDelayListItem(
     index: Int,
     count: Int,
+    automationDetail: StateFlow<AutomationDetail>,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
-    links: List<Link>,
     selected: Boolean,
     values: UserPreferencesValues,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
 ) {
-    var enabled by retain { mutableStateOf(true) }
-
-    LaunchedEffect(values, billingStatus, links) {
-        enabled = billingStatus is BillingStatus.Purchased &&
-            AutomationFeature in billingFeatures &&
-            onGetAutomationOutput(values.automation) { links.findByUUID(it) } is Output.HasAutomationDelay
-    }
+    val automationDetail by automationDetail.collectAsStateWithLifecycle()
+    val enabled = billingStatus is BillingStatus.Purchased &&
+        AutomationFeature in billingFeatures &&
+        automationDetail.output is Output.HasAutomationDelay
 
     SegmentedListItem(
         selected = selected,
