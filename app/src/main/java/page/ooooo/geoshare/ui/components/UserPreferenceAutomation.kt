@@ -135,12 +135,12 @@ fun UserPreferenceAutomationControls(
             optionGroups = automationDetails,
             enabled = enabled,
             itemTestTag = { option ->
-                try {
-                    Json.encodeToString(option)
+                val serializedString = try {
+                    Json.encodeToString(option.automation)
                 } catch (_: IllegalArgumentException) {
                     null
                 }
-                    .let { serializedString -> "geoShareUserPreferenceAutomation_$serializedString" }
+                "geoShareUserPreferenceAutomation_$serializedString"
             },
         ) { value, modifier ->
             AutomationPreferenceValue(

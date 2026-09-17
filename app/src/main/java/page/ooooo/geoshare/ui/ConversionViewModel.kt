@@ -112,28 +112,28 @@ class ConversionViewModel @Inject constructor(
         .combine(appRepository.appDetails) { currentState, appDetails ->
             when (currentState) {
                 is ActionWaiting -> ActionWaitingDetail(
-                    (currentState.output as Output.HasActivity<*>).getAppDetail(appDetails),
+                    (currentState.output as? Output.HasActivity<*>)?.getAppDetail(appDetails),
                     currentState.delay,
                     currentState.output,
                 )
 
                 is ActionSucceeded -> ActionSucceededDetail(
-                    (currentState.output as Output.HasActivity<*>).getAppDetail(appDetails),
+                    (currentState.output as? Output.HasActivity<*>)?.getAppDetail(appDetails),
                     currentState.output,
                 )
 
                 is ActionFailed -> ActionFailedDetail(
-                    (currentState.output as Output.HasActivity<*>).getAppDetail(appDetails),
+                    (currentState.output as? Output.HasActivity<*>)?.getAppDetail(appDetails),
                     currentState.output,
                 )
 
                 is ActionAutomationSucceeded -> ActionAutomationSucceededDetail(
-                    (currentState.output as Output.HasActivity<*>).getAppDetail(appDetails),
+                    (currentState.output as? Output.HasActivity<*>)?.getAppDetail(appDetails),
                     currentState.output,
                 )
 
                 is ActionAutomationFailed -> ActionAutomationFailedDetail(
-                    (currentState.output as Output.HasActivity<*>).getAppDetail(appDetails),
+                    (currentState.output as? Output.HasActivity<*>)?.getAppDetail(appDetails),
                     currentState.output,
                 )
 
