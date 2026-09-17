@@ -12,7 +12,7 @@
     <string name="intro_open_by_default_google_maps_button">Відкрити налаштування Google Maps</string>
     <string name="intro_open_by_default_app_button">Відкрити налаштування %1$s</string>
     <string name="main_create_geo_uri">Показати координати</string>
-    <string name="conversion_permission">Підключитися до %1$s?</string>
+    <string name="conversion_permission">З’єднатися з %1$s?</string>
     <string name="about_title">Про застосунок</string>
     <string name="about_app_icon_content_description">Значок застосунку</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>
@@ -51,7 +51,7 @@
     </plurals>
     <string name="intro_open_by_default_app_screenshot_cancel">Скасувати</string>
     <string name="intro_open_by_default_app_screenshot_add">Додати</string>
-    <string name="conversion_connecting">Підключення до %1$s…</string>
+    <string name="conversion_connecting">З’єднання з %1$s…</string>
     <string name="conversion_loading_indicator_cancel">Скасувати</string>
     <string name="conversion_failed_cancelled">Скасовано</string>
     <string name="conversion_succeeded_skip">Скопіювати оригінальне посилання</string>
@@ -324,4 +324,18 @@
     <string name="user_preferences_finish_never">Не закривати застосунок автоматично</string>
     <string name="user_preferences_finish_title">Закриття</string>
     <string name="conversion_failed_unsupported_source_google_search">Посилання на Google Пошук не підтримуються</string>
+    <string name="conversion_processing">Обробка посилання типу %1$s…</string>
+    <string name="conversion_succeeded_copy_name">Копіювати назву</string>
+    <string name="help_open_by_default_action">Дізнайтеся більше в розділі «ЧаПи»</string>
+    <string name="help_open_by_default_text">Ви можете налаштувати Android так, аби натискання на посилання мапи завжди відкривало %1$s замість типової мапи.</string>
+    <string name="help_open_by_default_title">Завжди відкривати посилання на мапи в %1$s</string>
+    <string name="help_share_source_action">Спробувати в %1$s</string>
+    <string name="help_share_source_text">У багатьох мапографічних застосунках ви можете скористатися кнопкою «Поділитися» %1$s, щоб відкрити розташування в %2$s.</string>
+    <string name="help_share_source_title">Запустіть GeoShare з мапографічного застосунку</string>
+    <string name="help_welcome_action">Або скопіюйте цей приклад:</string>
+    <string name="help_welcome_text">У вас уже є посилання на мапу? Введіть його у форму та натисніть %1$s.</string>
+    <string name="help_welcome_title">Вітаємо</string>
+    <string name="main_source_open">Відкрити оригінальне посилання</string>
+    <string name="conversion_automation_copy_name_succeeded">Автоматично скопійована назва</string>
+    <string name="faq_open_by_default_headline">Як завжди відкривати посилання в %1$s</string>
 </resources>
