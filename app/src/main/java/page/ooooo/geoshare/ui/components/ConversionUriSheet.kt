@@ -12,6 +12,7 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -59,31 +60,36 @@ fun ConversionUriSheet(
             if (outputsForUriByCategory.copy.isNotEmpty()) {
                 SheetSection(title = stringResource(R.string.conversion_succeeded_skip)) {
                     outputsForUriByCategory.copy.forEach { outputDetail ->
-                        OneLineSheetListItem(
-                            headlineText = outputDetail.output.getDescription(uriString).orEmpty(),
-                            onClick = {
-                                onDismissRequest()
-                                onExecute(outputDetail.output.toAction(uriString))
-                            },
-                            icon = ResourceIconDescriptor(R.drawable.content_copy_24px),
-                        )
+                        key(outputDetail.output.id) {
+                            OneLineSheetListItem(
+                                headlineText = outputDetail.output.getDescription(uriString).orEmpty(),
+                                onClick = {
+                                    onDismissRequest()
+                                    onExecute(outputDetail.output.toAction(uriString))
+                                },
+                                icon = ResourceIconDescriptor(R.drawable.content_copy_24px),
+                            )
+                        }
                     }
                 }
             }
-            // TODO Sort by label
             if (outputsForUriByCategory.open.isNotEmpty()) {
                 SheetSection(title = stringResource(R.string.main_source_open), first = false) {
-                    outputsForUriByCategory.open.forEach { outputDetail ->
-                        SheetListItem(
-                            headlineText = outputDetail.label(),
-                            modifier = Modifier.testTag("geoShareConversionUriSheetItem_${outputDetail.output.id}"),
-                            onClick = {
-                                onDismissRequest()
-                                onExecute(outputDetail.output.toAction(uriString))
-                            },
-                            icon = outputDetail.icon ?: PlaceholderIconDescriptor,
-                        )
-                    }
+                    outputsForUriByCategory.open
+                        .sortedBy { it.label }
+                        .forEach { outputDetail ->
+                            key(outputDetail.output.id) {
+                                SheetListItem(
+                                    headlineText = outputDetail.label.orEmpty(),
+                                    modifier = Modifier.testTag("geoShareConversionUriSheetItem_${outputDetail.output.id}"),
+                                    onClick = {
+                                        onDismissRequest()
+                                        onExecute(outputDetail.output.toAction(uriString))
+                                    },
+                                    icon = outputDetail.icon ?: PlaceholderIconDescriptor,
+                                )
+                            }
+                        }
                 }
             }
         }

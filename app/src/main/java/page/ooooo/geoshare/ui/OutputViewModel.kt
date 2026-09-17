@@ -66,9 +66,15 @@ data class OutputDetailsForLink(
     val all: List<OutputDetail<Output>>,
 )
 
+data class OutputDetailForUri(
+    val label: String?,
+    val icon: IconDescriptor?,
+    val output: StringOutput,
+)
+
 data class OutputDetailsForUriByCategory(
-    val copy: List<OutputDetail<StringOutput>>,
-    val open: List<OutputDetail<StringOutput>>,
+    val copy: List<OutputDetailForUri>,
+    val open: List<OutputDetailForUri>,
 )
 
 /**
@@ -253,12 +259,11 @@ fun PointsOutput.toOutputDetail(appDetails: AppDetails): OutputDetail<PointsOutp
         )
     }
 
-fun StringOutput.toOutputDetail(appDetails: AppDetails): OutputDetail<StringOutput> =
+fun StringOutput.toOutputDetailForUri(appDetails: AppDetails): OutputDetailForUri =
     (this as? Output.HasActivity<*>)?.getAppDetail(appDetails).let { appDetail ->
-        OutputDetail(
-            appDetail = appDetail,
+        OutputDetailForUri(
+            label = appDetail?.label,
             icon = getIcon(appDetail),
-            menuIcon = getMenuIcon(appDetail),
             output = this,
         )
     }
@@ -311,7 +316,7 @@ fun List<Output>.toOutputDetailsForSharing(appDetails: AppDetails): OutputDetail
 fun Pair<List<StringOutput>, List<StringOutput>>.toOutputDetailsForUriByCategory(appDetails: AppDetails): OutputDetailsForUriByCategory =
     let { (outputsForCopying, outputsForOpening) ->
         OutputDetailsForUriByCategory(
-            copy = outputsForCopying.map { it.toOutputDetail(appDetails) },
-            open = outputsForOpening.map { it.toOutputDetail(appDetails) },
+            copy = outputsForCopying.map { it.toOutputDetailForUri(appDetails) },
+            open = outputsForOpening.map { it.toOutputDetailForUri(appDetails) },
         )
     }
