@@ -555,9 +555,7 @@ private fun MainScreen(
                                 outputsForSharing = outputsForSharing,
                                 points = currentState.points,
                                 source = source,
-                                modifier = Modifier
-                                    .padding(horizontal = spacing.windowPadding)
-                                    .padding(top = spacing.tiny),
+                                modifier = Modifier.padding(top = spacing.tiny),
                                 onDisableLinkGroup = onDisableLinkGroup,
                                 onExecute = onExecute,
                                 onHideApp = onHideApp,

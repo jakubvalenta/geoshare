@@ -6,6 +6,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
@@ -49,6 +50,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeOpenStreetMapDisplayLink
+import page.ooooo.geoshare.data.di.getFakeAppDetails
+import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.extensions.zipWithNextFirstNull
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
@@ -73,19 +76,12 @@ fun AppIcon(
     var expanded by retain { mutableStateOf(false) }
 
     Box(
-        modifier
-            .width(78.dp)
-            .run {
-                if (enabled) {
-                    combinedClickable(
-                        role = Role.Button,
-                        onLongClick = { expanded = true },
-                        onClick = onClick,
-                    )
-                } else {
-                    this
-                }
-            },
+        modifier.combinedClickable(
+            enabled = enabled,
+            role = Role.Button,
+            onLongClick = { expanded = true },
+            onClick = onClick,
+        ),
         contentAlignment = Alignment.TopEnd,
     ) {
         Column(
@@ -192,18 +188,77 @@ fun AppMenu(
 private fun DefaultPreview() {
     AppTheme {
         Surface {
-            AppIcon(
-                label = FakeOpenStreetMapDisplayLink.group,
-                menu = { _, _ -> },
-                onClick = {},
-            ) {
-                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
-                    IconFromDescriptor(
-                        FakeOpenStreetMapDisplayLink.icon,
-                        contentDescription = null,
-                        size = 46.dp,
-                        inverseContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                    )
+            Row {
+                val context = LocalContext.current
+
+                Box(Modifier.width(78.dp)) {
+                    val appDetail = getFakeAppDetails(context)[PackageNames.OSMAND_PLUS]!!
+                    AppIcon(
+                        label = appDetail.label,
+                        menu = { _, _ -> },
+                        onClick = {},
+                    ) {
+                        IconFromDescriptor(
+                            DrawableIconDescriptor(appDetail.icon),
+                            size = 46.dp,
+                            contentDescription = null,
+                        )
+                    }
+                }
+
+                Box(Modifier.width(78.dp)) {
+                    val geometries = Geometries(context)
+                    val coordinateConverter = CoordinateConverter(geometries)
+                    val output = ShareDisplayGeoUriOutput(coordinateConverter)
+                    AppIcon(
+                        label = null,
+                        menu = { _, _ -> },
+                        onClick = {},
+                    ) {
+                        Surface(
+                            Modifier.requiredSize(46.dp),
+                            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                            shape = CircleShape,
+                        ) {
+                            IconFromDescriptor(
+                                output.getIcon(null),
+                                contentDescription = output.label(null),
+                                size = 24.dp,
+                            )
+                        }
+                    }
+                }
+
+                Box(Modifier.width(78.dp)) {
+                    val link = FakeOpenStreetMapDisplayLink
+                    AppIcon(
+                        label = link.group,
+                        menu = { _, _ -> },
+                        onClick = {},
+                    ) {
+                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
+                            IconFromDescriptor(
+                                link.icon,
+                                contentDescription = null,
+                                size = 46.dp,
+                                inverseContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                            )
+                        }
+                    }
+                }
+
+                Box(Modifier.width(78.dp)) {
+                    AppIcon(
+                        label = null,
+                        menu = { _, _ -> },
+                        onClick = {},
+                    ) {
+                        Box(
+                            Modifier
+                                .background(MaterialTheme.colorScheme.surfaceContainer, CircleShape)
+                                .requiredSize(46.dp)
+                        )
+                    }
                 }
             }
         }
@@ -215,165 +270,78 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         Surface {
-            AppIcon(
-                label = FakeOpenStreetMapDisplayLink.group,
-                menu = { _, _ -> },
-                onClick = {},
-            ) {
-                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
-                    IconFromDescriptor(
-                        FakeOpenStreetMapDisplayLink.icon,
-                        contentDescription = null,
-                        size = 46.dp,
-                        inverseContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                    )
+            Row {
+                val context = LocalContext.current
+
+                Box(Modifier.width(78.dp)) {
+                    val appDetail = getFakeAppDetails(context)[PackageNames.OSMAND_PLUS]!!
+                    AppIcon(
+                        label = appDetail.label,
+                        menu = { _, _ -> },
+                        onClick = {},
+                    ) {
+                        IconFromDescriptor(
+                            DrawableIconDescriptor(appDetail.icon),
+                            size = 46.dp,
+                            contentDescription = null,
+                        )
+                    }
                 }
-            }
-        }
-    }
-}
 
-@Preview(showBackground = true)
-@Composable
-private fun ShareItemPreview() {
-    AppTheme {
-        Surface {
-            val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
-            val output = ShareDisplayGeoUriOutput(coordinateConverter)
-            AppIcon(
-                label = null,
-                menu = { _, _ -> },
-                onClick = {},
-            ) {
-                Surface(
-                    Modifier.requiredSize(46.dp),
-                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    shape = CircleShape,
-                ) {
-                    IconFromDescriptor(
-                        output.getIcon(null),
-                        contentDescription = output.label(null),
-                        size = 24.dp,
-                    )
+                Box(Modifier.width(78.dp)) {
+                    val geometries = Geometries(context)
+                    val coordinateConverter = CoordinateConverter(geometries)
+                    val output = ShareDisplayGeoUriOutput(coordinateConverter)
+                    AppIcon(
+                        label = null,
+                        menu = { _, _ -> },
+                        onClick = {},
+                    ) {
+                        Surface(
+                            Modifier.requiredSize(46.dp),
+                            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                            shape = CircleShape,
+                        ) {
+                            IconFromDescriptor(
+                                output.getIcon(null),
+                                contentDescription = output.label(null),
+                                size = 24.dp,
+                            )
+                        }
+                    }
                 }
-            }
-        }
-    }
-}
 
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkShareItemPreview() {
-    AppTheme {
-        Surface {
-            val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
-            val output = ShareDisplayGeoUriOutput(coordinateConverter)
-            AppIcon(
-                label = null,
-                menu = { _, _ -> },
-                onClick = {},
-            ) {
-                Surface(
-                    Modifier.requiredSize(46.dp),
-                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    shape = CircleShape,
-                ) {
-                    IconFromDescriptor(
-                        output.getIcon(null),
-                        contentDescription = output.label(null),
-                        size = 24.dp,
-                    )
+                Box(Modifier.width(78.dp)) {
+                    val link = FakeOpenStreetMapDisplayLink
+                    AppIcon(
+                        label = link.group,
+                        menu = { _, _ -> },
+                        onClick = {},
+                    ) {
+                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
+                            IconFromDescriptor(
+                                link.icon,
+                                contentDescription = null,
+                                size = 46.dp,
+                                inverseContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                            )
+                        }
+                    }
                 }
-            }
-        }
-    }
-}
 
-@Preview(showBackground = true)
-@Composable
-private fun LinkPreview() {
-    AppTheme {
-        Surface {
-            AppIcon(
-                label = FakeOpenStreetMapDisplayLink.group,
-                menu = { _, _ -> },
-                onClick = {},
-            ) {
-                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
-                    IconFromDescriptor(
-                        FakeOpenStreetMapDisplayLink.icon,
-                        contentDescription = null,
-                        size = 46.dp,
-                        inverseContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                    )
+                Box(Modifier.width(78.dp)) {
+                    AppIcon(
+                        label = null,
+                        menu = { _, _ -> },
+                        onClick = {},
+                    ) {
+                        Box(
+                            Modifier
+                                .background(MaterialTheme.colorScheme.surfaceContainer, CircleShape)
+                                .requiredSize(46.dp)
+                        )
+                    }
                 }
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkLinkPreview() {
-    AppTheme {
-        Surface {
-            AppIcon(
-                label = FakeOpenStreetMapDisplayLink.group,
-                menu = { _, _ -> },
-                onClick = {},
-            ) {
-                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
-                    IconFromDescriptor(
-                        FakeOpenStreetMapDisplayLink.icon,
-                        contentDescription = null,
-                        size = 46.dp,
-                        inverseContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun PlaceholderPreview() {
-    AppTheme {
-        Surface {
-            AppIcon(
-                label = null,
-                menu = { _, _ -> },
-                onClick = {},
-            ) {
-                Box(
-                    Modifier
-                        .background(MaterialTheme.colorScheme.surfaceContainer, CircleShape)
-                        .requiredSize(46.dp)
-                )
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkPlaceholderPreview() {
-    AppTheme {
-        Surface {
-            AppIcon(
-                label = null,
-                menu = { _, _ -> },
-                onClick = {},
-            ) {
-                Box(
-                    Modifier
-                        .background(MaterialTheme.colorScheme.surfaceContainer, CircleShape)
-                        .requiredSize(46.dp)
-                )
             }
         }
     }

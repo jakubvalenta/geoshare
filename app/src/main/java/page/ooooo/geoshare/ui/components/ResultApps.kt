@@ -3,7 +3,6 @@ package page.ooooo.geoshare.ui.components
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -11,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -77,7 +78,10 @@ fun ResultApps(
     points: Points,
     source: StateFlow<String>,
     modifier: Modifier = Modifier,
+    gridHorizontalPadding: Dp = LocalSpacing.current.windowPadding - 10.dp,
+    horizontalSpacing: Dp = LocalSpacing.current.tiny,
     iconSize: Dp = 46.dp,
+    minItemWidth: Dp = 78.dp,
     onDisableLinkGroup: (group: String?) -> Unit,
     onExecute: (Action<*>) -> Unit,
     onHideApp: (packageName: String) -> Unit,
@@ -94,14 +98,18 @@ fun ResultApps(
 
     Column(modifier) {
         // Map apps
-        // TODO Distribute space between flow row items
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(spacing.extraTiny)) {
+        EvenlySpacedGrid(
+            minItemWidth,
+            modifier = Modifier.padding(horizontal = gridHorizontalPadding),
+            horizontalSpacing = horizontalSpacing,
+        ) { itemWidth ->
             outputsForAppsByCategory.mapApps
                 .forEach { outputsForApp ->
                     key(outputsForApp.packageName) {
                         ResultAppsAppIcon(
                             outputsForApp = outputsForApp,
                             iconSize = iconSize,
+                            width = itemWidth,
                             onClick = { output -> onExecute(output.toAction(lastPoint, points, source)) },
                             onHideApp = { onHideApp(outputsForApp.packageName) },
                         )
@@ -113,6 +121,7 @@ fun ResultApps(
                     ResultAppsShareIcon(
                         outputsForSharing = outputsForSharing,
                         iconSize = iconSize,
+                        width = itemWidth,
                         onClick = { output -> onExecute(output.toAction(lastPoint, points, source)) },
                     )
                 }
@@ -122,13 +131,18 @@ fun ResultApps(
         // Messaging apps
         if (outputsForAppsByCategory.messagingApps.isNotEmpty()) {
             ResultAppsHeadline(stringResource(R.string.output_send))
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(spacing.extraTiny)) {
+            EvenlySpacedGrid(
+                minItemWidth,
+                modifier = Modifier.padding(horizontal = gridHorizontalPadding),
+                horizontalSpacing = horizontalSpacing,
+            ) { itemWidth ->
                 outputsForAppsByCategory.messagingApps
                     .forEach { outputsForApp ->
                         key(outputsForApp.packageName) {
                             ResultAppsAppIcon(
                                 outputsForApp = outputsForApp,
                                 iconSize = iconSize,
+                                width = itemWidth,
                                 onClick = { output -> onExecute(output.toAction(lastPoint, points, source)) },
                                 onHideApp = { onHideApp(outputsForApp.packageName) },
                             )
@@ -153,12 +167,17 @@ fun ResultApps(
                     )
                 }
             }
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(spacing.extraTiny)) {
+            EvenlySpacedGrid(
+                minItemWidth,
+                modifier = Modifier.padding(horizontal = gridHorizontalPadding),
+                horizontalSpacing = horizontalSpacing,
+            ) { itemWidth ->
                 outputsForLinks.forEach { outputsForLink ->
                     key(outputsForLink.group) {
                         ResultAppsLinkIcon(
                             outputsForLink = outputsForLink,
                             iconSize = iconSize,
+                            width = itemWidth,
                             onClick = { output -> onExecute(output.toAction(lastPoint, points, source)) },
                             onDisableLinkGroup = { onDisableLinkGroup(outputsForLink.group) },
                         )
@@ -168,7 +187,13 @@ fun ResultApps(
         }
 
         // Message
-        message?.invoke(PaddingValues(top = spacing.small))
+        message?.invoke(
+            PaddingValues(
+                start = spacing.windowPadding,
+                top = spacing.small,
+                end = spacing.windowPadding,
+            )
+        )
     }
 }
 
@@ -179,6 +204,7 @@ private fun ResultAppsHeadline(text: String, extra: (@Composable RowScope.() -> 
     Row(
         Modifier
             .padding(top = spacing.tiny)
+            .padding(horizontal = spacing.windowPadding)
             .fillMaxWidth()
             .height(50.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -197,6 +223,7 @@ private fun ResultAppsHeadline(text: String, extra: (@Composable RowScope.() -> 
 private fun ResultAppsAppIcon(
     outputsForApp: OutputDetailsForApp,
     iconSize: Dp,
+    width: Dp,
     onClick: (output: Output) -> Unit,
     onHideApp: () -> Unit,
 ) {
@@ -212,7 +239,9 @@ private fun ResultAppsAppIcon(
             )
         },
         onClick = { onClick(outputsForApp.default.output) },
-        modifier = Modifier.testTag("geoShareApp_${outputsForApp.packageName}"),
+        modifier = Modifier
+            .width(width)
+            .testTag("geoShareApp_${outputsForApp.packageName}"),
     ) {
         IconFromDescriptor(
             outputsForApp.default.icon ?: PlaceholderIconDescriptor,
@@ -227,6 +256,7 @@ private fun ResultAppsAppIcon(
 private fun ResultAppsShareIcon(
     outputsForSharing: OutputDetailsForSharing,
     iconSize: Dp,
+    width: Dp,
     onClick: (output: Output) -> Unit,
 ) {
     AppIcon(
@@ -241,7 +271,9 @@ private fun ResultAppsShareIcon(
             )
         },
         onClick = { onClick(outputsForSharing.defaultOutputDetail.output) },
-        modifier = Modifier.testTag("geoShareAppShare"),
+        modifier = Modifier
+            .width(width)
+            .testTag("geoShareAppShare"),
     ) {
         Surface(
             Modifier.requiredSize(iconSize),
@@ -261,6 +293,7 @@ private fun ResultAppsShareIcon(
 private fun ResultAppsLinkIcon(
     outputsForLink: OutputDetailsForLink,
     iconSize: Dp,
+    width: Dp,
     onClick: (output: Output) -> Unit,
     onDisableLinkGroup: () -> Unit,
 ) {
@@ -276,7 +309,9 @@ private fun ResultAppsLinkIcon(
             )
         },
         onClick = { onClick(outputsForLink.default.output) },
-        modifier = Modifier.testTag("geoShareLink_${outputsForLink.group}"),
+        modifier = Modifier
+            .width(width)
+            .testTag("geoShareLink_${outputsForLink.group}"),
     ) {
         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
             IconFromDescriptor(
@@ -338,6 +373,92 @@ private fun DefaultPreview() {
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DarkPreview() {
+    AppTheme {
+        Surface {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+                log = log,
+            )
+            val appDetails = getFakeAppDetails(context)
+            ResultApps(
+                outputsForAppsByCategory = MutableStateFlow(
+                    fakeActivities
+                        .partition { !it.isMessagingApp() }
+                        .let { (mapAppActivities, messagingAppActivities) ->
+                            Pair(
+                                outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
+                                outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
+                            )
+                        }
+                        .toOutputDetailsForAppsByCategory(appDetails)
+                ),
+                outputsForLinks = MutableStateFlow(
+                    outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
+                ),
+                outputsForSharing = MutableStateFlow(
+                    outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
+                ),
+                points = persistentListOf(WGS84Point(NaivePoint.example)),
+                source = MutableStateFlow(""),
+                onDisableLinkGroup = {},
+                onExecute = {},
+                onHideApp = {},
+                onNavigateToLinkScreen = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, device = Devices.NEXUS_5)
+@Composable
+private fun SmallPreview() {
+    AppTheme {
+        Surface {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+                log = log,
+            )
+            val appDetails = getFakeAppDetails(context)
+            ResultApps(
+                outputsForAppsByCategory = MutableStateFlow(
+                    fakeActivities
+                        .partition { !it.isMessagingApp() }
+                        .let { (mapAppActivities, messagingAppActivities) ->
+                            Pair(
+                                outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
+                                outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
+                            )
+                        }
+                        .toOutputDetailsForAppsByCategory(appDetails)
+                ),
+                outputsForLinks = MutableStateFlow(
+                    outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
+                ),
+                outputsForSharing = MutableStateFlow(
+                    outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
+                ),
+                points = persistentListOf(WGS84Point(NaivePoint.example)),
+                source = MutableStateFlow(""),
+                onDisableLinkGroup = {},
+                onExecute = {},
+                onHideApp = {},
+                onNavigateToLinkScreen = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, device = "spec:width=640dp,height=800dp,dpi=240")
+@Composable
+private fun TabletPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
