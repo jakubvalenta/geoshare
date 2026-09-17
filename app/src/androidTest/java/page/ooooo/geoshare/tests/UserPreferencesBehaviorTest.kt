@@ -192,7 +192,7 @@ class UserPreferencesBehaviorTest {
     }
 
     @Test
-    fun whenAppIsHidden_itIsNotShownOnResultScreen() = uiAutomator { // FIXME
+    fun whenAppIsHidden_itIsNotShownOnResultScreen() = uiAutomator {
         assumeAppInstalled(PackageNames.OSMAND_PLUS)
 
         // Launch app

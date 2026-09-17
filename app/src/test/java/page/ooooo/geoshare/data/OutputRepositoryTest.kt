@@ -60,6 +60,7 @@ import page.ooooo.geoshare.lib.outputs.CopyCoordsDegMinSecOutput
 import page.ooooo.geoshare.lib.outputs.CopyGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.CopyLinkUriOutput
 import page.ooooo.geoshare.lib.outputs.CopyNameOutput
+import page.ooooo.geoshare.lib.outputs.CopyStringOutput
 import page.ooooo.geoshare.lib.outputs.NoopOutput
 import page.ooooo.geoshare.lib.outputs.OpenDisplayCartesIGNUrlOutput
 import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
@@ -70,11 +71,13 @@ import page.ooooo.geoshare.lib.outputs.OpenPointsGpxOutput
 import page.ooooo.geoshare.lib.outputs.OpenRouteGpxOutput
 import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 import page.ooooo.geoshare.lib.outputs.OpenStreetViewGoogleUriOutput
+import page.ooooo.geoshare.lib.outputs.OpenUnknownUriOutput
 import page.ooooo.geoshare.lib.outputs.SavePointGpxOutput
 import page.ooooo.geoshare.lib.outputs.SavePointToContactOutput
 import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
 import page.ooooo.geoshare.lib.outputs.SaveRouteGpxOutput
 import page.ooooo.geoshare.lib.outputs.SendPointOutput
+import page.ooooo.geoshare.lib.outputs.SendStringOutput
 import page.ooooo.geoshare.lib.outputs.ShareDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.ShareLinkUriOutput
 import page.ooooo.geoshare.lib.outputs.ShareNavigationGoogleUriOutput
@@ -359,7 +362,29 @@ class OutputRepositoryTest {
     }
 
     @Test
-    fun getAutomationOutput_convertsAllAutomationsToOutputs() = runTest {
+    fun getOutputsForUri_returnsOutputsForTextActivityAndUriActivityAndIgnoresFileActivity() {
+        assertEquals(
+            listOf(
+                CopyStringOutput,
+                OpenUnknownUriOutput(
+                    UriActivity(packageName = PackageNames.OSMAND_PLUS, uriScheme = UriScheme.GEO)
+                ),
+                SendStringOutput(
+                    TextActivity(packageName = PackageNames.CONVERSATIONS, mimeType = MimeType.TEXT_PLAIN),
+                )
+            ),
+            outputRepository.getOutputsForUri(
+                listOf(
+                    UriActivity(packageName = PackageNames.OSMAND_PLUS, uriScheme = UriScheme.GEO),
+                    TextActivity(packageName = PackageNames.CONVERSATIONS, mimeType = MimeType.TEXT_PLAIN),
+                    FileActivity(packageName = PackageNames.COMAPS_FDROID, fileType = FileType.GPX),
+                )
+            )
+        )
+    }
+
+    @Test
+    fun toOutput_convertsAllAutomationsToOutputs() = runTest {
         assertEquals(
             listOf(
                 listOf(

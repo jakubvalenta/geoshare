@@ -169,7 +169,6 @@ class OutputRepository @Inject constructor(
             SavePointsGpxOutput(coordinateConverter),
         )
 
-    // TODO Test
     fun getOutputsForUri(activities: List<AppActivity>): List<StringOutput> =
         listOf(
             CopyStringOutput,
