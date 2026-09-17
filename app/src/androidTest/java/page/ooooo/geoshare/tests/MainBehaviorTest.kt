@@ -175,9 +175,15 @@ class MainBehaviorTest {
     fun whenLinkIsShared_allowsOpeningGoogleMapsSearchLink() = uiAutomator {
         assumeAppInstalled(PackageNames.GOOGLE_MAPS)
 
-        // Share a point with name with the app
+        // Launch app
+        launchApplication()
+        waitForAppToBeVisible()
+
+        // Enter a point in the main form and submit it. Use the form instead of sharing the point, so that the app
+        // doesn't finish, which causes clicking on a non-clickable element on Redmi 8
         val query = "foo"
-        shareUri(WGS84Point(name = query, source = Source.GENERATED))
+        setMainInput(WGS84Point(name = query, source = Source.GENERATED))
+        submitMainForm()
 
         // Click the link
         scrollToLinkIcons()

@@ -52,7 +52,6 @@ class AutomationBehaviorTest {
 
         // Configure automation
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
-        quickWaitForStableInActiveWindow() // TODO
         scrollToAutomationItem(OpenDisplayGeoUriAutomation(PackageNames.GOOGLE_MAPS)).click()
 
         // Share a URI with the app
@@ -149,7 +148,9 @@ class AutomationBehaviorTest {
 
         // Configure automation
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
-        scrollToAutomationItem(SavePointsGpxAutomation).click()
+        // Use a custom point of the click, instead of the default center, otherwise the click doesn't work on Redmi 8
+        // for some reason
+        scrollToAutomationItem(SavePointsGpxAutomation).click(android.graphics.Point(10, 10))
 
         // Share a URI with the app
         shareUri()

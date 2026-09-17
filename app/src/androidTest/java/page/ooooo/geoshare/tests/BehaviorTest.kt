@@ -141,6 +141,7 @@ fun UiAutomatorTestScope.denySystemPermission() {
 }
 
 fun UiAutomatorTestScope.clickSystemShareMenuIfShown(appLabel: String) {
+    quickWaitForStableInActiveWindow() // Wait to prevent clicking a non-clickable element
     onElementOrNull(1_000L) {
         packageName != BuildConfig.APPLICATION_ID && // Make sure we don't accidentally click a similar text in our app
             textAsString() == appLabel
