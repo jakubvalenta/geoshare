@@ -32,6 +32,7 @@ sealed interface Output {
     fun automationDescription(): String? = null
 
     interface HasActivity<T : AppActivity> {
+        @Suppress("EmptyMethod")
         val activity: T
 
         fun getAppDetail(appDetails: AppDetails): AppDetail? =

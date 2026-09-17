@@ -97,7 +97,6 @@ fun ResultApps(
         // TODO Distribute space between flow row items
         FlowRow(horizontalArrangement = Arrangement.spacedBy(spacing.extraTiny)) {
             outputsForAppsByCategory.mapApps
-                .sortedBy { it.label }
                 .forEach { outputsForApp ->
                     key(outputsForApp.packageName) {
                         ResultAppsAppIcon(
@@ -125,7 +124,6 @@ fun ResultApps(
             ResultAppsHeadline(stringResource(R.string.output_send))
             FlowRow(horizontalArrangement = Arrangement.spacedBy(spacing.extraTiny)) {
                 outputsForAppsByCategory.messagingApps
-                    .sortedBy { it.label }
                     .forEach { outputsForApp ->
                         key(outputsForApp.packageName) {
                             ResultAppsAppIcon(

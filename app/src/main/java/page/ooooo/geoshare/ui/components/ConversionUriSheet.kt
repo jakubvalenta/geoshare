@@ -76,7 +76,6 @@ fun ConversionUriSheet(
             if (outputsForUriByCategory.open.isNotEmpty()) {
                 SheetSection(title = stringResource(R.string.main_source_open), first = false) {
                     outputsForUriByCategory.open
-                        .sortedBy { it.label }
                         .forEach { outputDetail ->
                             key(outputDetail.output.id) {
                                 SheetListItem(

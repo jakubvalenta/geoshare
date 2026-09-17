@@ -281,6 +281,7 @@ fun Map<String, List<Output>>.toOutputDetailsForApps(appDetails: AppDetails): Li
             }
         }
     }
+        .sortedBy { it.label }
 
 fun Pair<Map<String, List<Output>>, Map<String, List<Output>>>.toOutputDetailsForAppsByCategory(appDetails: AppDetails): OutputDetailsForAppsByCategory =
     let { (outputsForMapApps, outputsForMessagingApps) ->
@@ -316,7 +317,11 @@ fun List<Output>.toOutputDetailsForSharing(appDetails: AppDetails): OutputDetail
 fun Pair<List<StringOutput>, List<StringOutput>>.toOutputDetailsForUriByCategory(appDetails: AppDetails): OutputDetailsForUriByCategory =
     let { (outputsForCopying, outputsForOpening) ->
         OutputDetailsForUriByCategory(
-            copy = outputsForCopying.map { it.toOutputDetailForUri(appDetails) },
-            open = outputsForOpening.map { it.toOutputDetailForUri(appDetails) },
+            copy = outputsForCopying
+                .map { it.toOutputDetailForUri(appDetails) }
+                .sortedBy { it.label },
+            open = outputsForOpening
+                .map { it.toOutputDetailForUri(appDetails) }
+                .sortedBy { it.label },
         )
     }
