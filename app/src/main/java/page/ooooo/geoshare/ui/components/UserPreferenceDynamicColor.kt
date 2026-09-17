@@ -68,6 +68,7 @@ fun UserPreferenceDynamicColorControls(
     ) {
         val selectedValue = DynamicColorPreference.getValue(values)
         userPreferenceOptionsControl(
+            key = "dynamic_color_control",
             isSelected = { it == selectedValue },
             onSelect = {
                 onValueChange { preferences ->

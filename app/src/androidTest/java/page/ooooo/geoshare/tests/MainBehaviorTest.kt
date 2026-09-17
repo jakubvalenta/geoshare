@@ -322,6 +322,7 @@ class MainBehaviorTest {
         shareUri()
 
         // Help message OPEN_BY_DEFAULT is visible
+        quickWaitForStableInActiveWindow() // Wait for the result to render, to prevent stale object error
         onMainScrollablePane()
             // Scroll by percents not to element, because it's more reliable due to the lazy list loading
             .scroll(Direction.DOWN, 3f)

@@ -101,6 +101,7 @@ fun UserPreferenceAutomationDelayControls(
         onNavigateToBillingScreen = onNavigateToBillingScreen,
     ) {
         userPreferenceTextControl(
+            key = "automation_delay_control",
             userPreference = AutomationDelayPreference,
             values = values,
             onValueChange = onValueChange,

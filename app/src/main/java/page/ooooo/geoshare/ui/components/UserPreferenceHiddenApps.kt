@@ -114,7 +114,7 @@ fun UserPreferenceHiddenAppsControls(
             }
         }
 
-        item {
+        item(key = "hidden_apps_list", contentType = "segmented_list") {
             val spacing = LocalSpacing.current
 
             SegmentedList(

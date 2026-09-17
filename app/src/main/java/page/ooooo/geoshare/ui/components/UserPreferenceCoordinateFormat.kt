@@ -75,6 +75,7 @@ fun UserPreferenceCoordinateFormatControls(
     ) {
         val selectedValue = CoordinateFormatPreference.getValue(values)
         userPreferenceOptionsControl(
+            key = "coordinate_format_control",
             isSelected = { it == selectedValue },
             onSelect = {
                 onValueChange { preferences ->

@@ -81,7 +81,7 @@ fun ResultSheet(
                 .semantics { testTagsAsResourceId = true }
                 .testTag("geoShareResultSheet"),
         ) {
-            item {
+            item(key = "point_section", contentType = "sheet_section") {
                 SheetSection(
                     title = if (points.size > 1) {
                         stringResource(R.string.conversion_succeeded_point_number, selectedPointIndex + 1)
@@ -105,7 +105,7 @@ fun ResultSheet(
                         }
                 }
             }
-            item {
+            item(key = "points_section", contentType = "sheet_section") {
                 SheetSection(
                     title = if (points.size > 1) {
                         stringResource(R.string.conversion_succeeded_point_all, points.size)

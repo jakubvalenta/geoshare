@@ -66,7 +66,7 @@ fun UserPreferenceDeveloperOptionsControls(
         onBack = onBack,
         onNavigateToBillingScreen = onNavigateToBillingScreen,
     ) {
-        item {
+        item(key = "changelog_shown_label", contentType = "paragraph_text") {
             ParagraphText(
                 stringResource(R.string.user_preferences_changelog_shown_for_version_code_title),
                 Modifier
@@ -76,12 +76,13 @@ fun UserPreferenceDeveloperOptionsControls(
             )
         }
         userPreferenceTextControl(
+            key = "changelog_shown_control",
             userPreference = ChangelogShownForVersionCodePreference,
             values = values,
             onValueChange = onValueChange,
             modifier = Modifier.testTag("geoShareUserPreferenceChangelogShownForVersionCode"),
         )
-        item {
+        item(key = "cached_purchase_label", contentType = "paragraph_text") {
             ParagraphText(
                 stringResource(R.string.user_preferences_billing_cached_purchase),
                 Modifier
@@ -91,11 +92,12 @@ fun UserPreferenceDeveloperOptionsControls(
             )
         }
         userPreferenceTextControl(
+            key = "cached_purchase_control",
             userPreference = CachedPurchasePreference,
             values = values,
             onValueChange = onValueChange,
         )
-        item {
+        item(key = "dimissed_help_messages_label", contentType = "paragraph_text") {
             ParagraphText(
                 stringResource(R.string.user_preferences_dismissed_help_messages),
                 Modifier
@@ -105,6 +107,7 @@ fun UserPreferenceDeveloperOptionsControls(
             )
         }
         userPreferenceTextControl(
+            key = "dismissed_help_messages_control",
             userPreference = DismissedHelpMessagesPreference,
             values = values,
             onValueChange = onValueChange,

@@ -52,6 +52,7 @@ class AutomationBehaviorTest {
 
         // Configure automation
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
+        quickWaitForStableInActiveWindow() // TODO
         scrollToAutomationItem(OpenDisplayGeoUriAutomation(PackageNames.GOOGLE_MAPS)).click()
 
         // Share a URI with the app

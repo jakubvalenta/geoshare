@@ -41,7 +41,7 @@ fun MainScaffold(
                 topContent()
                 if (!wide) {
                     supportingTitle?.let { supportingTitle ->
-                        item {
+                        item(key = "supporting_title", contentType = "column") {
                             val spacing = LocalSpacing.current
                             Column(
                                 Modifier
@@ -67,7 +67,7 @@ fun MainScaffold(
             ) {
                 if (wide) {
                     if (supportingTitle != null) {
-                        item {
+                        item(key = "supporting_title", contentType = "column") {
                             Column(Modifier.padding(horizontal = LocalSpacing.current.windowPadding)) {
                                 supportingTitle(Int.MAX_VALUE)
                             }

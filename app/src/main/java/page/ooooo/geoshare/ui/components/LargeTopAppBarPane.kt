@@ -128,7 +128,7 @@ fun LargeTopAppBarPane(
     )
     LazyColumn(modifier, state = listState) {
         if (title != null) {
-            item {
+            item(key = "title", contentType = "column") {
                 Column(
                     Modifier
                         .padding(horizontal = spacing.windowPadding)

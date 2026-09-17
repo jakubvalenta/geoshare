@@ -126,6 +126,7 @@ fun UserPreferenceAutomationControls(
             AutomationPreference.default
         }
         userPreferenceOptionsControl(
+            key = "automation_control",
             isSelected = { it.automation == selectedValue },
             onSelect = {
                 onValueChange { preferences ->

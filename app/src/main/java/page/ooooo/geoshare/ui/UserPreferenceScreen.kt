@@ -47,7 +47,6 @@ import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.CustomLinkFeature
 import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.outputs.NoopOutput
-import page.ooooo.geoshare.ui.components.LabelLarge
 import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
 import page.ooooo.geoshare.ui.components.NavigableStyledListDetailPaneScaffold
 import page.ooooo.geoshare.ui.components.SegmentedListLabel
@@ -245,16 +244,15 @@ private fun UserPreferenceListPane(
         },
         onBack = onBack,
     ) {
-        item {
-            LabelLarge(
+        item(key = "input_list_label", contentType = "segmented_list_label") {
+            SegmentedListLabel(
                 stringResource(R.string.user_preferences_section_input),
-                Modifier
-                    .padding(horizontal = spacing.windowPadding)
-                    .padding(top = spacing.tiny, bottom = spacing.tiny),
+                Modifier.padding(horizontal = spacing.windowPadding),
+                paddingTop = spacing.tiny,
                 color = MaterialTheme.colorScheme.primary
             )
         }
-        item {
+        item(key = "input_list", contentType = "column") {
             Column(
                 modifier = Modifier
                     .selectableGroup()
@@ -279,13 +277,13 @@ private fun UserPreferenceListPane(
                 )
             }
         }
-        item {
+        item(key = "automation_list_label", contentType = "segmented_list_label") {
             SegmentedListLabel(
                 stringResource(R.string.user_preferences_automation_title),
                 modifier = Modifier.padding(horizontal = spacing.windowPadding),
             )
         }
-        item {
+        item(key = "automation_list", contentType = "column") {
             Column(
                 modifier = Modifier
                     .selectableGroup()
@@ -315,13 +313,13 @@ private fun UserPreferenceListPane(
                 )
             }
         }
-        item {
+        item(key = "output_list_label", contentType = "segmented_list_label") {
             SegmentedListLabel(
                 stringResource(R.string.user_preferences_section_output),
                 modifier = Modifier.padding(horizontal = spacing.windowPadding),
             )
         }
-        item {
+        item(key = "output_list", contentType = "column") {
             Column(
                 modifier = Modifier
                     .selectableGroup()
@@ -363,13 +361,13 @@ private fun UserPreferenceListPane(
             }
         }
         if (DynamicColorPreference.isAvailable()) {
-            item {
+            item(key = "dynamic_color_list_label", contentType = "segmented_list_label") {
                 SegmentedListLabel(
                     stringResource(R.string.user_preferences_section_appearance),
                     modifier = Modifier.padding(horizontal = spacing.windowPadding),
                 )
             }
-            item {
+            item(key = "dynamic_color_list", contentType = "column") {
                 Column(
                     modifier = Modifier
                         .selectableGroup()
@@ -388,13 +386,13 @@ private fun UserPreferenceListPane(
             }
         }
         if (BuildConfig.DEBUG) {
-            item {
+            item(key = "developer_options_list_label", contentType = "segmented_list_label") {
                 SegmentedListLabel(
                     stringResource(R.string.user_preferences_developer_title),
                     modifier = Modifier.padding(horizontal = spacing.windowPadding),
                 )
             }
-            item {
+            item(key = "developer_options_list", contentType = "column") {
                 Column(
                     modifier = Modifier
                         .selectableGroup()

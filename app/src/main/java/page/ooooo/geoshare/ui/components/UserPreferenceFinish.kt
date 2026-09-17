@@ -72,6 +72,7 @@ fun UserPreferenceFinishControls(
     ) {
         val selectedValue = FinishPreference.getValue(values)
         userPreferenceOptionsControl(
+            key = "finish_control",
             isSelected = { it == selectedValue },
             onSelect = {
                 onValueChange { preferences ->

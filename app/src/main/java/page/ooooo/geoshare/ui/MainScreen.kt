@@ -12,7 +12,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -438,37 +437,38 @@ private fun MainScreen(
                 )
             },
             topContent = {
-                item {
-                    Column {
-                        MainSourceBar(
-                            currentState = currentState,
-                            errorMessageResId = errorMessageResId,
-                            logExpanded = logExpanded,
-                            source = source,
-                            start = start,
-                            stateLog = stateLog,
-                            onSelectUri = onSelectUri,
-                            onSetLogExpanded = { logExpanded = it },
-                            onSetErrorMessageResId = { errorMessageResId = it },
-                            onSetSource = onSetSource,
-                            onSubmit = onSubmit,
-                        )
-                        ConversionStateLogList(
-                            expanded = logExpanded,
-                            stateLog = stateLog,
-                            onUriClick = onSelectUri,
-                        )
-                    }
+                item(key = "main_source_bar", contentType = "main_source_bar") {
+                    MainSourceBar(
+                        currentState = currentState,
+                        errorMessageResId = errorMessageResId,
+                        logExpanded = logExpanded,
+                        source = source,
+                        start = start,
+                        stateLog = stateLog,
+                        onSelectUri = onSelectUri,
+                        onSetLogExpanded = { logExpanded = it },
+                        onSetErrorMessageResId = { errorMessageResId = it },
+                        onSetSource = onSetSource,
+                        onSubmit = onSubmit,
+                    )
                 }
-
-                item {
-                    if (currentState is Initial) {
+                item(key = "conversion_state_log_list", contentType = "conversion_state_log_list") {
+                    ConversionStateLogList(
+                        expanded = logExpanded,
+                        stateLog = stateLog,
+                        onUriClick = onSelectUri,
+                    )
+                }
+                if (currentState is Initial) {
+                    item(key = "main_submit", contentType = "main_submit") {
                         MainSubmit(
                             source = source,
                             onSetErrorMessageResId = { errorMessageResId = it },
                             onSubmit = onSubmit,
                         )
-                    } else {
+                    }
+                } else {
+                    item(key = "result", contentType = "result") {
                         Card(
                             colors = CardDefaults.cardColors(
                                 containerColor = mainContainerColor(currentState),
@@ -520,7 +520,7 @@ private fun MainScreen(
                 }
 
                 if (currentState is PermissionGrantedWebViewInput) {
-                    item {
+                    item(key = "main_web_view", contentType = "main_web_view") {
                         MainWebView(
                             matchedInput = currentState.matchedInput,
                             pendingData = currentState.pendingData,
@@ -531,7 +531,7 @@ private fun MainScreen(
             bottomContent = {
                 when (currentState) {
                     is Initial ->
-                        item {
+                        item(key = "main_help", contentType = "main_help") {
                             MainHelp(
                                 inputRepository = inputRepository,
                                 onNavigateToFaqScreen = onNavigateToFaqScreen,
@@ -548,7 +548,7 @@ private fun MainScreen(
                         }
 
                     is ConversionState.HasResult ->
-                        item {
+                        item(key = "result_apps", contentType = "result_apps") {
                             ResultApps(
                                 outputsForAppsByCategory = outputsForAppsByCategory,
                                 outputsForLinks = outputsForLinks,

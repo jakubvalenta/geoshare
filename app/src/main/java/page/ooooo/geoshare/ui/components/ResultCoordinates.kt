@@ -178,22 +178,20 @@ fun ResultCoordinates(
         }
         if (outputsForPointChips.isNotEmpty()) {
             ScrollableChips(
-                paddingValues = PaddingValues(
+                contentPadding = PaddingValues(
                     start = spacing.windowPadding,
                     end = spacing.windowPadding,
                     bottom = spacing.extraTiny,
                 ),
             ) {
                 outputsForPointChips.forEach { outputDetail ->
-                    item {
-                        StyledChip(
-                            label = outputDetail.label(),
-                            icon = outputDetail.icon?.let {
-                                { IconFromDescriptor(it, contentDescription = null) }
-                            },
-                        ) {
-                            onExecute(outputDetail.output.toAction(lastPoint))
-                        }
+                    StyledChip(
+                        label = outputDetail.label(),
+                        icon = outputDetail.icon?.let {
+                            { IconFromDescriptor(it, contentDescription = null) }
+                        },
+                    ) {
+                        onExecute(outputDetail.output.toAction(lastPoint))
                     }
                 }
             }
@@ -256,15 +254,13 @@ fun ResultCoordinates(
                     if (outputsForPointsChips.isNotEmpty()) {
                         ScrollableChips(Modifier.testTag("geoShareResultPointsChips")) {
                             outputsForPointsChips.forEach { outputDetail ->
-                                item {
-                                    StyledChip(
-                                        label = outputDetail.label(),
-                                        icon = outputDetail.icon?.let {
-                                            { IconFromDescriptor(it, contentDescription = null) }
-                                        },
-                                    ) {
-                                        onExecute(outputDetail.output.toAction(points))
-                                    }
+                                StyledChip(
+                                    label = outputDetail.label(),
+                                    icon = outputDetail.icon?.let {
+                                        { IconFromDescriptor(it, contentDescription = null) }
+                                    },
+                                ) {
+                                    onExecute(outputDetail.output.toAction(points))
                                 }
                             }
                         }

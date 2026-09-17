@@ -320,7 +320,7 @@ private fun LinkListPane(
         },
         onBack = onBack,
     ) {
-        item {
+        item(key = "description", contentType = "paragraph_text") {
             ParagraphText(
                 stringResource(R.string.links_description),
                 Modifier
@@ -329,7 +329,7 @@ private fun LinkListPane(
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
-        item {
+        item(key = "add", contentType = "feature_badged") {
             FeatureBadged(
                 enabled = CustomLinkFeature in billingFeatures && billingStatus !is BillingStatus.Loading && billingStatus !is BillingStatus.Purchased,
                 badge = { modifier ->
@@ -357,14 +357,16 @@ private fun LinkListPane(
             .groupBy { it.groupOrName }
             .toSortedMap()
             .forEach { (group, links) ->
-                item {
-                    if (group.isNotEmpty()) {
+                if (group.isNotEmpty()) {
+                    item(key = "group_${group}_list_label", contentType = "segmented_list_label") {
                         SegmentedListLabel(group, modifier = Modifier.padding(horizontal = spacing.windowPadding))
-                    } else {
+                    }
+                } else {
+                    item(key = "group_${group}_list_label", contentType = "spacer") {
                         Spacer(Modifier.height(spacing.small))
                     }
                 }
-                item {
+                item(key = "group_${group}_list", contentType = "segmented_list") {
                     SegmentedList(
                         values = links,
                         modifier = Modifier.padding(horizontal = spacing.windowPadding),
@@ -425,7 +427,7 @@ private fun LinkListPane(
                     )
                 }
             }
-        item {
+        item(key = "restore", contentType = "text_button") {
             TextButton(
                 onClick = { setRestoreInitialDataDialogOpen(true) },
                 modifier = Modifier
@@ -519,7 +521,7 @@ private fun LinkDetailPane(
                 },
                 backIcon = Icons.Default.Close,
             ) {
-                item {
+                item(key = "link_form", contentType = "link_form") {
                     LinkForm(
                         appEnabled = appEnabled,
                         chipEnabled = chipEnabled,

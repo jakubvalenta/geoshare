@@ -75,6 +75,7 @@ fun UserPreferenceConnectionPermissionControls(
     ) {
         val selectedValue = ConnectionPermissionPreference.getValue(values)
         userPreferenceOptionsControl(
+            key = "connection_permission_control",
             isSelected = { it == selectedValue },
             onSelect = {
                 onValueChange { preferences ->

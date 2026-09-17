@@ -191,36 +191,34 @@ fun LinkForm(
             WGS84Point.ForbiddenCity to stringResource(R.string.links_form_test_china),
         ).let { testPointsWithName ->
             Column(verticalArrangement = Arrangement.spacedBy(spacing.small)) {
-                ScrollableChips(paddingValues = PaddingValues(horizontal = LocalSpacing.current.windowPadding)) {
+                ScrollableChips(contentPadding = PaddingValues(horizontal = LocalSpacing.current.windowPadding)) {
                     testPointsWithName.forEach { (point, name) ->
-                        item {
-                            SuggestionChip(
-                                onClick = {
-                                    UriFormatter.formatUriString(
-                                        coordinateConverter.toSrs(point, srs).copy(name = name),
-                                        coordsUriTemplate,
-                                        nameUriTemplate,
-                                    )?.let {
-                                        context.openUriInDefaultApp(it)
-                                    }
-                                },
-                                label = {
-                                    Row(
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                    ) {
-                                        Text(name)
-                                        Icon(
-                                            painterResource(R.drawable.arrow_outward_24px),
-                                            contentDescription = null,
-                                            Modifier.size(16.dp),
-                                        )
-                                    }
-                                },
-                                enabled = enabled,
-                                contentPadding = PaddingValues(start = 8.dp, end = 2.dp),
-                            )
-                        }
+                        SuggestionChip(
+                            onClick = {
+                                UriFormatter.formatUriString(
+                                    coordinateConverter.toSrs(point, srs).copy(name = name),
+                                    coordsUriTemplate,
+                                    nameUriTemplate,
+                                )?.let {
+                                    context.openUriInDefaultApp(it)
+                                }
+                            },
+                            label = {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Text(name)
+                                    Icon(
+                                        painterResource(R.drawable.arrow_outward_24px),
+                                        contentDescription = null,
+                                        Modifier.size(16.dp),
+                                    )
+                                }
+                            },
+                            enabled = enabled,
+                            contentPadding = PaddingValues(start = 8.dp, end = 2.dp),
+                        )
                     }
                 }
             }
