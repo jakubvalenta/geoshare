@@ -20,7 +20,6 @@ object CopyStringOutput : StringOutput, Output.HasSuccessText {
     override fun label(appDetail: AppDetail?) =
         stringResource(R.string.conversion_succeeded_skip)
 
-    // TODO Use label()
     override fun getDescription(value: String, uriQuote: UriQuote) =
         value
 

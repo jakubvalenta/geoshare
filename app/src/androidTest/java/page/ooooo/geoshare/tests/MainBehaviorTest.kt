@@ -12,11 +12,16 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.android.TextActivity
+import page.ooooo.geoshare.lib.android.UriActivity
+import page.ooooo.geoshare.lib.android.UriScheme
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.outputs.OpenUnknownUriOutput
+import page.ooooo.geoshare.lib.outputs.SendStringOutput
 import kotlin.time.Duration.Companion.seconds
 
 class MainBehaviorTest {
@@ -120,10 +125,9 @@ class MainBehaviorTest {
 
         // Open the source sheet and tap an app
         onElement { viewIdResourceName == "geoShareMainSourceButton" }.click()
+        val output = SendStringOutput(TextActivity(messagingAppPackageName, mimeType = "text/plain"))
         onElement { viewIdResourceName == "geoShareConversionUriSheet" }
-            .scrollToElement(Direction.DOWN) {
-                viewIdResourceName == "geoShareConversionUriSheetItem_$messagingAppPackageName" // FIXME
-            }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareConversionUriSheetItem_${output.id}" }
             .click()
 
         // Opens the messaging app
@@ -139,10 +143,9 @@ class MainBehaviorTest {
 
         // Open the source sheet and tap an app
         onElement { viewIdResourceName == "geoShareMainSourceButton" }.click()
+        val output = OpenUnknownUriOutput(UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.UNKNOWN))
         onElement { viewIdResourceName == "geoShareConversionUriSheet" }
-            .scrollToElement(Direction.DOWN) {
-                viewIdResourceName == "geoShareConversionUriSheetItem_${PackageNames.GOOGLE_MAPS}" // FIXME
-            }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareConversionUriSheetItem_${output.id}" }
             .click()
 
         // Google Maps shows precise location

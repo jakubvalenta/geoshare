@@ -25,8 +25,8 @@ import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.fakeActivities
+import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.lib.DefaultLog
-import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
@@ -56,33 +56,34 @@ fun ConversionUriSheet(
         sheetState = sheetState,
     ) {
         Column(Modifier.verticalScroll(rememberScrollState())) {
-            SheetSection(title = stringResource(R.string.conversion_succeeded_skip)) {
-                outputsForUriByCategory.copy.forEach { outputDetail ->
-                    OneLineSheetListItem(
-                        headlineText = outputDetail.output.getDescription(uriString).orEmpty(),
-                        onClick = {
-                            onDismissRequest()
-                            onExecute(outputDetail.output.toAction(uriString))
-                        },
-                        icon = ResourceIconDescriptor(R.drawable.content_copy_24px),
-                    )
+            if (outputsForUriByCategory.copy.isNotEmpty()) {
+                SheetSection(title = stringResource(R.string.conversion_succeeded_skip)) {
+                    outputsForUriByCategory.copy.forEach { outputDetail ->
+                        OneLineSheetListItem(
+                            headlineText = outputDetail.output.getDescription(uriString).orEmpty(),
+                            onClick = {
+                                onDismissRequest()
+                                onExecute(outputDetail.output.toAction(uriString))
+                            },
+                            icon = ResourceIconDescriptor(R.drawable.content_copy_24px),
+                        )
+                    }
                 }
             }
             // TODO Sort by label
-            outputsForUriByCategory.open.forEach { outputDetail ->
-                SheetSection(
-                    first = false,
-                    title = stringResource(R.string.main_source_open),
-                ) {
-                    SheetListItem(
-                        headlineText = outputDetail.label(),
-                        modifier = Modifier.testTag("geoShareConversionUriSheetItem_${outputDetail.output.id}"),
-                        onClick = {
-                            onDismissRequest()
-                            onExecute(outputDetail.output.toAction(uriString))
-                        },
-                        icon = outputDetail.icon,
-                    )
+            if (outputsForUriByCategory.open.isNotEmpty()) {
+                SheetSection(title = stringResource(R.string.main_source_open), first = false) {
+                    outputsForUriByCategory.open.forEach { outputDetail ->
+                        SheetListItem(
+                            headlineText = outputDetail.label(),
+                            modifier = Modifier.testTag("geoShareConversionUriSheetItem_${outputDetail.output.id}"),
+                            onClick = {
+                                onDismissRequest()
+                                onExecute(outputDetail.output.toAction(uriString))
+                            },
+                            icon = outputDetail.icon ?: PlaceholderIconDescriptor,
+                        )
+                    }
                 }
             }
         }
@@ -104,7 +105,7 @@ private fun DefaultPreview() {
                 coordinateConverter = coordinateConverter,
                 log = log,
             )
-            val appDetails: AppDetails = emptyMap()
+            val appDetails = getFakeAppDetails(context)
             ConversionUriSheet(
                 outputsForUriByCategory = MutableStateFlow(
                     outputRepository.getOutputsForUri(
@@ -143,7 +144,7 @@ private fun DarkPreview() {
                 coordinateConverter = coordinateConverter,
                 log = log,
             )
-            val appDetails: AppDetails = emptyMap()
+            val appDetails = getFakeAppDetails(context)
             ConversionUriSheet(
                 outputsForUriByCategory = MutableStateFlow(
                     outputRepository.getOutputsForUri(
@@ -157,6 +158,82 @@ private fun DarkPreview() {
                     )
                         .partition { it is CopyStringOutput }
                         .toOutputDetailsForUriByCategory(appDetails)
+                ),
+                uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                initialValue = SheetValue.Expanded,
+                onDismissRequest = {},
+                onExecute = {},
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
+@Composable
+private fun DefaultLoadingPreview() {
+    AppTheme {
+        @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+        Scaffold {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+                log = log,
+            )
+            ConversionUriSheet(
+                outputsForUriByCategory = MutableStateFlow(
+                    outputRepository.getOutputsForUri(
+                        fakeActivities.filter {
+                            it.packageName in setOf(
+                                PackageNames.COMAPS_FDROID,
+                                PackageNames.CONVERSATIONS,
+                                PackageNames.OSMAND_PLUS,
+                            )
+                        }
+                    )
+                        .partition { it is CopyStringOutput }
+                        .toOutputDetailsForUriByCategory(emptyMap())
+                ),
+                uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                initialValue = SheetValue.Expanded,
+                onDismissRequest = {},
+                onExecute = {},
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkLoadingPreview() {
+    AppTheme {
+        @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+        Scaffold {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+                log = log,
+            )
+            ConversionUriSheet(
+                outputsForUriByCategory = MutableStateFlow(
+                    outputRepository.getOutputsForUri(
+                        fakeActivities.filter {
+                            it.packageName in setOf(
+                                PackageNames.COMAPS_FDROID,
+                                PackageNames.CONVERSATIONS,
+                                PackageNames.OSMAND_PLUS,
+                            )
+                        }
+                    )
+                        .partition { it is CopyStringOutput }
+                        .toOutputDetailsForUriByCategory(emptyMap())
                 ),
                 uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 initialValue = SheetValue.Expanded,

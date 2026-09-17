@@ -39,6 +39,7 @@ import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.data.toOutput
 import page.ooooo.geoshare.lib.DefaultLog
+import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingProduct
@@ -163,8 +164,10 @@ private fun AutomationPreferenceValue(
         horizontalArrangement = Arrangement.spacedBy(LocalSpacing.current.tiny),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            IconFromDescriptor(automationDetail.icon ?: PlaceholderIconDescriptor, contentDescription = null)
+        if (automationDetail.icon != null) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                IconFromDescriptor(automationDetail.icon, contentDescription = null)
+            }
         }
         if (description != null) {
             Column {
@@ -302,7 +305,7 @@ private fun DarkNoneListItemPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, device = "spec:width=1080px,height=3200px,dpi=440")
 @Composable
 private fun ControlsPreview() {
     AppTheme {
@@ -351,7 +354,11 @@ private fun ControlsPreview() {
     }
 }
 
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(
+    showBackground = true,
+    device = "spec:width=1080px,height=3200px,dpi=440",
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
 @Composable
 private fun DarkControlsPreview() {
     AppTheme {
@@ -361,6 +368,55 @@ private fun DarkControlsPreview() {
             val coordinateConverter = CoordinateConverter(geometries)
             val log = DefaultLog
             val appDetails = getFakeAppDetails(context)
+            UserPreferenceAutomationControls(
+                automationDetails = MutableStateFlow(
+                    AutomationPreference.getOptionGroups(
+                        activities = fakeActivities.filter { it.packageName == PackageNames.OSMAND_PLUS },
+                        appDetails = appDetails,
+                        hiddenApps = emptySet(),
+                        links = defaultFakeLinks,
+                    )
+                        .map { group ->
+                            group.map { automation ->
+                                when (automation) {
+                                    is BasicAutomation -> automation.toOutput(coordinateConverter)
+                                    is ActivityAutomation -> automation.toOutput(coordinateConverter, log)
+                                    is LinkAutomation -> defaultFakeLinks.findByUUID(automation.linkUUID)?.let { link ->
+                                        automation.toOutput(coordinateConverter, link)
+                                    }
+                                }
+                                    .toAutomationDetail(automation, appDetails)
+                            }
+                        }
+                ),
+                billingAppNameResId = R.string.app_name_pro,
+                values = UserPreferencesValues(automation = SavePointsGpxAutomation),
+                wide = true,
+                billingFeatures = listOf(AutomationFeature),
+                billingStatus = BillingStatus.Purchased(
+                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
+                    refundable = true,
+                    token = "test_purchased",
+                ),
+                onBack = {},
+                onNavigateToBillingScreen = {},
+                onValueChange = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, device = "spec:width=1080px,height=3200px,dpi=440")
+@Composable
+private fun LoadingControlsPreview() {
+    AppTheme {
+        Surface {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
+            val appDetails: AppDetails = emptyMap()
             UserPreferenceAutomationControls(
                 automationDetails = MutableStateFlow(
                     AutomationPreference.getOptionGroups(

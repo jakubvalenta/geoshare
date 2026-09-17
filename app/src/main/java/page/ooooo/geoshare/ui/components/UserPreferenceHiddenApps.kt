@@ -54,7 +54,7 @@ fun UserPreferenceHiddenAppsListItem(
         modifier = modifier,
         supportingContent = {
             Text(
-                if (hiddenAppsSize.visible == 0) {
+                if (hiddenAppsSize.total == hiddenAppsSize.visible) {
                     stringResource(R.string.user_preferences_apps_visible_all)
                 } else {
                     pluralStringResource(
@@ -128,6 +128,7 @@ fun UserPreferenceHiddenAppsControls(
                         IconFromDescriptor(
                             detail.icon?.let { DrawableIconDescriptor(it) } ?: PlaceholderIconDescriptor,
                             contentDescription = null,
+                            placeholderContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                         )
                     }
                 },
@@ -158,7 +159,7 @@ private fun ListItemPreview() {
                 UserPreferenceHiddenAppsListItem(
                     index = 0,
                     count = 1,
-                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 3, visible = 2)),
+                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 3, visible = 1)),
                     selected = false,
                     onClick = {},
                 )
@@ -176,7 +177,7 @@ private fun DarkListItemPreview() {
                 UserPreferenceHiddenAppsListItem(
                     index = 0,
                     count = 1,
-                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 3, visible = 2)),
+                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 3, visible = 1)),
                     selected = false,
                     onClick = {},
                 )
@@ -194,7 +195,7 @@ private fun AllListItemPreview() {
                 UserPreferenceHiddenAppsListItem(
                     index = 0,
                     count = 1,
-                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 3, visible = 0)),
+                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 3, visible = 3)),
                     selected = false,
                     onClick = {},
                 )
@@ -212,7 +213,7 @@ private fun DarkAllListItemPreview() {
                 UserPreferenceHiddenAppsListItem(
                     index = 0,
                     count = 1,
-                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 3, visible = 0)),
+                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 3, visible = 3)),
                     selected = false,
                     onClick = {},
                 )
@@ -230,7 +231,7 @@ private fun NoneListItemPreview() {
                 UserPreferenceHiddenAppsListItem(
                     index = 0,
                     count = 1,
-                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 3, visible = 3)),
+                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 3, visible = 0)),
                     selected = false,
                     onClick = {},
                 )
@@ -248,7 +249,7 @@ private fun DarkNoneListItemPreview() {
                 UserPreferenceHiddenAppsListItem(
                     index = 0,
                     count = 1,
-                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 3, visible = 3)),
+                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 3, visible = 0)),
                     selected = false,
                     onClick = {},
                 )

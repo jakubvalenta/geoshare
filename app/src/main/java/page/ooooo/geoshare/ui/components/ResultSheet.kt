@@ -107,12 +107,12 @@ fun ResultSheet(
             }
             item {
                 SheetSection(
-                    first = false,
                     title = if (points.size > 1) {
                         stringResource(R.string.conversion_succeeded_point_all, points.size)
                     } else {
                         null
                     },
+                    first = false,
                 ) {
                     outputsForPoints
                         .filter { it.output.isAvailable(points) }
