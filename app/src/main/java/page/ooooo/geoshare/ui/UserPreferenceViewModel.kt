@@ -154,7 +154,7 @@ class UserPreferenceViewModel @Inject constructor(
             ) { activities, hiddenApps ->
                 HiddenAppsSize(
                     total = activities.size,
-                    visible = activities.size.minus(hiddenApps?.size ?: 0),
+                    visible = (activities.map { it.packageName }.toSet() - (hiddenApps ?: emptySet())).size,
                 )
             }
             .stateIn(

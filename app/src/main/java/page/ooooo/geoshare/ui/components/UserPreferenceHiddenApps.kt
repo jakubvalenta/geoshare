@@ -139,7 +139,7 @@ fun UserPreferenceHiddenAppsControls(
                             onCheckedChange = {
                                 setValue(detail.packageName, it)
                             },
-                            modifier = Modifier.testTag("geoShareVisibleAppToggle_${detail}"),
+                            modifier = Modifier.testTag("geoShareVisibleAppToggle_${detail.packageName}"),
                             enabled = enabled,
                         )
                     }
