@@ -44,6 +44,7 @@ import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.android.AppActivity
 import page.ooooo.geoshare.lib.android.FileActivity
 import page.ooooo.geoshare.lib.android.FileType
+import page.ooooo.geoshare.lib.android.MimeType
 import page.ooooo.geoshare.lib.android.TextActivity
 import page.ooooo.geoshare.lib.android.UriActivity
 import page.ooooo.geoshare.lib.android.UriScheme
@@ -340,7 +341,7 @@ fun ActivityAutomation.toOutput(coordinateConverter: CoordinateConverter, log: L
 
         is SendPointAutomation ->
             packageName?.let { packageName ->
-                SendPointOutput(TextActivity(packageName, "text/plain"), coordinateConverter)
+                SendPointOutput(TextActivity(packageName, MimeType.TEXT_PLAIN), coordinateConverter)
             }
     }
 

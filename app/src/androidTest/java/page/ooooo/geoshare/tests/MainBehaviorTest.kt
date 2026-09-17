@@ -11,6 +11,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
+import page.ooooo.geoshare.lib.android.MimeType
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.android.TextActivity
 import page.ooooo.geoshare.lib.android.UriActivity
@@ -125,7 +126,7 @@ class MainBehaviorTest {
 
         // Open the source sheet and tap an app
         onElement { viewIdResourceName == "geoShareMainSourceButton" }.click()
-        val output = SendStringOutput(TextActivity(messagingAppPackageName, mimeType = "text/plain"))
+        val output = SendStringOutput(TextActivity(messagingAppPackageName, MimeType.TEXT_PLAIN))
         onElement { viewIdResourceName == "geoShareConversionUriSheet" }
             .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareConversionUriSheetItem_${output.id}" }
             .click()

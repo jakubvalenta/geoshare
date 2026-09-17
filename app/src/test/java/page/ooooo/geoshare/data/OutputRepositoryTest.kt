@@ -48,6 +48,7 @@ import page.ooooo.geoshare.data.local.preferences.ShareStreetViewGoogleUriAutoma
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.android.FileActivity
 import page.ooooo.geoshare.lib.android.FileType
+import page.ooooo.geoshare.lib.android.MimeType
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.android.TextActivity
 import page.ooooo.geoshare.lib.android.UriActivity
@@ -178,7 +179,7 @@ class OutputRepositoryTest {
                 ),
                 PackageNames.SIGNAL to listOf(
                     SendPointOutput(
-                        TextActivity(PackageNames.SIGNAL, mimeType = "text/plain"),
+                        TextActivity(PackageNames.SIGNAL, MimeType.TEXT_PLAIN),
                         coordinateConverter,
                     ),
                 ),
@@ -199,7 +200,7 @@ class OutputRepositoryTest {
                     FileActivity(PackageNames.GOOGLE_MAPS, FileType.GPX),
                     UriActivity(PackageNames.CARTES_IGN, UriScheme.CARTES_IGN),
                     UriActivity(PackageNames.MAGIC_EARTH, UriScheme.MAGIC_EARTH),
-                    TextActivity(PackageNames.SIGNAL, mimeType = "text/plain"),
+                    TextActivity(PackageNames.SIGNAL, MimeType.TEXT_PLAIN),
                     FileActivity(PackageNames.TOMTOM, FileType.GPX_ONE_POINT),
                 ),
                 emptySet(),
@@ -395,7 +396,7 @@ class OutputRepositoryTest {
                         coordinateConverter,
                     ),
                     SendPointOutput(
-                        TextActivity(PackageNames.SIGNAL, mimeType = "text/plain"),
+                        TextActivity(PackageNames.SIGNAL, MimeType.TEXT_PLAIN),
                         coordinateConverter,
                     ),
                     OpenRouteOnePointGpxOutput(

@@ -21,6 +21,7 @@ import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.FileActivity
 import page.ooooo.geoshare.lib.android.FileType
+import page.ooooo.geoshare.lib.android.MimeType
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.android.TextActivity
 import page.ooooo.geoshare.lib.android.UriActivity
@@ -83,7 +84,7 @@ class AutomationPreferenceTest {
                 .getOptionGroups(
                     activities = listOf(
                         UriActivity(PackageNames.MAGIC_EARTH, UriScheme.MAGIC_EARTH),
-                        TextActivity(PackageNames.SIGNAL, mimeType = "text/plain"),
+                        TextActivity(PackageNames.SIGNAL, MimeType.TEXT_PLAIN),
                         UriActivity(PackageNames.TEST, UriScheme.GEO),
                         FileActivity(PackageNames.TOMTOM, FileType.GPX_ONE_POINT),
                     ),

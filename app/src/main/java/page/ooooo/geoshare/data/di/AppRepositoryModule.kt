@@ -15,6 +15,7 @@ import page.ooooo.geoshare.data.DefaultAppRepository
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.FileActivity
 import page.ooooo.geoshare.lib.android.FileType
+import page.ooooo.geoshare.lib.android.MimeType
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.android.TextActivity
 import page.ooooo.geoshare.lib.android.UriActivity
@@ -37,7 +38,7 @@ object AppRepositoryModule {
 val fakeActivities = listOf(
     UriActivity(PackageNames.COMAPS_FDROID, UriScheme.GEO),
     UriActivity(PackageNames.COMAPS_FDROID, UriScheme.GOOGLE_NAVIGATION),
-    TextActivity(PackageNames.CONVERSATIONS, mimeType = "text/plain"),
+    TextActivity(PackageNames.CONVERSATIONS, MimeType.TEXT_PLAIN),
     UriActivity(PackageNames.GMAPS_WV, UriScheme.GEO),
     UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GEO),
     UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GOOGLE_NAVIGATION),
