@@ -336,4 +336,5 @@
     <string name="conversion_processing">Zpracovává se odkaz typu %1$s…</string>
     <string name="conversion_succeeded_copy_name">Zkopírovat název</string>
     <string name="conversion_automation_copy_name_succeeded">Název byl automaticky zkopírován</string>
+    <string name="main_source_open">Otevřít původní odkaz</string>
 </resources>
