@@ -5,7 +5,7 @@ import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.insertOrEditContactAddress
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
@@ -33,18 +33,18 @@ class SavePointToContactOutput @Inject constructor(
         ).let { success -> if (success) ActionResult.SUCCEEDED else ActionResult.FAILED }
 
     @Composable
-    override fun label(appLabel: String?) =
+    override fun label(appDetail: AppDetail?) =
         stringResource(R.string.output_save_to_contact)
 
-    override fun getMenuIcon(appDetails: AppDetails) =
+    override fun getMenuIcon(appDetail: AppDetail?) =
         ImageVectorIconDescriptor(Icons.Default.AccountBox)
 
     @Composable
-    override fun errorText(appLabel: String?) =
+    override fun errorText(appDetail: AppDetail?) =
         stringResource(R.string.output_save_to_contact_failed)
 
     @Composable
-    override fun automationErrorText(appLabel: String?) =
+    override fun automationErrorText(appDetail: AppDetail?) =
         stringResource(R.string.output_save_to_contact_automation_failed)
 
     override fun equals(other: Any?): Boolean {

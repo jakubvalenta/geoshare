@@ -18,6 +18,7 @@ import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.local.database.InitialLinks
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.database.findByUUID
+import page.ooooo.geoshare.data.local.preferences.ActivityAutomation
 import page.ooooo.geoshare.data.local.preferences.BasicAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDegMinSecAutomation
@@ -97,7 +98,7 @@ class OutputRepositoryTest {
             listOf(
                 CopyCoordsDecOutput(coordinateConverter),
                 CopyCoordsDegMinSecOutput(coordinateConverter),
-                CopyNameOutput(),
+                CopyNameOutput,
                 CopyGeoUriOutput(coordinateConverter),
                 CopyLinkUriOutput(FakeAppleMapsDisplayLink, coordinateConverter),
                 CopyLinkUriOutput(FakeAppleMapsNavigationLink, coordinateConverter),
@@ -366,7 +367,7 @@ class OutputRepositoryTest {
                 listOf(
                     CopyCoordsDecOutput(coordinateConverter),
                     CopyCoordsDegMinSecOutput(coordinateConverter),
-                    CopyNameOutput(),
+                    CopyNameOutput,
                     CopyGeoUriOutput(coordinateConverter),
                     ShareDisplayGeoUriOutput(coordinateConverter),
                     ShareNavigationGoogleUriOutput(coordinateConverter),
@@ -477,7 +478,8 @@ class OutputRepositoryTest {
             ).map { group ->
                 group.map { automation ->
                     when (automation) {
-                        is BasicAutomation -> automation.toOutput(coordinateConverter, log)
+                        is BasicAutomation -> automation.toOutput(coordinateConverter)
+                        is ActivityAutomation -> automation.toOutput(coordinateConverter, log)
                         is LinkAutomation -> defaultFakeLinks.findByUUID(automation.linkUUID)?.let { link ->
                             automation.toOutput(coordinateConverter, link)
                         }
@@ -546,7 +548,8 @@ class OutputRepositoryTest {
                 ShareRouteGpxAutomation,
             ).map { automation ->
                 when (automation) {
-                    is BasicAutomation -> automation.toOutput(coordinateConverter, log)
+                    is BasicAutomation -> automation.toOutput(coordinateConverter)
+                    is ActivityAutomation -> automation.toOutput(coordinateConverter, log)
                     is LinkAutomation ->
                         when (automation.linkUUID) {
                             UUID.fromString(InitialLinks.APPLE_MAPS_DISPLAY_UUID) -> FakeAppleMapsDisplayLink

@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
+import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.FileActivity
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
@@ -22,12 +23,12 @@ class OpenRouteGpxOutput @Inject constructor(
     }
 
     @Composable
-    override fun label(appLabel: String?) =
+    override fun label(appDetail: AppDetail?) =
         stringResource(R.string.output_gpx_route_open)
 
     @Composable
-    override fun automationLabel(appLabel: String?) =
-        stringResource(R.string.output_gpx_route_open_in, appLabel.orEmpty())
+    override fun automationLabel(appDetail: AppDetail?) =
+        stringResource(R.string.output_gpx_route_open_in, appDetail?.label.orEmpty())
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

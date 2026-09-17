@@ -333,7 +333,6 @@ private fun UserPreferenceListPane(
                     count = 4,
                     hiddenAppsSize = hiddenAppsSize,
                     selected = currentGroupId == UserPreferenceGroupId.HIDDEN_APPS,
-                    values = values,
                     modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.HIDDEN_APPS}"),
                     onClick = { onNavigateToGroup(UserPreferenceGroupId.HIDDEN_APPS) },
                 )

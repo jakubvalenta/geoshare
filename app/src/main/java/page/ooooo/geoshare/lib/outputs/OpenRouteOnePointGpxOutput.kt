@@ -6,7 +6,7 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.FileActivity
 import page.ooooo.geoshare.lib.deleteAllAndWriteFile
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
@@ -23,11 +23,12 @@ import javax.inject.Inject
  * It's only useful for TomTom, because TomTom doesn't support geo: URIs.
  */
 class OpenRouteOnePointGpxOutput @Inject constructor(
-    val activity: FileActivity,
+    override val activity: FileActivity,
     private val coordinateConverter: CoordinateConverter,
     private val log: Log,
 ) :
     PointOutput.WithLocation,
+    Output.HasActivity<FileActivity>,
     Output.HasErrorText,
     Output.HasAutomationDelay,
     Output.HasAutomationErrorText {
@@ -50,13 +51,13 @@ class OpenRouteOnePointGpxOutput @Inject constructor(
             .toActionResult(openedApp = true)
 
     @Composable
-    override fun label(appLabel: String?) =
+    override fun label(appDetail: AppDetail?) =
         stringResource(R.string.output_open_navigation)
 
-    override fun getIcon(appDetails: AppDetails) =
-        appDetails[activity.packageName]?.let { DrawableIconDescriptor(it.icon) }
+    override fun getIcon(appDetail: AppDetail?) =
+        appDetail?.let { DrawableIconDescriptor(it.icon) }
 
-    override fun getMenuIcon(appDetails: AppDetails) =
+    override fun getMenuIcon(appDetail: AppDetail?) =
         ResourceIconDescriptor(R.drawable.navigation_24px)
 
     @Composable
@@ -66,26 +67,26 @@ class OpenRouteOnePointGpxOutput @Inject constructor(
     )
 
     @Composable
-    override fun errorText(appLabel: String?) =
+    override fun errorText(appDetail: AppDetail?) =
         stringResource(
             R.string.conversion_succeeded_open_app_failed,
-            appLabel.orEmpty(),
+            appDetail?.label.orEmpty(),
         )
 
     @Composable
-    override fun automationLabel(appLabel: String?) =
-        stringResource(R.string.conversion_succeeded_open_app_navigate_to, appLabel.orEmpty())
+    override fun automationLabel(appDetail: AppDetail?) =
+        stringResource(R.string.conversion_succeeded_open_app_navigate_to, appDetail?.label.orEmpty())
 
     @Composable
-    override fun automationErrorText(appLabel: String?) =
-        stringResource(R.string.conversion_automation_open_app_failed, appLabel.orEmpty())
+    override fun automationErrorText(appDetail: AppDetail?) =
+        stringResource(R.string.conversion_automation_open_app_failed, appDetail?.label.orEmpty())
 
     @Composable
-    override fun automationWaitingText(counterSec: Int, appLabel: String?) =
+    override fun automationWaitingText(counterSec: Int, appDetail: AppDetail?) =
         pluralStringResource(
             R.plurals.conversion_automation_open_app_waiting,
             counterSec,
-            appLabel.orEmpty(),
+            appDetail?.label.orEmpty(),
             counterSec,
         )
 

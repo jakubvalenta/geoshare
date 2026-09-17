@@ -41,6 +41,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
+import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
@@ -319,7 +320,7 @@ private fun DefaultPreview() {
                 coordinateConverter = coordinateConverter,
                 log = log,
             )
-            val appDetails = fakeAppDetails()
+            val appDetails = getFakeAppDetails(context)
             ResultCoordinates(
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 coordinateConverter = coordinateConverter,
@@ -351,7 +352,7 @@ private fun DarkPreview() {
                 coordinateConverter = coordinateConverter,
                 log = log,
             )
-            val appDetails = fakeAppDetails()
+            val appDetails = getFakeAppDetails(context)
             ResultCoordinates(
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 coordinateConverter = coordinateConverter,
@@ -383,7 +384,7 @@ private fun DescriptionPreview() {
                 coordinateConverter = coordinateConverter,
                 log = log,
             )
-            val appDetails = fakeAppDetails()
+            val appDetails = getFakeAppDetails(context)
             ResultCoordinates(
                 points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI)),
                 coordinateConverter = coordinateConverter,
@@ -430,7 +431,7 @@ private fun DarkDescriptionPreview() {
                 coordinateConverter = coordinateConverter,
                 log = log,
             )
-            val appDetails = fakeAppDetails()
+            val appDetails = getFakeAppDetails(context)
             ResultCoordinates(
                 points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI)),
                 coordinateConverter = coordinateConverter,
@@ -477,7 +478,7 @@ private fun NamePreview() {
                 coordinateConverter = coordinateConverter,
                 log = log,
             )
-            val appDetails = fakeAppDetails()
+            val appDetails = getFakeAppDetails(context)
             ResultCoordinates(
                 points = persistentListOf(
                     WGS84Point(NaivePoint.example),
@@ -512,7 +513,7 @@ private fun DarkNamePreview() {
                 coordinateConverter = coordinateConverter,
                 log = log,
             )
-            val appDetails = fakeAppDetails()
+            val appDetails = getFakeAppDetails(context)
             ResultCoordinates(
                 points = persistentListOf(
                     WGS84Point(NaivePoint.example),
@@ -547,7 +548,7 @@ private fun PointsPreview() {
                 coordinateConverter = coordinateConverter,
                 log = log,
             )
-            val appDetails = fakeAppDetails()
+            val appDetails = getFakeAppDetails(context)
             ResultCoordinates(
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
@@ -588,7 +589,7 @@ private fun DarkPointsPreview() {
                 coordinateConverter = coordinateConverter,
                 log = log,
             )
-            val appDetails = fakeAppDetails()
+            val appDetails = getFakeAppDetails(context)
             ResultCoordinates(
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
@@ -629,7 +630,7 @@ private fun PointsWithNamePreview() {
                 coordinateConverter = coordinateConverter,
                 log = log,
             )
-            val appDetails = fakeAppDetails()
+            val appDetails = getFakeAppDetails(context)
             ResultCoordinates(
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
@@ -670,7 +671,7 @@ private fun DarkPointsWithNamePreview() {
                 coordinateConverter = coordinateConverter,
                 log = log,
             )
-            val appDetails = fakeAppDetails()
+            val appDetails = getFakeAppDetails(context)
             ResultCoordinates(
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),

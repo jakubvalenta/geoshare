@@ -1,7 +1,5 @@
 package page.ooooo.geoshare.ui.components
 
-import android.annotation.SuppressLint
-import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -46,9 +44,9 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.fakeActivities
+import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.lib.DefaultLog
-import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.android.isMessagingApp
@@ -96,6 +94,7 @@ fun ResultApps(
 
     Column(modifier) {
         // Map apps
+        // TODO Distribute space between flow row items
         FlowRow(horizontalArrangement = Arrangement.spacedBy(spacing.extraTiny)) {
             outputsForAppsByCategory.mapApps
                 // TODO Sort by label
@@ -293,63 +292,6 @@ private fun ResultAppsLinkIcon(
     }
 }
 
-@SuppressLint("LocalContextGetResourceValueCall")
-@Composable
-fun fakeAppDetails(
-    context: Context = LocalContext.current,
-) = mapOf(
-    PackageNames.COMAPS_FDROID to AppDetail(
-        packageName = PackageNames.COMAPS_FDROID,
-        label = "CoMaps",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
-    ),
-    PackageNames.CONVERSATIONS to AppDetail(
-        packageName = PackageNames.CONVERSATIONS,
-        label = "Conversations",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
-    ),
-    PackageNames.ORGANIC_MAPS to AppDetail(
-        packageName = PackageNames.ORGANIC_MAPS,
-        label = "Organic Maps",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
-    ),
-    PackageNames.HERE_WEGO to AppDetail(
-        packageName = PackageNames.HERE_WEGO,
-        label = "HERE WeGo",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
-    ),
-    PackageNames.MAPY_COM to AppDetail(
-        packageName = PackageNames.MAPY_COM,
-        label = "Mapy.com",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
-    ),
-    PackageNames.OSMAND_PLUS to AppDetail(
-        packageName = PackageNames.OSMAND_PLUS,
-        label = "OsmAnd",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
-    ),
-    PackageNames.MAGIC_EARTH to AppDetail(
-        packageName = PackageNames.MAGIC_EARTH,
-        label = "Magic Earth",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
-    ),
-    PackageNames.GOOGLE_MAPS to AppDetail(
-        packageName = PackageNames.GOOGLE_MAPS,
-        label = "Google Maps",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
-    ),
-    PackageNames.GMAPS_WV to AppDetail(
-        packageName = PackageNames.GMAPS_WV,
-        label = @Suppress("SpellCheckingInspection", "GrazieInspectionRunner") "GMaps WV",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
-    ),
-    PackageNames.TOMTOM to AppDetail(
-        packageName = PackageNames.TOMTOM,
-        label = "TomTom",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
-    ),
-)
-
 // Previews
 
 @Preview(showBackground = true)
@@ -365,7 +307,7 @@ private fun DefaultPreview() {
                 coordinateConverter = coordinateConverter,
                 log = log,
             )
-            val appDetails = fakeAppDetails()
+            val appDetails = getFakeAppDetails(context)
             ResultApps(
                 outputsForAppsByCategory = MutableStateFlow(
                     fakeActivities
@@ -408,7 +350,7 @@ private fun DarkPreview() {
                 coordinateConverter = coordinateConverter,
                 log = log,
             )
-            val appDetails = fakeAppDetails()
+            val appDetails = getFakeAppDetails(context)
             ResultApps(
                 outputsForAppsByCategory = MutableStateFlow(
                     fakeActivities

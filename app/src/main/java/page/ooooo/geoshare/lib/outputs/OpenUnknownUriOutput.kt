@@ -1,13 +1,13 @@
 package page.ooooo.geoshare.lib.outputs
 
 import androidx.compose.runtime.Composable
-import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.UriActivity
 import page.ooooo.geoshare.ui.components.DrawableIconDescriptor
 
 class OpenUnknownUriOutput(
-    val activity: UriActivity,
-) : StringOutput {
+    override val activity: UriActivity,
+) : StringOutput, Output.HasActivity<UriActivity> {
     override val id = "OpenUnknownUriOutput(activity=$activity)"
 
     override suspend fun execute(value: String, actionContext: ActionContext) =
@@ -16,10 +16,10 @@ class OpenUnknownUriOutput(
             .toActionResult(openedApp = true)
 
     @Composable
-    override fun label(appLabel: String?) = appLabel.orEmpty()
+    override fun label(appDetail: AppDetail?) = appDetail?.label.orEmpty()
 
-    override fun getMenuIcon(appDetails: AppDetails) =
-        appDetails[activity.packageName]?.let { DrawableIconDescriptor(it.icon) }
+    override fun getMenuIcon(appDetail: AppDetail?) =
+        appDetail?.let { DrawableIconDescriptor(it.icon) }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

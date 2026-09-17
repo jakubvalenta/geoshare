@@ -28,7 +28,9 @@ import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.fakeActivities
+import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.data.local.database.findByUUID
+import page.ooooo.geoshare.data.local.preferences.ActivityAutomation
 import page.ooooo.geoshare.data.local.preferences.AutomationPreference
 import page.ooooo.geoshare.data.local.preferences.BasicAutomation
 import page.ooooo.geoshare.data.local.preferences.LinkAutomation
@@ -154,12 +156,8 @@ private fun AutomationPreferenceValue(
     modifier: Modifier = Modifier,
     descriptionEnabled: Boolean = true,
 ) {
-    val label = automationDetail.automationLabel()
-    val description = if (descriptionEnabled) {
-        automationDetail.output.getAutomationDescription()
-    } else {
-        null
-    }
+    val label = automationDetail.label()
+    val description = if (descriptionEnabled) automationDetail.description() else null
     Row(
         modifier,
         horizontalArrangement = Arrangement.spacedBy(LocalSpacing.current.tiny),
@@ -172,7 +170,7 @@ private fun AutomationPreferenceValue(
             Column {
                 Text(label)
                 Text(
-                    description(),
+                    description,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall,
                 )
@@ -193,15 +191,14 @@ private fun ListItemPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val log = DefaultLog
-                val appDetails = fakeAppDetails()
+                val appDetails = getFakeAppDetails(context)
                 UserPreferenceAutomationListItem(
                     index = 0,
                     count = 1,
                     automationDetail = MutableStateFlow(
                         SavePointsGpxAutomation.let { automation ->
                             automation
-                                .toOutput(coordinateConverter, log)
+                                .toOutput(coordinateConverter)
                                 .toAutomationDetail(automation, appDetails)
                         }
                     ),
@@ -229,15 +226,14 @@ private fun DarkListItemPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val log = DefaultLog
-                val appDetails = fakeAppDetails()
+                val appDetails = getFakeAppDetails(context)
                 UserPreferenceAutomationListItem(
                     index = 0,
                     count = 1,
                     automationDetail = MutableStateFlow(
                         SavePointsGpxAutomation.let { automation ->
                             automation
-                                .toOutput(coordinateConverter, log)
+                                .toOutput(coordinateConverter)
                                 .toAutomationDetail(automation, appDetails)
                         }
                     ),
@@ -315,7 +311,7 @@ private fun ControlsPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val log = DefaultLog
-            val appDetails = fakeAppDetails()
+            val appDetails = getFakeAppDetails(context)
             UserPreferenceAutomationControls(
                 automationDetails = MutableStateFlow(
                     AutomationPreference.getOptionGroups(
@@ -327,7 +323,8 @@ private fun ControlsPreview() {
                         .map { group ->
                             group.map { automation ->
                                 when (automation) {
-                                    is BasicAutomation -> automation.toOutput(coordinateConverter, log)
+                                    is BasicAutomation -> automation.toOutput(coordinateConverter)
+                                    is ActivityAutomation -> automation.toOutput(coordinateConverter, log)
                                     is LinkAutomation -> defaultFakeLinks.findByUUID(automation.linkUUID)?.let { link ->
                                         automation.toOutput(coordinateConverter, link)
                                     }
@@ -363,7 +360,7 @@ private fun DarkControlsPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val log = DefaultLog
-            val appDetails = fakeAppDetails()
+            val appDetails = getFakeAppDetails(context)
             UserPreferenceAutomationControls(
                 automationDetails = MutableStateFlow(
                     AutomationPreference.getOptionGroups(
@@ -375,7 +372,8 @@ private fun DarkControlsPreview() {
                         .map { group ->
                             group.map { automation ->
                                 when (automation) {
-                                    is BasicAutomation -> automation.toOutput(coordinateConverter, log)
+                                    is BasicAutomation -> automation.toOutput(coordinateConverter)
+                                    is ActivityAutomation -> automation.toOutput(coordinateConverter, log)
                                     is LinkAutomation -> defaultFakeLinks.findByUUID(automation.linkUUID)?.let { link ->
                                         automation.toOutput(coordinateConverter, link)
                                     }
@@ -411,7 +409,7 @@ private fun TabletControlsPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val log = DefaultLog
-            val appDetails = fakeAppDetails()
+            val appDetails = getFakeAppDetails(context)
             UserPreferenceAutomationControls(
                 automationDetails = MutableStateFlow(
                     AutomationPreference.getOptionGroups(
@@ -423,7 +421,8 @@ private fun TabletControlsPreview() {
                         .map { group ->
                             group.map { automation ->
                                 when (automation) {
-                                    is BasicAutomation -> automation.toOutput(coordinateConverter, log)
+                                    is BasicAutomation -> automation.toOutput(coordinateConverter)
+                                    is ActivityAutomation -> automation.toOutput(coordinateConverter, log)
                                     is LinkAutomation -> defaultFakeLinks.findByUUID(automation.linkUUID)?.let { link ->
                                         automation.toOutput(coordinateConverter, link)
                                     }
@@ -459,7 +458,7 @@ private fun NotPurchasedControlsPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val log = DefaultLog
-            val appDetails = fakeAppDetails()
+            val appDetails = getFakeAppDetails(context)
             UserPreferenceAutomationControls(
                 automationDetails = MutableStateFlow(
                     AutomationPreference.getOptionGroups(
@@ -471,7 +470,8 @@ private fun NotPurchasedControlsPreview() {
                         .map { group ->
                             group.map { automation ->
                                 when (automation) {
-                                    is BasicAutomation -> automation.toOutput(coordinateConverter, log)
+                                    is BasicAutomation -> automation.toOutput(coordinateConverter)
+                                    is ActivityAutomation -> automation.toOutput(coordinateConverter, log)
                                     is LinkAutomation -> defaultFakeLinks.findByUUID(automation.linkUUID)?.let { link ->
                                         automation.toOutput(coordinateConverter, link)
                                     }
@@ -502,7 +502,7 @@ private fun DarkNotPurchasedControlsPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val log = DefaultLog
-            val appDetails = fakeAppDetails()
+            val appDetails = getFakeAppDetails(context)
             UserPreferenceAutomationControls(
                 automationDetails = MutableStateFlow(
                     AutomationPreference.getOptionGroups(
@@ -514,7 +514,8 @@ private fun DarkNotPurchasedControlsPreview() {
                         .map { group ->
                             group.map { automation ->
                                 when (automation) {
-                                    is BasicAutomation -> automation.toOutput(coordinateConverter, log)
+                                    is BasicAutomation -> automation.toOutput(coordinateConverter)
+                                    is ActivityAutomation -> automation.toOutput(coordinateConverter, log)
                                     is LinkAutomation -> defaultFakeLinks.findByUUID(automation.linkUUID)?.let { link ->
                                         automation.toOutput(coordinateConverter, link)
                                     }
@@ -545,7 +546,7 @@ private fun TabletNotPurchasedControlsPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val log = DefaultLog
-            val appDetails = fakeAppDetails()
+            val appDetails = getFakeAppDetails(context)
             UserPreferenceAutomationControls(
                 automationDetails = MutableStateFlow(
                     AutomationPreference.getOptionGroups(
@@ -557,7 +558,8 @@ private fun TabletNotPurchasedControlsPreview() {
                         .map { group ->
                             group.map { automation ->
                                 when (automation) {
-                                    is BasicAutomation -> automation.toOutput(coordinateConverter, log)
+                                    is BasicAutomation -> automation.toOutput(coordinateConverter)
+                                    is ActivityAutomation -> automation.toOutput(coordinateConverter, log)
                                     is LinkAutomation -> defaultFakeLinks.findByUUID(automation.linkUUID)?.let { link ->
                                         automation.toOutput(coordinateConverter, link)
                                     }

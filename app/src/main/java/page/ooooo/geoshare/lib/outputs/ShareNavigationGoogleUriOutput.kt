@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
@@ -20,14 +20,14 @@ class ShareNavigationGoogleUriOutput @Inject constructor(
         GoogleMapsUriFormatter.formatNavigationUriString(coordinateConverter.toWGS84(value), uriQuote)
 
     @Composable
-    override fun label(appLabel: String?) =
+    override fun label(appDetail: AppDetail?) =
         stringResource(R.string.output_open_navigation)
 
-    override fun getMenuIcon(appDetails: AppDetails) =
+    override fun getMenuIcon(appDetail: AppDetail?) =
         ResourceIconDescriptor(R.drawable.navigation_24px)
 
     @Composable
-    override fun automationLabel(appLabel: String?) =
+    override fun automationLabel(appDetail: AppDetail?) =
         stringResource(R.string.output_open_navigation)
 
     override fun equals(other: Any?): Boolean {

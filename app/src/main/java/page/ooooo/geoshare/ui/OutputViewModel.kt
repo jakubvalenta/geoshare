@@ -18,11 +18,12 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import page.ooooo.geoshare.data.AppsRepository
+import page.ooooo.geoshare.data.AppRepository
 import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.lib.android.AppActivity
+import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.getPackageNames
 import page.ooooo.geoshare.lib.android.isMessagingApp
@@ -38,13 +39,13 @@ import page.ooooo.geoshare.ui.components.IconDescriptor
 import javax.inject.Inject
 
 data class OutputDetail<T : Output>(
-    private val appLabel: String?,
+    private val appDetail: AppDetail?,
     val icon: IconDescriptor?,
     val menuIcon: IconDescriptor?,
     val output: T,
 ) {
     @Composable
-    fun label(): String = output.label(appLabel)
+    fun label(): String = output.label(appDetail)
 }
 
 data class OutputDetailsForApp(
@@ -86,7 +87,7 @@ data class OutputDetailsForSharing(
 @HiltViewModel
 class OutputViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
-    appsRepository: AppsRepository,
+    appRepository: AppRepository,
     linkRepository: LinkRepository,
     private val outputRepository: OutputRepository,
     userPreferencesRepository: UserPreferencesRepository,
@@ -107,7 +108,7 @@ class OutputViewModel @Inject constructor(
             emptyList(),
         )
 
-    val appDetails: StateFlow<AppDetails> = appsRepository.appDetails
+    val appDetails: StateFlow<AppDetails> = appRepository.appDetails
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
@@ -124,7 +125,7 @@ class OutputViewModel @Inject constructor(
 
     val outputsForPoint: StateFlow<List<OutputDetail<PointOutput>>> =
         linkRepository.all.map { outputRepository.getOutputsForPoint(it) }
-            .combine(appsRepository.appDetails) { outputs, appDetails ->
+            .combine(appRepository.appDetails) { outputs, appDetails ->
                 outputs.map { it.toOutputDetail(appDetails) }
             }
             .stateIn(
@@ -134,7 +135,7 @@ class OutputViewModel @Inject constructor(
             )
     val outputsForPoints: StateFlow<List<OutputDetail<PointsOutput>>> =
         flow { emit(outputRepository.getOutputsForPoints()) }
-            .combine(appsRepository.appDetails) { outputs, appDetails ->
+            .combine(appRepository.appDetails) { outputs, appDetails ->
                 outputs.map { it.toOutputDetail(appDetails) }
             }
             .stateIn(
@@ -144,7 +145,7 @@ class OutputViewModel @Inject constructor(
             )
     val outputsForPointChips: StateFlow<List<OutputDetail<PointOutput>>> =
         linkRepository.all.map { outputRepository.getOutputsForPointChips(it) }
-            .combine(appsRepository.appDetails) { outputs, appDetails ->
+            .combine(appRepository.appDetails) { outputs, appDetails ->
                 outputs.map { it.toOutputDetail(appDetails) }
             }
             .stateIn(
@@ -154,7 +155,7 @@ class OutputViewModel @Inject constructor(
             )
     val outputsForPointsChips: StateFlow<List<OutputDetail<PointsOutput>>> =
         flow { emit(outputRepository.getOutputsForPointsChips()) }
-            .combine(appsRepository.appDetails) { outputs, appDetails ->
+            .combine(appRepository.appDetails) { outputs, appDetails ->
                 outputs.map { it.toOutputDetail(appDetails) }
             }
             .stateIn(
@@ -163,7 +164,7 @@ class OutputViewModel @Inject constructor(
                 emptyList(),
             )
     val outputsForAppsByCategory: StateFlow<OutputDetailsForAppsByCategory> =
-        appsRepository.activities
+        appRepository.activities
             .combine(
                 userPreferencesRepository.values
                     .map { it.hiddenApps }
@@ -223,36 +224,44 @@ class OutputViewModel @Inject constructor(
 }
 
 fun Output.toOutputDetail(appDetails: AppDetails): OutputDetail<Output> =
-    OutputDetail(
-        appLabel = getAppLabel(appDetails),
-        icon = getIcon(appDetails),
-        menuIcon = getMenuIcon(appDetails),
-        output = this,
-    )
+    (this as? Output.HasActivity<*>)?.getAppDetail(appDetails).let { appDetail ->
+        OutputDetail(
+            appDetail = appDetail,
+            icon = getIcon(appDetail),
+            menuIcon = getMenuIcon(appDetail),
+            output = this,
+        )
+    }
 
 fun PointOutput.toOutputDetail(appDetails: AppDetails): OutputDetail<PointOutput> =
-    OutputDetail(
-        appLabel = getAppLabel(appDetails),
-        icon = getIcon(appDetails),
-        menuIcon = getMenuIcon(appDetails),
-        output = this,
-    )
+    (this as? Output.HasActivity<*>)?.getAppDetail(appDetails).let { appDetail ->
+        OutputDetail(
+            appDetail = appDetail,
+            icon = getIcon(appDetail),
+            menuIcon = getMenuIcon(appDetail),
+            output = this,
+        )
+    }
 
 fun PointsOutput.toOutputDetail(appDetails: AppDetails): OutputDetail<PointsOutput> =
-    OutputDetail(
-        appLabel = getAppLabel(appDetails),
-        icon = getIcon(appDetails),
-        menuIcon = getMenuIcon(appDetails),
-        output = this,
-    )
+    (this as? Output.HasActivity<*>)?.getAppDetail(appDetails).let { appDetail ->
+        OutputDetail(
+            appDetail = appDetail,
+            icon = getIcon(appDetail),
+            menuIcon = getMenuIcon(appDetail),
+            output = this,
+        )
+    }
 
 fun StringOutput.toOutputDetail(appDetails: AppDetails): OutputDetail<StringOutput> =
-    OutputDetail(
-        appLabel = getAppLabel(appDetails),
-        icon = getIcon(appDetails),
-        menuIcon = getMenuIcon(appDetails),
-        output = this,
-    )
+    (this as? Output.HasActivity<*>)?.getAppDetail(appDetails).let { appDetail ->
+        OutputDetail(
+            appDetail = appDetail,
+            icon = getIcon(appDetail),
+            menuIcon = getMenuIcon(appDetail),
+            output = this,
+        )
+    }
 
 fun Map<String, List<Output>>.toOutputDetailsForApps(appDetails: AppDetails): List<OutputDetailsForApp> =
     mapNotNull { (packageName, outputs) ->

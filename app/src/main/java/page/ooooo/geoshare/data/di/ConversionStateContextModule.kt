@@ -69,14 +69,14 @@ object ConversionStateContextModule {
  * For testing purposes only.
  */
 class FakeConversionStateContext(
+    override val billing: Billing,
+    override val coordinateConverter: CoordinateConverter,
     override val inputs: List<Input>,
     override val linkRepository: LinkRepository,
-    override val coordinateConverter: CoordinateConverter,
-    override val resources: Resources,
-    override val userPreferencesRepository: UserPreferencesRepository,
     override val log: Log,
-    override val billing: Billing,
+    override val resources: Resources,
     override val uriQuote: UriQuote,
+    override val userPreferencesRepository: UserPreferencesRepository,
 ) : ConversionStateContext {
     private var counter: Int = 0
 

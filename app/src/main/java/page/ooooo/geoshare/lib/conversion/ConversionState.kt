@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.timeout
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.local.preferences.ActivityAutomation
 import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
 import page.ooooo.geoshare.data.local.preferences.AutomationPreference
 import page.ooooo.geoshare.data.local.preferences.BasicAutomation
@@ -526,7 +527,8 @@ data class ConversionSucceeded(
 
         if (billingStatus is BillingStatus.Purchased && stateContext.billing.features.contains(AutomationFeature)) {
             val output = when (automation) {
-                is BasicAutomation -> automation.toOutput(stateContext.coordinateConverter, stateContext.log)
+                is BasicAutomation -> automation.toOutput(stateContext.coordinateConverter)
+                is ActivityAutomation -> automation.toOutput(stateContext.coordinateConverter, stateContext.log)
                 is LinkAutomation -> stateContext.linkRepository.getByUUID(automation.linkUUID)?.let { link ->
                     automation.toOutput(stateContext.coordinateConverter, link)
                 }

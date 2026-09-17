@@ -67,6 +67,7 @@ import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.di.fakeActivities
+import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
@@ -136,7 +137,6 @@ import page.ooooo.geoshare.ui.components.ResultError
 import page.ooooo.geoshare.ui.components.ResultSheet
 import page.ooooo.geoshare.ui.components.ResultTitle
 import page.ooooo.geoshare.ui.components.checkeredBackground
-import page.ooooo.geoshare.ui.components.fakeAppDetails
 import page.ooooo.geoshare.ui.components.fakeStateLog
 import page.ooooo.geoshare.ui.components.mainContainerColor
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -265,6 +265,7 @@ fun MainScreen(
 
     MainScreen(
         currentState = currentState,
+        actionDetail = conversionViewModel.actionDetail,
         billingAppNameResId = billingViewModel.billingAppNameResId,
         billingFeatures = billingViewModel.billingFeatures,
         billingStatus = billingViewModel.billingStatus,
@@ -340,6 +341,7 @@ fun MainScreen(
 @Composable
 private fun MainScreen(
     currentState: ConversionState,
+    actionDetail: StateFlow<ActionDetail?>,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
     billingStatus: StateFlow<BillingStatus>,
@@ -595,7 +597,7 @@ private fun MainScreen(
             supportingTitle = if (currentState is ConversionState.HasResult) {
                 {
                     ResultTitle(
-                        currentState = currentState,
+                        actionDetail = actionDetail,
                         billingFeatures = billingFeatures,
                         billingStatus = billingStatus,
                         onCancel = onCancel,
@@ -737,6 +739,7 @@ private fun DefaultPreview() {
         val timeSource = TestTimeSource()
         MainScreen(
             currentState = Initial,
+            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(BillingStatus.NotPurchased()),
@@ -798,6 +801,7 @@ private fun DarkPreview() {
         val timeSource = TestTimeSource()
         MainScreen(
             currentState = Initial,
+            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(BillingStatus.NotPurchased()),
@@ -859,6 +863,7 @@ private fun SmallPreview() {
         val timeSource = TestTimeSource()
         MainScreen(
             currentState = Initial,
+            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(BillingStatus.NotPurchased()),
@@ -920,6 +925,7 @@ private fun TabletPreview() {
         val timeSource = TestTimeSource()
         MainScreen(
             currentState = Initial,
+            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(BillingStatus.NotPurchased()),
@@ -985,7 +991,7 @@ private fun SucceededPreview() {
         )
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
-        val appDetails = fakeAppDetails()
+        val appDetails = getFakeAppDetails(context)
         MainScreen(
             currentState = ActionCompleted(
                 source = source,
@@ -999,6 +1005,7 @@ private fun SucceededPreview() {
                 ),
                 actionResult = ActionResult.SUCCEEDED,
             ),
+            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1087,7 +1094,7 @@ private fun DarkSucceededPreview() {
         )
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
-        val appDetails = fakeAppDetails()
+        val appDetails = getFakeAppDetails(context)
         MainScreen(
             currentState = ActionCompleted(
                 source = source,
@@ -1101,6 +1108,7 @@ private fun DarkSucceededPreview() {
                 ),
                 actionResult = ActionResult.SUCCEEDED,
             ),
+            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1189,7 +1197,7 @@ private fun SmallSucceededPreview() {
         )
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
-        val appDetails = fakeAppDetails()
+        val appDetails = getFakeAppDetails(context)
         MainScreen(
             currentState = ActionCompleted(
                 source = source,
@@ -1202,6 +1210,7 @@ private fun SmallSucceededPreview() {
                 ),
                 actionResult = ActionResult.SUCCEEDED,
             ),
+            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1290,7 +1299,7 @@ private fun TabletSucceededPreview() {
         )
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
-        val appDetails = fakeAppDetails()
+        val appDetails = getFakeAppDetails(context)
         MainScreen(
             currentState = ActionCompleted(
                 source = source,
@@ -1304,6 +1313,7 @@ private fun TabletSucceededPreview() {
                 ),
                 actionResult = ActionResult.SUCCEEDED,
             ),
+            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1392,6 +1402,7 @@ private fun ErrorPreview() {
                 source = source,
                 message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
+            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1464,6 +1475,7 @@ private fun DarkErrorPreview() {
                 source = source,
                 message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
+            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1536,6 +1548,7 @@ private fun TabletErrorPreview() {
                 source = source,
                 message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
+            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1609,6 +1622,7 @@ private fun WarningPreview() {
                 message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
                 warning = true,
             ),
+            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1682,6 +1696,7 @@ private fun DarkWarningPreview() {
                 message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
                 warning = true,
             ),
+            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1759,6 +1774,7 @@ private fun LoadingIndicatorPreview() {
                 results = emptyMap(),
                 lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
             ),
+            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1836,6 +1852,7 @@ private fun DarkLoadingIndicatorPreview() {
                 results = emptyMap(),
                 lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
             ),
+            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1913,6 +1930,7 @@ private fun TabletLoadingIndicatorPreview() {
                 results = emptyMap(),
                 lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
             ),
+            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1987,6 +2005,7 @@ private fun WebViewPreview() {
                 permission = Permission.ALWAYS,
                 results = emptyMap(),
             ),
+            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -2061,6 +2080,7 @@ private fun DarkWebViewPreview() {
                 permission = Permission.ALWAYS,
                 results = emptyMap(),
             ),
+            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -2136,6 +2156,7 @@ private fun TabletWebViewPreview() {
         )
         MainScreen(
             currentState = currentState,
+            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -2209,6 +2230,7 @@ private fun EmptyPreview() {
         )
         MainScreen(
             currentState = currentState,
+            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(

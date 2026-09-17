@@ -253,7 +253,7 @@ private fun ShareItemPreview() {
                     shape = CircleShape,
                 ) {
                     IconFromDescriptor(
-                        output.getIcon(emptyMap()),
+                        output.getIcon(null),
                         contentDescription = output.label(null),
                         size = 24.dp,
                     )
@@ -283,7 +283,7 @@ private fun DarkShareItemPreview() {
                     shape = CircleShape,
                 ) {
                     IconFromDescriptor(
-                        output.getIcon(emptyMap()),
+                        output.getIcon(null),
                         contentDescription = output.label(null),
                         size = 24.dp,
                     )

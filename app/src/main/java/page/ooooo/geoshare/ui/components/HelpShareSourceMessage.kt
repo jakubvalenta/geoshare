@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.fakeActivities
+import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.android.PackageNames
@@ -134,7 +135,7 @@ private fun DefaultPreview() {
             coordinateConverter = coordinateConverter,
             log = log,
         )
-        val appDetails = fakeAppDetails()
+        val appDetails = getFakeAppDetails(context)
         HelpShareSourceMessage(
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             outputsForAppsByCategory = MutableStateFlow(
@@ -167,7 +168,7 @@ private fun DarkPreview() {
             coordinateConverter = coordinateConverter,
             log = log,
         )
-        val appDetails = fakeAppDetails()
+        val appDetails = getFakeAppDetails(context)
         HelpShareSourceMessage(
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             outputsForAppsByCategory = MutableStateFlow(

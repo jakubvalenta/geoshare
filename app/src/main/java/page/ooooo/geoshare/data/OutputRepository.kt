@@ -3,6 +3,7 @@
 package page.ooooo.geoshare.data
 
 import page.ooooo.geoshare.data.local.database.Link
+import page.ooooo.geoshare.data.local.preferences.ActivityAutomation
 import page.ooooo.geoshare.data.local.preferences.BasicAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDegMinSecAutomation
@@ -93,7 +94,7 @@ class OutputRepository @Inject constructor(
         listOf(
             CopyCoordsDecOutput(coordinateConverter),
             CopyCoordsDegMinSecOutput(coordinateConverter),
-            CopyNameOutput(),
+            CopyNameOutput,
             CopyGeoUriOutput(coordinateConverter),
             *links
                 .filter { it.sheetEnabled }
@@ -172,7 +173,7 @@ class OutputRepository @Inject constructor(
         listOf(
             CopyStringOutput,
             *activities
-                .mapNotNull { activity ->
+                .mapNotNull<AppActivity, StringOutput> { activity ->
                     when (activity) {
                         // Don't show an item for a file activity, because we don't know how to create a file from the
                         // source, which is a URI or a text
@@ -232,7 +233,7 @@ class OutputRepository @Inject constructor(
         }
 }
 
-fun BasicAutomation.toOutput(coordinateConverter: CoordinateConverter, log: Log = DefaultLog): Output? =
+fun BasicAutomation.toOutput(coordinateConverter: CoordinateConverter): Output? =
     when (this) {
         is CopyCoordsDecAutomation ->
             CopyCoordsDecOutput(coordinateConverter)
@@ -244,11 +245,41 @@ fun BasicAutomation.toOutput(coordinateConverter: CoordinateConverter, log: Log 
             CopyGeoUriOutput(coordinateConverter)
 
         is CopyNameAutomation ->
-            CopyNameOutput()
+            CopyNameOutput
 
         is NoopAutomation ->
             NoopOutput
 
+        is SavePointGpxAutomation ->
+            SavePointGpxOutput(coordinateConverter)
+
+        is SavePointsGpxAutomation ->
+            SavePointsGpxOutput(coordinateConverter)
+
+        is SaveRouteGpxAutomation ->
+            SaveRouteGpxOutput(coordinateConverter)
+
+        is SavePointToContactAutomation ->
+            SavePointToContactOutput(coordinateConverter)
+
+        is ShareDisplayGeoUriAutomation ->
+            ShareDisplayGeoUriOutput(coordinateConverter)
+
+        is ShareRouteGpxAutomation ->
+            ShareRouteGpxOutput(coordinateConverter)
+
+        is SharePointsGpxAutomation ->
+            SharePointsGpxOutput(coordinateConverter)
+
+        is ShareNavigationGoogleUriAutomation ->
+            ShareNavigationGoogleUriOutput(coordinateConverter)
+
+        is ShareStreetViewGoogleUriAutomation ->
+            ShareStreetViewGoogleUriOutput(coordinateConverter)
+    }
+
+fun ActivityAutomation.toOutput(coordinateConverter: CoordinateConverter, log: Log = DefaultLog): Output? =
+    when (this) {
         is OpenDisplayGeoUriAutomation ->
             packageName?.let { packageName ->
                 OpenDisplayGeoUriOutput(UriActivity(packageName, UriScheme.GEO), coordinateConverter)
@@ -307,37 +338,10 @@ fun BasicAutomation.toOutput(coordinateConverter: CoordinateConverter, log: Log 
                 )
             }
 
-        is SavePointGpxAutomation ->
-            SavePointGpxOutput(coordinateConverter)
-
-        is SavePointsGpxAutomation ->
-            SavePointsGpxOutput(coordinateConverter)
-
-        is SaveRouteGpxAutomation ->
-            SaveRouteGpxOutput(coordinateConverter)
-
-        is SavePointToContactAutomation ->
-            SavePointToContactOutput(coordinateConverter)
-
         is SendPointAutomation ->
             packageName?.let { packageName ->
                 SendPointOutput(TextActivity(packageName, "text/plain"), coordinateConverter)
             }
-
-        is ShareDisplayGeoUriAutomation ->
-            ShareDisplayGeoUriOutput(coordinateConverter)
-
-        is ShareRouteGpxAutomation ->
-            ShareRouteGpxOutput(coordinateConverter)
-
-        is SharePointsGpxAutomation ->
-            SharePointsGpxOutput(coordinateConverter)
-
-        is ShareNavigationGoogleUriAutomation ->
-            ShareNavigationGoogleUriOutput(coordinateConverter)
-
-        is ShareStreetViewGoogleUriAutomation ->
-            ShareStreetViewGoogleUriOutput(coordinateConverter)
     }
 
 fun LinkAutomation.toOutput(coordinateConverter: CoordinateConverter, link: Link): Output? =

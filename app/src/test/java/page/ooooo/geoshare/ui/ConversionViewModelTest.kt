@@ -15,7 +15,7 @@ import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.OutputRepository
+import page.ooooo.geoshare.data.di.FakeAppRepository
 import page.ooooo.geoshare.data.di.FakeBilling
 import page.ooooo.geoshare.data.di.FakeConversionStateContext
 import page.ooooo.geoshare.data.di.FakeInputRepository
@@ -46,6 +46,7 @@ class ConversionViewModelTest {
     private val context: Context = mock {
         on { resources } doReturn resources
     }
+    private val appRepository = FakeAppRepository(context)
     private val billing = FakeBilling(context)
     private val coordinateConverter: CoordinateConverter = mock()
     private val inputs = listOf(
@@ -53,10 +54,6 @@ class ConversionViewModelTest {
     )
     private val linkRepository = FakeLinkRepository()
     private val log = FakeLog
-    private val outputRepository = OutputRepository(
-        coordinateConverter = coordinateConverter,
-        log = log,
-    )
     private val savedStateHandle = SavedStateHandle()
     private val source = "https://maps.google.com/foo"
     private val timeSource = TestTimeSource()
@@ -69,17 +66,18 @@ class ConversionViewModelTest {
     @Test
     fun extendedStateLog_whenNextItemHasError_returnsFinishedItemWithSucceededFalse() = runTest {
         val stateContext = FakeConversionStateContext(
+            billing = billing,
+            coordinateConverter = coordinateConverter,
             inputs = inputs,
             linkRepository = linkRepository,
-            outputRepository = outputRepository,
-            resources = resources,
-            userPreferencesRepository = userPreferencesRepository,
             log = log,
-            billing = billing,
+            resources = resources,
             uriQuote = uriQuote,
+            userPreferencesRepository = userPreferencesRepository,
         )
         val conversionViewModel = ConversionViewModel(
             stateContext = stateContext,
+            appRepository = appRepository,
             savedStateHandle = savedStateHandle,
         )
         backgroundScope.launch {
@@ -126,17 +124,18 @@ class ConversionViewModelTest {
     @Test
     fun extendedStateLog_whenNextItemHasLastAttempt_returnsFinishedItemWithSucceededFalse() = runTest {
         val stateContext = FakeConversionStateContext(
+            billing = billing,
+            coordinateConverter = coordinateConverter,
             inputs = inputs,
             linkRepository = linkRepository,
-            outputRepository = outputRepository,
-            resources = resources,
-            userPreferencesRepository = userPreferencesRepository,
             log = log,
-            billing = billing,
+            resources = resources,
             uriQuote = uriQuote,
+            userPreferencesRepository = userPreferencesRepository,
         )
         val conversionViewModel = ConversionViewModel(
             stateContext = stateContext,
+            appRepository = appRepository,
             savedStateHandle = savedStateHandle,
         )
         backgroundScope.launch {
@@ -191,17 +190,18 @@ class ConversionViewModelTest {
     @Test
     fun extendedStateLog_whenNextItemDoesNotHaveErrorOrLastAttempt_returnsFinishedItemWithSucceededTrue() = runTest {
         val stateContext = FakeConversionStateContext(
+            billing = billing,
+            coordinateConverter = coordinateConverter,
             inputs = inputs,
             linkRepository = linkRepository,
-            outputRepository = outputRepository,
-            resources = resources,
-            userPreferencesRepository = userPreferencesRepository,
             log = log,
-            billing = billing,
+            resources = resources,
             uriQuote = uriQuote,
+            userPreferencesRepository = userPreferencesRepository,
         )
         val conversionViewModel = ConversionViewModel(
             stateContext = stateContext,
+            appRepository = appRepository,
             savedStateHandle = savedStateHandle,
         )
         backgroundScope.launch {
@@ -255,17 +255,18 @@ class ConversionViewModelTest {
     @Test
     fun extendedStateLog_whenThereIsNoNextItem_returnsPendingItem() = runTest {
         val stateContext = FakeConversionStateContext(
+            billing = billing,
+            coordinateConverter = coordinateConverter,
             inputs = inputs,
             linkRepository = linkRepository,
-            outputRepository = outputRepository,
-            resources = resources,
-            userPreferencesRepository = userPreferencesRepository,
             log = log,
-            billing = billing,
+            resources = resources,
             uriQuote = uriQuote,
+            userPreferencesRepository = userPreferencesRepository,
         )
         val conversionViewModel = ConversionViewModel(
             stateContext = stateContext,
+            appRepository = appRepository,
             savedStateHandle = savedStateHandle,
         )
         backgroundScope.launch {
@@ -304,17 +305,18 @@ class ConversionViewModelTest {
     @Test
     fun extendedStateLog_whenThereAreItemsWithoutDescription_returnsOnlyItemsWithDescription() = runTest {
         val stateContext = FakeConversionStateContext(
+            billing = billing,
+            coordinateConverter = coordinateConverter,
             inputs = inputs,
             linkRepository = linkRepository,
-            outputRepository = outputRepository,
-            resources = resources,
-            userPreferencesRepository = userPreferencesRepository,
             log = log,
-            billing = billing,
+            resources = resources,
             uriQuote = uriQuote,
+            userPreferencesRepository = userPreferencesRepository,
         )
         val conversionViewModel = ConversionViewModel(
             stateContext = stateContext,
+            appRepository = appRepository,
             savedStateHandle = savedStateHandle,
         )
         backgroundScope.launch {

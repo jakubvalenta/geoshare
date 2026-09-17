@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.android.UriActivity
 import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
@@ -30,15 +30,15 @@ class OpenNavigationGoogleUriOutput @Inject constructor(
         )
 
     @Composable
-    override fun label(appLabel: String?) =
+    override fun label(appDetail: AppDetail?) =
         stringResource(R.string.output_open_navigation)
 
-    override fun getMenuIcon(appDetails: AppDetails) =
+    override fun getMenuIcon(appDetail: AppDetail?) =
         ResourceIconDescriptor(R.drawable.navigation_24px)
 
     @Composable
-    override fun automationLabel(appLabel: String?) =
-        stringResource(R.string.conversion_succeeded_open_app_navigate_to, appLabel.orEmpty())
+    override fun automationLabel(appDetail: AppDetail?) =
+        stringResource(R.string.conversion_succeeded_open_app_navigate_to, appDetail?.label.orEmpty())
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

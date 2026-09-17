@@ -22,11 +22,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
 import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.data.toOutput
-import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
@@ -133,15 +133,14 @@ private fun ListItemPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val log = DefaultLog
-                val appDetails = fakeAppDetails()
+                val appDetails = getFakeAppDetails(context)
                 UserPreferenceAutomationDelayListItem(
                     index = 0,
                     count = 1,
                     automationDetail = MutableStateFlow(
                         SavePointsGpxAutomation.let { automation ->
                             automation
-                                .toOutput(coordinateConverter, log)
+                                .toOutput(coordinateConverter)
                                 .toAutomationDetail(automation, appDetails)
                         }
                     ),
@@ -170,15 +169,14 @@ private fun DarkListItemPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val log = DefaultLog
-                val appDetails = fakeAppDetails()
+                val appDetails = getFakeAppDetails(context)
                 UserPreferenceAutomationDelayListItem(
                     index = 0,
                     count = 1,
                     automationDetail = MutableStateFlow(
                         SavePointsGpxAutomation.let { automation ->
                             automation
-                                .toOutput(coordinateConverter, log)
+                                .toOutput(coordinateConverter)
                                 .toAutomationDetail(automation, appDetails)
                         }
                     ),

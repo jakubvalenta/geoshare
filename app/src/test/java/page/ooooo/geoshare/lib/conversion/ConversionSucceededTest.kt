@@ -13,7 +13,6 @@ import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.LinkRepository
-import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.FakeBilling
 import page.ooooo.geoshare.data.di.FakeGoogleMapsDisplayLink
 import page.ooooo.geoshare.data.di.FakeLinkRepository
@@ -48,10 +47,6 @@ class ConversionSucceededTest {
     private val coordinateConverter: CoordinateConverter = mock()
     private val linkRepository: LinkRepository = FakeLinkRepository()
     private val log = FakeLog
-    private val outputRepository = OutputRepository(
-        coordinateConverter = coordinateConverter,
-        log = log,
-    )
     private val source = "https://maps.google.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
 
@@ -63,9 +58,9 @@ class ConversionSucceededTest {
             UserPreferencesValues(automation = automation)
         )
         val stateContext: ConversionStateContext = mock {
+            on { this@on.coordinateConverter } doReturn coordinateConverter
             on { this@on.linkRepository } doReturn linkRepository
             on { this@on.log } doReturn log
-            on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(source, points)
@@ -79,9 +74,9 @@ class ConversionSucceededTest {
             UserPreferencesValues(automation = automation)
         )
         val stateContext: ConversionStateContext = mock {
+            on { this@on.coordinateConverter } doReturn coordinateConverter
             on { this@on.linkRepository } doReturn linkRepository
             on { this@on.log } doReturn log
-            on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(source, points)
@@ -97,9 +92,9 @@ class ConversionSucceededTest {
         )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
+            on { this@on.coordinateConverter } doReturn coordinateConverter
             on { this@on.linkRepository } doReturn linkRepository
             on { this@on.log } doReturn log
-            on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(source, points)
@@ -119,9 +114,9 @@ class ConversionSucceededTest {
         )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
+            on { this@on.coordinateConverter } doReturn coordinateConverter
             on { this@on.linkRepository } doReturn linkRepository
             on { this@on.log } doReturn log
-            on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(source, points)
@@ -145,9 +140,9 @@ class ConversionSucceededTest {
         )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
+            on { this@on.coordinateConverter } doReturn coordinateConverter
             on { this@on.linkRepository } doReturn linkRepository
             on { this@on.log } doReturn log
-            on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(source, points)
@@ -179,9 +174,9 @@ class ConversionSucceededTest {
         )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
+            on { this@on.coordinateConverter } doReturn coordinateConverter
             on { this@on.linkRepository } doReturn linkRepository
             on { this@on.log } doReturn log
-            on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(source, points)
@@ -210,9 +205,9 @@ class ConversionSucceededTest {
         )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
+            on { this@on.coordinateConverter } doReturn coordinateConverter
             on { this@on.linkRepository } doReturn linkRepository
             on { this@on.log } doReturn log
-            on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(source, points)
@@ -236,9 +231,9 @@ class ConversionSucceededTest {
         )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
+            on { this@on.coordinateConverter } doReturn coordinateConverter
             on { this@on.linkRepository } doReturn linkRepository
             on { this@on.log } doReturn log
-            on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(source, points, billingStatusTimeout = 3.seconds)
@@ -278,9 +273,9 @@ class ConversionSucceededTest {
         )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
+            on { this@on.coordinateConverter } doReturn coordinateConverter
             on { this@on.linkRepository } doReturn linkRepository
             on { this@on.log } doReturn log
-            on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(source, points, billingStatusTimeout = 3.seconds)
@@ -311,9 +306,9 @@ class ConversionSucceededTest {
         )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
+            on { this@on.coordinateConverter } doReturn coordinateConverter
             on { this@on.linkRepository } doReturn linkRepository
             on { this@on.log } doReturn log
-            on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(source, points, billingStatusTimeout = 3.seconds)
@@ -353,9 +348,9 @@ class ConversionSucceededTest {
         )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
+            on { this@on.coordinateConverter } doReturn coordinateConverter
             on { this@on.linkRepository } doReturn linkRepository
             on { this@on.log } doReturn log
-            on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(source, points)
@@ -388,9 +383,9 @@ class ConversionSucceededTest {
         )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
+            on { this@on.coordinateConverter } doReturn coordinateConverter
             on { this@on.linkRepository } doReturn linkRepository
             on { this@on.log } doReturn log
-            on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(source, points)
@@ -420,9 +415,9 @@ class ConversionSucceededTest {
         )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
+            on { this@on.coordinateConverter } doReturn coordinateConverter
             on { this@on.linkRepository } doReturn linkRepository
             on { this@on.log } doReturn log
-            on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(source, points)
@@ -450,9 +445,9 @@ class ConversionSucceededTest {
         )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
+            on { this@on.coordinateConverter } doReturn coordinateConverter
             on { this@on.linkRepository } doReturn linkRepository
             on { this@on.log } doReturn log
-            on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(source, points)
@@ -479,9 +474,9 @@ class ConversionSucceededTest {
         )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
+            on { this@on.coordinateConverter } doReturn coordinateConverter
             on { this@on.linkRepository } doReturn linkRepository
             on { this@on.log } doReturn log
-            on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(source, points)
@@ -514,9 +509,9 @@ class ConversionSucceededTest {
         )
         val stateContext: ConversionStateContext = mock {
             on { this@on.billing } doReturn billing
+            on { this@on.coordinateConverter } doReturn coordinateConverter
             on { this@on.linkRepository } doReturn linkRepository
             on { this@on.log } doReturn log
-            on { this@on.outputRepository } doReturn outputRepository
             on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
         }
         val state = ConversionSucceeded(source, points)

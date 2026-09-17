@@ -11,6 +11,10 @@ sealed interface Automation
 
 sealed interface BasicAutomation : Automation
 
+sealed interface ActivityAutomation : Automation {
+    val packageName: String?
+}
+
 sealed interface LinkAutomation : Automation {
     val linkUUID: UUID
 }
@@ -91,39 +95,39 @@ object NoopAutomation : BasicAutomation
 
 @Serializable
 @SerialName("OPEN_APP")
-data class OpenDisplayGeoUriAutomation(val packageName: String?) : BasicAutomation
+data class OpenDisplayGeoUriAutomation(override val packageName: String?) : ActivityAutomation
 
 @Serializable
 @SerialName("OPEN_DISPLAY_CARTES_IGN_URL")
-data class OpenDisplayCartesIGNUrlAutomation(val packageName: String?) : BasicAutomation
+data class OpenDisplayCartesIGNUrlAutomation(override val packageName: String?) : ActivityAutomation
 
 @Serializable
 @SerialName("OPEN_DISPLAY_MAGIC_EARTH_URI")
-data class OpenDisplayMagicEarthUriAutomation(val packageName: String?) : BasicAutomation
+data class OpenDisplayMagicEarthUriAutomation(override val packageName: String?) : ActivityAutomation
 
 @Serializable
 @SerialName("OPEN_APP_GOOGLE_MAPS_NAVIGATE_TO")
-data class OpenNavigationGoogleUriAutomation(val packageName: String?) : BasicAutomation
+data class OpenNavigationGoogleUriAutomation(override val packageName: String?) : ActivityAutomation
 
 @Serializable
 @SerialName("OPEN_APP_MAGIC_EARTH_NAVIGATE_TO")
-data class OpenNavigationMagicEarthUriAutomation(val packageName: String?) : BasicAutomation
+data class OpenNavigationMagicEarthUriAutomation(override val packageName: String?) : ActivityAutomation
 
 @Serializable
 @SerialName("OPEN_APP_GOOGLE_MAPS_STREET_VIEW")
-data class OpenStreetViewGoogleUriAutomation(val packageName: String?) : BasicAutomation
+data class OpenStreetViewGoogleUriAutomation(override val packageName: String?) : ActivityAutomation
 
 @Serializable
 @SerialName("OPEN_GPX_POINTS")
-data class OpenPointsGpxAutomation(val packageName: String?) : BasicAutomation
+data class OpenPointsGpxAutomation(override val packageName: String?) : ActivityAutomation
 
 @Serializable
 @SerialName("OPEN_GPX_ROUTE_MANY")
-data class OpenRouteGpxAutomation(val packageName: String?) : BasicAutomation
+data class OpenRouteGpxAutomation(override val packageName: String?) : ActivityAutomation
 
 @Serializable
 @SerialName("OPEN_APP_GPX_ROUTE")
-data class OpenRouteOnePointGpxAutomation(val packageName: String?) : BasicAutomation
+data class OpenRouteOnePointGpxAutomation(override val packageName: String?) : ActivityAutomation
 
 @Serializable
 @SerialName("SAVE_GPX_POINT")
@@ -143,7 +147,7 @@ object SavePointToContactAutomation : BasicAutomation
 
 @Serializable
 @SerialName("SEND_POINT")
-data class SendPointAutomation(val packageName: String?) : BasicAutomation
+data class SendPointAutomation(override val packageName: String?) : ActivityAutomation
 
 @Serializable
 @SerialName("SHARE")

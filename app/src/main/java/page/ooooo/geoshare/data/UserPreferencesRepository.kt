@@ -26,7 +26,7 @@ interface UserPreferencesRepository {
 class DefaultUserPreferencesRepository @Inject constructor(
     private val dataStore: DataStore<Preferences>,
 ) : UserPreferencesRepository {
-    override val values: Flow<UserPreferencesValues> =
+    override val values =
         dataStore.data.catch { exception ->
             if (exception is IOException) {
                 emit(emptyPreferences())

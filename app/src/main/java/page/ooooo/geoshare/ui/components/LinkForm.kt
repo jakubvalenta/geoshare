@@ -53,7 +53,6 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeGoogleMapsStreetViewLink
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.database.LinkType
-import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.openUriInDefaultApp
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
@@ -96,7 +95,6 @@ fun LinkForm(
     val context = LocalContext.current
     val spacing = LocalSpacing.current
 
-    val appDetails: AppDetails = emptyMap()
     var expanded by retain { mutableStateOf(initialExpanded) }
     val appEnabled by appEnabled.collectAsStateWithLifecycle()
     val chipEnabled by chipEnabled.collectAsStateWithLifecycle()
@@ -255,7 +253,7 @@ fun LinkForm(
                     ) {
                         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
                             IconFromDescriptor(
-                                shareOutput.getIcon(appDetails),
+                                shareOutput.getIcon(null),
                                 contentDescription = null,
                                 size = 46.dp,
                                 inverseContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
@@ -280,7 +278,7 @@ fun LinkForm(
                         SheetListItem(
                             headlineText = copyOutput.label(null),
                             supportingText = copyOutput.getDescription(WGS84Point(NaivePoint.example)),
-                            icon = copyOutput.getIcon(appDetails),
+                            icon = copyOutput.getIcon(null),
                         )
                     }
                 }
@@ -426,7 +424,7 @@ fun LinkForm(
                                 leadingIcon = {
                                     IconFromDescriptor(
                                         ShareLinkUriOutput(link.copy(type = value), coordinateConverter)
-                                            .getMenuIcon(appDetails),
+                                            .getMenuIcon(null),
                                         contentDescription = null,
                                     )
                                 },

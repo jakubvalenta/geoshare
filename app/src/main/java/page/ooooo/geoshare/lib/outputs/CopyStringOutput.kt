@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.copy
 import page.ooooo.geoshare.ui.components.ResourceIconDescriptor
 
@@ -17,15 +17,17 @@ object CopyStringOutput : StringOutput, Output.HasSuccessText {
             .toActionResult()
 
     @Composable
-    override fun label(appLabel: String?) = stringResource(R.string.conversion_succeeded_skip)
+    override fun label(appDetail: AppDetail?) =
+        stringResource(R.string.conversion_succeeded_skip)
 
     // TODO Use label()
-    override fun getDescription(value: String, uriQuote: UriQuote) = value
+    override fun getDescription(value: String, uriQuote: UriQuote) =
+        value
 
-    override fun getMenuIcon(appDetails: AppDetails) =
+    override fun getMenuIcon(appDetail: AppDetail?) =
         ResourceIconDescriptor(R.drawable.content_copy_24px)
 
     @Composable
-    override fun successText(appLabel: String?) =
+    override fun successText(appDetail: AppDetail?) =
         stringResource(R.string.copying_finished)
 }

@@ -4,15 +4,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.geo.Point
-import javax.inject.Inject
 
 /**
  * Copies the name of the point to the clipboard.
  *
  * Only available when the point actually has a name.
  */
-class CopyNameOutput @Inject constructor() : CopyPointTextOutput {
+object CopyNameOutput : CopyPointTextOutput {
     override val id = "CopyNameOutput"
 
     override fun getText(value: Point, uriQuote: UriQuote) =
@@ -22,11 +22,11 @@ class CopyNameOutput @Inject constructor() : CopyPointTextOutput {
         value.hasName()
 
     @Composable
-    override fun label(appLabel: String?) =
+    override fun label(appDetail: AppDetail?) =
         stringResource(R.string.conversion_succeeded_copy_name)
 
     @Composable
-    override fun automationSuccessText(appLabel: String?) =
+    override fun automationSuccessText(appDetail: AppDetail?) =
         stringResource(R.string.conversion_automation_copy_name_succeeded)
 
     override fun equals(other: Any?): Boolean {
