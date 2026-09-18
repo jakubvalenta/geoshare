@@ -29,7 +29,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
@@ -37,7 +36,6 @@ import org.junit.AssumptionViolatedException
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.database.ServerAuthType
-import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.android.PackageNames
@@ -535,15 +533,6 @@ fun UiAutomatorTestScope.onMainScrollablePane(): UiObject2 = onElement {
         viewIdResourceName == "geoShareMainPane"
 }
 
-/**
- * Scrolls to and returns an [automation] item on the automation preferences screen.
- */
-fun UiAutomatorTestScope.scrollToAutomationItem(automation: Automation): UiObject2 =
-    onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
-        .scrollToElement(Direction.DOWN, 20_000) {
-            viewIdResourceName == "geoShareUserPreferenceAutomation_${Json.encodeToString<Automation>(automation)}"
-        }
-
 fun UiAutomatorTestScope.launchNavigationInApp(@Suppress("SameParameterValue") packageName: String) {
     onElement { viewIdResourceName == "geoShareApp_$packageName" }.longClick()
     onElement {
@@ -556,11 +545,6 @@ fun UiAutomatorTestScope.launchNavigationInApp(@Suppress("SameParameterValue") p
 
 fun UiObject2.expandSheet() {
     swipe(Direction.UP, 1f)
-}
-
-fun UiObject2.collapseSheet() {
-    swipe(Direction.DOWN, 1f)
-    swipe(Direction.DOWN, 1f)
 }
 
 fun UiObject2.longScrollSheet(direction: Direction = Direction.DOWN) {
@@ -960,17 +944,6 @@ fun UiAutomatorTestScope.setAppLocales(locales: String) {
     device.executeShellCommand(
         "cmd locale set-app-locales ${BuildConfig.APPLICATION_ID} --user current --locales $locales"
     )
-}
-
-inline fun <T> UiAutomatorTestScope.withNetworkOff(block: () -> T): T {
-    device.executeShellCommand("svc wifi disable")
-    device.executeShellCommand("svc data disable")
-    try {
-        return block()
-    } finally {
-        device.executeShellCommand("svc wifi enable")
-        device.executeShellCommand("svc data enable")
-    }
 }
 
 /**

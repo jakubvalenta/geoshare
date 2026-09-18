@@ -1,13 +1,19 @@
 package page.ooooo.geoshare.tests
 
+import androidx.test.uiautomator.Direction
+import androidx.test.uiautomator.UiAutomatorTestScope
+import androidx.test.uiautomator.UiObject2
+import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
 import org.junit.Assert.assertNull
 import org.junit.Test
+import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenRouteOnePointGpxAutomation
@@ -194,3 +200,12 @@ class AutomationBehaviorTest {
         assertContactContainsText(CoordinateFormatter.formatDecCoords(point))
     }
 }
+
+/**
+ * Scrolls to and returns an [automation] item on the automation preferences screen.
+ */
+fun UiAutomatorTestScope.scrollToAutomationItem(automation: Automation): UiObject2 =
+    onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
+        .scrollToElement(Direction.DOWN, 20_000) {
+            viewIdResourceName == "geoShareUserPreferenceAutomation_${Json.encodeToString<Automation>(automation)}"
+        }

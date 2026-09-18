@@ -1,6 +1,8 @@
 package page.ooooo.geoshare.screenshots
 
 import androidx.test.uiautomator.Direction
+import androidx.test.uiautomator.UiAutomatorTestScope
+import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
@@ -33,7 +35,6 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.InputGroupId
 import page.ooooo.geoshare.tests.assumeDomainResolvable
 import page.ooooo.geoshare.tests.chooseFile
-import page.ooooo.geoshare.tests.collapseSheet
 import page.ooooo.geoshare.tests.confirmDialog
 import page.ooooo.geoshare.tests.disableSystemUIDemoMode
 import page.ooooo.geoshare.tests.dismissDialog
@@ -64,7 +65,6 @@ import page.ooooo.geoshare.tests.setMainInput
 import page.ooooo.geoshare.tests.shareUri
 import page.ooooo.geoshare.tests.submitMainForm
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
-import page.ooooo.geoshare.tests.withNetworkOff
 import page.ooooo.geoshare.ui.FaqItemId
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 import java.util.UUID
@@ -1031,5 +1031,21 @@ class ScreenshotsFreeBehaviorTest {
         saveScreenshot("main_strings/servers_message_delete")
 
         goBackToMainForm()
+    }
+
+    private fun UiObject2.collapseSheet() {
+        swipe(Direction.DOWN, 1f)
+        swipe(Direction.DOWN, 1f)
+    }
+
+    private inline fun <T> UiAutomatorTestScope.withNetworkOff(block: () -> T): T {
+        device.executeShellCommand("svc wifi disable")
+        device.executeShellCommand("svc data disable")
+        try {
+            return block()
+        } finally {
+            device.executeShellCommand("svc wifi enable")
+            device.executeShellCommand("svc data enable")
+        }
     }
 }
