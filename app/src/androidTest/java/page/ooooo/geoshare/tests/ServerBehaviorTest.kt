@@ -42,8 +42,11 @@ class ServerBehaviorTest {
         }
 
         // Shows the new server
+        quickWaitForStableInActiveWindow() // Wait for the lazy list to render
         onElement { viewIdResourceName == "geoShareServerListPane" }
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerListItem_GoogleMapsAddress_${server.name}" }
+            .scrollToElement(Direction.DOWN, 3_000) {
+                viewIdResourceName == "geoShareServerListItem_GoogleMapsAddress_${server.name}"
+            }
     }
 
     @Test

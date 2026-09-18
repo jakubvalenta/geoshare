@@ -57,7 +57,9 @@ class UserPreferencesBehaviorTest {
         onElement { viewIdResourceName == "geoShareUserPreferenceCoordinateFormat_${CoordinateFormat.DEG_MIN_SEC}" }.click()
 
         // Shows coordinates in the degrees, minutes, seconds format
-        val coordinates = goBackToElement { viewIdResourceName == "geoShareResultLastPointCoordinates" }
+        val coordinates = goBackToElement(
+            2_000 // Increase timeout to prevent coordinate element not found on tablet
+        ) { viewIdResourceName == "geoShareResultLastPointCoordinates" }
         assertEquals(
             CoordinateFormatter.formatDegMinSecCoords(
                 coordinateConverter.toWGS84(
@@ -145,10 +147,10 @@ class UserPreferencesBehaviorTest {
         }
 
         // Open Google Maps
-        clickAppIcon(PackageNames.GOOGLE_MAPS)
+        scrollToAppIcon(PackageNames.GOOGLE_MAPS).clickAppIcon()
 
         // Wait for Google Maps
-        onElement(20_000) { packageName == PackageNames.GOOGLE_MAPS }
+        waitAndAssertGoogleMapsContainsElement { true }
 
         // Go back
         pressBack()
@@ -174,10 +176,10 @@ class UserPreferencesBehaviorTest {
         goBackToElement { viewIdResourceName == "geoShareResultLastPointCoordinates" }
 
         // Open Google Maps
-        clickAppIcon(PackageNames.GOOGLE_MAPS)
+        scrollToAppIcon(PackageNames.GOOGLE_MAPS).clickAppIcon()
 
         // Wait for Google Maps
-        onElement(20_000) { packageName == PackageNames.GOOGLE_MAPS }
+        waitAndAssertGoogleMapsContainsElement { true }
 
         // Go back
         pressBack()
@@ -204,10 +206,8 @@ class UserPreferencesBehaviorTest {
 
         // Hide an app
         quickWaitForStableInActiveWindow() // Wait for the result to render, to prevent stale object error
-        onMainScrollablePane()
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareApp_${PackageNames.OSMAND_PLUS}" }
-            .longClick()
-        onElement { viewIdResourceName == "geoShareAppHide" }.click()
+        scrollToAppIcon(PackageNames.OSMAND_PLUS).longClick()
+        hideApp()
 
         // Shows a message
         onElement(pollIntervalMs = 50) {
@@ -234,10 +234,7 @@ class UserPreferencesBehaviorTest {
 
         // Shows the app
         goBackToElement { viewIdResourceName == "geoShareMainPane" }
-        onMainScrollablePane()
-            .scrollToElement(Direction.DOWN, timeoutMs = 3_000) {
-                viewIdResourceName == "geoShareApp_${PackageNames.OSMAND_PLUS}"
-            }
+        scrollToAppIcon(PackageNames.OSMAND_PLUS)
     }
 
     @Test
@@ -253,8 +250,8 @@ class UserPreferencesBehaviorTest {
 
         // Hide a link
         scrollToLinkIcons()
-        onElement { viewIdResourceName == "geoShareLink_Apple Maps" }.longClick()
-        onElement { viewIdResourceName == "geoShareAppHide" }.click()
+        scrollToLinkIcon("Apple Maps").longClick()
+        hideApp()
 
         // Shows a message
         onElement(pollIntervalMs = 50) {
@@ -281,9 +278,6 @@ class UserPreferencesBehaviorTest {
 
         // Shows the link
         goBackToElement { viewIdResourceName == "geoShareMainPane" }
-        onMainScrollablePane()
-            .scrollToElement(Direction.DOWN, timeoutMs = 3_000) {
-                viewIdResourceName == "geoShareLink_Apple Maps"
-            }
+        scrollToLinkIcon("Apple Maps")
     }
 }

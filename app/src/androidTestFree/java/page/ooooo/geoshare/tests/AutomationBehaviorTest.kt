@@ -70,7 +70,7 @@ class AutomationBehaviorTest {
         assertNull(onElementOrNull(3_000) { packageName == PackageNames.GOOGLE_MAPS })
 
         // Google Maps opens
-        onElement(20_000) { packageName == PackageNames.GOOGLE_MAPS }
+        waitAndAssertGoogleMapsContainsElement { true }
 
         // Go back to app
         launchApplication()
@@ -201,11 +201,8 @@ class AutomationBehaviorTest {
     }
 }
 
-/**
- * Scrolls to and returns an [automation] item on the automation preferences screen.
- */
 fun UiAutomatorTestScope.scrollToAutomationItem(automation: Automation): UiObject2 =
-    onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
-        .scrollToElement(Direction.DOWN, 20_000) {
-            viewIdResourceName == "geoShareUserPreferenceAutomation_${Json.encodeToString<Automation>(automation)}"
-        }
+    // FIXME
+    onElementOrScrollToElement(scrollableElement = { onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" } }) {
+        viewIdResourceName == "geoShareUserPreferenceAutomation_${Json.encodeToString<Automation>(automation)}"
+    }

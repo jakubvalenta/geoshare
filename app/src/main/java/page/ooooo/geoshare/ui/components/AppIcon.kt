@@ -95,9 +95,7 @@ fun AppIcon(
             if (label != null) {
                 Text(
                     label,
-                    Modifier
-                        .fillMaxWidth()
-                        .testTag("geoShareAppLabel"),
+                    Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,

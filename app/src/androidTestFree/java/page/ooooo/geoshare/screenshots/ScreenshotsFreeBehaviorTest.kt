@@ -53,13 +53,17 @@ import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.tests.launchNavigationInApp
 import page.ooooo.geoshare.tests.longScrollSheet
 import page.ooooo.geoshare.tests.mockLocation
+import page.ooooo.geoshare.tests.onElementOrScrollToElement
 import page.ooooo.geoshare.tests.onMainScrollablePane
 import page.ooooo.geoshare.tests.quickWaitForStableInActiveWindow
 import page.ooooo.geoshare.tests.saveLinkForm
 import page.ooooo.geoshare.tests.saveScreenshot
 import page.ooooo.geoshare.tests.saveServerForm
+import page.ooooo.geoshare.tests.scrollToAppIcon
 import page.ooooo.geoshare.tests.scrollToAppIcons
 import page.ooooo.geoshare.tests.scrollToAutomationItem
+import page.ooooo.geoshare.tests.scrollToLinkIcon
+import page.ooooo.geoshare.tests.scrollToTop
 import page.ooooo.geoshare.tests.setAppLocales
 import page.ooooo.geoshare.tests.setMainInput
 import page.ooooo.geoshare.tests.shareUri
@@ -392,11 +396,7 @@ class ScreenshotsFreeBehaviorTest {
 
         // Conversion - Result - App - Google Maps
         quickWaitForStableInActiveWindow() // Wait for the result to render
-        onMainScrollablePane()
-            .scrollToElement(Direction.DOWN, 3_000) {
-                viewIdResourceName == "geoShareApp_${PackageNames.GOOGLE_MAPS}"
-            }
-            .longClick()
+        scrollToAppIcon(PackageNames.GOOGLE_MAPS).longClick()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_app_google_maps")
 
@@ -409,21 +409,13 @@ class ScreenshotsFreeBehaviorTest {
         }
 
         // Conversion - Result - Share
-        onMainScrollablePane()
-            .scrollToElement(Direction.DOWN, 3_000) {
-                viewIdResourceName == "geoShareAppShare"
-            }
-            .longClick()
+        scrollToShareItem().longClick()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_share")
         pressBack() // Close app menu
 
         // Conversion - Result - Web map
-        onMainScrollablePane()
-            .scrollToElement(Direction.DOWN, 3_000) {
-                viewIdResourceName == "geoShareLink_Google Maps"
-            }
-            .longClick()
+        scrollToLinkIcon("Google Maps").longClick()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_web_map")
         pressBack() // Close app menu
@@ -439,11 +431,7 @@ class ScreenshotsFreeBehaviorTest {
         shareUri()
 
         // Conversion - Result - App - Messaging
-        onMainScrollablePane()
-            .scrollToElement(Direction.DOWN, 3_000) {
-                viewIdResourceName == "geoShareApp_${PackageNames.CONVERSATIONS}"
-            }
-            .longClick()
+        scrollToAppIcon(PackageNames.CONVERSATIONS).longClick()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_app_messaging")
         pressBack() // Close app menu
@@ -459,11 +447,7 @@ class ScreenshotsFreeBehaviorTest {
         shareUri()
 
         // Conversion - Result - App - OsmAnd
-        onMainScrollablePane()
-            .scrollToElement(Direction.DOWN, 3_000) {
-                viewIdResourceName == "geoShareApp_${PackageNames.OSMAND_PLUS}"
-            }
-            .longClick()
+        scrollToAppIcon(PackageNames.OSMAND_PLUS).longClick()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_app_osmand")
         pressBack() // Close app menu
@@ -503,7 +487,8 @@ class ScreenshotsFreeBehaviorTest {
 
         // Conversion - Result - Location - Rationale
         scrollToAppIcons()
-        launchNavigationInApp(PackageNames.TOMTOM)
+        scrollToAppIcon(PackageNames.TOMTOM)
+        launchNavigationInApp()
         onElement(20_000) { viewIdResourceName == "geoShareLocationRationaleDialog" }.let { dialog ->
             quickWaitForStableInActiveWindow()
             saveScreenshot("main_strings/conversion_result_location_rationale")
@@ -513,7 +498,7 @@ class ScreenshotsFreeBehaviorTest {
         // Conversion - Result - Location - Loading
         waitForStableInActiveWindow() // Wait, otherwise tapping the location permission grant button does nothing
         grantSystemPermission()
-        onMainScrollablePane().scroll(Direction.UP, 3f) // Scroll up to see message
+        onMainScrollablePane().scrollToTop()
         onElement { viewIdResourceName == "geoShareResultSmallLoadingIndicatorMessage" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_location_loading_indicator")
@@ -709,11 +694,7 @@ class ScreenshotsFreeBehaviorTest {
 
         // Conversion - Result - Message - Web map hidden
         quickWaitForStableInActiveWindow() // Wait for the result to render
-        onMainScrollablePane()
-            .scrollToElement(Direction.DOWN, 3_000) {
-                viewIdResourceName == "geoShareLink_Apple Maps"
-            }
-            .longClick()
+        scrollToLinkIcon("Apple Maps").longClick()
         onElement { viewIdResourceName == "geoShareAppHide" }.click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_message_web_map_hidden")
@@ -1048,4 +1029,9 @@ class ScreenshotsFreeBehaviorTest {
             device.executeShellCommand("svc data enable")
         }
     }
+
+    private fun UiAutomatorTestScope.scrollToShareItem(): UiObject2 =
+        onElementOrScrollToElement(scrollableElement = { onMainScrollablePane() }) {
+            viewIdResourceName == "geoShareAppShare"
+        }
 }
