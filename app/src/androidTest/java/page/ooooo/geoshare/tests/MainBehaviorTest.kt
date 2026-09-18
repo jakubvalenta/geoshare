@@ -10,14 +10,19 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertNull
 import org.junit.Test
-import page.ooooo.geoshare.data.local.database.InitialLinks
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
+import page.ooooo.geoshare.lib.android.MimeType
 import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.android.TextActivity
+import page.ooooo.geoshare.lib.android.UriActivity
+import page.ooooo.geoshare.lib.android.UriScheme
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.outputs.OpenUnknownUriOutput
+import page.ooooo.geoshare.lib.outputs.SendStringOutput
 import kotlin.time.Duration.Companion.seconds
 
 class MainBehaviorTest {
@@ -121,10 +126,9 @@ class MainBehaviorTest {
 
         // Open the source sheet and tap an app
         onElement { viewIdResourceName == "geoShareMainSourceButton" }.click()
+        val output = SendStringOutput(TextActivity(messagingAppPackageName, MimeType.TEXT_PLAIN))
         onElement { viewIdResourceName == "geoShareConversionUriSheet" }
-            .scrollToElement(Direction.DOWN) {
-                viewIdResourceName == "geoShareConversionUriSheetItem_$messagingAppPackageName"
-            }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareConversionUriSheetItem_${output.id}" }
             .click()
 
         // Opens the messaging app
@@ -140,10 +144,9 @@ class MainBehaviorTest {
 
         // Open the source sheet and tap an app
         onElement { viewIdResourceName == "geoShareMainSourceButton" }.click()
+        val output = OpenUnknownUriOutput(UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.UNKNOWN))
         onElement { viewIdResourceName == "geoShareConversionUriSheet" }
-            .scrollToElement(Direction.DOWN) {
-                viewIdResourceName == "geoShareConversionUriSheetItem_${PackageNames.GOOGLE_MAPS}"
-            }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareConversionUriSheetItem_${output.id}" }
             .click()
 
         // Google Maps shows precise location
@@ -172,13 +175,19 @@ class MainBehaviorTest {
     fun whenLinkIsShared_allowsOpeningGoogleMapsSearchLink() = uiAutomator {
         assumeAppInstalled(PackageNames.GOOGLE_MAPS)
 
-        // Share a point with name with the app
+        // Launch app
+        launchApplication()
+        waitForAppToBeVisible()
+
+        // Enter a point in the main form and submit it. Use the form instead of sharing the point, so that the app
+        // doesn't finish, which causes clicking on a non-clickable element on Redmi 8
         val query = "foo"
-        shareUri(WGS84Point(name = query, source = Source.GENERATED))
+        setMainInput(WGS84Point(name = query, source = Source.GENERATED))
+        submitMainForm()
 
         // Click the link
         scrollToLinkIcons()
-        onElement { viewIdResourceName == "geoShareApp_${InitialLinks.GOOGLE_MAPS_DISPLAY_UUID}" }.longClick()
+        onElement { viewIdResourceName == "geoShareLink_Google Maps" }.longClick()
         onElement {
             viewIdResourceName == "geoShareAppOutput" && textAsString()?.contains("Google Maps search") == true
         }.click()
@@ -319,6 +328,7 @@ class MainBehaviorTest {
         shareUri()
 
         // Help message OPEN_BY_DEFAULT is visible
+        quickWaitForStableInActiveWindow() // Wait for the result to render, to prevent stale object error
         onMainScrollablePane()
             // Scroll by percents not to element, because it's more reliable due to the lazy list loading
             .scroll(Direction.DOWN, 3f)

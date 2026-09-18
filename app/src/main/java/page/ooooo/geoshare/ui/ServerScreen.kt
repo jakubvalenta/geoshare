@@ -302,7 +302,7 @@ private fun ServerListPane(
         },
         onBack = onBack,
     ) {
-        item {
+        item(key = "description", contentType = "paragraph_text") {
             ParagraphText(
                 stringResource(R.string.server_list_description, stringResource(R.string.app_name)),
                 Modifier
@@ -311,7 +311,7 @@ private fun ServerListPane(
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
-        item {
+        item(key = "add", contentType = "button") {
             Button(
                 { onNavigateToContentKey(-1) },
                 Modifier
@@ -329,6 +329,7 @@ private fun ServerListPane(
             destination = destination,
             all = all,
             itemTestTag = { "geoShareServerListItem_GoogleMapsAddress_${it?.name}" },
+            key = "google_maps_address",
             title = { stringResource(R.string.server_list_google_maps_address_title) },
             noneDescription = { stringResource(R.string.server_list_google_maps_none_description) },
             selectedServer = selectedServerGoogleMapsAddress,
@@ -339,6 +340,7 @@ private fun ServerListPane(
             destination = destination,
             all = all,
             itemTestTag = { "geoShareServerListItem_GoogleMapsPlace_${it?.name}" },
+            key = "google_maps_place",
             title = { stringResource(R.string.server_list_google_maps_place_title) },
             noneDescription = { stringResource(R.string.server_list_google_maps_none_description) },
             selectedServer = selectedServerGoogleMapsPlace,
@@ -350,6 +352,7 @@ private fun ServerListPane(
                 destination = destination,
                 all = all,
                 itemTestTag = { "geoShareServerSearchListItem_${it?.name}" },
+                key = "search",
                 title = { stringResource(R.string.server_list_search_title) },
                 noneDescription = { stringResource(R.string.server_list_search_none_description) },
                 selectedServer = selectedServerSearch,
@@ -357,7 +360,7 @@ private fun ServerListPane(
                 onSelectServer = onSelectServerSearch,
             )
         }
-        item {
+        item(key = "restore", contentType = "text_button") {
             TextButton(
                 onClick = { setRestoreInitialDataDialogOpen(true) },
                 modifier = Modifier
@@ -444,7 +447,7 @@ private fun ServerDetailPane(
                 },
                 backIcon = Icons.Default.Close,
             ) {
-                item {
+                item(key = "server_form", contentType = "server_form") {
                     ServerForm(
                         apiKey = apiKey,
                         apiKeyHeader = apiKeyHeader,
@@ -496,19 +499,20 @@ fun LazyListScope.serverListSection(
     destination: Int?,
     all: List<Server>,
     itemTestTag: (Server?) -> String,
+    key: String,
     title: @Composable () -> String,
     noneDescription: @Composable () -> String,
     selectedServer: Server?,
     onNavigateToContentKey: (Int?) -> Unit,
     onSelectServer: (Server?) -> Unit,
 ) {
-    item {
+    item(key = "server_list_${key}_label", contentType = "segmented_list_label") {
         SegmentedListLabel(
             title(),
             Modifier.padding(horizontal = LocalSpacing.current.windowPadding),
         )
     }
-    item {
+    item(key = "server_list_${key}_list", contentType = "segmented_list") {
         SegmentedList(
             values = listOf(null) + all,
             modifier = Modifier.padding(horizontal = LocalSpacing.current.windowPadding),

@@ -5,7 +5,7 @@ import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.openUriInDefaultApp
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
@@ -16,6 +16,8 @@ class ShareLinkUriOutput @Inject constructor(
     val link: Link,
     private val coordinateConverter: CoordinateConverter,
 ) : SharePointUriOutput {
+    override val id = "ShareLinkUriOutput(link.uuid=${link.uuid})"
+
     override fun getUriString(value: Point, uriQuote: UriQuote) =
         UriFormatter.formatUriString(
             coordinateConverter.toSrs(value, link.srs),
@@ -30,13 +32,13 @@ class ShareLinkUriOutput @Inject constructor(
         }.let { success -> if (success == true) ActionResult.SUCCEEDED_AND_OPENED_APP else ActionResult.FAILED }
 
     @Composable
-    override fun label(appDetails: AppDetails) =
+    override fun label(appDetail: AppDetail?) =
         stringResource(R.string.output_open_link, link.name)
 
-    override fun getMenuIcon(appDetails: AppDetails) =
+    override fun getMenuIcon(appDetail: AppDetail?) =
         link.menuIcon
 
-    override fun getIcon(appDetails: AppDetails) =
+    override fun getIcon(appDetail: AppDetail?) =
         link.icon
 
     override fun equals(other: Any?): Boolean {

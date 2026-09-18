@@ -53,7 +53,6 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeGoogleMapsStreetViewLink
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.database.LinkType
-import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.openUriInDefaultApp
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
@@ -96,7 +95,6 @@ fun LinkForm(
     val context = LocalContext.current
     val spacing = LocalSpacing.current
 
-    val appDetails: AppDetails = emptyMap()
     var expanded by retain { mutableStateOf(initialExpanded) }
     val appEnabled by appEnabled.collectAsStateWithLifecycle()
     val chipEnabled by chipEnabled.collectAsStateWithLifecycle()
@@ -193,36 +191,34 @@ fun LinkForm(
             WGS84Point.ForbiddenCity to stringResource(R.string.links_form_test_china),
         ).let { testPointsWithName ->
             Column(verticalArrangement = Arrangement.spacedBy(spacing.small)) {
-                ScrollableChips(paddingValues = PaddingValues(horizontal = LocalSpacing.current.windowPadding)) {
+                ScrollableChips(contentPadding = PaddingValues(horizontal = LocalSpacing.current.windowPadding)) {
                     testPointsWithName.forEach { (point, name) ->
-                        item {
-                            SuggestionChip(
-                                onClick = {
-                                    UriFormatter.formatUriString(
-                                        coordinateConverter.toSrs(point, srs).copy(name = name),
-                                        coordsUriTemplate,
-                                        nameUriTemplate,
-                                    )?.let {
-                                        context.openUriInDefaultApp(it)
-                                    }
-                                },
-                                label = {
-                                    Row(
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                    ) {
-                                        Text(name)
-                                        Icon(
-                                            painterResource(R.drawable.arrow_outward_24px),
-                                            contentDescription = null,
-                                            Modifier.size(16.dp),
-                                        )
-                                    }
-                                },
-                                enabled = enabled,
-                                contentPadding = PaddingValues(start = 8.dp, end = 2.dp),
-                            )
-                        }
+                        SuggestionChip(
+                            onClick = {
+                                UriFormatter.formatUriString(
+                                    coordinateConverter.toSrs(point, srs).copy(name = name),
+                                    coordsUriTemplate,
+                                    nameUriTemplate,
+                                )?.let {
+                                    context.openUriInDefaultApp(it)
+                                }
+                            },
+                            label = {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Text(name)
+                                    Icon(
+                                        painterResource(R.drawable.arrow_outward_24px),
+                                        contentDescription = null,
+                                        Modifier.size(16.dp),
+                                    )
+                                }
+                            },
+                            enabled = enabled,
+                            contentPadding = PaddingValues(start = 8.dp, end = 2.dp),
+                        )
                     }
                 }
             }
@@ -246,10 +242,16 @@ fun LinkForm(
                         .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.extraSmall)
                         .padding(vertical = spacing.tiny)
                 ) {
-                    AppIcon(Modifier.width(100.dp), link.groupOrName, enabled = false) {
+                    AppIcon(
+                        label = link.groupOrName,
+                        menu = { _, _ -> },
+                        onClick = {},
+                        modifier = Modifier.width(100.dp),
+                        enabled = false,
+                    ) {
                         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
                             IconFromDescriptor(
-                                shareOutput.getIcon(appDetails),
+                                shareOutput.getIcon(null),
                                 contentDescription = null,
                                 size = 46.dp,
                                 inverseContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
@@ -272,9 +274,9 @@ fun LinkForm(
                             BottomSheetDefaults.DragHandle()
                         }
                         SheetListItem(
-                            headlineText = copyOutput.label(appDetails),
+                            headlineText = copyOutput.label(null),
                             supportingText = copyOutput.getDescription(WGS84Point(NaivePoint.example)),
-                            icon = copyOutput.getIcon(appDetails),
+                            icon = copyOutput.getIcon(null),
                         )
                     }
                 }
@@ -295,7 +297,7 @@ fun LinkForm(
                     // Row prevents the chip from filling the whole container width
                     Row(Modifier.padding(horizontal = spacing.small)) {
                         StyledChip(
-                            label = copyOutput.label(appDetails),
+                            label = copyOutput.label(null),
                             modifier = Modifier.widthIn(min = 150.dp),
                             icon = {
                                 IconFromDescriptor(
@@ -404,7 +406,7 @@ fun LinkForm(
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     RadioButtonGroup(
-                        selectedValue = type,
+                        isSelected = { it == type },
                         onSelect = onSetType,
                         values = listOf(LinkType.DISPLAY, LinkType.NAVIGATION, LinkType.STREET_VIEW),
                         enabled = enabled,
@@ -415,12 +417,12 @@ fun LinkForm(
                             color = MaterialTheme.colorScheme.surfaceContainerHighest,
                         ) {
                             DropdownMenuItem(
-                                text = { Text(shareOutput.label(appDetails)) },
+                                text = { Text(shareOutput.label(null)) },
                                 onClick = { onSetType(value) },
                                 leadingIcon = {
                                     IconFromDescriptor(
                                         ShareLinkUriOutput(link.copy(type = value), coordinateConverter)
-                                            .getMenuIcon(appDetails),
+                                            .getMenuIcon(null),
                                         contentDescription = null,
                                     )
                                 },

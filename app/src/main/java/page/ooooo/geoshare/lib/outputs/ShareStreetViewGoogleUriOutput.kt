@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.formatters.GoogleMapsUriFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
@@ -14,18 +14,20 @@ import javax.inject.Inject
 class ShareStreetViewGoogleUriOutput @Inject constructor(
     private val coordinateConverter: CoordinateConverter,
 ) : SharePointUriOutput {
+    override val id = "ShareStreetViewGoogleUriOutput"
+
     override fun getUriString(value: Point, uriQuote: UriQuote) =
         GoogleMapsUriFormatter.formatStreetViewUriString(coordinateConverter.toWGS84(value), uriQuote = uriQuote)
 
     @Composable
-    override fun label(appDetails: AppDetails) =
+    override fun label(appDetail: AppDetail?) =
         stringResource(R.string.output_open_street_view)
 
-    override fun getMenuIcon(appDetails: AppDetails) =
+    override fun getMenuIcon(appDetail: AppDetail?) =
         ResourceIconDescriptor(R.drawable.streetview_24px)
 
     @Composable
-    override fun automationLabel(appDetails: AppDetails) =
+    override fun automationLabel(appDetail: AppDetail?) =
         stringResource(R.string.output_open_street_view)
 
     override fun equals(other: Any?): Boolean {

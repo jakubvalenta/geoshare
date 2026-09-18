@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import page.ooooo.geoshare.data.InputRepository
 import page.ooooo.geoshare.data.LinkRepository
-import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
@@ -25,6 +24,7 @@ import page.ooooo.geoshare.lib.conversion.ConversionStateContext
 import page.ooooo.geoshare.lib.conversion.ConversionStateLogItem
 import page.ooooo.geoshare.lib.conversion.DefaultConversionStateContext
 import page.ooooo.geoshare.lib.conversion.Initial
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.inputs.Input
 import kotlin.time.ComparableTimeMark
 
@@ -44,17 +44,17 @@ object ConversionStateContextModule {
     fun provideConversionStateContext(
         @ApplicationContext context: Context,
         billing: Billing,
+        coordinateConverter: CoordinateConverter,
         inputRepository: InputRepository,
         linkRepository: LinkRepository,
         log: Log,
-        outputRepository: OutputRepository,
         uriQuote: UriQuote,
         userPreferencesRepository: UserPreferencesRepository,
     ): ConversionStateContext =
         DefaultConversionStateContext(
+            coordinateConverter = coordinateConverter,
             inputs = inputRepository.all,
             linkRepository = linkRepository,
-            outputRepository = outputRepository,
             resources = context.resources,
             userPreferencesRepository = userPreferencesRepository,
             log = log,
@@ -69,14 +69,14 @@ object ConversionStateContextModule {
  * For testing purposes only.
  */
 class FakeConversionStateContext(
+    override val billing: Billing,
+    override val coordinateConverter: CoordinateConverter,
     override val inputs: List<Input>,
     override val linkRepository: LinkRepository,
-    override val outputRepository: OutputRepository,
-    override val resources: Resources,
-    override val userPreferencesRepository: UserPreferencesRepository,
     override val log: Log,
-    override val billing: Billing,
+    override val resources: Resources,
     override val uriQuote: UriQuote,
+    override val userPreferencesRepository: UserPreferencesRepository,
 ) : ConversionStateContext {
     private var counter: Int = 0
 

@@ -14,13 +14,17 @@ import kotlinx.coroutines.flow.timeout
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.local.preferences.ActivityAutomation
 import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
 import page.ooooo.geoshare.data.local.preferences.AutomationPreference
+import page.ooooo.geoshare.data.local.preferences.BasicAutomation
 import page.ooooo.geoshare.data.local.preferences.CachedPurchase
 import page.ooooo.geoshare.data.local.preferences.CachedPurchasePreference
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
+import page.ooooo.geoshare.data.local.preferences.LinkAutomation
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.Permission
+import page.ooooo.geoshare.data.toOutput
 import page.ooooo.geoshare.lib.Attempt
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingStatus
@@ -41,9 +45,11 @@ import page.ooooo.geoshare.lib.outputs.ActionResult
 import page.ooooo.geoshare.lib.outputs.BasicAction
 import page.ooooo.geoshare.lib.outputs.FileAction
 import page.ooooo.geoshare.lib.outputs.LocationAction
+import page.ooooo.geoshare.lib.outputs.NoopAction
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
+import page.ooooo.geoshare.lib.outputs.StringOutput
 import java.net.MalformedURLException
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
@@ -520,13 +526,17 @@ data class ConversionSucceeded(
         }
 
         if (billingStatus is BillingStatus.Purchased && stateContext.billing.features.contains(AutomationFeature)) {
-            val output = stateContext.outputRepository.getAutomationOutput(
-                automation = automation,
-                getLinkByUUID = { stateContext.linkRepository.getByUUID(it) },
-            ) ?: return null
+            val output = when (automation) {
+                is BasicAutomation -> automation.toOutput(stateContext.coordinateConverter)
+                is ActivityAutomation -> automation.toOutput(stateContext.coordinateConverter, stateContext.log)
+                is LinkAutomation -> stateContext.linkRepository.getByUUID(automation.linkUUID)?.let { link ->
+                    automation.toOutput(stateContext.coordinateConverter, link)
+                }
+            } ?: return null
             val action = when (output) {
                 is PointOutput -> output.toAction(lastPoint)
                 is PointsOutput -> output.toAction(points)
+                is StringOutput -> NoopAction
             }
             if (output is Output.HasAutomationDelay) {
                 val delay = stateContext.userPreferencesRepository.getValue(AutomationDelayPreference)

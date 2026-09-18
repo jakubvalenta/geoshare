@@ -10,11 +10,7 @@ import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.retain.retain
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
@@ -22,13 +18,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.datastore.preferences.core.MutablePreferences
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.local.database.Link
-import page.ooooo.geoshare.data.local.database.findByUUID
-import page.ooooo.geoshare.data.local.preferences.Automation
+import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
 import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.toOutput
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
@@ -36,9 +34,9 @@ import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.outputs.Output
-import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
+import page.ooooo.geoshare.ui.AutomationDetail
 import page.ooooo.geoshare.ui.theme.AppTheme
-import java.util.UUID
+import page.ooooo.geoshare.ui.toAutomationDetail
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
@@ -47,22 +45,18 @@ import kotlin.time.DurationUnit
 fun UserPreferenceAutomationDelayListItem(
     index: Int,
     count: Int,
+    automationDetail: StateFlow<AutomationDetail>,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
-    links: List<Link>,
     selected: Boolean,
     values: UserPreferencesValues,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
 ) {
-    var enabled by retain { mutableStateOf(true) }
-
-    LaunchedEffect(values, billingStatus, links) {
-        enabled = billingStatus is BillingStatus.Purchased &&
-            AutomationFeature in billingFeatures &&
-            onGetAutomationOutput(values.automation) { links.findByUUID(it) } is Output.HasAutomationDelay
-    }
+    val automationDetail by automationDetail.collectAsStateWithLifecycle()
+    val enabled = billingStatus is BillingStatus.Purchased &&
+        AutomationFeature in billingFeatures &&
+        automationDetail.output is Output.HasAutomationDelay
 
     SegmentedListItem(
         selected = selected,
@@ -107,6 +101,7 @@ fun UserPreferenceAutomationDelayControls(
         onNavigateToBillingScreen = onNavigateToBillingScreen,
     ) {
         userPreferenceTextControl(
+            key = "automation_delay_control",
             userPreference = AutomationDelayPreference,
             values = values,
             onValueChange = onValueChange,
@@ -139,9 +134,17 @@ private fun ListItemPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
+                val appDetails = getFakeAppDetails(context)
                 UserPreferenceAutomationDelayListItem(
                     index = 0,
                     count = 1,
+                    automationDetail = MutableStateFlow(
+                        SavePointsGpxAutomation.let { automation ->
+                            automation
+                                .toOutput(coordinateConverter)
+                                .toAutomationDetail(automation, appDetails)
+                        }
+                    ),
                     billingFeatures = listOf(AutomationFeature),
                     billingStatus = BillingStatus.Purchased(
                         product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
@@ -149,11 +152,9 @@ private fun ListItemPreview() {
                         refundable = true,
                         token = "test_purchased",
                     ),
-                    links = emptyList(),
                     selected = false,
                     values = UserPreferencesValues(automation = SavePointsGpxAutomation),
                     onClick = {},
-                    onGetAutomationOutput = { _, _ -> SavePointsGpxOutput(coordinateConverter) },
                 )
             }
         }
@@ -169,9 +170,17 @@ private fun DarkListItemPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
+                val appDetails = getFakeAppDetails(context)
                 UserPreferenceAutomationDelayListItem(
                     index = 0,
                     count = 1,
+                    automationDetail = MutableStateFlow(
+                        SavePointsGpxAutomation.let { automation ->
+                            automation
+                                .toOutput(coordinateConverter)
+                                .toAutomationDetail(automation, appDetails)
+                        }
+                    ),
                     billingFeatures = listOf(AutomationFeature),
                     billingStatus = BillingStatus.Purchased(
                         product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
@@ -179,11 +188,9 @@ private fun DarkListItemPreview() {
                         refundable = true,
                         token = "test_purchased",
                     ),
-                    links = emptyList(),
                     selected = false,
                     values = UserPreferencesValues(automation = SavePointsGpxAutomation),
                     onClick = {},
-                    onGetAutomationOutput = { _, _ -> SavePointsGpxOutput(coordinateConverter) },
                 )
             }
         }

@@ -42,5 +42,5 @@ class CartesIGNUriInput @Inject constructor(
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "https://cartes-ign.ign.fr?lng={lon}&lat={lat}&z={z}")
 
-    override fun toString() = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "CartesIGNUriInput"
+    override fun toString() = "CartesIGNUriInput"
 }

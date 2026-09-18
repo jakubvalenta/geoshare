@@ -44,7 +44,7 @@ class DefaultLinkRepository @Inject constructor(
     /**
      * Flow of all objects, which is shared between multiple view models, so we don't query the db multiple times.
      */
-    override val all: Flow<List<Link>> = linkDao.getAllFlow()
+    override val all = linkDao.getAllFlow()
         .shareIn(applicationScope, SharingStarted.WhileSubscribed(5000), replay = 1)
 
     /**

@@ -73,10 +73,15 @@ fun UserPreferenceCoordinateFormatControls(
         onBack = onBack,
         onNavigateToBillingScreen = onNavigateToBillingScreen,
     ) {
+        val selectedValue = CoordinateFormatPreference.getValue(values)
         userPreferenceOptionsControl(
-            userPreference = CoordinateFormatPreference,
-            values = values,
-            onValueChange = onValueChange,
+            key = "coordinate_format_control",
+            isSelected = { it == selectedValue },
+            onSelect = {
+                onValueChange { preferences ->
+                    CoordinateFormatPreference.setValue(preferences, it)
+                }
+            },
             optionGroups = CoordinateFormatPreference.getOptionGroups(),
             itemTestTag = { option -> "geoShareUserPreferenceCoordinateFormat_${option}" },
         ) { option, modifier ->

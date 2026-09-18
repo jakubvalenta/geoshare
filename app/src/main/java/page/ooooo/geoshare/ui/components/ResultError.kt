@@ -62,33 +62,27 @@ fun ResultError(
         }
         ScrollableChips {
             if (!currentState.warning) {
-                item {
-                    StyledChip(
-                        stringResource(R.string.conversion_error_retry),
-                        icon = {
-                            Icon(Icons.Default.Refresh, null)
-                        },
-                        onClick = onRetry,
-                    )
-                }
-                item {
-                    val uriHandler = LocalUriHandler.current
-                    StyledChip(
-                        stringResource(R.string.conversion_error_report),
-                    ) {
-                        uriHandler.openUri("https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml")
-                    }
+                StyledChip(
+                    stringResource(R.string.conversion_error_retry),
+                    icon = {
+                        Icon(Icons.Default.Refresh, null)
+                    },
+                    onClick = onRetry,
+                )
+                val uriHandler = LocalUriHandler.current
+                StyledChip(
+                    stringResource(R.string.conversion_error_report),
+                ) {
+                    uriHandler.openUri("https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml")
                 }
             }
-            item {
-                StyledChip(
-                    stringResource(R.string.inputs_title),
-                    icon = {
-                        Icon(painterResource(R.drawable.map_24px), null)
-                    },
-                ) {
-                    onNavigateToInputsScreen()
-                }
+            StyledChip(
+                stringResource(R.string.inputs_title),
+                icon = {
+                    Icon(painterResource(R.drawable.map_24px), null)
+                },
+            ) {
+                onNavigateToInputsScreen()
             }
         }
     }

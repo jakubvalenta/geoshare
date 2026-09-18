@@ -18,6 +18,10 @@ enum class UriScheme {
     UNKNOWN,
 }
 
+enum class MimeType(val value: String) {
+    TEXT_PLAIN("text/plain")
+}
+
 sealed interface AppActivity {
     val packageName: String
 }
@@ -27,15 +31,18 @@ data class FileActivity(override val packageName: String, val fileType: FileType
         context.openFileInApp(file, packageName, log)
 }
 
-data class TextActivity(override val packageName: String, val mimeType: String) : AppActivity {
+data class TextActivity(override val packageName: String, val mimeType: MimeType) : AppActivity {
     fun launch(context: Context, text: String): Boolean =
-        context.sendTextViaApp(text, packageName, mimeType = mimeType)
+        context.sendTextViaApp(text, packageName, mimeType)
 }
 
 data class UriActivity(override val packageName: String, val uriScheme: UriScheme) : AppActivity {
     fun launch(context: Context, uriString: String): Boolean =
         context.openUriInApp(uriString, packageName)
 }
+
+fun AppActivity.isMessagingApp(): Boolean =
+    this is TextActivity
 
 fun Iterable<AppActivity>.getPackageNames(): Set<String> =
     map { it.packageName }.toSet()

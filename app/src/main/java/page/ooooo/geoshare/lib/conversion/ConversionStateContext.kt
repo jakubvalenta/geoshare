@@ -6,22 +6,23 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import page.ooooo.geoshare.data.LinkRepository
-import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.billing.Billing
+import page.ooooo.geoshare.lib.conversion.DefaultConversionStateContext.Companion.MAX_ITERATIONS
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.inputs.Input
 import kotlin.time.TimeSource
 
 interface ConversionStateContext {
     val billing: Billing
+    val coordinateConverter: CoordinateConverter
     val inputs: List<Input>
     val linkRepository: LinkRepository
     val log: Log
-    val outputRepository: OutputRepository
     val resources: Resources
     val uriQuote: UriQuote
     val userPreferencesRepository: UserPreferencesRepository
@@ -36,10 +37,10 @@ interface ConversionStateContext {
 
 class DefaultConversionStateContext(
     override val billing: Billing,
+    override val coordinateConverter: CoordinateConverter,
     override val inputs: List<Input> = emptyList(),
     override val linkRepository: LinkRepository,
     override val log: Log = DefaultLog,
-    override val outputRepository: OutputRepository,
     override val resources: Resources,
     override val uriQuote: UriQuote = DefaultUriQuote,
     override val userPreferencesRepository: UserPreferencesRepository,

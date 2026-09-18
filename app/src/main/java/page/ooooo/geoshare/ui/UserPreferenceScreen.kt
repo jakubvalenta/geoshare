@@ -30,24 +30,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.database.Link
-import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.DynamicColorPreference
+import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
-import page.ooooo.geoshare.lib.android.AppActivity
-import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.CustomLinkFeature
 import page.ooooo.geoshare.lib.billing.Feature
-import page.ooooo.geoshare.lib.outputs.Output
-import page.ooooo.geoshare.ui.components.LabelLarge
+import page.ooooo.geoshare.lib.outputs.NoopOutput
 import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
 import page.ooooo.geoshare.ui.components.NavigableStyledListDetailPaneScaffold
 import page.ooooo.geoshare.ui.components.SegmentedListLabel
@@ -72,7 +71,6 @@ import page.ooooo.geoshare.ui.components.UserPreferenceLinksListItem
 import page.ooooo.geoshare.ui.components.UserPreferenceServersListItem
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
-import java.util.UUID
 
 @Keep
 enum class UserPreferenceGroupId {
@@ -97,30 +95,25 @@ fun UserPreferenceScreen(
     onNavigateToServerScreen: () -> Unit,
     billingViewModel: BillingViewModel,
     linkViewModel: LinkViewModel = hiltViewModel(),
-    outputViewModel: OutputViewModel = hiltViewModel(),
     viewModel: UserPreferenceViewModel = hiltViewModel(),
 ) {
-    val activities by outputViewModel.activities.collectAsStateWithLifecycle()
-    val appDetails by outputViewModel.appDetails.collectAsStateWithLifecycle()
     val billingAppNameResId = billingViewModel.billingAppNameResId
     val billingFeatures = billingViewModel.billingFeatures
     val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
-    val links by linkViewModel.all.collectAsStateWithLifecycle()
     val userPreferencesValues by viewModel.values.collectAsStateWithLifecycle()
 
     UserPreferenceScreen(
         initialGroupId = initialGroupId,
-        activities = activities,
-        appDetails = appDetails,
+        automationDetail = viewModel.automationDetail,
+        automationDetails = viewModel.automationDetails,
         billingAppNameResId = billingAppNameResId,
         billingFeatures = billingFeatures,
         billingStatus = billingStatus,
-        links = links,
+        hiddenAppsDetails = viewModel.hiddenAppsDetails,
+        hiddenAppsSize = viewModel.hiddenAppsSize,
+        links = linkViewModel.all,
         userPreferencesValues = userPreferencesValues,
         onBack = onBack,
-        onGetAutomationOutput = { automation, getLinkByUUID ->
-            outputViewModel.getAutomationOutput(automation, getLinkByUUID)
-        },
         onNavigateToBillingScreen = onNavigateToBillingScreen,
         onNavigateToLinkScreen = onNavigateToLinkScreen,
         onNavigateToServerScreen = onNavigateToServerScreen,
@@ -134,15 +127,16 @@ fun UserPreferenceScreen(
 @Composable
 private fun UserPreferenceScreen(
     initialGroupId: UserPreferenceGroupId?,
-    activities: List<AppActivity>,
-    appDetails: AppDetails,
+    automationDetail: StateFlow<AutomationDetail>,
+    automationDetails: StateFlow<List<List<AutomationDetail>>>,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
-    links: List<Link>,
+    hiddenAppsDetails: StateFlow<List<HiddenAppDetail>>,
+    hiddenAppsSize: StateFlow<HiddenAppsSize>,
+    links: StateFlow<List<Link>>,
     userPreferencesValues: UserPreferencesValues,
     onBack: () -> Unit,
-    onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
     onNavigateToBillingScreen: () -> Unit,
     onNavigateToLinkScreen: () -> Unit,
     onNavigateToServerScreen: () -> Unit,
@@ -171,10 +165,10 @@ private fun UserPreferenceScreen(
         listPane = {
             UserPreferenceListPane(
                 currentGroupId = currentGroupId,
-                activities = activities,
-                appDetails = appDetails,
+                automationDetail = automationDetail,
                 billingStatus = billingStatus,
                 billingFeatures = billingFeatures,
+                hiddenAppsSize = hiddenAppsSize,
                 links = links,
                 values = userPreferencesValues,
                 onBack = {
@@ -186,7 +180,6 @@ private fun UserPreferenceScreen(
                         }
                     }
                 },
-                onGetAutomationOutput = onGetAutomationOutput,
                 onNavigateToGroup = { id ->
                     coroutineScope.launch {
                         navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, id)
@@ -200,12 +193,11 @@ private fun UserPreferenceScreen(
             if (currentGroupId != null) {
                 UserPreferenceDetailPane(
                     currentGroupId = currentGroupId,
-                    activities = activities,
-                    appDetails = appDetails,
+                    automationDetails = automationDetails,
                     billingAppNameResId = billingAppNameResId,
                     billingFeatures = billingFeatures,
                     billingStatus = billingStatus,
-                    links = links,
+                    hiddenAppsDetails = hiddenAppsDetails,
                     values = userPreferencesValues,
                     wide = wide,
                     onBack = {
@@ -217,7 +209,6 @@ private fun UserPreferenceScreen(
                             }
                         }
                     },
-                    onGetAutomationOutput = onGetAutomationOutput,
                     onNavigateToBillingScreen = onNavigateToBillingScreen,
                     onValueChange = onValueChange,
                 )
@@ -233,14 +224,13 @@ private fun UserPreferenceScreen(
 @Composable
 private fun UserPreferenceListPane(
     currentGroupId: UserPreferenceGroupId?,
-    values: UserPreferencesValues,
-    activities: List<AppActivity>,
-    appDetails: AppDetails,
+    automationDetail: StateFlow<AutomationDetail>,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
-    links: List<Link>,
+    hiddenAppsSize: StateFlow<HiddenAppsSize>,
+    links: StateFlow<List<Link>>,
+    values: UserPreferencesValues,
     onBack: () -> Unit,
-    onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
     onNavigateToGroup: (id: UserPreferenceGroupId) -> Unit,
     onNavigateToLinkScreen: () -> Unit,
     onNavigateToServerScreen: () -> Unit,
@@ -254,16 +244,15 @@ private fun UserPreferenceListPane(
         },
         onBack = onBack,
     ) {
-        item {
-            LabelLarge(
+        item(key = "input_list_label", contentType = "segmented_list_label") {
+            SegmentedListLabel(
                 stringResource(R.string.user_preferences_section_input),
-                Modifier
-                    .padding(horizontal = spacing.windowPadding)
-                    .padding(top = spacing.tiny, bottom = spacing.tiny),
+                Modifier.padding(horizontal = spacing.windowPadding),
+                paddingTop = spacing.tiny,
                 color = MaterialTheme.colorScheme.primary
             )
         }
-        item {
+        item(key = "input_list", contentType = "column") {
             Column(
                 modifier = Modifier
                     .selectableGroup()
@@ -288,13 +277,13 @@ private fun UserPreferenceListPane(
                 )
             }
         }
-        item {
+        item(key = "automation_list_label", contentType = "segmented_list_label") {
             SegmentedListLabel(
                 stringResource(R.string.user_preferences_automation_title),
                 modifier = Modifier.padding(horizontal = spacing.windowPadding),
             )
         }
-        item {
+        item(key = "automation_list", contentType = "column") {
             Column(
                 modifier = Modifier
                     .selectableGroup()
@@ -304,37 +293,33 @@ private fun UserPreferenceListPane(
                 UserPreferenceAutomationListItem(
                     index = 0,
                     count = 2,
-                    appDetails = appDetails,
+                    automationDetail = automationDetail,
                     billingFeatures = billingFeatures,
                     billingStatus = billingStatus,
-                    links = links,
                     selected = currentGroupId == UserPreferenceGroupId.AUTOMATION,
-                    values = values,
                     modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.AUTOMATION}"),
                     onClick = { onNavigateToGroup(UserPreferenceGroupId.AUTOMATION) },
-                    onGetAutomationOutput = onGetAutomationOutput,
                 )
                 UserPreferenceAutomationDelayListItem(
                     index = 1,
                     count = 2,
+                    automationDetail = automationDetail,
                     billingFeatures = billingFeatures,
                     billingStatus = billingStatus,
-                    links = links,
                     selected = currentGroupId == UserPreferenceGroupId.AUTOMATION_DELAY,
                     values = values,
                     modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.AUTOMATION_DELAY}"),
                     onClick = { onNavigateToGroup(UserPreferenceGroupId.AUTOMATION_DELAY) },
-                    onGetAutomationOutput = onGetAutomationOutput,
                 )
             }
         }
-        item {
+        item(key = "output_list_label", contentType = "segmented_list_label") {
             SegmentedListLabel(
                 stringResource(R.string.user_preferences_section_output),
                 modifier = Modifier.padding(horizontal = spacing.windowPadding),
             )
         }
-        item {
+        item(key = "output_list", contentType = "column") {
             Column(
                 modifier = Modifier
                     .selectableGroup()
@@ -344,9 +329,8 @@ private fun UserPreferenceListPane(
                 UserPreferenceHiddenAppsListItem(
                     index = 0,
                     count = 4,
-                    activities = activities,
+                    hiddenAppsSize = hiddenAppsSize,
                     selected = currentGroupId == UserPreferenceGroupId.HIDDEN_APPS,
-                    values = values,
                     modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.HIDDEN_APPS}"),
                     onClick = { onNavigateToGroup(UserPreferenceGroupId.HIDDEN_APPS) },
                 )
@@ -377,13 +361,13 @@ private fun UserPreferenceListPane(
             }
         }
         if (DynamicColorPreference.isAvailable()) {
-            item {
+            item(key = "dynamic_color_list_label", contentType = "segmented_list_label") {
                 SegmentedListLabel(
                     stringResource(R.string.user_preferences_section_appearance),
                     modifier = Modifier.padding(horizontal = spacing.windowPadding),
                 )
             }
-            item {
+            item(key = "dynamic_color_list", contentType = "column") {
                 Column(
                     modifier = Modifier
                         .selectableGroup()
@@ -402,13 +386,13 @@ private fun UserPreferenceListPane(
             }
         }
         if (BuildConfig.DEBUG) {
-            item {
+            item(key = "developer_options_list_label", contentType = "segmented_list_label") {
                 SegmentedListLabel(
                     stringResource(R.string.user_preferences_developer_title),
                     modifier = Modifier.padding(horizontal = spacing.windowPadding),
                 )
             }
-            item {
+            item(key = "developer_options_list", contentType = "column") {
                 Column(
                     modifier = Modifier
                         .selectableGroup()
@@ -431,16 +415,14 @@ private fun UserPreferenceListPane(
 @Composable
 private fun UserPreferenceDetailPane(
     currentGroupId: UserPreferenceGroupId,
-    activities: List<AppActivity>,
-    appDetails: AppDetails,
+    automationDetails: StateFlow<List<List<AutomationDetail>>>,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
-    links: List<Link>,
+    hiddenAppsDetails: StateFlow<List<HiddenAppDetail>>,
     values: UserPreferencesValues,
     wide: Boolean,
     onBack: () -> Unit,
-    onGetAutomationOutput: suspend (automation: Automation, getLinkByUUID: suspend (linkUUID: UUID) -> Link?) -> Output?,
     onNavigateToBillingScreen: () -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
@@ -455,14 +437,11 @@ private fun UserPreferenceDetailPane(
         )
 
         UserPreferenceGroupId.AUTOMATION -> UserPreferenceAutomationControls(
-            appDetails = appDetails,
-            activities = activities,
+            automationDetails = automationDetails,
             billingAppNameResId = billingAppNameResId,
             billingFeatures = billingFeatures,
             billingStatus = billingStatus,
-            links = links,
             onBack = onBack,
-            onGetAutomationOutput = onGetAutomationOutput,
             onNavigateToBillingScreen = onNavigateToBillingScreen,
             onValueChange = onValueChange,
             values = values,
@@ -517,9 +496,8 @@ private fun UserPreferenceDetailPane(
         )
 
         UserPreferenceGroupId.HIDDEN_APPS -> UserPreferenceHiddenAppsControls(
-            appDetails = appDetails,
-            activities = activities,
             billingAppNameResId = billingAppNameResId,
+            hiddenAppsDetails = hiddenAppsDetails,
             onBack = onBack,
             onNavigateToBillingScreen = onNavigateToBillingScreen,
             onValueChange = onValueChange,
@@ -543,17 +521,18 @@ private fun DefaultPreview() {
             Column {
                 UserPreferenceScreen(
                     initialGroupId = null,
-                    activities = emptyList(),
-                    appDetails = emptyMap(),
+                    automationDetail = MutableStateFlow(NoopOutput.toAutomationDetail(NoopAutomation, emptyMap())),
+                    automationDetails = MutableStateFlow(emptyList()),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
-                    links = defaultFakeLinks,
+                    hiddenAppsDetails = MutableStateFlow(emptyList()),
+                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 0, visible = 0)),
+                    links = MutableStateFlow(defaultFakeLinks),
                     userPreferencesValues = defaultFakeUserPreferences.copy(
                         connectionPermission = Permission.NEVER,
                     ),
                     onBack = {},
-                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinkScreen = {},
                     onNavigateToServerScreen = {},
@@ -576,17 +555,18 @@ private fun DarkPreview() {
             Column {
                 UserPreferenceScreen(
                     initialGroupId = null,
-                    activities = emptyList(),
-                    appDetails = emptyMap(),
+                    automationDetail = MutableStateFlow(NoopOutput.toAutomationDetail(NoopAutomation, emptyMap())),
+                    automationDetails = MutableStateFlow(emptyList()),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
-                    links = defaultFakeLinks,
+                    hiddenAppsDetails = MutableStateFlow(emptyList()),
+                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 0, visible = 0)),
+                    links = MutableStateFlow(defaultFakeLinks),
                     userPreferencesValues = defaultFakeUserPreferences.copy(
                         connectionPermission = Permission.NEVER,
                     ),
                     onBack = {},
-                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinkScreen = {},
                     onNavigateToServerScreen = {},
@@ -604,18 +584,19 @@ private fun TabletPreview() {
         Surface {
             Column {
                 UserPreferenceScreen(
-                    initialGroupId = UserPreferenceGroupId.CONNECTION_PERMISSION,
-                    activities = emptyList(),
-                    appDetails = emptyMap(),
+                    initialGroupId = null,
+                    automationDetail = MutableStateFlow(NoopOutput.toAutomationDetail(NoopAutomation, emptyMap())),
+                    automationDetails = MutableStateFlow(emptyList()),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = BillingStatus.Loading(),
-                    links = defaultFakeLinks,
+                    hiddenAppsDetails = MutableStateFlow(emptyList()),
+                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 0, visible = 0)),
+                    links = MutableStateFlow(defaultFakeLinks),
                     userPreferencesValues = defaultFakeUserPreferences.copy(
                         connectionPermission = Permission.NEVER,
                     ),
                     onBack = {},
-                    onGetAutomationOutput = { _, _ -> null },
                     onNavigateToBillingScreen = {},
                     onNavigateToLinkScreen = {},
                     onNavigateToServerScreen = {},

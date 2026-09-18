@@ -27,7 +27,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun <T> RadioButtonGroup(
-    selectedValue: T,
+    isSelected: (value: T) -> Boolean,
     onSelect: (value: T) -> Unit,
     values: List<T>,
     modifier: Modifier = Modifier,
@@ -48,7 +48,7 @@ fun <T> RadioButtonGroup(
                         .fillMaxWidth()
                         .padding(vertical = spacing.tiny)
                         .selectable(
-                            selected = value == selectedValue,
+                            selected = isSelected(value),
                             enabled = itemEnabled,
                             role = Role.RadioButton,
                             onClick = { onSelect(value) },
@@ -62,7 +62,7 @@ fun <T> RadioButtonGroup(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RadioButton(
-                        selected = value == selectedValue,
+                        selected = isSelected(value),
                         // Null recommended for accessibility with screen readers
                         onClick = null,
                         enabled = itemEnabled,
@@ -82,13 +82,16 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             RadioButtonGroup(
-                selectedValue = 2,
+                isSelected = { it == 2 },
                 onSelect = {},
                 values = listOf(1, 2),
             ) { value, modifier ->
                 when (value) {
                     1 -> Text("Foo bar", modifier)
-                    2 -> Text("Kotlin is a modern but already mature programming language designed to make developers happier.", modifier)
+                    2 -> Text(
+                        "Kotlin is a modern but already mature programming language designed to make developers happier.",
+                        modifier
+                    )
                 }
             }
         }
@@ -101,13 +104,16 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             RadioButtonGroup(
-                selectedValue = 2,
+                isSelected = { it == 2 },
                 onSelect = {},
                 values = listOf(1, 2),
             ) { value, modifier ->
                 when (value) {
                     1 -> Text("Foo bar", modifier)
-                    2 -> Text("Kotlin is a modern but already mature programming language designed to make developers happier.", modifier)
+                    2 -> Text(
+                        "Kotlin is a modern but already mature programming language designed to make developers happier.",
+                        modifier
+                    )
                 }
             }
         }
@@ -120,14 +126,17 @@ private fun DisabledPreview() {
     AppTheme {
         Surface {
             RadioButtonGroup(
-                selectedValue = 2,
+                isSelected = { it == 2 },
                 onSelect = {},
                 values = listOf(1, 2),
                 enabled = false,
             ) { value, modifier ->
                 when (value) {
                     1 -> Text("Foo bar", modifier)
-                    2 -> Text("Kotlin is a modern but already mature programming language designed to make developers happier.", modifier)
+                    2 -> Text(
+                        "Kotlin is a modern but already mature programming language designed to make developers happier.",
+                        modifier
+                    )
                 }
             }
         }
@@ -140,7 +149,7 @@ private fun ItemDisabledPreview() {
     AppTheme {
         Surface {
             RadioButtonGroup(
-                selectedValue = 2,
+                isSelected = { it == 2 },
                 onSelect = {},
                 values = listOf(1, 2),
                 enabled = true,
@@ -148,7 +157,10 @@ private fun ItemDisabledPreview() {
             ) { value, modifier ->
                 when (value) {
                     1 -> Text("Foo bar", modifier)
-                    2 -> Text("Kotlin is a modern but already mature programming language designed to make developers happier.", modifier)
+                    2 -> Text(
+                        "Kotlin is a modern but already mature programming language designed to make developers happier.",
+                        modifier
+                    )
                 }
             }
         }

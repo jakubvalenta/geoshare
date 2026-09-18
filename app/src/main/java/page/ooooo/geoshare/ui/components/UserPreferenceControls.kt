@@ -18,8 +18,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.retain.retain
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.testTag
@@ -29,7 +32,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.MutablePreferences
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.local.preferences.OptionsPreference
 import page.ooooo.geoshare.data.local.preferences.TextPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -57,8 +59,8 @@ fun UserPreferenceControls(
                 },
                 onBack = onBack.takeUnless { wide },
             ) {
-                item {
-                    description?.let { description ->
+                if (description != null) {
+                    item(key = "description", contentType = "paragraph_text") {
                         ParagraphText(
                             description(),
                             Modifier
@@ -73,7 +75,11 @@ fun UserPreferenceControls(
                                 },
                             style = MaterialTheme.typography.bodyMedium,
                         )
-                    } ?: Spacer(Modifier.height(spacing.tiny))
+                    }
+                } else {
+                    item(key = "description", contentType = "spacer") {
+                        Spacer(Modifier.height(spacing.tiny))
+                    }
                 }
                 content()
             }
@@ -89,30 +95,21 @@ fun UserPreferenceControls(
 }
 
 fun <T> LazyListScope.userPreferenceOptionsControl(
-    userPreference: OptionsPreference<T>,
-    values: UserPreferencesValues,
+    key: String,
+    isSelected: (value: T) -> Boolean,
+    onSelect: (value: T) -> Unit,
     optionGroups: List<List<T>>,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    itemTestTag: ((option: T) -> String)? = null,
-    onValueChange: ((MutablePreferences) -> Unit) -> Unit,
-    option: @Composable RowScope.(option: T, modifier: Modifier) -> Unit,
+    itemTestTag: ((value: T) -> String)? = null,
+    option: @Composable RowScope.(value: T, modifier: Modifier) -> Unit,
 ) {
-    val value = if (enabled) {
-        userPreference.getValue(values)
-    } else {
-        userPreference.default
-    }
     optionGroups.forEachIndexed { i, values ->
-        item {
+        item("${key}_group_${i}_radio_buttons", contentType = "radio_button_group") {
             val spacing = LocalSpacing.current
             RadioButtonGroup(
-                selectedValue = value,
-                onSelect = {
-                    onValueChange { preferences ->
-                        userPreference.setValue(preferences, it)
-                    }
-                },
+                isSelected = isSelected,
+                onSelect = onSelect,
                 values = values,
                 enabled = enabled,
                 modifier = modifier
@@ -129,7 +126,7 @@ fun <T> LazyListScope.userPreferenceOptionsControl(
             )
         }
         if (i < optionGroups.size - 1) {
-            item {
+            item("${key}_group_${i}_divider", contentType = "horizontal_divider") {
                 val spacing = LocalSpacing.current
                 HorizontalDivider(
                     modifier.padding(vertical = spacing.tiny),
@@ -141,6 +138,7 @@ fun <T> LazyListScope.userPreferenceOptionsControl(
 }
 
 fun <T> LazyListScope.userPreferenceTextControl(
+    key: String,
     userPreference: TextPreference<T>,
     values: UserPreferencesValues,
     onValueChange: ((MutablePreferences) -> Unit) -> Unit,
@@ -149,15 +147,15 @@ fun <T> LazyListScope.userPreferenceTextControl(
     error: (@Composable () -> String)? = null,
     suffix: (@Composable () -> String)? = null,
 ) {
-    item {
-        val value = userPreference.getValue(values)
-        val (inputValue, setInputValue) = remember { mutableStateOf(userPreference.serialize(value)) }
-        val isValid = userPreference.isValid(inputValue)
+    item(key, contentType = "text_field") {
+        val value = remember(userPreference, values) { userPreference.getValue(values) }
+        var inputValue by retain { mutableStateOf(userPreference.serialize(value)) }
+        val isValid = remember(userPreference, inputValue) { userPreference.isValid(inputValue) }
 
         TextField(
             value = inputValue,
             onValueChange = {
-                setInputValue(it)
+                inputValue = it
                 onValueChange { preferences ->
                     userPreference.setValue(preferences, userPreference.deserialize(it))
                 }
@@ -180,7 +178,7 @@ fun <T> LazyListScope.userPreferenceTextControl(
             },
             trailingIcon = {
                 IconButton({
-                    setInputValue(userPreference.serialize(userPreference.default))
+                    inputValue = userPreference.serialize(userPreference.default)
                     onValueChange { preferences ->
                         userPreference.setValue(preferences, userPreference.default)
                     }

@@ -111,10 +111,10 @@ fun Context.openSettingsOpenByDefault(launcher: ActivityResultLauncher<Intent>) 
     openSettingsOpenByDefaultForPackage(launcher, BuildConfig.APPLICATION_ID)
 }
 
-fun Context.sendTextViaApp(text: String, packageName: String, mimeType: String): Boolean =
+fun Context.sendTextViaApp(text: String, packageName: String, mimeType: MimeType): Boolean =
     startActivityOrFalse(
         Intent(Intent.ACTION_SEND).apply {
-            type = mimeType
+            type = mimeType.value
             setPackage(packageName)
             putExtra(Intent.EXTRA_TEXT, text)
         }

@@ -3,7 +3,7 @@ package page.ooooo.geoshare.lib.outputs
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Points
@@ -12,12 +12,14 @@ import javax.inject.Inject
 class ShareRouteGpxOutput @Inject constructor(
     private val coordinateConverter: CoordinateConverter,
 ) : SharePointsFileOutput {
+    override val id = "ShareRouteGpxOutput"
+
     override fun write(value: Points, writer: Appendable) {
         GpxFormatter.writeGpxRoute(coordinateConverter.toWGS84(value), writer)
     }
 
     @Composable
-    override fun label(appDetails: AppDetails) =
+    override fun label(appDetail: AppDetail?) =
         stringResource(R.string.output_gpx_route_share)
 
     override fun equals(other: Any?): Boolean {

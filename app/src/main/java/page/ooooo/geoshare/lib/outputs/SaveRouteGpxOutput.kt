@@ -4,7 +4,7 @@ import android.content.res.Resources
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.formatters.GpxFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Points
@@ -14,6 +14,8 @@ import javax.inject.Inject
 class SaveRouteGpxOutput @Inject constructor(
     private val coordinateConverter: CoordinateConverter,
 ) : SavePointsFileOutput {
+    override val id = "SaveRouteGpxOutput"
+
     override fun getFilename(resources: Resources) =
         resources.getString(
             R.string.conversion_succeeded_save_gpx_filename,
@@ -28,7 +30,7 @@ class SaveRouteGpxOutput @Inject constructor(
     }
 
     @Composable
-    override fun label(appDetails: AppDetails) =
+    override fun label(appDetail: AppDetail?) =
         stringResource(R.string.output_gpx_route_save)
 
     override fun equals(other: Any?): Boolean {

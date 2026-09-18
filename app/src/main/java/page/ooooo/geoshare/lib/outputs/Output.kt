@@ -5,47 +5,63 @@ import android.net.Uri
 import androidx.compose.runtime.Composable
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.android.AppActivity
+import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.ui.components.IconDescriptor
 
 sealed interface Output {
-    @Composable
-    fun label(appDetails: AppDetails): String
-
-    fun getMenuIcon(appDetails: AppDetails): IconDescriptor?
-
-    fun getIcon(appDetails: AppDetails): IconDescriptor? = getMenuIcon(appDetails)
+    /**
+     * A unique id of the output and its parameters. Used as a LazyList key, testTag, etc.
+     */
+    val id: String
 
     @Composable
-    fun automationLabel(appDetails: AppDetails): String = label(appDetails)
+    fun label(appDetail: AppDetail?): String
 
-    fun getAutomationDescription(): (@Composable () -> String)? = null
+    fun getMenuIcon(appDetail: AppDetail?): IconDescriptor?
+
+    fun getIcon(appDetail: AppDetail?): IconDescriptor? = getMenuIcon(appDetail)
+
+    @Composable
+    fun automationLabel(appDetail: AppDetail?): String = label(appDetail)
+
+    @Composable
+    fun automationDescription(): String? = null
+
+    interface HasActivity<T : AppActivity> {
+        @Suppress("EmptyMethod")
+        val activity: T
+
+        fun getAppDetail(appDetails: AppDetails): AppDetail? =
+            activity.packageName.let { appDetails[it] }
+    }
 
     interface HasErrorText {
         @Composable
-        fun errorText(appDetails: AppDetails): String
+        fun errorText(appDetail: AppDetail?): String
     }
 
     interface HasSuccessText {
         @Composable
-        fun successText(appDetails: AppDetails): String
+        fun successText(appDetail: AppDetail?): String
     }
 
     interface HasAutomationErrorText {
         @Composable
-        fun automationErrorText(appDetails: AppDetails): String
+        fun automationErrorText(appDetail: AppDetail?): String
     }
 
     interface HasAutomationSuccessText {
         @Composable
-        fun automationSuccessText(appDetails: AppDetails): String
+        fun automationSuccessText(appDetail: AppDetail?): String
     }
 
     interface HasAutomationDelay {
         @Composable
-        fun automationWaitingText(counterSec: Int, appDetails: AppDetails): String
+        fun automationWaitingText(counterSec: Int, appDetail: AppDetail?): String
     }
 }
 
@@ -154,3 +170,18 @@ sealed interface PointsOutput : Output {
         fun permissionText(): String
     }
 }
+
+sealed interface StringOutput : Output {
+    fun getDescription(value: String, uriQuote: UriQuote = DefaultUriQuote): String? = null
+
+    suspend fun execute(value: String, actionContext: ActionContext): ActionResult
+
+    fun toAction(value: String) = BasicAction.WithString(value, this)
+}
+
+fun Output.toAction(point: Point, points: Points, source: String): Action<*> =
+    when (this) {
+        is PointOutput -> toAction(point)
+        is PointsOutput -> toAction(points)
+        is StringOutput -> toAction(source)
+    }

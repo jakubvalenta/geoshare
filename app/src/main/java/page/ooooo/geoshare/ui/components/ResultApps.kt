@@ -1,7 +1,5 @@
 package page.ooooo.geoshare.ui.components
 
-import android.annotation.SuppressLint
-import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -26,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -44,11 +45,12 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.fakeActivities
+import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.lib.DefaultLog
-import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.android.isMessagingApp
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.NaivePoint
@@ -56,23 +58,30 @@ import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Output
-import page.ooooo.geoshare.lib.outputs.PointOutput
-import page.ooooo.geoshare.lib.outputs.PointsOutput
-import page.ooooo.geoshare.lib.outputs.SendPointOutput
-import page.ooooo.geoshare.lib.outputs.ShareLinkUriOutput
+import page.ooooo.geoshare.lib.outputs.toAction
+import page.ooooo.geoshare.ui.OutputDetailsForApp
+import page.ooooo.geoshare.ui.OutputDetailsForAppsByCategory
+import page.ooooo.geoshare.ui.OutputDetailsForLink
+import page.ooooo.geoshare.ui.OutputDetailsForSharing
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
+import page.ooooo.geoshare.ui.toOutputDetailsForAppsByCategory
+import page.ooooo.geoshare.ui.toOutputDetailsForLinks
+import page.ooooo.geoshare.ui.toOutputDetailsForSharing
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ResultApps(
-    appDetails: StateFlow<AppDetails>,
-    outputsForApps: StateFlow<Map<String, List<Output>>>,
-    outputsForLinks: StateFlow<Map<String?, List<Output>>>,
-    outputsForSharing: StateFlow<List<Output>>,
+    outputsForAppsByCategory: StateFlow<OutputDetailsForAppsByCategory>,
+    outputsForLinks: StateFlow<List<OutputDetailsForLink>>,
+    outputsForSharing: StateFlow<OutputDetailsForSharing?>,
     points: Points,
+    source: StateFlow<String>,
     modifier: Modifier = Modifier,
+    gridHorizontalPadding: Dp = LocalSpacing.current.windowPadding - 10.dp,
+    horizontalSpacing: Dp = LocalSpacing.current.tiny,
     iconSize: Dp = 46.dp,
+    minItemWidth: Dp = 78.dp,
     onDisableLinkGroup: (group: String?) -> Unit,
     onExecute: (Action<*>) -> Unit,
     onHideApp: (packageName: String) -> Unit,
@@ -82,72 +91,64 @@ fun ResultApps(
     val lastPoint = points.lastOrNull() ?: return
     val spacing = LocalSpacing.current
 
-    val appDetails by appDetails.collectAsStateWithLifecycle()
-    val outputsForApps by outputsForApps.collectAsStateWithLifecycle()
+    val outputsForAppsByCategory by outputsForAppsByCategory.collectAsStateWithLifecycle()
     val outputsForLinks by outputsForLinks.collectAsStateWithLifecycle()
     val outputsForSharing by outputsForSharing.collectAsStateWithLifecycle()
-    val (outputsForMapApps, outputsForMessagingApps) = outputsForApps.entries.partition { (_, outputs) ->
-        outputs.size != 1 || outputs[0] !is SendPointOutput
-    }
-
-    fun onClick(output: Output) {
-        onExecute(
-            when (output) {
-                is PointOutput -> output.toAction(lastPoint)
-                is PointsOutput -> output.toAction(points)
-            }
-        )
-    }
+    val source by source.collectAsStateWithLifecycle()
 
     Column(modifier) {
         // Map apps
-        ResultAppsGrid(
-            outputsForApps = outputsForMapApps,
-            appDetails = appDetails,
-            iconSize = iconSize,
-            onClick = { onClick(it) },
-            onHideApp = onHideApp,
-        ) {
-            outputsForSharing.firstOrNull()?.let { firstOutput ->
-                firstOutput.getIcon(appDetails)?.let { icon ->
-                    // Share item
-                    item {
-                        AppIcon(
-                            modifier = Modifier
-                                .weight(1f)
-                                .testTag("geoShareApp_share"),
-                            label = null,
-                            appDetails = appDetails,
-                            outputs = outputsForSharing,
-                            onClick = { onClick(it) },
-                        ) {
-                            Surface(
-                                Modifier.requiredSize(iconSize),
-                                color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                                shape = CircleShape,
-                            ) {
-                                IconFromDescriptor(
-                                    icon,
-                                    contentDescription = firstOutput.label(appDetails),
-                                    size = 24.dp,
-                                )
-                            }
-                        }
+        EvenlySpacedGrid(
+            minItemWidth,
+            modifier = Modifier.padding(horizontal = gridHorizontalPadding),
+            horizontalSpacing = horizontalSpacing,
+        ) { itemWidth ->
+            outputsForAppsByCategory.mapApps
+                .forEach { outputsForApp ->
+                    key(outputsForApp.packageName) {
+                        ResultAppsAppIcon(
+                            outputsForApp = outputsForApp,
+                            iconSize = iconSize,
+                            width = itemWidth,
+                            onClick = { output -> onExecute(output.toAction(lastPoint, points, source)) },
+                            onHideApp = { onHideApp(outputsForApp.packageName) },
+                        )
                     }
+                }
+            // Share item
+            outputsForSharing?.let { outputsForSharing ->
+                key(outputsForSharing.defaultOutputDetail.output.id) {
+                    ResultAppsShareIcon(
+                        outputsForSharing = outputsForSharing,
+                        iconSize = iconSize,
+                        width = itemWidth,
+                        onClick = { output -> onExecute(output.toAction(lastPoint, points, source)) },
+                    )
                 }
             }
         }
 
         // Messaging apps
-        if (outputsForMessagingApps.isNotEmpty()) {
+        if (outputsForAppsByCategory.messagingApps.isNotEmpty()) {
             ResultAppsHeadline(stringResource(R.string.output_send))
-            ResultAppsGrid(
-                outputsForApps = outputsForMessagingApps,
-                appDetails = appDetails,
-                iconSize = iconSize,
-                onClick = { onClick(it) },
-                onHideApp = onHideApp,
-            )
+            EvenlySpacedGrid(
+                minItemWidth,
+                modifier = Modifier.padding(horizontal = gridHorizontalPadding),
+                horizontalSpacing = horizontalSpacing,
+            ) { itemWidth ->
+                outputsForAppsByCategory.messagingApps
+                    .forEach { outputsForApp ->
+                        key(outputsForApp.packageName) {
+                            ResultAppsAppIcon(
+                                outputsForApp = outputsForApp,
+                                iconSize = iconSize,
+                                width = itemWidth,
+                                onClick = { output -> onExecute(output.toAction(lastPoint, points, source)) },
+                                onHideApp = { onHideApp(outputsForApp.packageName) },
+                            )
+                        }
+                    }
+            }
         }
 
         // Links
@@ -166,17 +167,33 @@ fun ResultApps(
                     )
                 }
             }
-            ResultAppsLinksGrid(
-                outputsForLinks = outputsForLinks,
-                appDetails = appDetails,
-                iconSize = iconSize,
-                onClick = { onClick(it) },
-                onDisableLinkGroup = onDisableLinkGroup,
-            )
+            EvenlySpacedGrid(
+                minItemWidth,
+                modifier = Modifier.padding(horizontal = gridHorizontalPadding),
+                horizontalSpacing = horizontalSpacing,
+            ) { itemWidth ->
+                outputsForLinks.forEach { outputsForLink ->
+                    key(outputsForLink.group) {
+                        ResultAppsLinkIcon(
+                            outputsForLink = outputsForLink,
+                            iconSize = iconSize,
+                            width = itemWidth,
+                            onClick = { output -> onExecute(output.toAction(lastPoint, points, source)) },
+                            onDisableLinkGroup = { onDisableLinkGroup(outputsForLink.group) },
+                        )
+                    }
+                }
+            }
         }
 
         // Message
-        message?.invoke(PaddingValues(top = spacing.small))
+        message?.invoke(
+            PaddingValues(
+                start = spacing.windowPadding,
+                top = spacing.small,
+                end = spacing.windowPadding,
+            )
+        )
     }
 }
 
@@ -187,6 +204,7 @@ private fun ResultAppsHeadline(text: String, extra: (@Composable RowScope.() -> 
     Row(
         Modifier
             .padding(top = spacing.tiny)
+            .padding(horizontal = spacing.windowPadding)
             .fillMaxWidth()
             .height(50.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -202,137 +220,110 @@ private fun ResultAppsHeadline(text: String, extra: (@Composable RowScope.() -> 
 }
 
 @Composable
-private fun ResultAppsGrid(
-    outputsForApps: List<Map.Entry<String, List<Output>>>,
-    appDetails: AppDetails,
+private fun ResultAppsAppIcon(
+    outputsForApp: OutputDetailsForApp,
     iconSize: Dp,
+    width: Dp,
     onClick: (output: Output) -> Unit,
-    onHideApp: (packageName: String) -> Unit,
-    extra: (GridScope.() -> Unit)? = null,
+    onHideApp: () -> Unit,
 ) {
-    Grid {
-        outputsForApps
-            .map { (packageName, outputs) -> Triple(packageName, appDetails[packageName]?.label, outputs) }
-            .sortedWith(compareBy(nullsLast()) { (_, label) -> label })
-            .forEach { (packageName, label, outputs) ->
-                item {
-                    AppIcon(
-                        modifier = Modifier
-                            .weight(1f)
-                            .testTag("geoShareApp_$packageName"),
-                        label = label,
-                        appDetails = appDetails,
-                        outputs = outputs,
-                        onClick = onClick,
-                        onHide = { onHideApp(packageName) },
-                    ) {
-                        IconFromDescriptor(
-                            outputs.firstOrNull()?.getIcon(appDetails) ?: PlaceholderIconDescriptor,
-                            contentDescription = null,
-                            size = iconSize,
-                            placeholderContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                        )
-                    }
-                }
-            }
-        extra?.invoke(this)
+    AppIcon(
+        label = outputsForApp.label,
+        menu = { expanded, onDismissRequest ->
+            AppMenu(
+                expanded = expanded,
+                outputDetails = outputsForApp.all,
+                onClick = onClick,
+                onDismissRequest = onDismissRequest,
+                onHide = onHideApp,
+            )
+        },
+        onClick = { onClick(outputsForApp.default.output) },
+        modifier = Modifier
+            .width(width)
+            .testTag("geoShareApp_${outputsForApp.packageName}"),
+    ) {
+        IconFromDescriptor(
+            outputsForApp.default.icon ?: PlaceholderIconDescriptor,
+            contentDescription = null,
+            size = iconSize,
+            placeholderContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+        )
     }
 }
 
 @Composable
-private fun ResultAppsLinksGrid(
-    outputsForLinks: Map<String?, List<Output>>,
-    appDetails: AppDetails,
+private fun ResultAppsShareIcon(
+    outputsForSharing: OutputDetailsForSharing,
     iconSize: Dp,
+    width: Dp,
     onClick: (output: Output) -> Unit,
-    onDisableLinkGroup: (group: String?) -> Unit,
 ) {
-    Grid {
-        outputsForLinks
-            .forEach { (group, outputs) ->
-                item {
-                    val uuid = (outputs.firstOrNull() as? ShareLinkUriOutput)?.link?.uuid
-                    AppIcon(
-                        modifier = Modifier
-                            .weight(1f)
-                            .testTag("geoShareApp_$uuid"),
-                        label = group,
-                        appDetails = appDetails,
-                        outputs = outputs,
-                        onClick = onClick,
-                        onHide = { onDisableLinkGroup(group) },
-                    ) {
-                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
-                            IconFromDescriptor(
-                                outputs.firstOrNull()?.getIcon(appDetails) ?: PlaceholderIconDescriptor,
-                                contentDescription = null,
-                                size = iconSize,
-                                inverseContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                                placeholderContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                            )
-                        }
-                    }
-                }
-            }
+    AppIcon(
+        label = null,
+        menu = { expanded, onDismissRequest ->
+            AppMenu(
+                expanded = expanded,
+                outputDetails = outputsForSharing.outputDetails,
+                onClick = onClick,
+                onDismissRequest = onDismissRequest,
+                onHide = null,
+            )
+        },
+        onClick = { onClick(outputsForSharing.defaultOutputDetail.output) },
+        modifier = Modifier
+            .width(width)
+            .testTag("geoShareAppShare"),
+    ) {
+        Surface(
+            Modifier.requiredSize(iconSize),
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            shape = CircleShape,
+        ) {
+            IconFromDescriptor(
+                outputsForSharing.defaultOutputDetail.icon ?: PlaceholderIconDescriptor,
+                contentDescription = outputsForSharing.defaultOutputDetail.label(),
+                size = 24.dp,
+            )
+        }
     }
 }
 
-@SuppressLint("LocalContextGetResourceValueCall")
 @Composable
-fun fakeAppDetails(
-    context: Context = LocalContext.current,
-) = mapOf(
-    PackageNames.COMAPS_FDROID to AppDetail(
-        packageName = PackageNames.COMAPS_FDROID,
-        label = "CoMaps",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
-    ),
-    PackageNames.CONVERSATIONS to AppDetail(
-        packageName = PackageNames.CONVERSATIONS,
-        label = "Conversations",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
-    ),
-    PackageNames.ORGANIC_MAPS to AppDetail(
-        packageName = PackageNames.ORGANIC_MAPS,
-        label = "Organic Maps",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
-    ),
-    PackageNames.HERE_WEGO to AppDetail(
-        packageName = PackageNames.HERE_WEGO,
-        label = "HERE WeGo",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
-    ),
-    PackageNames.MAPY_COM to AppDetail(
-        packageName = PackageNames.MAPY_COM,
-        label = "Mapy.com",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
-    ),
-    PackageNames.OSMAND_PLUS to AppDetail(
-        packageName = PackageNames.OSMAND_PLUS,
-        label = "OsmAnd",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
-    ),
-    PackageNames.MAGIC_EARTH to AppDetail(
-        packageName = PackageNames.MAGIC_EARTH,
-        label = "Magic Earth",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
-    ),
-    PackageNames.GOOGLE_MAPS to AppDetail(
-        packageName = PackageNames.GOOGLE_MAPS,
-        label = "Google Maps",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
-    ),
-    PackageNames.GMAPS_WV to AppDetail(
-        packageName = PackageNames.GMAPS_WV,
-        label = @Suppress("SpellCheckingInspection", "GrazieInspectionRunner") "GMaps WV",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
-    ),
-    PackageNames.TOMTOM to AppDetail(
-        packageName = PackageNames.TOMTOM,
-        label = "TomTom",
-        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
-    ),
-)
+private fun ResultAppsLinkIcon(
+    outputsForLink: OutputDetailsForLink,
+    iconSize: Dp,
+    width: Dp,
+    onClick: (output: Output) -> Unit,
+    onDisableLinkGroup: () -> Unit,
+) {
+    AppIcon(
+        label = outputsForLink.group,
+        menu = { expanded, onDismissRequest ->
+            AppMenu(
+                expanded = expanded,
+                outputDetails = outputsForLink.all,
+                onClick = onClick,
+                onDismissRequest = onDismissRequest,
+                onHide = onDisableLinkGroup,
+            )
+        },
+        onClick = { onClick(outputsForLink.default.output) },
+        modifier = Modifier
+            .width(width)
+            .testTag("geoShareLink_${outputsForLink.group}"),
+    ) {
+        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
+            IconFromDescriptor(
+                outputsForLink.default.icon ?: PlaceholderIconDescriptor,
+                contentDescription = null,
+                size = iconSize,
+                inverseContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                placeholderContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+            )
+        }
+    }
+}
 
 // Previews
 
@@ -349,17 +340,27 @@ private fun DefaultPreview() {
                 coordinateConverter = coordinateConverter,
                 log = log,
             )
+            val appDetails = getFakeAppDetails(context)
             ResultApps(
-                appDetails = MutableStateFlow(fakeAppDetails()),
-                outputsForApps = MutableStateFlow(
-                    outputRepository.getOutputsForApps(
-                        activities = fakeActivities,
-                        hiddenApps = emptySet(),
-                    )
+                outputsForAppsByCategory = MutableStateFlow(
+                    fakeActivities
+                        .partition { !it.isMessagingApp() }
+                        .let { (mapAppActivities, messagingAppActivities) ->
+                            Pair(
+                                outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
+                                outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
+                            )
+                        }
+                        .toOutputDetailsForAppsByCategory(appDetails)
                 ),
-                outputsForLinks = MutableStateFlow(outputRepository.getOutputsForLinks(defaultFakeLinks)),
-                outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
+                outputsForLinks = MutableStateFlow(
+                    outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
+                ),
+                outputsForSharing = MutableStateFlow(
+                    outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
+                ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
+                source = MutableStateFlow(""),
                 onDisableLinkGroup = {},
                 onExecute = {},
                 onHideApp = {},
@@ -382,17 +383,113 @@ private fun DarkPreview() {
                 coordinateConverter = coordinateConverter,
                 log = log,
             )
+            val appDetails = getFakeAppDetails(context)
             ResultApps(
-                appDetails = MutableStateFlow(fakeAppDetails()),
-                outputsForApps = MutableStateFlow(
-                    outputRepository.getOutputsForApps(
-                        activities = fakeActivities,
-                        hiddenApps = emptySet(),
-                    )
+                outputsForAppsByCategory = MutableStateFlow(
+                    fakeActivities
+                        .partition { !it.isMessagingApp() }
+                        .let { (mapAppActivities, messagingAppActivities) ->
+                            Pair(
+                                outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
+                                outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
+                            )
+                        }
+                        .toOutputDetailsForAppsByCategory(appDetails)
                 ),
-                outputsForLinks = MutableStateFlow(outputRepository.getOutputsForLinks(defaultFakeLinks)),
-                outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
+                outputsForLinks = MutableStateFlow(
+                    outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
+                ),
+                outputsForSharing = MutableStateFlow(
+                    outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
+                ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
+                source = MutableStateFlow(""),
+                onDisableLinkGroup = {},
+                onExecute = {},
+                onHideApp = {},
+                onNavigateToLinkScreen = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, device = Devices.NEXUS_5)
+@Composable
+private fun SmallPreview() {
+    AppTheme {
+        Surface {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+                log = log,
+            )
+            val appDetails = getFakeAppDetails(context)
+            ResultApps(
+                outputsForAppsByCategory = MutableStateFlow(
+                    fakeActivities
+                        .partition { !it.isMessagingApp() }
+                        .let { (mapAppActivities, messagingAppActivities) ->
+                            Pair(
+                                outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
+                                outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
+                            )
+                        }
+                        .toOutputDetailsForAppsByCategory(appDetails)
+                ),
+                outputsForLinks = MutableStateFlow(
+                    outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
+                ),
+                outputsForSharing = MutableStateFlow(
+                    outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
+                ),
+                points = persistentListOf(WGS84Point(NaivePoint.example)),
+                source = MutableStateFlow(""),
+                onDisableLinkGroup = {},
+                onExecute = {},
+                onHideApp = {},
+                onNavigateToLinkScreen = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, device = "spec:width=640dp,height=800dp,dpi=240")
+@Composable
+private fun TabletPreview() {
+    AppTheme {
+        Surface {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+                log = log,
+            )
+            val appDetails = getFakeAppDetails(context)
+            ResultApps(
+                outputsForAppsByCategory = MutableStateFlow(
+                    fakeActivities
+                        .partition { !it.isMessagingApp() }
+                        .let { (mapAppActivities, messagingAppActivities) ->
+                            Pair(
+                                outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
+                                outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
+                            )
+                        }
+                        .toOutputDetailsForAppsByCategory(appDetails)
+                ),
+                outputsForLinks = MutableStateFlow(
+                    outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
+                ),
+                outputsForSharing = MutableStateFlow(
+                    outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
+                ),
+                points = persistentListOf(WGS84Point(NaivePoint.example)),
+                source = MutableStateFlow(""),
                 onDisableLinkGroup = {},
                 onExecute = {},
                 onHideApp = {},
@@ -415,22 +512,33 @@ private fun LoadingPreview() {
                 coordinateConverter = coordinateConverter,
                 log = log,
             )
+            val appDetails: AppDetails = emptyMap()
             ResultApps(
-                appDetails = MutableStateFlow(emptyMap()),
-                outputsForApps = MutableStateFlow(
-                    outputRepository.getOutputsForApps(
-                        activities = fakeActivities.filter {
+                outputsForAppsByCategory = MutableStateFlow(
+                    fakeActivities
+                        .filter {
                             it.packageName in setOf(
                                 PackageNames.COMAPS_FDROID,
                                 PackageNames.ORGANIC_MAPS,
                             )
-                        },
-                        hiddenApps = emptySet(),
-                    )
+                        }
+                        .partition { !it.isMessagingApp() }
+                        .let { (mapAppActivities, messagingAppActivities) ->
+                            Pair(
+                                outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
+                                outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
+                            )
+                        }
+                        .toOutputDetailsForAppsByCategory(appDetails)
                 ),
-                outputsForLinks = MutableStateFlow(outputRepository.getOutputsForLinks(defaultFakeLinks)),
-                outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
+                outputsForLinks = MutableStateFlow(
+                    outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
+                ),
+                outputsForSharing = MutableStateFlow(
+                    outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
+                ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
+                source = MutableStateFlow(""),
                 onDisableLinkGroup = {},
                 onExecute = {},
                 onHideApp = {},
@@ -468,22 +576,33 @@ private fun DarkLoadingPreview() {
                 coordinateConverter = coordinateConverter,
                 log = log,
             )
+            val appDetails: AppDetails = emptyMap()
             ResultApps(
-                appDetails = MutableStateFlow(emptyMap()),
-                outputsForApps = MutableStateFlow(
-                    outputRepository.getOutputsForApps(
-                        activities = fakeActivities.filter {
+                outputsForAppsByCategory = MutableStateFlow(
+                    fakeActivities
+                        .filter {
                             it.packageName in setOf(
                                 PackageNames.COMAPS_FDROID,
                                 PackageNames.ORGANIC_MAPS,
                             )
-                        },
-                        hiddenApps = emptySet(),
-                    )
+                        }
+                        .partition { !it.isMessagingApp() }
+                        .let { (mapAppActivities, messagingAppActivities) ->
+                            Pair(
+                                outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
+                                outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
+                            )
+                        }
+                        .toOutputDetailsForAppsByCategory(appDetails)
                 ),
-                outputsForLinks = MutableStateFlow(outputRepository.getOutputsForLinks(defaultFakeLinks)),
-                outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
+                outputsForLinks = MutableStateFlow(
+                    outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
+                ),
+                outputsForSharing = MutableStateFlow(
+                    outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
+                ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
+                source = MutableStateFlow(""),
                 onDisableLinkGroup = {},
                 onExecute = {},
                 onHideApp = {},
@@ -504,62 +623,6 @@ private fun DarkLoadingPreview() {
                     )
                 }
             }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun EmptyPreview() {
-    AppTheme {
-        Surface {
-            val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
-            val log = DefaultLog
-            val outputRepository = OutputRepository(
-                coordinateConverter = coordinateConverter,
-                log = log,
-            )
-            ResultApps(
-                appDetails = MutableStateFlow(emptyMap()),
-                outputsForApps = MutableStateFlow(emptyMap()),
-                outputsForLinks = MutableStateFlow(emptyMap()),
-                outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
-                points = persistentListOf(WGS84Point(NaivePoint.example)),
-                onDisableLinkGroup = {},
-                onExecute = {},
-                onHideApp = {},
-                onNavigateToLinkScreen = {},
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkEmptyPreview() {
-    AppTheme {
-        Surface {
-            val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
-            val log = DefaultLog
-            val outputRepository = OutputRepository(
-                coordinateConverter = coordinateConverter,
-                log = log,
-            )
-            ResultApps(
-                appDetails = MutableStateFlow(emptyMap()),
-                outputsForApps = MutableStateFlow(outputRepository.getOutputsForApps(emptyList(), emptySet())),
-                outputsForLinks = MutableStateFlow(emptyMap()),
-                outputsForSharing = MutableStateFlow(outputRepository.getOutputsForSharing()),
-                points = persistentListOf(WGS84Point(NaivePoint.example)),
-                onDisableLinkGroup = {},
-                onExecute = {},
-                onHideApp = {},
-                onNavigateToLinkScreen = {},
-            )
         }
     }
 }

@@ -5,7 +5,7 @@ import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Point
@@ -15,6 +15,8 @@ class CopyLinkUriOutput @Inject constructor(
     val link: Link,
     private val coordinateConverter: CoordinateConverter,
 ) : CopyPointTextOutput {
+    override val id = "CopyLinkUriOutput"
+
     override fun getText(value: Point, uriQuote: UriQuote) =
         UriFormatter.formatUriString(
             coordinateConverter.toSrs(value, link.srs),
@@ -23,15 +25,15 @@ class CopyLinkUriOutput @Inject constructor(
             uriQuote = uriQuote,
         )
 
-    override fun getIcon(appDetails: AppDetails) =
+    @Composable
+    override fun label(appDetail: AppDetail?) =
+        stringResource(R.string.conversion_succeeded_copy_link, link.name)
+
+    override fun getIcon(appDetail: AppDetail?) =
         link.icon
 
     @Composable
-    override fun label(appDetails: AppDetails) =
-        stringResource(R.string.conversion_succeeded_copy_link, link.name)
-
-    @Composable
-    override fun automationSuccessText(appDetails: AppDetails) =
+    override fun automationSuccessText(appDetail: AppDetail?) =
         stringResource(R.string.conversion_automation_copy_link_succeeded)
 
     override fun equals(other: Any?): Boolean {

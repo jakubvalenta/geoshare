@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -78,11 +79,16 @@ fun <T> SegmentedList(
 }
 
 @Composable
-fun SegmentedListLabel(text: String, modifier: Modifier = Modifier, color: Color = MaterialTheme.colorScheme.primary) {
-    val spacing = LocalSpacing.current
+fun SegmentedListLabel(
+    text: String,
+    modifier: Modifier = Modifier,
+    paddingTop: Dp = LocalSpacing.current.medium,
+    paddingBottom: Dp = LocalSpacing.current.tiny,
+    color: Color = MaterialTheme.colorScheme.primary,
+) {
     LabelLarge(
         text,
-        modifier.padding(top = spacing.medium, bottom = spacing.tiny),
+        modifier.padding(top = paddingTop, bottom = paddingBottom),
         color = color,
     )
 }

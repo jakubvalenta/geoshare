@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.ui.components
 
-import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -26,8 +25,8 @@ import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,15 +38,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.DefaultLog
-import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.android.FileActivity
-import page.ooooo.geoshare.lib.android.FileType
+import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.android.UriActivity
 import page.ooooo.geoshare.lib.android.UriScheme
@@ -56,33 +51,28 @@ import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.CustomLinkFeature
 import page.ooooo.geoshare.lib.billing.Feature
-import page.ooooo.geoshare.lib.conversion.ActionAutomationFailed
-import page.ooooo.geoshare.lib.conversion.ActionAutomationSucceeded
-import page.ooooo.geoshare.lib.conversion.ActionCompleted
-import page.ooooo.geoshare.lib.conversion.ActionFailed
-import page.ooooo.geoshare.lib.conversion.ActionSucceeded
-import page.ooooo.geoshare.lib.conversion.ActionWaiting
-import page.ooooo.geoshare.lib.conversion.ConversionState
-import page.ooooo.geoshare.lib.conversion.LocationFindingFailed
-import page.ooooo.geoshare.lib.conversion.LocationPermissionReceived
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
-import page.ooooo.geoshare.lib.geo.NaivePoint
-import page.ooooo.geoshare.lib.geo.WGS84Point
-import page.ooooo.geoshare.lib.outputs.ActionResult
 import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
-import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
+import page.ooooo.geoshare.ui.ActionAutomationFailedDetail
+import page.ooooo.geoshare.ui.ActionAutomationSucceededDetail
+import page.ooooo.geoshare.ui.ActionDetail
+import page.ooooo.geoshare.ui.ActionFailedDetail
+import page.ooooo.geoshare.ui.ActionSucceededDetail
+import page.ooooo.geoshare.ui.ActionWaitingDetail
+import page.ooooo.geoshare.ui.LocationFindingFailedDetail
+import page.ooooo.geoshare.ui.LocationPermissionReceivedDetail
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 @Composable
 fun ResultTitle(
-    currentState: ConversionState.HasResult,
-    appDetails: StateFlow<AppDetails>,
+    actionDetail: StateFlow<ActionDetail?>,
     billingFeatures: List<Feature>,
     billingStatus: StateFlow<BillingStatus>,
     modifier: Modifier = Modifier,
@@ -90,43 +80,30 @@ fun ResultTitle(
     onCancel: () -> Unit,
     onNavigateToUserPreferencesScreen: (groupId: UserPreferenceGroupId?) -> Unit,
 ) {
-    var counterSec by remember { mutableIntStateOf(0) }
+    val actionDetail by actionDetail.collectAsStateWithLifecycle()
+    var counter by retain { mutableStateOf(Duration.ZERO) }
 
-    val appDetails by appDetails.collectAsStateWithLifecycle()
     val billingStatus by billingStatus.collectAsStateWithLifecycle()
 
     AnimatedMessage(
-        state = currentState,
-        isMessageShown = { state ->
-            when (state) {
-                is ActionWaiting,
-                is ActionSucceeded,
-                is ActionAutomationSucceeded,
-                is ActionFailed,
-                is ActionAutomationFailed,
-                is LocationFindingFailed,
-                is LocationPermissionReceived,
-                    -> true
-
-                else -> false
-            }
-        },
+        state = actionDetail,
+        isMessageShown = { state -> state != null },
         modifier = modifier
             .fillMaxWidth()
             .height(40.dp),
         animationsEnabled = animationsEnabled,
     ) { targetState ->
         when (targetState) {
-            is ActionWaiting -> ResultMessageRow {
-                LaunchedEffect(targetState.action) {
-                    counterSec = targetState.delay.toInt(DurationUnit.SECONDS)
-                    while (counterSec > 0) {
+            is ActionWaitingDetail -> ResultMessageRow {
+                LaunchedEffect(Unit) {
+                    counter = targetState.delay
+                    while (counter.isPositive()) {
                         delay(1.seconds)
-                        counterSec--
+                        counter -= 1.seconds
                     }
                 }
                 ResultMessageText(
-                    targetState.output.automationWaitingText(counterSec, appDetails),
+                    targetState.automationWaitingText(counter.toInt(DurationUnit.SECONDS)),
                     Modifier.testTag("geoShareResultAutomationCounter"),
                 )
                 FilledIconButton(
@@ -144,37 +121,37 @@ fun ResultTitle(
                 }
             }
 
-            is ActionSucceeded -> ResultMessageRow {
+            is ActionSucceededDetail -> ResultMessageRow {
                 ResultMessageText(
-                    targetState.output.successText(appDetails),
+                    targetState.successText(),
                     Modifier.testTag("geoShareResultMessageSuccess"),
                 )
             }
 
-            is ActionFailed -> ResultMessageRow {
+            is ActionFailedDetail -> ResultMessageRow {
                 ResultMessageText(
-                    targetState.output.errorText(appDetails),
+                    targetState.errorText(),
                     Modifier.testTag("geoShareResultMessageError"),
                     containerColor = MaterialTheme.colorScheme.errorContainer,
                 )
             }
 
-            is ActionAutomationSucceeded -> ResultMessageRow {
+            is ActionAutomationSucceededDetail -> ResultMessageRow {
                 ResultMessageText(
-                    targetState.output.automationSuccessText(appDetails),
+                    targetState.automationSuccessText(),
                     Modifier.testTag("geoShareResultMessageSuccess"),
                 )
             }
 
-            is ActionAutomationFailed -> ResultMessageRow {
+            is ActionAutomationFailedDetail -> ResultMessageRow {
                 ResultMessageText(
-                    targetState.output.automationErrorText(appDetails),
+                    targetState.automationErrorText(),
                     Modifier.testTag("geoShareResultMessageError"),
                     containerColor = MaterialTheme.colorScheme.errorContainer,
                 )
             }
 
-            is LocationFindingFailed -> ResultMessageRow {
+            is LocationFindingFailedDetail -> ResultMessageRow {
                 ResultMessageText(
                     stringResource(R.string.conversion_succeeded_location_failed),
                     Modifier.testTag("geoShareResultMessageError"),
@@ -182,7 +159,7 @@ fun ResultTitle(
                 )
             }
 
-            is LocationPermissionReceived -> ResultMessageRow {
+            is LocationPermissionReceivedDetail -> ResultMessageRow {
                 ResultMessageText(
                     stringResource(R.string.conversion_succeeded_location_loading_indicator_title),
                     Modifier.testTag("geoShareResultSmallLoadingIndicatorMessage"),
@@ -201,7 +178,7 @@ fun ResultTitle(
                 }
             }
 
-            else -> ResultMessageRow {
+            null -> ResultMessageRow {
                 Text(
                     stringResource(R.string.conversion_succeeded_apps_headline),
                     style = MaterialTheme.typography.headlineSmall,
@@ -275,12 +252,7 @@ private fun ActionCompletedPreview() {
     AppTheme {
         Surface {
             ResultTitle(
-                currentState = ActionCompleted(
-                    source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    actionResult = ActionResult.SUCCEEDED,
-                ),
-                appDetails = MutableStateFlow(fakeAppDetails()),
+                actionDetail = MutableStateFlow(null),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -304,12 +276,7 @@ private fun DarkActionCompletedPreview() {
     AppTheme {
         Surface {
             ResultTitle(
-                currentState = ActionCompleted(
-                    source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    actionResult = ActionResult.SUCCEEDED,
-                ),
-                appDetails = MutableStateFlow(fakeAppDetails()),
+                actionDetail = MutableStateFlow(null),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -334,12 +301,7 @@ private fun ActionCompletedFeatureNotAvailablePreview() {
         Surface {
             Column {
                 ResultTitle(
-                    currentState = ActionCompleted(
-                        source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                        points = persistentListOf(WGS84Point(NaivePoint.example)),
-                        actionResult = ActionResult.SUCCEEDED,
-                    ),
-                    appDetails = MutableStateFlow(fakeAppDetails()),
+                    actionDetail = MutableStateFlow(null),
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = MutableStateFlow(BillingStatus.NotPurchased()),
                     animationsEnabled = false,
@@ -359,12 +321,7 @@ private fun DarkActionCompletedFeatureNotAvailablePreview() {
         Surface {
             Column {
                 ResultTitle(
-                    currentState = ActionCompleted(
-                        source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                        points = persistentListOf(WGS84Point(NaivePoint.example)),
-                        actionResult = ActionResult.SUCCEEDED,
-                    ),
-                    appDetails = MutableStateFlow(fakeAppDetails()),
+                    actionDetail = MutableStateFlow(null),
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = MutableStateFlow(BillingStatus.NotPurchased()),
                     animationsEnabled = false,
@@ -389,17 +346,15 @@ private fun ActionWaitingPreview() {
                 UriActivity(PackageNames.OSMAND_PLUS, UriScheme.GEO),
                 coordinateConverter,
             )
-            @SuppressLint("LocalContextGetResourceValueCall")
+            val appDetails = getFakeAppDetails(context)
             ResultTitle(
-                currentState = ActionWaiting(
-                    source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    action = output.toAction(WGS84Point(NaivePoint.example)),
-                    output = output,
-                    isAutomation = true,
-                    delay = 3.seconds,
+                actionDetail = MutableStateFlow(
+                    ActionWaitingDetail(
+                        appDetail = output.getAppDetail(appDetails),
+                        delay = 3.seconds,
+                        output = output,
+                    )
                 ),
-                appDetails = MutableStateFlow(fakeAppDetails()),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -429,17 +384,15 @@ private fun DarkActionWaitingPreview() {
                 UriActivity(PackageNames.OSMAND_PLUS, UriScheme.GEO),
                 coordinateConverter,
             )
-            @SuppressLint("LocalContextGetResourceValueCall")
+            val appDetails = getFakeAppDetails(context)
             ResultTitle(
-                currentState = ActionWaiting(
-                    source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    action = output.toAction(WGS84Point(NaivePoint.example)),
-                    output = output,
-                    isAutomation = true,
-                    delay = 3.seconds,
+                actionDetail = MutableStateFlow(
+                    ActionWaitingDetail(
+                        appDetail = output.getAppDetail(appDetails),
+                        delay = 3.seconds,
+                        output = output,
+                    )
                 ),
-                appDetails = MutableStateFlow(fakeAppDetails()),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -462,24 +415,8 @@ private fun DarkActionWaitingPreview() {
 private fun LocationPermissionReceivedPreview() {
     AppTheme {
         Surface {
-            val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
-            val log = DefaultLog
-            val output = OpenRouteOnePointGpxOutput(
-                FileActivity(PackageNames.TOMTOM, FileType.GPX_ONE_POINT),
-                coordinateConverter,
-                log,
-            )
-            @SuppressLint("LocalContextGetResourceValueCall")
             ResultTitle(
-                currentState = LocationPermissionReceived(
-                    source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    action = output.toAction(WGS84Point(NaivePoint.example)),
-                    isAutomation = true,
-                ),
-                appDetails = MutableStateFlow(fakeAppDetails()),
+                actionDetail = MutableStateFlow(LocationPermissionReceivedDetail),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -502,24 +439,8 @@ private fun LocationPermissionReceivedPreview() {
 private fun DarkLocationPermissionReceivedPreview() {
     AppTheme {
         Surface {
-            val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
-            val log = DefaultLog
-            val output = OpenRouteOnePointGpxOutput(
-                FileActivity(PackageNames.TOMTOM, FileType.GPX_ONE_POINT),
-                coordinateConverter,
-                log,
-            )
-            @SuppressLint("LocalContextGetResourceValueCall")
             ResultTitle(
-                currentState = LocationPermissionReceived(
-                    source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    action = output.toAction(WGS84Point(NaivePoint.example)),
-                    isAutomation = true,
-                ),
-                appDetails = MutableStateFlow(fakeAppDetails()),
+                actionDetail = MutableStateFlow(LocationPermissionReceivedDetail),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -545,15 +466,14 @@ private fun SucceededPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            @SuppressLint("LocalContextGetResourceValueCall")
+            val output = SavePointsGpxOutput(coordinateConverter)
             ResultTitle(
-                currentState = ActionSucceeded(
-                    source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    output = SavePointsGpxOutput(coordinateConverter),
-                    actionResult = ActionResult.SUCCEEDED,
+                actionDetail = MutableStateFlow(
+                    ActionSucceededDetail(
+                        appDetail = null,
+                        output = output,
+                    )
                 ),
-                appDetails = MutableStateFlow(fakeAppDetails()),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -579,15 +499,14 @@ private fun DarSucceededPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            @SuppressLint("LocalContextGetResourceValueCall")
+            val output = SavePointsGpxOutput(coordinateConverter)
             ResultTitle(
-                currentState = ActionSucceeded(
-                    source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    output = SavePointsGpxOutput(coordinateConverter),
-                    actionResult = ActionResult.SUCCEEDED,
+                actionDetail = MutableStateFlow(
+                    ActionSucceededDetail(
+                        appDetail = null,
+                        output = output,
+                    )
                 ),
-                appDetails = MutableStateFlow(fakeAppDetails()),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -613,15 +532,14 @@ private fun FailedPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            @SuppressLint("LocalContextGetResourceValueCall")
+            val output = SavePointsGpxOutput(coordinateConverter)
             ResultTitle(
-                currentState = ActionFailed(
-                    source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    output = SavePointsGpxOutput(coordinateConverter),
-                    actionResult = ActionResult.FAILED,
+                actionDetail = MutableStateFlow(
+                    ActionFailedDetail(
+                        appDetail = null,
+                        output = output,
+                    )
                 ),
-                appDetails = MutableStateFlow(fakeAppDetails()),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -647,15 +565,14 @@ private fun DarkFailedPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
-            @SuppressLint("LocalContextGetResourceValueCall")
+            val output = SavePointsGpxOutput(coordinateConverter)
             ResultTitle(
-                currentState = ActionFailed(
-                    source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    points = persistentListOf(WGS84Point(NaivePoint.example)),
-                    output = SavePointsGpxOutput(coordinateConverter),
-                    actionResult = ActionResult.FAILED,
+                actionDetail = MutableStateFlow(
+                    ActionFailedDetail(
+                        appDetail = null,
+                        output = output,
+                    )
                 ),
-                appDetails = MutableStateFlow(fakeAppDetails()),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(

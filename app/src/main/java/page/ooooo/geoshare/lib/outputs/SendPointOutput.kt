@@ -7,7 +7,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.TextActivity
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
@@ -21,13 +21,16 @@ import javax.inject.Inject
  * Creates a Google Maps display URI and sends it via [activity], which is often a messaging app.
  */
 class SendPointOutput @Inject constructor(
-    val activity: TextActivity,
+    override val activity: TextActivity,
     private val coordinateConverter: CoordinateConverter,
 ) :
     PointOutput.WithoutLocation,
+    Output.HasActivity<TextActivity>,
     Output.HasErrorText,
     Output.HasAutomationDelay,
     Output.HasAutomationErrorText {
+
+    override val id = "SendPointOutput(activity=$activity)"
 
     fun getUriString(value: Point, uriQuote: UriQuote): String? =
         UriFormatter.formatUriString(
@@ -45,42 +48,33 @@ class SendPointOutput @Inject constructor(
             .toActionResult(openedApp = true)
 
     @Composable
-    override fun label(appDetails: AppDetails) =
+    override fun label(appDetail: AppDetail?) =
         stringResource(R.string.output_send)
 
-    override fun getMenuIcon(appDetails: AppDetails) =
+    override fun getMenuIcon(appDetail: AppDetail?) =
         ImageVectorIconDescriptor(Icons.AutoMirrored.Default.Send)
 
-    override fun getIcon(appDetails: AppDetails) =
-        appDetails[activity.packageName]?.let { DrawableIconDescriptor(it.icon) }
+    override fun getIcon(appDetail: AppDetail?) =
+        appDetail?.let { DrawableIconDescriptor(it.icon) }
 
     @Composable
-    override fun errorText(appDetails: AppDetails) =
-        stringResource(
-            R.string.conversion_succeeded_open_app_failed,
-            appDetails[activity.packageName]?.label ?: activity.packageName,
-        )
+    override fun errorText(appDetail: AppDetail?) =
+        stringResource(R.string.conversion_succeeded_open_app_failed, appDetail?.label.orEmpty())
 
     @Composable
-    override fun automationLabel(appDetails: AppDetails) =
-        stringResource(
-            R.string.output_send_via,
-            appDetails[activity.packageName]?.label ?: activity.packageName,
-        )
+    override fun automationLabel(appDetail: AppDetail?) =
+        stringResource(R.string.output_send_via, appDetail?.label.orEmpty())
 
     @Composable
-    override fun automationErrorText(appDetails: AppDetails) =
-        stringResource(
-            R.string.conversion_automation_open_app_failed,
-            appDetails[activity.packageName]?.label ?: activity.packageName,
-        )
+    override fun automationErrorText(appDetail: AppDetail?) =
+        stringResource(R.string.conversion_automation_open_app_failed, appDetail?.label.orEmpty())
 
     @Composable
-    override fun automationWaitingText(counterSec: Int, appDetails: AppDetails) =
+    override fun automationWaitingText(counterSec: Int, appDetail: AppDetail?) =
         pluralStringResource(
             R.plurals.conversion_automation_open_app_waiting,
             counterSec,
-            appDetails[activity.packageName]?.label ?: activity.packageName,
+            appDetail?.label.orEmpty(),
             counterSec,
         )
 

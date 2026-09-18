@@ -6,7 +6,7 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
 
-class ConversionFreeBehaviorTest {
+class MainPermissionFreeBehaviorTest {
     @Test
     fun whenLinkWithNameOnlyIsSharedAndPermissionIsGrantedWithoutDoNotAsk_showsPointAndShowsDialogAgain() =
         uiAutomator {

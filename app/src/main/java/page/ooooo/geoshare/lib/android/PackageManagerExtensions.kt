@@ -59,7 +59,7 @@ fun PackageManager.queryActivities(
     )) {
         // Allow only selected messaging apps, so that the app list is not flooded with apps no one will use
         if (packageName in allowedMessagingApps) {
-            add(TextActivity(packageName, mimeType = "text/plain"))
+            add(TextActivity(packageName, MimeType.TEXT_PLAIN))
         }
     }
 }
@@ -83,7 +83,7 @@ fun PackageManager.queryActivitiesForUri(uriString: String): List<AppActivity> =
                 },
                 flags = PackageManager.MATCH_ALL,
             )
-                .map { packageName -> TextActivity(packageName, mimeType = "text/plain") }
+                .map { packageName -> TextActivity(packageName, MimeType.TEXT_PLAIN) }
         }
     }
 

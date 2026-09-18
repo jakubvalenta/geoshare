@@ -188,28 +188,30 @@ private fun InputsListPane(
         onBack = onBack,
     ) {
         if (!wide) {
-            item {
-                Column(Modifier.padding(horizontal = spacing.windowPadding)) {
-                    ParagraphText(
-                        stringResource(R.string.inputs_list_text, appName),
-                        Modifier.padding(top = spacing.tiny, bottom = spacing.small),
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                    InputsSettingsButton {
-                        context.openSettingsOpenByDefault(settingsLauncher)
-                    }
+            item(key = "description", contentType = "paragraph_text") {
+                ParagraphText(
+                    stringResource(R.string.inputs_list_text, appName),
+                    Modifier
+                        .padding(horizontal = spacing.windowPadding)
+                        .padding(top = spacing.tiny, bottom = spacing.small),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+            item(key = "settings", contentType = "inputs_settings_button") {
+                InputsSettingsButton(Modifier.padding(horizontal = spacing.windowPadding)) {
+                    context.openSettingsOpenByDefault(settingsLauncher)
                 }
             }
         }
         if (recentChangelogsByGroup.isNotEmpty()) {
-            item {
+            item(key = "recent_list_label", contentType = "segmented_list_label") {
                 SegmentedListLabel(
                     stringResource(R.string.inputs_recent),
                     modifier = Modifier.padding(horizontal = spacing.windowPadding),
                     color = MaterialTheme.colorScheme.error,
                 )
             }
-            item {
+            item(key = "recent_list", contentType = "segmented_list") {
                 SegmentedList(
                     values = recentChangelogsByGroup.keys.toList(),
                     modifier = Modifier.padding(horizontal = spacing.windowPadding),
@@ -220,18 +222,18 @@ private fun InputsListPane(
                     sort = true,
                 )
             }
-            item {
+            item(key = "all_list_label", contentType = "segmented_list_label") {
                 SegmentedListLabel(
                     stringResource(R.string.inputs_all),
                     modifier = Modifier.padding(horizontal = spacing.windowPadding),
                 )
             }
         } else {
-            item {
+            item(key = "recent_spacer", contentType = "spacer") {
                 Spacer(Modifier.height(spacing.small))
             }
         }
-        item {
+        item(key = "all_list", contentType = "segmented_list") {
             SegmentedList(
                 values = allChangelogsByGroup.keys.toList(),
                 modifier = Modifier.padding(horizontal = spacing.windowPadding),
@@ -298,7 +300,7 @@ private fun InputsDetailPane(
         },
         onBack = onBack.takeUnless { wide },
     ) {
-        item {
+        item(key = "description", contentType = "paragraph_text") {
             ParagraphText(
                 stringResource(R.string.inputs_detail_text, appName),
                 Modifier
@@ -308,12 +310,12 @@ private fun InputsDetailPane(
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
-        item {
+        item(key = "settings", contentType = "inputs_settings_button") {
             InputsSettingsButton(Modifier.padding(horizontal = spacing.windowPadding)) {
                 context.openSettingsOpenByDefault(settingsLauncher)
             }
         }
-        item {
+        item(key = "table_header", contentType = "row") {
             Row(
                 Modifier
                     .fillMaxWidth()
@@ -333,11 +335,11 @@ private fun InputsDetailPane(
                 )
             }
         }
-        item {
+        item(key = "table_header_divider", contentType = "horizontal_divider") {
             HorizontalDivider(Modifier.padding(horizontal = spacing.windowPadding))
         }
-        changelogDetails.forEach { changelogDetails ->
-            item {
+        changelogDetails.forEachIndexed { i, changelogDetails ->
+            item(key = "table_row_$i", contentType = "row") {
                 Row(
                     Modifier
                         .padding(horizontal = spacing.windowPadding)
@@ -367,6 +369,8 @@ private fun InputsDetailPane(
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
+            }
+            item(key = "table_row_${i}_divider", contentType = "horizontal_divider") {
                 HorizontalDivider(Modifier.padding(horizontal = spacing.windowPadding))
             }
         }

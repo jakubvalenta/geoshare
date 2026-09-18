@@ -73,10 +73,15 @@ fun UserPreferenceConnectionPermissionControls(
         onBack = onBack,
         onNavigateToBillingScreen = onNavigateToBillingScreen,
     ) {
+        val selectedValue = ConnectionPermissionPreference.getValue(values)
         userPreferenceOptionsControl(
-            userPreference = ConnectionPermissionPreference,
-            values = values,
-            onValueChange = onValueChange,
+            key = "connection_permission_control",
+            isSelected = { it == selectedValue },
+            onSelect = {
+                onValueChange { preferences ->
+                    ConnectionPermissionPreference.setValue(preferences, it)
+                }
+            },
             optionGroups = ConnectionPermissionPreference.getOptionGroups(),
             itemTestTag = { option -> "geoShareUserPreferenceConnectionPermission_${option}" },
         ) { option, modifier ->

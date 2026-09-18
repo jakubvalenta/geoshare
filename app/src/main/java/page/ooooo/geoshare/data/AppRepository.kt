@@ -3,7 +3,7 @@ package page.ooooo.geoshare.data
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -16,14 +16,19 @@ import page.ooooo.geoshare.lib.android.queryActivities
 import page.ooooo.geoshare.lib.android.queryAppDetails
 import javax.inject.Inject
 
-class AppsRepository @Inject constructor(
+interface AppRepository {
+    val activities: Flow<List<AppActivity>>
+    val appDetails: Flow<AppDetails>
+}
+
+class DefaultAppRepository @Inject constructor(
     @param:ApplicationScope private val applicationScope: CoroutineScope,
     @param:ApplicationContext private val context: Context,
-) {
-    val activities: SharedFlow<List<AppActivity>> =
+) : AppRepository {
+    override val activities =
         flow { emit(context.packageManager.queryActivities()) }
             .shareIn(applicationScope, SharingStarted.WhileSubscribed(5000), replay = 1)
-    val appDetails: SharedFlow<AppDetails> =
-        activities.map { apps -> context.packageManager.queryAppDetails(apps.getPackageNames()) }
+    override val appDetails =
+        activities.map { activities -> context.packageManager.queryAppDetails(activities.getPackageNames()) }
             .shareIn(applicationScope, SharingStarted.WhileSubscribed(5000), replay = 1)
 }

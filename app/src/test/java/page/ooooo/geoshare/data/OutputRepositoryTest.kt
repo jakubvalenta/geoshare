@@ -18,11 +18,14 @@ import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.local.database.InitialLinks
 import page.ooooo.geoshare.data.local.database.Link
 import page.ooooo.geoshare.data.local.database.findByUUID
+import page.ooooo.geoshare.data.local.preferences.ActivityAutomation
+import page.ooooo.geoshare.data.local.preferences.BasicAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDegMinSecAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyLinkUriAutomation
 import page.ooooo.geoshare.data.local.preferences.CopyNameAutomation
+import page.ooooo.geoshare.data.local.preferences.LinkAutomation
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayCartesIGNUrlAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation
@@ -45,6 +48,7 @@ import page.ooooo.geoshare.data.local.preferences.ShareStreetViewGoogleUriAutoma
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.android.FileActivity
 import page.ooooo.geoshare.lib.android.FileType
+import page.ooooo.geoshare.lib.android.MimeType
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.android.TextActivity
 import page.ooooo.geoshare.lib.android.UriActivity
@@ -56,6 +60,7 @@ import page.ooooo.geoshare.lib.outputs.CopyCoordsDegMinSecOutput
 import page.ooooo.geoshare.lib.outputs.CopyGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.CopyLinkUriOutput
 import page.ooooo.geoshare.lib.outputs.CopyNameOutput
+import page.ooooo.geoshare.lib.outputs.CopyStringOutput
 import page.ooooo.geoshare.lib.outputs.NoopOutput
 import page.ooooo.geoshare.lib.outputs.OpenDisplayCartesIGNUrlOutput
 import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
@@ -66,11 +71,13 @@ import page.ooooo.geoshare.lib.outputs.OpenPointsGpxOutput
 import page.ooooo.geoshare.lib.outputs.OpenRouteGpxOutput
 import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 import page.ooooo.geoshare.lib.outputs.OpenStreetViewGoogleUriOutput
+import page.ooooo.geoshare.lib.outputs.OpenUnknownUriOutput
 import page.ooooo.geoshare.lib.outputs.SavePointGpxOutput
 import page.ooooo.geoshare.lib.outputs.SavePointToContactOutput
 import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
 import page.ooooo.geoshare.lib.outputs.SaveRouteGpxOutput
 import page.ooooo.geoshare.lib.outputs.SendPointOutput
+import page.ooooo.geoshare.lib.outputs.SendStringOutput
 import page.ooooo.geoshare.lib.outputs.ShareDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.ShareLinkUriOutput
 import page.ooooo.geoshare.lib.outputs.ShareNavigationGoogleUriOutput
@@ -95,7 +102,7 @@ class OutputRepositoryTest {
             listOf(
                 CopyCoordsDecOutput(coordinateConverter),
                 CopyCoordsDegMinSecOutput(coordinateConverter),
-                CopyNameOutput(),
+                CopyNameOutput,
                 CopyGeoUriOutput(coordinateConverter),
                 CopyLinkUriOutput(FakeAppleMapsDisplayLink, coordinateConverter),
                 CopyLinkUriOutput(FakeAppleMapsNavigationLink, coordinateConverter),
@@ -175,7 +182,7 @@ class OutputRepositoryTest {
                 ),
                 PackageNames.SIGNAL to listOf(
                     SendPointOutput(
-                        TextActivity(PackageNames.SIGNAL, mimeType = "text/plain"),
+                        TextActivity(PackageNames.SIGNAL, MimeType.TEXT_PLAIN),
                         coordinateConverter,
                     ),
                 ),
@@ -196,7 +203,7 @@ class OutputRepositoryTest {
                     FileActivity(PackageNames.GOOGLE_MAPS, FileType.GPX),
                     UriActivity(PackageNames.CARTES_IGN, UriScheme.CARTES_IGN),
                     UriActivity(PackageNames.MAGIC_EARTH, UriScheme.MAGIC_EARTH),
-                    TextActivity(PackageNames.SIGNAL, mimeType = "text/plain"),
+                    TextActivity(PackageNames.SIGNAL, MimeType.TEXT_PLAIN),
                     FileActivity(PackageNames.TOMTOM, FileType.GPX_ONE_POINT),
                 ),
                 emptySet(),
@@ -355,16 +362,38 @@ class OutputRepositoryTest {
     }
 
     @Test
-    fun getAutomationOutput_convertsAllAutomationsToOutputs() = runTest {
+    fun getOutputsForUri_returnsOutputsForTextActivityAndUriActivityAndIgnoresFileActivity() {
+        assertEquals(
+            listOf(
+                CopyStringOutput,
+                OpenUnknownUriOutput(
+                    UriActivity(packageName = PackageNames.OSMAND_PLUS, uriScheme = UriScheme.GEO)
+                ),
+                SendStringOutput(
+                    TextActivity(packageName = PackageNames.CONVERSATIONS, mimeType = MimeType.TEXT_PLAIN),
+                )
+            ),
+            outputRepository.getOutputsForUri(
+                listOf(
+                    UriActivity(packageName = PackageNames.OSMAND_PLUS, uriScheme = UriScheme.GEO),
+                    TextActivity(packageName = PackageNames.CONVERSATIONS, mimeType = MimeType.TEXT_PLAIN),
+                    FileActivity(packageName = PackageNames.COMAPS_FDROID, fileType = FileType.GPX),
+                )
+            )
+        )
+    }
+
+    @Test
+    fun toOutput_convertsAllAutomationsToOutputs() = runTest {
         assertEquals(
             listOf(
                 listOf(
-                    NoopOutput(),
+                    NoopOutput,
                 ),
                 listOf(
                     CopyCoordsDecOutput(coordinateConverter),
                     CopyCoordsDegMinSecOutput(coordinateConverter),
-                    CopyNameOutput(),
+                    CopyNameOutput,
                     CopyGeoUriOutput(coordinateConverter),
                     ShareDisplayGeoUriOutput(coordinateConverter),
                     ShareNavigationGoogleUriOutput(coordinateConverter),
@@ -392,7 +421,7 @@ class OutputRepositoryTest {
                         coordinateConverter,
                     ),
                     SendPointOutput(
-                        TextActivity(PackageNames.SIGNAL, mimeType = "text/plain"),
+                        TextActivity(PackageNames.SIGNAL, MimeType.TEXT_PLAIN),
                         coordinateConverter,
                     ),
                     OpenRouteOnePointGpxOutput(
@@ -474,17 +503,20 @@ class OutputRepositoryTest {
                 ),
             ).map { group ->
                 group.map { automation ->
-                    outputRepository.getAutomationOutput(
-                        automation = automation,
-                        getLinkByUUID = { defaultFakeLinks.findByUUID(it) },
-                    )
+                    when (automation) {
+                        is BasicAutomation -> automation.toOutput(coordinateConverter)
+                        is ActivityAutomation -> automation.toOutput(coordinateConverter, log)
+                        is LinkAutomation -> defaultFakeLinks.findByUUID(automation.linkUUID)?.let { link ->
+                            automation.toOutput(coordinateConverter, link)
+                        }
+                    }
                 }
             },
         )
     }
 
     @Test
-    fun getAutomationOutput_convertsAllOldAutomationsToOutputs() = runTest {
+    fun toOutput_convertsAllOldAutomationsToOutputs() = runTest {
         assertEquals(
             listOf(
                 CopyLinkUriOutput(FakeAppleMapsNavigationLink, coordinateConverter),
@@ -497,7 +529,7 @@ class OutputRepositoryTest {
                 CopyLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter),
                 CopyLinkUriOutput(FakeMagicEarthNavigationLink, coordinateConverter),
                 CopyLinkUriOutput(FakeMagicEarthDisplayLink, coordinateConverter),
-                NoopOutput(),
+                NoopOutput,
                 OpenDisplayGeoUriOutput(UriActivity(PackageNames.TEST, UriScheme.GEO), coordinateConverter),
                 OpenNavigationGoogleUriOutput(
                     UriActivity(PackageNames.TEST, UriScheme.GOOGLE_NAVIGATION),
@@ -541,10 +573,11 @@ class OutputRepositoryTest {
                 ShareDisplayGeoUriAutomation,
                 ShareRouteGpxAutomation,
             ).map { automation ->
-                outputRepository.getAutomationOutput(
-                    automation = automation,
-                    getLinkByUUID = {
-                        when (it) {
+                when (automation) {
+                    is BasicAutomation -> automation.toOutput(coordinateConverter)
+                    is ActivityAutomation -> automation.toOutput(coordinateConverter, log)
+                    is LinkAutomation ->
+                        when (automation.linkUUID) {
                             UUID.fromString(InitialLinks.APPLE_MAPS_DISPLAY_UUID) -> FakeAppleMapsDisplayLink
                             UUID.fromString(InitialLinks.APPLE_MAPS_NAVIGATION_UUID) -> FakeAppleMapsNavigationLink
                             UUID.fromString(InitialLinks.GOOGLE_MAPS_DISPLAY_UUID) -> FakeGoogleMapsDisplayLink
@@ -553,9 +586,10 @@ class OutputRepositoryTest {
                             UUID.fromString("b109970a-aef8-4482-9879-52e128fd0e07") -> FakeMagicEarthDisplayLink
                             UUID.fromString("ee4f961c-44b0-4cb6-baad-1ed28edb8ec7") -> FakeMagicEarthNavigationLink
                             else -> null
+                        }?.let { link ->
+                            automation.toOutput(coordinateConverter, link)
                         }
-                    },
-                )
+                }
             },
         )
     }
