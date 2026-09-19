@@ -1,7 +1,7 @@
 [versions]
 aboutLibraries = "15.2.0"
 accompanistDrawablePainter = "0.37.3"
-agp = "9.4.0"
+agp = "9.4.1"
 androidBillingClient = "9.1.0"
 androidxActivityCompose = "1.13.0"
 androidxComposeBom = "2026.09.00"
