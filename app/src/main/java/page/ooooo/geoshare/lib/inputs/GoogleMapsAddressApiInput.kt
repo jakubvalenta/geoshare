@@ -2,7 +2,6 @@ package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
 import io.ktor.client.call.body
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.accept
 import io.ktor.client.request.prepareRequest
 import io.ktor.client.request.url
@@ -10,9 +9,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headers
 import io.ktor.serialization.JsonConvertException
-import io.ktor.serialization.kotlinx.json.json
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.ServerRepository
 import page.ooooo.geoshare.lib.Log
@@ -60,13 +57,7 @@ class GoogleMapsAddressApiInput @Inject constructor(
         val query = Regex("""[\s+]*@$LAT$COORD_SEP$LON\s*$""").replace(rawQuery, "")
 
         // Call API
-        val client = serverHttpClientFactory.createHttpClient(server).config {
-            install(ContentNegotiation) {
-                json(Json {
-                    ignoreUnknownKeys = true
-                })
-            }
-        }
+        val client = serverHttpClientFactory.createHttpClient(server)
         val res = try {
             client.use { client ->
                 client

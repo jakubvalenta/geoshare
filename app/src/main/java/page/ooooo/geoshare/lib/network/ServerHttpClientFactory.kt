@@ -20,6 +20,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.database.ServerAuthType
@@ -72,145 +73,131 @@ class ServerHttpClientFactory @Inject constructor(
             setDefaultTimeouts()
             rethrowExceptionsAsNetworkException(log)
 
+            install(ContentNegotiation) {
+                json(Json {
+                    ignoreUnknownKeys = true
+                })
+            }
+
             when (server.authType) {
-                ServerAuthType.API_KEY -> {
+                ServerAuthType.API_KEY ->
                     install(DefaultRequest) {
                         header(server.apiKeyHeader, server.apiKey)
                     }
-                }
 
-                ServerAuthType.ATTESTATION -> {
+                ServerAuthType.ATTESTATION ->
                     install(Auth) {
                         bearer {
                             loadTokens {
                                 attestationLoadTokens()
                             }
                             refreshTokens {
-                                attestationLogin(server.challengeUrl, server.loginUrl)
-                                    ?: attestationRegister(server.challengeUrl, server.registerUrl)
+                                HttpClient(engine) {
+                                    expectSuccess = true
+                                    configureLogging(log)
+                                    setDefaultTimeouts()
+
+                                    install(ContentNegotiation) {
+                                        json()
+                                    }
+                                }.use { client ->
+                                    val challenge = client.attestationChallenge(response, server.challengeUrl)
+                                    client.attestationLogin(challenge, server.loginUrl)
+                                        ?: client.attestationRegister(challenge, server.registerUrl)
+                                }
                             }
                         }
                     }
-                }
             }
         }
 
     suspend fun attestationLoadTokens(): BearerTokens? =
-        userPreferencesRepository.getValue(CachedServerTokenPreference)?.let {
-            BearerTokens(it.token, it.publicKey)
-        }
+        userPreferencesRepository.getValue(CachedServerTokenPreference)
+            ?.let { BearerTokens(it.token, it.publicKey) }
 
-    private suspend fun attestationLogin(challengeUrl: String, loginUrl: String): BearerTokens? =
-        HttpClient(engine) {
-            expectSuccess = true
-            configureLogging(log)
-            setDefaultTimeouts()
-
-            install(ContentNegotiation) {
-                json()
-            }
-        }.use { client ->
-            // Get key
-            val key = keyStoreTools.getKey() ?: return null
-            val publicKeyBase64 = key.publicKey.encoded.base64Encode()
-
-            // Login challenge
-            val loginChallenge = try {
-                client
-                    .post(challengeUrl)
-                    .body<ChallengeResponse>().challenge.base64Decode()
+    private suspend fun HttpClient.attestationChallenge(response: HttpResponse, challengeUrl: String): ByteArray =
+        try {
+            response.body<ChallengeResponse>().challenge.base64Decode()
+        } catch (_: NoTransformationFoundException) {
+            try {
+                post(challengeUrl)
             } catch (e: ClientRequestException) {
                 with(e.response) {
                     log.e(TAG, "Login challenge error ${status.value} ${bodyAsErrorMessage()}")
                 }
                 throw e
             }
-
-            // Login
-            val loginSignature = key.privateKey.sign(loginChallenge)
-            val token = try {
-                client
-                    .post(loginUrl) {
-                        contentType(ContentType.Application.Json)
-                        setBody(
-                            LoginRequest(
-                                challenge = loginChallenge.base64Encode(),
-                                signature = loginSignature.base64Encode(),
-                                publicKey = publicKeyBase64,
-                            )
-                        )
-                    }
-                    .body<TokenResponse>().token
-            } catch (e: ClientRequestException) {
-                if (e.response.status == HttpStatusCode.Unauthorized) {
-                    return null
-                }
-                with(e.response) {
-                    log.e(TAG, "Login error ${status.value} ${bodyAsErrorMessage()}")
-                }
-                throw e
-            }
-            log.i(TAG, "Login succeeded")
-            userPreferencesRepository.setValue(
-                CachedServerTokenPreference,
-                CachedServerToken(token, publicKeyBase64),
-            )
-            return BearerTokens(token, publicKeyBase64)
+                .body<ChallengeResponse>().challenge.base64Decode()
         }
 
-    private suspend fun attestationRegister(challengeUrl: String, registerUrl: String): BearerTokens =
-        HttpClient(engine) {
-            expectSuccess = true
-            setDefaultTimeouts()
+    private suspend fun HttpClient.attestationLogin(challenge: ByteArray, loginUrl: String): BearerTokens? {
+        // Get key
+        val key = keyStoreTools.getKey() ?: return null
+        val publicKeyBase64 = key.publicKey.encoded.base64Encode()
 
-            install(ContentNegotiation) {
-                json()
+        // Login
+        val loginSignature = key.privateKey.sign(challenge)
+        val token = try {
+            post(loginUrl) {
+                contentType(ContentType.Application.Json)
+                setBody(
+                    LoginRequest(
+                        challenge = challenge.base64Encode(),
+                        signature = loginSignature.base64Encode(),
+                        publicKey = publicKeyBase64,
+                    )
+                )
             }
-        }.use { client ->
-            // Registration challenge
-            val registrationChallenge = try {
-                client
-                    .post(challengeUrl)
-                    .body<ChallengeResponse>().challenge.base64Decode()
-            } catch (e: ClientRequestException) {
-                with(e.response) {
-                    log.e(TAG, "Registration challenge error ${status.value} ${bodyAsErrorMessage()}")
-                }
-                throw e
+                .body<TokenResponse>().token
+        } catch (e: ClientRequestException) {
+            if (e.response.status == HttpStatusCode.Unauthorized) {
+                return null
             }
-
-            // Generate key
-            val key = keyStoreTools.generateKey()
-            val publicKeyBase64 = key.publicKey.encoded.base64Encode()
-
-            // Register
-            val registrationSignature = key.privateKey.sign(registrationChallenge)
-            val token = try {
-                client
-                    .post(registerUrl) {
-                        contentType(ContentType.Application.Json)
-                        setBody(
-                            RegisterRequest(
-                                challenge = registrationChallenge.base64Encode(),
-                                signature = registrationSignature.base64Encode(),
-                                certificateChain = key.certificateChain.map { it.encoded.base64Encode() },
-                            )
-                        )
-                    }
-                    .body<TokenResponse>().token
-            } catch (e: ClientRequestException) {
-                with(e.response) {
-                    log.e(TAG, "Registration error ${status.value} ${bodyAsErrorMessage()}")
-                }
-                throw e
+            with(e.response) {
+                log.e(TAG, "Login error ${status.value} ${bodyAsErrorMessage()}")
             }
-            log.i(TAG, "Registration succeeded")
-            userPreferencesRepository.setValue(
-                CachedServerTokenPreference,
-                CachedServerToken(token, publicKeyBase64),
-            )
-            return BearerTokens(token, publicKeyBase64)
+            throw e
         }
+        log.i(TAG, "Login succeeded")
+        userPreferencesRepository.setValue(
+            CachedServerTokenPreference,
+            CachedServerToken(token, publicKeyBase64),
+        )
+        return BearerTokens(token, publicKeyBase64)
+    }
+
+    private suspend fun HttpClient.attestationRegister(challenge: ByteArray, registerUrl: String): BearerTokens {
+        // Generate key
+        val key = keyStoreTools.generateKey()
+        val publicKeyBase64 = key.publicKey.encoded.base64Encode()
+
+        // Register
+        val registrationSignature = key.privateKey.sign(challenge)
+        val token = try {
+            post(registerUrl) {
+                contentType(ContentType.Application.Json)
+                setBody(
+                    RegisterRequest(
+                        challenge = challenge.base64Encode(),
+                        signature = registrationSignature.base64Encode(),
+                        certificateChain = key.certificateChain.map { it.encoded.base64Encode() },
+                    )
+                )
+            }
+                .body<TokenResponse>().token
+        } catch (e: ClientRequestException) {
+            with(e.response) {
+                log.e(TAG, "Registration error ${status.value} ${bodyAsErrorMessage()}")
+            }
+            throw e
+        }
+        log.i(TAG, "Registration succeeded")
+        userPreferencesRepository.setValue(
+            CachedServerTokenPreference,
+            CachedServerToken(token, publicKeyBase64),
+        )
+        return BearerTokens(token, publicKeyBase64)
+    }
 
     private suspend fun HttpResponse.bodyAsErrorMessage(): String = try {
         body<ErrorResponse>().message

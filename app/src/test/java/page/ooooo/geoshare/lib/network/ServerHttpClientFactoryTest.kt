@@ -551,4 +551,69 @@ class ServerHttpClientFactoryTest {
             userPreferencesRepository.getValue(CachedServerTokenPreference),
         )
     }
+
+    @Test
+    fun createHttpClient_attestation_whenTokenIsIncorrectAndEndpointReturnsChallenge_doesNotRequestChallengeAndReturnsResponse() =
+        runTest {
+            val keyStoreTools = FakeKeyStoreTools().apply { generateKey() }
+            val engine = MockEngine { request ->
+                when (request.url.toString()) {
+                    attestationServer.getUrl(query, uriQuote) ->
+                        when (request.headers[HttpHeaders.Authorization]) {
+                            "Bearer $incorrectToken" -> respondError(
+                                HttpStatusCode.Unauthorized,
+                                Json.encodeToString(
+                                    ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())
+                                ),
+                                headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                            )
+
+                            "Bearer $newToken" -> respondOk("success")
+                            else -> throw NotImplementedError()
+                        }
+
+                    attestationServer.challengeUrl ->
+                        throw AssertionError("Challenge requested")
+
+                    attestationServer.loginUrl -> {
+                        val key = keyStoreTools.getKey() ?: throw NotImplementedError()
+                        val body =
+                            Json.decodeFromString<ServerHttpClientFactory.LoginRequest>((request.body as TextContent).text)
+                        val signatureOk = key.publicKey.verifySignature(
+                            body.signature.base64Decode(),
+                            body.challenge.base64Decode(),
+                        )
+                        val publicKeyOk = key.publicKey.encoded.base64Encode() == body.publicKey
+                        if (signatureOk && publicKeyOk) {
+                            respond(
+                                Json.encodeToString(ServerHttpClientFactory.TokenResponse(token = newToken)),
+                                HttpStatusCode.OK,
+                                headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
+                            )
+                        } else {
+                            throw NotImplementedError()
+                        }
+                    }
+
+                    else -> throw NotImplementedError()
+                }
+            }
+            val userPreferencesRepository = FakeUserPreferencesRepository(
+                UserPreferencesValues(
+                    cachedServerToken = CachedServerToken(
+                        incorrectToken,
+                        keyStoreTools.getKey()!!.publicKey.encoded.base64Encode(),
+                    ),
+                )
+            )
+            val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
+            val res = factory.createHttpClient(attestationServer).use { client ->
+                client.get(attestationServer.getUrl(query, uriQuote))
+            }
+            assertEquals("success", res.bodyAsText())
+            assertEquals(
+                CachedServerToken(newToken, keyStoreTools.getKey()!!.publicKey.encoded.base64Encode()),
+                userPreferencesRepository.getValue(CachedServerTokenPreference),
+            )
+        }
 }
