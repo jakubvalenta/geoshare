@@ -33,6 +33,7 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.Srs
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.InputGroupId
+import page.ooooo.geoshare.tests.NETWORK_TIMEOUT
 import page.ooooo.geoshare.tests.assumeDomainResolvable
 import page.ooooo.geoshare.tests.chooseFile
 import page.ooooo.geoshare.tests.confirmDialog
@@ -460,7 +461,7 @@ class ScreenshotsFreeBehaviorTest {
         // Conversion - Check - Experimental
         shareUri("https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg")
         onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
-        onElement { viewIdResourceName == "geoShareResultLastPointName" }
+        onElement(NETWORK_TIMEOUT) { viewIdResourceName == "geoShareResultLastPointName" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_check_experimental")
 
