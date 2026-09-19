@@ -1,6 +1,7 @@
 - Added a top bar with original link and elapsed time.
 - Added a menu to the top bar with copy and open original link options.
 - Added a menu to the elapsed time with a log of the processing of the current link.
+- Added copy place name feature.
 - Added contextual help messages, which teach how to use the app.
 - Improved rendering speed of the result screen.
 - Improved result screen on tablets.
