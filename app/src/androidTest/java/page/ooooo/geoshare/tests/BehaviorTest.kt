@@ -9,10 +9,12 @@ import android.location.provider.ProviderProperties
 import android.os.Build
 import android.os.SystemClock
 import android.view.accessibility.AccessibilityNodeInfo
+import android.view.inputmethod.InputMethodManager
 import androidx.core.graphics.scale
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.platform.io.PlatformTestStorageRegistry
 import androidx.test.uiautomator.Direction
+import androidx.test.uiautomator.ElementNotFoundException
 import androidx.test.uiautomator.StaleObjectException
 import androidx.test.uiautomator.UiAutomatorTestScope
 import androidx.test.uiautomator.UiObject2
@@ -29,7 +31,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
@@ -37,7 +38,6 @@ import org.junit.AssumptionViolatedException
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.database.ServerAuthType
-import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.android.PackageNames
@@ -129,8 +129,8 @@ private fun AccessibilityNodeInfo.isDenyPermissionButton(): Boolean =
         "ne pas autoriser",
     )
 
-fun UiAutomatorTestScope.isSystemPermissionShown(): Boolean =
-    onElementOrNull(3_000) { isGrantPermissionButton() } != null
+fun UiAutomatorTestScope.isSystemPermissionShown(timeoutMs: Long = 3_000): Boolean =
+    onElementOrNull(timeoutMs) { isGrantPermissionButton() } != null
 
 fun UiAutomatorTestScope.grantSystemPermission() {
     onElement { isGrantPermissionButton() }.click()
@@ -332,6 +332,11 @@ fun UiAutomatorTestScope.waitAndAssertGoogleMapsContainsElement(block: Accessibi
         }.click()
     }
 
+    // If there is a location permission dialog, confirm it
+    if (isSystemPermissionShown(1_000)) {
+        grantSystemPermission()
+    }
+
     // Verify Google Maps content
     onElement(20_000) { packageName == PackageNames.GOOGLE_MAPS && this.block() }
 }
@@ -454,14 +459,36 @@ fun UiAutomatorTestScope.testText(expectedPoints: Points, unsafeText: String) {
 fun UiAutomatorTestScope.testText(expectedPoint: Point, unsafeText: String) =
     testText(persistentListOf(expectedPoint), unsafeText)
 
+fun UiAutomatorTestScope.onElementOrScrollToElement(
+    timeoutMs: Long = 3_000,
+    scrollableElement: UiAutomatorTestScope.() -> UiObject2,
+    block: AccessibilityNodeInfo.() -> Boolean,
+): UiObject2 =
+    try {
+        // First try to get the element without scrolling, to fix element not found on tablets
+        onElement(1_000, block = block)
+    } catch (_: ElementNotFoundException) {
+        scrollableElement().scrollToElement(Direction.DOWN, timeoutMs, block = block)
+    }
+
+fun UiAutomatorTestScope.scrollToAppIcon(packageName: String): UiObject2 =
+    onElementOrScrollToElement(scrollableElement = { onMainScrollablePane() }) {
+        viewIdResourceName == "geoShareApp_$packageName"
+    }
+
+fun UiAutomatorTestScope.scrollToLinkIcon(name: String): UiObject2 =
+    onElementOrScrollToElement(scrollableElement = { onMainScrollablePane() }) {
+        viewIdResourceName == "geoShareLink_$name"
+    }
+
 /**
  * Clicks an app icon on the conversion result screen.
  *
  * It uses a custom point of the click, instead of the default center, so that we don't accidentally hit the context
  * menu icon, which can happen on Nexus 5.
  */
-fun UiAutomatorTestScope.clickAppIcon(id: String) {
-    onElement { viewIdResourceName == "geoShareApp_$id" }.click(android.graphics.Point(10, 10))
+fun UiObject2.clickAppIcon() {
+    click(android.graphics.Point(10, 10))
 }
 
 fun UiAutomatorTestScope.scrollToAppIcons() {
@@ -495,20 +522,22 @@ fun UiAutomatorTestScope.goToUserPreferencesDetail(groupId: UserPreferenceGroupI
     onElementOrNull(1_000) { viewIdResourceName == "geoShareMainMenuButton" }?.let { mainMenu ->
         mainMenu.click()
         onElement { viewIdResourceName == "geoShareMainMenuUserPreferences" }.click()
-    } ?: run {
-        // If we're on the detail screen, go back
-        onElementOrNull(1_000) { viewIdResourceName == "geoShareUserPreferencesControlsPane" }?.also {
-            onElement { viewIdResourceName == "geoShareBack" }.click()
-        }
     }
-    onElement { viewIdResourceName == "geoShareUserPreferencesListPane" }
-        .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferencesGroup_${groupId}" }
-        .click()
+
+    // If we're on the list screen, get the pane. Or if we're on the detail screen, go to the list screen and then get the pane
+    goBackToElement { viewIdResourceName == "geoShareUserPreferencesListPane" }.run {
+        quickWaitForStableInActiveWindow() // Wait for the lazy list to render
+        scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferencesGroup_${groupId}" }
+            .click()
+    }
 }
 
-fun UiAutomatorTestScope.goBackToElement(block: AccessibilityNodeInfo.() -> Boolean): UiObject2 {
+fun UiAutomatorTestScope.goBackToElement(
+    timeoutMs: Long = 1_000,
+    block: AccessibilityNodeInfo.() -> Boolean,
+): UiObject2 {
     repeat(4) {
-        val element = onElementOrNull(1_000, block = block)
+        val element = onElementOrNull(timeoutMs, block = block)
         if (element != null) {
             // We've reached the desired screen
             return element
@@ -536,16 +565,28 @@ fun UiAutomatorTestScope.onMainScrollablePane(): UiObject2 = onElement {
 }
 
 /**
- * Scrolls to and returns an [automation] item on the automation preferences screen.
+ * Swipe a scrollable element to quickly get to the top.
+ *
+ * It's useful for example when needing to check a message that will disappear soon.
  */
-fun UiAutomatorTestScope.scrollToAutomationItem(automation: Automation): UiObject2 =
-    onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
-        .scrollToElement(Direction.DOWN, 20_000) {
-            viewIdResourceName == "geoShareUserPreferenceAutomation_${Json.encodeToString<Automation>(automation)}"
-        }
+fun UiObject2.scrollToTop() {
+    swipe(Direction.DOWN, 1f)
+}
 
-fun UiAutomatorTestScope.launchNavigationInApp(@Suppress("SameParameterValue") packageName: String) {
-    onElement { viewIdResourceName == "geoShareApp_$packageName" }.longClick()
+/**
+ * Swipe a scrollable element to quickly get to the bottom.
+ *
+ * See [scrollToTop].
+ */
+fun UiObject2.scrollToBottom() {
+    swipe(Direction.UP, 1f)
+}
+
+fun UiAutomatorTestScope.hideApp() {
+    onElement { viewIdResourceName == "geoShareAppHide" }.click()
+}
+
+fun UiAutomatorTestScope.launchNavigationInApp() {
     onElement {
         viewIdResourceName == "geoShareAppOutput" && textAsString() in setOf(
             "Navigate",
@@ -556,11 +597,6 @@ fun UiAutomatorTestScope.launchNavigationInApp(@Suppress("SameParameterValue") p
 
 fun UiObject2.expandSheet() {
     swipe(Direction.UP, 1f)
-}
-
-fun UiObject2.collapseSheet() {
-    swipe(Direction.DOWN, 1f)
-    swipe(Direction.DOWN, 1f)
 }
 
 fun UiObject2.longScrollSheet(direction: Direction = Direction.DOWN) {
@@ -747,12 +783,9 @@ fun UiAutomatorTestScope.assertContactContainsText(expectedText: String) {
     }?.click()
 
     // Assert
-    val scrollablePane = onElementOrNull(1_000) { isScrollable }
-    if (scrollablePane != null) {
-        scrollablePane.scrollToElement(Direction.DOWN) { textAsString() == expectedText }
-    } else {
-        // On Nexus 5, there is no scrollable pane, so we don't need to scroll to the element
-        onElement { textAsString() == expectedText }
+    // On tablet and Nexus 5, there is no scrollable pane, so we don't need to scroll to the element
+    onElementOrScrollToElement(10_000, scrollableElement = { onElement(1_000) { isScrollable } }) {
+        textAsString() == expectedText
     }
 }
 
@@ -926,6 +959,21 @@ fun UiAutomatorTestScope.configureServer(testServer: TestServer) {
     }
 }
 
+private fun isKeyboardOpen(): Boolean {
+    val context = InstrumentationRegistry.getInstrumentation().targetContext
+    val inputMethodManager = context.getSystemService(InputMethodManager::class.java)
+    return inputMethodManager.isAcceptingText()
+}
+
+fun UiAutomatorTestScope.hideKeyboard() {
+    if (isKeyboardOpen()) {
+        device.executeShellCommand(
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+            "input keyevent 111"
+        )
+    }
+}
+
 fun UiAutomatorTestScope.enableSystemUIDemoMode() {
     device.executeShellCommand("settings put global sysui_demo_allowed 1")
     device.executeShellCommand("am broadcast -a com.android.systemui.demo -e command enter")
@@ -960,17 +1008,6 @@ fun UiAutomatorTestScope.setAppLocales(locales: String) {
     device.executeShellCommand(
         "cmd locale set-app-locales ${BuildConfig.APPLICATION_ID} --user current --locales $locales"
     )
-}
-
-inline fun <T> UiAutomatorTestScope.withNetworkOff(block: () -> T): T {
-    device.executeShellCommand("svc wifi disable")
-    device.executeShellCommand("svc data disable")
-    try {
-        return block()
-    } finally {
-        device.executeShellCommand("svc wifi enable")
-        device.executeShellCommand("svc data enable")
-    }
 }
 
 /**
