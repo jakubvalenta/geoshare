@@ -1,7 +1,8 @@
-- Added a bar to the top of the screen with original link and elapsed time.
-- Added a menu with options to copy and open the original link, accessible by tapping the original link bar.
-- Added a log of the processing of the current link, accessible by tapping the elapsed time.
+- Added a top bar with original link and elapsed time.
+- Added a menu to the top bar with copy and open original link options.
+- Added a menu to the elapsed time with a log of the processing of the current link.
 - Added contextual help messages, which teach how to use the app.
 - Improved rendering speed of the result screen.
+- Improved result screen on tablets.
 - Removed the intro screen.
 - Removed the button to copy original link from the bottom of the result screen.
